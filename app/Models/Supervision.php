@@ -1,0 +1,34 @@
+<?php
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Supervision extends Model {
+    use HasFactory;
+
+    protected $fillable = ['name', 'zone_id', 'description'];
+
+    public function zone() {
+        return $this->belongsTo(Zone::class);
+    }
+
+    public function cells() {
+        return $this->hasMany(Cell::class);
+    }
+
+    public function contributions() {
+        return $this->hasMany(Contribution::class);
+    }
+
+    public function getTotalContributedThisMonth() {
+        $now = now();
+        $monthStart = $now->copy()->startOfMonth()->addDays(19);
+        $monthEnd = $now->copy()->addMonth()->startOfMonth()->addDays(4);
+
+        return $this->contributions()
+            ->whereBetween('contribution_date', [$monthStart, $monthEnd])
+            ->where('status', 'verificada')
+            ->sum('amount');
+    }
+}
