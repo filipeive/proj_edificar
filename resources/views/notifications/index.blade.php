@@ -5,7 +5,7 @@
 @section('page-subtitle', 'Gerir suas notificações')
 
 @section('content')
-<div class="max-w-4xl mx-auto">
+<div class="grid grid-max-w-4xl mx-auto">
     <!-- Header com Filtros e Ações -->
     <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

@@ -57,10 +57,10 @@
                         @endif
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                        <a href="{{ route('users.show', $member) }}" class="text-blue-600 hover:text-blue-800 transition">
+                        <a href="{{ route('users.show', $user) }}" class="text-blue-600 hover:text-blue-800 transition">
                             Ver
                         </a>
-                        <a href="{{ route('users.edit', $member) }}" class="text-orange-600 hover:text-orange-800 transition">
+                        <a href="{{ route('users.edit', $user) }}" class="text-orange-600 hover:text-orange-800 transition">
                             Editar
                         </a>
                         {{-- Opcional: Adicionar botão de contribuição rápida --}}

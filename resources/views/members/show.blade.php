@@ -5,7 +5,7 @@
 @section('page-subtitle', 'Informações completas do membro')
 
 @section('content')
-<div class="max-w-6xl mx-auto">
+<div class="grid grid-max-w-6xl mx-auto">
     <!-- Header com ações -->
     <div class="mb-6 flex justify-between items-center">
         <a href="{{ route('members.index') }}" 

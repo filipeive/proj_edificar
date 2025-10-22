@@ -5,7 +5,7 @@
 @section('page-subtitle', 'Atualizar informações do Pastor e descrição')
 
 @section('content')
-<div class="max-w-2xl mx-auto">
+<div class="grid grid-max-w-2xl mx-auto">
     <div class="bg-white rounded-xl shadow-xl p-8">
         <form action="{{ route('zones.update', $zone) }}" method="POST">
             @csrf

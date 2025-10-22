@@ -109,16 +109,18 @@ Route::middleware('auth')->group(function () {
         ->name('dashboard.membro');
 
     // Criar Membros contexto das rotas abaixo
+    // Criar Membros contexto das rotas abaixo
     Route::prefix('members')->middleware('role:lider_celula,supervisor,pastor_zona,admin')->group(function () {
-    Route::get('/', [UserController::class, 'members'])->name('members.index');
-    Route::get('/create', [UserController::class, 'createFromContext'])->name('members.create');
-    Route::post('/', [UserController::class, 'storeFromContext'])->name('members.store');
-    Route::get('/{user}', [UserController::class, 'showFromContext'])->name('members.show');
-    Route::get('/{user}/edit', [UserController::class, 'editFromContext'])->name('members.edit');
-    Route::put('/{user}', [UserController::class, 'updateFromContext'])->name('members.update');
-    Route::delete('/{user}', [UserController::class, 'destroyFromContext'])->name('members.destroy');
+        Route::get('/', [UserController::class, 'members'])->name('members.index');
+        Route::get('/create', [UserController::class, 'createFromContext'])->name('members.create');
+        Route::post('/', [UserController::class, 'storeFromContext'])->name('members.store');
+        
+        // CORREÇÃO CRÍTICA: Mudança de /{user} para /{member}
+        Route::get('/{member}', [UserController::class, 'showFromContext'])->name('members.show');
+        Route::get('/{member}/edit', [UserController::class, 'editFromContext'])->name('members.edit');
+        Route::put('/{member}', [UserController::class, 'updateFromContext'])->name('members.update');
+        Route::delete('/{member}', [UserController::class, 'destroyFromContext'])->name('members.destroy');
     });
-
     // ===== ADMIN ROUTES =====
     Route::prefix('admin')->middleware('role:admin')->group(function () {
 
@@ -137,6 +139,16 @@ Route::middleware('auth')->group(function () {
         // Gestão de Pacotes
         Route::resource('packages', PackageController::class);
     });
+
+    // Rota de FORMULÁRIO GET para atribuir/modificar o compromisso de OUTRO usuário
+    Route::get('users/{user}/commitment/set', [\App\Http\Controllers\CommitmentController::class, 'showSetCommitmentForm'])
+        ->middleware('role:admin,pastor_zona,supervisor') // Apenas quem pode gerir
+        ->name('users.commitment.set');
+
+    // Rota de PROCESSAMENTO POST para salvar a atribuição de compromisso
+    Route::post('users/{user}/commitment/assign', [\App\Http\Controllers\CommitmentController::class, 'assignCommitment'])
+        ->middleware('role:admin,pastor_zona,supervisor')
+        ->name('users.commitment.assign');
      // Validar contribuições
         Route::prefix('contributions')->middleware('role:admin,pastor_zona')->group(function () {
             Route::get('/pending', [ContributionController::class, 'pendingAdmin'])

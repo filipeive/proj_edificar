@@ -21,10 +21,56 @@ class UserController
 
     // ==================== ADMIN ROUTES ====================
     
-    public function index(): View
+    public function index(Request $request): View
     {
-        $users = User::with('cell')->paginate(10);
-        return view('admin.users.index', ['users' => $users]);
+        $query = User::with('cell');
+
+        // Filtro por role
+        if ($request->filled('role')) {
+            $query->where('role', $request->role);
+        }
+
+        // Filtro por status
+        if ($request->filled('status')) {
+            $query->where('is_active', $request->status === 'active' ? 1 : 0);
+        }
+
+        // Filtro por célula
+        if ($request->filled('cell_id')) {
+            $query->where('cell_id', $request->cell_id);
+        }
+
+        // Busca por nome ou email
+        if ($request->filled('search')) {
+            $query->where(function($q) use ($request) {
+                $q->where('name', 'LIKE', '%' . $request->search . '%')
+                  ->orWhere('email', 'LIKE', '%' . $request->search . '%')
+                  ->orWhere('phone', 'LIKE', '%' . $request->search . '%');
+            });
+        }
+
+        // Ordenação
+        $query->orderBy('name', 'asc');
+
+        $users = $query->paginate(15);
+
+        // Buscar todas as células para o filtro
+        $cells = Cell::orderBy('name')->get();
+
+        // Estatísticas para os cards
+        $totalUsers = User::count();
+        $totalMembers = User::where('role', 'membro')->count();
+        $totalLeaders = User::where('role', 'lider_celula')->count();
+        $totalActive = User::where('is_active', true)->count();
+
+        return view('admin.users.index', [
+            'users' => $users,
+            'cells' => $cells,
+            'totalUsers' => $totalUsers,
+            'totalMembers' => $totalMembers,
+            'totalLeaders' => $totalLeaders,
+            'totalActive' => $totalActive,
+        ]);
     }
 
     public function create(): View
@@ -46,11 +92,12 @@ class UserController
             'is_active' => 'boolean',
         ]);
 
-        $validated['password'] = bcrypt($validated['password']);
+        $plainPassword = $validated['password'];
+        $validated['password'] = bcrypt($plainPassword);
         $user = User::create($validated);
 
         // Notificar novo usuário
-        $user->notify(new MemberCreatedNotification($user, $request->password));
+        $user->notify(new MemberCreatedNotification($user, $plainPassword));
 
         return redirect()->route('users.index')
             ->with('success', 'Utilizador criado com sucesso!');

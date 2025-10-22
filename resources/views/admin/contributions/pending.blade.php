@@ -5,7 +5,7 @@
 @section('page-subtitle', 'Verifique e valide as contribuições')
 
 @section('content')
-<div class="bg-white rounded-lg shadow overflow-hidden">
+<div class="grid grid-max-w-5xl mx-auto bg-white rounded-lg shadow overflow-hidden">
     <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
         <p class="text-sm text-gray-600 flex items-center space-x-2">
             <!-- Icona de total -->

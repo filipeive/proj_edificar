@@ -4,7 +4,7 @@
 @section('page-title', 'Nova Célula')
 
 @section('content')
-<div class="max-w-2xl mx-auto">
+<div class="grid grid-max-w-2xl mx-auto">
     <div class="bg-white rounded-lg shadow p-8">
         <form action="{{ route('cells.store') }}" method="POST">
             @csrf

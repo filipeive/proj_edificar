@@ -5,7 +5,7 @@
 @section('page-subtitle', 'Visualize e gerencie esta contribuição')
 
 @section('content')
-<div class="max-w-3xl mx-auto">
+<div class="grid grid-max-w-3xl mx-auto">
     <div class="bg-white rounded-lg shadow p-6 mb-6">
         <div class="flex items-start justify-between">
             <div>

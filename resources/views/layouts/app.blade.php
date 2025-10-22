@@ -636,6 +636,18 @@
                                     class="block px-4 py-2 text-sm rounded-lg hover:bg-gray-700/50 transition {{ request()->routeIs('users.index') && !request()->query('role') ? 'text-blue-400 bg-gray-700/30' : 'text-gray-300' }}">
                                     <i class="bi bi-people mr-2"></i>Todos
                                 </a>
+                                <a href="{{ route('users.index', ['role' => 'admin']) }}"
+                                    class="block px-4 py-2 text-sm rounded-lg hover:bg-gray-700/50 transition {{ request()->query('role') == 'admin' ? 'text-blue-400 bg-gray-700/30' : 'text-gray-300' }}">
+                                    <i class="bi bi-shield-lock mr-2"></i>Administradores
+                                </a>
+                                <a href="{{ route('users.index', ['role' => 'pastor_zona']) }}"
+                                    class="block px-4 py-2 text-sm rounded-lg hover:bg-gray-700/50 transition {{ request()->query('role') == 'pastor_zona' ? 'text-blue-400 bg-gray-700/30' : 'text-gray-300' }}">
+                                    <i class="bi bi-geo-alt mr-2"></i>Pastores de Zona
+                                </a>
+                                <a href="{{ route('users.index', ['role' => 'supervisor']) }}"
+                                    class="block px-4 py-2 text-sm rounded-lg hover:bg-gray-700/50 transition {{ request()->query('role') == 'supervisor' ? 'text-blue-400 bg-gray-700/30' : 'text-gray-300' }}">
+                                    <i class="bi bi-diagram-3-fill mr-2"></i>Supervisores
+                                </a>
                                 <a href="{{ route('users.index', ['role' => 'lider_celula']) }}"
                                     class="block px-4 py-2 text-sm rounded-lg hover:bg-gray-700/50 transition {{ request()->query('role') == 'lider_celula' ? 'text-blue-400 bg-gray-700/30' : 'text-gray-300' }}">
                                     <i class="bi bi-star mr-2"></i>Líderes
@@ -781,8 +793,52 @@
                         </div>
 
                         <div class="hidden md:block border-l border-gray-300 pl-4">
-                            <p class="text-sm font-medium text-gray-800 truncate max-w-[150px]">{{ $user->name }}</p>
-                            <p class="text-xs text-gray-500">{{ $user->email }}</p>
+                            <div class="relative">
+                                <button type="button" onclick="toggleUserMenu()" class="flex items-center space-x-2 hover:bg-gray-100 p-2 rounded-lg transition">
+                                    <div class="text-right">
+                                        <p class="text-sm font-medium text-gray-800 truncate max-w-[150px]">{{ $user->name }}</p>
+                                        <p class="text-xs text-gray-500">{{ ucfirst(str_replace('_', ' ', $role)) }}</p>
+                                    </div>
+                                    <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0 font-bold text-white">
+                                        {{ strtoupper(substr($user->name, 0, 1)) }}
+                                    </div>
+                                    <i class="bi bi-chevron-down text-gray-600 text-sm transition-transform duration-200"></i>
+                                </button>
+
+                                <!-- User Dropdown Menu -->
+                                <div id="userMenu" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+                                    <div class="p-3 border-b border-gray-100">
+                                        <p class="text-sm font-semibold text-gray-800">{{ $user->name }}</p>
+                                        <p class="text-xs text-gray-500 truncate">{{ $user->email }}</p>
+                                    </div>
+                                    <div class="py-2">
+                                        <a href="{{ route('profile.edit') }}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
+                                            <i class="bi bi-person-circle mr-3 text-blue-600"></i>
+                                            Meu Perfil
+                                        </a>
+                                        <a href="{{ route('commitments.index') }}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
+                                            <i class="bi bi-handshake mr-3 text-green-600"></i>
+                                            Meus Compromissos
+                                        </a>
+                                        <a href="{{ route('notifications.all') }}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
+                                            <i class="bi bi-bell mr-3 text-purple-600"></i>
+                                            Notificações
+                                            @if ($unreadNotifications > 0)
+                                            <span class="ml-auto badge bg-red-500 text-white text-xs">{{ $unreadNotifications }}</span>
+                                            @endif
+                                        </a>
+                                    </div>
+                                    <div class="border-t border-gray-100">
+                                        <form method="POST" action="{{ route('logout') }}">
+                                            @csrf
+                                            <button type="submit" class="flex items-center w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition font-medium">
+                                                <i class="bi bi-box-arrow-right mr-3"></i>
+                                                Sair
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1066,6 +1122,18 @@
             }
         }
 
+        function toggleUserMenu() {
+            const userMenu = document.getElementById('userMenu');
+            const chevron = document.querySelector('[onclick="toggleUserMenu()"] .bi-chevron-down');
+            
+            userMenu.classList.toggle('hidden');
+            
+            // Rotacionar o chevron
+            if (chevron) {
+                chevron.classList.toggle('rotate-180');
+            }
+        }
+
         function loadNotifications(showSuccess = false) {
             const targetContent = document.getElementById('notificationsContent');
             
@@ -1162,6 +1230,18 @@
                 const notifButton = document.querySelector('[onclick="toggleNotifications()"]');
                 if (notifButton && !notificationsPanel.contains(event.target) && !notifButton.contains(event.target)) {
                     notificationsPanel.classList.add('hidden');
+                }
+
+                // Close user menu
+                const userMenuButton = event.target.closest('[onclick="toggleUserMenu()"]');
+                const userMenu = document.getElementById('userMenu');
+                
+                if (userMenu && !userMenu.contains(event.target) && !userMenuButton) {
+                    userMenu.classList.add('hidden');
+                    const chevron = document.querySelector('[onclick="toggleUserMenu()"] .bi-chevron-down');
+                    if (chevron) {
+                        chevron.classList.remove('rotate-180');
+                    }
                 }
 
                 // Close search results

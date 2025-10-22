@@ -5,7 +5,7 @@
 @section('page-subtitle', 'Registar um novo membro na célula')
 
 @section('content')
-<div class="max-w-3xl mx-auto">
+<div class="grid grid-max-w-3xl mx-auto">
     <div class="bg-white rounded-lg shadow-lg p-8">
         <form action="{{ route('members.store') }}" method="POST">
             @csrf

@@ -5,7 +5,7 @@
 @section('page-subtitle', 'Adicione uma nova contribuição')
 
 @section('content')
-<div class="max-w-3xl mx-auto">
+<div class="grid grid-max-w-3xl mx-auto">
     <div class="bg-white rounded-lg shadow p-8">
         <form action="{{ route('contributions.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
