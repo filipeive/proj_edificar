@@ -204,7 +204,7 @@ class ReportController
         if ($selectedZone) {
             $contributions = $selectedZone->contributions()
                 ->whereBetween('contribution_date', [$startDate, $endDate])
-                ->with(['user.cell', 'user.cell.supervision'])
+                ->with(['user.cell', 'user.cell.supervision', 'supervision.zone'])
                 ->orderBy('contribution_date', 'desc')
                 ->get();
         }
