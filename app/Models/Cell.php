@@ -53,4 +53,5 @@ class Cell extends Model {
             })
             ->count();
     }
+    
 }

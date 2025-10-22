@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Contribution;
 
 use App\Models\Cell;
@@ -9,213 +10,206 @@ use App\Models\CommitmentPackage;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Notification;
 
-class ContributionController {
+// Modelos de Notificação
+use App\Notifications\ContributionCreatedNotification;
+use App\Notifications\ContributionVerifiedNotification;
+use App\Notifications\ContributionRejectedNotification;
+
+class ContributionController
+{
     use AuthorizesRequests;  // ADICIONAR ISTO!
 
     // app/Http/Controllers/Contribution/ContributionController.php
 
-public function index(Request $request): View {
-    $user = auth()->user();
-    $isMine = $request->query('mine');
-    
-    $contributions = Contribution::query()
-        ->with('user', 'cell');
-
-    // Lógica para "Minhas Contribuições"
-    if ($isMine) {
-        $contributions->where('user_id', $user->id);
-    } 
-    // Lógica para visualização hierárquica (se não for "Minhas Contribuições")
-    else {
-        switch ($user->role) {
-            case 'membro':
-                // Membros só veem as suas por padrão, mas se clicarem na área hierárquica (o que não deve acontecer no menu)
-                // vamos manter a lógica de segurança. No menu só oferecemos a rota 'mine'.
-                $contributions->where('user_id', $user->id);
-                break;
-
-            case 'lider_celula':
-                // Líder vê as da sua célula
-                $contributions->where('cell_id', $user->cell_id);
-                break;
-
-            case 'supervisor':
-                // Supervisor vê as das suas supervisões
-                $cellIds = Cell::where('supervision_id', $user->cell->supervision_id)->pluck('id');
-                $contributions->whereIn('cell_id', $cellIds);
-                break;
-
-            case 'pastor_zona':
-                // Pastor de Zona vê as da sua zona
-                // ASSUMIMOS que o usuário tem célula para definir a zona/supervisão
-                if ($user->cell && $user->cell->supervision && $user->cell->supervision->zone) {
-                    $supervisionIds = $user->cell->supervision->zone->supervisions->pluck('id');
-                    $cellIds = Cell::whereIn('supervision_id', $supervisionIds)->pluck('id');
-                    $contributions->whereIn('cell_id', $cellIds);
-                } else {
-                    // Prevenção se a hierarquia não estiver definida (deve ser tratada noutra parte, mas segurança aqui)
-                    $contributions->where('id', 0); 
-                }
-                break;
-            
-            case 'admin':
-                // Admin vê todas por padrão (não precisa de filtro)
-                break;
-
-            default:
-                // Segurança extra
-                $contributions->where('user_id', $user->id);
-                break;
-        }
-    }
-    
-    $contributions = $contributions
-        ->orderBy('contribution_date', 'desc')
-        ->paginate(10);
-
-    // Ajuste o título da página para refletir o que está sendo exibido
-    $pageTitle = $this->getPageTitle($user->role, $isMine);
-
-    return view('contributions.index', [
-        'contributions' => $contributions,
-        'pageTitle' => $pageTitle, // Passa o novo título
-        'showUserColumn' => !$isMine && $user->role !== 'membro', // Determina se deve mostrar a coluna do usuário
-    ]);
-}
-
-// Adicione esta função auxiliar (helper) dentro da classe ContributionController
-private function getPageTitle($role, $isMine) {
-    if ($isMine) {
-        return 'Minhas Contribuições';
-    }
-
-    return match($role) {
-        'admin' => 'Todas as Contribuições',
-        'pastor_zona' => 'Contribuições da Zona',
-        'supervisor' => 'Contribuições da Supervisão',
-        'lider_celula' => 'Contribuições da Célula',
-        default => 'Histórico de Contribuições',
-    };
-}
-    /* public function create(): View {
+    public function index(Request $request): View
+    {
         $user = auth()->user();
-        $members = collect();
+        $isMine = $request->query('mine');
 
-        // Se for membro, pode só registar para si
-        if ($user->role === 'membro') {
-            $members = collect([$user]);
-        }
-        // Se for líder, pode registar para membros da sua célula
-        elseif ($user->role === 'lider_celula') {
-            $members = $user->cell->members()
-                ->where('is_active', true)
-                ->where('id', '!=', $user->id)
-                ->get();
-        }
-        // Se for supervisor, pode registar para qualquer membro das suas células
-        elseif ($user->role === 'supervisor') {
-            $cellIds = Cell::where('supervision_id', $user->cell->supervision_id)->pluck('id');
-            $members = User::whereIn('cell_id', $cellIds)
-                ->where('is_active', true)
-                ->get();
-        }
-        // Se for pastor, pode registar para qualquer membro da sua zona
-        elseif ($user->role === 'pastor_zona') {
-            $supervisionIds = $user->cell->supervision->zone->supervisions->pluck('id');
-            $cellIds = Cell::whereIn('supervision_id', $supervisionIds)->pluck('id');
-            $members = User::whereIn('cell_id', $cellIds)
-                ->where('is_active', true)
-                ->get();
-        }
-        // Se for admin, pode registar para qualquer membro
-        elseif ($user->role === 'admin') {
-            $members = User::where('is_active', true)
-                ->where('role', 'membro')
-                ->get();
+        $contributions = Contribution::query()
+            ->with('user', 'cell');
+
+        // Lógica para "Minhas Contribuições" vs. Visualização Hierárquica
+        if ($isMine) {
+            $contributions->where('user_id', $user->id);
+        } else {
+            switch ($user->role) {
+                case 'membro':
+                    $contributions->where('user_id', $user->id);
+                    break;
+                case 'lider_celula':
+                    $contributions->where('cell_id', $user->cell_id);
+                    break;
+                case 'supervisor':
+                    // Protege quando o utilizador não tem célula atribuída
+                    if (!$user->cell || !$user->cell->supervision_id) {
+                        // Nenhuma célula sob supervisão => resultado vazio
+                        $contributions->where('id', 0);
+                        break;
+                    }
+                    $cellIds = Cell::where('supervision_id', $user->cell->supervision_id)->pluck('id');
+                    $contributions->whereIn('cell_id', $cellIds);
+                    break;
+                case 'pastor_zona':
+                    if ($user->cell && $user->cell->supervision && $user->cell->supervision->zone) {
+                        $supervisionIds = $user->cell->supervision->zone->supervisions->pluck('id');
+                        $cellIds = Cell::whereIn('supervision_id', $supervisionIds)->pluck('id');
+                        $contributions->whereIn('cell_id', $cellIds);
+                    } else {
+                        $contributions->where('id', 0);
+                    }
+                    break;
+                case 'admin':
+                    break;
+                default:
+                    $contributions->where('user_id', $user->id);
+                    break;
+            }
         }
 
-        return view('contributions.create', ['members' => $members, 'currentUser' => $user]);
-    } */
-   
-    public function create(): View {
+        $contributions = $contributions
+            ->orderBy('contribution_date', 'desc')
+            ->paginate(10);
+
+        $pageTitle = $this->getPageTitle($user->role, $isMine);
+
+        return view('contributions.index', [
+            'contributions' => $contributions,
+            'pageTitle' => $pageTitle,
+            'showUserColumn' => !$isMine && $user->role !== 'membro',
+        ]);
+    }
+
+    private function getPageTitle($role, $isMine)
+    {
+        if ($isMine) {
+            return 'Minhas Contribuições';
+        }
+
+        return match ($role) {
+            'admin' => 'Todas as Contribuições',
+            'pastor_zona' => 'Contribuições da Zona',
+            'supervisor' => 'Contribuições da Supervisão',
+            'lider_celula' => 'Contribuições da Célula',
+            default => 'Histórico de Contribuições',
+        };
+    }
+
+    public function create(): View
+    {
         $user = auth()->user();
         $members = collect();
 
         // 1. Lógica para filtrar membros que podem receber a contribuição
-        
-        // Se for membro, vê apenas a si mesmo na lista
         if ($user->role === 'membro') {
-            // Membros não terão a opção de toggle, mas precisam de si mesmos na lista para o 'updateSelectedMemberInfo' no JS
-            $members = collect([$user]); 
+            $members = collect([$user]);
+        } elseif ($user->role === 'lider_celula') {
+            $members = $user->cell ? $user->cell->members()->where('is_active', true)->get() : collect();
+        } elseif ($user->role === 'supervisor') {
+            if ($user->cell && $user->cell->supervision_id) {
+                $cellIds = Cell::where('supervision_id', $user->cell->supervision_id)->pluck('id');
+                $members = User::whereIn('cell_id', $cellIds)->where('is_active', true)->get();
+            } else {
+                $members = collect();
+            }
+        } elseif ($user->role === 'pastor_zona') {
+            if ($user->cell && $user->cell->supervision && $user->cell->supervision->zone) {
+                $supervisionIds = $user->cell->supervision->zone->supervisions->pluck('id');
+                $cellIds = Cell::whereIn('supervision_id', $supervisionIds)->pluck('id');
+                $members = User::whereIn('cell_id', $cellIds)->where('is_active', true)->get();
+            } else {
+                $members = collect();
+            }
+        } elseif ($user->role === 'admin') {
+            $members = User::where('is_active', true)->where('role', 'membro')->get();
+        } else {
+            $members = collect();
         }
-        // Se for líder, pode registar para membros da sua célula
-        elseif ($user->role === 'lider_celula') {
-            // Incluir o próprio líder na lista de seleção (caso ele use o toggle)
-            $members = $user->cell->members()
-                ->where('is_active', true)
-                ->get();
-        }
-        // Se for supervisor, pastor, ou admin, a lógica permanece inalterada
-        elseif ($user->role === 'supervisor') {
-            $cellIds = Cell::where('supervision_id', $user->cell->supervision_id)->pluck('id');
-            $members = User::whereIn('cell_id', $cellIds)
-                ->where('is_active', true)
-                ->get();
-        }
-        elseif ($user->role === 'pastor_zona') {
-            $supervisionIds = $user->cell->supervision->zone->supervisions->pluck('id');
-            $cellIds = Cell::whereIn('supervision_id', $supervisionIds)->pluck('id');
-            $members = User::whereIn('cell_id', $cellIds)
-                ->where('is_active', true)
-                ->get();
-        }
-        elseif ($user->role === 'admin') {
-            $members = User::where('is_active', true)
-                ->where('role', 'membro')
-                ->get();
-        }
-        
-        // 2. Lógica para Pacotes de Compromisso
+
+
+        // 2. Lógica para Pacotes de Compromisso (usada na view para info/seleção)
         $activeCommitment = UserCommitment::with('package')
             ->where('user_id', $user->id)
             ->where('start_date', '<=', now())
             ->where(function ($query) {
-                $query->whereNull('end_date')
-                      ->orWhere('end_date', '>', now());
+                $query->whereNull('end_date')->orWhere('end_date', '>', now());
             })
-            ->latest('start_date')
-            ->first();
-            
-        // Prepara o objeto para a view
+            ->latest('start_date')->first();
+
         if ($activeCommitment) {
             $currentPackage = $activeCommitment->package;
-            // Se você adicionou 'committed_amount' no UserCommitment
             $currentPackage->committed_amount = $activeCommitment->committed_amount ?? $currentPackage->min_amount;
         } else {
             $currentPackage = (object)['name' => 'Nenhum', 'min_amount' => 0, 'max_amount' => 0, 'committed_amount' => 0];
         }
 
-        // Obtem todos os pacotes ativos para a lista de seleção
-        $packages = CommitmentPackage::where('is_active', true)
-            ->orderBy('order')
-            ->get();
-            
-        // 3. Variável de Controle
+        $packages = CommitmentPackage::where('is_active', true)->orderBy('order')->get();
+
+        // 3. Variável de Controle para alternar membro na view
         $canRegisterForOthers = in_array($user->role, ['lider_celula', 'supervisor', 'pastor_zona', 'admin']);
 
-        // 4. Retorna a View
         return view('contributions.create', [
-            'members' => $members, 
+            'members' => $members,
             'currentUser' => $user,
             'currentPackage' => $currentPackage,
             'packages' => $packages,
-            'canRegisterForOthers' => $canRegisterForOthers, // Variável de controle
+            'canRegisterForOthers' => $canRegisterForOthers,
         ]);
     }
-    public function store(Request $request) {
+
+    public function show(Contribution $contribution): View
+    {
+        $contribution->load(['user.cell.supervision.zone', 'registeredBy', 'verifiedBy']);
         $user = auth()->user();
-        
+
+        // Lógica de Permissão (Mantida)
+        if ($user->role === 'membro' && $contribution->user_id !== $user->id) {
+            abort(403, 'Você não tem permissão para ver esta contribuição');
+        }
+        if ($user->role === 'lider_celula' && $contribution->cell_id !== $user->cell_id) {
+            abort(403, 'Você não tem permissão para ver esta contribuição');
+        }
+
+        if ($user->role === 'supervisor') {
+            $cellIds = Cell::where('supervision_id', $user->cell->supervision_id)->pluck('id');
+            if (!$cellIds->contains($contribution->cell_id)) {
+                abort(403, 'Você não tem permissão para ver esta contribuição');
+            }
+        }
+
+        if ($user->role === 'pastor_zona') {
+            $supervisionIds = $user->cell->supervision->zone->supervisions->pluck('id');
+            $cellIds = Cell::whereIn('supervision_id', $supervisionIds)->pluck('id');
+            if (!$cellIds->contains($contribution->cell_id)) {
+                abort(403, 'Você não tem permissão para ver esta contribuição');
+            }
+        }
+
+        $canManage = $user->role === 'admin' || $user->role === 'pastor_zona';
+
+        return view('contributions.show', [
+            'contribution' => $contribution,
+            'canManage' => $canManage,
+        ]);
+    }
+
+    public function edit(Contribution $contribution): View
+    {
+        if (auth()->id() !== $contribution->user_id && auth()->user()->role !== 'admin') {
+            abort(403, 'Você não tem permissão para editar esta contribuição');
+        }
+        if ($contribution->status !== 'pendente') {
+            return back()->with('error', 'Só pode editar contribuições pendentes!');
+        }
+        return view('contributions.edit', ['contribution' => $contribution]);
+    }
+
+    public function store(Request $request)
+    {
+        $user = auth()->user();
+
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'amount' => 'required|numeric|min:0.01',
@@ -223,26 +217,25 @@ private function getPageTitle($role, $isMine) {
             'proof_path' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
 
-        // Validar que o utilizador tem permissão para registar para este membro
         $targetUser = User::find($validated['user_id']);
         $this->validateContributionPermission($user, $targetUser);
 
         $cell = $targetUser->cell;
-        if (!$cell) {
-            return back()->with('error', 'Utilizador não está atribuído a nenhuma célula!');
+        if (!$cell || !$cell->supervision) {
+            // Garante que a hierarquia básica (célula e supervisão) existe
+            return back()->with('error', 'Utilizador não está atribuído a uma hierarquia completa (célula/supervisão)!');
         }
 
         $proofPath = null;
         if ($request->hasFile('proof_path')) {
-            $proofPath = $request->file('proof_path')
-                ->store('contributions', 'public');
+            $proofPath = $request->file('proof_path')->store('contributions', 'public');
         }
 
-        Contribution::create([
+        $contribution = Contribution::create([
             'user_id' => $validated['user_id'],
             'cell_id' => $cell->id,
             'supervision_id' => $cell->supervision_id,
-            'zone_id' => $cell->supervision->zone_id,
+            'zone_id' => $cell->supervision->zone_id, // Assume que supervisão tem zone_id
             'amount' => $validated['amount'],
             'contribution_date' => $validated['contribution_date'],
             'proof_path' => $proofPath,
@@ -250,75 +243,41 @@ private function getPageTitle($role, $isMine) {
             'registered_by_id' => auth()->id(),
         ]);
 
+        // ----------------------------------------------------
+        // DISPARO DE NOTIFICAÇÕES: Contribuição Criada
+        // ----------------------------------------------------
+
+        // 1. Notificar Líder da Célula (para verificação imediata)
+        if ($cell->leader_id) {
+            $leader = User::find($cell->leader_id);
+            // Evitar notificar o líder se ele mesmo fez a contribuição para outro membro
+            if ($leader && $leader->id !== $user->id) {
+                $leader->notify(new ContributionCreatedNotification($contribution));
+            }
+        }
+
+        // 2. Notificar o Admin (sempre, para verificação final)
+        $admin = User::where('role', 'admin')->first();
+        if ($admin) {
+            $admin->notify(new ContributionCreatedNotification($contribution));
+        }
+
+        // 3. Notificar o usuário final (se ele mesmo não registrou)
+        if ($targetUser->id !== $user->id) {
+            $targetUser->notify(new ContributionCreatedNotification($contribution));
+        }
+        // ----------------------------------------------------
+
         $memberName = $targetUser->name === auth()->user()->name ? 'Sua' : 'A contribuição de ' . $targetUser->name;
         return redirect()->route('contributions.index')
-            ->with('success', "$memberName foi registada com sucesso!");
+            ->with('success', "$memberName foi registada com sucesso! Aguarda verificação.");
     }
 
-
-public function show(Contribution $contribution): View {
-    // Carregar as relações necessárias (user, cell, registeredBy, verifiedBy)
-    $contribution->load(['user.cell.supervision.zone', 'registeredBy', 'verifiedBy']);
-
-    $user = auth()->user();
-    
-    // --- Lógica de Permissão (Mantida) ---
-    
-    // Membro pode ver apenas suas contribuições
-    if ($user->role === 'membro' && $contribution->user_id !== $user->id) {
-        abort(403, 'Você não tem permissão para ver esta contribuição');
-    }
-    
-    // Líder pode ver apenas contribuições da sua célula
-    if ($user->role === 'lider_celula' && $contribution->cell_id !== $user->cell_id) {
-        abort(403, 'Você não tem permissão para ver esta contribuição');
-    }
-    
-    // Supervisor pode ver apenas contribuições das suas células
-    if ($user->role === 'supervisor') {
-        // ASSUMIMOS que $user->cell->supervision_id existe
-        $cellIds = Cell::where('supervision_id', $user->cell->supervision_id)->pluck('id');
-        if (!$cellIds->contains($contribution->cell_id)) {
-            abort(403, 'Você não tem permissão para ver esta contribuição');
-        }
-    }
-    
-    // Pastor pode ver apenas contribuições da sua zona
-    if ($user->role === 'pastor_zona') {
-        // ASSUMIMOS que a hierarquia existe
-        $supervisionIds = $user->cell->supervision->zone->supervisions->pluck('id');
-        $cellIds = Cell::whereIn('supervision_id', $supervisionIds)->pluck('id');
-        if (!$cellIds->contains($contribution->cell_id)) {
-            abort(403, 'Você não tem permissão para ver esta contribuição');
-        }
-    }    
-    // Apenas Admins podem realizar as ações finais de verificação/rejeição
-    $canManage = $user->role === 'admin'; 
-
-    return view('contributions.show', [
-        'contribution' => $contribution,
-        'canManage' => $canManage, // Passar esta variável para a view
-    ]);}
-
-    public function edit(Contribution $contribution): View {
-        // Apenas o dono pode editar
-        if (auth()->id() !== $contribution->user_id && auth()->user()->role !== 'admin') {
-            abort(403, 'Você não tem permissão para editar esta contribuição');
-        }
-
-        if ($contribution->status !== 'pendente') {
-            return back()->with('error', 'Só pode editar contribuições pendentes!');
-        }
-
-        return view('contributions.edit', ['contribution' => $contribution]);
-    }
-
-    public function update(Request $request, Contribution $contribution) {
-        // Apenas o dono pode atualizar
+    public function update(Request $request, Contribution $contribution)
+    {
         if (auth()->id() !== $contribution->user_id && auth()->user()->role !== 'admin') {
             abort(403, 'Você não tem permissão para atualizar esta contribuição');
         }
-
         if ($contribution->status !== 'pendente') {
             return back()->with('error', 'Só pode editar contribuições pendentes!');
         }
@@ -333,8 +292,7 @@ public function show(Contribution $contribution): View {
             if ($contribution->proof_path) {
                 \Storage::disk('public')->delete($contribution->proof_path);
             }
-            $validated['proof_path'] = $request->file('proof_path')
-                ->store('contributions', 'public');
+            $validated['proof_path'] = $request->file('proof_path')->store('contributions', 'public');
         }
 
         $contribution->update($validated);
@@ -343,12 +301,12 @@ public function show(Contribution $contribution): View {
             ->with('success', 'Contribuição atualizada com sucesso!');
     }
 
-    public function verify(Contribution $contribution) {
+    public function verify(Contribution $contribution)
+    {
         $user = auth()->user();
-        
-        // Apenas admin pode verificar
-        if ($user->role !== 'admin') {
-            abort(403, 'Apenas admin pode verificar contribuições');
+
+        if ($user->role !== 'admin' && $user->role !== 'pastor_zona') {
+            abort(403, 'Apenas admin e pastor_zona pode verificar contribuições');
         }
 
         $contribution->update([
@@ -357,40 +315,69 @@ public function show(Contribution $contribution): View {
             'notes' => 'Verificado',
         ]);
 
+        // ----------------------------------------------------
+        // DISPARO DE NOTIFICAÇÃO: Contribuição Verificada (Para o Doador)
+        $contribution->user->notify(new ContributionVerifiedNotification($contribution));
+        // ----------------------------------------------------
+
         return back()->with('success', 'Contribuição verificada com sucesso!');
     }
 
-    public function reject(Request $request, Contribution $contribution) {
+    public function reject(Request $request, Contribution $contribution)
+    {
         $user = auth()->user();
-        
-        // Apenas admin pode rejeitar
-        if ($user->role !== 'admin') {
-            abort(403, 'Apenas admin pode rejeitar contribuições');
+
+        if ($user->role !== 'admin' && $user->role !== 'pastor_zona') {
+            abort(403, 'Apenas admin ou pastor_zona pode rejeitar contribuições');
         }
 
         $validated = $request->validate([
             'notes' => 'required|string|min:5',
         ]);
 
+        $reason = $validated['notes'];
+
         $contribution->update([
             'status' => 'rejeitada',
             'verified_by_id' => auth()->id(),
-            'notes' => $validated['notes'],
+            'notes' => $reason,
         ]);
+
+        // ----------------------------------------------------
+        // DISPARO DE NOTIFICAÇÃO: Contribuição Rejeitada (Para o Doador)
+        $contribution->user->notify(new ContributionRejectedNotification($contribution, $reason));
+        // ----------------------------------------------------
 
         return back()->with('success', 'Contribuição rejeitada!');
     }
 
-    public function pendingAdmin(): View {
+    public function adminShow(Contribution $contribution): View
+    {
+        $contribution->load(['user.cell.supervision.zone', 'registeredBy', 'verifiedBy']);
+
+        // Apenas admins podem ver esta view de administração
+        $user = auth()->user();
+        if ($user->role !== 'admin') {
+            abort(403, 'Acesso negado.');
+        }
+
+        return view('admin.contributions.details', [
+            'contribution' => $contribution,
+            'canManage' => true,
+        ]);
+    }
+
+    public function pendingAdmin(): View
+    {
         $contributions = Contribution::where('status', 'pendente')
             ->with('user', 'cell')
             ->orderBy('created_at', 'desc')
             ->paginate(15);
-
         return view('admin.contributions.pending', ['contributions' => $contributions]);
     }
 
-    private function validateContributionPermission($user, $targetUser) {
+    private function validateContributionPermission($user, $targetUser)
+    {
         // Membro só pode registar para si mesmo
         if ($user->role === 'membro') {
             if ($user->id !== $targetUser->id) {
@@ -401,7 +388,7 @@ public function show(Contribution $contribution): View {
 
         // Líder pode registar para membros da sua célula
         if ($user->role === 'lider_celula') {
-            if ($targetUser->cell_id !== $user->cell_id) {
+            if ($user->cell_id === null || $targetUser->cell_id !== $user->cell_id) {
                 abort(403, 'Você só pode registar para membros da sua célula');
             }
             return;
@@ -409,6 +396,9 @@ public function show(Contribution $contribution): View {
 
         // Supervisor pode registar para membros das suas células
         if ($user->role === 'supervisor') {
+            if (!$user->cell || !$user->cell->supervision_id) {
+                abort(403, 'Sua conta não está atribuída a uma célula/supervisão válida.');
+            }
             $cellIds = Cell::where('supervision_id', $user->cell->supervision_id)->pluck('id');
             if (!$cellIds->contains($targetUser->cell_id)) {
                 abort(403, 'Você só pode registar para membros da sua supervisão');
@@ -418,6 +408,9 @@ public function show(Contribution $contribution): View {
 
         // Pastor de zona pode registar para qualquer membro da zona
         if ($user->role === 'pastor_zona') {
+            if (!$user->cell || !$user->cell->supervision || !$user->cell->supervision->zone) {
+                abort(403, 'Sua conta não está atribuída a uma zona/supervisão válida.');
+            }
             $supervisionIds = $user->cell->supervision->zone->supervisions->pluck('id');
             $cellIds = Cell::whereIn('supervision_id', $supervisionIds)->pluck('id');
             if (!$cellIds->contains($targetUser->cell_id)) {

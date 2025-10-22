@@ -44,8 +44,12 @@
                 <p class="text-sm text-gray-600 mt-2">Período: {{ $startDate->format('d/m/Y') }} - {{ $endDate->format('d/m/Y') }}</p>
             </div>
             <div class="flex gap-2">
-                <a href="#" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 font-medium"><i class="bi bi-file-pdf"></i> PDF</a>
-                <a href="#" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 font-medium"><i class="bi bi-file-excel"></i> Excel</a>
+                <a href="{{ route('reports.export.pdf', ['type' => 'zone', 'id' => $zone->id, 'start_date' => $startDate->format('Y-m-d'), 'end_date' => $endDate->format('Y-m-d')]) }}"
+                   class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 font-medium" target="_blank">
+                   <i class="bi bi-file-pdf"></i> PDF</a>
+                <a href="{{ route('reports.export.excel', ['type' => 'zone', 'id' => $zone->id, 'start_date' => $startDate->format('Y-m-d'), 'end_date' => $endDate->format('Y-m-d')]) }}"
+                   class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 font-medium">
+                   <i class="bi bi-file-excel"></i> Excel</a>
             </div>
         </div>
     </div>

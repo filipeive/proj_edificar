@@ -1,6 +1,5 @@
 @extends('layouts.app')
 
-// Use o título passado pelo controller
 @section('title', $pageTitle . ' - Projeto Edificar') 
 @section('page-title', $pageTitle)
 @section('page-subtitle', 'Histórico de contribuições')
@@ -93,7 +92,7 @@
                             @endif
                             
                             {{-- Admin/Pastor/Supervisor/Líder pode verificar a contribuição de outros --}}
-                            @if (auth()->user()->role === 'admin' && $contribution->status === 'pendente')
+                            @if (auth()->user()->role === 'admin' || 'pastor' || 'supervisor' && $contribution->status === 'pendente')
                                 {{-- Ações de Admin (Verificar/Rejeitar) devem estar na rota 'show' --}}
                                 <a href="{{ route('contributions.show', $contribution) }}"
                                     class="text-purple-600 hover:text-purple-800">

@@ -15,10 +15,13 @@ use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController
 {
+    use AuthorizesRequests;
     public function cellReport(Request $request): View
     {
         $user = auth()->user();
@@ -58,114 +61,86 @@ class ReportController
         ]);
     }
 
-    /* public function supervisionReport(Request $request): View
-    {
-        $user = auth()->user();
-        $supervisions = collect();
-        $selectedSupervision = null;
-
-        if ($user->role === 'admin') {
-            $supervisions = Supervision::orderBy('name')->get();
-            if ($request->filled('supervision_id')) {
-                $selectedSupervision = Supervision::findOrFail($request->supervision_id);
-            }
-        } else {
-            $selectedSupervision = $user->cell?->supervision;
-            if (!$selectedSupervision) abort(403, 'Acesso negado.');
-        }
-
-        $startDate = $request->filled('start_date') ? Carbon::parse($request->start_date) : now()->startOfMonth()->addDays(19);
-        $endDate = $request->filled('end_date') ? Carbon::parse($request->end_date) : now()->addMonth()->startOfMonth()->addDays(4);
-
-        $contributions = collect();
-        if ($selectedSupervision) {
-            $contributions = $selectedSupervision->contributions()
-                ->whereBetween('contribution_date', [$startDate, $endDate])
-                ->with('user.cell')
-                ->orderBy('contribution_date', 'desc')
-                ->get();
-        }
-        
-        return view('reports.supervision', [
-            'supervision' => $selectedSupervision,
-            'contributions' => $contributions,
-            'startDate' => $startDate,
-            'endDate' => $endDate,
-            'total' => $contributions->where('status', 'verificada')->sum('amount'),
-            'allSupervisions' => $supervisions,
-        ]);
-    }
- */
     /**
      * Exibe o relatório de contribuições e compromissos para a Supervisão.
      */
     public function supervisionReport(Request $request): View
     {
         $user = auth()->user();
+        $allSupervisions = collect();
+        $selectedSupervision = null;
 
-        // 1. Verificar permissão e hierarquia (mantido)
-        if (!in_array($user->role, ['supervisor', 'pastor_zona', 'admin'])) {
-            if ($user->role === 'lider_celula') {
-                return redirect()->route('reports.cell');
+        // 1. Verificar permissão
+        //$this->authorize('viewSupervisionReport', Contribution::class);
+
+        // 2. Obter o escopo disponível
+        if ($user->role === 'admin') {
+            $allSupervisions = Supervision::with('zone')->orderBy('name')->get();
+            if ($request->filled('supervision_id')) {
+                $selectedSupervision = Supervision::findOrFail($request->supervision_id);
+            } elseif ($allSupervisions->isNotEmpty()) {
+                 $selectedSupervision = $allSupervisions->first();
             }
-            abort(403, 'Você não tem permissão para ver relatórios de Supervisão.');
+        } elseif ($user->role === 'pastor_zona') {
+            // Pastor de zona: vê todas as supervisões da sua zona
+            $zone = $user->cell->supervision->zone ?? null;
+            if (!$zone) abort(403, 'Sua conta não está associada a uma Zona válida.');
+            
+            $allSupervisions = $zone->supervisions()->orderBy('name')->get();
+            if ($request->filled('supervision_id')) {
+                $selectedSupervision = $allSupervisions->firstWhere('id', $request->supervision_id);
+                if (!$selectedSupervision) abort(403, 'Supervisão inválida para sua zona.');
+            } elseif ($allSupervisions->isNotEmpty()) {
+                 $selectedSupervision = $allSupervisions->first();
+            }
+        } elseif ($user->role === 'supervisor') { 
+            // Supervisor: só vê a sua supervisão
+            $selectedSupervision = $user->cell->supervision ?? null;
+            if (!$selectedSupervision) abort(403, 'Sua conta não está associada a uma Supervisão válida.');
+        } else {
+             // Caso não seja Admin, Pastor ou Supervisor (Líder/Membro), já deveria ter abortado
+             abort(403, 'Acesso negado.'); 
         }
+        
+        if (!$selectedSupervision) abort(403, 'Nenhuma supervisão encontrada para este perfil.');
 
-        if (!$user->cell || !$user->cell->supervision) {
-            return redirect()->route('dashboard')->with('error', 'Sua conta não está associada a uma Supervisão válida.');
-        }
+        // O restante da lógica de agregação permanece a mesma
+        $contributions = collect();
+        $cellsData = collect();
+        $totalCommitted = 0;
 
-        $supervision = $user->cell->supervision;
-        // Pega todas as Células que pertencem a esta Supervisão
-        $cellIds = $supervision->cells()->pluck('id');
+        $cellIds = $selectedSupervision->cells()->pluck('id');
 
-        // 2. Obter Contribuições Agregadas (por mês e por célula)
+        // Obter Contribuições Agregadas (por mês e por célula)
         $contributions = Contribution::whereIn('cell_id', $cellIds)
             ->selectRaw('YEAR(contribution_date) as year, MONTH(contribution_date) as month, status, SUM(amount) as total_amount')
             ->groupBy('year', 'month', 'status')
-            ->orderBy('year', 'desc')
-            ->orderBy('month', 'desc')
+            ->orderBy('year', 'desc')->orderBy('month', 'desc')
             ->get();
 
         $contributionsByCell = Contribution::whereIn('cell_id', $cellIds)
             ->selectRaw('cell_id, status, SUM(amount) as total_amount')
             ->groupBy('cell_id', 'status')
-            ->with('cell')
             ->get()
             ->groupBy('cell_id');
 
-        // 3. Obter Total Comprometido (Metas Agregadas)
-        // ASSUMIMOS que a coluna `committed_amount` existe em `user_commitments`
-        // Filtramos apenas por compromissos ativos (data de início <= hoje E data de fim nula ou futura)
-        $totalCommitted = UserCommitment::query()
-            ->whereIn('cell_id', $cellIds)
+        // Obter Total Comprometido (Metas Agregadas)
+        $totalCommitted = UserCommitment::whereIn('cell_id', $cellIds)
             ->where('start_date', '<=', now())
-            ->where(function ($query) {
-                $query->whereNull('end_date')
-                    ->orWhere('end_date', '>', now());
-            })
-            ->sum('committed_amount'); // <-- Campo 'committed_amount' assumido
-
-        // 4. Preparação dos Dados para a View
-        $totalCells = $supervision->cells->count();
+            ->where(fn ($q) => $q->whereNull('end_date')->orWhere('end_date', '>', now()))
+            ->sum('committed_amount');
 
         // Preparar dados de Células
-        $cellsData = $supervision->cells->map(function ($cell) use ($contributionsByCell) {
-
-            // Calcular o total comprometido por esta célula
-            $cellCommitted = UserCommitment::query()
-                ->where('cell_id', $cell->id)
+        $cellsData = $selectedSupervision->cells()->with('leader')->get()->map(function ($cell) use ($contributionsByCell) {
+            $cellCommitted = UserCommitment::where('cell_id', $cell->id)
                 ->where('start_date', '<=', now())
-                ->where(function ($query) {
-                    $query->whereNull('end_date')
-                        ->orWhere('end_date', '>', now());
-                })
-                ->sum('committed_amount'); // <-- Campo 'committed_amount' assumido
+                ->where(fn ($q) => $q->whereNull('end_date')->orWhere('end_date', '>', now()))
+                ->sum('committed_amount');
 
             $data = [
                 'name' => $cell->name,
-                'lider' => $cell->lider->name ?? 'N/A',
-                'committed' => $cellCommitted ?? 0,
+                'lider' => $cell->leader->name ?? 'N/A',
+                'committed' => $cellCommitted,
                 'total_contributed' => 0,
                 'verified' => 0,
                 'pending' => 0,
@@ -184,11 +159,11 @@ class ReportController
             return $data;
         });
 
-
         return view('reports.supervision', [
-            'supervision' => $supervision,
-            'totalCells' => $totalCells,
-            'totalCommitted' => $totalCommitted ?? 0,
+            'supervision' => $selectedSupervision,
+            'allSupervisions' => $allSupervisions,
+            'totalCells' => $selectedSupervision->cells->count(),
+            'totalCommitted' => $totalCommitted,
             'cellsData' => $cellsData,
             'contributions' => $contributions,
         ]);
@@ -200,15 +175,27 @@ class ReportController
         $zones = collect();
         $selectedZone = null;
 
+        // 1. Verificar permissão
+        //$this->authorize('viewZoneReport', Contribution::class);
+
+        // 2. Obter a zona selecionada com base no perfil e no request
         if ($user->role === 'admin') {
             $zones = Zone::orderBy('name')->get();
             if ($request->filled('zone_id')) {
                 $selectedZone = Zone::findOrFail($request->zone_id);
+            } elseif ($zones->isNotEmpty()) {
+                $selectedZone = $zones->first();
             }
+        } elseif ($user->role === 'pastor_zona') { 
+            // Pastor de Zona: vê apenas a sua zona
+            $selectedZone = $user->cell->supervision->zone ?? null;
+            if (!$selectedZone) abort(403, 'Sua conta não está associada a uma Zona válida.');
         } else {
-            $selectedZone = $user->cell?->supervision?->zone;
-            if (!$selectedZone) abort(403, 'Acesso negado.');
+             abort(403, 'Acesso negado para relatórios de Zona.');
         }
+        
+        if (!$selectedZone) abort(403, 'Nenhuma zona encontrada para este perfil.');
+
 
         $startDate = $request->filled('start_date') ? Carbon::parse($request->start_date) : now()->startOfMonth()->addDays(19);
         $endDate = $request->filled('end_date') ? Carbon::parse($request->end_date) : now()->addMonth()->startOfMonth()->addDays(4);
@@ -640,5 +627,57 @@ class ReportController
             ),
             default => abort(400, 'Tipo de relatório inválido'),
         };
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $type = $request->input('type', 'cell');
+        $id = $request->input('id');
+        $startDate = Carbon::parse($request->input('start_date', now()->startOfMonth()->addDays(19)));
+        $endDate = Carbon::parse($request->input('end_date', now()->addMonth()->startOfMonth()->addDays(4)));
+
+        $pdf = null;
+
+        switch ($type) {
+            case 'cell':
+                $cell = Cell::findOrFail($id);
+                $contributions = $cell->contributions()->whereBetween('contribution_date', [$startDate, $endDate])->with('user')->get();
+                $html = $this->generateCellPdfHtml($cell, $contributions, $startDate, $endDate);
+                $pdf = Pdf::loadHtml($html);
+                return $pdf->download("relatorio_celula_{$cell->name}_" . now()->format('Y-m-d') . '.pdf');
+
+            case 'supervision':
+                $supervision = Supervision::findOrFail($id);
+                $contributions = $supervision->contributions()->whereBetween('contribution_date', [$startDate, $endDate])->with(['user', 'cell'])->get();
+                $html = $this->generateSupervisionPdfHtml($supervision, $contributions, $startDate, $endDate);
+                $pdf = Pdf::loadHtml($html);
+                return $pdf->download("relatorio_supervisao_{$supervision->name}_" . now()->format('Y-m-d') . '.pdf');
+
+            case 'zone':
+                $zone = Zone::findOrFail($id);
+                $contributions = $zone->contributions()->whereBetween('contribution_date', [$startDate, $endDate])->with(['user', 'cell', 'supervision'])->get();
+                $html = $this->generateZonePdfHtml($zone, $contributions, $startDate, $endDate);
+                $pdf = Pdf::loadHtml($html);
+                return $pdf->download("relatorio_zona_{$zone->name}_" . now()->format('Y-m-d') . '.pdf');
+
+            case 'global':
+                $query = Contribution::whereBetween('contribution_date', [$startDate, $endDate])->with(['user', 'cell', 'supervision', 'zone']);
+                
+                // Reaplicar filtros da página global, se existirem
+                if ($request->filled('zone_id')) {
+                    $query->where('zone_id', $request->zone_id);
+                }
+                if ($request->filled('status')) {
+                    $query->where('status', $request->status);
+                }
+
+                $contributions = $query->get();
+                $html = $this->generateGlobalPdfHtml($contributions, $startDate, $endDate);
+                $pdf = Pdf::loadHtml($html);
+                return $pdf->download("relatorio_global_" . now()->format('Y-m-d') . '.pdf');
+
+            default:
+                abort(400, 'Tipo de relatório inválido');
+        }
     }
 }

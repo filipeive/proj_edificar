@@ -9,7 +9,8 @@ class ContributionPolicy {
         // Pode ver se é o dono ou líder da célula ou admin
         return $user->id === $contribution->user_id 
             || $user->id === $contribution->cell->leader_id 
-            || $user->role === 'admin';
+            || $user->role === 'admin' 
+            || $user->role === 'pastor_zona';
     }
 
     public function update(User $user, Contribution $contribution): bool {
@@ -20,11 +21,11 @@ class ContributionPolicy {
 
     public function verify(User $user): bool {
         // Só admin pode verificar
-        return $user->role === 'admin';
+        return $user->role === 'admin' || $user->role === 'pastor_zona';
     }
 
     public function reject(User $user): bool {
         // Só admin pode rejeitar
-        return $user->role === 'admin';
+        return $user->role === 'admin' || $user->role === 'pastor_zona';
     }
 }

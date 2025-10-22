@@ -2,6 +2,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 
 class AppServiceProvider extends ServiceProvider {
     /**
@@ -19,8 +20,8 @@ class AppServiceProvider extends ServiceProvider {
         // Basta ter o arquivo ContributionPolicy.php em app/Policies/
         
         // Gates
-        \Gate::define('verify-contribution', function ($user) {
-            return $user->role === 'admin';
+        Gate::define('verify-contribution', function ($user) {
+            return $user->role === 'admin' || $user->role === 'pastor_zona';
         });
     }
 }

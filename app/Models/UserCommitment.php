@@ -1,10 +1,11 @@
 <?php
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class UserCommitment extends Model {
+class UserCommitment extends Model
+{
     use HasFactory;
 
     protected $fillable = [
@@ -20,16 +21,41 @@ class UserCommitment extends Model {
         'end_date' => 'date',
     ];
 
-    public function user() {
+    // RELACIONAMENTOS
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function package() {
+    public function package()
+    {
         return $this->belongsTo(CommitmentPackage::class);
     }
 
+    // ESCOPOS
+    public function scopeActive($query)
+    {
+        return $query->where(function ($q) {
+            $q->whereNull('end_date')
+              ->orWhere('end_date', '>', now());
+        });
+    }
 
-    public function isActive() {
-        return is_null($this->end_date) || $this->end_date > now();
+    // HELPERS
+    public function isActive()
+    {
+        return $this->end_date === null || $this->end_date->isFuture();
+    }
+
+    public function daysUntilExpiration()
+    {
+        if (!$this->end_date) return null;
+        return now()->diffInDays($this->end_date, false);
+    }
+
+    public function isExpiringSoon($days = 7)
+    {
+        $daysRemaining = $this->daysUntilExpiration();
+        return $daysRemaining !== null && $daysRemaining > 0 && $daysRemaining <= $days;
     }
 }

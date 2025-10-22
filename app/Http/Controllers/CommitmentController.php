@@ -7,6 +7,10 @@ use App\Models\UserCommitment;
 use App\Models\Cell;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use App\Models\User;
+
+// Modelos de Notificação
+use App\Notifications\CommitmentChosenNotification;
 
 class CommitmentController
 {
@@ -63,36 +67,24 @@ class CommitmentController
         $user = auth()->user();
         $package = CommitmentPackage::find($validated['package_id']);
 
-        // 2. Checagem de célula (necessário após a migração)
         if (!$user->cell_id) {
             return back()->with('error', 'O seu perfil deve estar associado a uma célula para assumir um compromisso.');
         }
 
-        // 3. Definir o valor do compromisso (Min_amount como padrão)
         $commitmentValue = $package->min_amount;
-
-        // 4. Encerrar o compromisso anterior ATIVO
         $activeCommitment = $user->getActiveCommitment();
 
-        // Lógica do TOGGLE:
         if ($activeCommitment && $activeCommitment->package_id === $package->id) {
-            // Se o usuário clicou no pacote que JÁ está ativo: Não faça nada, é apenas um display de "Ativo".
             return redirect()->route('commitments.index')
                 ->with('info', 'O pacote "' . $package->name . '" já está ativo.');
         }
 
-        // 5. Se houver um compromisso ativo DIFERENTE, encerre-o
         if ($activeCommitment) {
-            // Para evitar a colisão de data no mesmo segundo (SQLSTATE[23000]), 
-            // usaremos um pequeno atraso de tempo ou apenas a data atual
             $activeCommitment->update(['end_date' => now()]);
         }
 
-        // 6. Criar novo compromisso
-        // Verificamos se já existe um compromisso 'pendente' ou 'ativo' com o mesmo pacote
-        // Isso é uma salvaguarda contra múltiplos cliques rápidos, mas a lógica acima já previne a duplicidade do mesmo pacote.
-
-        UserCommitment::create([
+        // Criar novo compromisso e capturar o model
+        $userCommitment = UserCommitment::create([
             'user_id' => $user->id,
             'package_id' => $package->id,
             'start_date' => now(),
@@ -100,9 +92,18 @@ class CommitmentController
             'cell_id' => $user->cell_id,
         ]);
 
+        // Notificar o próprio utilizador como confirmação
+        $user->notify(new CommitmentChosenNotification($userCommitment));
+
+        // Notificar todos os admins (pode ajustar para notificar supervisores/pastores conforme necessidade)
+        User::where('role', 'admin')->get()->each(function (User $admin) use ($userCommitment) {
+            $admin->notify(new CommitmentChosenNotification($userCommitment));
+        });
+
         return redirect()->route('commitments.index')
             ->with('success', 'Pacote atualizado com sucesso! Você escolheu: ' . $package->name);
     }
+
 
     public function current(): View
     {

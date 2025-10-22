@@ -17,6 +17,8 @@ use App\Http\Controllers\Contribution\ContributionController;
 use App\Http\Controllers\CommitmentController;
 use App\Http\Controllers\Report\ReportController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 // Rotas de autenticação (Breeze)
@@ -26,6 +28,44 @@ require __DIR__ . '/auth.php';
 Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
+
+// Rota para pesquisa AJAX (pode ser GET ou POST, mas GET é comum para buscas)
+Route::get('/api/search', [SearchController::class, 'search'])
+    ->middleware('auth') // Garante que apenas usuários logados podem pesquisar
+    ->name('api.search');
+
+// Rotas de Notificação
+Route::prefix('notifications')->middleware('auth')->name('notifications.')->group(function () {
+
+    // API - Retorna notificações não lidas (JSON)
+    Route::get('/api', [NotificationController::class, 'index'])
+        ->name('api.index');
+
+    // Página de todas as notificações
+    Route::get('/', [NotificationController::class, 'all'])
+        ->name('all');
+
+    // Marcar todas como lidas (AJAX)
+    Route::post('/read', [NotificationController::class, 'markAllAsRead'])
+        ->name('read');
+
+    // Marcar uma específica como lida e redirecionar
+    Route::get('/{id}/mark-read', [NotificationController::class, 'markAsRead'])
+        ->name('mark-read');
+
+    // Deletar uma notificação
+    Route::delete('/{id}', [NotificationController::class, 'destroy'])
+        ->name('destroy');
+
+    // Limpar todas as notificações lidas
+    Route::post('/clear-read', [NotificationController::class, 'clearRead'])
+        ->name('clear-read');
+
+    // Contagem de não lidas (AJAX)
+    Route::get('/unread-count', [NotificationController::class, 'unreadCount'])
+        ->name('unread-count');
+});
+
 
 // Register Route (Público para criar conta)
 Route::get('/register', [RegisteredUserController::class, 'create'])
@@ -70,11 +110,15 @@ Route::middleware('auth')->group(function () {
 
     // Criar Membros contexto das rotas abaixo
     Route::prefix('members')->middleware('role:lider_celula,supervisor,pastor_zona,admin')->group(function () {
-        Route::get('/create', [UserController::class, 'createFromContext'])
-            ->name('members.create');
-        Route::post('/', [UserController::class, 'storeFromContext'])
-            ->name('members.store');
+    Route::get('/', [UserController::class, 'members'])->name('members.index');
+    Route::get('/create', [UserController::class, 'createFromContext'])->name('members.create');
+    Route::post('/', [UserController::class, 'storeFromContext'])->name('members.store');
+    Route::get('/{user}', [UserController::class, 'showFromContext'])->name('members.show');
+    Route::get('/{user}/edit', [UserController::class, 'editFromContext'])->name('members.edit');
+    Route::put('/{user}', [UserController::class, 'updateFromContext'])->name('members.update');
+    Route::delete('/{user}', [UserController::class, 'destroyFromContext'])->name('members.destroy');
     });
+
     // ===== ADMIN ROUTES =====
     Route::prefix('admin')->middleware('role:admin')->group(function () {
 
@@ -92,17 +136,18 @@ Route::middleware('auth')->group(function () {
 
         // Gestão de Pacotes
         Route::resource('packages', PackageController::class);
-
-        // Validar contribuições
-        Route::prefix('contributions')->group(function () {
+    });
+     // Validar contribuições
+        Route::prefix('contributions')->middleware('role:admin,pastor_zona')->group(function () {
             Route::get('/pending', [ContributionController::class, 'pendingAdmin'])
                 ->name('contributions.pending');
             Route::post('/{contribution}/verify', [ContributionController::class, 'verify'])
                 ->name('contributions.verify');
             Route::post('/{contribution}/reject', [ContributionController::class, 'reject'])
                 ->name('contributions.reject');
+            Route::get('/{contribution}/details', [ContributionController::class, 'adminShow'])
+                ->name('admin.contributions.show');
         });
-    });
 
     // ===== CONTRIBUIÇÕES ROUTES =====
     Route::prefix('contributions')->/* middleware('not.admin')-> */group(function () {
@@ -111,21 +156,22 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [ContributionController::class, 'index'])
             ->name('contributions.index');
 
-        // Criar contribuição (membro, líder, supervisor, pastor, admin)
-Route::get('/create', [ContributionController::class, 'create'])
-    ->middleware('role:membro,lider_celula,supervisor,pastor_zona,admin')
-    ->name('contributions.create');
 
-Route::post('/', [ContributionController::class, 'store'])
-    ->middleware('role:membro,lider_celula,supervisor,pastor_zona,admin')
-    ->name('contributions.store');
+        // Criar contribuição (membro, líder, supervisor, pastor, admin)
+        Route::get('/create', [ContributionController::class, 'create'])
+            ->middleware('role:membro,lider_celula,supervisor,pastor_zona,admin')
+            ->name('contributions.create');
+
+        Route::post('/', [ContributionController::class, 'store'])
+            ->middleware('role:membro,lider_celula,supervisor,pastor_zona,admin')
+            ->name('contributions.store');
         // Editar contribuição pendente
         Route::get('/{contribution}/edit', [ContributionController::class, 'edit'])
-            ->middleware('role:membro,lider_celula')
+            ->middleware('role:membro,lider_celula,supervisor,pastor_zona')
             ->name('contributions.edit');
 
         Route::put('/{contribution}', [ContributionController::class, 'update'])
-            ->middleware('role:membro,lider_celula')
+            ->middleware('role:membro,lider_celula,supervisor,pastor_zona')
             ->name('contributions.update');
 
         // Ver detalhes
@@ -133,16 +179,16 @@ Route::post('/', [ContributionController::class, 'store'])
             ->name('contributions.show');
     });
     // ===== ROTAS DE GESTÃO DE CONTRIBUIÇÕES (ADMIN) =====
-Route::prefix('contributions')->middleware('role:admin')->group(function () {
-    
-    // Ação de Verificação (Confirmação)
-    Route::post('/{contribution}/verify', [ContributionController::class, 'verify'])
-        ->name('contributions.verify');
+    Route::prefix('contributions')->middleware('role:admin,pastor_zona')->group(function () {
 
-    // Ação de Rejeição
-    Route::post('/{contribution}/reject', [ContributionController::class, 'reject'])
-        ->name('contributions.reject');
-});
+        // Ação de Verificação (Confirmação)
+        Route::post('/{contribution}/verify', [ContributionController::class, 'verify'])
+            ->name('contributions.verify');
+
+        // Ação de Rejeição
+        Route::post('/{contribution}/reject', [ContributionController::class, 'reject'])
+            ->name('contributions.reject');
+    });
     // ===== PACOTES DE COMPROMISSO ROUTES =====
     Route::prefix('commitments')->middleware('not.admin')->group(function () {
 
@@ -164,17 +210,17 @@ Route::prefix('contributions')->middleware('role:admin')->group(function () {
 
         // Relatório da célula (líder)
         Route::get('/cell', [ReportController::class, 'cellReport'])
-            ->middleware('role:lider_celula,supervisor,pastor_zona')
+            ->middleware('role:lider_celula,supervisor,pastor_zona,admin')
             ->name('reports.cell');
 
         // Relatório da supervisão
         Route::get('/supervision', [ReportController::class, 'supervisionReport'])
-            ->middleware('role:supervisor,pastor_zona')
+            ->middleware('role:supervisor,pastor_zona,admin')
             ->name('reports.supervision');
 
         // Relatório da zona
         Route::get('/zone', [ReportController::class, 'zoneReport'])
-            ->middleware('role:pastor_zona')
+            ->middleware('role:pastor_zona,admin')
             ->name('reports.zone');
 
         // Relatório global (admin)
