@@ -54,6 +54,11 @@ class Contribution extends Model
         return $this->belongsTo(CommitmentPackage::class);
     }
 
+    public function offeringType()
+    {
+        return $this->belongsTo(OfferingType::class);
+    }
+
     public function verifier()
     {
         return $this->belongsTo(User::class, 'verified_by');
@@ -84,7 +89,7 @@ class Contribution extends Model
         $now = now();
         $monthStart = $now->copy()->startOfMonth()->addDays(19);
         $monthEnd = $now->copy()->addMonth()->startOfMonth()->addDays(4);
-        
+
         return $query->whereBetween('contribution_date', [$monthStart, $monthEnd]);
     }
 

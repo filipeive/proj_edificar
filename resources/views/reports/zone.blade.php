@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Relatório da Zona - Projeto Edificar')
+@section('title', 'Relatório da Zona - Portal Life Church')
 @section('page-title', 'Relatório da Zona')
 @section('page-subtitle', $zone ? $zone->name : 'Selecione uma zona para começar')
 

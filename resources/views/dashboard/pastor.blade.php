@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard Pastor - Projeto Edificar')
+@section('title', 'Dashboard Pastor - Portal Life Church')
 @section('page-title', 'Dashboard do Pastor de Zona')
 @section('page-subtitle', 'Visão geral da zona')
 

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Meus Compromissos - Projeto Edificar')
+@section('title', 'Meus Compromissos - Portal Life Church')
 @section('page-title', 'Pacotes de Compromisso')
 @section('page-subtitle', 'Escolha seu nível de compromisso mensal')
 

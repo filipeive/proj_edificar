@@ -135,7 +135,7 @@ class ZoneSeeder extends Seeder {
         User::firstOrCreate(
             ['email' => 'admin@chiesa.local'],
             [
-                'name' => 'Admin Projeto Edificar',
+                'name' => 'Admin Portal Life Church',
                 'password' => Hash::make('password'),
                 'phone' => '823562000',
                 'role' => 'admin',

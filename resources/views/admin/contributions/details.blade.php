@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Detalhes da Contribuição - Projeto Edificar')
+@section('title', 'Detalhes da Contribuição - Portal Life Church')
 @section('page-title', 'Detalhes da Contribuição Pendente')
 @section('page-subtitle', 'Visualize e gerencie esta contribuição')
 

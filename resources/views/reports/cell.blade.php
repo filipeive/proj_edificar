@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Relatório da Célula - Projeto Edificar')
+@section('title', 'Relatório da Célula - Portal Life Church')
 @section('page-title', 'Relatório da Célula')
 @section('page-subtitle', $cell ? $cell->name : 'Selecione uma célula para começar')
 

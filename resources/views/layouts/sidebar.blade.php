@@ -1,361 +1,318 @@
-<aside class="w-64 bg-gray-900 text-white flex flex-col">
-    <!-- Logo -->
-    <div class="px-6 py-8 border-b border-gray-700">
-        <h1 class="text-2xl font-bold"><i class="bi bi-building mr-2"></i>Edificar</h1>
-        <p class="text-sm text-gray-400 mt-1">Sistema de Contribuições</p>
+@php
+    $can = function ($permission) use ($user) {
+        if (!$user)
+            return false;
+        $permissions = [
+            'admin' => [
+                'view_global_report',
+                'view_zone_report',
+                'view_supervision_report',
+                'view_cell_report',
+            ],
+            'pastor_zona' => ['view_zone_report', 'view_supervision_report', 'view_cell_report'],
+            'supervisor' => ['view_supervision_report', 'view_cell_report'],
+            'lider_celula' => ['view_cell_report'],
+            'membro' => [],
+        ];
+        return in_array($permission, $permissions[$user->role] ?? []);
+    };
+@endphp
+<aside id="sidebar"
+    class="sidebar-expanded bg-black text-white flex flex-col overflow-y-auto shadow-2xl transition-all duration-300 ease-in-out border-r border-white/5">
+    <!-- Header -->
+    <div
+        class="px-6 py-8 border-b border-white/5 flex items-center justify-between bg-black/50 backdrop-blur-xl sticky top-0 z-20">
+        <div class="flex items-center space-x-3 overflow-hidden">
+            <div class="flex-shrink-0 p-2 bg-orange-600 rounded-xl shadow-lg shadow-orange-600/20">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-8 w-auto brightness-0 invert">
+            </div>
+            <div class="sidebar-text">
+                <h1 class="text-lg font-black tracking-tighter text-white uppercase leading-none">Life - APP</h1>
+                <p class="text-[9px] text-orange-500 font-black uppercase tracking-[0.2em] mt-1"><small>Portal de Gestão/Edificar</small></p>
+            </div>
+        </div>
+        <button onclick="toggleSidebar()"
+            class="hidden md:flex text-gray-400 hover:text-white transition-all p-2 hover:bg-white/5 rounded-xl border border-transparent hover:border-white/10">
+            <i id="sidebarIcon" class="bi bi-layout-sidebar-inset-reverse text-xl"></i>
+        </button>
     </div>
 
     <!-- Navigation -->
-    <nav class="flex-1 px-4 py-8 space-y-4 overflow-y-auto">
-        
-        <!-- Dashboard -->
-        <a href="{{ route('dashboard.membro') }}" class="flex items-center px-4 py-2 rounded-lg hover:bg-gray-800 transition {{ request()->routeIs('dashboard.*') ? 'bg-blue-600' : '' }}">
-            <i class="bi bi-speedometer2 mr-3"></i>Dashboard
-        </a>
-
-        <!-- Contribuições -->
-        <div>
-            <button class="w-full text-left flex items-center px-4 py-2 rounded-lg hover:bg-gray-800 transition" onclick="toggleMenu('contributions')">
-                <i class="bi bi-cash-coin mr-3"></i>Contribuições
-                <i class="bi bi-chevron-down ml-auto text-xs"></i>
-            </button>
-            <div id="contributions" class="hidden pl-8 space-y-2 mt-2">
-                <a href="{{ route('contributions.index') }}" class="block px-4 py-2 text-sm rounded hover:bg-gray-800">
-                    Minhas Contribuições
-                </a>
-                <a href="{{ route('contributions.create') }}" class="block px-4 py-2 text-sm rounded hover:bg-gray-800">
-                    + Nova Contribuição
-                </a>
-            </div>
-        </div>
-
-        <!-- Pacotes de Compromisso -->
-        <a href="{{ route('commitments.index') }}" class="flex items-center px-4 py-2 rounded-lg hover:bg-gray-800 transition">
-            <i class="bi bi-handshake mr-3"></i>Meu Compromisso
-        </a>
-
-        <!-- Relatórios (se autorizado) -->
-        @if(auth()->user()->role !== 'membro')
-        <div>
-            <button class="w-full text-left flex items-center px-4 py-2 rounded-lg hover:bg-gray-800 transition" onclick="toggleMenu('reports')">
-                <i class="bi bi-file-earmark-pdf mr-3"></i>Relatórios
-                <i class="bi bi-chevron-down ml-auto text-xs"></i>
-            </button>
-            <div id="reports" class="hidden pl-8 space-y-2 mt-2">
-                @if(auth()->user()->role === 'lider_celula' || auth()->user()->role === 'supervisor' || auth()->user()->role === 'pastor_zona')
-                <a href="{{ route('reports.cell') }}" class="block px-4 py-2 text-sm rounded hover:bg-gray-800">
-                    Célula
-                </a>
-                @endif
-                @if(auth()->user()->role === 'supervisor' || auth()->user()->role === 'pastor_zona')
-                <a href="{{ route('reports.supervision') }}" class="block px-4 py-2 text-sm rounded hover:bg-gray-800">
-                    Supervisão
-                </a>
-                @endif
-                @if(auth()->user()->role === 'pastor_zona')
-                <a href="{{ route('reports.zone') }}" class="block px-4 py-2 text-sm rounded hover:bg-gray-800">
-                    Zona
-                </a>
-                @endif
-                @if(auth()->user()->role === 'admin')
-                <a href="{{ route('reports.global') }}" class="block px-4 py-2 text-sm rounded hover:bg-gray-800">
-                    Global
-                </a>
-                @endif
-            </div>
-        </div>
-        @endif
-
-        <!-- Admin Menu -->
-        @if(auth()->user()->role === 'admin')
-        <hr class="border-gray-700 my-4">
-        <div class="text-xs uppercase font-bold text-gray-500 px-4 mb-4">Administração</div>
-        
-        <a href="{{ route('zones.index') }}" class="flex items-center px-4 py-2 rounded-lg hover:bg-gray-800 transition">
-            <i class="bi bi-map mr-3"></i>Zonas
-        </a>
-        <a href="{{ route('supervisions.index') }}" class="flex items-center px-4 py-2 rounded-lg hover:bg-gray-800 transition">
-            <i class="bi bi-diagram-3 mr-3"></i>Supervisões
-        </a>
-        <a href="{{ route('cells.index') }}" class="flex items-center px-4 py-2 rounded-lg hover:bg-gray-800 transition">
-            <i class="bi bi-people-fill mr-3"></i>Células
-        </a>
-        <a href="{{ route('users.index') }}" class="flex items-center px-4 py-2 rounded-lg hover:bg-gray-800 transition">
-            <i class="bi bi-person-badge mr-3"></i>Utilizadores
-        </a>
-        <a href="{{ route('packages.index') }}" class="flex items-center px-4 py-2 rounded-lg hover:bg-gray-800 transition">
-            <i class="bi bi-box-seam mr-3"></i>Pacotes
-        </a>
-        <a href="{{ route('contributions.pending') }}" class="flex items-center px-4 py-2 rounded-lg hover:bg-gray-800 transition">
-            <i class="bi bi-clock-history mr-3"></i>Contribuições Pendentes
-        </a>
-        @endif
-    </nav>
-
-    <!-- User Info -->
-    <div class="px-6 py-4 border-t border-gray-700">
-        <div class="flex items-center">
-            <div class="flex-1">
-                <p class="text-sm font-semibold">{{ auth()->user()->name }}</p>
-                <p class="text-xs text-gray-400">{{ ucfirst(str_replace('_', ' ', auth()->user()->role)) }}</p>
-            </div>
-            <a href="{{ route('profile.edit') }}" class="text-gray-400 hover:text-white">
-                <i class="bi bi-gear"></i>
+    <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto custom-scrollbar">
+        <!-- DASHBOARD -->
+        <div class="pb-4">
+            <a href="{{ route('dashboard') }}"
+                class="nav-item relative flex items-center px-4 py-3.5 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('dashboard') ? 'bg-orange-600 text-white shadow-xl shadow-orange-600/30' : 'text-slate-400' }}">
+                <i class="bi bi-grid-1x2-fill text-xl flex-shrink-0"></i>
+                <span class="sidebar-text ml-4 font-bold tracking-tight">Dashboard</span>
+                <span class="tooltip">Dashboard Geral</span>
             </a>
         </div>
-    </div>
 
-    <!-- Logout -->
-    <div class="px-6 py-3 border-t border-gray-700">
-        <form method="POST" action="{{ route('logout') }}" class="inline">
-            @csrf
-            <button class="w-full text-left px-4 py-2 text-sm rounded hover:bg-gray-800 transition">
-                <i class="bi bi-box-arrow-right mr-2"></i>Sair
-            </button>
-        </form>
-    </div><!DOCTYPE html>
-<html lang="pt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Projeto Edificar')</title>
-    
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body class="bg-gray-50">
-    <div class="flex h-screen bg-gray-100">
-        <!-- Sidebar -->
-        <aside class="w-64 bg-gray-900 text-white flex flex-col overflow-y-auto">
-            <!-- Logo -->
-            <div class="px-6 py-8 border-b border-gray-700">
-                <h1 class="text-2xl font-bold">
-                    <i class="bi bi-building mr-2"></i>Edificar
-                </h1>
-                <p class="text-sm text-gray-400 mt-1">Sistema de Contribuições</p>
-            </div>
+        @if (in_array($role, ['admin', 'pastor', 'pastor_zona', 'supervisor']))
+            <!-- GESTÃO ECLESIÁSTICA -->
+            <div
+                class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-2">
+                Gestão Eclesiástica</div>
 
-            <!-- Navigation -->
-            <nav class="flex-1 px-4 py-8 space-y-4 overflow-y-auto">
-                
-                <!-- Dashboard -->
-                <a href="{{ route('dashboard.membro') }}" 
-                   class="flex items-center px-4 py-2 rounded-lg hover:bg-gray-800 transition {{ request()->routeIs('dashboard.*') ? 'bg-blue-600' : '' }}">
-                    <i class="bi bi-speedometer2 mr-3"></i>Dashboard
+            <a href="{{ route('services.index') }}"
+                class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('services.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                <i class="bi bi-church-fill text-xl flex-shrink-0"></i>
+                <span class="sidebar-text ml-4 font-bold tracking-tight">Cultos</span>
+                <span class="tooltip">Relatórios de Celebração</span>
+            </a>
+
+            <a href="{{ route('events.index') }}"
+                class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('events.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                <i class="bi bi-calendar-check-fill text-xl flex-shrink-0"></i>
+                <span class="sidebar-text ml-4 font-bold tracking-tight">Eventos</span>
+                <span class="tooltip">Eventos e Cerimônias</span>
+            </a>
+        @endif
+
+        @if (in_array($role, ['admin', 'pastor', 'pastor_zona', 'supervisor', 'lider_celula', 'timoteo']))
+            <!-- CÉLULAS & GRUPOS -->
+            <div
+                class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-4">
+                Células & Grupos</div>
+
+            <a href="{{ route('cell-meetings.index') }}"
+                class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('cell-meetings.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                <i class="bi bi-people-fill text-xl flex-shrink-0"></i>
+                <span class="sidebar-text ml-4 font-bold tracking-tight">Encontros</span>
+                <span class="tooltip">Reuniões de Célula</span>
+            </a>
+
+            @if ($role === 'lider_celula' && $user->ledCells()->exists())
+                <a href="{{ route('cells.attendance', $user->ledCells()->first()) }}"
+                    class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('cells.attendance') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                    <i class="bi bi-calendar-check-fill text-xl flex-shrink-0"></i>
+                    <span class="sidebar-text ml-4 font-bold tracking-tight">Ficha Guia</span>
+                    <span class="tooltip">Presenças da Célula</span>
+                </a>
+            @endif
+
+            @if (in_array($role, ['admin', 'pastor_zona', 'supervisor']))
+                <a href="{{ route('cells.index') }}"
+                    class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('cells.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                    <i class="bi bi-diagram-3-fill text-xl flex-shrink-0"></i>
+                    <span class="sidebar-text ml-4 font-bold tracking-tight">Listagem de Células</span>
+                    <span class="tooltip">Gestão de Células</span>
+                </a>
+            @endif
+
+            @if ($role === 'admin')
+                <a href="{{ route('supervisions.index') }}"
+                    class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('supervisions.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                    <i class="bi bi-layers-fill text-xl flex-shrink-0"></i>
+                    <span class="sidebar-text ml-4 font-bold tracking-tight">Supervisões</span>
+                    <span class="tooltip">Gestão de Supervisões</span>
                 </a>
 
-                <!-- Contribuições -->
-                <div>
-                    <button class="w-full text-left flex items-center px-4 py-2 rounded-lg hover:bg-gray-800 transition" onclick="toggleMenu('contributions')">
-                        <i class="bi bi-cash-coin mr-3"></i>Contribuições
-                        <i class="bi bi-chevron-down ml-auto text-xs"></i>
-                    </button>
-                    <div id="contributions" class="hidden pl-8 space-y-2 mt-2">
-                        <a href="{{ route('contributions.index') }}" class="block px-4 py-2 text-sm rounded hover:bg-gray-800">
+                <a href="{{ route('zones.index') }}"
+                    class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('zones.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                    <i class="bi bi-geo-alt-fill text-xl flex-shrink-0"></i>
+                    <span class="sidebar-text ml-4 font-bold tracking-tight">Zonas</span>
+                    <span class="tooltip">Gestão de Zonas</span>
+                </a>
+            @endif
+        @endif
+
+        <!-- FINANCEIRO -->
+        <div
+            class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-4">
+            Financeiro</div>
+
+        <div>
+            <button
+                class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('contributions.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}"
+                onclick="toggleMenu('contributions')">
+                <i class="bi bi-cash-stack text-xl flex-shrink-0"></i>
+                <span class="sidebar-text ml-4 font-bold tracking-tight flex-1">Contribuições</span>
+                <i
+                    class="bi bi-chevron-down sidebar-text ml-2 text-[10px] transition-transform duration-300 {{ request()->routeIs('contributions.*') ? 'rotate-180' : '' }}"></i>
+                <span class="tooltip">Dízimos e Ofertas</span>
+            </button>
+            <div id="contributions" class="overflow-hidden {{ request()->routeIs('contributions.*') ? '' : 'hidden' }}">
+                <div class="ml-12 mt-2 space-y-1 border-l border-white/10 pl-4">
+                    @if ($role !== 'admin')
+                        <a href="{{ route('contributions.index', ['mine' => 1]) }}"
+                            class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('contributions.index') && request()->query('mine') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">
                             Minhas Contribuições
                         </a>
-                        @if(auth()->user()->role !== 'membro')
-                        <a href="{{ route('contributions.create') }}" class="block px-4 py-2 text-sm rounded hover:bg-gray-800">
-                            + Nova Contribuição
-                        </a>
-                        @endif
-                    </div>
-                </div>
+                    @endif
 
-                <!-- Pacotes de Compromisso -->
-                <a href="{{ route('commitments.index') }}" 
-                   class="flex items-center px-4 py-2 rounded-lg hover:bg-gray-800 transition">
-                    <i class="bi bi-handshake mr-3"></i>Meu Compromisso
-                </a>
+                    @if (in_array($role, ['admin', 'pastor_zona', 'supervisor', 'lider_celula']))
+                        <a href="{{ route('contributions.index') }}"
+                            class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('contributions.index') && !request()->query('mine') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">
+                            @if ($role === 'admin') Todas @elseif ($role === 'pastor_zona') Da Zona
+                            @elseif ($role === 'supervisor') Da Supervisão @else Da Célula @endif
+                        </a>
+                    @endif
 
-                <!-- Relatórios -->
-                @if(auth()->user()->role !== 'membro')
-                <div>
-                    <button class="w-full text-left flex items-center px-4 py-2 rounded-lg hover:bg-gray-800 transition" onclick="toggleMenu('reports')">
-                        <i class="bi bi-file-earmark-pdf mr-3"></i>Relatórios
-                        <i class="bi bi-chevron-down ml-auto text-xs"></i>
-                    </button>
-                    <div id="reports" class="hidden pl-8 space-y-2 mt-2">
-                        @if(auth()->user()->role === 'lider_celula' || auth()->user()->role === 'supervisor' || auth()->user()->role === 'pastor_zona')
-                        <a href="{{ route('reports.cell') }}" class="block px-4 py-2 text-sm rounded hover:bg-gray-800">
-                            Célula
-                        </a>
-                        @endif
-                        @if(auth()->user()->role === 'supervisor' || auth()->user()->role === 'pastor_zona')
-                        <a href="{{ route('reports.supervision') }}" class="block px-4 py-2 text-sm rounded hover:bg-gray-800">
-                            Supervisão
-                        </a>
-                        @endif
-                        @if(auth()->user()->role === 'pastor_zona')
-                        <a href="{{ route('reports.zone') }}" class="block px-4 py-2 text-sm rounded hover:bg-gray-800">
-                            Zona
-                        </a>
-                        @endif
-                        @if(auth()->user()->role === 'admin')
-                        <a href="{{ route('reports.global') }}" class="block px-4 py-2 text-sm rounded hover:bg-gray-800">
-                            Global
-                        </a>
-                        @endif
-                    </div>
-                </div>
-                @endif
-
-                <!-- Admin Menu -->
-                @if(auth()->user()->role === 'admin')
-                <hr class="border-gray-700 my-4">
-                <div class="text-xs uppercase font-bold text-gray-500 px-4 mb-4">Administração</div>
-                
-                <a href="{{ route('zones.index') }}" class="flex items-center px-4 py-2 rounded-lg hover:bg-gray-800 transition">
-                    <i class="bi bi-map mr-3"></i>Zonas
-                </a>
-                <a href="{{ route('supervisions.index') }}" class="flex items-center px-4 py-2 rounded-lg hover:bg-gray-800 transition">
-                    <i class="bi bi-diagram-3 mr-3"></i>Supervisões
-                </a>
-                <a href="{{ route('cells.index') }}" class="flex items-center px-4 py-2 rounded-lg hover:bg-gray-800 transition">
-                    <i class="bi bi-people-fill mr-3"></i>Células
-                </a>
-                <a href="{{ route('users.index') }}" class="flex items-center px-4 py-2 rounded-lg hover:bg-gray-800 transition">
-                    <i class="bi bi-person-badge mr-3"></i>Utilizadores
-                </a>
-                <a href="{{ route('packages.index') }}" class="flex items-center px-4 py-2 rounded-lg hover:bg-gray-800 transition">
-                    <i class="bi bi-box-seam mr-3"></i>Pacotes
-                </a>
-                <a href="{{ route('contributions.pending') }}" class="flex items-center px-4 py-2 rounded-lg hover:bg-gray-800 transition">
-                    <i class="bi bi-clock-history mr-3"></i>Contribuições Pendentes
-                </a>
-                @endif
-            </nav>
-
-            <!-- User Info -->
-            <div class="px-6 py-4 border-t border-gray-700">
-                <div class="flex items-center">
-                    <div class="flex-1">
-                        <p class="text-sm font-semibold">{{ auth()->user()->name }}</p>
-                        <p class="text-xs text-gray-400">{{ ucfirst(str_replace('_', ' ', auth()->user()->role)) }}</p>
-                    </div>
-                    <a href="{{ route('profile.edit') }}" class="text-gray-400 hover:text-white">
-                        <i class="bi bi-gear"></i>
+                    <a href="{{ route('contributions.create') }}"
+                        class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('contributions.create') ? 'text-green-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">
+                        Nova Contribuição
                     </a>
                 </div>
             </div>
+        </div>
 
-            <!-- Logout -->
-            <div class="px-6 py-3 border-t border-gray-700">
-                <form method="POST" action="{{ route('logout') }}" class="inline w-full">
-                    @csrf
-                    <button type="submit" class="w-full text-left px-4 py-2 text-sm rounded hover:bg-gray-800 transition">
-                        <i class="bi bi-box-arrow-right mr-2"></i>Sair
-                    </button>
-                </form>
-            </div>
-        </aside>
+        @if (in_array($role, ['admin', 'pastor', 'pastor_zona', 'tesouraria']))
+            <a href="{{ route('financial.dashboard') }}"
+                class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('financial.dashboard') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                <i class="bi bi-pie-chart-fill text-xl flex-shrink-0"></i>
+                <span class="sidebar-text ml-4 font-bold tracking-tight">Painel Financeiro</span>
+                <span class="tooltip">Consolidado Financeiro</span>
+            </a>
+        @endif
 
-        <!-- Main Content -->
-        <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- Header -->
-            <header class="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between">
+        @if ($role === 'admin')
+            <a href="{{ route('contributions.pending') }}"
+                class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('contributions.pending') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                <i class="bi bi-shield-lock-fill text-xl flex-shrink-0"></i>
+                <span class="sidebar-text ml-4 font-bold tracking-tight">Pendentes</span>
+                @if ($pendingCount > 0)
+                    <span
+                        class="absolute right-4 top-1/2 -translate-y-1/2 bg-orange-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-lg shadow-orange-600/20">{{ $pendingCount }}</span>
+                @endif
+                <span class="tooltip">Validação Pendente</span>
+            </a>
+        @endif
+
+        <a href="{{ route('commitments.index') }}"
+            class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('commitments.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+            <i class="bi bi-heart-pulse-fill text-xl flex-shrink-0"></i>
+            <span class="sidebar-text ml-4 font-bold tracking-tight">Meu Compromisso</span>
+            <span class="tooltip">Meus Compromissos</span>
+        </a>
+
+        <!-- ACADEMIA & ENSINO -->
+        <div
+            class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-4">
+            Academia & Ensino</div>
+
+        <a href="{{ route('courses.index') }}"
+            class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('courses.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+            <i class="bi bi-mortarboard-fill text-xl flex-shrink-0"></i>
+            <span class="sidebar-text ml-4 font-bold tracking-tight">Cursos</span>
+            <span class="tooltip">Academia de Vida e Cursos</span>
+        </a>
+
+        @if ($role !== 'membro')
+            <!-- PESSOAS & RELATÓRIOS -->
+            <div
+                class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-4">
+                Pessoas & Relatórios</div>
+
+            <a href="{{ route('members.index') }}"
+                class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('members.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                <i class="bi bi-person-badge-fill text-xl flex-shrink-0"></i>
+                <span class="sidebar-text ml-4 font-bold tracking-tight">Membros</span>
+                <span class="tooltip">Gestão de Membros</span>
+            </a>
+
+            @if ($role === 'admin')
+                <a href="{{ route('users.index') }}"
+                    class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('users.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                    <i class="bi bi-person-lock text-xl flex-shrink-0"></i>
+                    <span class="sidebar-text ml-4 font-bold tracking-tight">Utilizadores</span>
+                    <span class="tooltip">Acessos ao Sistema</span>
+                </a>
+            @endif
+
+            @if (in_array($role, ['admin', 'pastor', 'pastor_zona', 'supervisor']))
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-800">@yield('page-title', 'Dashboard')</h2>
-                    <p class="text-sm text-gray-500 mt-1">@yield('page-subtitle', 'Bem-vindo ao Projeto Edificar')</p>
-                </div>
-                
-                <div class="flex items-center space-x-6">
-                    <button class="text-gray-600 hover:text-gray-800 relative">
-                        <i class="bi bi-bell text-xl"></i>
-                        <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+                    <button
+                        class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('reports.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}"
+                        onclick="toggleMenu('reports')">
+                        <i class="bi bi-bar-chart-line-fill text-xl flex-shrink-0"></i>
+                        <span class="sidebar-text ml-4 font-bold tracking-tight flex-1">Estatísticas</span>
+                        <i
+                            class="bi bi-chevron-down sidebar-text ml-2 text-[10px] transition-transform duration-300 {{ request()->routeIs('reports.*') ? 'rotate-180' : '' }}"></i>
+                        <span class="tooltip">Relatórios de Desempenho</span>
                     </button>
-                    <div class="border-l border-gray-300 pl-6">
-                        <p class="text-sm text-gray-600">{{ auth()->user()->email }}</p>
+                    <div id="reports" class="overflow-hidden {{ request()->routeIs('reports.*') ? '' : 'hidden' }}">
+                        <div class="ml-12 mt-2 space-y-1 border-l border-white/10 pl-4">
+                            @if ($can('view_cell_report')) <a href="{{ route('reports.cell') }}"
+                                class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('reports.cell') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Célula</a>
+                            @endif
+                            @if ($can('view_supervision_report')) <a href="{{ route('reports.supervision') }}"
+                                class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('reports.supervision') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Supervisão</a>
+                            @endif
+                            @if ($can('view_zone_report')) <a href="{{ route('reports.zone') }}"
+                                class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('reports.zone') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Zona</a>
+                            @endif
+                            @if ($can('view_global_report')) <a href="{{ route('reports.global') }}"
+                                class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('reports.global') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Global</a>
+                            @endif
+                        </div>
                     </div>
                 </div>
-            </header>
+            @endif
 
-            <!-- Page Content -->
-            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
-                <div class="container mx-auto px-6 py-8">
-                    <!-- Toast Messages -->
-                    @if ($message = Session::get('success'))
-                    <div id="successToast" class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg flex items-center justify-between shadow-lg" role="alert">
-                        <div class="flex items-center">
-                            <i class="bi bi-check-circle mr-3"></i>
-                            <span>{{ $message }}</span>
-                        </div>
-                        <button onclick="closeToast('successToast')" class="text-green-700 hover:text-green-900">
-                            <i class="bi bi-x"></i>
-                        </button>
-                    </div>
-                    @endif
+            <a href="{{ route('quarterly-reports.index') }}"
+                class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('quarterly-reports.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                <i class="bi bi-file-earmark-text-fill text-xl flex-shrink-0"></i>
+                <span class="sidebar-text ml-4 font-bold tracking-tight">Trimestrais</span>
+                <span class="tooltip">Relatórios Trimestrais</span>
+            </a>
+        @endif
 
-                    @if ($message = Session::get('error'))
-                    <div id="errorToast" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-center justify-between shadow-lg" role="alert">
-                        <div class="flex items-center">
-                            <i class="bi bi-exclamation-circle mr-3"></i>
-                            <span>{{ $message }}</span>
-                        </div>
-                        <button onclick="closeToast('errorToast')" class="text-red-700 hover:text-red-900">
-                            <i class="bi bi-x"></i>
-                        </button>
-                    </div>
-                    @endif
+        <!-- SISTEMA -->
+        <div
+            class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-4">
+            Sistema</div>
 
-                    @if ($message = Session::get('warning'))
-                    <div id="warningToast" class="mb-4 p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded-lg flex items-center justify-between shadow-lg" role="alert">
-                        <div class="flex items-center">
-                            <i class="bi bi-exclamation-triangle mr-3"></i>
-                            <span>{{ $message }}</span>
-                        </div>
-                        <button onclick="closeToast('warningToast')" class="text-yellow-700 hover:text-yellow-900">
-                            <i class="bi bi-x"></i>
-                        </button>
-                    </div>
-                    @endif
+        <a href="{{ route('notifications.all') }}"
+            class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('notifications.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+            <i class="bi bi-bell-fill text-xl flex-shrink-0"></i>
+            <span class="sidebar-text ml-4 font-bold tracking-tight">Notificações</span>
+            @if ($unreadNotifications > 0)
+                <span
+                    class="absolute right-4 top-1/2 -translate-y-1/2 bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-lg shadow-red-600/20">{{ $unreadNotifications }}</span>
+            @endif
+            <span class="tooltip">Central de Alertas</span>
+        </a>
 
-                    @if ($message = Session::get('info'))
-                    <div id="infoToast" class="mb-4 p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded-lg flex items-center justify-between shadow-lg" role="alert">
-                        <div class="flex items-center">
-                            <i class="bi bi-info-circle mr-3"></i>
-                            <span>{{ $message }}</span>
-                        </div>
-                        <button onclick="closeToast('infoToast')" class="text-blue-700 hover:text-blue-900">
-                            <i class="bi bi-x"></i>
-                        </button>
-                    </div>
-                    @endif
+        @if ($role === 'admin')
+            <a href="{{ route('packages.index') }}"
+                class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('packages.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                <i class="bi bi-gear-wide-connected text-xl flex-shrink-0"></i>
+                <span class="sidebar-text ml-4 font-bold tracking-tight">Configurações</span>
+                <span class="tooltip">Ajustes do Sistema</span>
+            </a>
+        @endif
+    </nav>
 
-                    @yield('content')
+    <!-- User Profile Footer -->
+    <div class="mt-auto border-t border-white/5 bg-black/80 backdrop-blur-md sticky bottom-0 z-20">
+        <div class="p-4">
+            <div class="flex items-center space-x-3 mb-4 overflow-hidden">
+                <div
+                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-700 flex items-center justify-center flex-shrink-0 font-black text-white shadow-lg shadow-orange-600/20">
+                    {{ strtoupper(substr($user->name, 0, 1)) }}
                 </div>
-            </main>
+                <div class="sidebar-text flex-1 min-w-0">
+                    <p class="text-sm font-black text-white truncate">{{ $user->name }}</p>
+                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider truncate">
+                        {{ ucfirst(str_replace('_', ' ', $role)) }}
+                    </p>
+                </div>
+                <a href="{{ route('profile.edit') }}"
+                    class="sidebar-text text-slate-400 hover:text-white transition-all p-2 hover:bg-white/5 rounded-xl border border-transparent hover:border-white/10"
+                    title="Editar Perfil">
+                    <i class="bi bi-gear-fill"></i>
+                </a>
+            </div>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit"
+                    class="w-full flex items-center justify-center px-4 py-3 text-slate-400 hover:text-white hover:bg-red-600 transition-all duration-300 rounded-2xl font-black text-xs uppercase tracking-widest border border-white/5 hover:border-red-600 shadow-lg hover:shadow-red-600/20">
+                    <i class="bi bi-power mr-2 text-lg"></i>
+                    <span class="sidebar-text">Sair do Sistema</span>
+                </button>
+            </form>
         </div>
     </div>
-
-    <script>
-        // Toggle Menu Sidebar
-        function toggleMenu(menuId) {
-            const menu = document.getElementById(menuId);
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-            } else {
-                menu.classList.add('hidden');
-            }
-        }
-
-        // Close Toast
-        function closeToast(toastId) {
-            const toast = document.getElementById(toastId);
-            toast.style.display = 'none';
-        }
-
-        // Auto-hide toasts after 5 seconds
-        document.addEventListener('DOMContentLoaded', function() {
-            const toasts = document.querySelectorAll('[role="alert"]');
-            toasts.forEach(toast => {
-                setTimeout(() => {
-                    toast.style.display = 'none';
-                }, 5000);
-            });
-        });
-    </script>
-</body>
-</html>
 </aside>

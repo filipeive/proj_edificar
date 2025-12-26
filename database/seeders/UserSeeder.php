@@ -8,7 +8,7 @@ class UserSeeder extends Seeder {
     public function run(): void {
         // Criar usuário admin principal
         User::create([
-            'name' => 'Administrador Projeto Edificar',
+            'name' => 'Administrador Portal Life Church',
             'email' => 'admin@chiesa.local',
             'password' => bcrypt('123456'),
             'phone' => '823562000',

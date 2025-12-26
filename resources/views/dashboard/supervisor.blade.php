@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard Supervisor - Projeto Edificar')
+@section('title', 'Dashboard Supervisor - Portal Life Church')
 @section('page-title', 'Dashboard do Supervisor')
 @section('page-subtitle', 'Monitorize suas supervisões')
 

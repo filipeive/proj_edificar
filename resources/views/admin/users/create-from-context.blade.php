@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Criar Novo Membro - Projeto Edificar')
+@section('title', 'Criar Novo Membro - Portal Life Church')
 @section('page-title', 'Criar Novo Membro')
 @section('page-subtitle', 'Registar um novo membro na célula')
 

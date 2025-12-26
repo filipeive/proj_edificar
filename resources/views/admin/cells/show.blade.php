@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', "Célula $cell->name - Projeto Edificar")
+@section('title', "Célula $cell->name - Portal Life Church")
 @section('page-title', $cell->name)
 @section('page-subtitle', 'Gestão da célula e membros')
 
@@ -25,8 +25,7 @@
         <div class="bg-white rounded-lg shadow p-6">
             <h3 class="text-sm font-medium text-gray-500 mb-2">LÍDER</h3>
             @if ($cell->leader)
-                <a href="{{ route('users.show', $cell->leader) }}"
-                    class="text-lg font-bold text-blue-600 hover:text-blue-800">
+                <a href="{{ route('users.show', $cell->leader) }}" class="text-lg font-bold text-blue-600 hover:text-blue-800">
                     {{ $cell->leader->name }}
                 </a>
             @else
@@ -44,7 +43,8 @@
         <div class="bg-white rounded-lg shadow p-6">
             <h3 class="text-sm font-medium text-gray-500 mb-2">TOTAL ESTE MÊS</h3>
             <p class="text-3xl font-bold text-green-600">
-                {{ number_format($cell->getTotalContributedThisMonth(), 2, ',', '.') }} MT</p>
+                {{ number_format($cell->getTotalContributedThisMonth(), 2, ',', '.') }} MT
+            </p>
         </div>
     </div>
 
@@ -116,6 +116,14 @@
             <div class="bg-white rounded-lg shadow p-6 mb-6">
                 <h4 class="font-bold text-gray-800 mb-4">Ações</h4>
                 <div class="space-y-2">
+                    <a href="{{ route('cells.pdf', $cell) }}"
+                        class="block w-full bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 text-center text-sm font-medium">
+                        <i class="bi bi-file-earmark-pdf mr-2"></i>Exportar Ficha (PDF)
+                    </a>
+                    <a href="{{ route('cells.attendance', $cell) }}"
+                        class="block w-full bg-black text-white px-4 py-2 rounded hover:bg-zinc-800 text-center text-sm font-medium">
+                        <i class="bi bi-calendar-check mr-2"></i>Ficha Guia (Presenças)
+                    </a>
                     <a href="{{ route('cells.edit', $cell) }}"
                         class="block w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-center text-sm font-medium">
                         <i class="bi bi-pencil mr-2"></i>Editar Célula

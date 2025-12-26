@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Gestão de Utilizadores - Projeto Edificar')
+@section('title', 'Gestão de Utilizadores - Portal Life Church')
 @section('page-title', 'Utilizadores')
 @section('page-subtitle', 'Gestão de membros e líderes da igreja')
 

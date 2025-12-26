@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Editar Zona - Projeto Edificar')
+@section('title', 'Editar Zona - Portal Life Church')
 @section('page-title', 'Editar Zona ' . $zone->name)
 @section('page-subtitle', 'Atualizar informações do Pastor e descrição')
 

@@ -1,7 +1,7 @@
 <header class="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between">
     <div>
         <h2 class="text-2xl font-bold text-gray-800">@yield('page-title', 'Dashboard')</h2>
-        <p class="text-sm text-gray-500 mt-1">@yield('page-subtitle', 'Bem-vindo ao Projeto Edificar')</p>
+        <p class="text-sm text-gray-500 mt-1">@yield('page-subtitle', 'Bem-vindo ao Portal Life Church')</p>
     </div>
     
     <div class="flex items-center space-x-6">

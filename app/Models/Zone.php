@@ -4,10 +4,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Zone extends Model {
+class Zone extends Model
+{
     use HasFactory;
 
-     protected $fillable = [
+    protected $fillable = [
         'name',
         'pastor_id',
         'description', // Adicionado para consistência com o Controller
@@ -19,23 +20,37 @@ class Zone extends Model {
     ];
 
     // RELACIONAMENTOS
-    public function supervisions() {
+    public function supervisions()
+    {
         return $this->hasMany(Supervision::class);
     }
-     public function pastor()
+    public function pastor()
     {
         return $this->belongsTo(User::class, 'pastor_id');
     }
 
-    public function cells() {
+    public function cells()
+    {
         // Assume-se que esta relação many-through está correta
         return $this->hasManyThrough(Cell::class, Supervision::class);
     }
-    public function contributions() {
+    public function contributions()
+    {
         return $this->hasMany(Contribution::class);
     }
 
-    public function getTotalContributedThisMonth() {
+    public function quarterlyReports()
+    {
+        return $this->hasMany(QuarterlyReport::class);
+    }
+
+    public function events()
+    {
+        return $this->hasMany(Event::class);
+    }
+
+    public function getTotalContributedThisMonth()
+    {
         $now = now();
         $monthStart = $now->copy()->startOfMonth()->addDays(19);
         $monthEnd = $now->copy()->addMonth()->startOfMonth()->addDays(4);
@@ -57,7 +72,8 @@ class Zone extends Model {
     {
         // CORREÇÃO CRÍTICA: Removida a condição is_active para evitar o erro 1054.
         // Se a tabela 'cells' não tiver a coluna 'is_active', esta é a correção.
-        return Cell::whereIn('supervision_id',
+        return Cell::whereIn(
+            'supervision_id',
             $this->supervisions()->pluck('id')
         )->count();
     }
@@ -65,10 +81,11 @@ class Zone extends Model {
     public function getTotalMembers()
     {
         // CORREÇÃO CRÍTICA: Removida a condição is_active para evitar o erro 1054.
-        $cellIds = Cell::whereIn('supervision_id',
+        $cellIds = Cell::whereIn(
+            'supervision_id',
             $this->supervisions()->pluck('id')
         )->pluck('id');
-        
+
         // Mantive o filtro 'is_active' no User pois assumimos que existe no modelo User
         return User::whereIn('cell_id', $cellIds)
             ->where('is_active', true)

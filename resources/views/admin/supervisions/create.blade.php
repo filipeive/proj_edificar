@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Criar Supervisão - Projeto Edificar')
+@section('title', 'Criar Supervisão - Portal Life Church')
 @section('page-title', 'Criar Supervisão')
 
 @section('content')

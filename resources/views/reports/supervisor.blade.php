@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Relatório da Supervisão - Projeto Edificar')
+@section('title', 'Relatório da Supervisão - Portal Life Church')
 @section('page-title', 'Relatório da Supervisão')
 @section('page-subtitle', $supervision ? $supervision->name : 'Selecione uma supervisão para começar')
 

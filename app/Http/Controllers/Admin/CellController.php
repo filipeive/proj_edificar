@@ -5,14 +5,17 @@ use App\Models\Cell;
 use App\Models\Supervision;
 use App\Models\User;
 use App\Models\Zone; // Importar o modelo Zone
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-class CellController {
-    public function index(Request $request): View {
+class CellController
+{
+    public function index(Request $request): View
+    {
         // Obter todas as zonas para o filtro de dropdown
         $zones = Zone::orderBy('name')->get();
-        
+
         // Iniciar a query
         $cellsQuery = Cell::query()->with('supervision.zone', 'leader', 'members');
 
@@ -36,17 +39,17 @@ class CellController {
                 $query->orWhereHas('leader', function ($q) use ($searchTerm) {
                     $q->where('name', 'LIKE', '%' . $searchTerm . '%');
                 });
-                
+
                 // Busca por nome da zona (JOIN necessário)
                 $query->orWhereHas('supervision.zone', function ($q) use ($searchTerm) {
                     $q->where('name', 'LIKE', '%' . $searchTerm . '%');
                 });
             });
         }
-        
+
         // --- 3. ORDENAÇÃO (Sort) ---
         $sort = $request->input('sort', 'name');
-        
+
         switch ($sort) {
             case 'members':
                 // Ordenar pela contagem de membros (requires selectRaw for efficiency)
@@ -72,8 +75,9 @@ class CellController {
 
     // ... (restante dos métodos create, store, show, edit, update, destroy)
     // Mantenha os demais métodos inalterados, pois a lógica de filtro foi adicionada apenas ao index.
-    
-    public function create(): View {
+
+    public function create(): View
+    {
         $supervisions = Supervision::all();
         $leaders = User::where('role', '!=', 'admin')->get();
         return view('admin.cells.create', [
@@ -82,7 +86,8 @@ class CellController {
         ]);
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'supervision_id' => 'required|exists:supervisions,id',
@@ -101,12 +106,16 @@ class CellController {
             ->with('success', 'Célula criada com sucesso!');
     }
 
-    public function show(Cell $cell): View {
-        return view('admin.cells.show', 
-            ['cell' => $cell->load('supervision', 'leader', 'members')]);
+    public function show(Cell $cell): View
+    {
+        return view(
+            'admin.cells.show',
+            ['cell' => $cell->load('supervision', 'leader', 'members')]
+        );
     }
 
-    public function edit(Cell $cell): View {
+    public function edit(Cell $cell): View
+    {
         $supervisions = Supervision::all();
         $leaders = User::where('role', '!=', 'admin')->get();
         return view('admin.cells.edit', [
@@ -116,7 +125,8 @@ class CellController {
         ]);
     }
 
-    public function update(Request $request, Cell $cell) {
+    public function update(Request $request, Cell $cell)
+    {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'supervision_id' => 'required|exists:supervisions,id',
@@ -141,14 +151,21 @@ class CellController {
             ->with('success', 'Célula atualizada com sucesso!');
     }
 
-    public function destroy(Cell $cell) {
+    public function destroy(Cell $cell)
+    {
         if ($cell->members()->exists()) {
             return back()->with('error', 'Não pode deletar célula com membros!');
         }
-
         $cell->delete();
+        return redirect()->route('cells.index')->with('success', 'Célula excluída com sucesso!');
+    }
 
-        return redirect()->route('cells.index')
-            ->with('success', 'Célula deletada com sucesso!');
+    public function downloadPdf(Cell $cell)
+    {
+        $cell->load(['supervision.zone', 'leader', 'members']);
+
+        $pdf = Pdf::loadView('admin.cells.pdf', compact('cell'));
+
+        return $pdf->download("ficha_celula_{$cell->name}.pdf");
     }
 }

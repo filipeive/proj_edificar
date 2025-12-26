@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Meu Perfil - Projeto Edificar')
+@section('title', 'Meu Perfil - Portal Life Church')
 @section('page-title', 'Meu Perfil')
 @section('page-subtitle', 'Atualize suas informações')
 

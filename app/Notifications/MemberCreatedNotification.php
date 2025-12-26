@@ -25,7 +25,7 @@ class MemberCreatedNotification extends Notification
     public function toDatabase(object $notifiable): array
     {
         return [
-            'title' => 'Bem-vindo ao Edificar!',
+            'title' => 'Bem-vindo ao Portal Life Church!',
             'message' => 'Sua conta foi criada com sucesso. Você pode agora fazer login no sistema.',
             'link' => route('dashboard'),
             'type' => 'member_created',

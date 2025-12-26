@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', "Supervisão $supervision->name - Projeto Edificar")
+@section('title', "Supervisão $supervision->name - Portal Life Church")
 @section('page-title', $supervision->name)
 @section('page-subtitle', "Gestão da supervisão e suas células")
 

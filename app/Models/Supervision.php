@@ -4,10 +4,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Supervision extends Model {
+class Supervision extends Model
+{
 
     use HasFactory;
-    
+
 
     protected $fillable = [
         'name',
@@ -21,16 +22,24 @@ class Supervision extends Model {
     ];
 
     // RELACIONAMENTOS
-    public function zone() {
+    public function zone()
+    {
         return $this->belongsTo(Zone::class);
     }
 
-    public function cells() {
+    public function cells()
+    {
         return $this->hasMany(Cell::class);
     }
 
-    public function contributions() {
+    public function contributions()
+    {
         return $this->hasMany(Contribution::class);
+    }
+
+    public function supervisor()
+    {
+        return $this->belongsTo(User::class, 'supervisor_id');
     }
 
     // HELPERS
@@ -41,11 +50,13 @@ class Supervision extends Model {
 
     public function getTotalMembers()
     {
-        return User::whereIn('cell_id', 
+        return User::whereIn(
+            'cell_id',
             $this->cells()->pluck('id')
         )->where('is_active', true)->count();
     }
-    public function getTotalContributedThisMonth() {
+    public function getTotalContributedThisMonth()
+    {
         $now = now();
         $monthStart = $now->copy()->startOfMonth()->addDays(19);
         $monthEnd = $now->copy()->addMonth()->startOfMonth()->addDays(4);

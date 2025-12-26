@@ -1,7 +1,7 @@
 
 @extends('layouts.app')
 
-@section('title', 'Editar Pacote - Projeto Edificar')
+@section('title', 'Editar Pacote - Portal Life Church')
 @section('page-title', 'Editar Pacote')
 
 @section('content')
