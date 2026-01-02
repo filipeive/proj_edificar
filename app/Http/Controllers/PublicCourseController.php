@@ -22,6 +22,50 @@ class PublicCourseController extends Controller
         return view('public.courses.register', compact('course'));
     }
 
+    public function store(Request $request, Course $course)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
+            'observations' => 'nullable|string',
+        ]);
+
+        // Check if user exists
+        $user = \App\Models\User::where('email', $validated['email'])->first();
+
+        if (!$user) {
+            // Create new user
+            $user = \App\Models\User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'phone' => $validated['phone'],
+                'password' => \Illuminate\Support\Facades\Hash::make('password'), // Default password
+                'role' => 'membro',
+                'is_active' => true,
+            ]);
+        }
+
+        // Check if already enrolled
+        $existingEnrollment = \App\Models\CourseEnrollment::where('course_id', $course->id)
+            ->where('user_id', $user->id)
+            ->first();
+
+        if ($existingEnrollment) {
+            return redirect()->route('welcome')->with('info', 'Você já está inscrito neste curso.');
+        }
+
+        // Create enrollment
+        \App\Models\CourseEnrollment::create([
+            'course_id' => $course->id,
+            'user_id' => $user->id,
+            'status' => 'pending', // Or 'active' depending on logic
+            'enrolled_at' => now(),
+        ]);
+
+        return redirect()->route('welcome')->with('success', 'Inscrição realizada com sucesso! Entraremos em contacto em breve.');
+    }
+
     public function showCasaisForm()
     {
         $course = Course::where('slug', 'like', '%casais%')
