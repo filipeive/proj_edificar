@@ -12,6 +12,7 @@ class CourseEnrollment extends Model
         'status',
         'enrolled_at',
         'completed_at',
+        'course_class_id',
     ];
 
     protected $casts = [
@@ -27,5 +28,15 @@ class CourseEnrollment extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function courseClass()
+    {
+        return $this->belongsTo(CourseClass::class);
+    }
+
+    public function attendances()
+    {
+        return $this->morphMany(CourseClassAttendance::class, 'enrollable');
     }
 }

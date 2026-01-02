@@ -55,7 +55,11 @@
                                 class="flex-1 bg-gray-900 text-white text-center py-3 rounded-xl font-bold hover:bg-orange-600 transition shadow-lg">
                                 Ver Detalhes
                             </a>
-                            @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
+                            @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor' || auth()->user()->role === 'secretaria')
+                                <a href="{{ route('course-classes.index', ['course_id' => $course->id]) }}"
+                                    class="p-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition" title="Ver Turmas">
+                                    <i class="bi bi-collection"></i>
+                                </a>
                                 <a href="{{ route('courses.edit', $course) }}"
                                     class="p-3 bg-gray-100 text-gray-600 rounded-xl hover:bg-orange-100 hover:text-orange-600 transition">
                                     <i class="bi bi-pencil"></i>

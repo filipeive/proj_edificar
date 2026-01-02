@@ -204,6 +204,15 @@
             <span class="tooltip">Academia de Vida e Cursos</span>
         </a>
 
+        @if ($user->isAdmin() || $user->isSecretaria() || $user->isPastor())
+            <a href="{{ route('course-classes.index') }}"
+                class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('course-classes.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                <i class="bi bi-collection-fill text-xl flex-shrink-0"></i>
+                <span class="sidebar-text ml-4 font-bold tracking-tight">Turmas</span>
+                <span class="tooltip">Gestão de Turmas</span>
+            </a>
+        @endif
+
         @if (!$user->hasRole('membro'))
             <!-- PESSOAS & RELATÓRIOS -->
             <div

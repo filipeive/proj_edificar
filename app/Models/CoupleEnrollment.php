@@ -22,10 +22,21 @@ class CoupleEnrollment extends Model
         'has_pastoral_recommendation',
         'observations',
         'status',
+        'course_class_id',
     ];
 
     public function course()
     {
         return $this->belongsTo(Course::class);
+    }
+
+    public function courseClass()
+    {
+        return $this->belongsTo(CourseClass::class);
+    }
+
+    public function attendances()
+    {
+        return $this->morphMany(CourseClassAttendance::class, 'enrollable');
     }
 }
