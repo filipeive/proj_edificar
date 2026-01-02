@@ -285,6 +285,12 @@
                         <span
                             class="absolute bottom-0 left-0 w-0 h-0.5 orange-gradient transition-all duration-300 group-hover:w-full"></span>
                     </a>
+                    <a href="#online"
+                        class="text-xs font-bold text-gray-600 hover:text-orange-600 transition-all uppercase tracking-wider relative group">
+                        Online
+                        <span
+                            class="absolute bottom-0 left-0 w-0 h-0.5 orange-gradient transition-all duration-300 group-hover:w-full"></span>
+                    </a>
                     @auth
                         <a href="{{ route('dashboard') }}"
                             class="btn-premium text-white px-8 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300">
@@ -318,6 +324,8 @@
                     onclick="toggleMobileMenu()">Eventos</a>
                 <a href="#services" class="block text-lg font-bold text-gray-900 hover:text-orange-600 transition"
                     onclick="toggleMobileMenu()">Cultos</a>
+                <a href="#online" class="block text-lg font-bold text-gray-900 hover:text-orange-600 transition"
+                    onclick="toggleMobileMenu()">Online</a>
                 @auth
                     <a href="{{ route('dashboard') }}"
                         class="btn-premium text-white px-8 py-3 rounded-xl font-bold text-xs uppercase tracking-wider w-full inline-block text-center">
@@ -614,6 +622,54 @@
         </div>
     </section>
 
+    <!-- YouTube Section -->
+    <section id="online" class="py-32 bg-black relative overflow-hidden">
+        <div class="absolute inset-0 opacity-20">
+            <div
+                class="absolute top-0 left-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')] bg-cover bg-center">
+            </div>
+            <div class="absolute inset-0 bg-black/50"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-16">
+                <span class="text-orange-500 font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Assista
+                    Online</span>
+                <h2 class="text-5xl md:text-7xl font-black text-white mb-6 tracking-tighter">
+                    Nossos <span class="orange-gradient-text">Cultos</span>
+                </h2>
+                <p class="text-gray-400 text-xl font-light max-w-2xl mx-auto">
+                    Acompanhe nossas transmissões e seja edificado onde estiver
+                </p>
+            </div>
+
+            <div class="max-w-5xl mx-auto">
+                <div class="relative aspect-video rounded-3xl overflow-hidden shadow-2xl border border-white/10 group">
+                    <iframe class="w-full h-full" src="https://www.youtube.com/embed/-X1wWrLCnBs?si=Edificar2025"
+                        title="YouTube video player" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+
+                    <!-- Decorative elements -->
+                    <div
+                        class="absolute -top-10 -right-10 w-40 h-40 bg-orange-600 rounded-full blur-[100px] opacity-20 group-hover:opacity-40 transition-opacity duration-500">
+                    </div>
+                    <div
+                        class="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-600 rounded-full blur-[100px] opacity-20 group-hover:opacity-40 transition-opacity duration-500">
+                    </div>
+                </div>
+
+                <div class="mt-12 text-center">
+                    <a href="https://www.youtube.com/@LifeChurch" target="_blank"
+                        class="inline-flex items-center space-x-3 bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-2xl transition-all duration-300 backdrop-blur-sm border border-white/10 group">
+                        <i class="bi bi-youtube text-2xl text-red-600 group-hover:scale-110 transition-transform"></i>
+                        <span class="font-bold uppercase tracking-widest text-xs">Visitar Canal no YouTube</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- CTA Section -->
     <section class="py-32 bg-gray-900 relative overflow-hidden">
         <div class="absolute inset-0 opacity-10">
@@ -709,6 +765,14 @@
                                 <i
                                     class="bi bi-arrow-right mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                 Cultos
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#online"
+                                class="text-gray-500 hover:text-orange-600 transition text-sm font-medium flex items-center group">
+                                <i
+                                    class="bi bi-arrow-right mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                Online
                             </a>
                         </li>
                         <li>

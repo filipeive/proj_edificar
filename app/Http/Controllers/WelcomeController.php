@@ -9,7 +9,7 @@ class WelcomeController extends Controller
 {
     public function index()
     {
-        $events = Event::where('date', '>=', now())
+        $events = Event::where('date', '>=', now()->startOfDay())
             ->orderBy('date', 'asc')
             ->limit(6)
             ->get();

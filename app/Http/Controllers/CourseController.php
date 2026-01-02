@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Str;
+
 class CourseController extends Controller
 {
     public function index()
@@ -27,6 +29,9 @@ class CourseController extends Controller
             'duration' => 'nullable|string|max:255',
             'is_active' => 'boolean',
         ]);
+
+        $validated['slug'] = Str::slug($validated['name']);
+        $validated['registration_open'] = true; // Default to open for new courses
 
         Course::create($validated);
 
@@ -53,6 +58,10 @@ class CourseController extends Controller
             'duration' => 'nullable|string|max:255',
             'is_active' => 'boolean',
         ]);
+
+        if ($course->name !== $validated['name']) {
+            $validated['slug'] = Str::slug($validated['name']);
+        }
 
         $course->update($validated);
 
