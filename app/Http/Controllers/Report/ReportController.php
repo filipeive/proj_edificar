@@ -327,6 +327,10 @@ class ReportController
                 new \App\Exports\GlobalReportExport($startDate, $endDate),
                 "relatorio_global_" . now()->format('Y-m-d') . '.xlsx'
             ),
+            'structure' => Excel::download(
+                new \App\Exports\ChurchStructureExport(),
+                "estrutura_igreja_" . now()->format('Y-m-d') . '.xlsx'
+            ),
             default => abort(400, 'Tipo de relatório inválido'),
         };
     }

@@ -4,289 +4,817 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Life Church - Gestão Eclesiástica</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <title>Portal Life Church - Edificando Vidas, Transformando Destinos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"
+        rel="stylesheet">
     <style>
         body {
             font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
         }
 
         .glass-nav {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .hero-section {
-            background: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.9)), url('{{ asset('images/hero-bg.png') }}');
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(249, 115, 22, 0.3) 100%),
+                url('https://images.unsplash.com/photo-1438232992991-995b7058bbb3?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
         }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .glass-card:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: translateY(-5px);
-            border-color: rgba(249, 115, 22, 0.3);
+        .orange-gradient {
+            background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
         }
 
         .orange-gradient-text {
-            background: linear-gradient(to right, #f97316, #fb923c);
+            background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .btn-primary {
+        .btn-premium {
             background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-            box-shadow: 0 10px 20px -10px rgba(249, 115, 22, 0.5);
+            box-shadow: 0 20px 40px -15px rgba(249, 115, 22, 0.4);
+            position: relative;
+            overflow: hidden;
         }
 
-        .btn-primary:hover {
-            box-shadow: 0 15px 25px -10px rgba(249, 115, 22, 0.6);
+        .btn-premium::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-premium:hover::before {
+            left: 100%;
+        }
+
+        .btn-premium:hover {
             transform: translateY(-2px);
+            box-shadow: 0 25px 50px -12px rgba(249, 115, 22, 0.5);
+        }
+
+        .card-float {
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .card-float:hover {
+            transform: translateY(-15px) scale(1.02);
+        }
+
+        .feature-card {
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #f97316, #fb923c);
+            transform: scaleX(0);
+            transition: transform 0.5s ease;
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-card:hover {
+            box-shadow: 0 30px 60px -15px rgba(249, 115, 22, 0.2);
+            border-color: rgba(249, 115, 22, 0.2);
+        }
+
+        .feature-icon {
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.15) rotate(-5deg);
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s ease;
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .event-card {
+            transition: all 0.5s ease;
+            position: relative;
+        }
+
+        .event-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 3rem;
+            padding: 2px;
+            background: linear-gradient(135deg, #f97316, #fb923c);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .event-card:hover::after {
+            opacity: 1;
+        }
+
+        .event-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 40px 80px -20px rgba(249, 115, 22, 0.3);
+        }
+
+        .service-item {
+            transition: all 0.4s ease;
+        }
+
+        .service-item:hover {
+            background: white !important;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1);
         }
 
         @keyframes float {
-            0% {
+
+            0%,
+            100% {
                 transform: translateY(0px);
             }
 
             50% {
-                transform: translateY(-10px);
-            }
-
-            100% {
-                transform: translateY(0px);
+                transform: translateY(-20px);
             }
         }
 
-        .floating {
-            animation: float 4s ease-in-out infinite;
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(249, 115, 22, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 40px rgba(249, 115, 22, 0.6);
+            }
+        }
+
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        .parallax-bg {
+            transform: translateZ(-1px) scale(2);
+        }
+
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .mobile-menu.active {
+            transform: translateX(0);
+        }
+
+        @keyframes gradient-shift {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .animated-gradient {
+            background: linear-gradient(270deg, #f97316, #fb923c, #ea580c);
+            background-size: 200% 200%;
+            animation: gradient-shift 5s ease infinite;
+        }
+
+        .scroll-indicator {
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0) translateX(-50%);
+            }
+
+            50% {
+                transform: translateY(10px) translateX(-50%);
+            }
+        }
+
+        .text-shadow-glow {
+            text-shadow: 0 0 40px rgba(249, 115, 22, 0.5);
         }
     </style>
 </head>
 
-<body class="bg-white text-gray-900 overflow-x-hidden">
-    <!-- Navbar -->
-    <nav class="fixed w-full z-50 glass-nav">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<body class="bg-white text-gray-900">
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-nav transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
-                <div class="flex items-center space-x-3">
-                    <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-12 w-auto">
-                    <div class="hidden sm:block">
-                        <span class="text-xl font-black tracking-tighter text-gray-900 uppercase">Portal Life
+                <div class="flex items-center space-x-3 group cursor-pointer">
+                    <div
+                        class="p-2 orange-gradient rounded-2xl shadow-lg transition-transform duration-300 group-hover:scale-110 pulse-glow">
+                        <svg class="h-8 w-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" />
+                        </svg>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-xl font-black tracking-tighter text-gray-900 uppercase leading-none">Life
                             Church</span>
+                        <span class="text-[9px] text-orange-600 font-black uppercase tracking-[0.3em]">Portal de
+                            Gestão</span>
                     </div>
                 </div>
-                <div class="flex items-center space-x-8">
-                    @if (Route::has('login'))
-                        @auth
-                            <a href="{{ url('/dashboard') }}"
-                                class="text-sm font-bold text-gray-700 hover:text-orange-600 transition uppercase tracking-widest">Dashboard</a>
-                            <form method="POST" action="{{ route('logout') }}" class="inline">
-                                @csrf
-                                <button type="submit"
-                                    class="bg-gray-900 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-orange-600 transition-all duration-300 shadow-lg uppercase text-xs tracking-widest">Sair</button>
-                            </form>
-                        @else
-                            <a href="{{ route('login') }}"
-                                class="btn-primary text-white px-8 py-3 rounded-xl font-bold transition-all duration-300 uppercase text-xs tracking-widest flex items-center">
-                                <i class="bi bi-person-circle mr-2 text-lg"></i>Entrar no Portal
-                            </a>
-                        @endauth
-                    @endif
+
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#features"
+                        class="text-xs font-bold text-gray-600 hover:text-orange-600 transition-all uppercase tracking-wider relative group">
+                        Recursos
+                        <span
+                            class="absolute bottom-0 left-0 w-0 h-0.5 orange-gradient transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <a href="#events"
+                        class="text-xs font-bold text-gray-600 hover:text-orange-600 transition-all uppercase tracking-wider relative group">
+                        Eventos
+                        <span
+                            class="absolute bottom-0 left-0 w-0 h-0.5 orange-gradient transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <a href="#services"
+                        class="text-xs font-bold text-gray-600 hover:text-orange-600 transition-all uppercase tracking-wider relative group">
+                        Cultos
+                        <span
+                            class="absolute bottom-0 left-0 w-0 h-0.5 orange-gradient transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    @auth
+                        <a href="{{ route('dashboard') }}"
+                            class="btn-premium text-white px-8 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300">
+                            <i class="bi bi-speedometer2 mr-2"></i>Dashboard
+                        </a>
+                    @else
+                        <a href="{{ route('login') }}"
+                            class="btn-premium text-white px-8 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300">
+                            <i class="bi bi-shield-lock-fill mr-2"></i>Login
+                        </a>
+                    @endauth
                 </div>
+
+                <button class="md:hidden text-gray-900 text-2xl" onclick="toggleMobileMenu()">
+                    <i class="bi bi-list"></i>
+                </button>
             </div>
         </div>
     </nav>
 
+    <!-- Mobile Menu -->
+    <div class="mobile-menu fixed top-0 right-0 w-full h-full bg-white z-40 md:hidden shadow-2xl" id="mobileMenu">
+        <div class="p-8">
+            <button class="absolute top-6 right-6 text-3xl text-gray-900" onclick="toggleMobileMenu()">
+                <i class="bi bi-x"></i>
+            </button>
+            <div class="mt-16 space-y-6">
+                <a href="#features" class="block text-lg font-bold text-gray-900 hover:text-orange-600 transition"
+                    onclick="toggleMobileMenu()">Recursos</a>
+                <a href="#events" class="block text-lg font-bold text-gray-900 hover:text-orange-600 transition"
+                    onclick="toggleMobileMenu()">Eventos</a>
+                <a href="#services" class="block text-lg font-bold text-gray-900 hover:text-orange-600 transition"
+                    onclick="toggleMobileMenu()">Cultos</a>
+                @auth
+                    <a href="{{ route('dashboard') }}"
+                        class="btn-premium text-white px-8 py-3 rounded-xl font-bold text-xs uppercase tracking-wider w-full inline-block text-center">
+                        <i class="bi bi-speedometer2 mr-2"></i>Dashboard
+                    </a>
+                @else
+                    <a href="{{ route('login') }}"
+                        class="btn-premium text-white px-8 py-3 rounded-xl font-bold text-xs uppercase tracking-wider w-full inline-block text-center">
+                        <i class="bi bi-shield-lock-fill mr-2"></i>Login
+                    </a>
+                @endauth
+            </div>
+        </div>
+    </div>
+
     <!-- Hero Section -->
-    <section class="relative min-h-screen flex items-center justify-center hero-section overflow-hidden">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-32">
-            <div class="text-center max-w-4xl mx-auto">
+    <section class="relative min-h-screen flex items-center justify-center hero-section">
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-black/10 to-white/90 z-0"></div>
+
+        <!-- Floating Elements -->
+        <div class="absolute top-40 left-20 w-20 h-20 orange-gradient rounded-full opacity-20 blur-xl float-animation"
+            style="animation-delay: 0s;"></div>
+        <div class="absolute top-60 right-40 w-32 h-32 orange-gradient rounded-full opacity-20 blur-xl float-animation"
+            style="animation-delay: 1s;"></div>
+        <div class="absolute bottom-40 left-1/3 w-24 h-24 orange-gradient rounded-full opacity-20 blur-xl float-animation"
+            style="animation-delay: 2s;"></div>
+
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 py-32">
+            <div class="text-center max-w-5xl mx-auto">
                 <div
-                    class="inline-flex items-center px-4 py-2 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[10px] font-black uppercase tracking-[0.2em] mb-8 floating">
-                    <span class="mr-2">✨</span> Gestão Eclesiástica de Próxima Geração
+                    class="inline-flex items-center px-6 py-3 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-orange-400 text-[10px] font-black uppercase tracking-[0.3em] mb-8 hover:bg-white/20 transition-all duration-300 cursor-default">
+                    <span class="flex h-2 w-2 rounded-full bg-orange-500 mr-3">
+                        <span
+                            class="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-orange-400 opacity-75"></span>
+                    </span>
+                    Edificando Vidas, Transformando Destinos
                 </div>
-                <h1 class="text-6xl md:text-8xl font-black text-white mb-8 leading-[0.9] tracking-tighter">
-                    O Futuro da Sua <br>
-                    <span class="orange-gradient-text">Igreja Conectada</span>
+
+                <h1
+                    class="text-6xl md:text-8xl lg:text-9xl font-black text-white mb-8 leading-[0.9] tracking-tighter text-shadow-glow">
+                    Onde a Fé Encontra a<br>
+                    <span
+                        class="orange-gradient-text inline-block hover:scale-105 transition-transform duration-300">Excelência
+                        Digital</span>
                 </h1>
-                <p class="text-xl text-gray-300 mb-12 leading-relaxed max-w-2xl mx-auto font-light">
-                    Uma plataforma inteligente para pastores e líderes que buscam excelência na gestão de membros,
-                    células e formação ministerial.
+
+                <p class="text-xl md:text-2xl text-gray-200 mb-12 leading-relaxed max-w-3xl mx-auto font-light">
+                    Uma plataforma de gestão eclesiástica de classe mundial, desenhada para potencializar o crescimento
+                    da sua igreja e o cuidado com cada membro.
                 </p>
 
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
-                    @auth
-                        <a href="{{ url('/dashboard') }}"
-                            class="w-full sm:w-auto bg-white text-gray-900 px-12 py-5 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-2xl">
-                            Aceder ao Painel
-                        </a>
-                    @else
-                        <a href="{{ route('login') }}"
-                            class="w-full sm:w-auto btn-primary text-white px-12 py-5 rounded-2xl font-black text-sm uppercase tracking-widest transition-all duration-300">
-                            Começar Agora
-                        </a>
-                        <a href="#features"
-                            class="w-full sm:w-auto bg-white/5 backdrop-blur-md text-white border border-white/10 px-12 py-5 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-white/10 transition-all duration-300">
-                            Explorar
-                        </a>
-                    @endauth
+                    <a href="{{ route('register') }}"
+                        class="w-full sm:w-auto bg-white text-gray-900 px-12 py-5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-orange-600 hover:text-white transition-all duration-500 shadow-2xl group text-center">
+                        Começar Agora
+                        <i
+                            class="bi bi-arrow-right ml-2 group-hover:translate-x-2 transition-transform inline-block"></i>
+                    </a>
+                    <a href="#features"
+                        class="w-full sm:w-auto bg-white/5 backdrop-blur-xl text-white border-2 border-white/20 px-12 py-5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-white/10 hover:border-white/40 transition-all duration-500 text-center">
+                        Explorar Recursos
+                    </a>
+                </div>
+
+                <!-- Stats Preview -->
+                <div class="grid grid-cols-3 gap-6 mt-20 max-w-3xl mx-auto">
+                    <div class="stat-card p-6 rounded-2xl text-center">
+                        <div class="text-3xl font-black text-white mb-1">100%</div>
+                        <div class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Seguro</div>
+                    </div>
+                    <div class="stat-card p-6 rounded-2xl text-center">
+                        <div class="text-3xl font-black text-white mb-1">+{{ $memberCount ?? '2.5k' }}</div>
+                        <div class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Membros</div>
+                    </div>
+                    <div class="stat-card p-6 rounded-2xl text-center">
+                        <div class="text-3xl font-black text-white mb-1">24/7</div>
+                        <div class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Online</div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Scroll Indicator -->
-        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/30 animate-bounce">
-            <i class="bi bi-chevron-down text-3xl"></i>
+        <div class="scroll-indicator absolute bottom-10 left-1/2 text-white/60 cursor-pointer z-10">
+            <a href="#features"><i class="bi bi-chevron-down text-3xl animate-bounce"></i></a>
         </div>
     </section>
 
-    <!-- Features Grid -->
-    <section id="features" class="py-32 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
-                <div class="max-w-2xl">
-                    <h2 class="text-4xl md:text-6xl font-black text-gray-900 mb-6 tracking-tighter leading-none">Tudo o
-                        que você precisa <br>em um só lugar.</h2>
-                    <p class="text-gray-500 text-lg">Desenvolvido para simplificar processos e focar no que realmente
-                        importa: pessoas.</p>
-                </div>
-                <div class="w-24 h-1 bg-orange-500 rounded-full hidden md:block"></div>
+    <!-- Features Section -->
+    <section id="features" class="py-32 bg-gradient-to-b from-white to-gray-50">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="text-center mb-20">
+                <span class="text-orange-600 font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Nossos
+                    Pilares</span>
+                <h2 class="text-5xl md:text-7xl font-black text-gray-900 mb-6 tracking-tighter leading-none">
+                    Tecnologia a serviço<br>do <span class="orange-gradient-text">Reino</span>
+                </h2>
+                <p class="text-gray-500 text-xl font-light leading-relaxed max-w-2xl mx-auto">
+                    Ferramentas que eliminam a burocracia para você focar no que realmente importa
+                </p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Eclesiástico -->
-                <div
-                    class="group p-12 rounded-[2.5rem] bg-white border border-gray-100 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] transition-all duration-500">
+                <div class="feature-card card-float p-10 rounded-3xl group cursor-pointer">
                     <div
-                        class="w-20 h-20 bg-orange-50 rounded-3xl flex items-center justify-center text-4xl text-orange-600 mb-10 group-hover:bg-orange-600 group-hover:text-white transition-all duration-500">
-                        <i class="bi bi-church"></i>
+                        class="w-16 h-16 orange-gradient rounded-2xl flex items-center justify-center text-3xl text-white mb-8 feature-icon shadow-lg">
+                        <i class="bi bi-journal-check"></i>
                     </div>
-                    <h3 class="text-2xl font-black text-gray-900 mb-4 tracking-tight">Gestão de Cultos</h3>
-                    <p class="text-gray-500 leading-relaxed">Relatórios detalhados de cada celebração, com exportação em
-                        PDF e partilha instantânea com a liderança.</p>
+                    <h3
+                        class="text-2xl font-black text-gray-900 mb-4 tracking-tight group-hover:text-orange-600 transition-colors">
+                        Gestão de Cultos
+                    </h3>
+                    <p class="text-gray-500 leading-relaxed font-light mb-6">
+                        Relatórios inteligentes com métricas de presença, ofertas e decisões. PDFs profissionais
+                        instantâneos.
+                    </p>
+                    <div
+                        class="flex items-center text-orange-600 text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                        Saiba mais <i class="bi bi-arrow-right ml-2"></i>
+                    </div>
                 </div>
 
-                <!-- Células -->
-                <div
-                    class="group p-12 rounded-[2.5rem] bg-white border border-gray-100 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] transition-all duration-500">
+                <div class="feature-card card-float p-10 rounded-3xl group cursor-pointer">
                     <div
-                        class="w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center text-4xl text-blue-600 mb-10 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
-                        <i class="bi bi-people"></i>
+                        class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center text-3xl text-white mb-8 feature-icon shadow-lg">
+                        <i class="bi bi-diagram-3"></i>
                     </div>
-                    <h3 class="text-2xl font-black text-gray-900 mb-4 tracking-tight">Células Ativas</h3>
-                    <p class="text-gray-500 leading-relaxed">Acompanhe o pulsar da sua igreja através das células.
-                        Visitantes, decisões e crescimento real em tempo real.</p>
+                    <h3
+                        class="text-2xl font-black text-gray-900 mb-4 tracking-tight group-hover:text-orange-600 transition-colors">
+                        Rede de Células
+                    </h3>
+                    <p class="text-gray-500 leading-relaxed font-light mb-6">
+                        Acompanhe o crescimento através de supervisões e zonas. Monitoramento em tempo real.
+                    </p>
+                    <div
+                        class="flex items-center text-orange-600 text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                        Saiba mais <i class="bi bi-arrow-right ml-2"></i>
+                    </div>
                 </div>
 
                 <!-- Cursos -->
-                <div
-                    class="group p-12 rounded-[2.5rem] bg-white border border-gray-100 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] transition-all duration-500">
+                <div class="card-premium p-12 rounded-[3rem]">
                     <div
-                        class="w-20 h-20 bg-green-50 rounded-3xl flex items-center justify-center text-4xl text-green-600 mb-10 group-hover:bg-green-600 group-hover:text-white transition-all duration-500">
+                        class="w-20 h-20 bg-green-50 rounded-3xl flex items-center justify-center text-4xl text-green-600 mb-10 feature-icon">
                         <i class="bi bi-mortarboard"></i>
                     </div>
-                    <h3 class="text-2xl font-black text-gray-900 mb-4 tracking-tight">Ensino & Formação</h3>
-                    <p class="text-gray-500 leading-relaxed mb-6">De Academia de Vida a Cursos de Casais. Gerencie o
-                        trilho
-                        de crescimento espiritual de cada membro.</p>
-                    <a href="{{ route('public.courses.casais') }}"
-                        class="inline-flex items-center text-orange-600 font-black uppercase tracking-widest text-xs hover:text-orange-700 transition group">
-                        Inscrição Curso de Casais
-                        <i class="bi bi-arrow-right ml-2 group-hover:translate-x-2 transition-transform"></i>
-                    </a>
+                    <h3 class="text-2xl font-black text-gray-900 mb-6 tracking-tight">Trilho de Ensino</h3>
+                    <p class="text-gray-500 leading-relaxed font-light mb-8">Gerencie inscrições e progresso em cursos
+                        como Academia de Vida e Escola de Líderes.</p>
+
+                    @if(isset($activeCourses) && $activeCourses->count() > 0)
+                        <div class="space-y-4">
+                            @foreach($activeCourses as $course)
+                                <div class="bg-green-50 p-4 rounded-2xl border border-green-100">
+                                    <h4 class="font-bold text-gray-900 text-sm mb-1">{{ $course->name }}</h4>
+                                    <p class="text-xs text-gray-500 mb-3 line-clamp-2">{{ $course->description }}</p>
+                                    <a href="{{ route('public.courses.register', $course->slug) }}"
+                                        class="inline-flex items-center text-green-700 font-black uppercase tracking-widest text-[10px] hover:text-green-800 transition group">
+                                        Inscrever-se <i
+                                            class="bi bi-arrow-right ml-2 group-hover:translate-x-2 transition-transform"></i>
+                                    </a>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <a href="#"
+                            class="inline-flex items-center text-gray-400 font-black uppercase tracking-widest text-[10px] cursor-not-allowed">
+                            Inscrições em Breve <i class="bi bi-clock ml-2"></i>
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Stats / CTA -->
-    <section class="py-32 bg-gray-900 relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-1/2 h-full bg-orange-600/5 skew-x-12 translate-x-1/4"></div>
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <!-- Events Section -->
+    <section id="events" class="py-32 bg-white">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="text-center mb-20">
+                <span
+                    class="text-orange-600 font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Calendário</span>
+                <h2 class="text-5xl md:text-7xl font-black text-gray-900 mb-6 tracking-tighter">
+                    Próximos <span class="orange-gradient-text">Eventos</span>
+                </h2>
+                <p class="text-gray-500 text-xl font-light max-w-2xl mx-auto">
+                    Momentos especiais que você não pode perder
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                @forelse($events as $event)
+                    <div class="event-card bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-lg">
+                        <div class="p-8">
+                            <div class="flex justify-between items-start mb-6">
+                                <div class="orange-gradient text-white px-5 py-4 rounded-2xl text-center shadow-lg">
+                                    <span class="block text-3xl font-black">{{ $event->date->format('d') }}</span>
+                                    <span
+                                        class="text-[9px] font-bold uppercase tracking-widest">{{ $event->date->translatedFormat('M') }}</span>
+                                </div>
+                                <span
+                                    class="px-4 py-2 bg-orange-50 rounded-full text-[9px] font-black uppercase tracking-wider text-orange-600">
+                                    {{ $event->eventType->name }}
+                                </span>
+                            </div>
+                            <h3 class="text-2xl font-black text-gray-900 mb-4 tracking-tight">
+                                {{ $event->name }}
+                            </h3>
+                            <div class="space-y-3 mb-6">
+                                <div class="flex items-center text-gray-500 text-sm">
+                                    <i class="bi bi-geo-alt text-orange-600 mr-3"></i>
+                                    {{ $event->location ?? 'Life Church' }}
+                                </div>
+                                <div class="flex items-center text-gray-500 text-sm">
+                                    <i class="bi bi-clock text-orange-600 mr-3"></i>
+                                    {{ $event->date->format('H:i') }}h
+                                </div>
+                            </div>
+                            <p class="text-gray-400 text-sm leading-relaxed line-clamp-2">
+                                {{ $event->description ?? 'Um momento especial de comunhão e adoração.' }}
+                            </p>
+                        </div>
+                    </div>
+                @empty
+                    <div class="col-span-3 text-center py-20">
+                        <div class="text-gray-300 text-6xl mb-6">
+                            <i class="bi bi-calendar-x"></i>
+                        </div>
+                        <p class="text-gray-500 font-light">Nenhum evento programado para os próximos dias.</p>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-32 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
                 <div>
-                    <h2 class="text-4xl md:text-6xl font-black text-white mb-8 tracking-tighter leading-none">Pronto
-                        para elevar o nível da sua gestão?</h2>
-                    <p class="text-gray-400 text-xl mb-12 font-light">Junte-se a centenas de líderes que já
-                        transformaram a forma como cuidam do rebanho.</p>
-                    <div class="flex flex-wrap gap-4">
-                        <div class="bg-white/5 backdrop-blur-sm border border-white/10 p-6 rounded-2xl">
-                            <div class="text-3xl font-black text-orange-500 mb-1">100%</div>
-                            <div class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Seguro & Cloud
+                    <span
+                        class="text-orange-600 font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Celebrações</span>
+                    <h2 class="text-5xl md:text-7xl font-black text-gray-900 mb-8 tracking-tighter leading-none">
+                        Últimos<br><span class="orange-gradient-text">Cultos</span>
+                    </h2>
+                    <p class="text-gray-500 text-xl font-light leading-relaxed mb-12">
+                        Cada culto é uma nova oportunidade de encontro com Deus
+                    </p>
+
+                    <div class="space-y-4">
+                        @forelse($recentServices as $service)
+                            <div
+                                class="service-item flex items-center p-6 bg-white rounded-2xl border border-gray-100 group cursor-pointer">
+                                <div
+                                    class="w-14 h-14 orange-gradient rounded-xl flex items-center justify-center text-xl text-white shadow-md group-hover:scale-110 transition-transform">
+                                    <i class="bi bi-play-circle-fill"></i>
+                                </div>
+                                <div class="ml-5 flex-1">
+                                    <h4 class="font-black text-gray-900 text-lg">
+                                        {{ $service->name ?? 'Culto de Celebração' }}
+                                    </h4>
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">
+                                        {{ $service->date->format('d/m/Y') }} • {{ $service->date->translatedFormat('l') }}
+                                    </p>
+                                </div>
+                                <div class="text-right">
+                                    <span
+                                        class="text-2xl font-black text-gray-900">{{ $service->attendance_count ?? 0 }}</span>
+                                    <p class="text-[8px] text-gray-400 font-black uppercase tracking-widest">Presentes</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="bg-white/5 backdrop-blur-sm border border-white/10 p-6 rounded-2xl">
-                            <div class="text-3xl font-black text-orange-500 mb-1">+2k</div>
-                            <div class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Membros Ativos
-                            </div>
-                        </div>
+                        @empty
+                            <p class="text-gray-400 font-light italic">Nenhum culto registrado recentemente.</p>
+                        @endforelse
                     </div>
                 </div>
+
                 <div class="relative">
-                    <div class="bg-gradient-to-br from-orange-500 to-orange-700 p-1 rounded-[3rem] shadow-2xl">
-                        <div class="bg-gray-900 rounded-[2.8rem] p-12">
-                            <h3 class="text-2xl font-black text-white mb-6 tracking-tight">Inscrição Rápida</h3>
-                            <p class="text-gray-400 mb-8">Acesse o portal agora e comece a gerenciar sua igreja com
-                                inteligência.</p>
-                            <a href="{{ route('login') }}"
-                                class="block w-full btn-primary text-white text-center py-5 rounded-2xl font-black text-sm uppercase tracking-widest transition-all duration-300">
-                                Entrar no Sistema
-                            </a>
-                        </div>
+                    <div class="aspect-square rounded-[3rem] overflow-hidden shadow-2xl">
+                        <img src="https://images.unsplash.com/photo-1438232992991-995b7058bbb3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                            alt="Worship"
+                            class="w-full h-full object-cover hover:scale-110 transition-transform duration-700">
+                    </div>
+                    <div
+                        class="absolute -bottom-10 -left-10 orange-gradient p-10 rounded-[2.5rem] shadow-2xl text-white max-w-sm hover:scale-105 transition-transform duration-300">
+                        <i class="bi bi-quote text-4xl mb-4 block opacity-80"></i>
+                        <p class="text-lg font-medium leading-relaxed italic">
+                            "Onde dois ou três estiverem reunidos em meu nome, ali eu estou."
+                        </p>
+                        <span class="text-[10px] font-black uppercase tracking-widest mt-6 block opacity-60">
+                            — Mateus 18:20
+                        </span>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-32 bg-gray-900 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-0 right-0 w-1/2 h-full orange-gradient skew-x-12 translate-x-1/4"></div>
+            <div class="absolute bottom-0 left-0 w-1/2 h-full bg-blue-600 -skew-x-12 -translate-x-1/4"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+            <div class="text-center max-w-4xl mx-auto">
+                <h2 class="text-5xl md:text-8xl font-black text-white mb-8 tracking-tighter leading-none">
+                    Pronto para<br>
+                    <span class="orange-gradient-text">Edificar</span>?
+                </h2>
+                <p class="text-gray-400 text-xl md:text-2xl mb-16 font-light leading-relaxed">
+                    Junte-se à liderança da Life Church e tenha em mãos a ferramenta definitiva para gestão eclesiástica
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+                    <div class="stat-card p-8 rounded-2xl hover:scale-105 transition-transform duration-300">
+                        <div class="text-4xl font-black text-orange-500 mb-2">100%</div>
+                        <div class="text-[10px] text-gray-500 uppercase font-black tracking-[0.3em]">Nuvem & Seguro
+                        </div>
+                    </div>
+                    <div class="stat-card p-8 rounded-2xl hover:scale-105 transition-transform duration-300">
+                        <div class="text-4xl font-black text-orange-500 mb-2">+{{ $memberCount ?? '2.5k' }}</div>
+                        <div class="text-[10px] text-gray-500 uppercase font-black tracking-[0.3em]">Membros Ativos
+                        </div>
+                    </div>
+                    <div class="stat-card p-8 rounded-2xl hover:scale-105 transition-transform duration-300">
+                        <div class="text-4xl font-black text-orange-500 mb-2">24/7</div>
+                        <div class="text-[10px] text-gray-500 uppercase font-black tracking-[0.3em]">Acesso Global</div>
+                    </div>
+                </div>
+
+                @auth
+                    <a href="{{ route('dashboard') }}"
+                        class="btn-premium text-white px-16 py-6 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all duration-500 shadow-2xl group inline-block">
+                        Aceder ao Dashboard
+                        <i class="bi bi-arrow-right ml-3 group-hover:translate-x-2 transition-transform inline-block"></i>
+                    </a>
+                @else
+                    <a href="{{ route('login') }}"
+                        class="btn-premium text-white px-16 py-6 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all duration-500 shadow-2xl group inline-block">
+                        Aceder ao Portal
+                        <i class="bi bi-arrow-right ml-3 group-hover:translate-x-2 transition-transform inline-block"></i>
+                    </a>
+                @endauth
             </div>
         </div>
     </section>
 
     <!-- Footer -->
     <footer class="bg-white border-t border-gray-100 py-20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-12">
-                <div class="flex items-center space-x-3">
-                    <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-10 w-auto">
-                    <span class="text-xl font-black text-gray-900 uppercase tracking-tighter">Portal Life Church</span>
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-16 mb-16">
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center space-x-3 mb-8 group cursor-pointer">
+                        <div
+                            class="p-2 orange-gradient rounded-2xl transition-transform duration-300 group-hover:scale-110">
+                            <svg class="h-8 w-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" />
+                            </svg>
+                        </div>
+                        <span class="text-2xl font-black text-gray-900 uppercase tracking-tighter">Life Church</span>
+                    </div>
+                    <p class="text-gray-500 text-base font-light leading-relaxed max-w-md">
+                        Uma comunidade dedicada a amar a Deus, amar as pessoas e servir o mundo com excelência e paixão.
+                    </p>
                 </div>
-                <div class="flex space-x-12">
-                    <a href="#"
-                        class="text-gray-400 hover:text-orange-600 transition text-sm font-bold uppercase tracking-widest">Termos</a>
-                    <a href="#"
-                        class="text-gray-400 hover:text-orange-600 transition text-sm font-bold uppercase tracking-widest">Privacidade</a>
-                    <a href="#"
-                        class="text-gray-400 hover:text-orange-600 transition text-sm font-bold uppercase tracking-widest">Suporte</a>
+
+                <div>
+                    <h5 class="text-xs font-black text-gray-900 uppercase tracking-[0.3em] mb-6">Navegação</h5>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="#features"
+                                class="text-gray-500 hover:text-orange-600 transition text-sm font-medium flex items-center group">
+                                <i
+                                    class="bi bi-arrow-right mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                Recursos
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#events"
+                                class="text-gray-500 hover:text-orange-600 transition text-sm font-medium flex items-center group">
+                                <i
+                                    class="bi bi-arrow-right mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                Eventos
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#services"
+                                class="text-gray-500 hover:text-orange-600 transition text-sm font-medium flex items-center group">
+                                <i
+                                    class="bi bi-arrow-right mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                Cultos
+                            </a>
+                        </li>
+                        <li>
+                            @auth
+                                <a href="{{ route('dashboard') }}"
+                                    class="text-gray-500 hover:text-orange-600 transition text-sm font-medium flex items-center group">
+                                    <i
+                                        class="bi bi-arrow-right mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    Dashboard
+                                </a>
+                            @else
+                                <a href="{{ route('login') }}"
+                                    class="text-gray-500 hover:text-orange-600 transition text-sm font-medium flex items-center group">
+                                    <i
+                                        class="bi bi-arrow-right mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    Login
+                                </a>
+                            @endauth
+                        </li>
+                    </ul>
                 </div>
-                <div class="flex space-x-6">
-                    <a href="#"
-                        class="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-orange-500 hover:text-white transition"><i
-                            class="bi bi-facebook"></i></a>
-                    <a href="#"
-                        class="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-orange-500 hover:text-white transition"><i
-                            class="bi bi-instagram"></i></a>
-                    <a href="#"
-                        class="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-orange-500 hover:text-white transition"><i
-                            class="bi bi-youtube"></i></a>
+
+                <div>
+                    <h5 class="text-xs font-black text-gray-900 uppercase tracking-[0.3em] mb-6">Social</h5>
+                    <div class="flex space-x-3">
+                        <a href="#"
+                            class="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-orange-600 hover:text-white transition-all duration-300 shadow-sm hover:scale-110">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a href="#"
+                            class="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-orange-600 hover:text-white transition-all duration-300 shadow-sm hover:scale-110">
+                            <i class="bi bi-instagram"></i>
+                        </a>
+                        <a href="#"
+                            class="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-orange-600 hover:text-white transition-all duration-300 shadow-sm hover:scale-110">
+                            <i class="bi bi-youtube"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
+
             <div
-                class="mt-20 pt-8 border-t border-gray-50 text-center text-gray-400 text-xs font-bold uppercase tracking-widest">
-                &copy; {{ date('Y') }} Portal Life Church. Todos os direitos reservados.
+                class="pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6 text-gray-400 text-[10px] font-bold uppercase tracking-[0.3em]">
+                <div>&copy; 2025 Portal Life Church. Todos os direitos reservados.</div>
+                <div class="flex space-x-8">
+                    <a href="#" class="hover:text-orange-600 transition">Privacidade</a>
+                    <a href="#" class="hover:text-orange-600 transition">Termos</a>
+                </div>
             </div>
         </div>
     </footer>
+
+    <script>
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('active');
+        }
+
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('shadow-lg');
+            } else {
+                navbar.classList.remove('shadow-lg');
+            }
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards
+        document.querySelectorAll('.feature-card, .event-card, .service-item').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'all 0.6s ease-out';
+            observer.observe(el);
+        });
+    </script>
 </body>
 
 </html>

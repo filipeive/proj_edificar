@@ -1,7 +1,7 @@
-
 <?php
 namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Controller;
 use App\Models\Cell;
 use App\Models\User;
 use App\Models\UserCommitment;
@@ -13,13 +13,16 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
-class RegisteredUserController extends Controller {
-    public function create(): View {
+class RegisteredUserController extends Controller
+{
+    public function create(): View
+    {
         $cells = Cell::with('leader')->get();
         return view('auth.register', ['cells' => $cells]);
     }
 
-    public function store(Request $request): RedirectResponse {
+    public function store(Request $request): RedirectResponse
+    {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],

@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Gates
         Gate::define('verify-contribution', function ($user) {
-            return $user->role === 'admin' || $user->role === 'pastor_zona';
+            return $user->isAdmin() || $user->isSecretaria() || $user->isPastorZona();
         });
 
         // Compartilhar dados globais com as views

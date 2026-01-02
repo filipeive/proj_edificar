@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\EventType;
 use App\Models\QuarterlyReport;
 use App\Models\QuarterlyReportEvent;
+use App\Models\Supervision;
 use App\Models\Zone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -39,19 +40,25 @@ class QuarterlyReportController extends Controller
 
         $user = auth()->user();
         $zones = collect();
+        $supervisions = collect();
+        $userSupervision = null;
 
         if ($user->role === 'admin' || $user->role === 'pastor') {
-            $zones = Zone::all();
+            $zones = Zone::with('supervisions')->get();
         } elseif ($user->role === 'pastor_zona') {
-            $zones = Zone::where('pastor_id', $user->id)->get();
+            $zones = Zone::where('pastor_id', $user->id)->with('supervisions')->get();
         } elseif ($user->role === 'supervisor') {
             $zoneId = $user->getZoneId();
             $zones = Zone::where('id', $zoneId)->get();
+            $userSupervision = \App\Models\Supervision::where('supervisor_id', $user->id)->first();
+            if ($userSupervision) {
+                $supervisions = collect([$userSupervision]);
+            }
         }
 
         $eventTypes = EventType::where('is_active', true)->get();
 
-        return view('quarterly_reports.create', compact('zones', 'eventTypes'));
+        return view('quarterly_reports.create', compact('zones', 'supervisions', 'userSupervision', 'eventTypes'));
     }
 
     public function store(Request $request)
@@ -60,6 +67,7 @@ class QuarterlyReportController extends Controller
 
         $validated = $request->validate([
             'zone_id' => 'required|exists:zones,id',
+            'supervision_id' => 'required|exists:supervisions,id',
             'year' => 'required|integer|min:2020|max:2100',
             'quarter' => 'required|integer|min:1|max:4',
             'leaders_count' => 'required|integer|min:0',
@@ -88,7 +96,7 @@ class QuarterlyReportController extends Controller
         ]);
 
         // Check for duplicate report
-        $exists = QuarterlyReport::where('zone_id', $validated['zone_id'])
+        $exists = QuarterlyReport::where('supervision_id', $validated['supervision_id'])
             ->where('year', $validated['year'])
             ->where('quarter', $validated['quarter'])
             ->exists();
@@ -131,20 +139,22 @@ class QuarterlyReportController extends Controller
 
         $user = auth()->user();
         $zones = collect();
+        $supervisions = collect();
 
         if ($user->role === 'admin' || $user->role === 'pastor') {
-            $zones = Zone::all();
+            $zones = Zone::with('supervisions')->get();
         } elseif ($user->role === 'pastor_zona') {
-            $zones = Zone::where('pastor_id', $user->id)->get();
+            $zones = Zone::where('pastor_id', $user->id)->with('supervisions')->get();
         } elseif ($user->role === 'supervisor') {
             $zoneId = $user->getZoneId();
             $zones = Zone::where('id', $zoneId)->get();
+            $supervisions = Supervision::where('supervisor_id', $user->id)->get();
         }
 
         $eventTypes = EventType::where('is_active', true)->get();
-        $quarterlyReport->load('events');
+        $quarterlyReport->load(['events', 'supervision']);
 
-        return view('quarterly_reports.edit', compact('quarterlyReport', 'zones', 'eventTypes'));
+        return view('quarterly_reports.edit', compact('quarterlyReport', 'zones', 'supervisions', 'eventTypes'));
     }
 
     public function update(Request $request, QuarterlyReport $quarterlyReport)
@@ -153,6 +163,7 @@ class QuarterlyReportController extends Controller
 
         $validated = $request->validate([
             'zone_id' => 'required|exists:zones,id',
+            'supervision_id' => 'required|exists:supervisions,id',
             'year' => 'required|integer|min:2020|max:2100',
             'quarter' => 'required|integer|min:1|max:4',
             'leaders_count' => 'required|integer|min:0',
@@ -181,7 +192,7 @@ class QuarterlyReportController extends Controller
         ]);
 
         // Check for duplicate report (excluding current)
-        $exists = QuarterlyReport::where('zone_id', $validated['zone_id'])
+        $exists = QuarterlyReport::where('supervision_id', $validated['supervision_id'])
             ->where('year', $validated['year'])
             ->where('quarter', $validated['quarter'])
             ->where('id', '!=', $quarterlyReport->id)
@@ -215,5 +226,13 @@ class QuarterlyReportController extends Controller
         $quarterlyReport->delete();
 
         return redirect()->route('quarterly-reports.index')->with('success', 'Relatório trimestral excluído com sucesso!');
+    }
+
+    public function export()
+    {
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new \App\Exports\QuarterlyReportExport(),
+            'relatorios_trimestrais_' . now()->format('Y-m-d') . '.xlsx'
+        );
     }
 }

@@ -8,12 +8,18 @@
     <div class="container-fluid">
         <div class="mb-6 flex justify-between items-center">
             <h3 class="text-2xl font-bold text-gray-800">Histórico de Relatórios</h3>
-            @can('create', App\Models\QuarterlyReport::class)
-                <a href="{{ route('quarterly-reports.create') }}"
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center transition shadow-md">
-                    <i class="bi bi-file-earmark-plus mr-2"></i> Novo Relatório
+            <div class="flex space-x-3">
+                <a href="{{ route('quarterly-reports.export') }}"
+                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center transition shadow-md">
+                    <i class="bi bi-file-earmark-spreadsheet mr-2"></i> Exportar Excel
                 </a>
-            @endcan
+                @can('create', App\Models\QuarterlyReport::class)
+                    <a href="{{ route('quarterly-reports.create') }}"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center transition shadow-md">
+                        <i class="bi bi-file-earmark-plus mr-2"></i> Novo Relatório
+                    </a>
+                @endcan
+            </div>
         </div>
 
         @if(session('success'))
@@ -30,6 +36,7 @@
                         <tr class="bg-gray-50 border-b border-gray-200">
                             <th class="px-6 py-4 text-sm font-semibold text-gray-600">Período</th>
                             <th class="px-6 py-4 text-sm font-semibold text-gray-600">Zona</th>
+                            <th class="px-6 py-4 text-sm font-semibold text-gray-600">Supervisão</th>
                             <th class="px-6 py-4 text-sm font-semibold text-gray-600">Supervisor</th>
                             <th class="px-6 py-4 text-sm font-semibold text-gray-600 text-center">Células</th>
                             <th class="px-6 py-4 text-sm font-semibold text-gray-600 text-center">Membros</th>
@@ -47,6 +54,9 @@
                                     {{ $report->zone->name }}
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-600">
+                                    {{ $report->supervision->name ?? '-' }}
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-600">
                                     {{ $report->supervisor->name }}
                                 </td>
                                 <td class="px-6 py-4 text-sm text-center font-semibold">
@@ -57,8 +67,8 @@
                                 </td>
                                 <td class="px-6 py-4 text-sm text-center">
                                     <span class="px-2 py-1 rounded-full text-xs font-semibold 
-                                        @if($report->status == 'submitted') bg-green-100 text-green-700 
-                                        @else bg-yellow-100 text-yellow-700 @endif">
+                                                                @if($report->status == 'submitted') bg-green-100 text-green-700 
+                                                                @else bg-yellow-100 text-yellow-700 @endif">
                                         {{ $report->status == 'submitted' ? 'Submetido' : 'Rascunho' }}
                                     </span>
                                 </td>

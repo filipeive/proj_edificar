@@ -8,10 +8,12 @@ class Course extends Model
 {
     protected $fillable = [
         'name',
+        'slug',
         'description',
         'category',
         'duration',
         'is_active',
+        'registration_open',
     ];
 
     public function enrollments()

@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Dashboard;
 use App\Models\Supervision;
 use Illuminate\View\View;
 
-class PastorDashboardController {
-    public function __invoke(): View {
+class PastorDashboardController
+{
+    public function __invoke(): View
+    {
         $pastor = auth()->user();
         $zone = $pastor->cell ? $pastor->cell->supervision->zone : null;
 
@@ -34,11 +36,23 @@ class PastorDashboardController {
 
         $total = $zone->getTotalContributedThisMonth();
 
+        $upcomingEvents = \App\Models\Event::where('zone_id', $zone->id)
+            ->where('date', '>=', now())
+            ->orderBy('date', 'asc')
+            ->limit(5)
+            ->get();
+
+        $recentServices = \App\Models\Service::orderBy('date', 'desc')
+            ->limit(5)
+            ->get();
+
         return view('dashboard.pastor', [
             'zone' => $zone,
             'supervisions' => $supervisions,
             'total' => $total,
             'zoneName' => $zone->name,
+            'upcomingEvents' => $upcomingEvents,
+            'recentServices' => $recentServices,
         ]);
     }
 }

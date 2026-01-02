@@ -20,7 +20,7 @@ class UserController
     use AuthorizesRequests;
 
     // ==================== ADMIN ROUTES ====================
-    
+
     public function index(Request $request): View
     {
         $query = User::with('cell');
@@ -42,10 +42,10 @@ class UserController
 
         // Busca por nome ou email
         if ($request->filled('search')) {
-            $query->where(function($q) use ($request) {
+            $query->where(function ($q) use ($request) {
                 $q->where('name', 'LIKE', '%' . $request->search . '%')
-                  ->orWhere('email', 'LIKE', '%' . $request->search . '%')
-                  ->orWhere('phone', 'LIKE', '%' . $request->search . '%');
+                    ->orWhere('email', 'LIKE', '%' . $request->search . '%')
+                    ->orWhere('phone', 'LIKE', '%' . $request->search . '%');
             });
         }
 
@@ -173,9 +173,9 @@ class UserController
         }
 
         if ($request->filled('search')) {
-            $membersQuery->where(function($q) use ($request) {
+            $membersQuery->where(function ($q) use ($request) {
                 $q->where('name', 'LIKE', '%' . $request->search . '%')
-                  ->orWhere('email', 'LIKE', '%' . $request->search . '%');
+                    ->orWhere('email', 'LIKE', '%' . $request->search . '%');
             });
         }
 
@@ -260,7 +260,7 @@ class UserController
 
         // Notificações
         $newUser->notify(new MemberCreatedNotification($newUser, $plainPassword));
-        
+
         if ($cell->leader_id && $cell->leader_id !== $user->id) {
             $cell->leader->notify(new MemberAddedToCellNotification($newUser));
         }
@@ -275,7 +275,7 @@ class UserController
     public function showFromContext(User $member): View
     {
         $user = auth()->user();
-        
+
         // Validar se pode ver este membro
         $this->validateMemberAccess($user, $member);
 
@@ -293,7 +293,7 @@ class UserController
     public function editFromContext(User $member): View
     {
         $user = auth()->user();
-        
+
         // Validar se pode editar este membro
         $this->validateMemberAccess($user, $member);
 
@@ -314,7 +314,7 @@ class UserController
     public function updateFromContext(Request $request, User $member)
     {
         $user = auth()->user();
-        
+
         // Validar se pode editar
         $this->validateMemberAccess($user, $member);
 
@@ -342,7 +342,7 @@ class UserController
     public function destroyFromContext(User $member)
     {
         $user = auth()->user();
-        
+
         // Validar se pode deletar
         $this->validateMemberAccess($user, $member);
 
@@ -381,7 +381,10 @@ class UserController
                 break;
 
             case 'admin':
-                // Admin vê todos
+            case 'pastor_senior':
+            case 'secretaria':
+            case 'tesouraria':
+                // Admin e roles equivalentes vêem todos
                 break;
 
             default:
@@ -420,6 +423,9 @@ class UserController
                 break;
 
             case 'admin':
+            case 'pastor_senior':
+            case 'secretaria':
+            case 'tesouraria':
                 // Todas as células
                 break;
         }
@@ -432,7 +438,8 @@ class UserController
      */
     private function validateMemberAccess($user, $member)
     {
-        if ($user->role === 'admin') return;
+        if ($user->isAdmin())
+            return;
 
         if ($user->role === 'lider_celula') {
             if ($member->cell_id !== $user->cell_id) {
@@ -461,7 +468,8 @@ class UserController
      */
     private function validateCellPermission($user, $cell)
     {
-        if ($user->role === 'admin') return;
+        if ($user->isAdmin())
+            return;
 
         if ($user->role === 'lider_celula') {
             if ($cell->id !== $user->cell_id) {

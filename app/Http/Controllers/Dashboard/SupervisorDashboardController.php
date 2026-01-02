@@ -3,8 +3,10 @@ namespace App\Http\Controllers\Dashboard;
 
 use Illuminate\View\View;
 
-class SupervisorDashboardController {
-    public function __invoke(): View {
+class SupervisorDashboardController
+{
+    public function __invoke(): View|\Illuminate\Http\RedirectResponse
+    {
         $supervisor = auth()->user();
 
         if ($supervisor->role === 'pastor_zona') {
@@ -34,10 +36,22 @@ class SupervisorDashboardController {
 
         $total = $supervision->getTotalContributedThisMonth();
 
+        $upcomingEvents = \App\Models\Event::where('zone_id', $supervision->zone_id)
+            ->where('date', '>=', now())
+            ->orderBy('date', 'asc')
+            ->limit(5)
+            ->get();
+
+        $recentServices = \App\Models\Service::orderBy('date', 'desc')
+            ->limit(5)
+            ->get();
+
         return view('dashboard.supervisor', [
             'cells' => $cells,
             'total' => $total,
             'supervisionName' => $supervision->name,
+            'upcomingEvents' => $upcomingEvents,
+            'recentServices' => $recentServices,
         ]);
     }
 }

@@ -3,8 +3,10 @@ namespace App\Http\Controllers\Dashboard;
 
 use Illuminate\View\View;
 
-class LiderDashboardController {
-    public function __invoke(): View {
+class LiderDashboardController
+{
+    public function __invoke(): View
+    {
         $lider = auth()->user();
         $cell = $lider->cell;
 
@@ -40,10 +42,24 @@ class LiderDashboardController {
 
         $total = $cell->getTotalContributedThisMonth();
 
+        $upcomingEvents = \App\Models\Event::where('zone_id', $cell->supervision->zone_id)
+            ->where('date', '>=', now())
+            ->orderBy('date', 'asc')
+            ->limit(5)
+            ->get();
+
+        $recentMeetings = $cell->meetings()
+            ->orderBy('meeting_date', 'desc')
+            ->limit(5)
+            ->get();
+
         return view('dashboard.lider', [
             'members' => $members,
             'total' => $total,
             'cellName' => $cell->name,
+            'upcomingEvents' => $upcomingEvents,
+            'recentMeetings' => $recentMeetings,
+            'cell' => $cell,
         ]);
     }
 }

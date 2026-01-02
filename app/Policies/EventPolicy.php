@@ -10,20 +10,20 @@ class EventPolicy
 {
     public function viewAny(User $user): bool
     {
-        return in_array($user->role, ['admin', 'pastor', 'pastor_zona', 'supervisor']);
+        return in_array($user->role, ['admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'secretaria', 'tesouraria']);
     }
 
     public function view(User $user, Event $event): bool
     {
-        if (in_array($user->role, ['admin', 'pastor'])) {
+        if ($user->isAdmin() || $user->isSecretaria() || $user->isPastor()) {
             return true;
         }
 
-        if ($user->role === 'pastor_zona') {
+        if ($user->isPastorZona()) {
             return $event->zone_id === $user->getZoneId();
         }
 
-        if ($user->role === 'supervisor') {
+        if ($user->isSupervisor()) {
             return $event->zone_id === $user->getZoneId();
         }
 
@@ -32,20 +32,24 @@ class EventPolicy
 
     public function create(User $user): bool
     {
-        return in_array($user->role, ['admin', 'pastor', 'pastor_zona', 'supervisor']);
+        return in_array($user->role, ['admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'secretaria', 'tesouraria']);
     }
 
     public function update(User $user, Event $event): bool
     {
-        if ($user->role === 'admin') {
+        if ($user->isAdmin() || $user->isSecretaria()) {
             return true;
         }
 
-        return in_array($user->role, ['pastor', 'pastor_zona', 'supervisor']) && $event->zone_id === $user->getZoneId();
+        if ($user->isPastorZona() || $user->isSupervisor() || $user->isPastor()) {
+            return $event->zone_id === $user->getZoneId();
+        }
+
+        return false;
     }
 
     public function delete(User $user, Event $event): bool
     {
-        return $user->role === 'admin';
+        return $user->isAdmin() || $user->isSecretaria();
     }
 }

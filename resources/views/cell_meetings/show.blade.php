@@ -40,7 +40,7 @@
             </div>
         </div>
 
-        <div class="max-w-4xl mx-auto space-y-8">
+        <div class="max-w-6xl mx-auto space-y-8">
             <!-- Card Principal -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <div class="bg-blue-600 px-8 py-10 text-white relative">
@@ -129,6 +129,106 @@
                     </div>
                 @endif
             </div>
+
+            <!-- Participants Section -->
+            @if($cellMeeting->attendances && $cellMeeting->attendances->count() > 0)
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="bg-green-50 px-8 py-6 border-b border-green-100">
+                        <h3 class="text-xl font-black text-green-900 flex items-center">
+                            <i class="bi bi-check-circle-fill mr-3 text-green-600"></i>
+                            Membros Presentes ({{ $cellMeeting->attendances->count() }})
+                        </h3>
+                        <p class="text-sm text-green-600 mt-1">Lista de membros que participaram do encontro</p>
+                    </div>
+                    <div class="p-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            @foreach($cellMeeting->attendances as $attendance)
+                                <div
+                                    class="flex items-center p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-green-300 transition-colors">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-bold mr-3">
+                                        {{ substr($attendance->member->name, 0, 1) }}
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="font-bold text-gray-900 text-sm">{{ $attendance->member->name }}</p>
+                                        <p class="text-xs text-gray-500">{{ $attendance->member->phone ?? 'Sem telefone' }}</p>
+                                    </div>
+                                    <i class="bi bi-check-circle-fill text-green-500 text-lg"></i>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Visitors Section -->
+            @if($cellMeeting->visitors && $cellMeeting->visitors->count() > 0)
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="bg-purple-50 px-8 py-6 border-b border-purple-100">
+                        <h3 class="text-xl font-black text-purple-900 flex items-center">
+                            <i class="bi bi-person-plus-fill mr-3 text-purple-600"></i>
+                            Visitantes ({{ $cellMeeting->visitors->count() }})
+                        </h3>
+                        <p class="text-sm text-purple-600 mt-1">Novos visitantes que participaram do encontro</p>
+                    </div>
+                    <div class="p-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            @foreach($cellMeeting->visitors as $visitor)
+                                <div class="p-6 bg-purple-50 rounded-xl border border-purple-200">
+                                    <div class="flex items-start justify-between mb-4">
+                                        <div class="flex items-center">
+                                            <div
+                                                class="w-12 h-12 rounded-full bg-purple-200 flex items-center justify-center text-purple-700 font-bold text-lg mr-3">
+                                                {{ substr($visitor->name, 0, 1) }}
+                                            </div>
+                                            <div>
+                                                <p class="font-black text-gray-900">{{ $visitor->name }}</p>
+                                                @if($visitor->phone)
+                                                    <p class="text-sm text-gray-600"><i
+                                                            class="bi bi-telephone-fill mr-1"></i>{{ $visitor->phone }}</p>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        @if($visitor->pivot->converted)
+                                            <span
+                                                class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-bold uppercase">
+                                                <i class="bi bi-heart-fill mr-1"></i>Convertido
+                                            </span>
+                                        @endif
+                                    </div>
+                                    @if($visitor->pivot->notes)
+                                        <div class="bg-white p-3 rounded-lg border border-purple-100 mt-3">
+                                            <p class="text-xs text-gray-400 uppercase font-bold mb-1">Observações:</p>
+                                            <p class="text-sm text-gray-700">{{ $visitor->pivot->notes }}</p>
+                                        </div>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Offering Section -->
+            @if($cellMeeting->offering_amount && $cellMeeting->offering_amount > 0)
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="bg-amber-50 px-8 py-6 border-b border-amber-100">
+                        <h3 class="text-xl font-black text-amber-900 flex items-center">
+                            <i class="bi bi-cash-coin mr-3 text-amber-600"></i>
+                            Oferta do Encontro
+                        </h3>
+                    </div>
+                    <div class="p-8">
+                        <div class="flex items-center justify-center">
+                            <div class="text-center">
+                                <p class="text-5xl font-black text-amber-600">
+                                    {{ number_format($cellMeeting->offering_amount, 2, ',', '.') }} MT</p>
+                                <p class="text-sm text-gray-500 mt-2 uppercase tracking-wider font-bold">Total arrecadado</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
 
             <div class="flex justify-between text-xs text-gray-400 font-medium px-4">
                 <span>Registrado em: {{ $cellMeeting->created_at->format('d/m/Y H:i') }}</span>

@@ -13,6 +13,7 @@ class Event extends Model
         'event_type_id',
         'name',
         'date',
+        'end_date',
         'zone_id',
         'cell_id',
         'participants_count',
@@ -22,6 +23,7 @@ class Event extends Model
 
     protected $casts = [
         'date' => 'date',
+        'end_date' => 'date',
     ];
 
     public function eventType()

@@ -25,11 +25,10 @@ use Illuminate\Support\Facades\Route;
 require __DIR__ . '/auth.php';
 
 // Welcome Route
-Route::get('/', function () {
-    return view('welcome');
-})->name('welcome');
+Route::get('/', [\App\Http\Controllers\WelcomeController::class, 'index'])->name('welcome');
 
 // Public Course Enrollment
+Route::get('/cursos/{course:slug}/inscricao', [\App\Http\Controllers\PublicCourseController::class, 'register'])->name('public.courses.register');
 Route::get('/inscricao-casais', [\App\Http\Controllers\PublicCourseController::class, 'showCasaisForm'])->name('public.courses.casais');
 Route::post('/inscricao-casais', [\App\Http\Controllers\PublicCourseController::class, 'storeCasaisEnrollment'])->name('public.courses.casais.store');
 
@@ -268,9 +267,11 @@ Route::middleware('auth')->group(function () {
     Route::resource('cell-meetings', \App\Http\Controllers\CellMeetingController::class);
 
     // ===== RELATÓRIOS TRIMESTRAIS (QUARTERLY REPORTS) ROUTES =====
+    Route::get('quarterly-reports/export', [\App\Http\Controllers\QuarterlyReportController::class, 'export'])->name('quarterly-reports.export');
     Route::resource('quarterly-reports', \App\Http\Controllers\QuarterlyReportController::class);
 
     // ===== EVENTOS E CERIMÓNIAS (EVENTS) ROUTES =====
+    Route::get('events/feed', [\App\Http\Controllers\EventController::class, 'feed'])->name('events.feed');
     Route::get('events/{event}/pdf', [\App\Http\Controllers\EventController::class, 'downloadPdf'])->name('events.pdf');
     Route::post('events/{event}/email', [\App\Http\Controllers\EventController::class, 'sendEmail'])->name('events.email');
     Route::resource('events', \App\Http\Controllers\EventController::class);
@@ -289,6 +290,12 @@ Route::middleware('auth')->group(function () {
         Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');
     });
+
+    // Weddings
+    Route::get('weddings/feed', [App\Http\Controllers\Admin\WeddingController::class, 'feed'])->name('weddings.feed');
+    Route::get('weddings/pdf', [App\Http\Controllers\Admin\WeddingController::class, 'downloadPdf'])->name('weddings.pdf');
+    Route::resource('weddings', App\Http\Controllers\Admin\WeddingController::class);
+    Route::post('/test-email', [App\Http\Controllers\Admin\WeddingController::class, 'testEmail'])->name('test.email');
 });
 # ============================================
 # ROTA DE REGISTRO (PÚBLICA MAS CONTROLADA)

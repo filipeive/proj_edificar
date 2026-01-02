@@ -12,6 +12,57 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class EventController extends Controller
 {
+    public function feed(Request $request)
+    {
+        $start = $request->input('start');
+        $end = $request->input('end');
+
+        $events = Event::with(['eventType', 'zone', 'cell'])
+            ->where(function ($query) use ($start, $end) {
+                $query->whereBetween('date', [$start, $end])
+                    ->orWhereBetween('end_date', [$start, $end])
+                    ->orWhere(function ($q) use ($start, $end) {
+                        $q->where('date', '<', $start)
+                            ->where('end_date', '>', $end);
+                    });
+            })
+            ->get();
+
+        $calendarEvents = $events->map(function ($event) {
+            $color = '#3b82f6'; // blue-500 default
+            if ($event->eventType->name === 'Culto')
+                $color = '#f59e0b'; // amber-500
+            if ($event->eventType->name === 'Batismo')
+                $color = '#06b6d4'; // cyan-500
+
+            $title = $event->name;
+            if ($event->participants_count > 0) {
+                $title .= ' (' . $event->participants_count . ')';
+            }
+
+            return [
+                'id' => $event->id,
+                'title' => $title,
+                'start' => $event->date->format('Y-m-d'),
+                'end' => $event->end_date ? $event->end_date->addDay()->format('Y-m-d') : null,
+                'url' => route('events.edit', $event),
+                'backgroundColor' => $color,
+                'borderColor' => $color,
+                'allDay' => true,
+                'extendedProps' => [
+                    'event_type' => $event->eventType->name,
+                    'location' => $event->location,
+                    'description' => $event->description,
+                    'participants_count' => $event->participants_count,
+                    'zone' => $event->zone ? $event->zone->name : null,
+                    'cell' => $event->cell ? $event->cell->name : null,
+                ]
+            ];
+        });
+
+        return response()->json($calendarEvents);
+    }
+
     public function downloadPdf(Event $event)
     {
         Gate::authorize('view', $event);
@@ -104,9 +155,11 @@ class EventController extends Controller
 
         $validated = $request->validate([
             'event_type_id' => 'required|exists:event_types,id',
+            'name' => 'required|string|max:255',
             'zone_id' => 'nullable|exists:zones,id',
             'cell_id' => 'nullable|exists:cells,id',
             'date' => 'required|date',
+            'end_date' => 'nullable|date|after_or_equal:date',
             'location' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'participants_count' => 'required|integer|min:0',
@@ -163,9 +216,11 @@ class EventController extends Controller
 
         $validated = $request->validate([
             'event_type_id' => 'required|exists:event_types,id',
+            'name' => 'required|string|max:255',
             'zone_id' => 'nullable|exists:zones,id',
             'cell_id' => 'nullable|exists:cells,id',
             'date' => 'required|date',
+            'end_date' => 'nullable|date|after_or_equal:date',
             'location' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'participants_count' => 'required|integer|min:0',

@@ -78,7 +78,12 @@ class User extends Authenticatable
     // Helpers
     public function isAdmin()
     {
-        return $this->role === 'admin';
+        return in_array($this->role, ['admin', 'pastor_senior', 'secretaria', 'tesouraria']);
+    }
+
+    public function isPastorSenior()
+    {
+        return $this->role === 'pastor_senior';
     }
 
     public function isPastor()
@@ -106,13 +111,30 @@ class User extends Authenticatable
         return $this->role === 'timoteo';
     }
 
+    public function isSecretaria()
+    {
+        return $this->role === 'secretaria' || $this->role === 'tesouraria';
+    }
+
     public function isTesouraria()
     {
-        return $this->role === 'tesouraria';
+        return $this->role === 'tesouraria' || $this->role === 'secretaria';
     }
 
     public function hasRole($role)
     {
+        if ($role === 'admin' && in_array($this->role, ['pastor_senior', 'secretaria', 'tesouraria'])) {
+            return true;
+        }
+
+        if ($role === 'secretaria' && $this->role === 'tesouraria') {
+            return true;
+        }
+
+        if ($role === 'tesouraria' && $this->role === 'secretaria') {
+            return true;
+        }
+
         return $this->role === $role;
     }
 

@@ -11,6 +11,7 @@ class QuarterlyReport extends Model
 
     protected $fillable = [
         'zone_id',
+        'supervision_id',
         'supervisor_id',
         'year',
         'quarter',
@@ -44,6 +45,11 @@ class QuarterlyReport extends Model
     public function zone()
     {
         return $this->belongsTo(Zone::class);
+    }
+
+    public function supervision()
+    {
+        return $this->belongsTo(Supervision::class);
     }
 
     public function supervisor()

@@ -10,26 +10,26 @@ class ServicePolicy
 {
     public function viewAny(User $user): bool
     {
-        return in_array($user->role, ['admin', 'pastor', 'pastor_zona', 'supervisor', 'tesouraria']);
+        return in_array($user->role, ['admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'secretaria', 'tesouraria']);
     }
 
     public function view(User $user, Service $service): bool
     {
-        return in_array($user->role, ['admin', 'pastor', 'pastor_zona', 'supervisor', 'tesouraria']);
+        return in_array($user->role, ['admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'secretaria', 'tesouraria']);
     }
 
     public function create(User $user): bool
     {
-        return in_array($user->role, ['admin', 'pastor', 'pastor_zona']);
+        return $user->isAdmin() || $user->isSecretaria() || $user->isPastor() || $user->isPastorZona();
     }
 
     public function update(User $user, Service $service): bool
     {
-        return in_array($user->role, ['admin', 'pastor', 'pastor_zona']);
+        return $user->isAdmin() || $user->isSecretaria() || $user->isPastor() || $user->isPastorZona();
     }
 
     public function delete(User $user, Service $service): bool
     {
-        return $user->role === 'admin';
+        return $user->isAdmin() || $user->isSecretaria();
     }
 }

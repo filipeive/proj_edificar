@@ -8,17 +8,28 @@ use Illuminate\Http\Request;
 
 class PublicCourseController extends Controller
 {
+    public function register(Course $course)
+    {
+        if (!$course->is_active || !$course->registration_open) {
+            return redirect()->route('welcome')->with('error', 'Inscrições encerradas para este curso.');
+        }
+
+        // Se for o curso de casais, redireciona para o formulário específico (mantendo compatibilidade)
+        if (str_contains(strtolower($course->slug), 'casais') || str_contains(strtolower($course->slug), 'nupcial')) {
+            return view('public.courses.casais-enrollment', compact('course'));
+        }
+
+        return view('public.courses.register', compact('course'));
+    }
+
     public function showCasaisForm()
     {
-        $course = Course::where('name', 'like', '%Casais%')->first();
+        $course = Course::where('slug', 'like', '%casais%')
+            ->orWhere('slug', 'like', '%nupcial%')
+            ->first();
 
         if (!$course) {
-            // Create a default course if it doesn't exist
-            $course = Course::create([
-                'name' => 'Curso de Casais',
-                'description' => 'Fortalecendo os laços matrimoniais e relacionamentos.',
-                'is_active' => true
-            ]);
+            return redirect()->route('welcome')->with('error', 'Curso de Casais não encontrado.');
         }
 
         return view('public.courses.casais-enrollment', compact('course'));

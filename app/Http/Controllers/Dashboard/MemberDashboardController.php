@@ -3,8 +3,10 @@ namespace App\Http\Controllers\Dashboard;
 
 use Illuminate\View\View;
 
-class MemberDashboardController {
-    public function __invoke(): View {
+class MemberDashboardController
+{
+    public function __invoke(): View
+    {
         $member = auth()->user();
         $commitment = $member->getActiveCommitment();
 
@@ -20,10 +22,21 @@ class MemberDashboardController {
 
         $totalThisMonth = $member->getTotalContributedThisMonth();
 
+        $upcomingEvents = \App\Models\Event::where('date', '>=', now())
+            ->orderBy('date', 'asc')
+            ->limit(5)
+            ->get();
+
+        $recentServices = \App\Models\Service::orderBy('date', 'desc')
+            ->limit(5)
+            ->get();
+
         return view('dashboard.membro', [
             'commitment' => $commitment,
             'contributions' => $contributions,
             'totalThisMonth' => $totalThisMonth,
+            'upcomingEvents' => $upcomingEvents,
+            'recentServices' => $recentServices,
         ]);
     }
 }
