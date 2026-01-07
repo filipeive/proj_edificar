@@ -97,6 +97,6 @@ class Zone extends Model
      */
     public function members()
     {
-        return User::whereIn('cell_id', $this->cells()->pluck('id'))->with('cell');
+        return User::whereIn('cell_id', $this->cells()->pluck('cells.id'))->with('cell');
     }
 }
