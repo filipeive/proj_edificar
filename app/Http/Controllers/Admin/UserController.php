@@ -366,10 +366,19 @@ class UserController
                 break;
 
             case 'supervisor':
-                // Vê membros de todas as células da sua supervisão
-                $cellIds = Cell::where('supervision_id', $user->cell->supervision_id)->pluck('id');
+                // Vê membros de todas as células da sua supervisão (Baseado na tabela supervisions)
+                // $supervisionIds = Supervision::where('supervisor_id', $user->id)->pluck('id'); OR
+                $supervisionIds = $user->supervisedSupervisions()->pluck('id');
+
+                // Fallback for old logic if no explicit supervision assigned yet
+                if ($supervisionIds->isEmpty() && $user->cell) {
+                    $supervisionIds = collect([$user->cell->supervision_id]);
+                }
+
+                $cellIds = Cell::whereIn('supervision_id', $supervisionIds)->pluck('id');
                 $query->whereIn('cell_id', $cellIds);
                 break;
+
 
             case 'pastor_zona':
                 // Vê membros de todas as supervisões da sua zona
@@ -411,7 +420,11 @@ class UserController
 
             case 'supervisor':
                 // Células da sua supervisão
-                $cellsQuery->where('supervision_id', $user->cell->supervision_id);
+                $supervisionIds = $user->supervisedSupervisions()->pluck('id');
+                if ($supervisionIds->isEmpty() && $user->cell) {
+                    $supervisionIds = collect([$user->cell->supervision_id]);
+                }
+                $cellsQuery->whereIn('supervision_id', $supervisionIds);
                 break;
 
             case 'pastor_zona':
@@ -448,7 +461,12 @@ class UserController
         }
 
         if ($user->role === 'supervisor') {
-            $cellIds = Cell::where('supervision_id', $user->cell->supervision_id)->pluck('id');
+            $supervisionIds = $user->supervisedSupervisions()->pluck('id');
+            if ($supervisionIds->isEmpty() && $user->cell) {
+                $supervisionIds = collect([$user->cell->supervision_id]);
+            }
+            $cellIds = Cell::whereIn('supervision_id', $supervisionIds)->pluck('id');
+
             if (!$cellIds->contains($member->cell_id)) {
                 abort(403, 'Você só pode gerenciar membros da sua supervisão');
             }
@@ -478,7 +496,12 @@ class UserController
         }
 
         if ($user->role === 'supervisor') {
-            if ($cell->supervision_id !== $user->cell->supervision_id) {
+            $supervisionIds = $user->supervisedSupervisions()->pluck('id');
+            if ($supervisionIds->isEmpty() && $user->cell) {
+                $supervisionIds = collect([$user->cell->supervision_id]);
+            }
+
+            if (!$supervisionIds->contains($cell->supervision_id)) {
                 abort(403, 'Você só pode criar membros nas células da sua supervisão');
             }
         }

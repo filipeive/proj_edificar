@@ -19,6 +19,13 @@ class CellController
         // Iniciar a query
         $cellsQuery = Cell::query()->with('supervision.zone', 'leader', 'members');
 
+        // --- SCOPED ACCESS FOR SUPERVISORS ---
+        $user = auth()->user();
+        if ($user->isSupervisor()) {
+            $supervisionIds = $user->supervisedSupervisions()->pluck('id');
+            $cellsQuery->whereIn('supervision_id', $supervisionIds);
+        }
+
         // --- 1. FILTRO POR ZONA ---
         if ($request->filled('zone')) {
             $zoneId = $request->input('zone');

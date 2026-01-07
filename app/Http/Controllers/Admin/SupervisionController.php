@@ -6,21 +6,35 @@ use App\Models\Zone;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-class SupervisionController {
-    public function index(): View {
+class SupervisionController
+{
+    public function index(): View
+    {
         $supervisions = Supervision::with('zone', 'cells')->get();
         return view('admin.supervisions.index', ['supervisions' => $supervisions]);
     }
 
-    public function create(): View {
+    public function create(): View
+    {
         $zones = Zone::all();
-        return view('admin.supervisions.create', ['zones' => $zones]);
+        $supervisors = \App\Models\User::where('role', 'supervisor')
+            ->orWhere(function ($query) {
+                $query->where('role', 'admin') // Allow admins for testing/fallback
+                    ->orWhere('role', 'pastor_zona');
+            })->orderBy('name')->get();
+
+        return view('admin.supervisions.create', [
+            'zones' => $zones,
+            'supervisors' => $supervisors
+        ]);
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'zone_id' => 'required|exists:zones,id',
+            'supervisor_id' => 'nullable|exists:users,id',
             'description' => 'nullable|string',
         ]);
 
@@ -30,23 +44,36 @@ class SupervisionController {
             ->with('success', 'Supervisão criada com sucesso!');
     }
 
-    public function show(Supervision $supervision): View {
-        return view('admin.supervisions.show', 
-            ['supervision' => $supervision->load('zone', 'cells')]);
+    public function show(Supervision $supervision): View
+    {
+        return view(
+            'admin.supervisions.show',
+            ['supervision' => $supervision->load('zone', 'cells', 'supervisor')]
+        );
     }
 
-    public function edit(Supervision $supervision): View {
+    public function edit(Supervision $supervision): View
+    {
         $zones = Zone::all();
+        $supervisors = \App\Models\User::where('role', 'supervisor')
+            ->orWhere(function ($query) {
+                $query->where('role', 'admin')
+                    ->orWhere('role', 'pastor_zona');
+            })->orderBy('name')->get();
+
         return view('admin.supervisions.edit', [
             'supervision' => $supervision,
             'zones' => $zones,
+            'supervisors' => $supervisors
         ]);
     }
 
-    public function update(Request $request, Supervision $supervision) {
+    public function update(Request $request, Supervision $supervision)
+    {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'zone_id' => 'required|exists:zones,id',
+            'supervisor_id' => 'nullable|exists:users,id',
             'description' => 'nullable|string',
         ]);
 
@@ -56,7 +83,8 @@ class SupervisionController {
             ->with('success', 'Supervisão atualizada com sucesso!');
     }
 
-    public function destroy(Supervision $supervision) {
+    public function destroy(Supervision $supervision)
+    {
         if ($supervision->cells()->exists()) {
             return back()->with('error', 'Não pode deletar supervisão com células!');
         }
