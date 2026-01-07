@@ -45,11 +45,19 @@ class ServiceController extends Controller
             'theme' => 'nullable|string|max:255',
             'message' => 'nullable|string',
             'observations' => 'nullable|string',
-            'adults_count' => 'required|integer|min:0',
-            'children_count' => 'required|integer|min:0',
+            'adults_members' => 'required|integer|min:0',
+            'adults_visitors' => 'required|integer|min:0',
+            'adults_salvations' => 'required|integer|min:0',
+            'children_members' => 'required|integer|min:0',
+            'children_visitors' => 'required|integer|min:0',
+            'children_salvations' => 'required|integer|min:0',
+            'special_offerings_total' => 'required|numeric|min:0',
             'offerings' => 'nullable|array',
             'offerings.*.amount' => 'required|numeric|min:0',
             'offerings.*.offering_type_id' => 'required|exists:offering_types,id',
+            'tithes' => 'nullable|array',
+            'tithes.*.amount' => 'required|numeric|min:0',
+            'tithes.*.member_name' => 'nullable|string|max:255',
         ]);
 
         DB::transaction(function () use ($validated) {
@@ -59,6 +67,14 @@ class ServiceController extends Controller
                 foreach ($validated['offerings'] as $offeringData) {
                     if ($offeringData['amount'] > 0) {
                         $service->offerings()->create($offeringData);
+                    }
+                }
+            }
+
+            if (isset($validated['tithes'])) {
+                foreach ($validated['tithes'] as $titheData) {
+                    if ($titheData['amount'] > 0) {
+                        $service->tithes()->create($titheData);
                     }
                 }
             }
@@ -98,22 +114,39 @@ class ServiceController extends Controller
             'theme' => 'nullable|string|max:255',
             'message' => 'nullable|string',
             'observations' => 'nullable|string',
-            'adults_count' => 'required|integer|min:0',
-            'children_count' => 'required|integer|min:0',
+            'adults_members' => 'required|integer|min:0',
+            'adults_visitors' => 'required|integer|min:0',
+            'adults_salvations' => 'required|integer|min:0',
+            'children_members' => 'required|integer|min:0',
+            'children_visitors' => 'required|integer|min:0',
+            'children_salvations' => 'required|integer|min:0',
+            'special_offerings_total' => 'required|numeric|min:0',
             'offerings' => 'nullable|array',
             'offerings.*.amount' => 'required|numeric|min:0',
             'offerings.*.offering_type_id' => 'required|exists:offering_types,id',
+            'tithes' => 'nullable|array',
+            'tithes.*.amount' => 'required|numeric|min:0',
+            'tithes.*.member_name' => 'nullable|string|max:255',
         ]);
 
         DB::transaction(function () use ($validated, $service) {
             $service->update($validated);
 
             $service->offerings()->delete();
+            $service->tithes()->delete();
 
             if (isset($validated['offerings'])) {
                 foreach ($validated['offerings'] as $offeringData) {
                     if ($offeringData['amount'] > 0) {
                         $service->offerings()->create($offeringData);
+                    }
+                }
+            }
+
+            if (isset($validated['tithes'])) {
+                foreach ($validated['tithes'] as $titheData) {
+                    if ($titheData['amount'] > 0) {
+                        $service->tithes()->create($titheData);
                     }
                 }
             }
