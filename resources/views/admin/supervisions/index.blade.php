@@ -65,17 +65,6 @@
                             </span>
                         </div>
                         <div class="flex items-center justify-between text-sm">
-                            <span class="text-gray-400 font-medium">Supervisor</span>
-                            @if($supervision->supervisor)
-                                <span class="font-bold text-blue-600 flex items-center gap-1">
-                                    <i class="bi bi-person-fill"></i>
-                                    {{ $supervision->supervisor->name }}
-                                </span>
-                            @else
-                                <span class="text-gray-400 italic">Não atribuído</span>
-                            @endif
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
                             <span class="text-gray-400 font-medium">Células</span>
                             <span class="font-bold text-gray-900">
                                 {{ $supervision->cells->count() }}

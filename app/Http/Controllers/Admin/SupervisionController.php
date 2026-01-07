@@ -34,7 +34,6 @@ class SupervisionController
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'zone_id' => 'required|exists:zones,id',
-            'supervisor_id' => 'nullable|exists:users,id',
             'description' => 'nullable|string',
         ]);
 
@@ -48,7 +47,7 @@ class SupervisionController
     {
         return view(
             'admin.supervisions.show',
-            ['supervision' => $supervision->load('zone', 'cells', 'supervisor')]
+            ['supervision' => $supervision->load('zone', 'cells')]
         );
     }
 
@@ -73,7 +72,6 @@ class SupervisionController
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'zone_id' => 'required|exists:zones,id',
-            'supervisor_id' => 'nullable|exists:users,id',
             'description' => 'nullable|string',
         ]);
 
