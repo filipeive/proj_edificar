@@ -83,13 +83,14 @@
                                 </div>
                             </div>
 
-                            <div class="mt-auto pt-6 border-t border-gray-50 flex items-center justify-between">
-                                <div class="flex flex-col">
+                            <div class="mt-auto pt-6 border-t border-gray-50 space-y-4">
+                                <div class="flex items-center justify-between px-2">
                                     <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Contr. Mês</span>
                                     <span class="text-sm font-black text-green-600">{{ number_format($zone->getTotalContributedThisMonth(), 0, ',', '.') }} MT</span>
                                 </div>
-                                <a href="{{ route('zones.show', $zone) }}" class="p-3 rounded-xl bg-gray-900 text-white hover:bg-blue-600 transition-all shadow-md">
-                                    <i class="bi bi-arrow-right"></i>
+                                <a href="{{ route('zones.show', $zone) }}" class="flex items-center justify-center w-full py-4 rounded-2xl bg-gray-900 text-white font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition-all shadow-md group">
+                                    Aceder Dashboard
+                                    <i class="bi bi-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
                                 </a>
                             </div>
                         </div>

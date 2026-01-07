@@ -139,24 +139,27 @@
                             </div>
                         </div>
 
-                        <div class="flex items-center justify-between pt-6 border-t border-gray-50">
-                            <div class="flex -space-x-3">
-                                @foreach($cell->members->take(5) as $member)
-                                    <img src="https://ui-avatars.com/api/?name={{ urlencode($member->name) }}&background=EBF4FF&color=3B82F6&bold=true"
-                                        class="w-10 h-10 rounded-full border-4 border-white shadow-sm ring-1 ring-gray-100"
-                                        title="{{ $member->name }}">
-                                @endforeach
-                                @if($cell->members->count() > 5)
-                                    <div
-                                        class="w-10 h-10 rounded-full border-4 border-white bg-gray-100 flex items-center justify-center text-xs font-black text-gray-500 shadow-sm ring-1 ring-gray-100">
-                                        +{{ $cell->members->count() - 5 }}
-                                    </div>
-                                @endif
+                        <div class="mt-auto pt-6 border-t border-gray-50 space-y-4">
+                            <div class="flex items-center justify-between px-2">
+                                <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Membros</span>
+                                <div class="flex -space-x-3">
+                                    @foreach($cell->members->take(5) as $member)
+                                        <img src="https://ui-avatars.com/api/?name={{ urlencode($member->name) }}&background=EBF4FF&color=3B82F6&bold=true"
+                                            class="w-10 h-10 rounded-full border-4 border-white shadow-sm ring-1 ring-gray-100"
+                                            title="{{ $member->name }}">
+                                    @endforeach
+                                    @if($cell->members->count() > 5)
+                                        <div
+                                            class="w-10 h-10 rounded-full border-4 border-white bg-gray-100 flex items-center justify-center text-xs font-black text-gray-500 shadow-sm ring-1 ring-gray-100">
+                                            +{{ $cell->members->count() - 5 }}
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
                             <a href="{{ route('cells.show', $cell) }}"
-                                class="flex items-center gap-2 text-xs font-black text-gray-900 uppercase tracking-widest hover:text-blue-600 transition-colors group/link">
-                                Detalhes
-                                <i class="bi bi-arrow-right group-hover/link:translate-x-1 transition-transform"></i>
+                                class="flex items-center justify-center w-full py-4 rounded-2xl bg-gray-900 text-white font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition-all shadow-md group">
+                                Aceder Dashboard
+                                <i class="bi bi-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
                             </a>
                         </div>
                     </div>

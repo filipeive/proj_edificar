@@ -195,7 +195,7 @@
                     </div>
                 @endif
 
-                @if($cellMeeting->meeting_type === 'normal' && $cellMeeting->attendances->count() > 0)
+                @if($cellMeeting->meeting_type === 'normal' && $cellMeeting->attendances && $cellMeeting->attendances->count() > 0)
                     <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
                         <div class="bg-green-50 px-8 py-6 border-b border-green-100">
                             <h3 class="text-sm font-black text-green-900 uppercase tracking-widest flex items-center">
