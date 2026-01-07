@@ -3,7 +3,7 @@
 @section('title', 'Gestão de Supervisões - Portal Life Church')
 
 @section('content')
-<div class="space-y-8">
+<div class="w-full">
     <!-- Header -->
     <div
         class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
