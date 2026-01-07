@@ -16,12 +16,18 @@ class Service extends Model
         'theme',
         'message',
         'observations',
-        'adults_count',
-        'children_count',
+        'adults_members',
+        'adults_visitors',
+        'adults_salvations',
+        'children_members',
+        'children_visitors',
+        'children_salvations',
+        'special_offerings_total',
     ];
 
     protected $casts = [
         'date' => 'date',
+        'special_offerings_total' => 'decimal:2',
     ];
 
     public function preacher()
@@ -34,8 +40,29 @@ class Service extends Model
         return $this->hasMany(ServiceOffering::class);
     }
 
+    public function tithes()
+    {
+        return $this->hasMany(ServiceTithe::class);
+    }
+
     public function getTotalOfferingsAttribute()
     {
         return $this->offerings->sum('amount');
+    }
+
+    public function getTotalTithesAttribute()
+    {
+        return $this->tithes->sum('amount');
+    }
+
+    public function getTotalFinancialAttribute()
+    {
+        return $this->total_offerings + $this->total_tithes + $this->special_offerings_total;
+    }
+
+    public function getTotalParticipationAttribute()
+    {
+        return $this->adults_members + $this->adults_visitors + $this->adults_salvations +
+            $this->children_members + $this->children_visitors + $this->children_salvations;
     }
 }
