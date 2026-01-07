@@ -374,10 +374,14 @@
                     Uma plataforma de gestão eclesiástica de classe mundial, desenhada para potencializar o crescimento
                     da sua igreja e o cuidado com cada membro.
                 </p>
-                
+
                 <!-- Floating Decorative Elements -->
-                <div class="absolute top-1/2 left-10 w-24 h-24 border border-white/10 rounded-full animate-spin-slow hidden md:block"></div>
-                <div class="absolute bottom-20 right-10 w-32 h-32 border border-white/5 rounded-full animate-bounce-slow hidden md:block"></div>
+                <div
+                    class="absolute top-1/2 left-10 w-24 h-24 border border-white/10 rounded-full animate-spin-slow hidden md:block">
+                </div>
+                <div
+                    class="absolute bottom-20 right-10 w-32 h-32 border border-white/5 rounded-full animate-bounce-slow hidden md:block">
+                </div>
 
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
                     <a href="{{ route('register') }}"
@@ -394,17 +398,23 @@
 
                 <!-- Stats Preview -->
                 <div class="grid grid-cols-3 gap-6 mt-20 max-w-3xl mx-auto">
-                    <div class="stat-card p-6 rounded-2xl text-center">
-                        <div class="text-3xl font-black text-white mb-1">100%</div>
-                        <div class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Seguro</div>
+                    <div
+                        class="stat-card p-6 rounded-2xl text-center backdrop-blur-md bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                        <div class="text-3xl font-black text-white mb-1"><i
+                                class="bi bi-shield-check text-orange-500"></i></div>
+                        <div class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-2">Segurança</div>
                     </div>
-                    <div class="stat-card p-6 rounded-2xl text-center">
-                        <div class="text-3xl font-black text-white mb-1">+{{ $memberCount ?? '2.5k' }}</div>
-                        <div class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Membros</div>
+                    <div
+                        class="stat-card p-6 rounded-2xl text-center backdrop-blur-md bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                        <div class="text-3xl font-black text-white mb-1"><i class="bi bi-people text-orange-500"></i>
+                        </div>
+                        <div class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-2">Comunidade</div>
                     </div>
-                    <div class="stat-card p-6 rounded-2xl text-center">
-                        <div class="text-3xl font-black text-white mb-1">24/7</div>
-                        <div class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Online</div>
+                    <div
+                        class="stat-card p-6 rounded-2xl text-center backdrop-blur-md bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                        <div class="text-3xl font-black text-white mb-1"><i class="bi bi-globe text-orange-500"></i>
+                        </div>
+                        <div class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-2">Global</div>
                     </div>
                 </div>
             </div>
@@ -420,19 +430,23 @@
     <!-- Vision & Values Section -->
     <section id="vision" class="py-32 bg-gray-900 relative overflow-hidden">
         <div class="absolute inset-0 opacity-20">
-            <div class="absolute top-0 right-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1548625361-8889aa3fb942?ixlib=rb-4.0.3&fit=crop&w=2000&q=80')] bg-cover bg-center"></div>
+            <div
+                class="absolute top-0 right-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1548625361-8889aa3fb942?ixlib=rb-4.0.3&fit=crop&w=2000&q=80')] bg-cover bg-center">
+            </div>
             <div class="absolute inset-0 bg-gradient-to-l from-gray-900 via-gray-900/50 to-transparent"></div>
         </div>
-        
+
         <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
             <!-- Top Vision Block -->
             <div class="flex flex-col lg:flex-row items-center gap-16 mb-32">
                 <div class="lg:w-1/2">
-                    <span class="text-orange-500 font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">A Visão da Life Church</span>
+                    <span class="text-orange-500 font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">A Visão
+                        da Life Church</span>
                     <h2 class="text-4xl md:text-5xl font-black text-white mb-8 tracking-tighter leading-none">
                         "Onde não há visão,<br> o povo <span class="orange-gradient-text">perece</span>"
                     </h2>
-                    <blockquote class="text-orange-400 text-sm font-bold uppercase tracking-widest mb-8 border-l-4 border-orange-500 pl-4">
+                    <blockquote
+                        class="text-orange-400 text-sm font-bold uppercase tracking-widest mb-8 border-l-4 border-orange-500 pl-4">
                         Provérbios 29:18
                     </blockquote>
                     <p class="text-gray-400 text-lg font-light leading-relaxed mb-6">
@@ -441,11 +455,12 @@
                     <div class="bg-white/5 p-6 rounded-2xl border border-white/10 mb-8">
                         <h4 class="text-white font-bold mb-2">Nossa Declaração:</h4>
                         <p class="text-gray-300 italic leading-relaxed">
-                            "Somos uma Igreja baseada em grupos células, amando a Jesus, servindo e discipulando pessoas, transformando comunidades e mudando as nações; uma vida de cada vez."
+                            "Somos uma Igreja baseada em grupos células, amando a Jesus, servindo e discipulando
+                            pessoas, transformando comunidades e mudando as nações; uma vida de cada vez."
                         </p>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-4">
-                         <a href="{{ asset('documents/visao-igreja.pdf') }}" target="_blank"
+                        <a href="{{ asset('documents/visao-igreja.pdf') }}" target="_blank"
                             class="btn-premium text-white px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-transform duration-300 shadow-xl inline-flex items-center justify-center">
                             <i class="bi bi-file-earmark-pdf-fill mr-3 text-lg"></i>
                             Download PDF da Visão
@@ -453,133 +468,178 @@
                     </div>
                 </div>
                 <div class="lg:w-1/2 relative">
-                    <div class="relative aspect-video rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl group">
-                         <iframe class="w-full h-full" 
-                                src="https://www.youtube.com/embed/sHLqLp_7Uv8"
-                                title="Visão Life Church" frameborder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                allowfullscreen>
+                    <div
+                        class="relative aspect-video rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl group">
+                        <iframe class="w-full h-full" src="https://www.youtube.com/embed/sHLqLp_7Uv8"
+                            title="Visão Life Church" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowfullscreen>
                         </iframe>
                     </div>
                     <!-- Decorative Circle -->
-                     <div class="absolute -bottom-10 -right-10 w-40 h-40 orange-gradient rounded-full blur-[80px] opacity-30"></div>
+                    <div
+                        class="absolute -bottom-10 -right-10 w-40 h-40 orange-gradient rounded-full blur-[80px] opacity-30">
+                    </div>
                 </div>
             </div>
 
             <!-- Detailed Vision Grid -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-32">
                 <div class="bg-white/5 p-8 rounded-3xl border border-white/10 hover:bg-white/10 transition-colors">
-                    <div class="w-12 h-12 orange-gradient rounded-xl flex items-center justify-center text-white text-xl mb-6">
+                    <div
+                        class="w-12 h-12 orange-gradient rounded-xl flex items-center justify-center text-white text-xl mb-6">
                         <i class="bi bi-people-fill"></i>
                     </div>
                     <h3 class="text-xl font-black text-white mb-4">Família em Células</h3>
                     <p class="text-gray-400 text-sm leading-relaxed">
-                        A igreja não é um edifício, são pessoas vivendo em comunidade. Enfatizamos reuniões juntos no culto de celebração e em nossos grupos de células que funcionam em muitos bairros durante a semana.
+                        A igreja não é um edifício, são pessoas vivendo em comunidade. Enfatizamos reuniões juntos no
+                        culto de celebração e em nossos grupos de células que funcionam em muitos bairros durante a
+                        semana.
                     </p>
                 </div>
                 <div class="bg-white/5 p-8 rounded-3xl border border-white/10 hover:bg-white/10 transition-colors">
-                    <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white text-xl mb-6">
+                    <div
+                        class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white text-xl mb-6">
                         <i class="bi bi-heart-fill"></i>
                     </div>
                     <h3 class="text-xl font-black text-white mb-4">Amar e Servir</h3>
                     <p class="text-gray-400 text-sm leading-relaxed">
-                        Amar a Jesus significa amar o que Ele ama: as pessoas. Servimos e discipulamos uns aos outros, equipando cada membro para alcançar a próxima geração ("Ide e fazei discípulos" - Mateus 28:19-20).
+                        Amar a Jesus significa amar o que Ele ama: as pessoas. Servimos e discipulamos uns aos outros,
+                        equipando cada membro para alcançar a próxima geração ("Ide e fazei discípulos" - Mateus
+                        28:19-20).
                     </p>
                 </div>
                 <div class="bg-white/5 p-8 rounded-3xl border border-white/10 hover:bg-white/10 transition-colors">
-                    <div class="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center text-white text-xl mb-6">
+                    <div
+                        class="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center text-white text-xl mb-6">
                         <i class="bi bi-globe-americas"></i>
                     </div>
                     <h3 class="text-xl font-black text-white mb-4">Transformar Nações</h3>
                     <p class="text-gray-400 text-sm leading-relaxed">
-                        Para mudar uma nação, transformamos uma comunidade, uma vida de cada vez. Somos sal e luz (Mateus 5:13-16) impactando cidades e expandindo para nações como Moçambique, Malawi e Zimbábue.
+                        Para mudar uma nação, transformamos uma comunidade, uma vida de cada vez. Somos sal e luz
+                        (Mateus 5:13-16) impactando cidades e expandindo para nações como Moçambique, Malawi e Zimbábue.
                     </p>
                 </div>
             </div>
 
             <!-- Values Section -->
             <div class="text-center mb-16">
-                 <span class="text-orange-500 font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Nossa Identidade</span>
-                 <h2 class="text-3xl md:text-5xl font-black text-white mb-12">Valores da <span class="orange-gradient-text">Life Church</span></h2>
-                 
-                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-left">
-                     <div class="p-6 rounded-2xl bg-white/5 hover:bg-orange-600/20 border border-white/5 transition-all group">
-                         <i class="bi bi-book text-2xl text-orange-500 mb-3 block group-hover:scale-110 transition-transform"></i>
-                         <h4 class="text-white font-bold text-sm mb-1">Base Bíblica</h4>
-                         <p class="text-xs text-gray-500">Inspirados pela Palavra e ensino forte.</p>
-                     </div>
-                     <div class="p-6 rounded-2xl bg-white/5 hover:bg-orange-600/20 border border-white/5 transition-all group">
-                        <i class="bi bi-person-lines-fill text-2xl text-orange-500 mb-3 block group-hover:scale-110 transition-transform"></i>
+                <span class="text-orange-500 font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Nossa
+                    Identidade</span>
+                <h2 class="text-3xl md:text-5xl font-black text-white mb-12">Valores da <span
+                        class="orange-gradient-text">Life Church</span></h2>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-left">
+                    <div
+                        class="p-6 rounded-2xl bg-white/5 hover:bg-orange-600/20 border border-white/5 transition-all group">
+                        <i
+                            class="bi bi-book text-2xl text-orange-500 mb-3 block group-hover:scale-110 transition-transform"></i>
+                        <h4 class="text-white font-bold text-sm mb-1">Base Bíblica</h4>
+                        <p class="text-xs text-gray-500">Inspirados pela Palavra e ensino forte.</p>
+                    </div>
+                    <div
+                        class="p-6 rounded-2xl bg-white/5 hover:bg-orange-600/20 border border-white/5 transition-all group">
+                        <i
+                            class="bi bi-person-lines-fill text-2xl text-orange-500 mb-3 block group-hover:scale-110 transition-transform"></i>
                         <h4 class="text-white font-bold text-sm mb-1">Discipulado</h4>
                         <p class="text-xs text-gray-500">Crescer, equipar e liberar liderança.</p>
                     </div>
-                    <div class="p-6 rounded-2xl bg-white/5 hover:bg-orange-600/20 border border-white/5 transition-all group">
-                        <i class="bi bi-house-heart text-2xl text-orange-500 mb-3 block group-hover:scale-110 transition-transform"></i>
+                    <div
+                        class="p-6 rounded-2xl bg-white/5 hover:bg-orange-600/20 border border-white/5 transition-all group">
+                        <i
+                            class="bi bi-house-heart text-2xl text-orange-500 mb-3 block group-hover:scale-110 transition-transform"></i>
                         <h4 class="text-white font-bold text-sm mb-1">Família</h4>
                         <p class="text-xs text-gray-500">Relacionamentos fortes e herança divina.</p>
                     </div>
-                    <div class="p-6 rounded-2xl bg-white/5 hover:bg-orange-600/20 border border-white/5 transition-all group">
-                        <i class="bi bi-fire text-2xl text-orange-500 mb-3 block group-hover:scale-110 transition-transform"></i>
+                    <div
+                        class="p-6 rounded-2xl bg-white/5 hover:bg-orange-600/20 border border-white/5 transition-all group">
+                        <i
+                            class="bi bi-fire text-2xl text-orange-500 mb-3 block group-hover:scale-110 transition-transform"></i>
                         <h4 class="text-white font-bold text-sm mb-1">Disciplinas</h4>
                         <p class="text-xs text-gray-500">Oração, adoração, jejum e servir.</p>
                     </div>
-                    <div class="p-6 rounded-2xl bg-white/5 hover:bg-orange-600/20 border border-white/5 transition-all group">
-                        <i class="bi bi-globe text-2xl text-orange-500 mb-3 block group-hover:scale-110 transition-transform"></i>
+                    <div
+                        class="p-6 rounded-2xl bg-white/5 hover:bg-orange-600/20 border border-white/5 transition-all group">
+                        <i
+                            class="bi bi-globe text-2xl text-orange-500 mb-3 block group-hover:scale-110 transition-transform"></i>
                         <h4 class="text-white font-bold text-sm mb-1">Multi-nacional</h4>
                         <p class="text-xs text-gray-500">Diversificada e inclusiva, espaço para todos.</p>
                     </div>
-                    <div class="p-6 rounded-2xl bg-white/5 hover:bg-orange-600/20 border border-white/5 transition-all group">
-                        <i class="bi bi-send text-2xl text-orange-500 mb-3 block group-hover:scale-110 transition-transform"></i>
+                    <div
+                        class="p-6 rounded-2xl bg-white/5 hover:bg-orange-600/20 border border-white/5 transition-all group">
+                        <i
+                            class="bi bi-send text-2xl text-orange-500 mb-3 block group-hover:scale-110 transition-transform"></i>
                         <h4 class="text-white font-bold text-sm mb-1">Missional</h4>
                         <p class="text-xs text-gray-500">Diferença na comunidade e onde formos.</p>
                     </div>
-                    <div class="p-6 rounded-2xl bg-white/5 hover:bg-orange-600/20 border border-white/5 transition-all group col-span-2 md:col-span-2">
-                        <i class="bi bi-people text-2xl text-orange-500 mb-3 block group-hover:scale-110 transition-transform"></i>
+                    <div
+                        class="p-6 rounded-2xl bg-white/5 hover:bg-orange-600/20 border border-white/5 transition-all group col-span-2 md:col-span-2">
+                        <i
+                            class="bi bi-people text-2xl text-orange-500 mb-3 block group-hover:scale-110 transition-transform"></i>
                         <h4 class="text-white font-bold text-sm mb-1">Geração</h4>
-                        <p class="text-xs text-gray-500">Todas as idades, os mais velhos construindo a próxima geração.</p>
+                        <p class="text-xs text-gray-500">Todas as idades, os mais velhos construindo a próxima geração.
+                        </p>
                     </div>
-                 </div>
+                </div>
             </div>
 
             <!-- Journey Section -->
             <div class="bg-white rounded-[3rem] p-8 md:p-16">
                 <div class="text-center mb-16">
-                    <span class="text-orange-600 font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Crescimento</span>
-                    <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-4 tracking-tighter">Nossa Jornada de Vida</h2>
+                    <span
+                        class="text-orange-600 font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Crescimento</span>
+                    <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-4 tracking-tighter">Nossa Jornada de
+                        Vida</h2>
                     <p class="text-gray-500">4 Passos para o seu propósito</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                     <!-- Step 1 -->
                     <div class="text-center relative">
-                        <div class="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center text-gray-400 text-2xl font-black mb-6 border-4 border-white shadow-xl relative z-10">1</div>
+                        <div
+                            class="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center text-gray-400 text-2xl font-black mb-6 border-4 border-white shadow-xl relative z-10">
+                            1</div>
                         <div class="absolute top-8 left-1/2 w-full h-1 bg-gray-100 hidden md:block -z-0"></div>
                         <h4 class="font-black text-gray-900 mb-2">Pertencer</h4>
-                        <span class="text-[10px] text-orange-600 font-bold uppercase tracking-widest block mb-4">Fase Infantil</span>
-                        <p class="text-xs text-gray-500 leading-relaxed">Descobrir sua família, Salvação e encontrar sua Célula.</p>
+                        <span class="text-[10px] text-orange-600 font-bold uppercase tracking-widest block mb-4">Fase
+                            Infantil</span>
+                        <p class="text-xs text-gray-500 leading-relaxed">Descobrir sua família, Salvação e encontrar sua
+                            Célula.</p>
                     </div>
                     <!-- Step 2 -->
                     <div class="text-center relative">
-                        <div class="w-16 h-16 mx-auto bg-orange-100 rounded-full flex items-center justify-center text-orange-600 text-2xl font-black mb-6 border-4 border-white shadow-xl relative z-10">2</div>
+                        <div
+                            class="w-16 h-16 mx-auto bg-orange-100 rounded-full flex items-center justify-center text-orange-600 text-2xl font-black mb-6 border-4 border-white shadow-xl relative z-10">
+                            2</div>
                         <div class="absolute top-8 left-1/2 w-full h-1 bg-gray-100 hidden md:block -z-0"></div>
                         <h4 class="font-black text-gray-900 mb-2">Conectar</h4>
-                        <span class="text-[10px] text-orange-600 font-bold uppercase tracking-widest block mb-4">Relacionamentos</span>
-                        <p class="text-xs text-gray-500 leading-relaxed">Discipulado "vivendo juntos" e começar a Servir.</p>
+                        <span
+                            class="text-[10px] text-orange-600 font-bold uppercase tracking-widest block mb-4">Relacionamentos</span>
+                        <p class="text-xs text-gray-500 leading-relaxed">Discipulado "vivendo juntos" e começar a
+                            Servir.</p>
                     </div>
-                     <!-- Step 3 -->
-                     <div class="text-center relative">
-                        <div class="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-2xl font-black mb-6 border-4 border-white shadow-xl relative z-10">3</div>
+                    <!-- Step 3 -->
+                    <div class="text-center relative">
+                        <div
+                            class="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-2xl font-black mb-6 border-4 border-white shadow-xl relative z-10">
+                            3</div>
                         <div class="absolute top-8 left-1/2 w-full h-1 bg-gray-100 hidden md:block -z-0"></div>
                         <h4 class="font-black text-gray-900 mb-2">Equipar</h4>
-                        <span class="text-[10px] text-orange-600 font-bold uppercase tracking-widest block mb-4">Jovem Adulto</span>
-                        <p class="text-xs text-gray-500 leading-relaxed">Desenvolvimento espiritual, liderança e aplicação prática.</p>
+                        <span class="text-[10px] text-orange-600 font-bold uppercase tracking-widest block mb-4">Jovem
+                            Adulto</span>
+                        <p class="text-xs text-gray-500 leading-relaxed">Desenvolvimento espiritual, liderança e
+                            aplicação prática.</p>
                     </div>
                     <!-- Step 4 -->
                     <div class="text-center relative">
-                        <div class="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center text-green-600 text-2xl font-black mb-6 border-4 border-white shadow-xl relative z-10">4</div>
+                        <div
+                            class="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center text-green-600 text-2xl font-black mb-6 border-4 border-white shadow-xl relative z-10">
+                            4</div>
                         <h4 class="font-black text-gray-900 mb-2">Liberar</h4>
-                        <span class="text-[10px] text-orange-600 font-bold uppercase tracking-widest block mb-4">Fase dos Pais</span>
-                        <p class="text-xs text-gray-500 leading-relaxed">Multiplicação, discipular outros e transformação da comunidade.</p>
+                        <span class="text-[10px] text-orange-600 font-bold uppercase tracking-widest block mb-4">Fase
+                            dos Pais</span>
+                        <p class="text-xs text-gray-500 leading-relaxed">Multiplicação, discipular outros e
+                            transformação da comunidade.</p>
                     </div>
                 </div>
             </div>
@@ -587,74 +647,98 @@
             <!-- Appendix / Beliefs Section (Redesigned) -->
             <div class="mt-32">
                 <div class="text-center mb-16">
-                     <span class="text-orange-600 font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Fundamentos</span>
-                     <h2 class="text-3xl md:text-5xl font-black text-white mb-6">Nossas <span class="orange-gradient-text">Crenças</span></h2>
-                     <p class="text-gray-400 max-w-2xl mx-auto">A base inabalável da nossa fé e prática</p>
+                    <span
+                        class="text-orange-600 font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Fundamentos</span>
+                    <h2 class="text-3xl md:text-5xl font-black text-white mb-6">Nossas <span
+                            class="orange-gradient-text">Crenças</span></h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto">A base inabalável da nossa fé e prática</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div class="bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/5 hover:border-orange-500/30 transition-all hover:-translate-y-2 group">
-                        <div class="w-10 h-10 orange-gradient rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
+                    <div
+                        class="bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/5 hover:border-orange-500/30 transition-all hover:-translate-y-2 group">
+                        <div
+                            class="w-10 h-10 orange-gradient rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
                             <i class="bi bi-book-fill"></i>
                         </div>
                         <h4 class="text-white font-bold mb-2">Doutrina</h4>
-                        <p class="text-xs text-gray-400 leading-relaxed">A Bíblia é a palavra inspirada de Deus; existe um só Deus (Pai, Filho, Espírito Santo).</p>
+                        <p class="text-xs text-gray-400 leading-relaxed">A Bíblia é a palavra inspirada de Deus; existe
+                            um só Deus (Pai, Filho, Espírito Santo).</p>
                     </div>
 
-                    <div class="bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/5 hover:border-orange-500/30 transition-all hover:-translate-y-2 group">
-                        <div class="w-10 h-10 orange-gradient rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
+                    <div
+                        class="bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/5 hover:border-orange-500/30 transition-all hover:-translate-y-2 group">
+                        <div
+                            class="w-10 h-10 orange-gradient rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
                             <i class="bi bi-person-heart"></i>
                         </div>
                         <h4 class="text-white font-bold mb-2">Jesus Cristo</h4>
-                        <p class="text-xs text-gray-400 leading-relaxed">Sua divindade, humanidade, morte expiatória, ressurreição e retorno.</p>
+                        <p class="text-xs text-gray-400 leading-relaxed">Sua divindade, humanidade, morte expiatória,
+                            ressurreição e retorno.</p>
                     </div>
 
-                    <div class="bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/5 hover:border-orange-500/30 transition-all hover:-translate-y-2 group">
-                        <div class="w-10 h-10 orange-gradient rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
+                    <div
+                        class="bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/5 hover:border-orange-500/30 transition-all hover:-translate-y-2 group">
+                        <div
+                            class="w-10 h-10 orange-gradient rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
                             <i class="bi bi-fire"></i>
                         </div>
                         <h4 class="text-white font-bold mb-2">Espírito Santo</h4>
-                        <p class="text-xs text-gray-400 leading-relaxed">Poder santificador e batismo para viver a vida cristã.</p>
+                        <p class="text-xs text-gray-400 leading-relaxed">Poder santificador e batismo para viver a vida
+                            cristã.</p>
                     </div>
 
-                    <div class="bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/5 hover:border-orange-500/30 transition-all hover:-translate-y-2 group">
-                        <div class="w-10 h-10 orange-gradient rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
+                    <div
+                        class="bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/5 hover:border-orange-500/30 transition-all hover:-translate-y-2 group">
+                        <div
+                            class="w-10 h-10 orange-gradient rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
                             <i class="bi bi-heart-pulse-fill"></i>
                         </div>
                         <h4 class="text-white font-bold mb-2">Salvação</h4>
-                        <p class="text-xs text-gray-400 leading-relaxed">Todos pecaram; salvação apenas pelo arrependimento e fé no sangue de Cristo.</p>
+                        <p class="text-xs text-gray-400 leading-relaxed">Todos pecaram; salvação apenas pelo
+                            arrependimento e fé no sangue de Cristo.</p>
                     </div>
 
-                    <div class="bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/5 hover:border-orange-500/30 transition-all hover:-translate-y-2 group">
-                        <div class="w-10 h-10 orange-gradient rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
+                    <div
+                        class="bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/5 hover:border-orange-500/30 transition-all hover:-translate-y-2 group">
+                        <div
+                            class="w-10 h-10 orange-gradient rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
                             <i class="bi bi-droplet-fill"></i>
                         </div>
                         <h4 class="text-white font-bold mb-2">Práticas</h4>
                         <p class="text-xs text-gray-400 leading-relaxed">Batismo nas águas e Ceia do Senhor.</p>
                     </div>
 
-                    <div class="bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/5 hover:border-orange-500/30 transition-all hover:-translate-y-2 group">
-                         <div class="w-10 h-10 orange-gradient rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
+                    <div
+                        class="bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/5 hover:border-orange-500/30 transition-all hover:-translate-y-2 group">
+                        <div
+                            class="w-10 h-10 orange-gradient rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
                             <i class="bi bi-infinity"></i>
                         </div>
                         <h4 class="text-white font-bold mb-2">Ressurreição</h4>
                         <p class="text-xs text-gray-400 leading-relaxed">Vida eterna para os salvos.</p>
                     </div>
 
-                    <div class="bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/5 hover:border-orange-500/30 transition-all hover:-translate-y-2 group">
-                         <div class="w-10 h-10 orange-gradient rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
+                    <div
+                        class="bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/5 hover:border-orange-500/30 transition-all hover:-translate-y-2 group">
+                        <div
+                            class="w-10 h-10 orange-gradient rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
                             <i class="bi bi-house-door-fill"></i>
                         </div>
                         <h4 class="text-white font-bold mb-2">Igreja & Família</h4>
-                        <p class="text-xs text-gray-400 leading-relaxed">Sacerdócio, milagres atuais, igreja local e casamento como base da família.</p>
+                        <p class="text-xs text-gray-400 leading-relaxed">Sacerdócio, milagres atuais, igreja local e
+                            casamento como base da família.</p>
                     </div>
 
-                    <div class="bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/5 hover:border-orange-500/30 transition-all hover:-translate-y-2 group">
-                        <div class="w-10 h-10 orange-gradient rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
+                    <div
+                        class="bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/5 hover:border-orange-500/30 transition-all hover:-translate-y-2 group">
+                        <div
+                            class="w-10 h-10 orange-gradient rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
                             <i class="bi bi-globe"></i>
                         </div>
                         <h4 class="text-white font-bold mb-2">Missões</h4>
-                        <p class="text-xs text-gray-400 leading-relaxed">Fazer discípulos de todas as nações (Mateus 28:20).</p>
+                        <p class="text-xs text-gray-400 leading-relaxed">Fazer discípulos de todas as nações (Mateus
+                            28:20).</p>
                     </div>
                 </div>
             </div>
@@ -822,30 +906,100 @@
                     </p>
 
                     <div class="space-y-4">
-                        @forelse($recentServices as $service)
+                        <!-- Sunday 8h -->
+                        <div
+                            class="service-item flex items-center p-6 bg-white rounded-2xl border border-gray-100 group cursor-pointer hover:border-orange-500/30 transition-all">
                             <div
-                                class="service-item flex items-center p-6 bg-white rounded-2xl border border-gray-100 group cursor-pointer">
-                                <div
-                                    class="w-14 h-14 orange-gradient rounded-xl flex items-center justify-center text-xl text-white shadow-md group-hover:scale-110 transition-transform">
-                                    <i class="bi bi-play-circle-fill"></i>
-                                </div>
-                                <div class="ml-5 flex-1">
-                                    <h4 class="font-black text-gray-900 text-lg">
-                                        {{ $service->name ?? 'Culto de Celebração' }}
-                                    </h4>
-                                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">
-                                        {{ $service->date->format('d/m/Y') }} • {{ $service->date->translatedFormat('l') }}
-                                    </p>
-                                </div>
-                                <div class="text-right">
-                                    <span
-                                        class="text-2xl font-black text-gray-900">{{ $service->attendance_count ?? 0 }}</span>
-                                    <p class="text-[8px] text-gray-400 font-black uppercase tracking-widest">Presentes</p>
-                                </div>
+                                class="w-14 h-14 orange-gradient rounded-xl flex items-center justify-center text-xl text-white shadow-md group-hover:scale-110 transition-transform">
+                                <i class="bi bi-sun-fill"></i>
                             </div>
-                        @empty
-                            <p class="text-gray-400 font-light italic">Nenhum culto registrado recentemente.</p>
-                        @endforelse
+                            <div class="ml-5 flex-1">
+                                <h4 class="font-black text-gray-900 text-lg">Primeiro Culto</h4>
+                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">
+                                    Domingo • 08:00h
+                                </p>
+                            </div>
+                            <div
+                                class="px-4 py-2 bg-orange-50 text-orange-600 rounded-lg text-xs font-bold uppercase tracking-wider">
+                                Celebração
+                            </div>
+                        </div>
+
+                        <!-- Sunday 10h -->
+                        <div
+                            class="service-item flex items-center p-6 bg-white rounded-2xl border border-gray-100 group cursor-pointer hover:border-orange-500/30 transition-all">
+                            <div
+                                class="w-14 h-14 orange-gradient rounded-xl flex items-center justify-center text-xl text-white shadow-md group-hover:scale-110 transition-transform">
+                                <i class="bi bi-people-fill"></i>
+                            </div>
+                            <div class="ml-5 flex-1">
+                                <h4 class="font-black text-gray-900 text-lg">Segundo Culto</h4>
+                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">
+                                    Domingo • 10:00h
+                                </p>
+                            </div>
+                            <div
+                                class="px-4 py-2 bg-orange-50 text-orange-600 rounded-lg text-xs font-bold uppercase tracking-wider">
+                                Celebração
+                            </div>
+                        </div>
+
+                        <!-- Sunday 15h (Teens) -->
+                        <div
+                            class="service-item flex items-center p-6 bg-white rounded-2xl border border-gray-100 group cursor-pointer hover:border-yellow-500/30 transition-all">
+                            <div
+                                class="w-14 h-14 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center text-xl text-white shadow-md group-hover:scale-110 transition-transform">
+                                <i class="bi bi-emoji-smile-fill"></i>
+                            </div>
+                            <div class="ml-5 flex-1">
+                                <h4 class="font-black text-gray-900 text-lg">Culto de Adolescentes</h4>
+                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">
+                                    Domingo • 15:00h
+                                </p>
+                            </div>
+                            <div
+                                class="px-4 py-2 bg-yellow-50 text-yellow-600 rounded-lg text-xs font-bold uppercase tracking-wider">
+                                Teens
+                            </div>
+                        </div>
+
+                        <!-- Sunday 17h (Youth & Adults) -->
+                        <div
+                            class="service-item flex items-center p-6 bg-white rounded-2xl border border-gray-100 group cursor-pointer hover:border-blue-500/30 transition-all">
+                            <div
+                                class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-xl text-white shadow-md group-hover:scale-110 transition-transform">
+                                <i class="bi bi-fire"></i>
+                            </div>
+                            <div class="ml-5 flex-1">
+                                <h4 class="font-black text-gray-900 text-lg">Jovens e Adultos</h4>
+                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">
+                                    Domingo • 17:00h
+                                </p>
+                            </div>
+                            <div
+                                class="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold uppercase tracking-wider">
+                                Revival
+                            </div>
+                        </div>
+
+                        <!-- Wednesday 17:30 (Word) -->
+                        <div
+                            class="service-item flex items-center p-6 bg-white rounded-2xl border border-gray-100 group cursor-pointer hover:border-purple-500/30 transition-all">
+                            <div
+                                class="w-14 h-14 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center text-xl text-white shadow-md group-hover:scale-110 transition-transform">
+                                <i class="bi bi-book-half"></i>
+                            </div>
+                            <div class="ml-5 flex-1">
+                                <h4 class="font-black text-gray-900 text-lg">Culto da Palavra</h4>
+                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">
+                                    Quarta-feira • 17:30h
+                                </p>
+                            </div>
+                            <div
+                                class="px-4 py-2 bg-purple-50 text-purple-600 rounded-lg text-xs font-bold uppercase tracking-wider">
+                                Ensino
+                            </div>
+                        </div>
                     </div>
                 </div>
 
