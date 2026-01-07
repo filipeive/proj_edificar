@@ -254,9 +254,7 @@
                 <div class="flex items-center space-x-3 group cursor-pointer">
                     <div
                         class="p-2 orange-gradient rounded-2xl shadow-lg transition-transform duration-300 group-hover:scale-110 pulse-glow">
-                        <svg class="h-8 w-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" />
-                        </svg>
+                        <img src="{{ asset('images/logo-white-orange.png') }}" alt="Life Church" class="h-8 w-auto">
                     </div>
                     <div class="flex flex-col">
                         <span class="text-xl font-black tracking-tighter text-gray-900 uppercase leading-none">Life
@@ -410,6 +408,48 @@
 
         <div class="scroll-indicator absolute bottom-10 left-1/2 text-white/60 cursor-pointer z-10">
             <a href="#features"><i class="bi bi-chevron-down text-3xl animate-bounce"></i></a>
+        </div>
+    </section>
+
+    <!-- Vision Section -->
+    <section id="vision" class="py-32 bg-gray-900 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-20">
+            <div class="absolute top-0 right-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1548625361-8889aa3fb942?ixlib=rb-4.0.3&fit=crop&w=2000&q=80')] bg-cover bg-center"></div>
+            <div class="absolute inset-0 bg-gradient-to-l from-gray-900 via-gray-900/50 to-transparent"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col lg:flex-row items-center gap-16">
+                <div class="lg:w-1/2">
+                    <span class="text-orange-500 font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Quem Somos</span>
+                    <h2 class="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter leading-none">
+                        Nossa <span class="orange-gradient-text">Visão</span> e<br> Propósito
+                    </h2>
+                    <p class="text-gray-400 text-xl font-light leading-relaxed mb-10">
+                        Somos uma família de fé apaixonada por Jesus e pelas pessoas. Nossa visão é edificar vidas e transformar destinos através do poder do Evangelho, capacitando cada membro a viver seu potencial máximo em Cristo.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                         <a href="{{ asset('documents/visao-igreja.pdf') }}" target="_blank"
+                            class="btn-premium text-white px-10 py-5 rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-transform duration-300 shadow-xl inline-flex items-center justify-center">
+                            <i class="bi bi-file-earmark-pdf-fill mr-3 text-lg"></i>
+                            Download da Visão
+                        </a>
+                    </div>
+                </div>
+                <div class="lg:w-1/2 relative">
+                    <div class="relative rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl group">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10"></div>
+                        <img src="https://images.unsplash.com/photo-1519822472972-dc2939630131?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
+                             alt="Vision" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
+                        <div class="absolute bottom-10 left-10 z-20">
+                             <div class="text-white text-3xl font-black mb-2">Conheça nossa História</div>
+                             <div class="h-1 w-20 orange-gradient rounded-full"></div>
+                        </div>
+                    </div>
+                    <!-- Decorative Circle -->
+                     <div class="absolute -bottom-10 -right-10 w-40 h-40 orange-gradient rounded-full blur-[80px] opacity-30"></div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -726,14 +766,17 @@
         <div class="max-w-7xl mx-auto px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-16 mb-16">
                 <div class="col-span-1 md:col-span-2">
-                    <div class="flex items-center space-x-3 mb-8 group cursor-pointer">
+                    <div class="flex items-center space-x-3 group cursor-pointer">
                         <div
-                            class="p-2 orange-gradient rounded-2xl transition-transform duration-300 group-hover:scale-110">
-                            <svg class="h-8 w-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" />
-                            </svg>
+                            class="p-2 orange-gradient rounded-2xl shadow-lg transition-transform duration-300 group-hover:scale-110 pulse-glow">
+                            <img src="{{ asset('images/logo-white-orange.png') }}" alt="Life Church" class="h-8 w-auto">
                         </div>
-                        <span class="text-2xl font-black text-gray-900 uppercase tracking-tighter">Life Church</span>
+                        <div class="flex flex-col">
+                            <span class="text-xl font-black tracking-tighter text-gray-900 uppercase leading-none">Life
+                                Church</span>
+                            <span class="text-[9px] text-orange-600 font-black uppercase tracking-[0.3em]">Portal de
+                                Gestão</span>
+                        </div>
                     </div>
                     <p class="text-gray-500 text-base font-light leading-relaxed max-w-md">
                         Uma comunidade dedicada a amar a Deus, amar as pessoas e servir o mundo com excelência e paixão.
