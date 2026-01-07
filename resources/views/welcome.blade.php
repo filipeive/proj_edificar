@@ -414,40 +414,53 @@
     <!-- Vision Section -->
     <section id="vision" class="py-32 bg-gray-900 relative overflow-hidden">
         <div class="absolute inset-0 opacity-20">
-            <div class="absolute top-0 right-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1548625361-8889aa3fb942?ixlib=rb-4.0.3&fit=crop&w=2000&q=80')] bg-cover bg-center"></div>
+            <div
+                class="absolute top-0 right-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1548625361-8889aa3fb942?ixlib=rb-4.0.3&fit=crop&w=2000&q=80')] bg-cover bg-center">
+            </div>
             <div class="absolute inset-0 bg-gradient-to-l from-gray-900 via-gray-900/50 to-transparent"></div>
         </div>
-        
+
         <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
             <div class="flex flex-col lg:flex-row items-center gap-16">
                 <div class="lg:w-1/2">
-                    <span class="text-orange-500 font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Quem Somos</span>
+                    <span class="text-orange-500 font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Quem
+                        Somos</span>
                     <h2 class="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter leading-none">
                         Nossa <span class="orange-gradient-text">Visão</span> e<br> Propósito
                     </h2>
                     <p class="text-gray-400 text-xl font-light leading-relaxed mb-10">
-                        Somos uma família de fé apaixonada por Jesus e pelas pessoas. Nossa visão é edificar vidas e transformar destinos através do poder do Evangelho, capacitando cada membro a viver seu potencial máximo em Cristo.
+                        Somos uma família de fé apaixonada por Jesus e pelas pessoas. Nossa visão é edificar vidas e
+                        transformar destinos através do poder do Evangelho, capacitando cada membro a viver seu
+                        potencial máximo em Cristo.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4">
-                         <a href="{{ asset('documents/visao-igreja.pdf') }}" target="_blank"
+                        <a href="{{ asset('documents/visao-igreja.pdf') }}" target="_blank"
                             class="btn-premium text-white px-10 py-5 rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-transform duration-300 shadow-xl inline-flex items-center justify-center">
                             <i class="bi bi-file-earmark-pdf-fill mr-3 text-lg"></i>
                             Download da Visão
+                        </a>
+                        <a href="https://www.youtube.com/watch?v=sHLqLp_7Uv8" target="_blank"
+                            class="bg-white/10 text-white border border-white/20 px-10 py-5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-xl inline-flex items-center justify-center backdrop-blur-sm">
+                            <i class="bi bi-play-circle-fill mr-3 text-lg text-orange-500"></i>
+                            Ver Vídeo da Visão
                         </a>
                     </div>
                 </div>
                 <div class="lg:w-1/2 relative">
                     <div class="relative rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl group">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10"></div>
-                        <img src="https://images.unsplash.com/photo-1519822472972-dc2939630131?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
-                             alt="Vision" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
+                        <img src="https://images.unsplash.com/photo-1519822472972-dc2939630131?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                            alt="Vision"
+                            class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
                         <div class="absolute bottom-10 left-10 z-20">
-                             <div class="text-white text-3xl font-black mb-2">Conheça nossa História</div>
-                             <div class="h-1 w-20 orange-gradient rounded-full"></div>
+                            <div class="text-white text-3xl font-black mb-2">Conheça nossa História</div>
+                            <div class="h-1 w-20 orange-gradient rounded-full"></div>
                         </div>
                     </div>
                     <!-- Decorative Circle -->
-                     <div class="absolute -bottom-10 -right-10 w-40 h-40 orange-gradient rounded-full blur-[80px] opacity-30"></div>
+                    <div
+                        class="absolute -bottom-10 -right-10 w-40 h-40 orange-gradient rounded-full blur-[80px] opacity-30">
+                    </div>
                 </div>
             </div>
         </div>
