@@ -170,7 +170,7 @@ class ServiceController extends Controller
     {
         Gate::authorize('view', $service);
 
-        $service->load(['preacher', 'offerings.offeringType']);
+        $service->load(['preacher', 'offerings.offeringType', 'tithes']);
 
         $pdf = Pdf::loadView('services.pdf', compact('service'));
 

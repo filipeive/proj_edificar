@@ -18,7 +18,7 @@ class FinancialDashboardController extends Controller
         // 1. Contributions (Dízimos/Ofertas de Membros)
         $contributionsByType = Contribution::whereMonth('contribution_date', $month)
             ->whereYear('contribution_date', $year)
-            ->where('status', 'verified')
+            ->where('status', 'verificada')
             ->select('offering_type_id', DB::raw('SUM(amount) as total'))
             ->groupBy('offering_type_id')
             ->with('offeringType')

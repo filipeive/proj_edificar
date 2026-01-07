@@ -3,256 +3,210 @@
 @section('title', "Zona $zone->name - Portal Life Church")
 
 @section('content')
-    <div class="space-y-8">
-        <!-- Header & Breadcrumbs -->
-        <div
-            class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
-            <div>
-                <div class="flex items-center gap-2 text-xs font-bold text-blue-600 uppercase tracking-widest mb-2">
-                    <a href="{{ route('zones.index') }}" class="hover:underline">Zonas</a>
-                    <i class="bi bi-chevron-right text-[10px]"></i>
-                    <span>Detalhes da Zona</span>
+    <div class="space-y-8" x-data="{ activeTab: 'supervisions' }">
+        <!-- Header & Stats Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Info Zona -->
+            <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col justify-center">
+                <div class="flex items-center gap-2 text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] mb-3">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    <span>Zona Pastoral</span>
                 </div>
-                <h1 class="text-3xl font-black text-gray-900 tracking-tight mb-2">{{ $zone->name }}</h1>
-                <p class="text-gray-500">{{ $zone->description ?? 'Gestão detalhada da zona e sua estrutura.' }}</p>
+                <p class="text-3xl font-black text-gray-900 tracking-tighter">{{ $zone->name }}</p>
+                <div class="flex items-center gap-2 mt-2">
+                    <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                        Pastor: {{ $zone->pastor->name ?? 'Pendente' }}
+                    </span>
+                </div>
             </div>
-            <div class="flex gap-3">
-                <a href="{{ route('zones.edit', $zone) }}"
-                    class="group flex items-center bg-gray-50 text-gray-600 px-6 py-3 rounded-2xl hover:bg-gray-100 transition-all duration-300 font-bold">
-                    <i class="bi bi-pencil text-lg mr-2 group-hover:scale-110 transition-transform"></i>
-                    Editar Zona
-                </a>
-                <a href="{{ route('zones.index') }}"
-                    class="group flex items-center bg-white text-gray-600 px-6 py-3 rounded-2xl border border-gray-100 hover:bg-gray-50 transition-all duration-300 font-bold">
-                    <i class="bi bi-arrow-left text-lg mr-2 group-hover:-translate-x-1 transition-transform"></i>
-                    Voltar
-                </a>
+
+            <!-- Total Supervisões -->
+            <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col justify-center text-center">
+                <p class="text-5xl font-black text-purple-600 tracking-tighter">{{ $zone->supervisions->count() }}</p>
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mt-2">Supervisões</p>
+            </div>
+
+            <!-- Total Células -->
+            <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col justify-center text-center">
+                <p class="text-5xl font-black text-blue-600 tracking-tighter">{{ $cells->count() }}</p>
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mt-2">Unidades de Células</p>
+            </div>
+
+            <!-- Total Membros -->
+            <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col justify-center text-center relative overflow-hidden">
+                <div class="relative z-10">
+                    <p class="text-5xl font-black text-green-600 tracking-tighter">{{ $members->count() }}</p>
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mt-2">Membros Totais</p>
+                </div>
+                <div class="absolute -right-4 -bottom-4 text-8xl text-green-50 opacity-50"><i class="bi bi-people-fill"></i></div>
             </div>
         </div>
 
-        <!-- Summary Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Pastor -->
-            <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-4">
-                <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl">
-                    <i class="bi bi-person-badge-fill"></i>
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <div class="lg:col-span-3 space-y-8">
+                <!-- Tab Logic -->
+                <div class="flex items-center gap-4 bg-white p-2 rounded-[2rem] shadow-sm border border-gray-100 w-fit">
+                    <button @click="activeTab = 'supervisions'"
+                        :class="activeTab === 'supervisions' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'"
+                        class="px-8 py-3 rounded-[1.5rem] text-sm font-black uppercase tracking-widest transition-all">
+                        Supervisões
+                    </button>
+                    <button @click="activeTab = 'cells'"
+                        :class="activeTab === 'cells' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'"
+                        class="px-8 py-3 rounded-[1.5rem] text-sm font-black uppercase tracking-widest transition-all">
+                        Células
+                    </button>
+                    <button @click="activeTab = 'members'"
+                        :class="activeTab === 'members' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'"
+                        class="px-8 py-3 rounded-[1.5rem] text-sm font-black uppercase tracking-widest transition-all">
+                        Membros
+                    </button>
                 </div>
-                <div>
-                    <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Pastor</p>
-                    <p class="text-sm font-bold text-gray-900 leading-tight">
-                        {{ $zone->pastor->name ?? 'Não atribuído' }}
-                    </p>
-                </div>
-            </div>
 
-            <!-- Supervisões -->
-            <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-4">
-                <div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-2xl">
-                    <i class="bi bi-diagram-3-fill"></i>
-                </div>
-                <div>
-                    <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Supervisões</p>
-                    <p class="text-2xl font-black text-gray-900">{{ $zone->supervisions->count() }}</p>
-                </div>
-            </div>
-
-            <!-- Células -->
-            <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-4">
-                <div class="w-14 h-14 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center text-2xl">
-                    <i class="bi bi-grid-fill"></i>
-                </div>
-                <div>
-                    <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Células</p>
-                    <p class="text-2xl font-black text-gray-900">{{ $cells->count() }}</p>
-                </div>
-            </div>
-
-            <!-- Membros -->
-            <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-4">
-                <div class="w-14 h-14 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center text-2xl">
-                    <i class="bi bi-people-fill"></i>
-                </div>
-                <div>
-                    <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Membros</p>
-                    <p class="text-2xl font-black text-gray-900">{{ $members->count() }}</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Supervisões Section -->
-        <div class="space-y-4">
-            <div class="flex items-center justify-between px-4">
-                <h2 class="text-xl font-black text-gray-900 flex items-center gap-2">
-                    <i class="bi bi-diagram-3 text-blue-600"></i>
-                    Supervisões
-                </h2>
-                <a href="{{ route('supervisions.create', ['zone_id' => $zone->id]) }}"
-                    class="text-sm font-bold text-blue-600 hover:underline">
-                    + Nova Supervisão
-                </a>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @forelse($zone->supervisions as $supervision)
-                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 hover:shadow-md transition-all">
-                        <div class="flex items-center gap-4 mb-4">
-                            <div
-                                class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-black">
-                                {{ substr($supervision->name, 0, 1) }}
+                <!-- Tab Content: Supervisões -->
+                <div x-show="activeTab === 'supervisions'" x-transition.fade class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    @forelse($zone->supervisions as $supervision)
+                        <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 hover:border-blue-100 transition-all group">
+                            <div class="flex items-start justify-between mb-6">
+                                <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-black text-xl">
+                                    {{ substr($supervision->name, 0, 1) }}
+                                </div>
+                                <a href="{{ route('supervisions.show', $supervision) }}" class="text-gray-300 hover:text-blue-600 transition-colors">
+                                    <i class="bi bi-arrow-up-right-circle text-2xl"></i>
+                                </a>
                             </div>
-                            <div>
-                                <h3 class="font-bold text-gray-900">{{ $supervision->name }}</h3>
-                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                    {{ $supervision->cells->count() }} Células
-                                </p>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">{{ $supervision->name }}</h3>
+                            <div class="flex gap-4">
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] font-black text-gray-400 uppercase">Células</span>
+                                    <span class="text-lg font-black text-gray-900">{{ $supervision->cells->count() }}</span>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] font-black text-gray-400 uppercase">Membros</span>
+                                    <span class="text-lg font-black text-gray-900">{{ $supervision->cells->flatMap(fn($c) => $c->members)->count() }}</span>
+                                </div>
                             </div>
                         </div>
-                        <a href="{{ route('supervisions.show', $supervision) }}"
-                            class="block w-full text-center py-2 bg-gray-50 rounded-xl text-xs font-bold text-gray-600 hover:bg-blue-600 hover:text-white transition-all">
-                            Ver Detalhes
+                    @empty
+                        <div class="col-span-full py-16 text-center bg-gray-50 rounded-[2.5rem] border-2 border-dashed border-gray-200">
+                            <p class="text-gray-400 font-bold italic">Nenhuma supervisão registrada.</p>
+                        </div>
+                    @endforelse
+                </div>
+
+                <!-- Tab Content: Células -->
+                <div x-show="activeTab === 'cells'" x-transition.fade class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gray-50/50">
+                                    <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Unidade</th>
+                                    <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Supervisão</th>
+                                    <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Liderança</th>
+                                    <th class="px-10 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+                                @foreach($cells as $cell)
+                                    <tr class="hover:bg-gray-50/50 transition-colors group">
+                                        <td class="px-10 py-6 font-bold text-gray-900">{{ $cell->name }}</td>
+                                        <td class="px-10 py-6 text-sm text-gray-500 font-medium">{{ $cell->supervision->name }}</td>
+                                        <td class="px-10 py-6 text-sm font-bold text-gray-700">{{ $cell->leader->name ?? '-' }}</td>
+                                        <td class="px-10 py-6 text-right">
+                                            <a href="{{ route('cells.show', $cell) }}" class="text-gray-300 hover:text-blue-600 transition-colors">
+                                                <i class="bi bi-chevron-right text-lg"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab Content: Membros -->
+                <div x-show="activeTab === 'members'" x-transition.fade class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gray-50/50">
+                                    <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Membro</th>
+                                    <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Célula</th>
+                                    <th class="px-10 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+                                @foreach($members->take(50) as $member)
+                                    <tr class="hover:bg-gray-50/50 transition-colors group">
+                                        <td class="px-10 py-6">
+                                            <div class="flex items-center gap-4">
+                                                <div class="w-10 h-10 rounded-xl bg-gray-100 text-gray-400 flex items-center justify-center font-bold">
+                                                    {{ substr($member->name, 0, 1) }}
+                                                </div>
+                                                <div>
+                                                    <p class="text-sm font-bold text-gray-900 leading-tight">{{ $member->name }}</p>
+                                                    <p class="text-[10px] text-gray-400 font-medium">{{ $member->email }}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-10 py-6">
+                                            <span class="px-3 py-1 bg-gray-100 rounded-full text-[10px] font-black text-gray-500 uppercase">
+                                                {{ $member->cell->name ?? '-' }}
+                                            </span>
+                                        </td>
+                                        <td class="px-10 py-6 text-right">
+                                            <a href="{{ route('users.show', $member) }}" class="text-gray-300 hover:text-blue-600 transition-colors">
+                                                <i class="bi bi-chevron-right text-lg"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coluna de Ações -->
+            <div class="space-y-6">
+                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 space-y-6">
+                    <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Gestão da Zona</h3>
+                    <div class="grid grid-cols-1 gap-3">
+                        <a href="{{ route('zones.edit', $zone) }}"
+                            class="w-full bg-blue-600 text-white px-6 py-4 rounded-2xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3">
+                            <i class="bi bi-pencil-square"></i> Configurar Zona
+                        </a>
+                        <a href="{{ route('zones.index') }}"
+                            class="w-full bg-gray-50 text-gray-500 px-6 py-4 rounded-2xl hover:bg-gray-100 transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3">
+                            <i class="bi bi-arrow-left"></i> Voltar à Lista
                         </a>
                     </div>
-                @empty
-                    <div
-                        class="col-span-full py-8 text-center bg-gray-50 rounded-[2rem] border-2 border-dashed border-gray-200">
-                        <p class="text-gray-400 font-medium">Nenhuma supervisão vinculada.</p>
+                </div>
+
+                <div class="bg-gradient-to-br from-green-900 to-emerald-900 rounded-[2.5rem] shadow-xl p-10 text-white relative overflow-hidden">
+                    <div class="relative z-10 space-y-6">
+                        <p class="text-[10px] font-black text-green-300 uppercase tracking-[0.2em]">Faturamento Zona</p>
+                        <div class="space-y-1">
+                            <p class="text-sm font-medium text-green-100">Arrecadação Mensal</p>
+                            <div class="flex items-end gap-2">
+                                <span class="text-4xl font-black tracking-tighter text-white">{{ number_format($zone->getTotalContributedThisMonth(), 0, ',', '.') }}</span>
+                                <span class="text-xs font-bold text-green-300 mb-1">MT</span>
+                            </div>
+                        </div>
                     </div>
-                @endforelse
-            </div>
-        </div>
+                    <i class="bi bi-cash-stack absolute -right-4 -bottom-4 text-9xl text-white opacity-5"></i>
+                </div>
 
-        <!-- Células & Membros Grid -->
-        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-            <!-- Células Section -->
-            <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-8 border-b border-gray-50 flex items-center justify-between">
-                    <h2 class="text-xl font-black text-gray-900 flex items-center gap-2">
-                        <i class="bi bi-grid text-orange-500"></i>
-                        Células da Zona
-                    </h2>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-gray-50/50">
-                                <th
-                                    class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap">
-                                    Célula</th>
-                                <th
-                                    class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap">
-                                    Líder</th>
-                                <th
-                                    class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap text-center text-sm">
-                                    Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-50">
-                            @forelse($cells as $cell)
-                                <tr class="hover:bg-gray-50/50 transition-colors">
-                                    <td class="px-8 py-4 whitespace-nowrap">
-                                        <p class="font-bold text-gray-900">{{ $cell->name }}</p>
-                                        <p class="text-xs text-gray-400">{{ $cell->supervision->name }}</p>
-                                    </td>
-                                    <td class="px-8 py-4 whitespace-nowrap">
-                                        <p class="text-sm font-medium text-gray-700">
-                                            {{ $cell->leader->name ?? 'Não atribuído' }}</p>
-                                    </td>
-                                    <td class="px-8 py-4 whitespace-nowrap text-center">
-                                        <a href="{{ route('cells.show', $cell) }}"
-                                            class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white transition-all">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="3" class="px-8 py-12 text-center text-gray-400">Nenhuma célula encontrada.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Membros Section -->
-            <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-8 border-b border-gray-50 flex items-center justify-between">
-                    <h2 class="text-xl font-black text-gray-900 flex items-center gap-2">
-                        <i class="bi bi-people text-green-500"></i>
-                        Membros da Zona
-                    </h2>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-gray-50/50">
-                                <th
-                                    class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap">
-                                    Membro</th>
-                                <th
-                                    class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap">
-                                    Célula</th>
-                                <th
-                                    class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap text-center">
-                                    Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-50">
-                            @forelse($members->take(20) as $member)
-                                <tr class="hover:bg-gray-50/50 transition-colors">
-                                    <td class="px-8 py-4 whitespace-nowrap">
-                                        <p class="font-bold text-gray-900">{{ $member->name }}</p>
-                                        <p class="text-xs text-gray-400">{{ $member->email }}</p>
-                                    </td>
-                                    <td class="px-8 py-4 whitespace-nowrap">
-                                        <span
-                                            class="text-xs font-bold text-gray-600 bg-gray-100 px-2 py-1 rounded-md">{{ $member->cell->name ?? '-' }}</span>
-                                    </td>
-                                    <td class="px-8 py-4 whitespace-nowrap text-center">
-                                        <a href="{{ route('users.show', $member) }}"
-                                            class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-green-50 text-green-600 hover:bg-green-600 hover:text-white transition-all">
-                                            <i class="bi bi-person"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="3" class="px-8 py-12 text-center text-gray-400">Nenhum membro encontrado.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-                @if($members->count() > 20)
-                    <div class="p-4 bg-gray-50 text-center">
-                        <p class="text-xs text-gray-500">Exibindo os primeiros 20 de {{ $members->count() }} membros.</p>
-                    </div>
-                @endif
-            </div>
-        </div>
-
-        <!-- Danger Zone (Optional but good for completeness) -->
-        <div class="pt-8 mt-8 border-t border-gray-100">
-            <div
-                class="bg-red-50 p-8 rounded-[2rem] border border-red-100 flex flex-col md:flex-row justify-between items-center gap-6">
-                <div>
-                    <h3 class="text-red-900 font-black text-lg mb-1">Zona de Perigo</h3>
-                    <p class="text-red-600/80 text-sm">Ações irreversíveis relacionadas a esta zona.</p>
-                </div>
                 @if($zone->supervisions->count() === 0)
-                    <form action="{{ route('zones.destroy', $zone) }}" method="POST"
-                        onsubmit="return confirm('ATENÇÃO: Deseja realmente excluir esta zona permanentemente?');">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit"
-                            class="bg-white text-red-600 px-8 py-3 rounded-2xl font-bold border border-red-100 hover:bg-red-600 hover:text-white transition-all">
-                            Excluir Zona
-                        </button>
-                    </form>
-                @else
-                    <button disabled class="bg-gray-100 text-gray-400 px-8 py-3 rounded-2xl font-bold cursor-not-allowed"
-                        title="Não é possível excluir zona com supervisões">
-                        Excluir Zona (Bloqueado)
-                    </button>
+                    <div class="bg-red-50 p-6 rounded-[2rem] border border-red-100">
+                        <h4 class="text-sm font-black text-red-900 uppercase mb-2">Zona de Perigo</h4>
+                        <form action="{{ route('zones.destroy', $zone) }}" method="POST" onsubmit="return confirm('ATENÇÃO: Deseja realmente excluir esta zona permanentemente?');">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="w-full py-3 bg-white text-red-600 rounded-xl font-bold border border-red-100 hover:bg-red-600 hover:text-white transition-all text-xs uppercase">
+                                Excluir Zona
+                            </button>
+                        </form>
+                    </div>
                 @endif
             </div>
         </div>

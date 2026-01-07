@@ -151,11 +151,18 @@
                                     </span>
                                 </td>
                                 <td class="px-8 py-6 text-center font-black text-blue-600">{{ $service->total_participation }}</td>
+                                <td class="px-8 py-6 text-right font-black text-blue-600">{{ number_format($service->total_financial, 0, ',', '.') }} MT</td>
                                 <td class="px-8 py-6">
                                     <div class="flex justify-end gap-2 transition-all">
+                                        <!-- detalhes do culto -->
+                                        <a href="{{ route('services.show', $service) }}" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                                            <i class="bi bi-info-circle text-lg"></i>
+                                        </a>
+                                        <!-- download pdf -->
                                         <a href="{{ route('services.download-pdf', $service) }}" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
                                             <i class="bi bi-file-earmark-pdf text-lg"></i>
                                         </a>
+                                        <!-- editar -->
                                         <a href="{{ route('services.edit', $service) }}" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                                             <i class="bi bi-pencil-square text-lg"></i>
                                         </a>

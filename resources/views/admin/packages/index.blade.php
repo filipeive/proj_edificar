@@ -1,61 +1,125 @@
 @extends('layouts.app')
 
 @section('title', 'Gestão de Pacotes - Portal Life Church')
-@section('page-title', 'Pacotes de Compromisso')
-@section('page-subtitle', 'Gestão dos pacotes de contribuição')
 
 @section('content')
-<div class="flex justify-end mb-6">
-    <a href="{{ route('packages.create') }}" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
-        <i class="bi bi-plus-circle mr-2"></i>Novo Pacote
-    </a>
-</div>
+    <div class="space-y-8">
+        <!-- Header & Top Actions -->
+        <div
+            class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div>
+                <h1 class="text-3xl font-black text-gray-900 tracking-tight">Pacotes de Compromisso</h1>
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Gestão de Planos de Contribuição
+                </p>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="{{ route('packages.create') }}"
+                    class="bg-blue-600 text-white px-8 py-4 rounded-2xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest flex items-center shadow-lg shadow-blue-100">
+                    <i class="bi bi-plus-lg mr-2"></i> Novo Pacote
+                </a>
+            </div>
+        </div>
 
-<div class="bg-white rounded-lg shadow overflow-hidden">
-    <table class="w-full">
-        <thead class="bg-gray-50 border-b border-gray-200">
-            <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Intervalo</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Membros Ativos</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($packages as $package)
-            <tr class="border-b border-gray-200 hover:bg-gray-50">
-                <td class="px-6 py-4 font-medium text-gray-800">{{ $package->name }}</td>
-                <td class="px-6 py-4 text-sm text-gray-600">
-                    {{ number_format($package->min_amount, 2, ',', '.') }} - 
-                    @if($package->max_amount)
-                        {{ number_format($package->max_amount, 2, ',', '.') }}
-                    @else
-                        <span class="text-lg">∞</span>
-                    @endif
-                    MT
-                </td>
-                <td class="px-6 py-4 text-sm font-medium">{{ $package->getActiveMembersCount() }}</td>
-                <td class="px-6 py-4 text-sm">
-                    @if($package->is_active)
-                        <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">✓ Ativo</span>
-                    @else
-                        <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">✗ Inativo</span>
-                    @endif
-                </td>
-                <td class="px-6 py-4 text-sm space-x-3">
-                    <a href="{{ route('packages.edit', $package) }}" class="text-blue-600 hover:text-blue-800">Editar</a>
-                    <form action="{{ route('packages.destroy', $package) }}" method="POST" class="inline">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="text-red-600 hover:text-red-800" onclick="return confirm('Tem certeza?')">
-                            Deletar
-                        </button>
-                    </form>
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
-</div>
+        @if(session('success'))
+            <div
+                class="bg-green-50 border border-green-100 text-green-600 p-6 rounded-[2rem] flex items-center gap-4 animate-fade-in">
+                <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                    <i class="bi bi-check-lg"></i>
+                </div>
+                <p class="font-bold text-sm">{{ session('success') }}</p>
+            </div>
+        @endif
+
+        <!-- Packages List -->
+        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gray-50/50">
+                            <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                Nome do Pacote</th>
+                            <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                Intervalo de Valores</th>
+                            <th
+                                class="px-10 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                Membros Ativos</th>
+                            <th
+                                class="px-10 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                Estado</th>
+                            <th
+                                class="px-10 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        @foreach($packages as $package)
+                            <tr class="hover:bg-gray-50/50 transition-colors group">
+                                <td class="px-10 py-6">
+                                    <div class="flex flex-col">
+                                        <span
+                                            class="text-sm font-black text-gray-900 leading-tight group-hover:text-blue-600 transition-colors">
+                                            {{ $package->name }}
+                                        </span>
+                                        <span
+                                            class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Identificador:
+                                            #{{ str_pad($package->id, 3, '0', STR_PAD_LEFT) }}</span>
+                                    </div>
+                                </td>
+                                <td class="px-10 py-6">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-sm font-black text-green-600">
+                                            {{ number_format($package->min_amount, 0, ',', '.') }}
+                                        </span>
+                                        <span class="text-[10px] text-gray-300 font-black">→</span>
+                                        <span class="text-sm font-black text-green-600">
+                                            @if($package->max_amount)
+                                                {{ number_format($package->max_amount, 0, ',', '.') }}
+                                            @else
+                                                <i class="bi bi-infinity text-lg"></i>
+                                            @endif
+                                        </span>
+                                        <span class="text-[10px] text-gray-400 font-black uppercase ml-1">MT</span>
+                                    </div>
+                                </td>
+                                <td class="px-10 py-6 text-center">
+                                    <div class="flex flex-col items-center">
+                                        <span class="text-lg font-black text-gray-900 tracking-tighter">
+                                            {{ $package->getActiveMembersCount() }}
+                                        </span>
+                                        <span
+                                            class="text-[9px] text-gray-400 font-black uppercase tracking-widest">Inscritos</span>
+                                    </div>
+                                </td>
+                                <td class="px-10 py-6 text-center">
+                                    <span
+                                        class="px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border 
+                                                {{ $package->is_active ? 'bg-green-50 text-green-600 border-green-100' : 'bg-gray-50 text-gray-600 border-gray-100' }}">
+                                        {{ $package->is_active ? 'Ativo' : 'Inativo' }}
+                                    </span>
+                                </td>
+                                <td class="px-10 py-6 text-right">
+                                    <div
+                                        class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                        <a href="{{ route('packages.edit', $package) }}"
+                                            class="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <form action="{{ route('packages.destroy', $package) }}" method="POST"
+                                            onsubmit="return confirm('Tem certeza que deseja excluir este pacote?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                class="w-10 h-10 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all shadow-sm font-black">
+                                                <i class="bi bi-trash-fill"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 @endsection

@@ -221,27 +221,56 @@
             </tr>
         </table>
 
-        <div class="section-title">Estatísticas de Presença</div>
-        <div class="stats-box" style="background-color: #fff; border: 1px solid #f3f4f6;">
-            <table class="stats-grid">
+        <div class="section-title">Estatísticas de Presença Detalhada</div>
+        <table class="data-table" style="margin-bottom: 30px;">
+            <thead>
+                <tr style="background-color: #f9fafb;">
+                    <th style="padding-left: 10px;">Categoria</th>
+                    <th style="text-align: center;">Membros</th>
+                    <th style="text-align: center;">Visitantes</th>
+                    <th style="text-align: center;">Decisões</th>
+                    <th style="text-align: right; padding-right: 10px;">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
                 <tr>
-                    <td class="stats-item">
-                        <div class="stats-value" style="color: #4b5563;">{{ $service->adults_count }}</div>
-                        <div class="stats-label">Adultos</div>
-                    </td>
-                    <td class="stats-item">
-                        <div class="stats-value" style="color: #4b5563;">{{ $service->children_count }}</div>
-                        <div class="stats-label">Crianças</div>
+                    <td style="padding-left: 10px; font-weight: bold;">Adultos</td>
+                    <td style="text-align: center;">{{ $service->adults_members }}</td>
+                    <td style="text-align: center;">{{ $service->adults_visitors }}</td>
+                    <td style="text-align: center;">{{ $service->adults_salvations }}</td>
+                    <td style="text-align: right; padding-right: 10px; font-weight: bold;">
+                        {{ $service->adults_members + $service->adults_visitors + $service->adults_salvations }}
                     </td>
                 </tr>
-            </table>
-        </div>
+                <tr>
+                    <td style="padding-left: 10px; font-weight: bold;">Crianças</td>
+                    <td style="text-align: center;">{{ $service->children_members }}</td>
+                    <td style="text-align: center;">{{ $service->children_visitors }}</td>
+                    <td style="text-align: center;">{{ $service->children_salvations }}</td>
+                    <td style="text-align: right; padding-right: 10px; font-weight: bold;">
+                        {{ $service->children_members + $service->children_visitors + $service->children_salvations }}
+                    </td>
+                </tr>
+                <tr style="background-color: #f0f9ff; color: #0369a1; font-weight: bold;">
+                    <td style="padding-left: 10px;">TOTAL GERAL</td>
+                    <td style="text-align: center;">{{ $service->adults_members + $service->children_members }}</td>
+                    <td style="text-align: center;">{{ $service->adults_visitors + $service->children_visitors }}</td>
+                    <td style="text-align: center;">{{ $service->adults_salvations + $service->children_salvations }}
+                    </td>
+                    <td style="text-align: right; padding-right: 10px;">
+                        {{ $service->total_participation }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 
         <div class="section-title">Movimentação Financeira</div>
-        <table class="data-table">
+
+        <p style="font-size: 11px; font-weight: bold; color: #4b5563; margin-bottom: 10px;">OFERTAS POR TIPO</p>
+        <table class="data-table" style="margin-bottom: 20px;">
             <thead>
                 <tr>
-                    <th>Tipo de Oferta / Contribuição</th>
+                    <th>Descrição</th>
                     <th style="text-align: right;">Valor (MT)</th>
                 </tr>
             </thead>
@@ -252,12 +281,57 @@
                         <td style="text-align: right;">{{ number_format($offering->amount, 2, ',', '.') }}</td>
                     </tr>
                 @endforeach
-                <tr class="total-row">
-                    <td>TOTAL ARRECADADO</td>
-                    <td style="text-align: right;">{{ number_format($service->total_offerings, 2, ',', '.') }} MT</td>
+                @if($service->special_offerings_total > 0)
+                    <tr>
+                        <td>Ofertas Especiais</td>
+                        <td style="text-align: right;">{{ number_format($service->special_offerings_total, 2, ',', '.') }}
+                        </td>
+                    </tr>
+                @endif
+                <tr style="font-weight: bold; background-color: #f9fafb;">
+                    <td>Subtotal Ofertas</td>
+                    <td style="text-align: right;">
+                        {{ number_format($service->total_offerings + $service->special_offerings_total, 2, ',', '.') }}
+                        MT</td>
                 </tr>
             </tbody>
         </table>
+
+        @if($service->tithes->count() > 0)
+            <p style="font-size: 11px; font-weight: bold; color: #4b5563; margin-top: 20px; margin-bottom: 10px;">DÍZIMOS
+                REGISTRADOS</p>
+            <table class="data-table" style="margin-bottom: 20px;">
+                <thead>
+                    <tr>
+                        <th>Dizimista</th>
+                        <th style="text-align: right;">Valor (MT)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($service->tithes as $tithe)
+                        <tr>
+                            <td>{{ $tithe->member_name ?? 'Anônimo' }}</td>
+                            <td style="text-align: right;">{{ number_format($tithe->amount, 2, ',', '.') }}</td>
+                        </tr>
+                    @endforeach
+                    <tr style="font-weight: bold; background-color: #f9fafb;">
+                        <td>Subtotal Dízimos</td>
+                        <td style="text-align: right;">{{ number_format($service->total_tithes, 2, ',', '.') }} MT</td>
+                    </tr>
+                </tbody>
+            </table>
+        @endif
+
+        <div style="margin-top: 30px; padding: 20px; background-color: #111827; border-radius: 12px; color: white;">
+            <table width="100%">
+                <tr>
+                    <td style="font-size: 14px; font-weight: 300; vertical-align: middle;">TOTAL GERAL ARRECADADO</td>
+                    <td style="text-align: right; font-size: 24px; font-weight: 900; color: #f97316;">
+                        {{ number_format($service->total_financial, 2, ',', '.') }} MT
+                    </td>
+                </tr>
+            </table>
+        </div>
 
         @if($service->observations)
             <div class="section-title">Observações Adicionais</div>

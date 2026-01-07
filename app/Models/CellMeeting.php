@@ -19,6 +19,8 @@ class CellMeeting extends Model
         'children_count',
         'visitors_count',
         'decisions',
+        'meeting_type',
+        'minutes',
         'observations',
     ];
 
@@ -34,5 +36,10 @@ class CellMeeting extends Model
     public function leader()
     {
         return $this->belongsTo(User::class, 'leader_id');
+    }
+
+    public function participants()
+    {
+        return $this->belongsToMany(User::class, 'cell_meeting_participants');
     }
 }

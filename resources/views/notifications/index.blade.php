@@ -1,166 +1,171 @@
 @extends('layouts.app')
 
-@section('title', 'Notificações')
-@section('page-title', 'Notificações')
-@section('page-subtitle', 'Gerir suas notificações')
+@section('title', 'Notificações - Portal Life Church')
 
 @section('content')
-<div class="grid grid-max-w-4xl mx-auto">
-    <!-- Header com Filtros e Ações -->
-    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <!-- Estatísticas -->
-            <div class="flex items-center space-x-6">
+    <div class="space-y-8">
+        <!-- Header & Stats Overview -->
+        <div
+            class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col lg:flex-row justify-between items-center gap-8">
+            <div class="flex flex-col md:flex-row items-center gap-8">
                 <div>
-                    <p class="text-2xl font-bold text-gray-800">{{ $notifications->total() }}</p>
-                    <p class="text-sm text-gray-500">Total</p>
+                    <h1 class="text-3xl font-black text-gray-900 tracking-tight">Notificações</h1>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Alertas e Atualizações do
+                        Sistema</p>
                 </div>
-                <div class="h-12 w-px bg-gray-200"></div>
-                <div>
-                    <p class="text-2xl font-bold text-blue-600">{{ $unreadCount }}</p>
-                    <p class="text-sm text-gray-500">Não lidas</p>
+
+                <div class="hidden md:flex items-center gap-6">
+                    <div class="h-12 w-px bg-gray-100"></div>
+                    <div class="flex flex-col">
+                        <span class="text-2xl font-black text-gray-900 leading-none">{{ $notifications->total() }}</span>
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Total</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-2xl font-black text-blue-600 leading-none">{{ $unreadCount }}</span>
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Não Lidas</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Ações -->
-            <div class="flex flex-wrap gap-2">
+            <div class="flex flex-wrap items-center gap-3">
                 @if($unreadCount > 0)
-                    <form action="{{ route('notifications.read') }}" method="POST" class="inline">
+                    <form action="{{ route('notifications.read') }}" method="POST">
                         @csrf
-                        <button type="submit" 
-                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm">
-                            <i class="bi bi-check-all mr-1"></i> Marcar todas como lidas
+                        <button type="submit"
+                            class="bg-blue-600 text-white px-6 py-4 rounded-2xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest flex items-center shadow-lg shadow-blue-100">
+                            <i class="bi bi-check-all text-lg mr-2"></i> Marcar todas lidas
                         </button>
                     </form>
                 @endif
-
-                <form action="{{ route('notifications.clear-read') }}" method="POST" class="inline"
+                <form action="{{ route('notifications.clear-read') }}" method="POST"
                     onsubmit="return confirm('Deseja remover todas as notificações lidas?')">
                     @csrf
-                    <button type="submit" 
-                        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm">
-                        <i class="bi bi-trash mr-1"></i> Limpar lidas
+                    <button type="submit"
+                        class="bg-gray-100 text-gray-600 px-6 py-4 rounded-2xl hover:bg-gray-200 transition-all font-black text-xs uppercase tracking-widest flex items-center">
+                        <i class="bi bi-trash text-lg mr-2"></i> Limpar lidas
                     </button>
                 </form>
             </div>
         </div>
 
-        <!-- Filtros -->
-        <div class="mt-4 flex gap-2">
-            <a href="{{ route('notifications.all', ['filter' => 'all']) }}" 
-                class="px-4 py-2 rounded-lg text-sm transition {{ $filter === 'all' ? 'bg-blue-100 text-blue-700 font-semibold' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+        <!-- Filter Tabs -->
+        <div class="flex items-center gap-2 bg-gray-100/50 p-1.5 rounded-2xl w-fit">
+            <a href="{{ route('notifications.all', ['filter' => 'all']) }}"
+                class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all {{ $filter === 'all' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600' }}">
                 Todas
             </a>
-            <a href="{{ route('notifications.all', ['filter' => 'unread']) }}" 
-                class="px-4 py-2 rounded-lg text-sm transition {{ $filter === 'unread' ? 'bg-blue-100 text-blue-700 font-semibold' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+            <a href="{{ route('notifications.all', ['filter' => 'unread']) }}"
+                class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all {{ $filter === 'unread' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600' }}">
                 Não lidas
             </a>
-            <a href="{{ route('notifications.all', ['filter' => 'read']) }}" 
-                class="px-4 py-2 rounded-lg text-sm transition {{ $filter === 'read' ? 'bg-blue-100 text-blue-700 font-semibold' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+            <a href="{{ route('notifications.all', ['filter' => 'read']) }}"
+                class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all {{ $filter === 'read' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600' }}">
                 Lidas
             </a>
         </div>
-    </div>
 
-    <!-- Lista de Notificações -->
-    @if($notifications->isEmpty())
-        <div class="bg-white rounded-lg shadow-sm p-12 text-center">
-            <i class="bi bi-bell-slash text-6xl text-gray-300 mb-4"></i>
-            <h3 class="text-xl font-semibold text-gray-700 mb-2">Nenhuma notificação</h3>
-            <p class="text-gray-500">
-                @if($filter === 'unread')
-                    Você não tem notificações não lidas.
-                @elseif($filter === 'read')
-                    Você não tem notificações lidas.
-                @else
-                    Você ainda não recebeu nenhuma notificação.
-                @endif
-            </p>
-        </div>
-    @else
-        <div class="space-y-3">
-            @foreach($notifications as $notification)
-                <div class="bg-white rounded-lg shadow-sm hover:shadow-md transition-all {{ $notification->read_at ? 'opacity-75' : '' }}">
-                    <div class="p-4 flex items-start gap-4">
-                        <!-- Ícone por tipo -->
-                        <div class="flex-shrink-0 mt-1">
-                            @php
-                                $type = $notification->data['type'] ?? 'general';
-                                $iconClass = match($type) {
-                                    'contribution_verified' => 'bi-check-circle-fill text-green-500',
-                                    'contribution_rejected' => 'bi-x-circle-fill text-red-500',
-                                    'contribution_created' => 'bi-cash-coin text-blue-500',
-                                    'member_created' => 'bi-person-plus-fill text-purple-500',
-                                    'commitment_chosen' => 'bi-handshake-fill text-indigo-500',
-                                    'commitment_expiring' => 'bi-clock-fill text-yellow-500',
-                                    'pending_contributions' => 'bi-exclamation-triangle-fill text-orange-500',
-                                    'user_promoted' => 'bi-star-fill text-yellow-400',
-                                    default => 'bi-bell-fill text-gray-500',
-                                };
-                            @endphp
-                            <i class="bi {{ $iconClass }} text-2xl"></i>
-                        </div>
-
-                        <!-- Conteúdo -->
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-start justify-between gap-2">
-                                <div>
-                                    <h4 class="font-semibold text-gray-800 mb-1">
-                                        {{ $notification->data['title'] ?? 'Notificação' }}
-                                        @if(!$notification->read_at)
-                                            <span class="ml-2 inline-block w-2 h-2 bg-blue-500 rounded-full"></span>
-                                        @endif
-                                    </h4>
-                                    <p class="text-sm text-gray-600 mb-2">
-                                        {{ $notification->data['message'] ?? 'Sem descrição' }}
-                                    </p>
-                                    <p class="text-xs text-gray-400">
-                                        <i class="bi bi-clock mr-1"></i>
-                                        {{ $notification->created_at->diffForHumans() }}
-                                    </p>
-                                </div>
-
-                                <!-- Ações -->
-                                <div class="flex gap-1">
-                                    @if(!$notification->read_at)
-                                        <a href="{{ route('notifications.mark-read', $notification->id) }}" 
-                                            class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition"
-                                            title="Marcar como lida">
-                                            <i class="bi bi-check"></i>
-                                        </a>
-                                    @endif
-
-                                    <form action="{{ route('notifications.destroy', $notification->id) }}" 
-                                        method="POST" class="inline"
-                                        onsubmit="return confirm('Deseja remover esta notificação?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" 
-                                            class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition"
-                                            title="Remover">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
+        <!-- Notifications List -->
+        @if($notifications->isEmpty())
+            <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-20 text-center">
+                <div class="w-24 h-24 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-6">
+                    <i class="bi bi-bell-slash text-4xl text-gray-200"></i>
+                </div>
+                <h3 class="text-xl font-black text-gray-900 mb-2">Sem notificações</h3>
+                <p class="text-sm font-bold text-gray-400 max-w-xs mx-auto uppercase tracking-tighter">
+                    @if($filter === 'unread') Tudo em dia! Você visualizou todos os alertas recentes.
+                    @elseif($filter === 'read') Você ainda não possui histórico de alertas visualizados.
+                    @else Não há nenhum alerta ou mensagem no sistema no momento. @endif
+                </p>
+            </div>
+        @else
+            <div class="grid grid-cols-1 gap-4">
+                @foreach($notifications as $notification)
+                    <div
+                        class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all group {{ $notification->read_at ? 'opacity-60 grayscale-[0.5]' : 'border-blue-100' }}">
+                        <div class="flex flex-col md:flex-row md:items-center gap-6">
+                            <!-- Icon -->
+                            <div class="flex-shrink-0">
+                                @php
+                                    $type = $notification->data['type'] ?? 'general';
+                                    $config = match ($type) {
+                                        'contribution_verified' => ['icon' => 'bi-check-circle-fill', 'color' => 'bg-green-50 text-green-600'],
+                                        'contribution_rejected' => ['icon' => 'bi-x-circle-fill', 'color' => 'bg-red-50 text-red-600'],
+                                        'contribution_created' => ['icon' => 'bi-cash-coin', 'color' => 'bg-blue-50 text-blue-600'],
+                                        'member_created' => ['icon' => 'bi-person-plus-fill', 'color' => 'bg-purple-50 text-purple-600'],
+                                        'commitment_chosen' => ['icon' => 'bi-handshake-fill', 'color' => 'bg-indigo-50 text-indigo-600'],
+                                        'commitment_expiring' => ['icon' => 'bi-clock-fill', 'color' => 'bg-yellow-50 text-yellow-600'],
+                                        'pending_contributions' => ['icon' => 'bi-exclamation-triangle-fill', 'color' => 'bg-orange-50 text-orange-600'],
+                                        'user_promoted' => ['icon' => 'bi-star-fill', 'color' => 'bg-yellow-50 text-yellow-400'],
+                                        default => ['icon' => 'bi-bell-fill', 'color' => 'bg-gray-50 text-gray-500'],
+                                    };
+                                @endphp
+                     <div
+                                    class="w-14 h-14 rounded-2xl {{ $config['color'] }} flex items-center justify-center text-2xl shadow-sm">
+                                    <i class="bi {{ $config['icon'] }}"></i>
                                 </div>
                             </div>
 
-                            <!-- Link de ação -->
-                            @if(isset($notification->data['link']) && $notification->data['link'] !== '#')
-                                <a href="{{ route('notifications.mark-read', $notification->id) }}" 
-                                    class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 mt-2">
-                                    Ver detalhes <i class="bi bi-arrow-right ml-1"></i>
-                                </a>
-                            @endif
+                            <!-- Content -->
+                            <div class="flex-1 min-w-0 space-y-1">
+                                <div class="flex items-center gap-3">
+                                    <h4 class="text-sm font-black text-gray-900 uppercase tracking-tight">
+                                        {{ $notification->data['title'] ?? 'Notificação' }}
+                                    </h4>
+                                    @if(!$notification->read_at)
+                                        <span class="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></span>
+                                    @endif
+                                </div>
+                                <p class="text-sm font-medium text-gray-500 line-clamp-2">
+                                    {{ $notification->data['message'] ?? 'Sem descrição vinculada' }}
+                                </p>
+                                <div class="flex items-center gap-4 pt-1">
+                                    <span
+                                        class="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1">
+                                        <i class="bi bi-clock"></i>
+                                        {{ $notification->created_at->diffForHumans() }}
+                                    </span>
+                                    @if(isset($notification->data['link']) && $notification->data['link'] !== '#')
+                                        <a href="{{ route('notifications.mark-read', $notification->id) }}"
+                                            class="text-[10px] font-black text-blue-600 hover:text-blue-800 uppercase tracking-widest flex items-center gap-1 group/link">
+                                            Ver Detalhes
+                                            <i class="bi bi-arrow-right transition-transform group-hover/link:translate-x-1"></i>
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div
+                                class="flex md:flex-col items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
+                                @if(!$notification->read_at)
+                                    <a href="{{ route('notifications.mark-read', $notification->id) }}"
+                                        class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all shadow-sm"
+                                        title="Lido">
+                                        <i class="bi bi-check-lg"></i>
+                                    </a>
+                                @endif
+
+                                <form action="{{ route('notifications.destroy', $notification->id) }}" method="POST"
+                                    onsubmit="return confirm('Deseja remover esta notificação?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                        class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-red-500 hover:text-white flex items-center justify-center transition-all shadow-sm"
+                                        title="Excluir">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                </div>
-            @endforeach
-        </div>
+                @endforeach
+            </div>
 
-        <!-- Paginação -->
-        <div class="mt-6">
-            {{ $notifications->links() }}
-        </div>
-    @endif
-</div>
+            @if($notifications->hasPages())
+                <div class="mt-8">
+                    {{ $notifications->links() }}
+                </div>
+            @endif
+        @endif
+    </div>
 @endsection

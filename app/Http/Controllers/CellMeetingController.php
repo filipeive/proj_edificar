@@ -38,10 +38,18 @@ class CellMeetingController extends Controller
 
         Mail::send([], [], function ($message) use ($request, $cellMeeting, $pdfContent) {
             $date = Carbon::parse($cellMeeting->meeting_date);
+            $type = 'Relatório de Célula';
+            if ($cellMeeting->meeting_type === 'leadership')
+                $type = 'Acta de Reunião de Liderança';
+            if ($cellMeeting->meeting_type === 'supervision')
+                $type = 'Acta de Reunião de Supervisão';
+            if ($cellMeeting->meeting_type === 'zone')
+                $type = 'Acta de Reunião de Zona';
+
             $message->to($request->email)
-                ->subject('Relatório de Célula - ' . $date->format('d/m/Y'))
-                ->html('Olá,<br><br>Segue em anexo o relatório do encontro de célula realizado em ' . $date->format('d/m/Y') . '.<br><br>Atenciosamente,<br>Portal Life Church')
-                ->attachData($pdfContent, 'Relatorio_Celula_' . $date->format('d_m_Y') . '.pdf', [
+                ->subject($type . ' - ' . $date->format('d/m/Y'))
+                ->html('Olá,<br><br>Segue em anexo o/a ' . strtolower($type) . ' realizado em ' . $date->format('d/m/Y') . '.<br><br>Atenciosamente,<br>Portal Life Church')
+                ->attachData($pdfContent, str_replace(' ', '_', $type) . '_' . $date->format('d_m_Y') . '.pdf', [
                     'mime' => 'application/pdf',
                 ]);
         });
@@ -129,6 +137,10 @@ class CellMeetingController extends Controller
             'children_count' => 'required|integer|min:0',
             'visitors_count' => 'required|integer|min:0',
             'decisions' => 'nullable|string',
+            'meeting_type' => 'required|string|in:normal,leadership,supervision,zone,other',
+            'minutes' => 'nullable|string',
+            'participants' => 'nullable|array',
+            'participants.*' => 'exists:users,id',
             'observations' => 'nullable|string',
         ]);
 
@@ -142,6 +154,10 @@ class CellMeetingController extends Controller
         }
 
         $meeting = CellMeeting::create($validated);
+
+        if ($request->has('participants')) {
+            $meeting->participants()->sync($request->participants);
+        }
 
         // Record attendance for present members
         if ($request->has('present_members')) {
@@ -206,6 +222,10 @@ class CellMeetingController extends Controller
         $validated = $request->validate([
             'cell_id' => 'required|exists:cells,id',
             'meeting_date' => 'required|date',
+            'meeting_type' => 'required|string|in:normal,leadership,supervision,zone,other',
+            'minutes' => 'nullable|string',
+            'participants' => 'nullable|array',
+            'participants.*' => 'exists:users,id',
             'theme' => 'nullable|string|max:255',
             'biblical_text' => 'nullable|string|max:255',
             'leader_id' => 'required|exists:users,id',
@@ -227,6 +247,10 @@ class CellMeetingController extends Controller
         }
 
         $cellMeeting->update($validated);
+
+        if ($request->has('participants')) {
+            $cellMeeting->participants()->sync($request->participants);
+        }
 
         return redirect()->route('cell-meetings.index')->with('success', 'Encontro de célula atualizado com sucesso!');
     }

@@ -3,100 +3,107 @@
 @section('title', 'Detalhes do Relatório - Portal Life Church')
 
 @section('content')
-    <div class="max-w-6xl mx-auto space-y-8">
-        <!-- Header -->
+    <div class="space-y-8">
+        <!-- Header Section -->
         <div
-            class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-                <div class="flex items-center gap-2 text-xs font-bold text-blue-600 uppercase tracking-widest mb-2">
+            class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div class="space-y-1">
+                <div class="flex items-center gap-2 text-xs font-bold text-blue-600 uppercase tracking-widest mb-1">
                     <a href="{{ route('quarterly-reports.index') }}" class="hover:underline">Relatórios Trimestrais</a>
                     <i class="bi bi-chevron-right text-[10px]"></i>
-                    <span>Visualizar</span>
+                    <span>Ver Detalhes</span>
                 </div>
                 <h1 class="text-3xl font-black text-gray-900 tracking-tight">
-                    Trimestre {{ $report->quarter }}/{{ $report->year }}
+                    Trimestre {{ $quarterlyReport->quarter }}/{{ $quarterlyReport->year }}
                 </h1>
-                <p class="text-gray-500 font-bold">Supervisão: <span
-                        class="text-blue-600">{{ $report->supervision->name }}</span> | Zona: {{ $report->zone->name }}</p>
+                <p class="text-gray-500 font-bold">
+                    Supervisão: <span class="text-blue-600">{{ $quarterlyReport->supervision->name ?? 'N/A' }}</span> |
+                    Zona: {{ $quarterlyReport->zone->name ?? 'N/A' }}
+                </p>
             </div>
-            <div class="flex gap-3">
-                @can('update', $report)
-                    <a href="{{ route('quarterly-reports.edit', $report) }}"
-                        class="flex items-center bg-blue-50 text-blue-600 px-6 py-3 rounded-2xl hover:bg-blue-600 hover:text-white transition-all font-black">
-                        <i class="bi bi-pencil-square mr-2"></i>
-                        Editar
+
+            <div class="flex flex-wrap items-center gap-3">
+                @can('update', $quarterlyReport)
+                    <a href="{{ route('quarterly-reports.edit', $quarterlyReport) }}"
+                        class="flex items-center bg-blue-50 text-blue-600 px-6 py-4 rounded-2xl hover:bg-blue-600 hover:text-white transition-all font-black text-xs uppercase tracking-widest shadow-sm">
+                        <i class="bi bi-pencil-square text-lg mr-2"></i>
+                        Editar Dados
                     </a>
                 @endcan
                 <a href="{{ route('quarterly-reports.index') }}"
-                    class="group flex items-center bg-gray-50 text-gray-500 px-6 py-3 rounded-2xl hover:bg-gray-100 transition-all font-bold">
-                    <i class="bi bi-arrow-left text-sm mr-2"></i>
-                    Sair
+                    class="flex items-center bg-gray-50 text-gray-400 px-6 py-4 rounded-2xl hover:bg-gray-100 transition-all font-black text-xs uppercase tracking-widest">
+                    <i class="bi bi-arrow-left text-lg mr-2"></i>
+                    Voltar
                 </a>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Main Content -->
-            <div class="lg:col-span-2 space-y-8">
-                <!-- Stats Grid -->
-                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
-                    <h3 class="text-lg font-black text-gray-900 mb-8 flex items-center gap-2">
-                        <i class="bi bi-bar-chart text-blue-600"></i>
-                        Estatísticas Organizacionais
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
+            <!-- Left Column: Primary Content -->
+            <div class="xl:col-span-8 space-y-8">
+                <!-- Data Grid -->
+                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
+                    <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-8 flex items-center gap-2">
+                        <i class="bi bi-bar-chart-fill text-blue-600"></i>
+                        Métricas de Crescimento e Estrutura
                     </h3>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
                         @php
                             $stats = [
-                                ['label' => 'Líderes', 'value' => $report->leaders_count, 'icon' => 'bi-person-badge', 'color' => 'blue'],
-                                ['label' => 'Células', 'value' => $report->cells_count, 'icon' => 'bi-grid-3x3-gap', 'color' => 'purple'],
-                                ['label' => 'Timóteos', 'value' => $report->timoteos_count, 'icon' => 'bi-award', 'color' => 'indigo'],
-                                ['label' => 'Membros', 'value' => $report->members_count, 'icon' => 'bi-people', 'color' => 'green'],
-                                ['label' => 'Participantes', 'value' => $report->participants_count, 'icon' => 'bi-graph-up', 'color' => 'orange'],
-                                ['label' => 'Almas Ganhas', 'value' => $report->saved_count, 'icon' => 'bi-heart-pulse', 'color' => 'red'],
+                                ['label' => 'Líderes Ativos', 'value' => $quarterlyReport->leaders_count, 'icon' => 'bi-person-badge', 'color' => 'blue'],
+                                ['label' => 'Células Totais', 'value' => $quarterlyReport->cells_count, 'icon' => 'bi-grid-3x3-gap', 'color' => 'purple'],
+                                ['label' => 'Timóteos (Aux)', 'value' => $quarterlyReport->timoteos_count, 'icon' => 'bi-award', 'color' => 'indigo'],
+                                ['label' => 'Membros Arrolados', 'value' => $quarterlyReport->members_count, 'icon' => 'bi-people', 'color' => 'green'],
+                                ['label' => 'Média Participação', 'value' => $quarterlyReport->participants_count, 'icon' => 'bi-graph-up', 'color' => 'orange'],
+                                ['label' => 'Novas Conversões', 'value' => $quarterlyReport->saved_count, 'icon' => 'bi-heart-pulse', 'color' => 'red'],
                             ];
                         @endphp
                         @foreach($stats as $stat)
                             <div
-                                class="p-6 bg-gray-50 rounded-[2rem] border border-transparent hover:border-{{ $stat['color'] }}-100 transition-all">
-                                <i class="bi {{ $stat['icon'] }} text-{{ $stat['color'] }}-500 text-xl block mb-2"></i>
+                                class="p-6 bg-gray-50/50 rounded-[2rem] border border-gray-100/50 hover:bg-white hover:shadow-md transition-all group">
+                                <i
+                                    class="bi {{ $stat['icon'] }} text-{{ $stat['color'] }}-500 text-xl block mb-3 opacity-60 group-hover:opacity-100 transition-all"></i>
                                 <span
-                                    class="text-[10px] font-black text-gray-400 uppercase tracking-widest block">{{ $stat['label'] }}</span>
+                                    class="text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] block mb-1 group-hover:text-{{ $stat['color'] }}-600 transition-colors">{{ $stat['label'] }}</span>
                                 <span class="text-2xl font-black text-gray-900">{{ $stat['value'] }}</span>
                             </div>
                         @endforeach
                     </div>
                 </div>
 
-                <!-- Assessments -->
+                <!-- Health Indicators -->
                 <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="p-8 border-b border-gray-50 bg-gray-50/50">
-                        <h3 class="text-lg font-black text-gray-900 flex items-center gap-2">
-                            <i class="bi bi-star-half text-yellow-500"></i>
-                            Indicadores de Saúde
+                    <div class="p-8 border-b border-gray-50 bg-gray-50/30 flex items-center justify-between">
+                        <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
+                            <i class="bi bi-activity text-blue-600"></i>
+                            Avaliação de Saúde Ministerial
                         </h3>
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Escala 0-10</span>
                     </div>
-                    <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
                         @php
                             $assessments = [
-                                'discipleship_score' => 'Discipulado',
-                                'pastoral_score' => 'Cuidado Pastoral',
-                                'cell_participation_score' => 'Participação Células',
-                                'service_participation_score' => 'Participação Cultos',
-                                'communion_in_cells_score' => 'Comunhão',
-                                'relationship_building_score' => 'Integração',
-                                'prayer_intercession_score' => 'Oração'
+                                'discipleship_score' => 'Discipulado e Mentoria',
+                                'pastoral_score' => 'Cuidado e Pastoreio',
+                                'cell_participation_score' => 'Frequência em Células',
+                                'service_participation_score' => 'Frequência em Celebrações',
+                                'communion_in_cells_score' => 'Koinonia (Comunhão/Unidade)',
+                                'relationship_building_score' => 'Consolidação e Integração',
+                                'prayer_intercession_score' => 'Vida de Oração e Intercessão'
                             ];
                         @endphp
                         @foreach($assessments as $field => $label)
-                            <div class="space-y-4">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-xs font-black text-gray-500 uppercase tracking-widest">{{ $label }}</span>
+                            <div class="space-y-4 group">
+                                <div class="flex justify-between items-end">
                                     <span
-                                        class="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs font-black">{{ $report->$field }}/3</span>
+                                        class="text-[10px] font-black text-gray-500 uppercase tracking-widest">{{ $label }}</span>
+                                    <span
+                                        class="text-lg font-black text-blue-600 tracking-tighter">{{ $quarterlyReport->$field }}<span
+                                            class="text-[10px] text-gray-400 ml-0.5 opacity-50">/10</span></span>
                                 </div>
-                                <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
-                                    <div class="h-full bg-blue-600 rounded-full transition-all duration-1000"
-                                        style="width: {{ ($report->$field / 3) * 100 }}%"></div>
+                                <div class="h-3 bg-gray-100 rounded-full overflow-hidden p-0.5">
+                                    <div class="h-full bg-blue-600 rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(37,99,235,0.3)]"
+                                        style="width: {{ ($quarterlyReport->$field / 10) * 100 }}%"></div>
                                 </div>
                             </div>
                         @endforeach
@@ -105,78 +112,105 @@
 
                 <!-- Observations -->
                 <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
-                    <h3 class="text-lg font-black text-gray-900 mb-6 flex items-center gap-2">
+                    <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-6 flex items-center gap-2">
                         <i class="bi bi-journal-text text-blue-600"></i>
-                        Relato Ministerial
+                        Parecer Ministerial do Supervisor
                     </h3>
-                    <div class="prose prose-blue max-w-none text-gray-600 font-medium leading-relaxed">
-                        {!! nl2br(e($report->ministerial_observations)) !!}
+                    <div
+                        class="prose prose-blue max-w-none text-gray-600 font-medium leading-relaxed bg-gray-50/50 p-6 rounded-3xl border border-gray-100 italic">
+                        {!! nl2br(e($quarterlyReport->ministerial_observations ?? 'Nenhum detalhe adicional fornecido.')) !!}
                     </div>
                 </div>
             </div>
 
-            <!-- Side Content -->
-            <div class="space-y-8">
-                <!-- Achievement Card -->
-                <div class="bg-blue-600 rounded-[2.5rem] p-8 text-white shadow-xl shadow-blue-200">
-                    <div class="flex items-center gap-4 mb-6">
-                        <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
-                            <i class="bi bi-trophy text-2xl"></i>
+            <!-- Right Column: Sidebar Stats -->
+            <div class="xl:col-span-4 space-y-8">
+                <!-- Baptism Target Card -->
+                <div class="bg-blue-600 rounded-[2.5rem] p-8 text-white shadow-xl shadow-blue-100 group">
+                    <div class="flex items-center gap-4 mb-8">
+                        <div
+                            class="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform duration-500 text-blue-100 border border-white/10 shadow-inner">
+                            <i class="bi bi-droplet-half"></i>
                         </div>
                         <div>
-                            <h4 class="font-black uppercase tracking-widest text-xs text-blue-200">Alvos de Batismo</h4>
-                            <p class="text-2xl font-black">{{ $report->baptized_count }} /
-                                {{ $report->planned_baptism_count }}</p>
+                            <span
+                                class="text-[10px] font-black text-blue-200 uppercase tracking-[0.2em] block mb-1">Batismos
+                                em Águas</span>
+                            <p class="text-3xl font-black tracking-tighter">{{ $quarterlyReport->baptized_count }} <span
+                                    class="text-sm opacity-50 font-normal">REALIZADOS</span></p>
                         </div>
                     </div>
+
                     @php
-                        $perc = $report->planned_baptism_count > 0 ? min(100, ($report->baptized_count / $report->planned_baptism_count) * 100) : 0;
+                        $target = $quarterlyReport->planned_baptism_count ?: 1;
+                        $perc = min(100, ($quarterlyReport->baptized_count / $target) * 100);
                     @endphp
-                    <div class="space-y-2">
-                        <div class="flex justify-between text-[10px] font-black uppercase tracking-widest text-blue-200">
-                            <span>Atingimento</span>
-                            <span>{{ round($perc) }}%</span>
+
+                    <div class="space-y-4">
+                        <div
+                            class="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-blue-100">
+                            <span>Meta do Período: {{ $quarterlyReport->planned_baptism_count }}</span>
+                            <span class="bg-white/20 px-2 py-0.5 rounded-full">{{ round($perc) }}%</span>
                         </div>
-                        <div class="h-2 bg-white/10 rounded-full overflow-hidden">
-                            <div class="h-full bg-white rounded-full" style="width: {{ $perc }}%"></div>
+                        <div class="h-4 bg-white/10 rounded-full overflow-hidden p-1 border border-white/5">
+                            <div class="h-full bg-white rounded-full shadow-[0_0_15px_white]" style="width: {{ $perc }}%">
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Events List -->
+                <!-- Events Activity -->
                 <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="p-8 border-b border-gray-50 bg-gray-50/50">
-                        <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest">Eventos Realizados</h3>
+                    <div class="p-8 border-b border-gray-50 bg-gray-50/30">
+                        <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Fluxo de Atividades /
+                            Eventos</h3>
                     </div>
                     <div class="p-8 space-y-6">
-                        @foreach($report->events as $event)
-                            <div class="flex items-start gap-4">
+                        @forelse($quarterlyReport->events as $event)
+                            <div class="flex items-start gap-4 group">
                                 <div
-                                    class="w-10 h-10 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center font-black flex-shrink-0">
+                                    class="w-10 h-10 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center font-black flex-shrink-0 border border-purple-100 shadow-sm group-hover:bg-purple-600 group-hover:text-white transition-all">
                                     {{ $event->count }}
                                 </div>
                                 <div class="space-y-1">
-                                    <h4 class="text-sm font-black text-gray-900">{{ $event->type->name }}</h4>
-                                    <p class="text-xs text-gray-500 font-medium">{{ $event->description ?: 'Sem observações.' }}
-                                    </p>
+                                    <h4 class="text-xs font-black text-gray-900 uppercase tracking-tight">
+                                        {{ $event->eventType->name ?? 'Evento' }}</h4>
+                                    <p class="text-[10px] text-gray-500 font-bold leading-relaxed line-clamp-2 italic">
+                                        {{ $event->description ?: 'Atividade padrão concluída sem ressalvas.' }}</p>
                                 </div>
                             </div>
-                        @endforeach
+                        @empty
+                            <div class="text-center py-6">
+                                <i class="bi bi-calendar-x text-3xl text-gray-200 block mb-2"></i>
+                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Nenhum evento
+                                    registrado</span>
+                            </div>
+                        @endforelse
                     </div>
                 </div>
 
-                <!-- Meta Info -->
+                <!-- Submission Audit -->
                 <div
-                    class="p-8 bg-gray-50 rounded-[2.5rem] border border-gray-100 flex flex-col items-center text-center space-y-3">
-                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Relatório enviado
-                        por</span>
-                    @if($report->supervisor)
-                        <img src="https://ui-avatars.com/api/?name={{ urlencode($report->supervisor->name) }}&background=0D6EFD&color=fff"
-                            class="w-12 h-12 rounded-full ring-4 ring-white shadow-md">
-                        <span class="font-black text-gray-900">{{ $report->supervisor->name }}</span>
-                    @endif
-                    <span class="text-xs font-bold text-gray-400 italic">Em
-                        {{ $report->created_at->format('d/m/Y \à\s H:i') }}</span>
+                    class="bg-gray-50 p-8 rounded-[2.5rem] border border-gray-100 flex flex-col items-center text-center space-y-4">
+                    <div class="relative">
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode($quarterlyReport->supervisor->name ?? 'U') }}&background=0D6EFD&color=fff&bold=true"
+                            class="w-16 h-16 rounded-[1.5rem] shadow-xl ring-4 ring-white">
+                        <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 border-4 border-gray-50 rounded-full">
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Submetido
+                            Responsavelmente por</span>
+                        <span
+                            class="font-black text-gray-900 uppercase tracking-tight">{{ $quarterlyReport->supervisor->name ?? 'Supervisor do Sistema' }}</span>
+                    </div>
+                    <div class="bg-white px-4 py-2 rounded-2xl border border-gray-100 shadow-sm">
+                        <span class="text-[10px] font-bold text-gray-500 flex items-center gap-2">
+                            <i class="bi bi-shield-check text-blue-600"></i>
+                            Em
+                            {{ $quarterlyReport->submitted_at ? $quarterlyReport->submitted_at->format('d/m/Y \à\s H:i') : $quarterlyReport->created_at->format('d/m/Y \à\s H:i') }}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
