@@ -81,23 +81,6 @@
                 @endif
             </div>
 
-            <!-- Demo Info -->
-            <div class="mt-8 bg-blue-50 rounded-lg p-6 text-center">
-                <p class="text-sm text-gray-700 mb-3"><strong>Credenciais de Demonstração:</strong></p>
-                <div class="space-y-2 text-sm">
-                    <div>
-                        <p class="text-gray-600">Admin: <code
-                                class="bg-gray-200 px-2 py-1 rounded">admin@chiesa.local</code></p>
-                        <p class="text-gray-600">Senha: <code class="bg-gray-200 px-2 py-1 rounded">123456</code></p>
-                    </div>
-                    <hr class="my-3">
-                    <div>
-                        <p class="text-gray-600">Pastor: <code
-                                class="bg-gray-200 px-2 py-1 rounded">pastor@chiesa.local</code></p>
-                        <p class="text-gray-600">Senha: <code class="bg-gray-200 px-2 py-1 rounded">123456</code></p>
-                    </div>
-                </div>
-            </div>
 
             <!-- Back to Welcome -->
             <div class="mt-6 text-center">
