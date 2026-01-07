@@ -18,12 +18,14 @@ class QuarterlyReportController extends Controller
         Gate::authorize('viewAny', QuarterlyReport::class);
 
         $user = auth()->user();
-        $query = QuarterlyReport::with(['zone', 'supervisor']);
+        $query = QuarterlyReport::with(['zone', 'supervisor', 'supervision']);
 
         if ($user->role === 'pastor_zona') {
             $zoneId = $user->getZoneId();
             $query->where('zone_id', $zoneId);
         } elseif ($user->role === 'supervisor') {
+            // Um supervisor pode preencher múltiplos relatórios se supervisionar mais de uma supervisão?
+            // Geralmente é 1:1, mas vamos filtrar pelo supervisor_id
             $query->where('supervisor_id', $user->id);
         }
 
@@ -41,24 +43,27 @@ class QuarterlyReportController extends Controller
         $user = auth()->user();
         $zones = collect();
         $supervisions = collect();
-        $userSupervision = null;
 
-        if ($user->role === 'admin' || $user->role === 'pastor') {
+        // Lógica de seleção baseada no cargo
+        if ($user->role === 'admin' || $user->role === 'pastor' || $user->role === 'secretaria') {
             $zones = Zone::with('supervisions')->get();
+            $supervisions = Supervision::all();
         } elseif ($user->role === 'pastor_zona') {
             $zones = Zone::where('pastor_id', $user->id)->with('supervisions')->get();
+            if ($zones->isNotEmpty()) {
+                $supervisions = Supervision::whereIn('zone_id', $zones->pluck('id'))->get();
+            }
         } elseif ($user->role === 'supervisor') {
-            $zoneId = $user->getZoneId();
-            $zones = Zone::where('id', $zoneId)->get();
-            $userSupervision = \App\Models\Supervision::where('supervisor_id', $user->id)->first();
-            if ($userSupervision) {
-                $supervisions = collect([$userSupervision]);
+            $userSupervisions = Supervision::where('supervisor_id', $user->id)->get();
+            if ($userSupervisions->isNotEmpty()) {
+                $supervisions = $userSupervisions;
+                $zones = Zone::whereIn('id', $userSupervisions->pluck('zone_id'))->get();
             }
         }
 
         $eventTypes = EventType::where('is_active', true)->get();
 
-        return view('quarterly_reports.create', compact('zones', 'supervisions', 'userSupervision', 'eventTypes'));
+        return view('quarterly_reports.create', compact('zones', 'supervisions', 'eventTypes'));
     }
 
     public function store(Request $request)
