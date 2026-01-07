@@ -145,7 +145,7 @@ Route::middleware('auth')->group(function () {
 
         // Gestão de Utilizadores
         Route::resource('users', UserController::class);
-        Route::get('/services/{service}/pdf', [\App\Http\Controllers\ServiceController::class, 'downloadPdf'])->name('services.pdf');
+        Route::get('/services/{service}/pdf', [\App\Http\Controllers\ServiceController::class, 'downloadPdf'])->name('services.download-pdf');
         Route::resource('services', \App\Http\Controllers\ServiceController::class);
 
         // Gestão de Pacotes
