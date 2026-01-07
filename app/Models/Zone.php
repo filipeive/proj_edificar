@@ -91,4 +91,12 @@ class Zone extends Model
             ->where('is_active', true)
             ->count();
     }
+
+    /**
+     * Retorna todos os membros (Users) desta zona
+     */
+    public function members()
+    {
+        return User::whereIn('cell_id', $this->cells()->pluck('id'))->with('cell');
+    }
 }

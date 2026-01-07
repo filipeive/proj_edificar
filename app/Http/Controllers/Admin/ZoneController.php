@@ -6,19 +6,23 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-class ZoneController {
-    public function index(): View {
+class ZoneController
+{
+    public function index(): View
+    {
         $zones = Zone::with('supervisions', 'pastor')->get();
         return view('admin.zones.index', ['zones' => $zones]);
     }
 
-    public function create(): View {
+    public function create(): View
+    {
         // Encontra todos os usuários que são elegíveis para serem Pastores de Zona
-        $pastors = User::where('role', 'pastor_zona')->orderBy('name')->get(); 
+        $pastors = User::where('role', 'pastor_zona')->orderBy('name')->get();
         return view('admin.zones.create', ['pastors' => $pastors]);
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $validated = $request->validate([
             'name' => 'required|unique:zones|string|max:255',
             'description' => 'nullable|string',
@@ -31,17 +35,29 @@ class ZoneController {
             ->with('success', 'Zona criada com sucesso!');
     }
 
-    public function show(Zone $zone): View {
-        return view('admin.zones.show', ['zone' => $zone->load('supervisions', 'pastor')]);
+    public function show(Zone $zone): View
+    {
+        $zone->load(['supervisions.cells.leader', 'pastor']);
+
+        $cells = $zone->cells()->with(['leader', 'supervision'])->get();
+        $members = $zone->members()->get();
+
+        return view('admin.zones.show', [
+            'zone' => $zone,
+            'cells' => $cells,
+            'members' => $members
+        ]);
     }
 
-    public function edit(Zone $zone): View {
+    public function edit(Zone $zone): View
+    {
         // Encontra todos os usuários que são elegíveis para serem Pastores de Zona
-        $pastors = User::where('role', 'pastor_zona')->orderBy('name')->get(); 
+        $pastors = User::where('role', 'pastor_zona')->orderBy('name')->get();
         return view('admin.zones.edit', ['zone' => $zone, 'pastors' => $pastors]);
     }
 
-    public function update(Request $request, Zone $zone) {
+    public function update(Request $request, Zone $zone)
+    {
         $validated = $request->validate([
             'name' => "required|unique:zones,name,{$zone->id}|string|max:255",
             'description' => 'nullable|string',
@@ -54,7 +70,8 @@ class ZoneController {
             ->with('success', 'Zona atualizada com sucesso!');
     }
 
-    public function destroy(Zone $zone) {
+    public function destroy(Zone $zone)
+    {
         if ($zone->supervisions()->exists()) {
             return back()->with('error', 'Não pode deletar zona com supervisões!');
         }

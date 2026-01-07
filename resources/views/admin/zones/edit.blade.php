@@ -1,67 +1,86 @@
 @extends('layouts.app')
 
 @section('title', 'Editar Zona - Portal Life Church')
-@section('page-title', 'Editar Zona ' . $zone->name)
-@section('page-subtitle', 'Atualizar informações do Pastor e descrição')
 
 @section('content')
-<div class="grid grid-max-w-2xl mx-auto">
-    <div class="bg-white rounded-xl shadow-xl p-8">
-        <form action="{{ route('zones.update', $zone) }}" method="POST">
-            @csrf
-            @method('PUT')
+    <div class="max-w-4xl mx-auto space-y-8">
+        <!-- Header -->
+        <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-black text-gray-900 tracking-tight mb-2">Editar Zona</h1>
+                <p class="text-gray-500 text-sm italic">{{ $zone->name }}</p>
+            </div>
+            <a href="{{ route('zones.index') }}"
+                class="w-12 h-12 rounded-2xl bg-gray-50 text-gray-400 flex items-center justify-center hover:bg-gray-100 transition-colors">
+                <i class="bi bi-x-lg"></i>
+            </a>
+        </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <!-- Nome da Zona -->
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Nome</label>
-                    <input id="name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('name') border-red-500 @enderror" type="text" name="name"
-                        value="{{ old('name', $zone->name) }}" required />
-                    @error('name')
-                        <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
-                    @enderror
+        <!-- Form -->
+        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+            <form action="{{ route('zones.update', $zone) }}" method="POST" class="p-8 md:p-12 space-y-8">
+                @csrf
+                @method('PUT')
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Nome da Zona -->
+                    <div class="space-y-2">
+                        <label for="name" class="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">Nome da
+                            Zona</label>
+                        <div class="relative">
+                            <i class="bi bi-map absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" name="name" id="name"
+                                class="w-full pl-12 pr-4 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-medium text-gray-700 placeholder-gray-400 @error('name') border-red-500 @enderror"
+                                value="{{ old('name', $zone->name) }}" required>
+                        </div>
+                        @error('name')
+                            <p class="text-red-500 text-xs mt-1 ml-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Seleção do Pastor de Zona -->
+                    <div class="space-y-2">
+                        <label for="pastor_id"
+                            class="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">Pastor de Zona</label>
+                        <div class="relative">
+                            <i class="bi bi-person-badge absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <select name="pastor_id" id="pastor_id"
+                                class="w-full pl-12 pr-4 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-medium text-gray-700 appearance-none @error('pastor_id') border-red-500 @enderror">
+                                <option value="">A definir futuramente</option>
+                                @foreach ($pastors as $pastor)
+                                    <option value="{{ $pastor->id }}" @selected(old('pastor_id', $zone->pastor_id) == $pastor->id)>
+                                        {{ $pastor->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <i
+                                class="bi bi-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                        </div>
+                        @error('pastor_id')
+                            <p class="text-red-500 text-xs mt-1 ml-1">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
-                <!-- Seleção do Pastor de Zona -->
-                <div>
-                    <label for="pastor_id" class="block text-sm font-medium text-gray-700 mb-2">Pastor de Zona (Opcional)</label>
-                    <select name="pastor_id" id="pastor_id"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('pastor_id') border-red-500 @enderror">
-                        <option value="">-- Selecione um Pastor --</option>
-                        {{-- A variável $pastors é passada pelo ZoneController@edit --}}
-                        @foreach ($pastors as $pastor)
-                            <option value="{{ $pastor->id }}" @selected(old('pastor_id', $zone->pastor_id) == $pastor->id)>
-                                {{ $pastor->name }} ({{ $pastor->email }})
-                            </option>
-                        @endforeach
-                    </select>
-                    <p class="text-xs text-gray-500 mt-1">Pastor atual: 
-                        <span class="font-semibold text-gray-800">{{ $zone->pastor->name ?? 'Ninguém atribuído' }}</span>
-                    </p>
-                    @error('pastor_id')
-                        <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
-                    @enderror
+                <div class="space-y-2">
+                    <label for="description"
+                        class="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">Descrição Detalhada</label>
+                    <textarea name="description" id="description" rows="4"
+                        placeholder="Detalhes sobre a cobertura geográfica ou características da zona..."
+                        class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-medium text-gray-700 placeholder-gray-400 resize-none">{{ old('description', $zone->description) }}</textarea>
                 </div>
-            </div>
 
-            <div class="mb-8">
-                 <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Descrição (Opcional)</label>
-                 <textarea name="description" id="description" rows="4" placeholder="Detalhes sobre a cobertura geográfica da zona..."
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">{{ old('description', $zone->description) }}</textarea>
-                @error('description')
-                    <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <div class="flex space-x-4 justify-end">
-                <a href="{{ route('zones.index') }}" class="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg hover:bg-gray-300 transition font-bold text-center">
-                    <i class="bi bi-arrow-left mr-2"></i>Voltar
-                </a>
-                <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-bold shadow-md">
-                    <i class="bi bi-save mr-2"></i>Salvar Alterações
-                </button>
-            </div>
-        </form>
+                <div class="flex flex-col md:flex-row gap-4 pt-4">
+                    <button type="submit"
+                        class="flex-1 bg-blue-600 text-white px-8 py-4 rounded-2xl hover:bg-blue-700 transition-all duration-300 font-black shadow-lg shadow-blue-200">
+                        <i class="bi bi-save-fill mr-2"></i>Salvar Alterações
+                    </button>
+                    <a href="{{ route('zones.index') }}"
+                        class="flex-1 bg-gray-50 text-gray-500 px-8 py-4 rounded-2xl hover:bg-gray-100 transition-all duration-300 font-bold text-center">
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 @endsection
