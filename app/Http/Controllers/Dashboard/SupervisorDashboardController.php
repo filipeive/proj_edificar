@@ -20,6 +20,8 @@ class SupervisorDashboardController
                 'cells' => collect(),
                 'total' => 0,
                 'supervisionName' => 'Sem Supervisão Atribuída',
+                'upcomingEvents' => collect(),
+                'recentServices' => \App\Models\Service::orderBy('date', 'desc')->limit(5)->get(),
             ]);
         }
 
