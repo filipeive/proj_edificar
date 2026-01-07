@@ -362,17 +362,15 @@
                     Edificando Vidas, Transformando Destinos
                 </div>
 
-                <h1
-                    class="text-6xl md:text-8xl lg:text-9xl font-black text-white mb-8 leading-[0.9] tracking-tighter text-shadow-glow">
-                    Onde a Fé Encontra a<br>
-                    <span
-                        class="orange-gradient-text inline-block hover:scale-105 transition-transform duration-300">Excelência
-                        Digital</span>
+                <h1 class="text-6xl md:text-8xl font-black text-white mb-8 tracking-tighter leading-none">
+                    Transformando <span class="orange-gradient-text">Comunidades</span>,<br>
+                    Mudando <span class="orange-gradient-text">Nações</span>
                 </h1>
-
-                <p class="text-xl md:text-2xl text-gray-200 mb-12 leading-relaxed max-w-3xl mx-auto font-light">
-                    Uma plataforma de gestão eclesiástica de classe mundial, desenhada para potencializar o crescimento
-                    da sua igreja e o cuidado com cada membro.
+                <p class="text-2xl md:text-3xl text-white mb-8 font-black uppercase tracking-widest">
+                    Uma Vida de Cada Vez
+                </p>
+                <p class="text-xl text-gray-300 mb-12 leading-relaxed max-w-3xl mx-auto font-light">
+                    Somos uma igreja familiar baseada em células, amando a Jesus, servindo e discipulando pessoas.
                 </p>
 
                 <!-- Floating Decorative Elements -->
@@ -382,42 +380,45 @@
                 <div
                     class="absolute bottom-20 right-10 w-32 h-32 border border-white/5 rounded-full animate-bounce-slow hidden md:block">
                 </div>
+            </div>
 
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
-                    <a href="{{ route('register') }}"
-                        class="w-full sm:w-auto bg-white text-gray-900 px-12 py-5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-orange-600 hover:text-white transition-all duration-500 shadow-2xl group text-center">
-                        Começar Agora
-                        <i
-                            class="bi bi-arrow-right ml-2 group-hover:translate-x-2 transition-transform inline-block"></i>
-                    </a>
-                    <a href="#features"
-                        class="w-full sm:w-auto bg-white/5 backdrop-blur-xl text-white border-2 border-white/20 px-12 py-5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-white/10 hover:border-white/40 transition-all duration-500 text-center">
-                        Explorar Recursos
-                    </a>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
+                <a href="{{ route('register') }}"
+                    class="w-full sm:w-auto bg-white text-gray-900 px-12 py-5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-orange-600 hover:text-white transition-all duration-500 shadow-2xl group text-center">
+                    Começar Agora
+                    <i class="bi bi-arrow-right ml-2 group-hover:translate-x-2 transition-transform inline-block"></i>
+                </a>
+                <a href="#features"
+                    class="w-full sm:w-auto bg-white/5 backdrop-blur-xl text-white border-2 border-white/20 px-12 py-5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-white/10 hover:border-white/40 transition-all duration-500 text-center">
+                    Explorar Recursos
+                </a>
+            </div>
+
+            <!-- Stats Preview -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-20 max-w-4xl mx-auto">
+                <div
+                    class="stat-card p-6 rounded-2xl text-center backdrop-blur-md bg-white/5 border border-white/10 hover:bg-white/10 transition-colors group">
+                    <div class="text-3xl font-black text-white mb-2 group-hover:scale-110 transition-transform"><i
+                            class="bi bi-heart-fill text-red-500"></i></div>
+                    <div class="text-sm font-bold text-white uppercase tracking-widest">Amar</div>
+                    <div class="text-[10px] text-gray-400 font-medium mt-1">Jesus & Pessoas</div>
                 </div>
-
-                <!-- Stats Preview -->
-                <div class="grid grid-cols-3 gap-6 mt-20 max-w-3xl mx-auto">
-                    <div
-                        class="stat-card p-6 rounded-2xl text-center backdrop-blur-md bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
-                        <div class="text-3xl font-black text-white mb-1"><i
-                                class="bi bi-shield-check text-orange-500"></i></div>
-                        <div class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-2">Segurança</div>
-                    </div>
-                    <div
-                        class="stat-card p-6 rounded-2xl text-center backdrop-blur-md bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
-                        <div class="text-3xl font-black text-white mb-1"><i class="bi bi-people text-orange-500"></i>
-                        </div>
-                        <div class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-2">Comunidade</div>
-                    </div>
-                    <div
-                        class="stat-card p-6 rounded-2xl text-center backdrop-blur-md bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
-                        <div class="text-3xl font-black text-white mb-1"><i class="bi bi-globe text-orange-500"></i>
-                        </div>
-                        <div class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-2">Global</div>
-                    </div>
+                <div
+                    class="stat-card p-6 rounded-2xl text-center backdrop-blur-md bg-white/5 border border-white/10 hover:bg-white/10 transition-colors group">
+                    <div class="text-3xl font-black text-white mb-2 group-hover:scale-110 transition-transform"><i
+                            class="bi bi-people-fill text-blue-500"></i></div>
+                    <div class="text-sm font-bold text-white uppercase tracking-widest">Servir</div>
+                    <div class="text-[10px] text-gray-400 font-medium mt-1">E Discipular</div>
+                </div>
+                <div
+                    class="stat-card p-6 rounded-2xl text-center backdrop-blur-md bg-white/5 border border-white/10 hover:bg-white/10 transition-colors group">
+                    <div class="text-3xl font-black text-white mb-2 group-hover:scale-110 transition-transform"><i
+                            class="bi bi-globe-americas text-green-500"></i></div>
+                    <div class="text-sm font-bold text-white uppercase tracking-widest">Transformar</div>
+                    <div class="text-[10px] text-gray-400 font-medium mt-1">Comunidades & Nações</div>
                 </div>
             </div>
+        </div>
         </div>
 
         <div class="scroll-indicator absolute bottom-10 left-1/2 text-white/60 cursor-pointer z-10">
