@@ -374,6 +374,10 @@
                     Uma plataforma de gestão eclesiástica de classe mundial, desenhada para potencializar o crescimento
                     da sua igreja e o cuidado com cada membro.
                 </p>
+                
+                <!-- Floating Decorative Elements -->
+                <div class="absolute top-1/2 left-10 w-24 h-24 border border-white/10 rounded-full animate-spin-slow hidden md:block"></div>
+                <div class="absolute bottom-20 right-10 w-32 h-32 border border-white/5 rounded-full animate-bounce-slow hidden md:block"></div>
 
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
                     <a href="{{ route('register') }}"
@@ -580,23 +584,78 @@
                 </div>
             </div>
 
-            <!-- Appendix / Beliefs Toggle -->
-            <div class="mt-8 text-center" x-data="{ open: false }">
-                <button @click="open = !open" class="text-gray-500 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors flex items-center justify-center mx-auto">
-                    <span>Declaração de Crenças (Apêndice A)</span>
-                    <i class="bi bi-chevron-down ml-2 transition-transform" :class="{'rotate-180': open}"></i>
-                </button>
-                <div x-show="open" x-collapse class="mt-8 text-left max-w-4xl mx-auto bg-black/20 p-8 rounded-2xl border border-white/5 backdrop-blur-md">
-                    <ul class="space-y-4 text-gray-400 text-sm font-light list-disc pl-5">
-                        <li><strong>Doutrina:</strong> A Bíblia é a palavra inspirada de Deus; existe um só Deus (Pai, Filho, Espírito Santo).</li>
-                        <li><strong>Jesus Cristo:</strong> Sua divindade, humanidade, morte expiatória, ressurreição e retorno.</li>
-                        <li><strong>Espírito Santo:</strong> Poder santificador e batismo para viver a vida cristã.</li>
-                        <li><strong>Salvação:</strong> Todos pecaram; salvação apenas pelo arrependimento e fé no sangue de Cristo.</li>
-                        <li><strong>Práticas:</strong> Batismo nas águas e Ceia do Senhor.</li>
-                        <li><strong>Ressurreição:</strong> Vida eterna para os salvos.</li>
-                        <li><strong>Igreja & Família:</strong> Sacerdócio de todos os crentes, milagres atuais, igreja local autônoma e casamento heterossexual como base da família.</li>
-                        <li><strong>Missões:</strong> Fazer discípulos de todas as nações (Mateus 28:20).</li>
-                    </ul>
+            <!-- Appendix / Beliefs Section (Redesigned) -->
+            <div class="mt-32">
+                <div class="text-center mb-16">
+                     <span class="text-orange-600 font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Fundamentos</span>
+                     <h2 class="text-3xl md:text-5xl font-black text-white mb-6">Nossas <span class="orange-gradient-text">Crenças</span></h2>
+                     <p class="text-gray-400 max-w-2xl mx-auto">A base inabalável da nossa fé e prática</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/5 hover:border-orange-500/30 transition-all hover:-translate-y-2 group">
+                        <div class="w-10 h-10 orange-gradient rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
+                            <i class="bi bi-book-fill"></i>
+                        </div>
+                        <h4 class="text-white font-bold mb-2">Doutrina</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">A Bíblia é a palavra inspirada de Deus; existe um só Deus (Pai, Filho, Espírito Santo).</p>
+                    </div>
+
+                    <div class="bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/5 hover:border-orange-500/30 transition-all hover:-translate-y-2 group">
+                        <div class="w-10 h-10 orange-gradient rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
+                            <i class="bi bi-person-heart"></i>
+                        </div>
+                        <h4 class="text-white font-bold mb-2">Jesus Cristo</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">Sua divindade, humanidade, morte expiatória, ressurreição e retorno.</p>
+                    </div>
+
+                    <div class="bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/5 hover:border-orange-500/30 transition-all hover:-translate-y-2 group">
+                        <div class="w-10 h-10 orange-gradient rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
+                            <i class="bi bi-fire"></i>
+                        </div>
+                        <h4 class="text-white font-bold mb-2">Espírito Santo</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">Poder santificador e batismo para viver a vida cristã.</p>
+                    </div>
+
+                    <div class="bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/5 hover:border-orange-500/30 transition-all hover:-translate-y-2 group">
+                        <div class="w-10 h-10 orange-gradient rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
+                            <i class="bi bi-heart-pulse-fill"></i>
+                        </div>
+                        <h4 class="text-white font-bold mb-2">Salvação</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">Todos pecaram; salvação apenas pelo arrependimento e fé no sangue de Cristo.</p>
+                    </div>
+
+                    <div class="bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/5 hover:border-orange-500/30 transition-all hover:-translate-y-2 group">
+                        <div class="w-10 h-10 orange-gradient rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
+                            <i class="bi bi-droplet-fill"></i>
+                        </div>
+                        <h4 class="text-white font-bold mb-2">Práticas</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">Batismo nas águas e Ceia do Senhor.</p>
+                    </div>
+
+                    <div class="bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/5 hover:border-orange-500/30 transition-all hover:-translate-y-2 group">
+                         <div class="w-10 h-10 orange-gradient rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
+                            <i class="bi bi-infinity"></i>
+                        </div>
+                        <h4 class="text-white font-bold mb-2">Ressurreição</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">Vida eterna para os salvos.</p>
+                    </div>
+
+                    <div class="bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/5 hover:border-orange-500/30 transition-all hover:-translate-y-2 group">
+                         <div class="w-10 h-10 orange-gradient rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
+                            <i class="bi bi-house-door-fill"></i>
+                        </div>
+                        <h4 class="text-white font-bold mb-2">Igreja & Família</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">Sacerdócio, milagres atuais, igreja local e casamento como base da família.</p>
+                    </div>
+
+                    <div class="bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/5 hover:border-orange-500/30 transition-all hover:-translate-y-2 group">
+                        <div class="w-10 h-10 orange-gradient rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
+                            <i class="bi bi-globe"></i>
+                        </div>
+                        <h4 class="text-white font-bold mb-2">Missões</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">Fazer discípulos de todas as nações (Mateus 28:20).</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -990,15 +1049,15 @@
                 <div>
                     <h5 class="text-xs font-black text-gray-900 uppercase tracking-[0.3em] mb-6">Social</h5>
                     <div class="flex space-x-3">
-                        <a href="#"
+                        <a href="https://www.facebook.com/profile.php?id=61561915645001" target="_blank"
                             class="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-orange-600 hover:text-white transition-all duration-300 shadow-sm hover:scale-110">
                             <i class="bi bi-facebook"></i>
                         </a>
-                        <a href="#"
+                        <a href="https://www.instagram.com/lifechurchmoz_" target="_blank"
                             class="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-orange-600 hover:text-white transition-all duration-300 shadow-sm hover:scale-110">
                             <i class="bi bi-instagram"></i>
                         </a>
-                        <a href="#"
+                        <a href="https://www.youtube.com/@lifechurchmozambique8792" target="_blank"
                             class="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-orange-600 hover:text-white transition-all duration-300 shadow-sm hover:scale-110">
                             <i class="bi bi-youtube"></i>
                         </a>
