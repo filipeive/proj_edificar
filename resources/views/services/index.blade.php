@@ -3,7 +3,7 @@
 @section('title', 'Gestão de Cultos - Portal Life Church')
 
 @section('content')
-    <div class="space-y-8">
+    <div class="space-y-8" x-data="{ view: localStorage.getItem('serviceView') || 'grid' }" x-init="$watch('view', val => localStorage.setItem('serviceView', val))">
         <!-- Header Section -->
         <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div class="space-y-1">
@@ -15,14 +15,32 @@
                 <p class="text-gray-500 font-medium">Controle de participação e financeiro dos cultos</p>
             </div>
             
-            <a href="{{ route('services.create') }}" class="group flex items-center bg-blue-600 text-white px-8 py-4 rounded-[1.5rem] hover:bg-blue-700 transition-all font-black shadow-xl shadow-blue-200 hover:-translate-y-1">
-                <i class="bi bi-plus-lg mr-2 text-lg"></i>
-                Registrar Culto
-            </a>
+            <div class="flex items-center gap-4">
+                <!-- View Toggle -->
+                <div class="flex bg-gray-100 p-1.5 rounded-2xl mr-4">
+                    <button @click="view = 'grid'" 
+                        :class="view === 'grid' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400 hover:text-gray-600'"
+                        class="p-2.5 rounded-xl transition-all flex items-center gap-2 font-bold text-xs">
+                        <i class="bi bi-grid-fill"></i>
+                        <span class="hidden sm:inline">Grid</span>
+                    </button>
+                    <button @click="view = 'list'" 
+                        :class="view === 'list' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400 hover:text-gray-600'"
+                        class="p-2.5 rounded-xl transition-all flex items-center gap-2 font-bold text-xs">
+                        <i class="bi bi-list-task"></i>
+                        <span class="hidden sm:inline">Lista</span>
+                    </button>
+                </div>
+
+                <a href="{{ route('services.create') }}" class="group flex items-center bg-blue-600 text-white px-8 py-4 rounded-[1.5rem] hover:bg-blue-700 transition-all font-black shadow-xl shadow-blue-200 hover:-translate-y-1 text-sm md:text-base">
+                    <i class="bi bi-plus-lg mr-2 text-lg"></i>
+                    Registrar Culto
+                </a>
+            </div>
         </div>
 
-        <!-- Services Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <!-- Services Grid View -->
+        <div x-show="view === 'grid'" x-transition.fade.duration.300ms class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
             @foreach($services as $service)
                 <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 transition-all group flex flex-col">
                     <div class="p-8 space-y-6 flex-1">
@@ -40,7 +58,16 @@
                                 </div>
                                 <h3 class="text-xl font-black text-gray-900">{{ $service->date->format('d/m/Y') }}</h3>
                                 <p class="text-xs font-bold text-gray-400 uppercase tracking-tighter">
-                                    Pregador: <span class="text-gray-600">{{ $service->preacher ? $service->preacher->name : 'N/A' }}</span>
+                                    Pregador: <span class="text-xs font-black {{ ($service->preacher_id === null && $service->preacher_name) ? 'text-orange-600 bg-orange-50 px-2 py-0.5 rounded-lg' : 'text-gray-600' }}">
+                                        @if($service->preacher)
+                                            {{ $service->preacher->name }}
+                                        @else
+                                            {{ $service->preacher_name ?? 'N/A' }}
+                                            @if($service->preacher_id === null && $service->preacher_name)
+                                                <i class="bi bi-person-badge-fill ml-1" title="Convidado Externo"></i>
+                                            @endif
+                                        @endif
+                                    </span>
                                 </p>
                             </div>
                             <div class="text-right">
@@ -89,6 +116,64 @@
                     </div>
                 </div>
             @endforeach
+        </div>
+
+        <!-- Services List View -->
+        <div x-show="view === 'list'" x-transition.fade.duration.300ms class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50/50">
+                            <th class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Data</th>
+                            <th class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Tipo</th>
+                            <th class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Pregador</th>
+                            <th class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Partic.</th>
+                            <th class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Financ. Total</th>
+                            <th class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50 text-sm">
+                        @foreach($services as $service)
+                            <tr class="hover:bg-gray-50/50 transition-all group">
+                                <td class="px-8 py-6 font-black text-gray-900">{{ $service->date->format('d/m/Y') }}</td>
+                                <td class="px-8 py-6">
+                                    <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-bold uppercase">
+                                        {{ $service->service_type }}
+                                    </span>
+                                </td>
+                                <td class="px-8 py-6">
+                                    <span class="font-bold {{ ($service->preacher_id === null && $service->preacher_name) ? 'text-orange-600 bg-orange-50 px-2 py-0.5 rounded-lg' : 'text-gray-600' }}">
+                                        @if($service->preacher)
+                                            {{ $service->preacher->name }}
+                                        @else
+                                            {{ $service->preacher_name ?? 'N/A' }}
+                                        @endif
+                                    </span>
+                                </td>
+                                <td class="px-8 py-6 text-center font-black text-blue-600">{{ $service->total_participation }}</td>
+                                <td class="px-8 py-6 text-right font-black text-green-700">{{ number_format($service->total_financial, 2) }} MT</td>
+                                <td class="px-8 py-6">
+                                    <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                        <a href="{{ route('services.download-pdf', $service) }}" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                                            <i class="bi bi-file-earmark-pdf text-lg"></i>
+                                        </a>
+                                        <a href="{{ route('services.edit', $service) }}" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                                            <i class="bi bi-pencil-square text-lg"></i>
+                                        </a>
+                                        <form action="{{ route('services.destroy', $service) }}" method="POST" onsubmit="return confirm('Excluir?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                                                <i class="bi bi-trash text-lg"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Pagination -->

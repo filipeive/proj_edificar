@@ -3,7 +3,7 @@
 @section('title', 'Editar Culto - Portal Life Church')
 
 @section('content')
-    <div class="max-w-6xl mx-auto space-y-8">
+    <div class="space-y-8" x-data="{ guestPreacher: {{ $service->preacher_id === null && $service->preacher_name ? 'true' : 'false' }} }">
         <!-- Header -->
         <div
             class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -57,15 +57,25 @@
 
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Pregador</label>
-                        <select name="preacher_id"
-                            class="w-full px-5 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700 appearance-none">
-                            <option value="">Selecione o pregador</option>
-                            @foreach($preachers as $preacher)
-                                <option value="{{ $preacher->id }}" @selected(old('preacher_id', $service->preacher_id) == $preacher->id)>
-                                    {{ $preacher->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <div class="space-y-4">
+                            <select name="preacher_id"
+                                @change="guestPreacher = $event.target.value === 'other'"
+                                class="w-full px-5 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700 appearance-none">
+                                <option value="">Selecione o pregador</option>
+                                @foreach($preachers as $preacher)
+                                    <option value="{{ $preacher->id }}" @selected(old('preacher_id', $service->preacher_id) == $preacher->id)>
+                                        {{ $preacher->name }}
+                                    </option>
+                                @endforeach
+                                <option value="other" @selected(old('preacher_id', $service->preacher_id === null && $service->preacher_name) == 'other' || ($service->preacher_id === null && $service->preacher_name))>Outro (Convidado)</option>
+                            </select>
+
+                            <template x-if="guestPreacher">
+                                <input type="text" name="preacher_name" value="{{ old('preacher_name', $service->preacher_name) }}"
+                                    placeholder="Nome do pregador convidado"
+                                    class="w-full px-5 py-4 bg-blue-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700 placeholder-blue-300">
+                            </template>
+                        </div>
                     </div>
 
                     <div class="md:col-span-3 space-y-2">

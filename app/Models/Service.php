@@ -13,6 +13,7 @@ class Service extends Model
         'date',
         'service_type',
         'preacher_id',
+        'preacher_name',
         'theme',
         'message',
         'observations',

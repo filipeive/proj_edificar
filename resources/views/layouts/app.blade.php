@@ -645,9 +645,8 @@
                 </div>
             </header>
 
-            <!-- Main Content -->
             <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
-                <div class="container mx-auto px-4 md:px-6 py-6 md:py-8">
+                <div class="px-4 md:px-8 py-6 md:py-8">
                     @yield('content')
                 </div>
             </main>
