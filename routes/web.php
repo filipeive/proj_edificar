@@ -71,14 +71,7 @@ Route::prefix('notifications')->middleware('auth')->name('notifications.')->grou
 });
 
 
-// Register Route (Público para criar conta)
-Route::get('/register', [RegisteredUserController::class, 'create'])
-    ->middleware('guest')
-    ->name('register');
-
-Route::post('/register', [RegisteredUserController::class, 'store'])
-    ->middleware('guest')
-    ->name('register.store');
+// Register Route (Redundante, removido o duplicado no final)
 
 // Rotas protegidas (autenticado)
 Route::middleware('auth')->group(function () {
@@ -201,17 +194,6 @@ Route::middleware('auth')->group(function () {
         // Ver detalhes
         Route::get('/{contribution}', [ContributionController::class, 'show'])
             ->name('contributions.show');
-    });
-    // ===== ROTAS DE GESTÃO DE CONTRIBUIÇÕES (ADMIN) =====
-    Route::prefix('contributions')->middleware('role:admin,pastor_zona')->group(function () {
-
-        // Ação de Verificação (Confirmação)
-        Route::post('/{contribution}/verify', [ContributionController::class, 'verify'])
-            ->name('contributions.verify');
-
-        // Ação de Rejeição
-        Route::post('/{contribution}/reject', [ContributionController::class, 'reject'])
-            ->name('contributions.reject');
     });
     // ===== PACOTES DE COMPROMISSO ROUTES =====
     Route::prefix('commitments')->middleware('not.admin')->group(function () {
