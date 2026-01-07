@@ -411,56 +411,192 @@
         </div>
     </section>
 
-    <!-- Vision Section -->
+    </section>
+
+    <!-- Vision & Values Section -->
     <section id="vision" class="py-32 bg-gray-900 relative overflow-hidden">
         <div class="absolute inset-0 opacity-20">
-            <div
-                class="absolute top-0 right-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1548625361-8889aa3fb942?ixlib=rb-4.0.3&fit=crop&w=2000&q=80')] bg-cover bg-center">
-            </div>
+            <div class="absolute top-0 right-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1548625361-8889aa3fb942?ixlib=rb-4.0.3&fit=crop&w=2000&q=80')] bg-cover bg-center"></div>
             <div class="absolute inset-0 bg-gradient-to-l from-gray-900 via-gray-900/50 to-transparent"></div>
         </div>
-
+        
         <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
-            <div class="flex flex-col lg:flex-row items-center gap-16">
+            <!-- Top Vision Block -->
+            <div class="flex flex-col lg:flex-row items-center gap-16 mb-32">
                 <div class="lg:w-1/2">
-                    <span class="text-orange-500 font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Quem
-                        Somos</span>
-                    <h2 class="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter leading-none">
-                        Nossa <span class="orange-gradient-text">Visão</span> e<br> Propósito
+                    <span class="text-orange-500 font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">A Visão da Life Church</span>
+                    <h2 class="text-4xl md:text-5xl font-black text-white mb-8 tracking-tighter leading-none">
+                        "Onde não há visão,<br> o povo <span class="orange-gradient-text">perece</span>"
                     </h2>
-                    <p class="text-gray-400 text-xl font-light leading-relaxed mb-10">
-                        Somos uma família de fé apaixonada por Jesus e pelas pessoas. Nossa visão é edificar vidas e
-                        transformar destinos através do poder do Evangelho, capacitando cada membro a viver seu
-                        potencial máximo em Cristo.
+                    <blockquote class="text-orange-400 text-sm font-bold uppercase tracking-widest mb-8 border-l-4 border-orange-500 pl-4">
+                        Provérbios 29:18
+                    </blockquote>
+                    <p class="text-gray-400 text-lg font-light leading-relaxed mb-6">
+                        Na Life Church somos pessoas com visão, temos um propósito, temos um sentido e estamos focados.
                     </p>
+                    <div class="bg-white/5 p-6 rounded-2xl border border-white/10 mb-8">
+                        <h4 class="text-white font-bold mb-2">Nossa Declaração:</h4>
+                        <p class="text-gray-300 italic leading-relaxed">
+                            "Somos uma Igreja baseada em grupos células, amando a Jesus, servindo e discipulando pessoas, transformando comunidades e mudando as nações; uma vida de cada vez."
+                        </p>
+                    </div>
                     <div class="flex flex-col sm:flex-row gap-4">
-                        <a href="{{ asset('documents/visao-igreja.pdf') }}" target="_blank"
-                            class="btn-premium text-white px-10 py-5 rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-transform duration-300 shadow-xl inline-flex items-center justify-center">
+                         <a href="{{ asset('documents/visao-igreja.pdf') }}" target="_blank"
+                            class="btn-premium text-white px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-transform duration-300 shadow-xl inline-flex items-center justify-center">
                             <i class="bi bi-file-earmark-pdf-fill mr-3 text-lg"></i>
-                            Download da Visão
-                        </a>
-                        <a href="https://www.youtube.com/watch?v=sHLqLp_7Uv8" target="_blank"
-                            class="bg-white/10 text-white border border-white/20 px-10 py-5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-xl inline-flex items-center justify-center backdrop-blur-sm">
-                            <i class="bi bi-play-circle-fill mr-3 text-lg text-orange-500"></i>
-                            Ver Vídeo da Visão
+                            Download PDF da Visão
                         </a>
                     </div>
                 </div>
                 <div class="lg:w-1/2 relative">
-                    <div class="relative rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl group">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10"></div>
-                        <img src="https://images.unsplash.com/photo-1519822472972-dc2939630131?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
-                            alt="Vision"
-                            class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
-                        <div class="absolute bottom-10 left-10 z-20">
-                            <div class="text-white text-3xl font-black mb-2">Conheça nossa História</div>
-                            <div class="h-1 w-20 orange-gradient rounded-full"></div>
-                        </div>
+                    <div class="relative aspect-video rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl group">
+                         <iframe class="w-full h-full" 
+                                src="https://www.youtube.com/embed/sHLqLp_7Uv8"
+                                title="Visão Life Church" frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowfullscreen>
+                        </iframe>
                     </div>
                     <!-- Decorative Circle -->
-                    <div
-                        class="absolute -bottom-10 -right-10 w-40 h-40 orange-gradient rounded-full blur-[80px] opacity-30">
+                     <div class="absolute -bottom-10 -right-10 w-40 h-40 orange-gradient rounded-full blur-[80px] opacity-30"></div>
+                </div>
+            </div>
+
+            <!-- Detailed Vision Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-32">
+                <div class="bg-white/5 p-8 rounded-3xl border border-white/10 hover:bg-white/10 transition-colors">
+                    <div class="w-12 h-12 orange-gradient rounded-xl flex items-center justify-center text-white text-xl mb-6">
+                        <i class="bi bi-people-fill"></i>
                     </div>
+                    <h3 class="text-xl font-black text-white mb-4">Família em Células</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        A igreja não é um edifício, são pessoas vivendo em comunidade. Enfatizamos reuniões juntos no culto de celebração e em nossos grupos de células que funcionam em muitos bairros durante a semana.
+                    </p>
+                </div>
+                <div class="bg-white/5 p-8 rounded-3xl border border-white/10 hover:bg-white/10 transition-colors">
+                    <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white text-xl mb-6">
+                        <i class="bi bi-heart-fill"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-white mb-4">Amar e Servir</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Amar a Jesus significa amar o que Ele ama: as pessoas. Servimos e discipulamos uns aos outros, equipando cada membro para alcançar a próxima geração ("Ide e fazei discípulos" - Mateus 28:19-20).
+                    </p>
+                </div>
+                <div class="bg-white/5 p-8 rounded-3xl border border-white/10 hover:bg-white/10 transition-colors">
+                    <div class="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center text-white text-xl mb-6">
+                        <i class="bi bi-globe-americas"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-white mb-4">Transformar Nações</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Para mudar uma nação, transformamos uma comunidade, uma vida de cada vez. Somos sal e luz (Mateus 5:13-16) impactando cidades e expandindo para nações como Moçambique, Malawi e Zimbábue.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Values Section -->
+            <div class="text-center mb-16">
+                 <span class="text-orange-500 font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Nossa Identidade</span>
+                 <h2 class="text-3xl md:text-5xl font-black text-white mb-12">Valores da <span class="orange-gradient-text">Life Church</span></h2>
+                 
+                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-left">
+                     <div class="p-6 rounded-2xl bg-white/5 hover:bg-orange-600/20 border border-white/5 transition-all group">
+                         <i class="bi bi-book text-2xl text-orange-500 mb-3 block group-hover:scale-110 transition-transform"></i>
+                         <h4 class="text-white font-bold text-sm mb-1">Base Bíblica</h4>
+                         <p class="text-xs text-gray-500">Inspirados pela Palavra e ensino forte.</p>
+                     </div>
+                     <div class="p-6 rounded-2xl bg-white/5 hover:bg-orange-600/20 border border-white/5 transition-all group">
+                        <i class="bi bi-person-lines-fill text-2xl text-orange-500 mb-3 block group-hover:scale-110 transition-transform"></i>
+                        <h4 class="text-white font-bold text-sm mb-1">Discipulado</h4>
+                        <p class="text-xs text-gray-500">Crescer, equipar e liberar liderança.</p>
+                    </div>
+                    <div class="p-6 rounded-2xl bg-white/5 hover:bg-orange-600/20 border border-white/5 transition-all group">
+                        <i class="bi bi-house-heart text-2xl text-orange-500 mb-3 block group-hover:scale-110 transition-transform"></i>
+                        <h4 class="text-white font-bold text-sm mb-1">Família</h4>
+                        <p class="text-xs text-gray-500">Relacionamentos fortes e herança divina.</p>
+                    </div>
+                    <div class="p-6 rounded-2xl bg-white/5 hover:bg-orange-600/20 border border-white/5 transition-all group">
+                        <i class="bi bi-fire text-2xl text-orange-500 mb-3 block group-hover:scale-110 transition-transform"></i>
+                        <h4 class="text-white font-bold text-sm mb-1">Disciplinas</h4>
+                        <p class="text-xs text-gray-500">Oração, adoração, jejum e servir.</p>
+                    </div>
+                    <div class="p-6 rounded-2xl bg-white/5 hover:bg-orange-600/20 border border-white/5 transition-all group">
+                        <i class="bi bi-globe text-2xl text-orange-500 mb-3 block group-hover:scale-110 transition-transform"></i>
+                        <h4 class="text-white font-bold text-sm mb-1">Multi-nacional</h4>
+                        <p class="text-xs text-gray-500">Diversificada e inclusiva, espaço para todos.</p>
+                    </div>
+                    <div class="p-6 rounded-2xl bg-white/5 hover:bg-orange-600/20 border border-white/5 transition-all group">
+                        <i class="bi bi-send text-2xl text-orange-500 mb-3 block group-hover:scale-110 transition-transform"></i>
+                        <h4 class="text-white font-bold text-sm mb-1">Missional</h4>
+                        <p class="text-xs text-gray-500">Diferença na comunidade e onde formos.</p>
+                    </div>
+                    <div class="p-6 rounded-2xl bg-white/5 hover:bg-orange-600/20 border border-white/5 transition-all group col-span-2 md:col-span-2">
+                        <i class="bi bi-people text-2xl text-orange-500 mb-3 block group-hover:scale-110 transition-transform"></i>
+                        <h4 class="text-white font-bold text-sm mb-1">Geração</h4>
+                        <p class="text-xs text-gray-500">Todas as idades, os mais velhos construindo a próxima geração.</p>
+                    </div>
+                 </div>
+            </div>
+
+            <!-- Journey Section -->
+            <div class="bg-white rounded-[3rem] p-8 md:p-16">
+                <div class="text-center mb-16">
+                    <span class="text-orange-600 font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Crescimento</span>
+                    <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-4 tracking-tighter">Nossa Jornada de Vida</h2>
+                    <p class="text-gray-500">4 Passos para o seu propósito</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <!-- Step 1 -->
+                    <div class="text-center relative">
+                        <div class="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center text-gray-400 text-2xl font-black mb-6 border-4 border-white shadow-xl relative z-10">1</div>
+                        <div class="absolute top-8 left-1/2 w-full h-1 bg-gray-100 hidden md:block -z-0"></div>
+                        <h4 class="font-black text-gray-900 mb-2">Pertencer</h4>
+                        <span class="text-[10px] text-orange-600 font-bold uppercase tracking-widest block mb-4">Fase Infantil</span>
+                        <p class="text-xs text-gray-500 leading-relaxed">Descobrir sua família, Salvação e encontrar sua Célula.</p>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="text-center relative">
+                        <div class="w-16 h-16 mx-auto bg-orange-100 rounded-full flex items-center justify-center text-orange-600 text-2xl font-black mb-6 border-4 border-white shadow-xl relative z-10">2</div>
+                        <div class="absolute top-8 left-1/2 w-full h-1 bg-gray-100 hidden md:block -z-0"></div>
+                        <h4 class="font-black text-gray-900 mb-2">Conectar</h4>
+                        <span class="text-[10px] text-orange-600 font-bold uppercase tracking-widest block mb-4">Relacionamentos</span>
+                        <p class="text-xs text-gray-500 leading-relaxed">Discipulado "vivendo juntos" e começar a Servir.</p>
+                    </div>
+                     <!-- Step 3 -->
+                     <div class="text-center relative">
+                        <div class="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-2xl font-black mb-6 border-4 border-white shadow-xl relative z-10">3</div>
+                        <div class="absolute top-8 left-1/2 w-full h-1 bg-gray-100 hidden md:block -z-0"></div>
+                        <h4 class="font-black text-gray-900 mb-2">Equipar</h4>
+                        <span class="text-[10px] text-orange-600 font-bold uppercase tracking-widest block mb-4">Jovem Adulto</span>
+                        <p class="text-xs text-gray-500 leading-relaxed">Desenvolvimento espiritual, liderança e aplicação prática.</p>
+                    </div>
+                    <!-- Step 4 -->
+                    <div class="text-center relative">
+                        <div class="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center text-green-600 text-2xl font-black mb-6 border-4 border-white shadow-xl relative z-10">4</div>
+                        <h4 class="font-black text-gray-900 mb-2">Liberar</h4>
+                        <span class="text-[10px] text-orange-600 font-bold uppercase tracking-widest block mb-4">Fase dos Pais</span>
+                        <p class="text-xs text-gray-500 leading-relaxed">Multiplicação, discipular outros e transformação da comunidade.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Appendix / Beliefs Toggle -->
+            <div class="mt-8 text-center" x-data="{ open: false }">
+                <button @click="open = !open" class="text-gray-500 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors flex items-center justify-center mx-auto">
+                    <span>Declaração de Crenças (Apêndice A)</span>
+                    <i class="bi bi-chevron-down ml-2 transition-transform" :class="{'rotate-180': open}"></i>
+                </button>
+                <div x-show="open" x-collapse class="mt-8 text-left max-w-4xl mx-auto bg-black/20 p-8 rounded-2xl border border-white/5 backdrop-blur-md">
+                    <ul class="space-y-4 text-gray-400 text-sm font-light list-disc pl-5">
+                        <li><strong>Doutrina:</strong> A Bíblia é a palavra inspirada de Deus; existe um só Deus (Pai, Filho, Espírito Santo).</li>
+                        <li><strong>Jesus Cristo:</strong> Sua divindade, humanidade, morte expiatória, ressurreição e retorno.</li>
+                        <li><strong>Espírito Santo:</strong> Poder santificador e batismo para viver a vida cristã.</li>
+                        <li><strong>Salvação:</strong> Todos pecaram; salvação apenas pelo arrependimento e fé no sangue de Cristo.</li>
+                        <li><strong>Práticas:</strong> Batismo nas águas e Ceia do Senhor.</li>
+                        <li><strong>Ressurreição:</strong> Vida eterna para os salvos.</li>
+                        <li><strong>Igreja & Família:</strong> Sacerdócio de todos os crentes, milagres atuais, igreja local autônoma e casamento heterossexual como base da família.</li>
+                        <li><strong>Missões:</strong> Fazer discípulos de todas as nações (Mateus 28:20).</li>
+                    </ul>
                 </div>
             </div>
         </div>
