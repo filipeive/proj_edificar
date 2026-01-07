@@ -105,13 +105,13 @@ class UserController
 
     public function show(User $user): View
     {
-        // $this->authorize('view', $user);
+        $this->authorize('view', $user);
         return view('admin.users.show', ['user' => $user->load('cell', 'commitments')]);
     }
 
     public function edit(User $user): View
     {
-        // $this->authorize('update', $user);
+        $this->authorize('update', $user);
         $cells = Cell::all();
         $roles = ['membro', 'lider_celula', 'supervisor', 'pastor_zona', 'admin'];
         return view('admin.users.edit', [

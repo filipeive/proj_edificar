@@ -31,12 +31,12 @@ class AppServiceProvider extends ServiceProvider
         \Illuminate\Support\Facades\View::composer('*', function ($view) {
             if (auth()->check()) {
                 $user = auth()->user();
-                $view->with('user', $user);
+                $view->with('authUser', $user);
                 $view->with('role', $user->role ?? 'membro');
                 $view->with('unreadNotifications', $user->unreadNotifications()->count());
                 $view->with('pendingCount', \App\Models\Contribution::where('status', 'pendente')->count());
             } else {
-                $view->with('user', null);
+                $view->with('authUser', null);
                 $view->with('role', 'membro');
                 $view->with('unreadNotifications', 0);
                 $view->with('pendingCount', 0);

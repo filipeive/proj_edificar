@@ -577,13 +577,13 @@
                                     class="flex items-center space-x-2 hover:bg-gray-100 p-2 rounded-lg transition">
                                     <div class="text-right">
                                         <p class="text-sm font-medium text-gray-800 truncate max-w-[150px]">
-                                            {{ $user->name }}
+                                            {{ $authUser->name }}
                                         </p>
                                         <p class="text-xs text-gray-500">{{ ucfirst(str_replace('_', ' ', $role)) }}</p>
                                     </div>
                                     <div
                                         class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0 font-bold text-white">
-                                        {{ strtoupper(substr($user->name, 0, 1)) }}
+                                        {{ strtoupper(substr($authUser->name, 0, 1)) }}
                                     </div>
                                     <i
                                         class="bi bi-chevron-down text-gray-600 text-sm transition-transform duration-200"></i>
@@ -593,8 +593,8 @@
                                 <div id="userMenu"
                                     class="hidden absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
                                     <div class="p-3 border-b border-gray-100">
-                                        <p class="text-sm font-semibold text-gray-800">{{ $user->name }}</p>
-                                        <p class="text-xs text-gray-500 truncate">{{ $user->email }}</p>
+                                        <p class="text-sm font-semibold text-gray-800">{{ $authUser->name }}</p>
+                                        <p class="text-xs text-gray-500 truncate">{{ $authUser->email }}</p>
                                     </div>
                                     <div class="py-2">
                                         <a href="{{ route('profile.edit') }}"
