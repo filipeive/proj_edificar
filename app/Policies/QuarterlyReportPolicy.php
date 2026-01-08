@@ -32,13 +32,17 @@ class QuarterlyReportPolicy
 
     public function create(User $user): bool
     {
-        return in_array($user->role, ['admin', 'pastor', 'supervisor']);
+        return in_array($user->role, ['admin', 'pastor', 'pastor_zona', 'supervisor']);
     }
 
     public function update(User $user, QuarterlyReport $report): bool
     {
         if ($user->role === 'admin') {
             return true;
+        }
+
+        if ($user->role === 'pastor_zona') {
+            return $report->zone->pastor_id === $user->id;
         }
 
         return $report->status === 'draft' && $report->supervisor_id === $user->id;

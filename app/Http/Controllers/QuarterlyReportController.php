@@ -111,8 +111,17 @@ class QuarterlyReportController extends Controller
         }
 
         DB::transaction(function () use ($validated) {
+            $user = auth()->user();
+            $supervisorId = $user->id;
+
+            // If an Admin or Pastor de Zona is creating the report, get the real supervisor
+            if ($user->role !== 'supervisor') {
+                $supervision = Supervision::find($validated['supervision_id']);
+                $supervisorId = $supervision->supervisor_id ?? $user->id;
+            }
+
             $report = QuarterlyReport::create(array_merge($validated, [
-                'supervisor_id' => auth()->id(),
+                'supervisor_id' => $supervisorId,
                 'status' => 'submitted',
                 'submitted_at' => now(),
             ]));
