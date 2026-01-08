@@ -13,14 +13,31 @@ class CellController
 {
     public function index(Request $request): View
     {
-        // Obter todas as zonas para o filtro de dropdown
-        $zones = Zone::orderBy('name')->get();
+        $user = auth()->user();
+
+        // --- PREPARAR FILTROS (Dropdowns) ---
+        $zonesQuery = Zone::orderBy('name');
+        $supervisionsQuery = Supervision::orderBy('name');
+
+        if ($user->isPastorZona()) {
+            $zoneId = $user->getZoneId();
+            $zonesQuery->where('id', $zoneId);
+            $supervisionsQuery->where('zone_id', $zoneId);
+        } elseif ($user->isSupervisor()) {
+            $supervisionIds = $user->supervisedSupervisions()->pluck('id');
+            $supervisionsQuery->whereIn('id', $supervisionIds);
+            $zonesQuery->whereHas('supervisions', function ($q) use ($supervisionIds) {
+                $q->whereIn('id', $supervisionIds);
+            });
+        }
+
+        $zones = $zonesQuery->get();
+        $supervisions = $supervisionsQuery->get();
 
         // Iniciar a query
         $cellsQuery = Cell::query()->with('supervision.zone', 'leader', 'members');
 
         // --- SCOPED ACCESS FOR PASTORS AND SUPERVISORS ---
-        $user = auth()->user();
         if ($user->isPastorZona()) {
             $zoneId = $user->getZoneId();
             $cellsQuery->whereHas('supervision', function ($q) use ($zoneId) {
@@ -33,14 +50,17 @@ class CellController
 
         // --- 1. FILTRO POR ZONA ---
         if ($request->filled('zone')) {
-            $zoneId = $request->input('zone');
-            // Encontra todas as supervisões pertencentes à zona
-            $supervisionIds = Supervision::where('zone_id', $zoneId)->pluck('id');
-            // Filtra as células que pertencem a essas supervisões
-            $cellsQuery->whereIn('supervision_id', $supervisionIds);
+            $cellsQuery->whereHas('supervision', function ($q) use ($request) {
+                $q->where('zone_id', $request->input('zone'));
+            });
         }
 
-        // --- 2. FILTRO POR BUSCA (Search) ---
+        // --- 2. FILTRO POR SUPERVISÃO ---
+        if ($request->filled('supervision')) {
+            $cellsQuery->where('supervision_id', $request->input('supervision'));
+        }
+
+        // --- 3. FILTRO POR BUSCA (Search) ---
         if ($request->filled('search')) {
             $searchTerm = $request->input('search');
             $cellsQuery->where(function ($query) use ($searchTerm) {
@@ -59,13 +79,11 @@ class CellController
             });
         }
 
-        // --- 3. ORDENAÇÃO (Sort) ---
+        // --- 4. ORDENAÇÃO (Sort) ---
         $sort = $request->input('sort', 'name');
 
         switch ($sort) {
             case 'members':
-                // Ordenar pela contagem de membros (requires selectRaw for efficiency)
-                // Usaremos um orderBy simples na coluna member_count se ela existir e for atualizada
                 $cellsQuery->orderBy('member_count', 'desc');
                 break;
             case 'recent':
@@ -81,7 +99,8 @@ class CellController
 
         return view('admin.cells.index', [
             'cells' => $cells,
-            'zones' => $zones, // Passa as zonas para o dropdown da view
+            'zones' => $zones,
+            'supervisions' => $supervisions,
         ]);
     }
 

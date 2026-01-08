@@ -54,13 +54,27 @@
                         class="w-full pl-14 pr-6 py-4 bg-gray-50/50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700 placeholder-gray-400">
                 </div>
 
+                @if(count($zones) > 1)
+                    <div class="w-full md:w-64">
+                        <select name="zone"
+                            class="w-full px-6 py-4 bg-gray-50/50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700">
+                            <option value="">Todas as Zonas</option>
+                            @foreach($zones as $zone)
+                                <option value="{{ $zone->id }}" {{ request('zone') == $zone->id ? 'selected' : '' }}>
+                                    {{ $zone->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                @endif
+
                 <div class="w-full md:w-64">
-                    <select name="zone"
+                    <select name="supervision"
                         class="w-full px-6 py-4 bg-gray-50/50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700">
-                        <option value="">Todas as Zonas</option>
-                        @foreach($zones ?? [] as $zone)
-                            <option value="{{ $zone->id }}" {{ request('zone') == $zone->id ? 'selected' : '' }}>
-                                {{ $zone->name }}
+                        <option value="">Todas as Supervisões</option>
+                        @foreach($supervisions as $supervision)
+                            <option value="{{ $supervision->id }}" {{ request('supervision') == $supervision->id ? 'selected' : '' }}>
+                                {{ $supervision->name }}
                             </option>
                         @endforeach
                     </select>
@@ -71,7 +85,7 @@
                     Filtrar
                 </button>
 
-                @if(request()->hasAny(['search', 'zone']))
+                @if(request()->hasAny(['search', 'zone', 'supervision']))
                     <a href="{{ route('cells.index') }}"
                         class="flex items-center justify-center px-5 py-4 text-red-500 bg-red-50 hover:bg-red-100 rounded-2xl transition-all">
                         <i class="bi bi-x-lg text-lg"></i>
