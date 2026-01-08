@@ -193,7 +193,7 @@
                         <div class="stats-label">Tipo de Culto</div>
                     </td>
                     <td class="stats-item">
-                        <div class="stats-value">{{ $service->adults_count + $service->children_count }}</div>
+                        <div class="stats-value">{{ $service->total_participation }}</div>
                         <div class="stats-label">Total Presentes</div>
                     </td>
                 </tr>
