@@ -280,15 +280,17 @@
                                             class="space-y-4 p-6 bg-gray-50 rounded-[2rem] hover:bg-white hover:shadow-xl transition-all border border-transparent hover:border-{{ $section['color'] }}-100 group">
                                             <p
                                                 class="text-sm font-black text-gray-700 group-hover:text-{{ $section['color'] }}-700 transition-colors">
-                                                {{ $question }}</p>
+                                                {{ $question }}
+                                            </p>
                                             <div class="flex gap-2 justify-between">
                                                 @for($i = 0; $i <= 3; $i++)
                                                     <label class="flex-1">
                                                         <input type="radio" name="{{ $field }}" value="{{ $i }}" class="hidden peer"
                                                             required @if($i == 2) checked @endif>
-                                                        <div class="w-full py-3 text-center rounded-xl bg-white border border-gray-100 text-sm font-black transition-all cursor-pointer
-                                                                            peer-checked:bg-{{ $section['color'] }}-600 peer-checked:text-white peer-checked:shadow-lg peer-checked:shadow-{{ $section['color'] }}-200
-                                                                            hover:border-{{ $section['color'] }}-500 text-gray-400">
+                                                        <div
+                                                            class="w-full py-3 text-center rounded-xl bg-white border border-gray-100 text-sm font-black transition-all cursor-pointer
+                                                                                            peer-checked:bg-{{ $section['color'] }}-600 peer-checked:text-white peer-checked:shadow-lg peer-checked:shadow-{{ $section['color'] }}-200
+                                                                                            hover:border-{{ $section['color'] }}-500 text-gray-400">
                                                             {{ $i }}
                                                         </div>
                                                     </label>
@@ -367,15 +369,31 @@
                 filteredSupervisions: [],
 
                 init() {
-                    this.updateSupervisions();
+                    // Auto-select if only one zone
+                    if (this.zones.length === 1) {
+                        this.zoneId = this.zones[0].id;
+                        this.$nextTick(() => {
+                            this.updateSupervisions();
+                        });
+                    } else {
+                        this.updateSupervisions();
+                    }
                 },
 
                 updateSupervisions() {
                     if (!this.zoneId) {
                         this.filteredSupervisions = [];
+                        this.supervisionId = '';
                         return;
                     }
                     this.filteredSupervisions = this.supervisions.filter(s => s.zone_id == this.zoneId);
+
+                    // Auto-select if only one supervision after filtering
+                    if (this.filteredSupervisions.length === 1) {
+                        this.$nextTick(() => {
+                            this.supervisionId = this.filteredSupervisions[0].id;
+                        });
+                    }
                 },
 
                 nextStep() {

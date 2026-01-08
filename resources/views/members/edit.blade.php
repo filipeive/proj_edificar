@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Editar Membro')
-@section('page-title', 'Editar Membro')
+@section('title', 'Editar Membro / Líder')
+@section('page-title', 'Editar Registo')
 @section('page-subtitle', $member->name)
 
 @section('content')

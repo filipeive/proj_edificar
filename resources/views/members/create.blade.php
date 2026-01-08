@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Criar Novo Membro')
-@section('page-title', 'Criar Novo Membro')
-@section('page-subtitle', 'Registar um novo membro na célula')
+@section('title', 'Criar Membro / Líder')
+@section('page-title', 'Adicionar Novo')
+@section('page-subtitle', 'Registar um novo membro ou líder de célula')
 
 @section('content')
     <div class="grid grid-max-w-3xl mx-auto">

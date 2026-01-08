@@ -5,78 +5,80 @@
 @section('page-subtitle', 'Gerencie a formação ministerial e cursos da igreja')
 
 @section('content')
-    <div class="container-fluid">
-        <div class="mb-6 flex justify-between items-center">
-            <h3 class="text-xl font-bold text-gray-800">Cursos Disponíveis</h3>
+    <div class="container-fluid space-y-12">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 mb-8">
+            <div class="space-y-1">
+                <h1 class="text-3xl font-black text-gray-900 tracking-tight">Academia & Formação</h1>
+                <p class="text-gray-500 font-medium">Desenvolvimento ministerial e crescimento espiritual.</p>
+            </div>
             @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
                 <a href="{{ route('courses.create') }}"
-                    class="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2.5 rounded-xl flex items-center transition shadow-lg shadow-orange-600/20 font-bold">
+                    class="bg-orange-600 hover:bg-orange-700 text-white px-8 py-4 rounded-2xl flex items-center transition shadow-lg shadow-orange-600/20 font-black text-sm uppercase tracking-widest">
                     <i class="bi bi-plus-lg mr-2"></i> Novo Curso
                 </a>
             @endif
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            @forelse($courses as $course)
-                <div
-                    class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 group">
-                    <div class="h-3 bg-orange-500"></div>
-                    <div class="p-8">
-                        <div class="flex justify-between items-start mb-4">
-                            <span
-                                class="px-3 py-1 bg-orange-100 text-orange-600 text-[10px] font-bold uppercase rounded-full tracking-widest">
-                                {{ $course->category ?? 'Geral' }}
-                            </span>
-                            @if(!$course->is_active)
-                                <span
-                                    class="px-3 py-1 bg-gray-100 text-gray-500 text-[10px] font-bold uppercase rounded-full tracking-widest">
-                                    Inativo
-                                </span>
-                            @endif
-                        </div>
-                        <h4 class="text-2xl font-extrabold text-gray-900 mb-3 group-hover:text-orange-600 transition-colors">
-                            {{ $course->name }}
-                        </h4>
-                        <p class="text-gray-500 text-sm mb-6 line-clamp-2">
-                            {{ $course->description ?? 'Sem descrição disponível.' }}
-                        </p>
-
-                        <div class="flex items-center justify-between text-sm text-gray-400 mb-8">
-                            <div class="flex items-center">
-                                <i class="bi bi-clock mr-2"></i> {{ $course->duration ?? 'N/A' }}
-                            </div>
-                            <div class="flex items-center">
-                                <i class="bi bi-people mr-2"></i> {{ $course->enrollments_count }} Alunos
-                            </div>
-                        </div>
-
-                        <div class="flex items-center space-x-3">
-                            <a href="{{ route('courses.show', $course) }}"
-                                class="flex-1 bg-gray-900 text-white text-center py-3 rounded-xl font-bold hover:bg-orange-600 transition shadow-lg">
-                                Ver Detalhes
-                            </a>
-                            @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor' || auth()->user()->role === 'secretaria')
-                                <a href="{{ route('course-classes.index', ['course_id' => $course->id]) }}"
-                                    class="p-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition" title="Ver Turmas">
-                                    <i class="bi bi-collection"></i>
-                                </a>
-                                <a href="{{ route('courses.edit', $course) }}"
-                                    class="p-3 bg-gray-100 text-gray-600 rounded-xl hover:bg-orange-100 hover:text-orange-600 transition">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                            @endif
-                        </div>
+        @if($enrolledCourses->isNotEmpty())
+            <!-- Meus Cursos Section -->
+            <section class="space-y-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center">
+                        <i class="bi bi-mortarboard-fill text-xl"></i>
                     </div>
+                    <h2 class="text-2xl font-black text-gray-900 uppercase tracking-tight">Meus Cursos</h2>
                 </div>
-            @empty
-                <div class="col-span-full bg-white rounded-2xl p-12 text-center border border-dashed border-gray-300">
-                    <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <i class="bi bi-mortarboard text-4xl text-gray-300"></i>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    @foreach($enrolledCourses as $course)
+                        @include('courses.partials.course-card', ['course' => $course, 'type' => 'enrolled'])
+                    @endforeach
+                </div>
+            </section>
+        @endif
+
+        <!-- Cursos Disponíveis Section -->
+        <section class="space-y-6">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
+                    <i class="bi bi-book-half text-xl"></i>
+                </div>
+                <h2 class="text-2xl font-black text-gray-900 uppercase tracking-tight">Cursos Disponíveis</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                @forelse($availableCourses as $course)
+                    @include('courses.partials.course-card', ['course' => $course, 'type' => 'available'])
+                @empty
+                    <div class="col-span-full bg-white rounded-[2.5rem] p-16 text-center border border-dashed border-gray-200">
+                        <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i class="bi bi-stars text-5xl text-gray-200"></i>
+                        </div>
+                        <h4 class="text-xl font-black text-gray-900 mb-2 uppercase tracking-tight">Sem novos cursos no momento</h4>
+                        <p class="text-gray-500 font-medium max-w-md mx-auto">Já estás inscrito em todos os cursos disponíveis para o teu nível ou não há novas inscrições abertas.</p>
                     </div>
-                    <h4 class="text-xl font-bold text-gray-800 mb-2">Nenhum curso encontrado</h4>
-                    <p class="text-gray-500">Comece criando o primeiro curso da academia.</p>
+                @endforelse
+            </div>
+        </section>
+
+        @if((auth()->user()->role === 'admin' || auth()->user()->role === 'pastor') && $allCourses->isNotEmpty())
+             <!-- Admin: Todos os Cursos Monitoramento -->
+             <section class="mt-20 pt-10 border-t border-gray-100">
+                <h2 class="text-xl font-black text-gray-400 uppercase tracking-widest mb-8">Monitoramento Global (Admin)</h2>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    @foreach($allCourses as $course)
+                        <a href="{{ route('courses.show', $course) }}" class="bg-gray-50 p-4 rounded-2xl border border-gray-100 hover:bg-white hover:shadow-md transition-all group">
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{{ $course->category ?? 'ACADEMIA' }}</p>
+                            <h5 class="font-bold text-gray-900 group-hover:text-orange-600 transition-colors">{{ $course->name }}</h5>
+                            <div class="flex items-center justify-between mt-3">
+                                <span class="text-[10px] font-bold text-gray-500 uppercase">{{ $course->enrollments_count }} Alunos</span>
+                                <i class="bi bi-arrow-right-short text-gray-300 group-hover:text-orange-600 transition-colors"></i>
+                            </div>
+                        </a>
+                    @endforeach
                 </div>
-            @endforelse
-        </div>
+             </section>
+        @endif
     </div>
 @endsection

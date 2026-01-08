@@ -123,10 +123,93 @@
             @endif
         @endif
 
-        <!-- FINANCEIRO -->
+
+        <!-- ACADEMIA & ENSINO -->
         <div
             class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-4">
-            Financeiro</div>
+            Academia & Ensino</div>
+
+        <a href="{{ route('courses.index') }}"
+            class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('courses.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+            <i class="bi bi-mortarboard-fill text-xl flex-shrink-0"></i>
+            <span class="sidebar-text ml-4 font-bold tracking-tight">Cursos</span>
+            <span class="tooltip">Academia de Vida e Cursos</span>
+        </a>
+
+        @if ($authUser->isAdmin() || $authUser->isSecretaria() || $authUser->isPastor())
+            <a href="{{ route('course-classes.index') }}"
+                class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('course-classes.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                <i class="bi bi-collection-fill text-xl flex-shrink-0"></i>
+                <span class="sidebar-text ml-4 font-bold tracking-tight">Turmas</span>
+                <span class="tooltip">Gestão de Turmas</span>
+            </a>
+        @endif
+
+        @if (!$authUser->hasRole('membro'))
+            <!-- PESSOAS & RELATÓRIOS -->
+            <div
+                class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-4">
+                Pessoas & Relatórios</div>
+
+
+            @if ($authUser->isAdmin())
+                <a href="{{ route('users.index') }}"
+                    class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('users.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                    <i class="bi bi-person-lock text-xl flex-shrink-0"></i>
+                    <span class="sidebar-text ml-4 font-bold tracking-tight">Utilizadores</span>
+                    <span class="tooltip">Acessos ao Sistema</span>
+                </a>
+            @endif
+
+            @if ($authUser->isAdmin() || $authUser->isPastor() || $authUser->isPastorZona() || $authUser->isSupervisor() || $authUser->isSecretaria())
+                <div>
+                    <button
+                        class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('reports.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}"
+                        onclick="toggleMenu('reports')">
+                        <i class="bi bi-bar-chart-line-fill text-xl flex-shrink-0"></i>
+                        <span class="sidebar-text ml-4 font-bold tracking-tight flex-1">Estatísticas</span>
+                        <i
+                            class="bi bi-chevron-down sidebar-text ml-2 text-[10px] transition-transform duration-300 {{ request()->routeIs('reports.*') ? 'rotate-180' : '' }}"></i>
+                        <span class="tooltip">Relatórios de Desempenho</span>
+                    </button>
+                    <div id="reports" class="overflow-hidden {{ request()->routeIs('reports.*') ? '' : 'hidden' }}">
+                        <div class="ml-12 mt-2 space-y-1 border-l border-white/10 pl-4">
+                            <a href="{{ route('reports.cell') }}"
+                                class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('reports.cell') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Célula</a>
+
+                            @if ($authUser->isAdmin() || $authUser->isPastorZona() || $authUser->isSupervisor() || $authUser->isSecretaria())
+                                <a href="{{ route('reports.supervision') }}"
+                                    class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('reports.supervision') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Supervisão</a>
+                            @endif
+
+                            @if ($authUser->isAdmin() || $authUser->isPastorZona() || $authUser->isSecretaria())
+                                <a href="{{ route('reports.zone') }}"
+                                    class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('reports.zone') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Zona</a>
+                            @endif
+
+                            @if ($authUser->isAdmin() || $authUser->isSecretaria())
+                                <a href="{{ route('reports.global') }}"
+                                    class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('reports.global') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Global</a>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            @if ($authUser->isAdmin() || $authUser->isPastorZona() || $authUser->isSupervisor())
+                <a href="{{ route('quarterly-reports.index') }}"
+                    class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('quarterly-reports.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                    <i class="bi bi-file-earmark-text-fill text-xl flex-shrink-0"></i>
+                    <span class="sidebar-text ml-4 font-bold tracking-tight">Trimestrais</span>
+                    <span class="tooltip">Relatórios Trimestrais</span>
+                </a>
+            @endif
+        @endif
+
+        <!-- GESTÃO PROJECTO EDIFICAR -->
+        <div
+            class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-4">
+            Gestão Projecto Edificar</div>
 
         <div>
             <button
@@ -192,94 +275,6 @@
             <span class="sidebar-text ml-4 font-bold tracking-tight">Meu Compromisso</span>
             <span class="tooltip">Meus Compromissos</span>
         </a>
-
-        <!-- ACADEMIA & ENSINO -->
-        <div
-            class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-4">
-            Academia & Ensino</div>
-
-        <a href="{{ route('courses.index') }}"
-            class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('courses.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
-            <i class="bi bi-mortarboard-fill text-xl flex-shrink-0"></i>
-            <span class="sidebar-text ml-4 font-bold tracking-tight">Cursos</span>
-            <span class="tooltip">Academia de Vida e Cursos</span>
-        </a>
-
-        @if ($authUser->isAdmin() || $authUser->isSecretaria() || $authUser->isPastor())
-            <a href="{{ route('course-classes.index') }}"
-                class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('course-classes.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
-                <i class="bi bi-collection-fill text-xl flex-shrink-0"></i>
-                <span class="sidebar-text ml-4 font-bold tracking-tight">Turmas</span>
-                <span class="tooltip">Gestão de Turmas</span>
-            </a>
-        @endif
-
-        @if (!$authUser->hasRole('membro'))
-            <!-- PESSOAS & RELATÓRIOS -->
-            <div
-                class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-4">
-                Pessoas & Relatórios</div>
-
-            <a href="{{ route('members.index') }}"
-                class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('members.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
-                <i class="bi bi-person-badge-fill text-xl flex-shrink-0"></i>
-                <span class="sidebar-text ml-4 font-bold tracking-tight">Membros</span>
-                <span class="tooltip">Gestão de Membros</span>
-            </a>
-
-            @if ($authUser->isAdmin())
-                <a href="{{ route('users.index') }}"
-                    class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('users.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
-                    <i class="bi bi-person-lock text-xl flex-shrink-0"></i>
-                    <span class="sidebar-text ml-4 font-bold tracking-tight">Utilizadores</span>
-                    <span class="tooltip">Acessos ao Sistema</span>
-                </a>
-            @endif
-
-            @if ($authUser->isAdmin() || $authUser->isPastor() || $authUser->isPastorZona() || $authUser->isSupervisor() || $authUser->isSecretaria())
-                <div>
-                    <button
-                        class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('reports.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}"
-                        onclick="toggleMenu('reports')">
-                        <i class="bi bi-bar-chart-line-fill text-xl flex-shrink-0"></i>
-                        <span class="sidebar-text ml-4 font-bold tracking-tight flex-1">Estatísticas</span>
-                        <i
-                            class="bi bi-chevron-down sidebar-text ml-2 text-[10px] transition-transform duration-300 {{ request()->routeIs('reports.*') ? 'rotate-180' : '' }}"></i>
-                        <span class="tooltip">Relatórios de Desempenho</span>
-                    </button>
-                    <div id="reports" class="overflow-hidden {{ request()->routeIs('reports.*') ? '' : 'hidden' }}">
-                        <div class="ml-12 mt-2 space-y-1 border-l border-white/10 pl-4">
-                            <a href="{{ route('reports.cell') }}"
-                                class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('reports.cell') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Célula</a>
-
-                            @if ($authUser->isAdmin() || $authUser->isPastorZona() || $authUser->isSupervisor() || $authUser->isSecretaria())
-                                <a href="{{ route('reports.supervision') }}"
-                                    class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('reports.supervision') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Supervisão</a>
-                            @endif
-
-                            @if ($authUser->isAdmin() || $authUser->isPastorZona() || $authUser->isSecretaria())
-                                <a href="{{ route('reports.zone') }}"
-                                    class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('reports.zone') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Zona</a>
-                            @endif
-
-                            @if ($authUser->isAdmin() || $authUser->isSecretaria())
-                                <a href="{{ route('reports.global') }}"
-                                    class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('reports.global') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Global</a>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            @endif
-
-            @if ($authUser->isAdmin() || $authUser->isPastorZona() || $authUser->isSupervisor())
-                <a href="{{ route('quarterly-reports.index') }}"
-                    class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('quarterly-reports.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
-                    <i class="bi bi-file-earmark-text-fill text-xl flex-shrink-0"></i>
-                    <span class="sidebar-text ml-4 font-bold tracking-tight">Trimestrais</span>
-                    <span class="tooltip">Relatórios Trimestrais</span>
-                </a>
-            @endif
-        @endif
 
         <!-- SISTEMA -->
         <div

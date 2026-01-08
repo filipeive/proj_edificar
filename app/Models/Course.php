@@ -14,6 +14,7 @@ class Course extends Model
         'duration',
         'is_active',
         'registration_open',
+        'target_role',
     ];
 
     public function enrollments()

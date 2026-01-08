@@ -106,8 +106,17 @@ class EventController extends Controller
             $zoneId = $user->getZoneId();
             $query->where('zone_id', $zoneId);
         } elseif ($user->role === 'supervisor') {
+            $supervisionIds = $user->supervisedSupervisions()->pluck('id');
             $zoneId = $user->getZoneId();
-            $query->where('zone_id', $zoneId);
+
+            $query->where(function ($q) use ($zoneId, $supervisionIds) {
+                // Events in the zone (general events)
+                $q->where('zone_id', $zoneId)
+                    // OR events from cells supervised by this user
+                    ->orWhereHas('cell', function ($sq) use ($supervisionIds) {
+                        $sq->whereIn('supervision_id', $supervisionIds);
+                    });
+            });
         } elseif ($user->role === 'lider_celula') {
             $query->whereHas('cell', function ($q) use ($user) {
                 $q->where('leader_id', $user->id);

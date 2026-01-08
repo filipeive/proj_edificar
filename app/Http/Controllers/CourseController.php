@@ -11,8 +11,38 @@ class CourseController extends Controller
 {
     public function index()
     {
-        $courses = Course::withCount('enrollments')->get();
-        return view('courses.index', compact('courses'));
+        $user = auth()->user();
+
+        // 1. Courses the user is enrolled in
+        $enrolledCourses = Course::whereHas('enrollments', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->withCount('enrollments')->get();
+
+        // 2. Available courses for the user
+        $availableCourses = Course::whereDoesntHave('enrollments', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })
+            ->where('is_active', true)
+            ->where('registration_open', true)
+            ->where(function ($q) use ($user) {
+                // Eligible if no role restriction OR if user role matches the target role
+                // Admin/Pastor always see everything
+                if ($user->role === 'admin' || $user->role === 'pastor') {
+                    return;
+                }
+                $q->whereNull('target_role')
+                    ->orWhere('target_role', $user->role);
+            })
+            ->withCount('enrollments')
+            ->get();
+
+        // 3. For admins/pastors, list all courses separately if needed (optional)
+        $allCourses = collect();
+        if ($user->role === 'admin' || $user->role === 'pastor') {
+            $allCourses = Course::withCount('enrollments')->get();
+        }
+
+        return view('courses.index', compact('enrolledCourses', 'availableCourses', 'allCourses'));
     }
 
     public function create()
@@ -28,6 +58,7 @@ class CourseController extends Controller
             'category' => 'nullable|string|max:255',
             'duration' => 'nullable|string|max:255',
             'is_active' => 'boolean',
+            'target_role' => 'nullable|string|max:255',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
@@ -57,6 +88,7 @@ class CourseController extends Controller
             'category' => 'nullable|string|max:255',
             'duration' => 'nullable|string|max:255',
             'is_active' => 'boolean',
+            'target_role' => 'nullable|string|max:255',
         ]);
 
         if ($course->name !== $validated['name']) {

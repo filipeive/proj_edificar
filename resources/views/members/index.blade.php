@@ -56,7 +56,7 @@
                 <a href="{{ route('members.create') }}" 
                     class="w-full xl:w-auto px-8 py-4 bg-green-600 text-white rounded-2xl hover:bg-green-700 transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 shadow-lg shadow-green-100">
                     <i class="bi bi-person-plus-fill text-lg"></i>
-                    Novo Membro
+                    Novo Membro / Líder
                 </a>
             </div>
         </div>

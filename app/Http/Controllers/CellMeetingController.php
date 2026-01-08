@@ -105,9 +105,36 @@ class CellMeetingController extends Controller
             })->get();
         } elseif ($user->role === 'lider_celula') {
             $cells = Cell::where('leader_id', $user->id)->get();
+        } else {
+            $cells = collect();
         }
 
-        $leaders = User::whereIn('role', ['admin', 'pastor', 'pastor_zona', 'supervisor', 'lider_celula', 'timoteo'])->get();
+        $leadersQuery = User::whereIn('role', ['admin', 'pastor', 'pastor_zona', 'supervisor', 'lider_celula', 'timoteo']);
+
+        if ($user->isPastorZona()) {
+            $zoneId = $user->getZoneId();
+            $leadersQuery->where(function ($q) use ($zoneId, $user) {
+                $q->where('id', $user->id)
+                    ->orWhereHas('cell.supervision', function ($sq) use ($zoneId) {
+                        $sq->where('zone_id', $zoneId);
+                    })
+                    ->orWhereHas('supervisedSupervisions', function ($sq) use ($zoneId) {
+                        $sq->where('zone_id', $zoneId);
+                    });
+            });
+        } elseif ($user->isSupervisor()) {
+            $leadersQuery->where(function ($q) use ($user) {
+                $q->where('id', $user->id)
+                    ->orWhereHas('cell.supervision', function ($sq) use ($user) {
+                        $sq->where('supervisor_id', $user->id);
+                    });
+            });
+        } elseif ($user->isLider()) {
+            $leadersQuery->where('id', $user->id)
+                ->orWhere('cell_id', $user->cell_id);
+        }
+
+        $leaders = $leadersQuery->orderBy('name')->get();
 
         $selectedCellId = request('cell_id');
         $members = collect();
@@ -210,7 +237,32 @@ class CellMeetingController extends Controller
             $cells = Cell::where('leader_id', $user->id)->get();
         }
 
-        $leaders = User::whereIn('role', ['admin', 'pastor', 'pastor_zona', 'supervisor', 'lider_celula', 'timoteo'])->get();
+        $leadersQuery = User::whereIn('role', ['admin', 'pastor', 'pastor_zona', 'supervisor', 'lider_celula', 'timoteo']);
+
+        if ($user->isPastorZona()) {
+            $zoneId = $user->getZoneId();
+            $leadersQuery->where(function ($q) use ($zoneId, $user) {
+                $q->where('id', $user->id)
+                    ->orWhereHas('cell.supervision', function ($sq) use ($zoneId) {
+                        $sq->where('zone_id', $zoneId);
+                    })
+                    ->orWhereHas('supervisedSupervisions', function ($sq) use ($zoneId) {
+                        $sq->where('zone_id', $zoneId);
+                    });
+            });
+        } elseif ($user->isSupervisor()) {
+            $leadersQuery->where(function ($q) use ($user) {
+                $q->where('id', $user->id)
+                    ->orWhereHas('cell.supervision', function ($sq) use ($user) {
+                        $sq->where('supervisor_id', $user->id);
+                    });
+            });
+        } elseif ($user->isLider()) {
+            $leadersQuery->where('id', $user->id)
+                ->orWhere('cell_id', $user->cell_id);
+        }
+
+        $leaders = $leadersQuery->orderBy('name')->get();
 
         return view('cell_meetings.edit', compact('cellMeeting', 'cells', 'leaders'));
     }

@@ -448,8 +448,9 @@ class UserController
 
             case 'pastor_zona':
                 // Células de todas as supervisões da zona
-                if ($user->cell && $user->cell->supervision && $user->cell->supervision->zone) {
-                    $supervisionIds = Supervision::where('zone_id', $user->cell->supervision->zone_id)->pluck('id');
+                $zoneId = $user->getZoneId();
+                if ($zoneId) {
+                    $supervisionIds = Supervision::where('zone_id', $zoneId)->pluck('id');
                     $cellsQuery->whereIn('supervision_id', $supervisionIds);
                 }
                 break;
@@ -492,7 +493,11 @@ class UserController
         }
 
         if ($user->role === 'pastor_zona') {
-            $supervisionIds = Supervision::where('zone_id', $user->cell->supervision->zone_id)->pluck('id');
+            $zoneId = $user->getZoneId();
+            if (!$zoneId) {
+                abort(403, 'Zona não encontrada para este pastor.');
+            }
+            $supervisionIds = Supervision::where('zone_id', $zoneId)->pluck('id');
             $cellIds = Cell::whereIn('supervision_id', $supervisionIds)->pluck('id');
             if (!$cellIds->contains($member->cell_id)) {
                 abort(403, 'Você só pode gerenciar membros da sua zona');
@@ -526,7 +531,11 @@ class UserController
         }
 
         if ($user->role === 'pastor_zona') {
-            $supervisionIds = Supervision::where('zone_id', $user->cell->supervision->zone_id)->pluck('id');
+            $zoneId = $user->getZoneId();
+            if (!$zoneId) {
+                abort(403, 'Zona não encontrada para este pastor.');
+            }
+            $supervisionIds = Supervision::where('zone_id', $zoneId)->pluck('id');
             if (!$supervisionIds->contains($cell->supervision_id)) {
                 abort(403, 'Você só pode criar membros na sua zona');
             }
