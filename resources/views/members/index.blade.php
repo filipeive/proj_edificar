@@ -91,6 +91,7 @@
                     <thead>
                         <tr class="bg-gray-50/50">
                             <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Identificação</th>
+                            <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Cargo</th>
                             <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Contacto / Email</th>
                             <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Estrutura</th>
                             <th class="px-10 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Status</th>
@@ -110,6 +111,13 @@
                                             <p class="text-[10px] text-gray-400 font-mono uppercase tracking-tighter">ID: {{ str_pad($member->id, 5, '0', STR_PAD_LEFT) }}</p>
                                         </div>
                                     </div>
+                                </td>
+                                <td class="px-10 py-6">
+                                    @if($member->role === 'lider_celula')
+                                        <span class="px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-purple-100">Líder</span>
+                                    @else
+                                        <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-100">Membro</span>
+                                    @endif
                                 </td>
                                 <td class="px-10 py-6">
                                     <div class="flex flex-col">

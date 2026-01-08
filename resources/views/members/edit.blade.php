@@ -27,7 +27,7 @@
                     <i class="bi bi-person-vcard mr-2"></i>Dados Pessoais
                 </h3>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                     <!-- Nome -->
                     <div>
                         <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
@@ -41,6 +41,26 @@
                         @enderror
                     </div>
 
+                    <!-- Cargo / Role -->
+                    <div>
+                        <label for="role" class="block text-sm font-medium text-gray-700 mb-2">
+                            Cargo / Função <span class="text-red-500">*</span>
+                        </label>
+                        <select name="role" id="role" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 @error('role') border-red-500 @enderror">
+                            @foreach($allowedRoles as $role)
+                                <option value="{{ $role }}" {{ old('role', $member->role) == $role ? 'selected' : '' }}>
+                                    {{ ucfirst(str_replace('_', ' ', $role)) }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('role')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Telefone -->
                     <div>
                         <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">

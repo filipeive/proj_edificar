@@ -21,6 +21,12 @@
                         @else
                             <span class="px-3 py-1 bg-red-50 text-red-600 rounded-full text-[10px] font-black uppercase tracking-widest">Inativo</span>
                         @endif
+                        
+                        @if($member->role === 'lider_celula')
+                            <span class="px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-purple-100">Líder</span>
+                        @else
+                            <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-100">Membro</span>
+                        @endif
                     </div>
                     <p class="text-gray-400 font-medium flex items-center gap-2">
                         <i class="bi bi-envelope-fill"></i> {{ $member->email }}

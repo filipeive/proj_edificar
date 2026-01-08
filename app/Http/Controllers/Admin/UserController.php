@@ -163,7 +163,7 @@ class UserController
     public function members(Request $request): View
     {
         $user = auth()->user();
-        $membersQuery = User::where('role', 'membro')
+        $membersQuery = User::whereIn('role', ['membro', 'lider_celula'])
             ->with(['cell.supervision.zone', 'commitments']);
 
         // Aplicar filtro hierárquico
@@ -208,11 +208,18 @@ class UserController
             $selectedCell = $user->cell;
         }
 
+        // Definir papéis permitidos
+        $allowedRoles = ['membro'];
+        if ($user->isAdmin() || $user->isPastorZona() || $user->isSupervisor()) {
+            $allowedRoles[] = 'lider_celula';
+        }
+
         return view('members.create', [
             'availableCells' => $availableCells,
             'packages' => $packages,
             'userRole' => $user->role,
             'selectedCell' => $selectedCell,
+            'allowedRoles' => $allowedRoles,
         ]);
     }
 
@@ -228,6 +235,7 @@ class UserController
             'email' => 'required|email|unique:users',
             'phone' => 'nullable|string',
             'cell_id' => 'required|exists:cells,id',
+            'role' => 'required|in:membro,lider_celula',
             'package_id' => 'nullable|exists:commitment_packages,id',
             'committed_amount' => 'nullable|numeric|min:0',
             'password' => 'required|min:6|confirmed',
@@ -246,7 +254,7 @@ class UserController
             'phone' => $validated['phone'] ?? null,
             'password' => Hash::make($plainPassword),
             'cell_id' => $validated['cell_id'],
-            'role' => 'membro',
+            'role' => $validated['role'], // Usar o role validado
             'is_active' => true,
         ]);
 
@@ -302,11 +310,18 @@ class UserController
         $availableCells = $this->getAvailableCells($user);
         $packages = CommitmentPackage::where('is_active', true)->orderBy('order')->get();
 
+        // Definir papéis permitidos
+        $allowedRoles = ['membro'];
+        if ($user->isAdmin() || $user->isPastorZona() || $user->isSupervisor()) {
+            $allowedRoles[] = 'lider_celula';
+        }
+
         return view('members.edit', [
             'member' => $member,
             'availableCells' => $availableCells,
             'packages' => $packages,
             'userRole' => $user->role,
+            'allowedRoles' => $allowedRoles,
         ]);
     }
 
@@ -325,6 +340,7 @@ class UserController
             'email' => "required|email|unique:users,email,{$member->id}",
             'phone' => 'nullable|string',
             'cell_id' => 'required|exists:cells,id',
+            'role' => 'required|in:membro,lider_celula',
             'is_active' => 'boolean',
         ]);
 
@@ -363,7 +379,7 @@ class UserController
     {
         switch ($user->role) {
             case 'lider_celula':
-                // Vê apenas membros da sua célula
+                // Vê apenas membros e líderes (se houver mais de um, o que é raro) da sua célula
                 $query->where('cell_id', $user->cell_id);
                 break;
 
@@ -383,9 +399,10 @@ class UserController
 
 
             case 'pastor_zona':
-                // Vê membros de todas as supervisões da sua zona
-                if ($user->cell && $user->cell->supervision && $user->cell->supervision->zone) {
-                    $supervisionIds = Supervision::where('zone_id', $user->cell->supervision->zone_id)->pluck('id');
+                // Vê membros e líderes de todas as supervisões da sua zona
+                $zoneId = $user->getZoneId();
+                if ($zoneId) {
+                    $supervisionIds = Supervision::where('zone_id', $zoneId)->pluck('id');
                     $cellIds = Cell::whereIn('supervision_id', $supervisionIds)->pluck('id');
                     $query->whereIn('cell_id', $cellIds);
                 }
