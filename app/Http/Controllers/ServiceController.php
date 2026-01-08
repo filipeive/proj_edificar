@@ -54,10 +54,10 @@ class ServiceController extends Controller
             'children_salvations' => 'required|integer|min:0',
             'special_offerings_total' => 'required|numeric|min:0',
             'offerings' => 'nullable|array',
-            'offerings.*.amount' => 'required|numeric|min:0',
+            'offerings.*.amount' => 'nullable|numeric|min:0',
             'offerings.*.offering_type_id' => 'required|exists:offering_types,id',
             'tithes' => 'nullable|array',
-            'tithes.*.amount' => 'required|numeric|min:0',
+            'tithes.*.amount' => 'nullable|numeric|min:0',
             'tithes.*.member_name' => 'nullable|string|max:255',
         ]);
 
@@ -124,10 +124,10 @@ class ServiceController extends Controller
             'children_salvations' => 'required|integer|min:0',
             'special_offerings_total' => 'required|numeric|min:0',
             'offerings' => 'nullable|array',
-            'offerings.*.amount' => 'required|numeric|min:0',
+            'offerings.*.amount' => 'nullable|numeric|min:0',
             'offerings.*.offering_type_id' => 'required|exists:offering_types,id',
             'tithes' => 'nullable|array',
-            'tithes.*.amount' => 'required|numeric|min:0',
+            'tithes.*.amount' => 'nullable|numeric|min:0',
             'tithes.*.member_name' => 'nullable|string|max:255',
         ]);
 

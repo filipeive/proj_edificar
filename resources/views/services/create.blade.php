@@ -25,6 +25,20 @@
         <form action="{{ route('services.store') }}" method="POST" id="serviceForm" class="space-y-8 pb-12">
             @csrf
 
+            @if($errors->any())
+                <div class="bg-red-50 border-l-4 border-red-500 p-6 rounded-[2rem] shadow-sm mb-8">
+                    <div class="flex items-center mb-4">
+                        <i class="bi bi-exclamation-triangle-fill text-red-500 text-xl mr-3"></i>
+                        <h3 class="text-red-900 font-black uppercase tracking-widest text-sm">Erros de Validação</h3>
+                    </div>
+                    <ul class="list-disc list-inside text-red-700 text-sm font-bold space-y-1">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <!-- Section 1: Cabeçalho -->
             <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
                 <div class="p-8 border-b border-gray-50 bg-gray-50/50">
