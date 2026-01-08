@@ -90,8 +90,16 @@ class CellController
 
     public function create(): View
     {
-        $supervisions = Supervision::all();
+        $user = auth()->user();
+        $query = Supervision::query();
+
+        if ($user->isPastorZona()) {
+            $query->where('zone_id', $user->getZoneId());
+        }
+
+        $supervisions = $query->orderBy('name')->get();
         $leaders = User::where('role', '!=', 'admin')->get();
+
         return view('admin.cells.create', [
             'supervisions' => $supervisions,
             'leaders' => $leaders,
@@ -128,8 +136,16 @@ class CellController
 
     public function edit(Cell $cell): View
     {
-        $supervisions = Supervision::all();
+        $user = auth()->user();
+        $query = Supervision::query();
+
+        if ($user->isPastorZona()) {
+            $query->where('zone_id', $user->getZoneId());
+        }
+
+        $supervisions = $query->orderBy('name')->get();
         $leaders = User::where('role', '!=', 'admin')->get();
+
         return view('admin.cells.edit', [
             'cell' => $cell,
             'supervisions' => $supervisions,

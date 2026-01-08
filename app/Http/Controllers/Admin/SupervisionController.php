@@ -25,7 +25,14 @@ class SupervisionController
 
     public function create(): View
     {
-        $zones = Zone::all();
+        $user = auth()->user();
+        $zonesQuery = Zone::query();
+
+        if ($user->isPastorZona()) {
+            $zonesQuery->where('id', $user->getZoneId());
+        }
+
+        $zones = $zonesQuery->orderBy('name')->get();
         $supervisors = \App\Models\User::where('role', 'supervisor')
             ->orWhere(function ($query) {
                 $query->where('role', 'admin') // Allow admins for testing/fallback
@@ -62,7 +69,14 @@ class SupervisionController
 
     public function edit(Supervision $supervision): View
     {
-        $zones = Zone::all();
+        $user = auth()->user();
+        $zonesQuery = Zone::query();
+
+        if ($user->isPastorZona()) {
+            $zonesQuery->where('id', $user->getZoneId());
+        }
+
+        $zones = $zonesQuery->orderBy('name')->get();
         $supervisors = \App\Models\User::where('role', 'supervisor')
             ->orWhere(function ($query) {
                 $query->where('role', 'admin')
