@@ -38,6 +38,10 @@ class ServiceController extends Controller
     {
         Gate::authorize('create', Service::class);
 
+        if ($request->preacher_id === 'other') {
+            $request->merge(['preacher_id' => null]);
+        }
+
         $validated = $request->validate([
             'date' => 'required|date',
             'service_type' => 'required|in:1st,2nd,3rd,4th,special',
@@ -46,13 +50,13 @@ class ServiceController extends Controller
             'theme' => 'nullable|string|max:255',
             'message' => 'nullable|string',
             'observations' => 'nullable|string',
-            'adults_members' => 'required|integer|min:0',
-            'adults_visitors' => 'required|integer|min:0',
-            'adults_salvations' => 'required|integer|min:0',
-            'children_members' => 'required|integer|min:0',
-            'children_visitors' => 'required|integer|min:0',
-            'children_salvations' => 'required|integer|min:0',
-            'special_offerings_total' => 'required|numeric|min:0',
+            'adults_members' => 'nullable|integer|min:0',
+            'adults_visitors' => 'nullable|integer|min:0',
+            'adults_salvations' => 'nullable|integer|min:0',
+            'children_members' => 'nullable|integer|min:0',
+            'children_visitors' => 'nullable|integer|min:0',
+            'children_salvations' => 'nullable|integer|min:0',
+            'special_offerings_total' => 'nullable|numeric|min:0',
             'offerings' => 'nullable|array',
             'offerings.*.amount' => 'nullable|numeric|min:0',
             'offerings.*.offering_type_id' => 'required|exists:offering_types,id',
@@ -60,6 +64,20 @@ class ServiceController extends Controller
             'tithes.*.amount' => 'nullable|numeric|min:0',
             'tithes.*.member_name' => 'nullable|string|max:255',
         ]);
+
+        // Default numeric fields to 0 if null
+        $numericFields = [
+            'adults_members',
+            'adults_visitors',
+            'adults_salvations',
+            'children_members',
+            'children_visitors',
+            'children_salvations',
+            'special_offerings_total'
+        ];
+        foreach ($numericFields as $field) {
+            $validated[$field] = $validated[$field] ?? 0;
+        }
 
         DB::transaction(function () use ($validated) {
             $service = Service::create($validated);
@@ -108,6 +126,10 @@ class ServiceController extends Controller
     {
         Gate::authorize('update', $service);
 
+        if ($request->preacher_id === 'other') {
+            $request->merge(['preacher_id' => null]);
+        }
+
         $validated = $request->validate([
             'date' => 'required|date',
             'service_type' => 'required|in:1st,2nd,3rd,4th,special',
@@ -116,13 +138,13 @@ class ServiceController extends Controller
             'theme' => 'nullable|string|max:255',
             'message' => 'nullable|string',
             'observations' => 'nullable|string',
-            'adults_members' => 'required|integer|min:0',
-            'adults_visitors' => 'required|integer|min:0',
-            'adults_salvations' => 'required|integer|min:0',
-            'children_members' => 'required|integer|min:0',
-            'children_visitors' => 'required|integer|min:0',
-            'children_salvations' => 'required|integer|min:0',
-            'special_offerings_total' => 'required|numeric|min:0',
+            'adults_members' => 'nullable|integer|min:0',
+            'adults_visitors' => 'nullable|integer|min:0',
+            'adults_salvations' => 'nullable|integer|min:0',
+            'children_members' => 'nullable|integer|min:0',
+            'children_visitors' => 'nullable|integer|min:0',
+            'children_salvations' => 'nullable|integer|min:0',
+            'special_offerings_total' => 'nullable|numeric|min:0',
             'offerings' => 'nullable|array',
             'offerings.*.amount' => 'nullable|numeric|min:0',
             'offerings.*.offering_type_id' => 'required|exists:offering_types,id',
@@ -130,6 +152,20 @@ class ServiceController extends Controller
             'tithes.*.amount' => 'nullable|numeric|min:0',
             'tithes.*.member_name' => 'nullable|string|max:255',
         ]);
+
+        // Default numeric fields to 0 if null
+        $numericFields = [
+            'adults_members',
+            'adults_visitors',
+            'adults_salvations',
+            'children_members',
+            'children_visitors',
+            'children_salvations',
+            'special_offerings_total'
+        ];
+        foreach ($numericFields as $field) {
+            $validated[$field] = $validated[$field] ?? 0;
+        }
 
         DB::transaction(function () use ($validated, $service) {
             $service->update($validated);
