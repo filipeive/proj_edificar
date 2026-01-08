@@ -10,7 +10,16 @@ class SupervisionController
 {
     public function index(): View
     {
-        $supervisions = Supervision::with('zone', 'cells')->get();
+        $user = auth()->user();
+        $query = Supervision::with('zone', 'cells');
+
+        if ($user->isPastorZona()) {
+            $query->where('zone_id', $user->getZoneId());
+        } elseif ($user->isSupervisor()) {
+            $query->where('supervisor_id', $user->id);
+        }
+
+        $supervisions = $query->get();
         return view('admin.supervisions.index', ['supervisions' => $supervisions]);
     }
 

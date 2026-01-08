@@ -19,9 +19,14 @@ class CellController
         // Iniciar a query
         $cellsQuery = Cell::query()->with('supervision.zone', 'leader', 'members');
 
-        // --- SCOPED ACCESS FOR SUPERVISORS ---
+        // --- SCOPED ACCESS FOR PASTORS AND SUPERVISORS ---
         $user = auth()->user();
-        if ($user->isSupervisor()) {
+        if ($user->isPastorZona()) {
+            $zoneId = $user->getZoneId();
+            $cellsQuery->whereHas('supervision', function ($q) use ($zoneId) {
+                $q->where('zone_id', $zoneId);
+            });
+        } elseif ($user->isSupervisor()) {
             $supervisionIds = $user->supervisedSupervisions()->pluck('id');
             $cellsQuery->whereIn('supervision_id', $supervisionIds);
         }

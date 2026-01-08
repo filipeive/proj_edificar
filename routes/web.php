@@ -118,31 +118,37 @@ Route::middleware('auth')->group(function () {
         Route::put('/{member}', [UserController::class, 'updateFromContext'])->name('members.update');
         Route::delete('/{member}', [UserController::class, 'destroyFromContext'])->name('members.destroy');
     });
-    // ===== ADMIN ROUTES =====
-    Route::prefix('admin')->middleware('role:admin')->group(function () {
+    // ===== ECCLESIASTICAL & ADMINISTRATIVE ROUTES =====
+    Route::prefix('admin')->group(function () {
 
-        // Gestão de Zonas
-        Route::resource('zones', ZoneController::class);
+        // Intermediate Restricted (Admin, Pastor Zona, Supervisor, Secretaria)
+        Route::middleware('role:admin,pastor_zona,supervisor,secretaria,pastor')->group(function () {
+            // Gestão de Supervisões
+            Route::resource('supervisions', SupervisionController::class);
 
-        // Gestão de Supervisões
-        Route::resource('supervisions', SupervisionController::class);
+            // Gestão de Células
+            Route::get('/cells/{cell}/pdf', [CellController::class, 'downloadPdf'])->name('cells.pdf');
+            Route::get('/cells/{cell}/attendance', [\App\Http\Controllers\AttendanceController::class, 'index'])->name('cells.attendance');
+            Route::post('/cells/{cell}/attendance', [\App\Http\Controllers\AttendanceController::class, 'store'])->name('cells.attendance.store');
+            Route::post('/cells/{cell}/visitors', [\App\Http\Controllers\AttendanceController::class, 'storeVisitor'])->name('cells.visitors.store');
+            Route::post('/cells/{cell}/discipleships', [\App\Http\Controllers\AttendanceController::class, 'storeDiscipleship'])->name('cells.discipleships.store');
+            Route::post('/cells/{cell}/conversions', [\App\Http\Controllers\AttendanceController::class, 'storeConversion'])->name('cells.conversions.store');
+            Route::resource('cells', CellController::class);
 
-        // Gestão de Células
-        Route::get('/cells/{cell}/pdf', [CellController::class, 'downloadPdf'])->name('cells.pdf');
-        Route::get('/cells/{cell}/attendance', [\App\Http\Controllers\AttendanceController::class, 'index'])->name('cells.attendance');
-        Route::post('/cells/{cell}/attendance', [\App\Http\Controllers\AttendanceController::class, 'store'])->name('cells.attendance.store');
-        Route::post('/cells/{cell}/visitors', [\App\Http\Controllers\AttendanceController::class, 'storeVisitor'])->name('cells.visitors.store');
-        Route::post('/cells/{cell}/discipleships', [\App\Http\Controllers\AttendanceController::class, 'storeDiscipleship'])->name('cells.discipleships.store');
-        Route::post('/cells/{cell}/conversions', [\App\Http\Controllers\AttendanceController::class, 'storeConversion'])->name('cells.conversions.store');
-        Route::resource('cells', CellController::class);
+            // Cultos (Relatórios de Celebração)
+            Route::get('/services/{service}/pdf', [\App\Http\Controllers\ServiceController::class, 'downloadPdf'])->name('services.download-pdf');
+            Route::resource('services', \App\Http\Controllers\ServiceController::class);
+        });
 
-        // Gestão de Utilizadores
-        Route::resource('users', UserController::class);
-        Route::get('/services/{service}/pdf', [\App\Http\Controllers\ServiceController::class, 'downloadPdf'])->name('services.download-pdf');
-        Route::resource('services', \App\Http\Controllers\ServiceController::class);
-
-        // Gestão de Pacotes
-        Route::resource('packages', PackageController::class);
+        // Highly Restricted (Admin & Secretaria Only)
+        Route::middleware('role:admin,secretaria')->group(function () {
+            // Gestão de Zonas
+            Route::resource('zones', ZoneController::class);
+            // Gestão de Utilizadores
+            Route::resource('users', UserController::class);
+            // Gestão de Pacotes
+            Route::resource('packages', PackageController::class);
+        });
     });
 
     // Rota de FORMULÁRIO GET para atribuir/modificar o compromisso de OUTRO usuário

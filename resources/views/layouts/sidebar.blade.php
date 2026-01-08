@@ -150,7 +150,8 @@
                     @if ($authUser->isAdmin() || $authUser->isPastorZona() || $authUser->isSupervisor() || $authUser->isLider() || $authUser->isSecretaria())
                         <a href="{{ route('contributions.index') }}"
                             class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('contributions.index') && !request()->query('mine') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">
-                            @if ($authUser->isAdmin() || $authUser->isSecretaria()) Todas @elseif ($authUser->isPastorZona()) Da Zona
+                            @if ($authUser->isAdmin() || $authUser->isSecretaria()) Todas
+                            @elseif ($authUser->isPastorZona()) Da Zona
                             @elseif ($authUser->isSupervisor()) Da Supervisão @else Da Célula @endif
                         </a>
                     @endif
@@ -163,7 +164,7 @@
             </div>
         </div>
 
-        @if ($authUser->isAdmin() || $authUser->isPastor() || $authUser->isPastorZona() || $authUser->isSecretaria())
+        @if ($authUser->isAdmin() || $authUser->isPastor() || $authUser->isSecretaria())
             <a href="{{ route('financial.dashboard') }}"
                 class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('financial.dashboard') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                 <i class="bi bi-pie-chart-fill text-xl flex-shrink-0"></i>
