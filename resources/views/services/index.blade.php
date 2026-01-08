@@ -99,6 +99,9 @@
                     <!-- Card Actions -->
                     <div class="px-8 py-6 bg-gray-50/50 border-t border-gray-50 flex items-center justify-between">
                         <div class="flex gap-2">
+                            <a href="{{ route('services.show', $service) }}" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                                            <i class="bi bi-info-circle text-lg"></i>
+                                        </a>
                             <a href="{{ route('services.download-pdf', $service) }}" class="p-3 bg-white text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm border border-gray-100" title="Baixar PDF">
                                 <i class="bi bi-file-earmark-pdf"></i>
                             </a>

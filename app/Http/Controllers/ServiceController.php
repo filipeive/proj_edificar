@@ -40,6 +40,27 @@ class ServiceController extends Controller
 
         if ($request->preacher_id === 'other') {
             $request->merge(['preacher_id' => null]);
+        } else {
+            $request->merge(['preacher_name' => null]);
+        }
+
+        $numericFields = [
+            'adults_members',
+            'adults_visitors',
+            'adults_salvations',
+            'children_members',
+            'children_visitors',
+            'children_salvations',
+            'special_offerings_total'
+        ];
+
+        foreach ($numericFields as $field) {
+            if ($request->has($field)) {
+                $val = $request->input($field);
+                if (is_numeric($val)) {
+                    $request->merge([$field => $field === 'special_offerings_total' ? (float) $val : (int) $val]);
+                }
+            }
         }
 
         $validated = $request->validate([
@@ -65,16 +86,6 @@ class ServiceController extends Controller
             'tithes.*.member_name' => 'nullable|string|max:255',
         ]);
 
-        // Default numeric fields to 0 if null
-        $numericFields = [
-            'adults_members',
-            'adults_visitors',
-            'adults_salvations',
-            'children_members',
-            'children_visitors',
-            'children_salvations',
-            'special_offerings_total'
-        ];
         foreach ($numericFields as $field) {
             $validated[$field] = $validated[$field] ?? 0;
         }
@@ -128,6 +139,27 @@ class ServiceController extends Controller
 
         if ($request->preacher_id === 'other') {
             $request->merge(['preacher_id' => null]);
+        } else {
+            $request->merge(['preacher_name' => null]);
+        }
+
+        $numericFields = [
+            'adults_members',
+            'adults_visitors',
+            'adults_salvations',
+            'children_members',
+            'children_visitors',
+            'children_salvations',
+            'special_offerings_total'
+        ];
+
+        foreach ($numericFields as $field) {
+            if ($request->has($field)) {
+                $val = $request->input($field);
+                if (is_numeric($val)) {
+                    $request->merge([$field => $field === 'special_offerings_total' ? (float) $val : (int) $val]);
+                }
+            }
         }
 
         $validated = $request->validate([
@@ -153,16 +185,6 @@ class ServiceController extends Controller
             'tithes.*.member_name' => 'nullable|string|max:255',
         ]);
 
-        // Default numeric fields to 0 if null
-        $numericFields = [
-            'adults_members',
-            'adults_visitors',
-            'adults_salvations',
-            'children_members',
-            'children_visitors',
-            'children_salvations',
-            'special_offerings_total'
-        ];
         foreach ($numericFields as $field) {
             $validated[$field] = $validated[$field] ?? 0;
         }
