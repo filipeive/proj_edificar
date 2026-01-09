@@ -2,6 +2,10 @@
 
 Sistema completo de gestão para igrejas celulares, desenvolvido em Laravel 11.
 
+## 🌐 Demonstração
+
+**Sistema em Produção**: [http://146.235.224.99/edificar/](http://146.235.224.99/edificar/)
+
 ## 📋 Requisitos do Sistema
 
 - PHP >= 8.2
