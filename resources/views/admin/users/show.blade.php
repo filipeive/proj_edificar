@@ -242,11 +242,15 @@
                             <span>Lançar Oferta</span>
                             <i class="bi bi-plus-lg"></i>
                         </a>
-                        <button onclick="resetPassword({{ $user->id }})"
-                            class="w-full py-4 bg-gray-50 text-gray-700 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all flex items-center justify-between px-6">
-                            <span>Redefinir Senha</span>
-                            <i class="bi bi-key-fill"></i>
-                        </button>
+                        <form action="{{ route('users.reset-password', $user) }}" method="POST" class="w-full"
+                            onsubmit="return confirm('Tem certeza que deseja redefinir a senha deste utilizador? Um email será enviado com as novas credenciais.');">
+                            @csrf
+                            <button type="submit"
+                                class="w-full py-4 bg-gray-50 text-gray-700 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all flex items-center justify-between px-6">
+                                <span>Redefinir Senha</span>
+                                <i class="bi bi-key-fill"></i>
+                            </button>
+                        </form>
                         <a href="mailto:{{ $user->email }}"
                             class="w-full py-4 bg-gray-50 text-gray-700 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all flex items-center justify-between px-6">
                             <span>Enviar Email</span>
@@ -266,30 +270,4 @@
     </div>
     </div>
 
-    <script>
-        function resetPassword(userId) {
-            if (confirm('Tem certeza que deseja redefinir a senha deste utilizador? Um email será enviado com as novas credenciais.')) {
-                // Implementar lógica de redefinição de senha via AJAX
-                fetch(`/api/users/${userId}/reset-password`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert('Senha redefinida com sucesso! Um email foi enviado ao utilizador.');
-                        } else {
-                            alert('Erro ao redefinir senha. Tente novamente.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Erro ao redefinir senha. Tente novamente.');
-                    });
-            }
-        }
-    </script>
 @endsection

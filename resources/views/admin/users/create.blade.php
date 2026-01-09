@@ -78,6 +78,7 @@
                         <option value="lider_celula" {{ old('role') == 'lider_celula' ? 'selected' : '' }}>Líder de Célula</option>
                         <option value="supervisor" {{ old('role') == 'supervisor' ? 'selected' : '' }}>Supervisor</option>
                         <option value="pastor_zona" {{ old('role') == 'pastor_zona' ? 'selected' : '' }}>Pastor de Zona</option>
+                        <option value="secretaria" {{ old('role') == 'secretaria' ? 'selected' : '' }}>Secretaria</option>
                         <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Administrador</option>
                     </select>
                     @error('role')

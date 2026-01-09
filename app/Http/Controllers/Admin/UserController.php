@@ -87,7 +87,7 @@ class UserController
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6|confirmed',
             'phone' => 'nullable|string',
-            'role' => 'required|in:membro,lider_celula,supervisor,pastor_zona,admin',
+            'role' => 'required|in:membro,lider_celula,supervisor,pastor_zona,secretaria,admin',
             'cell_id' => 'nullable|exists:cells,id',
             'is_active' => 'boolean',
         ]);
@@ -127,7 +127,7 @@ class UserController
             'name' => 'required|string|max:255',
             'email' => "required|email|unique:users,email,{$user->id}",
             'phone' => 'nullable|string',
-            'role' => 'required|in:membro,lider_celula,supervisor,pastor_zona,admin',
+            'role' => 'required|in:membro,lider_celula,supervisor,pastor_zona,secretaria,admin',
             'cell_id' => 'nullable|exists:cells,id',
             'is_active' => 'boolean',
         ]);
@@ -153,6 +153,26 @@ class UserController
         $user->delete();
         return redirect()->route('users.index')
             ->with('success', 'Utilizador deletado com sucesso!');
+    }
+
+    /**
+     * Redefinir senha do utilizador (Admin)
+     */
+    public function resetPassword(User $user)
+    {
+        // Apenas admin ou quem pode editar
+        $this->authorize('update', $user);
+
+        // Gerar nova senha aleatória
+        $newPassword = \Illuminate\Support\Str::random(10);
+
+        $user->password = Hash::make($newPassword);
+        $user->save();
+
+        // Notificar utilizador (Email + DB)
+        $user->notify(new \App\Notifications\AdminPasswordResetNotification($newPassword));
+
+        return back()->with('success', 'Senha redefinida com sucesso. Nova senha enviada por email.');
     }
 
     // ==================== MEMBERS CONTEXT ROUTES ====================

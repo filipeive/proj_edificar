@@ -28,10 +28,12 @@
                     </button>
                 </div>
 
-                <a href="{{ route('events.create') }}"
-                    class="flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-all duration-300 shadow-lg shadow-blue-600/30">
-                    <i class="bi bi-plus-lg mr-2"></i> Novo Evento
-                </a>
+                @can('create', App\Models\Event::class)
+                    <a href="{{ route('events.create') }}"
+                        class="flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-all duration-300 shadow-lg shadow-blue-600/30">
+                        <i class="bi bi-plus-lg mr-2"></i> Novo Evento
+                    </a>
+                @endcan
             </div>
         </div>
 
@@ -78,7 +80,7 @@
                                                         <div class="flex items-center">
                                                             <div
                                                                 class="w-10 h-10 rounded-xl flex items-center justify-center mr-4 
-                                                                    {{ $event->eventType->name == 'Culto' ? 'bg-amber-100 text-amber-600' :
+                                                                                            {{ $event->eventType->name == 'Culto' ? 'bg-amber-100 text-amber-600' :
                                 ($event->eventType->name == 'Batismo' ? 'bg-cyan-100 text-cyan-600' : 'bg-blue-100 text-blue-600') }}">
                                                                 <i
                                                                     class="bi {{ $event->eventType->name == 'Culto' ? 'bi-church' : ($event->eventType->name == 'Batismo' ? 'bi-droplet-fill' : 'bi-calendar-event') }} text-lg"></i>
@@ -112,26 +114,35 @@
                                                     <td class="px-8 py-5 text-right">
                                                         <div
                                                             class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                                            <a href="{{ route('events.show', $event) }}"
+                                                                class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                                                                title="Ver Detalhes">
+                                                                <i class="bi bi-eye-fill"></i>
+                                                            </a>
                                                             <a href="{{ route('events.pdf', $event) }}" target="_blank"
                                                                 class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                                                                 title="PDF">
                                                                 <i class="bi bi-file-earmark-pdf-fill"></i>
                                                             </a>
-                                                            <a href="{{ route('events.edit', $event) }}"
-                                                                class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
-                                                                title="Editar">
-                                                                <i class="bi bi-pencil-fill"></i>
-                                                            </a>
-                                                            <form action="{{ route('events.destroy', $event) }}" method="POST" class="inline"
-                                                                onsubmit="return confirm('Tem certeza que deseja excluir este evento?');">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit"
-                                                                    class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                                                                    title="Excluir">
-                                                                    <i class="bi bi-trash-fill"></i>
-                                                                </button>
-                                                            </form>
+                                                            @can('update', $event)
+                                                                <a href="{{ route('events.edit', $event) }}"
+                                                                    class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                                                                    title="Editar">
+                                                                    <i class="bi bi-pencil-fill"></i>
+                                                                </a>
+                                                            @endcan
+                                                            @can('delete', $event)
+                                                                <form action="{{ route('events.destroy', $event) }}" method="POST" class="inline"
+                                                                    onsubmit="return confirm('Tem certeza que deseja excluir este evento?');">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <button type="submit"
+                                                                        class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                                                                        title="Excluir">
+                                                                        <i class="bi bi-trash-fill"></i>
+                                                                    </button>
+                                                                </form>
+                                                            @endcan
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -325,49 +336,49 @@
             const props = event.extendedProps;
 
             let tooltipContent = `
-                <div class="tooltip-header">${event.title}</div>
-                <div class="tooltip-row">
-                    <i class="bi bi-calendar-event"></i>
-                    <span>${event.start.toLocaleDateString('pt-BR')}</span>
-                </div>
-            `;
+                    <div class="tooltip-header">${event.title}</div>
+                    <div class="tooltip-row">
+                        <i class="bi bi-calendar-event"></i>
+                        <span>${event.start.toLocaleDateString('pt-BR')}</span>
+                    </div>
+                `;
 
             if (event.end && event.end.getTime() !== event.start.getTime()) {
                 const endDate = new Date(event.end);
                 endDate.setDate(endDate.getDate() - 1); // FullCalendar exclusive end
                 tooltipContent += `
-                    <div class="tooltip-row">
-                        <i class="bi bi-arrow-right"></i>
-                        <span>${endDate.toLocaleDateString('pt-BR')}</span>
-                    </div>
-                `;
+                        <div class="tooltip-row">
+                            <i class="bi bi-arrow-right"></i>
+                            <span>${endDate.toLocaleDateString('pt-BR')}</span>
+                        </div>
+                    `;
             }
 
             if (props.location) {
                 tooltipContent += `
-                    <div class="tooltip-row">
-                        <i class="bi bi-geo-alt-fill"></i>
-                        <span>${props.location}</span>
-                    </div>
-                `;
+                        <div class="tooltip-row">
+                            <i class="bi bi-geo-alt-fill"></i>
+                            <span>${props.location}</span>
+                        </div>
+                    `;
             }
 
             if (props.participants_count !== undefined) {
                 tooltipContent += `
-                    <div class="tooltip-row">
-                        <i class="bi bi-people-fill"></i>
-                        <span>${props.participants_count} participantes</span>
-                    </div>
-                `;
+                        <div class="tooltip-row">
+                            <i class="bi bi-people-fill"></i>
+                            <span>${props.participants_count} participantes</span>
+                        </div>
+                    `;
             }
 
             if (props.description) {
                 tooltipContent += `
-                    <div class="tooltip-row" style="margin-top: 0.5rem; font-style: italic;">
-                        <i class="bi bi-info-circle"></i>
-                        <span>${props.description.substring(0, 100)}${props.description.length > 100 ? '...' : ''}</span>
-                    </div>
-                `;
+                        <div class="tooltip-row" style="margin-top: 0.5rem; font-style: italic;">
+                            <i class="bi bi-info-circle"></i>
+                            <span>${props.description.substring(0, 100)}${props.description.length > 100 ? '...' : ''}</span>
+                        </div>
+                    `;
             }
 
             tooltip.innerHTML = tooltipContent;

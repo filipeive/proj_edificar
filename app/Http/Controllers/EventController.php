@@ -45,7 +45,7 @@ class EventController extends Controller
                 'title' => $title,
                 'start' => $event->date->format('Y-m-d'),
                 'end' => $event->end_date ? $event->end_date->addDay()->format('Y-m-d') : null,
-                'url' => route('events.edit', $event),
+                'url' => route('events.show', $event),
                 'backgroundColor' => $color,
                 'borderColor' => $color,
                 'allDay' => true,
@@ -104,7 +104,10 @@ class EventController extends Controller
 
         if ($user->role === 'pastor_zona') {
             $zoneId = $user->getZoneId();
-            $query->where('zone_id', $zoneId);
+            $query->where(function ($q) use ($zoneId) {
+                $q->where('zone_id', $zoneId)
+                    ->orWhereNull('zone_id');
+            });
         } elseif ($user->role === 'supervisor') {
             $supervisionIds = $user->supervisedSupervisions()->pluck('id');
             $zoneId = $user->getZoneId();
@@ -115,11 +118,16 @@ class EventController extends Controller
                     // OR events from cells supervised by this user
                     ->orWhereHas('cell', function ($sq) use ($supervisionIds) {
                         $sq->whereIn('supervision_id', $supervisionIds);
-                    });
+                    })
+                    // OR Global events
+                    ->orWhereNull('zone_id');
             });
         } elseif ($user->role === 'lider_celula') {
-            $query->whereHas('cell', function ($q) use ($user) {
-                $q->where('leader_id', $user->id);
+            $query->where(function ($q) use ($user) {
+                $q->whereHas('cell', function ($sq) use ($user) {
+                    $sq->where('leader_id', $user->id);
+                })
+                    ->orWhereNull('zone_id');
             });
         }
 
@@ -137,7 +145,7 @@ class EventController extends Controller
         $zones = collect();
         $cells = collect();
 
-        if ($user->role === 'admin' || $user->role === 'pastor') {
+        if ($user->role === 'admin' || $user->role === 'pastor' || $user->role === 'secretaria') {
             $zones = Zone::all();
             $cells = Cell::all();
         } elseif ($user->role === 'pastor_zona') {
@@ -198,7 +206,7 @@ class EventController extends Controller
         $zones = collect();
         $cells = collect();
 
-        if ($user->role === 'admin' || $user->role === 'pastor') {
+        if ($user->role === 'admin' || $user->role === 'pastor' || $user->role === 'secretaria') {
             $zones = Zone::all();
             $cells = Cell::all();
         } elseif ($user->role === 'pastor_zona') {

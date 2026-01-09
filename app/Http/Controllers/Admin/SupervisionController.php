@@ -50,6 +50,7 @@ class SupervisionController
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'zone_id' => 'required|exists:zones,id',
+            'supervisor_id' => 'nullable|exists:users,id',
             'description' => 'nullable|string',
         ]);
 
@@ -95,6 +96,7 @@ class SupervisionController
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'zone_id' => 'required|exists:zones,id',
+            'supervisor_id' => 'nullable|exists:users,id',
             'description' => 'nullable|string',
         ]);
 

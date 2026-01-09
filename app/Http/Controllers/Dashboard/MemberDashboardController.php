@@ -31,12 +31,42 @@ class MemberDashboardController
             ->limit(5)
             ->get();
 
+        // 1. Minha Célula
+        $myCell = $member->cell()->with('leader')->first();
+
+        // 2. Estatísticas de Participação (últimos 3 meses e total)
+        $attendanceStats = [
+            'total_present' => 0,
+            'last_3_months_present' => 0,
+            'last_attendance' => null
+        ];
+
+        if ($myCell) {
+            $attendanceStats['total_present'] = \App\Models\Attendance::where('user_id', $member->id)
+                ->where('cell_id', $myCell->id)
+                ->where('status', true)
+                ->count();
+
+            $attendanceStats['last_3_months_present'] = \App\Models\Attendance::where('user_id', $member->id)
+                ->where('cell_id', $myCell->id)
+                ->where('status', true)
+                ->where('date', '>=', now()->subMonths(3))
+                ->count();
+
+            $attendanceStats['last_attendance'] = \App\Models\Attendance::where('user_id', $member->id)
+                ->where('cell_id', $myCell->id)
+                ->where('status', true)
+                ->max('date');
+        }
+
         return view('dashboard.membro', [
             'commitment' => $commitment,
             'contributions' => $contributions,
             'totalThisMonth' => $totalThisMonth,
             'upcomingEvents' => $upcomingEvents,
             'recentServices' => $recentServices,
+            'myCell' => $myCell,
+            'attendanceStats' => $attendanceStats,
         ]);
     }
 }

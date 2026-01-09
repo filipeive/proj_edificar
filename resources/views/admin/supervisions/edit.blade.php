@@ -28,6 +28,23 @@
                 </div>
 
                 <div class="mb-6">
+                    <label for="supervisor_id" class="block text-sm font-medium text-gray-700 mb-2">Supervisor
+                        Responsável</label>
+                    <select name="supervisor_id" id="supervisor_id"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 @error('supervisor_id') border-red-500 @enderror">
+                        <option value="">-- Selecione um supervisor --</option>
+                        @foreach($supervisors as $supervisor)
+                            <option value="{{ $supervisor->id }}" @selected(old('supervisor_id', $supervision->supervisor_id) == $supervisor->id)>
+                                {{ $supervisor->name }} ({{ $supervisor->role }})
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('supervisor_id')
+                        <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="mb-6">
                     <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Nome da Supervisão</label>
                     <input type="text" name="name" id="name"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 @error('name') border-red-500 @enderror"

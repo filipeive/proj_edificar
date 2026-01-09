@@ -35,12 +35,12 @@ class CellPolicy
 
     public function create(User $user): bool
     {
-        return $user->isAdmin() || $user->isPastorZona() || $user->isSupervisor();
+        return $user->isAdmin() || $user->isSecretaria() || $user->isPastorZona() || $user->isSupervisor();
     }
 
     public function update(User $user, Cell $cell): bool
     {
-        if ($user->isAdmin()) {
+        if ($user->isAdmin() || $user->isSecretaria()) {
             return true;
         }
 
@@ -61,6 +61,6 @@ class CellPolicy
 
     public function delete(User $user, Cell $cell): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin() || $user->isSecretaria();
     }
 }

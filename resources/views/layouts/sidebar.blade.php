@@ -34,7 +34,7 @@
             </a>
         </div>
 
-        @if ($authUser->isAdmin() || $authUser->isSecretaria() || $authUser->isPastor() || $authUser->isPastorZona() || $authUser->isSupervisor())
+        @if ($authUser && ($authUser->isAdmin() || $authUser->isSecretaria() || $authUser->isPastor() || $authUser->isPastorZona() || $authUser->isSupervisor()))
             <!-- GESTÃO ECLESIÁSTICA -->
             <div
                 class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-2">
@@ -66,25 +66,36 @@
             @endif
         @endif
 
-        @if ($authUser->isAdmin() || $authUser->isPastor() || $authUser->isPastorZona() || $authUser->isSupervisor() || $authUser->isLider() || $authUser->isTimoteo() || $authUser->isSecretaria())
+        @if ($authUser->isAdmin() || $authUser->isPastor() || $authUser->isPastorZona() || $authUser->isSupervisor() || $authUser->isLider() || $authUser->isTimoteo() || $authUser->isSecretaria() || $authUser->hasRole('membro'))
             <!-- CÉLULAS & GRUPOS -->
             <div
                 class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-4">
                 Células & Grupos</div>
 
-            <a href="{{ route('cell-meetings.index') }}"
-                class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('cell-meetings.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
-                <i class="bi bi-people-fill text-xl flex-shrink-0"></i>
-                <span class="sidebar-text ml-4 font-bold tracking-tight">Encontros</span>
-                <span class="tooltip">Reuniões de Célula</span>
-            </a>
+            @if ($authUser->hasRole('membro'))
+                <a href="{{ route('dashboard.membro') }}#minha-celula"
+                    class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('dashboard.membro') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                    <i class="bi bi-people-fill text-xl flex-shrink-0"></i>
+                    <span class="sidebar-text ml-4 font-bold tracking-tight">Minha Célula</span>
+                    <span class="tooltip">Ver Célula</span>
+                </a>
+            @endif
 
-            <a href="{{ route('members.index') }}"
-                class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('members.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
-                <i class="bi bi-person-lines-fill text-xl flex-shrink-0"></i>
-                <span class="sidebar-text ml-4 font-bold tracking-tight">Membros</span>
-                <span class="tooltip">Listagem de Membros</span>
-            </a>
+            @if (!$authUser->hasRole('membro'))
+                <a href="{{ route('cell-meetings.index') }}"
+                    class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('cell-meetings.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                    <i class="bi bi-people-fill text-xl flex-shrink-0"></i>
+                    <span class="sidebar-text ml-4 font-bold tracking-tight">Encontros</span>
+                    <span class="tooltip">Reuniões de Célula</span>
+                </a>
+
+                <a href="{{ route('members.index') }}"
+                    class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('members.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                    <i class="bi bi-person-lines-fill text-xl flex-shrink-0"></i>
+                    <span class="sidebar-text ml-4 font-bold tracking-tight">Membros</span>
+                    <span class="tooltip">Listagem de Membros</span>
+                </a>
+            @endif
 
             @if ($authUser->isLider() && $authUser->ledCells()->exists())
                 <a href="{{ route('cells.attendance', $authUser->ledCells()->first()) }}"

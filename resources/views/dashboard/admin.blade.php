@@ -44,7 +44,7 @@
                 <p class="text-3xl font-black text-gray-900 mt-2 tracking-tighter">{{ $totalMembers }}</p>
                 <div class="flex items-center mt-4 text-xs">
                     <span class="text-blue-500 font-bold flex items-center">
-                        <i class="bi bi-plus text-lg"></i> 5 novos
+                        <i class="bi bi-plus text-lg"></i> <!-- adicionar a metrica dos ultimos 5 novos membros criados -->
                     </span>
                     <span class="text-gray-400 ml-2">esta semana</span>
                 </div>
@@ -274,9 +274,15 @@
                             </div>
                         </div>
                         <div class="text-right">
-                            <p class="font-black text-gray-900">{{ $service->attendance_count ?? 0 }}</p>
+                            <p class="font-black text-gray-900">{{ $service->total_participation ?? 0 }}</p>
                             <p class="text-[8px] text-gray-400 font-bold uppercase tracking-widest">Presentes</p>
                         </div>
+                        <!-- ver detalhes -->
+                        <a href="{{ route('services.show', $service->id) }}"
+                            class="text-xs font-black text-orange-600 uppercase tracking-widest hover:text-orange-700">
+                            <i class="bi bi-arrow-right ml-1"></i>
+                            Detalhes
+                        </a>
                     </div>
                 @empty
                     <p class="text-center text-gray-400 py-10">Nenhum relatório de culto registado.</p>

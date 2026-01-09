@@ -105,6 +105,11 @@ Route::middleware('auth')->group(function () {
         ->middleware('role:membro,lider_celula,supervisor,pastor_zona')
         ->name('dashboard.membro');
 
+    // Dashboard Secretaria
+    Route::get('/secretaria/dashboard', \App\Http\Controllers\Dashboard\SecretaryDashboardController::class)
+        ->middleware('role:secretaria')
+        ->name('dashboard.secretaria');
+
     // Criar Membros contexto das rotas abaixo
     // Criar Membros contexto das rotas abaixo
     Route::prefix('members')->middleware('role:lider_celula,supervisor,pastor_zona,admin')->group(function () {
@@ -121,8 +126,8 @@ Route::middleware('auth')->group(function () {
     // ===== ECCLESIASTICAL & ADMINISTRATIVE ROUTES =====
     Route::prefix('admin')->group(function () {
 
-        // Intermediate Restricted (Admin, Pastor Zona, Supervisor, Secretaria)
-        Route::middleware('role:admin,pastor_zona,supervisor,secretaria,pastor')->group(function () {
+        // Intermediate Restricted (Admin, Pastor Zona, Supervisor, Secretaria, Lider Celula)
+        Route::middleware('role:admin,pastor_zona,supervisor,secretaria,pastor,lider_celula')->group(function () {
             // Gestão de Supervisões
             Route::resource('supervisions', SupervisionController::class);
 
@@ -146,6 +151,7 @@ Route::middleware('auth')->group(function () {
             Route::resource('zones', ZoneController::class);
             // Gestão de Utilizadores
             Route::resource('users', UserController::class);
+            Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
             // Gestão de Pacotes
             Route::resource('packages', PackageController::class);
         });

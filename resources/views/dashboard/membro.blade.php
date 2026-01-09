@@ -146,7 +146,7 @@
         </div>
 
         <!-- Próximos Eventos -->
-        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
+        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8" x-data="{ activeEvent: null }">
             <div class="flex items-center justify-between mb-8">
                 <h3 class="text-xl font-black text-gray-900 tracking-tight">Próximos Eventos</h3>
                 <a href="{{ route('events.index') }}"
@@ -155,7 +155,7 @@
             </div>
             <div class="space-y-6">
                 @forelse($upcomingEvents as $event)
-                    <div class="flex items-center space-x-6 group">
+                    <div @click="activeEvent = {{ $event->toJson() }}" class="flex items-center space-x-6 group cursor-pointer hover:bg-gray-50 p-2 rounded-2xl transition-all">
                         <div
                             class="bg-gray-50 px-4 py-3 rounded-2xl text-center min-w-[70px] group-hover:bg-orange-600 group-hover:text-white transition-colors">
                             <span class="block text-xl font-black leading-none">{{ $event->date->format('d') }}</span>
@@ -178,71 +178,111 @@
                     <p class="text-center text-gray-400 py-10">Nenhum evento programado.</p>
                 @endforelse
             </div>
+
+            <!-- Modal de Detalhes do Evento -->
+            <div x-show="activeEvent" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="display: none;">
+                <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="activeEvent = null"></div>
+                <div class="relative bg-white rounded-3xl p-8 max-w-lg w-full shadow-2xl animate-fade-in-up">
+                    <button @click="activeEvent = null" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                        <i class="bi bi-x-lg text-xl"></i>
+                    </button>
+                    
+                    <div class="text-center mb-6">
+                        <span class="inline-block px-4 py-1.5 bg-orange-100 text-orange-700 rounded-full text-xs font-black uppercase tracking-widest mb-4" x-text="activeEvent?.event_type?.name ?? 'Evento'"></span>
+                        <h3 class="text-2xl font-black text-gray-900" x-text="activeEvent?.name"></h3>
+                    </div>
+
+                    <div class="space-y-4 mb-8">
+                        <div class="flex items-center text-gray-600 bg-gray-50 p-4 rounded-xl">
+                            <i class="bi bi-calendar-event text-xl mr-4 text-orange-600"></i>
+                            <div>
+                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Data e Hora</p>
+                                <p class="font-bold" x-text="new Date(activeEvent?.date).toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center text-gray-600 bg-gray-50 p-4 rounded-xl">
+                            <i class="bi bi-geo-alt text-xl mr-4 text-orange-600"></i>
+                            <div>
+                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Local</p>
+                                <p class="font-bold" x-text="activeEvent?.location ?? 'Life Church'"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-4 rounded-xl" x-show="activeEvent?.description">
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Detalhes</p>
+                            <p class="text-sm leading-relaxed text-gray-600" x-text="activeEvent?.description"></p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <button @click="activeEvent = null" class="w-full py-3 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200 transition-colors">
+                            Fechar
+                        </button>
+                        <a href="{{ route('events.index') }}" class="w-full py-3 bg-orange-600 text-white rounded-xl font-bold flex items-center justify-center hover:bg-orange-700 transition-colors">
+                            Ver no Calendário
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Últimos Cultos -->
-        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
-            <div class="flex items-center justify-between mb-8">
-                <h3 class="text-xl font-black text-gray-900 tracking-tight">Relatórios de Cultos</h3>
-                <a href="{{ route('services.index') }}"
-                    class="text-xs font-black text-orange-600 uppercase tracking-widest hover:text-orange-700">Ver Todos</a>
-            </div>
-            <div class="space-y-6">
-                @forelse($recentServices as $service)
-                    <div
-                        class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl hover:bg-white hover:shadow-lg transition-all duration-300 border border-transparent hover:border-gray-100">
-                        <div class="flex items-center space-x-4">
-                            <div
-                                class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-orange-600 shadow-sm">
-                                <i class="bi bi-journal-text text-xl"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-black text-gray-900">{{ $service->name }}</h4>
-                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                                    {{ $service->date->format('d/m/Y') }}</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-black text-gray-900">{{ $service->attendance_count ?? 0 }}</p>
-                            <p class="text-[8px] text-gray-400 font-bold uppercase tracking-widest">Presentes</p>
-                        </div>
+        @if(isset($myCell) && $myCell)
+        <!-- Minha Célula -->
+        <div id="minha-celula" class="bg-white rounded-[2.5rem] shadow-xl p-8 border border-gray-100 relative overflow-hidden flex flex-col justify-between group h-full">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-blue-600/5 rounded-full -mr-32 -mt-32 blur-3xl transition-all duration-700 group-hover:bg-blue-600/10"></div>
+            
+            <div class="relative z-10">
+                <div class="flex items-center justify-between mb-8">
+                    <h3 class="text-2xl font-black tracking-tight text-gray-900">Minha Célula</h3>
+                    <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 transform group-hover:rotate-12 transition-transform duration-500">
+                        <i class="bi bi-people-fill text-xl"></i>
                     </div>
-                @empty
-                    <p class="text-center text-gray-400 py-10">Nenhum relatório de culto registado.</p>
-                @endforelse
+                </div>
+
+                <div class="mb-8">
+                    <h4 class="text-3xl font-black text-blue-600 mb-1 tracking-tighter">{{ $myCell->name }}</h4>
+                    <p class="text-sm font-bold text-gray-400 flex items-center gap-2">
+                        <i class="bi bi-person-badge"></i> Líder: {{ $myCell->leader->name ?? 'N/A' }}
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div class="bg-gray-50 p-4 rounded-2xl">
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Presenças (Total)</p>
+                        <p class="text-2xl font-black text-gray-900">{{ $attendanceStats['total_present'] ?? 0 }}</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-2xl">
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Últimos 3 Meses</p>
+                        <p class="text-2xl font-black text-gray-900">{{ $attendanceStats['last_3_months_present'] ?? 0 }}</p>
+                    </div>
+                </div>
+                
+                @if(isset($attendanceStats['last_attendance']) && $attendanceStats['last_attendance'])
+                <div class="inline-flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-full text-xs font-bold w-fit">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    Última presença: {{ \Carbon\Carbon::parse($attendanceStats['last_attendance'])->format('d/m/Y') }}
+                </div>
+                @endif
             </div>
         </div>
-
-        <!-- Card Informativo -->
+        @else
+        <!-- Card Informativo (Fallback se não tiver célula) -->
         <div
             class="bg-gray-900 rounded-[2.5rem] shadow-xl p-8 text-white relative overflow-hidden flex flex-col justify-center">
             <div class="absolute top-0 right-0 w-64 h-64 bg-orange-600/20 rounded-full -mr-32 -mt-32 blur-3xl"></div>
             <div class="relative z-10">
                 <h3 class="text-2xl font-black tracking-tight mb-4">Comunidade Life Church</h3>
                 <p class="text-gray-400 leading-relaxed mb-8">
-                    Sua participação é fundamental para o crescimento da nossa igreja. Juntos estamos edificando vidas e
-                    transformando destinos.
+                    Ainda não participa de uma célula? Junte-se a nós e faça parte desta família!
                 </p>
-                <div class="flex items-center space-x-4">
-                    <div class="flex -space-x-2">
-                        <div
-                            class="w-10 h-10 rounded-full bg-orange-600 border-2 border-gray-900 flex items-center justify-center font-bold text-xs">
-                            L</div>
-                        <div
-                            class="w-10 h-10 rounded-full bg-blue-600 border-2 border-gray-900 flex items-center justify-center font-bold text-xs">
-                            I</div>
-                        <div
-                            class="w-10 h-10 rounded-full bg-green-600 border-2 border-gray-900 flex items-center justify-center font-bold text-xs">
-                            F</div>
-                        <div
-                            class="w-10 h-10 rounded-full bg-purple-600 border-2 border-gray-900 flex items-center justify-center font-bold text-xs">
-                            E</div>
-                    </div>
-                    <span class="text-xs font-black uppercase tracking-widest text-gray-500">+ de 500 membros</span>
-                </div>
+                <a href="#" class="inline-flex items-center px-6 py-3 bg-white text-gray-900 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-gray-100 transition-all">
+                    Encontrar uma Célula
+                </a>
             </div>
         </div>
+        @endif
     </div>
 @endsection
