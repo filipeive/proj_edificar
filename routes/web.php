@@ -33,6 +33,16 @@ Route::post('/cursos/{course:slug}/inscricao', [\App\Http\Controllers\PublicCour
 Route::get('/inscricao-casais', [\App\Http\Controllers\PublicCourseController::class, 'showCasaisForm'])->name('public.courses.casais');
 Route::post('/inscricao-casais', [\App\Http\Controllers\PublicCourseController::class, 'storeCasaisEnrollment'])->name('public.courses.casais.store');
 
+// Setup Wizard Routes (No authentication required)
+Route::prefix('setup')->group(function () {
+    Route::get('/', [\App\Http\Controllers\SetupController::class, 'index'])->name('setup.index');
+    Route::post('/step1', [\App\Http\Controllers\SetupController::class, 'step1'])->name('setup.step1');
+    Route::post('/step2', [\App\Http\Controllers\SetupController::class, 'step2'])->name('setup.step2');
+    Route::post('/step3', [\App\Http\Controllers\SetupController::class, 'step3'])->name('setup.step3');
+    Route::post('/complete', [\App\Http\Controllers\SetupController::class, 'complete'])->name('setup.complete');
+    Route::post('/upload-logo', [\App\Http\Controllers\SetupController::class, 'uploadLogo'])->name('setup.upload-logo');
+});
+
 // Rota para pesquisa AJAX (pode ser GET ou POST, mas GET é comum para buscas)
 Route::get('/api/search', [SearchController::class, 'search'])
     ->middleware('auth') // Garante que apenas usuários logados podem pesquisar
@@ -125,6 +135,14 @@ Route::middleware('auth')->group(function () {
     });
     // ===== ECCLESIASTICAL & ADMINISTRATIVE ROUTES =====
     Route::prefix('admin')->group(function () {
+
+        // Settings Routes (Admin only)
+        Route::middleware('role:admin')->prefix('settings')->name('settings.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('index');
+            Route::post('/update', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('update');
+            Route::post('/upload-logo', [\App\Http\Controllers\Admin\SettingController::class, 'uploadLogo'])->name('upload-logo');
+            Route::post('/reset', [\App\Http\Controllers\Admin\SettingController::class, 'resetToDefaults'])->name('reset');
+        });
 
         // Intermediate Restricted (Admin, Pastor Zona, Supervisor, Secretaria, Lider Celula)
         Route::middleware('role:admin,pastor_zona,supervisor,secretaria,pastor,lider_celula')->group(function () {

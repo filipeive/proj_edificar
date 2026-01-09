@@ -217,10 +217,33 @@
             @endif
         @endif
 
+        @if ($authUser->isAdmin())
+            <!-- CONFIGURAÇÕES -->
+            <div
+                class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-4">
+                Sistema</div>
+
+            <a href="{{ route('settings.index') }}"
+                class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('settings.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                <i class="bi bi-gear-fill text-xl flex-shrink-0"></i>
+                <span class="sidebar-text ml-4 font-bold tracking-tight">Configurações</span>
+                <span class="tooltip">Configurações do Sistema</span>
+            </a>
+        @endif
+
         <!-- GESTÃO PROJECTO EDIFICAR -->
         <div
             class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-4">
             Gestão Projecto Edificar</div>
+
+        @if ($authUser->isAdmin())
+            <a href="{{ route('packages.index') }}"
+                class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('packages.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                <i class="bi bi-box-seam-fill text-xl flex-shrink-0"></i>
+                <span class="sidebar-text ml-4 font-bold tracking-tight">Pacotes</span>
+                <span class="tooltip">Pacotes de Compromisso</span>
+            </a>
+        @endif
 
         <div>
             <button
@@ -302,15 +325,6 @@
             @endif
             <span class="tooltip">Central de Alertas</span>
         </a>
-
-        @if ($authUser->isAdmin())
-            <a href="{{ route('packages.index') }}"
-                class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('packages.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
-                <i class="bi bi-gear-wide-connected text-xl flex-shrink-0"></i>
-                <span class="sidebar-text ml-4 font-bold tracking-tight">Configurações</span>
-                <span class="tooltip">Ajustes do Sistema</span>
-            </a>
-        @endif
     </nav>
 
     <!-- User Profile Footer -->
