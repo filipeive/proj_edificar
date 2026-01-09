@@ -198,6 +198,16 @@ Para questões ou suporte, entre em contato através do repositório GitHub.
 
 ---
 
+## 🙏 Créditos
+
+**Desenvolvido por:**
+- **Engenheiro Filipe dos Santos** - Desenvolvimento e Arquitetura do Sistema
+- **Pastor Luis Sabonete** - Consultoria e Requisitos Eclesiásticos
+
+Desenvolvido para **Life Church - Moçambique**
+
+---
+
 ## 📄 Licença
 
 Este projeto é proprietário e destinado ao uso da Life Church.
