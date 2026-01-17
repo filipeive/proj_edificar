@@ -22,12 +22,12 @@ class MaritalCourse2025DetailedSeeder extends Seeder
 
         $cursoCasais = Course::firstOrCreate(['name' => 'Curso de Casais'], [
             'description' => 'Curso para casais vivendo juntos ou casados.',
-            'status' => 'active'
+            'is_active' => true
         ]);
 
         $cursoPreNupcial = Course::firstOrCreate(['name' => 'Curso Pré-Nupcial (Casais)'], [
             'description' => 'Curso preparatório para o casamento.',
-            'status' => 'active'
+            'is_active' => true
         ]);
 
         $startDate = Carbon::parse('2025-09-13');
