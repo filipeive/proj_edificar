@@ -13,7 +13,7 @@
             </a>
         </div>
 
-        <div class="max-w-4xl mx-auto">
+        <div class="w-full">
             <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
                 <div class="p-8 border-b border-gray-100 bg-gray-50/50">
                     <div class="flex justify-between items-center">

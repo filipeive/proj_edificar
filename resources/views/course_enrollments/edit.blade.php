@@ -6,7 +6,7 @@
 
 @section('content')
     <div class="container-fluid">
-        <div class="max-w-4xl mx-auto">
+        <div class="w-full">
             <div class="mb-6">
                 @if($enrollment->course_class_id)
                     <a href="{{ route('course-classes.show', $enrollment->course_class_id) }}"

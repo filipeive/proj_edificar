@@ -32,6 +32,7 @@ class CourseEnrollment extends Model
         'is_church_member' => 'boolean',
         'enrolled_at' => 'datetime',
         'completed_at' => 'datetime',
+        'completed_pillars' => 'array',
     ];
 
     public function courseClass()

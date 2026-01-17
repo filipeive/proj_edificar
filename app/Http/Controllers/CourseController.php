@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\GlobalCourseReportExport;
 
 class CourseController extends Controller
 {
@@ -104,5 +105,10 @@ class CourseController extends Controller
     {
         $course->delete();
         return redirect()->route('courses.index')->with('success', 'Curso excluído com sucesso!');
+    }
+
+    public function exportGlobalReport()
+    {
+        return Excel::download(new GlobalCourseReportExport(), 'relatorio_geral_cursos.xlsx');
     }
 }

@@ -4,12 +4,13 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
-class UserSeeder extends Seeder {
-    public function run(): void {
+class UserSeeder extends Seeder
+{
+    public function run(): void
+    {
         // Criar usuário admin principal
-        User::create([
+        User::updateOrCreate(['email' => 'admin@chiesa.local'], [
             'name' => 'Administrador Portal Life Church',
-            'email' => 'admin@chiesa.local',
             'password' => bcrypt('123456'),
             'phone' => '823562000',
             'role' => 'admin',
@@ -17,9 +18,8 @@ class UserSeeder extends Seeder {
         ]);
 
         // Criar usuário pastor de zona (teste)
-        User::create([
+        User::updateOrCreate(['email' => 'pastor@chiesa.local'], [
             'name' => 'Pastor da Zona Centro',
-            'email' => 'pastor@chiesa.local',
             'password' => bcrypt('123456'),
             'phone' => '823562001',
             'role' => 'pastor_zona',
@@ -27,22 +27,19 @@ class UserSeeder extends Seeder {
         ]);
 
         // criar usuário supervisor (teste)
-        User::create([
+        User::updateOrCreate(['email' => 'supervisor@chiesa.local'], [
             'name' => 'Supervisor da Zona Centro',
-            'email' => 'supervisor@chiesa.local',
             'password' => bcrypt('123456'),
             'phone' => '823562002',
             'role' => 'supervisor',
             'is_active' => true,
         ]);
 
-
         // Criar usuário membro comum (teste)
-        User::create([
+        User::updateOrCreate(['email' => 'membro@chiesa.local'], [
             'name' => 'Membro Comum',
-            'email' => 'membro  @chiesa.local',
             'password' => bcrypt('123456'),
-            'phone' => '823562002',
+            'phone' => '823562003',
             'role' => 'membro',
             'is_active' => true,
         ]);
