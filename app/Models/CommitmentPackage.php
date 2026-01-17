@@ -14,6 +14,8 @@ class CommitmentPackage extends Model
         'max_amount',
         'description',
         'whatsapp_link',
+        'sms_template',
+        'whatsapp_template',
         'is_active',
         'order',
     ];

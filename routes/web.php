@@ -301,6 +301,7 @@ Route::middleware('auth')->group(function () {
     // ===== RELATÓRIOS TRIMESTRAIS (QUARTERLY REPORTS) ROUTES =====
     Route::get('quarterly-reports/export', [\App\Http\Controllers\QuarterlyReportController::class, 'export'])->name('quarterly-reports.export');
     Route::resource('quarterly-reports', \App\Http\Controllers\QuarterlyReportController::class);
+    Route::post('packages/{package}/assign', [\App\Http\Controllers\Admin\PackageController::class, 'assignMember'])->name('packages.assign');
 
     // ===== EVENTOS E CERIMÓNIAS (EVENTS) ROUTES =====
     Route::get('events/feed', [\App\Http\Controllers\EventController::class, 'feed'])->name('events.feed');

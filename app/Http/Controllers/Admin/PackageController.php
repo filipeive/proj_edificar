@@ -26,6 +26,8 @@ class PackageController
             'max_amount' => 'nullable|numeric|min:0|gte:min_amount',
             'description' => 'nullable|string',
             'whatsapp_link' => 'nullable|url',
+            'sms_template' => 'nullable|string',
+            'whatsapp_template' => 'nullable|string',
             'order' => 'required|integer',
         ]);
 
@@ -56,6 +58,8 @@ class PackageController
             'max_amount' => 'nullable|numeric|min:0|gte:min_amount',
             'description' => 'nullable|string',
             'whatsapp_link' => 'nullable|url',
+            'sms_template' => 'nullable|string',
+            'whatsapp_template' => 'nullable|string',
             'order' => 'required|integer',
             'is_active' => 'boolean',
         ]);
@@ -76,5 +80,31 @@ class PackageController
 
         return redirect()->route('packages.index')
             ->with('success', 'Pacote deletado com sucesso!');
+    }
+
+    public function assignMember(Request $request, CommitmentPackage $package)
+    {
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'committed_amount' => 'required|numeric|min:0',
+        ]);
+
+        $user = \App\Models\User::findOrFail($validated['user_id']);
+
+        // Check if user has active commitment
+        $activeCommitment = $user->getActiveCommitment();
+        if ($activeCommitment) {
+            $activeCommitment->update(['end_date' => now()]);
+        }
+
+        \App\Models\UserCommitment::create([
+            'user_id' => $user->id,
+            'package_id' => $package->id,
+            'committed_amount' => $validated['committed_amount'],
+            'start_date' => now(),
+            'cell_id' => $user->cell_id,
+        ]);
+
+        return back()->with('success', 'Membro adicionado ao pacote com sucesso!');
     }
 }

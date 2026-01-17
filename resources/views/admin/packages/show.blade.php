@@ -73,7 +73,31 @@
             </div>
 
             <!-- Members List Column -->
-            <div class="lg:col-span-2">
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Add Member Form -->
+                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
+                    <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-6">Adicionar Membro ao Pacote</h3>
+                    <form action="{{ route('packages.assign', $package) }}" method="POST" class="flex flex-col md:flex-row gap-4 items-end">
+                        @csrf
+                        <div class="flex-1">
+                            <label for="user_id" class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Selecionar Membro</label>
+                            <select name="user_id" id="user_id" class="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500" required>
+                                <option value="">Escolha um membro...</option>
+                                @foreach(\App\Models\User::orderBy('name')->get() as $user)
+                                    <option value="{{ $user->id }}">{{ $user->name }} - {{ $user->phone }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="w-full md:w-32">
+                            <label for="committed_amount" class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Valor (MT)</label>
+                            <input type="number" name="committed_amount" id="committed_amount" value="{{ $package->min_amount }}" step="0.01" class="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 h-[46px]">
+                            <i class="bi bi-person-plus-fill"></i>
+                        </button>
+                    </form>
+                </div>
+
                 <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
                     <div class="p-8 border-b border-gray-50 flex justify-between items-center">
                         <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Membros Comprometidos</h3>
@@ -84,7 +108,7 @@
                                 <tr class="bg-gray-50/50">
                                     <th class="px-8 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Membro</th>
                                     <th class="px-8 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Valor</th>
-                                    <th class="px-8 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Data Início</th>
+                                    <th class="px-8 py-4 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Ações</th>
                                     <th class="px-8 py-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">Estado</th>
                                 </tr>
                             </thead>
@@ -98,15 +122,30 @@
                                                 </div>
                                                 <div class="flex flex-col">
                                                     <span class="text-sm font-black text-gray-900 leading-tight">{{ $commitment->user->name }}</span>
-                                                    <span class="text-[10px] text-gray-400 font-bold uppercase">{{ $commitment->user->cell->name ?? 'Sem Célula' }}</span>
+                                                    <span class="text-[10px] text-gray-400 font-bold uppercase">{{ $commitment->user->phone }}</span>
                                                 </div>
                                             </div>
                                         </td>
                                         <td class="px-8 py-6">
                                             <span class="text-sm font-black text-gray-900">{{ number_format($commitment->committed_amount, 2, ',', '.') }} MT</span>
                                         </td>
-                                        <td class="px-8 py-6">
-                                            <span class="text-xs font-bold text-gray-500">{{ $commitment->start_date ? $commitment->start_date->format('d/m/Y') : 'N/A' }}</span>
+                                        <td class="px-8 py-6 text-center">
+                                            <div class="flex items-center justify-center gap-2">
+                                                @if($commitment->user->phone)
+                                                    @php
+                                                        $smsBody = str_replace('[NOME]', $commitment->user->name, $package->sms_template ?? "Olá [NOME], lembrete de contribuição para o Projetor Edificar.");
+                                                        $whatsappBody = str_replace('[NOME]', $commitment->user->name, $package->whatsapp_template ?? "Olá [NOME], este é um lembrete do Projetor Edificar.");
+                                                    @endphp
+                                                    <a href="sms:{{ $commitment->user->phone }}?body={{ urlencode($smsBody) }}" 
+                                                        class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all shadow-sm" title="Mandar SMS">
+                                                        <i class="bi bi-chat-dots-fill"></i>
+                                                    </a>
+                                                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $commitment->user->phone) }}?text={{ urlencode($whatsappBody) }}" target="_blank"
+                                                        class="w-8 h-8 rounded-lg bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-600 hover:text-white transition-all shadow-sm" title="Mandar WhatsApp Individual">
+                                                        <i class="bi bi-whatsapp"></i>
+                                                    </a>
+                                                @endif
+                                            </div>
                                         </td>
                                         <td class="px-8 py-6 text-right">
                                             <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border 
