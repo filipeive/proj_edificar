@@ -11,6 +11,7 @@ use App\Models\CourseClassMeeting;
 use App\Models\CourseClassAttendance;
 use App\Models\Wedding;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Carbon\Carbon;
 
 class MaritalCourse2025DetailedSeeder extends Seeder
@@ -22,11 +23,13 @@ class MaritalCourse2025DetailedSeeder extends Seeder
 
         $cursoCasais = Course::firstOrCreate(['name' => 'Curso de Casais'], [
             'description' => 'Curso para casais vivendo juntos ou casados.',
+            'slug' => Str::slug('Curso de Casais'),
             'is_active' => true
         ]);
 
         $cursoPreNupcial = Course::firstOrCreate(['name' => 'Curso Pré-Nupcial (Casais)'], [
             'description' => 'Curso preparatório para o casamento.',
+            'slug' => Str::slug('Curso Pré-Nupcial (Casais)'),
             'is_active' => true
         ]);
 
