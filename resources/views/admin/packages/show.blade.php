@@ -5,14 +5,17 @@
 @section('content')
     <div class="space-y-8">
         <!-- Header -->
-        <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div
+            class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
             <div class="flex items-center gap-4">
-                <a href="{{ route('packages.index') }}" class="w-12 h-12 rounded-2xl bg-gray-50 text-gray-400 flex items-center justify-center hover:bg-gray-100 transition-all">
+                <a href="{{ route('packages.index') }}"
+                    class="w-12 h-12 rounded-2xl bg-gray-50 text-gray-400 flex items-center justify-center hover:bg-gray-100 transition-all">
                     <i class="bi bi-arrow-left text-xl"></i>
                 </a>
                 <div>
                     <h1 class="text-3xl font-black text-gray-900 tracking-tight">{{ $package->name }}</h1>
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Gestão de Membros e Contribuições</p>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Gestão de Membros e
+                        Contribuições</p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
@@ -37,7 +40,9 @@
                     <div class="space-y-4">
                         <div class="flex justify-between items-center pb-4 border-b border-gray-50">
                             <span class="text-xs font-bold text-gray-400 uppercase">Valor Mínimo</span>
-                            <span class="text-sm font-black text-gray-900">{{ number_format($package->min_amount, 2, ',', '.') }} MT</span>
+                            <span
+                                class="text-sm font-black text-gray-900">{{ number_format($package->min_amount, 2, ',', '.') }}
+                                MT</span>
                         </div>
                         <div class="flex justify-between items-center pb-4 border-b border-gray-50">
                             <span class="text-xs font-bold text-gray-400 uppercase">Valor Máximo</span>
@@ -62,26 +67,91 @@
                     </div>
                 </div>
 
-                <!-- SMS/Newsletter Mockup -->
-                <div class="bg-blue-600 p-8 rounded-[2.5rem] shadow-lg shadow-blue-100 text-white">
-                    <h3 class="text-sm font-black uppercase tracking-widest mb-4">Lembrete Automático</h3>
-                    <p class="text-xs text-blue-100 font-medium mb-6">Envie um lembrete para todos os membros deste pacote via SMS ou WhatsApp.</p>
-                    <button class="w-full bg-white text-blue-600 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-50 transition-all shadow-xl">
-                        Disparar Notificações
-                    </button>
+                <!-- SMS/WhatsApp Bulk Actions -->
+                <div class="bg-blue-600 p-8 rounded-[2.5rem] shadow-lg shadow-blue-100 text-white space-y-6">
+                    <div>
+                        <h3 class="text-sm font-black uppercase tracking-widest mb-2">Ações de Massa</h3>
+                        <p class="text-xs text-blue-100 font-medium">Use as ferramentas abaixo para comunicar com todos os
+                            membros deste pacote de uma só vez.</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <button
+                            onclick="copyToClipboard('{{ $package->whatsapp_template ?? 'Paz do Senhor! Este é um lembrete do Projeto Edificar.' }}', 'Mensagem copiada!', this)"
+                            class="w-full bg-white text-blue-600 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-50 transition-all shadow-xl flex items-center justify-center gap-2">
+                            <i class="bi bi-clipboard-check"></i> Copiar Mensagem
+                        </button>
+
+                        <button
+                            onclick="copyToClipboard('{{ $package->userCommitments->pluck('user.phone')->filter()->implode(', ') }}', 'Contactos copiados!', this)"
+                            class="w-full bg-blue-500/30 text-white border border-blue-400/30 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-500/50 transition-all flex items-center justify-center gap-2">
+                            <i class="bi bi-person-lines-fill"></i> Copiar Contactos
+                        </button>
+                    </div>
+
+                    @if($package->whatsapp_link)
+                        <a href="{{ $package->whatsapp_link }}" target="_blank"
+                            class="w-full bg-green-500 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-green-600 transition-all shadow-xl flex items-center justify-center gap-2">
+                            <i class="bi bi-whatsapp"></i> Ir para o Grupo
+                        </a>
+                    @endif
                 </div>
             </div>
+
+            <script>
+                function copyToClipboard(text, successMessage, element = null) {
+                    if (!text) {
+                        alert('Nenhum conteúdo para copiar.');
+                        return;
+                    }
+
+                    navigator.clipboard.writeText(text).then(() => {
+                        const target = element || event.currentTarget;
+                        const originalHTML = target.innerHTML;
+                        const originalClass = target.className;
+
+                        target.innerHTML = `<i class="bi bi-check2"></i> ${successMessage || ''}`;
+                        if (target.tagName === 'BUTTON') {
+                            target.classList.add('bg-green-500', 'text-white');
+                        }
+
+                        setTimeout(() => {
+                            target.innerHTML = originalHTML;
+                            target.className = originalClass;
+                        }, 2000);
+                    }).catch(err => {
+                        console.error('Erro ao copiar: ', err);
+                        const textArea = document.createElement("textarea");
+                        textArea.value = text;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        try {
+                            document.execCommand('copy');
+                            alert(successMessage || 'Copiado!');
+                        } catch (err) {
+                            alert('Erro ao copiar. Por favor copie manualmente.');
+                        }
+                        document.body.removeChild(textArea);
+                    });
+                }
+            </script>
 
             <!-- Members List Column -->
             <div class="lg:col-span-2 space-y-8">
                 <!-- Add Member Form -->
                 <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
-                    <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-6">Adicionar Membro ao Pacote</h3>
-                    <form action="{{ route('packages.assign', $package) }}" method="POST" class="flex flex-col md:flex-row gap-4 items-end">
+                    <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-6">Adicionar Membro ao Pacote
+                    </h3>
+                    <form action="{{ route('packages.assign', $package) }}" method="POST"
+                        class="flex flex-col md:flex-row gap-4 items-end">
                         @csrf
                         <div class="flex-1">
-                            <label for="user_id" class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Selecionar Membro</label>
-                            <select name="user_id" id="user_id" class="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500" required>
+                            <label for="user_id"
+                                class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Selecionar
+                                Membro</label>
+                            <select name="user_id" id="user_id"
+                                class="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500"
+                                required>
                                 <option value="">Escolha um membro...</option>
                                 @foreach(\App\Models\User::orderBy('name')->get() as $user)
                                     <option value="{{ $user->id }}">{{ $user->name }} - {{ $user->phone }}</option>
@@ -89,10 +159,16 @@
                             </select>
                         </div>
                         <div class="w-full md:w-32">
-                            <label for="committed_amount" class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Valor (MT)</label>
-                            <input type="number" name="committed_amount" id="committed_amount" value="{{ $package->min_amount }}" step="0.01" class="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500" required>
+                            <label for="committed_amount"
+                                class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Valor
+                                (MT)</label>
+                            <input type="number" name="committed_amount" id="committed_amount"
+                                value="{{ $package->min_amount }}" step="0.01"
+                                class="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500"
+                                required>
                         </div>
-                        <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 h-[46px]">
+                        <button type="submit"
+                            class="bg-blue-600 text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 h-[46px]">
                             <i class="bi bi-person-plus-fill"></i>
                         </button>
                     </form>
@@ -106,10 +182,18 @@
                         <table class="w-full">
                             <thead>
                                 <tr class="bg-gray-50/50">
-                                    <th class="px-8 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Membro</th>
-                                    <th class="px-8 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Valor</th>
-                                    <th class="px-8 py-4 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Ações</th>
-                                    <th class="px-8 py-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">Estado</th>
+                                    <th
+                                        class="px-8 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                        Membro</th>
+                                    <th
+                                        class="px-8 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                        Valor</th>
+                                    <th
+                                        class="px-8 py-4 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                        Ações</th>
+                                    <th
+                                        class="px-8 py-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                        Estado</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-50">
@@ -117,39 +201,58 @@
                                     <tr class="hover:bg-gray-50/50 transition-colors">
                                         <td class="px-8 py-6">
                                             <div class="flex items-center gap-3">
-                                                <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center font-black text-gray-400 text-xs">
+                                                <div
+                                                    class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center font-black text-gray-400 text-xs">
                                                     {{ strtoupper(substr($commitment->user->name, 0, 1)) }}
                                                 </div>
                                                 <div class="flex flex-col">
-                                                    <span class="text-sm font-black text-gray-900 leading-tight">{{ $commitment->user->name }}</span>
-                                                    <span class="text-[10px] text-gray-400 font-bold uppercase">{{ $commitment->user->phone }}</span>
+                                                    <span
+                                                        class="text-sm font-black text-gray-900 leading-tight">{{ $commitment->user->name }}</span>
+                                                    <span
+                                                        class="text-[10px] text-gray-400 font-bold uppercase">{{ $commitment->user->phone }}</span>
                                                 </div>
                                             </div>
                                         </td>
                                         <td class="px-8 py-6">
-                                            <span class="text-sm font-black text-gray-900">{{ number_format($commitment->committed_amount, 2, ',', '.') }} MT</span>
+                                            <span
+                                                class="text-sm font-black text-gray-900">{{ number_format($commitment->committed_amount, 2, ',', '.') }}
+                                                MT</span>
                                         </td>
                                         <td class="px-8 py-6 text-center">
                                             <div class="flex items-center justify-center gap-2">
                                                 @if($commitment->user->phone)
                                                     @php
-                                                        $smsBody = str_replace('[NOME]', $commitment->user->name, $package->sms_template ?? "Olá [NOME], lembrete de contribuição para o Projetor Edificar.");
-                                                        $whatsappBody = str_replace('[NOME]', $commitment->user->name, $package->whatsapp_template ?? "Olá [NOME], este é um lembrete do Projetor Edificar.");
+                                                        $name = $commitment->user->name;
+                                                        $smsBody = str_replace('[NOME]', $name, $package->sms_template ?? "Olá [NOME], lembrete de contribuição para o Projetor Edificar.");
+                                                        $whatsappBody = str_replace('[NOME]', $name, $package->whatsapp_template ?? "Olá [NOME], este é um lembrete do Projetor Edificar.");
+                                                        $cleanPhone = preg_replace('/[^0-9]/', '', $commitment->user->phone);
                                                     @endphp
-                                                    <a href="sms:{{ $commitment->user->phone }}?body={{ urlencode($smsBody) }}" 
-                                                        class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all shadow-sm" title="Mandar SMS">
+                                                    <a href="sms:{{ $commitment->user->phone }}?body={{ urlencode($smsBody) }}"
+                                                        class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                                                        title="Mandar SMS">
                                                         <i class="bi bi-chat-dots-fill"></i>
                                                     </a>
-                                                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $commitment->user->phone) }}?text={{ urlencode($whatsappBody) }}" target="_blank"
-                                                        class="w-8 h-8 rounded-lg bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-600 hover:text-white transition-all shadow-sm" title="Mandar WhatsApp Individual">
+                                                    <a href="https://wa.me/{{ $cleanPhone }}?text={{ urlencode($whatsappBody) }}"
+                                                        target="_blank"
+                                                        class="w-8 h-8 rounded-lg bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-600 hover:text-white transition-all shadow-sm"
+                                                        title="Mandar WhatsApp Individual">
                                                         <i class="bi bi-whatsapp"></i>
                                                     </a>
+                                                    <button
+                                                        onclick="copyToClipboard('{{ $commitment->user->phone }}', 'Copiado!', this)"
+                                                        class="w-8 h-8 rounded-lg bg-gray-50 text-gray-600 flex items-center justify-center hover:bg-gray-600 hover:text-white transition-all shadow-sm"
+                                                        title="Copiar Número">
+                                                        <i class="bi bi-telephone-outbound"></i>
+                                                    </button>
+                                                @else
+                                                    <span class="text-[10px] text-gray-300 font-bold uppercase">Sem contacto</span>
                                                 @endif
                                             </div>
                                         </td>
                                         <td class="px-8 py-6 text-right">
-                                            <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border 
-                                                {{ $commitment->isActive() ? 'bg-green-50 text-green-600 border-green-100' : 'bg-red-50 text-red-600 border-red-100' }}">
+                                            <span
+                                                class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border 
+                                                        {{ $commitment->isActive() ? 'bg-green-50 text-green-600 border-green-100' : 'bg-red-50 text-red-600 border-red-100' }}">
                                                 {{ $commitment->isActive() ? 'Ativo' : 'Encerrado' }}
                                             </span>
                                         </td>
@@ -157,7 +260,8 @@
                                 @empty
                                     <tr>
                                         <td colspan="4" class="px-8 py-10 text-center">
-                                            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Nenhum membro encontrado neste pacote.</p>
+                                            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Nenhum membro
+                                                encontrado neste pacote.</p>
                                         </td>
                                     </tr>
                                 @endforelse
