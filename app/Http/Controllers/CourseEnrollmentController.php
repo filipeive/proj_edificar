@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\CourseEnrollment;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class CourseEnrollmentController extends Controller
@@ -25,25 +26,107 @@ class CourseEnrollmentController extends Controller
             'course_id' => $course->id,
             'user_id' => $user->id,
             'status' => 'enrolled',
-            'enrolled_at' => now(),
         ]);
 
         return back()->with('success', 'Matrícula realizada com sucesso!');
     }
 
-    public function updateStatus(Request $request, CourseEnrollment $enrollment)
+    public function show(CourseEnrollment $courseEnrollment)
+    {
+        $courseEnrollment->load(['course', 'courseClass', 'malePartner', 'femalePartner', 'user']);
+        return view('course_enrollments.show', ['enrollment' => $courseEnrollment]);
+    }
+
+    public function edit(CourseEnrollment $courseEnrollment)
+    {
+        $courseEnrollment->load(['course', 'courseClass', 'malePartner', 'femalePartner', 'user']);
+        $users = User::orderBy('name')->get();
+        // Get classes for the same course to allow reassignment/initial assignment
+        $classes = \App\Models\CourseClass::where('course_id', $courseEnrollment->course_id)
+            ->where('status', '!=', 'cancelada')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('course_enrollments.edit', [
+            'enrollment' => $courseEnrollment,
+            'users' => $users,
+            'classes' => $classes
+        ]);
+    }
+
+    public function update(Request $request, CourseEnrollment $courseEnrollment)
     {
         $validated = $request->validate([
-            'status' => 'required|in:enrolled,completed,dropped',
+            'course_class_id' => 'nullable|exists:course_classes,id',
+            'status' => 'required|in:cursando,aprovado,reprovado,desistente',
+            'male_partner_name' => 'nullable|string|max:255',
+            'female_partner_name' => 'nullable|string|max:255',
+            'wedding_date' => 'nullable|date',
+            'engagement_date' => 'nullable|date',
+            'is_church_member' => 'required|boolean',
+            'attendance_count' => 'required|integer|min:0',
+            'absence_count' => 'required|integer|min:0',
+            'absence_reasons' => 'nullable|string',
+            'godparents_male' => 'nullable|string',
+            'godparents_female' => 'nullable|string',
+            'completed_pillars' => 'nullable|array',
+            'recommendation' => 'nullable|string',
+            'notes' => 'nullable|string',
         ]);
 
-        $data = ['status' => $validated['status']];
-
-        if ($validated['status'] === 'completed') {
-            $data['completed_at'] = now();
+        // Update partner names if provided
+        if (isset($validated['male_partner_name']) && $courseEnrollment->malePartner) {
+            $courseEnrollment->malePartner->update(['name' => $validated['male_partner_name']]);
+        }
+        if (isset($validated['female_partner_name']) && $courseEnrollment->femalePartner) {
+            $courseEnrollment->femalePartner->update(['name' => $validated['female_partner_name']]);
         }
 
-        $enrollment->update($data);
+        // Integrate with Weddings table if wedding date is new or updated
+        if (!empty($validated['wedding_date']) && $validated['wedding_date'] != optional($courseEnrollment->wedding_date)->format('Y-m-d')) {
+            \App\Models\Wedding::updateOrCreate(
+                [
+                    'groom_name' => $courseEnrollment->malePartner->name ?? 'N/A',
+                    'bride_name' => $courseEnrollment->femalePartner->name ?? 'N/A',
+                ],
+                [
+                    'date' => $validated['wedding_date'],
+                    'godparents' => ($validated['godparents_male'] ?? '') . ' & ' . ($validated['godparents_female'] ?? ''),
+                    'status' => 'scheduled'
+                ]
+            );
+        }
+
+        $courseEnrollment->update($validated);
+
+        if ($courseEnrollment->course_class_id) {
+            return redirect()->route('course-classes.show', $courseEnrollment->course_class_id)
+                ->with('success', 'Matrícula atualizada com sucesso!');
+        }
+
+        return redirect()->route('courses.index')->with('success', 'Matrícula atualizada com sucesso!');
+    }
+
+    public function destroy(CourseEnrollment $courseEnrollment)
+    {
+        $courseClassId = $courseEnrollment->course_class_id;
+        $courseEnrollment->delete();
+
+        if ($courseClassId) {
+            return redirect()->route('course-classes.show', $courseClassId)
+                ->with('success', 'Matrícula removida com sucesso!');
+        }
+
+        return redirect()->route('courses.index')->with('success', 'Matrícula removida com sucesso!');
+    }
+
+    public function updateStatus(Request $request, CourseEnrollment $courseEnrollment)
+    {
+        $validated = $request->validate([
+            'status' => 'required|in:cursando,aprovado,reprovado,desistente,enrolled,completed,dropped',
+        ]);
+
+        $courseEnrollment->update($validated);
 
         return back()->with('success', 'Status da matrícula atualizado!');
     }

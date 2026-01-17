@@ -10,9 +10,14 @@
         <a href="{{ route('course-classes.show', $courseClass) }}" class="text-gray-500 hover:text-gray-700 flex items-center">
             <i class="bi bi-arrow-left mr-2"></i> Voltar para a turma
         </a>
-        <button onclick="window.print()" class="bg-gray-800 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-black transition flex items-center shadow-lg shadow-gray-800/20">
-            <i class="bi bi-printer mr-2"></i> Imprimir Relatório
-        </button>
+        <div class="flex space-x-3">
+            <a href="{{ route('course-classes.export', $courseClass) }}" class="bg-green-600 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-green-700 transition flex items-center shadow-lg shadow-green-600/20">
+                <i class="bi bi-file-earmark-excel mr-2"></i> Exportar Excel
+            </a>
+            <button onclick="window.print()" class="bg-gray-800 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-black transition flex items-center shadow-lg shadow-gray-800/20">
+                <i class="bi bi-printer mr-2"></i> Imprimir Relatório
+            </button>
+        </div>
     </div>
 
     <!-- Estatísticas Gerais -->
@@ -51,49 +56,40 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
-                        @foreach($courseClass->coupleEnrollments as $couple)
-                            @php $absences = $couple->attendances()->where('status', 'absent')->count(); @endphp
+                        @forelse($courseClass->courseEnrollments as $enrollment)
+                            @php $absences = $enrollment->absence_count; @endphp
                             <tr>
                                 <td class="px-6 py-4">
-                                    <div class="font-bold text-gray-900">{{ $couple->husband_name }} & {{ $couple->wife_name }}</div>
-                                    <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Casal</div>
+                                    @if($enrollment->malePartner && $enrollment->femalePartner)
+                                        <div class="font-bold text-gray-900">{{ $enrollment->malePartner->name }} & {{ $enrollment->femalePartner->name }}</div>
+                                        <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">CASAL</div>
+                                    @else
+                                        <div class="font-bold text-gray-900">{{ $enrollment->user->name ?? 'N/A' }}</div>
+                                        <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">INDIVIDUAL</div>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 text-center font-bold {{ $absences > 2 ? 'text-red-600' : 'text-gray-600' }}">
                                     {{ $absences }}
                                 </td>
                                 <td class="px-6 py-4 text-center">
-                                    @if($couple->status == 'completed')
-                                        <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-[8px] font-black uppercase tracking-widest">Concluído</span>
-                                    @elseif($couple->status == 'failed')
-                                        <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-[8px] font-black uppercase tracking-widest">Reprovado</span>
-                                    @else
-                                        <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-[8px] font-black uppercase tracking-widest">Em Curso</span>
-                                    @endif
+                                    @php
+                                        $labelClasses = [
+                                            'cursando' => 'bg-blue-100 text-blue-800',
+                                            'aprovado' => 'bg-green-100 text-green-800',
+                                            'reprovado' => 'bg-red-100 text-red-800',
+                                            'desistente' => 'bg-gray-100 text-gray-800',
+                                        ];
+                                    @endphp
+                                    <span class="px-2 py-1 {{ $labelClasses[$enrollment->status] ?? 'bg-gray-100 text-gray-800' }} rounded-full text-[8px] font-black uppercase tracking-widest">
+                                        {{ $enrollment->status }}
+                                    </span>
                                 </td>
                             </tr>
-                        @endforeach
-
-                        @foreach($courseClass->courseEnrollments as $enrollment)
-                            @php $absences = $enrollment->attendances()->where('status', 'absent')->count(); @endphp
+                        @empty
                             <tr>
-                                <td class="px-6 py-4">
-                                    <div class="font-bold text-gray-900">{{ $enrollment->user->name }}</div>
-                                    <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Individual</div>
-                                </td>
-                                <td class="px-6 py-4 text-center font-bold {{ $absences > 2 ? 'text-red-600' : 'text-gray-600' }}">
-                                    {{ $absences }}
-                                </td>
-                                <td class="px-6 py-4 text-center">
-                                    @if($enrollment->status == 'completed')
-                                        <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-[8px] font-black uppercase tracking-widest">Concluído</span>
-                                    @elseif($enrollment->status == 'failed')
-                                        <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-[8px] font-black uppercase tracking-widest">Reprovado</span>
-                                    @else
-                                        <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-[8px] font-black uppercase tracking-widest">Em Curso</span>
-                                    @endif
-                                </td>
+                                <td colspan="3" class="px-6 py-4 text-center text-gray-400 italic">Nenhum inscrito.</td>
                             </tr>
-                        @endforeach
+                        @endforelse
                     </tbody>
                 </table>
             </div>
@@ -121,7 +117,7 @@
                                     <div class="text-right">
                                         @php 
                                             $present = $meeting->attendances->where('status', 'present')->count();
-                                            $total = $courseClass->enrollments_count;
+                                            $total = $courseClass->courseEnrollments->count();
                                             $percent = $total > 0 ? round(($present / $total) * 100) : 0;
                                         @endphp
                                         <span class="text-sm font-black text-gray-900">{{ $percent }}%</span>

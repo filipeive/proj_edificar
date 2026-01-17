@@ -121,6 +121,24 @@
                         {!! nl2br(e($quarterlyReport->ministerial_observations ?? 'Nenhum detalhe adicional fornecido.')) !!}
                     </div>
                 </div>
+
+                <!-- Visual Charts Section -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
+                        <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-6">Saúde Ministerial
+                            (Radar)</h3>
+                        <div class="aspect-square relative flex items-center justify-center">
+                            <canvas id="healthRadarChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
+                        <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-6">Tendência de Estrutura
+                        </h3>
+                        <div class="aspect-square relative flex items-center justify-center">
+                            <canvas id="structureBarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Right Column: Sidebar Stats -->
@@ -174,9 +192,11 @@
                                 </div>
                                 <div class="space-y-1">
                                     <h4 class="text-xs font-black text-gray-900 uppercase tracking-tight">
-                                        {{ $event->eventType->name ?? 'Evento' }}</h4>
+                                        {{ $event->eventType->name ?? 'Evento' }}
+                                    </h4>
                                     <p class="text-[10px] text-gray-500 font-bold leading-relaxed line-clamp-2 italic">
-                                        {{ $event->description ?: 'Atividade padrão concluída sem ressalvas.' }}</p>
+                                        {{ $event->description ?: 'Atividade padrão concluída sem ressalvas.' }}
+                                    </p>
                                 </div>
                             </div>
                         @empty
@@ -215,4 +235,97 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Radar Chart for Health Indicators
+                const radarCtx = document.getElementById('healthRadarChart').getContext('2d');
+                new Chart(radarCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: [
+                            'Discipulado', 'Pastoreio', 'Freq. Células',
+                            'Freq. Cultos', 'Koinonia', 'Consolidação', 'Oração'
+                        ],
+                        datasets: [{
+                            label: 'Pontuação Real',
+                            data: [
+                                    {{ $quarterlyReport->discipleship_score }},
+                                    {{ $quarterlyReport->pastoral_score }},
+                                    {{ $quarterlyReport->cell_participation_score }},
+                                    {{ $quarterlyReport->service_participation_score }},
+                                    {{ $quarterlyReport->communion_in_cells_score }},
+                                    {{ $quarterlyReport->relationship_building_score }},
+                                {{ $quarterlyReport->prayer_intercession_score }}
+                            ],
+                            backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                            borderColor: 'rgb(37, 99, 235)',
+                            pointBackgroundColor: 'rgb(37, 99, 235)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgb(37, 99, 235)'
+                        }, {
+                            label: 'Meta Mínima',
+                            data: [7, 7, 7, 7, 7, 7, 7],
+                            backgroundColor: 'rgba(209, 213, 219, 0.1)',
+                            borderColor: 'rgba(209, 213, 219, 0.5)',
+                            borderDash: [5, 5],
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                max: 10,
+                                ticks: { stepSize: 2 }
+                            }
+                        },
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+
+                // Bar Chart for Structure
+                const barCtx = document.getElementById('structureBarChart').getContext('2d');
+                new Chart(barCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Líderes', 'Células', 'Timóteos', 'Membros'],
+                        datasets: [{
+                            label: 'Quantidade',
+                            data: [
+                                    {{ $quarterlyReport->leaders_count }},
+                                    {{ $quarterlyReport->cells_count }},
+                                    {{ $quarterlyReport->timoteos_count }},
+                                {{ $quarterlyReport->members_count }}
+                            ],
+                            backgroundColor: [
+                                'rgba(59, 130, 246, 0.6)',
+                                'rgba(147, 51, 234, 0.6)',
+                                'rgba(99, 102, 241, 0.6)',
+                                'rgba(34, 197, 94, 0.6)'
+                            ],
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true }
+                        },
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            });
+        </script>
+    @endpush
 @endsection

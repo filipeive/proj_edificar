@@ -133,6 +133,24 @@ Route::middleware('auth')->group(function () {
         Route::put('/{member}', [UserController::class, 'updateFromContext'])->name('members.update');
         Route::delete('/{member}', [UserController::class, 'destroyFromContext'])->name('members.destroy');
     });
+
+    // Visitantes (Admin, Secretaria, Pastor de Zona)
+    Route::middleware('role:admin,secretaria,pastor_zona')->prefix('visitors')->name('visitors.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\VisitorController::class, 'index'])->name('index');
+        Route::get('/export', [\App\Http\Controllers\VisitorController::class, 'export'])->name('export');
+        Route::get('/create', [\App\Http\Controllers\VisitorController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\VisitorController::class, 'store'])->name('store');
+        Route::get('/{visitor}', [\App\Http\Controllers\VisitorController::class, 'show'])->name('show');
+        Route::get('/{visitor}/edit', [\App\Http\Controllers\VisitorController::class, 'edit'])->name('edit');
+        Route::put('/{visitor}', [\App\Http\Controllers\VisitorController::class, 'update'])->name('update');
+        Route::delete('/{visitor}', [\App\Http\Controllers\VisitorController::class, 'destroy'])->name('destroy');
+
+        // Ações especiais
+        Route::post('/{visitor}/assign-zone', [\App\Http\Controllers\VisitorController::class, 'assignToZone'])->name('assign-zone');
+        Route::post('/{visitor}/assign-cell', [\App\Http\Controllers\VisitorController::class, 'assignToCell'])->name('assign-cell');
+        Route::post('/{visitor}/mark-contacted', [\App\Http\Controllers\VisitorController::class, 'markAsContacted'])->name('mark-contacted');
+    });
+
     // ===== ECCLESIASTICAL & ADMINISTRATIVE ROUTES =====
     Route::prefix('admin')->group(function () {
 
@@ -160,6 +178,7 @@ Route::middleware('auth')->group(function () {
 
             // Cultos (Relatórios de Celebração)
             Route::get('/services/{service}/pdf', [\App\Http\Controllers\ServiceController::class, 'downloadPdf'])->name('services.download-pdf');
+            Route::get('services/report', [\App\Http\Controllers\ServiceController::class, 'report'])->name('services.report');
             Route::resource('services', \App\Http\Controllers\ServiceController::class);
         });
 
@@ -300,10 +319,14 @@ Route::middleware('auth')->group(function () {
     Route::post('course-classes/{course_class}/add-enrollment', [\App\Http\Controllers\CourseClassController::class, 'addEnrollment'])->name('course-classes.add-enrollment');
     Route::post('course-classes/{course_class}/remove-enrollment', [\App\Http\Controllers\CourseClassController::class, 'removeEnrollment'])->name('course-classes.remove-enrollment');
     Route::post('course-classes/{course_class}/meetings', [\App\Http\Controllers\CourseClassController::class, 'storeMeeting'])->name('course-classes.meetings.store');
+
+    Route::resource('course-enrollments', \App\Http\Controllers\CourseEnrollmentController::class);
+    Route::get('course-classes/upcoming-weddings', [\App\Http\Controllers\CourseClassController::class, 'upcomingWeddings'])->name('course-classes.upcoming-weddings');
     Route::get('course-classes/{course_class}/report', [\App\Http\Controllers\CourseClassController::class, 'report'])->name('course-classes.report');
+    Route::get('course-classes/{course_class}/export', [\App\Http\Controllers\CourseClassController::class, 'exportReport'])->name('course-classes.export');
 
     Route::post('courses/{course}/enroll', [\App\Http\Controllers\CourseEnrollmentController::class, 'enroll'])->name('courses.enroll');
-    Route::post('enrollments/{enrollment}/status', [\App\Http\Controllers\CourseEnrollmentController::class, 'updateStatus'])->name('enrollments.status');
+    Route::post('enrollments/{course_enrollment}/status', [\App\Http\Controllers\CourseEnrollmentController::class, 'updateStatus'])->name('enrollments.status');
 
     // ===== PERFIL DO UTILIZADOR =====
     Route::prefix('profile')->group(function () {

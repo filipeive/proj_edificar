@@ -9,11 +9,16 @@ class CourseClass extends Model
     protected $fillable = [
         'course_id',
         'name',
-        'leader_husband_id',
-        'leader_wife_id',
+        'type',
+        'teacher_male_id',
+        'teacher_female_id',
+        'assistant_male_id',
+        'assistant_female_id',
         'status',
         'start_date',
         'end_date',
+        'notes',
+        'created_by',
     ];
 
     protected $casts = [
@@ -26,14 +31,29 @@ class CourseClass extends Model
         return $this->belongsTo(Course::class);
     }
 
-    public function leaderHusband()
+    public function teacherMale()
     {
-        return $this->belongsTo(User::class, 'leader_husband_id');
+        return $this->belongsTo(User::class, 'teacher_male_id');
     }
 
-    public function leaderWife()
+    public function teacherFemale()
     {
-        return $this->belongsTo(User::class, 'leader_wife_id');
+        return $this->belongsTo(User::class, 'teacher_female_id');
+    }
+
+    public function assistantMale()
+    {
+        return $this->belongsTo(User::class, 'assistant_male_id');
+    }
+
+    public function assistantFemale()
+    {
+        return $this->belongsTo(User::class, 'assistant_female_id');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function meetings()

@@ -302,7 +302,9 @@
                     @endauth
                 </div>
 
-                <button class="md:hidden text-gray-900 text-2xl" onclick="toggleMobileMenu()">
+                <button
+                    class="md:hidden text-gray-900 text-2xl flex-shrink-0 p-2 hover:bg-gray-100 rounded-xl transition-colors"
+                    onclick="toggleMobileMenu()">
                     <i class="bi bi-list"></i>
                 </button>
             </div>
@@ -1063,7 +1065,7 @@
                 </div>
 
                 <div class="mt-12 text-center">
-                    <a href="https://www.youtube.com/@LifeChurch" target="_blank"
+                    <a href="https://www.youtube.com/@lifechurchmozambique8792" target="_blank"
                         class="inline-flex items-center space-x-3 bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-2xl transition-all duration-300 backdrop-blur-sm border border-white/10 group">
                         <i class="bi bi-youtube text-2xl text-red-600 group-hover:scale-110 transition-transform"></i>
                         <span class="font-bold uppercase tracking-widest text-xs">Visitar Canal no YouTube</span>

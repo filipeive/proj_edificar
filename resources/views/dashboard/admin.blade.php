@@ -5,6 +5,187 @@
 @section('page-subtitle', 'Visão geral de todas as atividades e contribuições')
 
 @section('content')
+    <!-- Métricas Eclesiásticas -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Card: Membros Ativos -->
+        <div
+            class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 hover:shadow-xl transition-all duration-500 group">
+            <div class="flex items-center justify-between mb-4">
+                <div class="bg-blue-50 p-4 rounded-2xl group-hover:bg-blue-600 transition-colors duration-500">
+                    <i
+                        class="bi bi-people-fill text-blue-600 text-2xl group-hover:text-white transition-colors duration-500"></i>
+                </div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Comunidade</span>
+            </div>
+            <div>
+                <p class="text-gray-500 text-sm font-bold uppercase tracking-wider">Membros Ativos</p>
+                <p class="text-3xl font-black text-gray-900 mt-2 tracking-tighter">{{ $totalMembers }}</p>
+                <div class="flex items-center mt-4 text-xs">
+                    <span class="text-blue-500 font-bold flex items-center">
+                        <i class="bi bi-graph-up text-lg"></i> Crescendo
+                    </span>
+                    <span class="text-gray-400 ml-2">este mês</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card: Células Ativas -->
+        <div
+            class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 hover:shadow-xl transition-all duration-500 group">
+            <div class="flex items-center justify-between mb-4">
+                <div class="bg-green-50 p-4 rounded-2xl group-hover:bg-green-600 transition-colors duration-500">
+                    <i
+                        class="bi bi-diagram-3-fill text-green-600 text-2xl group-hover:text-white transition-colors duration-500"></i>
+                </div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Células</span>
+            </div>
+            <div>
+                <p class="text-gray-500 text-sm font-bold uppercase tracking-wider">Células Ativas</p>
+                <p class="text-3xl font-black text-gray-900 mt-2 tracking-tighter">{{ count($topCells) }}</p>
+                <a href="{{ route('cells.index') }}"
+                    class="inline-flex items-center mt-4 text-xs font-black text-green-600 uppercase tracking-widest hover:text-green-700">
+                    Ver Todas <i class="bi bi-arrow-right ml-1"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Card: Próximos Eventos -->
+        <div
+            class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 hover:shadow-xl transition-all duration-500 group">
+            <div class="flex items-center justify-between mb-4">
+                <div class="bg-purple-50 p-4 rounded-2xl group-hover:bg-purple-600 transition-colors duration-500">
+                    <i
+                        class="bi bi-calendar-event-fill text-purple-600 text-2xl group-hover:text-white transition-colors duration-500"></i>
+                </div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Agenda</span>
+            </div>
+            <div>
+                <p class="text-gray-500 text-sm font-bold uppercase tracking-wider">Próximos Eventos</p>
+                <p class="text-3xl font-black text-gray-900 mt-2 tracking-tighter">{{ count($upcomingEvents) }}</p>
+                <a href="{{ route('events.index') }}"
+                    class="inline-flex items-center mt-4 text-xs font-black text-purple-600 uppercase tracking-widest hover:text-purple-700">
+                    Ver Calendário <i class="bi bi-arrow-right ml-1"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Card: Cultos Recentes -->
+        <div
+            class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 hover:shadow-xl transition-all duration-500 group">
+            <div class="flex items-center justify-between mb-4">
+                <div class="bg-orange-50 p-4 rounded-2xl group-hover:bg-orange-600 transition-colors duration-500">
+                    <i
+                        class="bi bi-journal-bookmark-fill text-orange-600 text-2xl group-hover:text-white transition-colors duration-500"></i>
+                </div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Cultos</span>
+            </div>
+            <div>
+                <p class="text-gray-500 text-sm font-bold uppercase tracking-wider">Relatórios</p>
+                <p class="text-3xl font-black text-gray-900 mt-2 tracking-tighter">{{ count($recentServices) }}</p>
+                <a href="{{ route('services.index') }}"
+                    class="inline-flex items-center mt-4 text-xs font-black text-orange-600 uppercase tracking-widest hover:text-orange-700">
+                    Ver Todos <i class="bi bi-arrow-right ml-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="mb-8">
+        <h3 class="text-xl font-black text-gray-900 tracking-tight mb-6 flex items-center">
+            <i class="bi bi-lightning-charge-fill text-orange-600 mr-3"></i> Ações Rápidas
+        </h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <a href="{{ route('events.create') }}" class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all text-center group">
+                <div class="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600 mx-auto mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors">
+                    <i class="bi bi-calendar-plus"></i>
+                </div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-gray-600">Novo Evento</span>
+            </a>
+            <a href="{{ route('services.create') }}" class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all text-center group">
+                <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 mx-auto mb-3 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                    <i class="bi bi-journal-plus"></i>
+                </div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-gray-600">Novo Culto</span>
+            </a>
+            <a href="{{ route('users.create') }}" class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all text-center group">
+                <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center text-green-600 mx-auto mb-3 group-hover:bg-green-600 group-hover:text-white transition-colors">
+                    <i class="bi bi-person-plus"></i>
+                </div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-gray-600">Novo Membro</span>
+            </a>
+            <a href="{{ route('cells.create') }}" class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all text-center group">
+                <div class="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600 mx-auto mb-3 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                    <i class="bi bi-diagram-3"></i>
+                </div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-gray-600">Nova Célula</span>
+            </a>
+            <a href="{{ route('quarterly-reports.create') }}" class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all text-center group">
+                <div class="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center text-red-600 mx-auto mb-3 group-hover:bg-red-600 group-hover:text-white transition-colors">
+                    <i class="bi bi-file-earmark-bar-graph"></i>
+                </div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-gray-600">Relat. Trimestral</span>
+            </a>
+            <a href="{{ route('quarterly-reports.export') }}" class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all text-center group">
+                <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 mx-auto mb-3 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                    <i class="bi bi-file-earmark-spreadsheet"></i>
+                </div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-gray-600">Exportar Excel</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Gestão Eclesiástica -->
+    <div class="mb-8">
+        <h3 class="text-2xl font-black text-gray-900 tracking-tight mb-6 flex items-center">
+            <i class="bi bi-building text-orange-600 mr-3"></i> Gestão Eclesiástica
+        </h3>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        <!-- Crescimento de Membros -->
+        <div class="lg:col-span-2 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
+            <div class="flex items-center justify-between mb-8">
+                <h3 class="text-xl font-black text-gray-900 tracking-tight">Crescimento de Membros</h3>
+                <span class="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-bold uppercase tracking-widest">Últimos 6 Meses</span>
+            </div>
+            <div class="h-[350px] relative">
+                <canvas id="growthChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Atividade Recente -->
+        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
+            <h3 class="text-xl font-black text-gray-900 tracking-tight mb-8">Atividade Recente</h3>
+            <div class="space-y-6">
+                @forelse($recentActivity as $activity)
+                    <div class="flex items-start space-x-4">
+                        <div class="w-10 h-10 {{ $activity['bg'] }} {{ $activity['color'] }} rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i class="bi {{ $activity['icon'] }}"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-black text-gray-900">{{ $activity['title'] }}</p>
+                            <p class="text-xs text-gray-500 truncate">{{ $activity['description'] }}</p>
+                            <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">
+                                {{ $activity['time']->diffForHumans() }}
+                            </p>
+                        </div>
+                    </div>
+                @empty
+                    <p class="text-center text-gray-400 py-10">Nenhuma atividade recente.</p>
+                @endforelse
+            </div>
+        </div>
+    </div>
+
+    <!-- Projeto Edificar - Métricas Financeiras -->
+    <div class="mb-8 mt-12">
+        <h3 class="text-2xl font-black text-gray-900 tracking-tight mb-6 flex items-center">
+            <i class="bi bi-cash-stack text-green-600 mr-3"></i> Projeto Edificar - Contribuições
+        </h3>
+    </div>
+
+    <!-- Métricas Financeiras -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <!-- Card: Total Arrecadado -->
         <div
@@ -25,28 +206,6 @@
                         <i class="bi bi-arrow-up-short text-lg"></i> 12%
                     </span>
                     <span class="text-gray-400 ml-2">vs mês anterior</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Card: Membros Ativos -->
-        <div
-            class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 hover:shadow-xl transition-all duration-500 group">
-            <div class="flex items-center justify-between mb-4">
-                <div class="bg-blue-50 p-4 rounded-2xl group-hover:bg-blue-600 transition-colors duration-500">
-                    <i
-                        class="bi bi-people-fill text-blue-600 text-2xl group-hover:text-white transition-colors duration-500"></i>
-                </div>
-                <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Comunidade</span>
-            </div>
-            <div>
-                <p class="text-gray-500 text-sm font-bold uppercase tracking-wider">Membros Ativos</p>
-                <p class="text-3xl font-black text-gray-900 mt-2 tracking-tighter">{{ $totalMembers }}</p>
-                <div class="flex items-center mt-4 text-xs">
-                    <span class="text-blue-500 font-bold flex items-center">
-                        <i class="bi bi-plus text-lg"></i> <!-- adicionar a metrica dos ultimos 5 novos membros criados -->
-                    </span>
-                    <span class="text-gray-400 ml-2">esta semana</span>
                 </div>
             </div>
         </div>
@@ -89,50 +248,25 @@
                 </a>
             </div>
         </div>
-    </div>
 
-    <!-- Quick Actions -->
-    <div class="mb-8">
-        <h3 class="text-xl font-black text-gray-900 tracking-tight mb-6 flex items-center">
-            <i class="bi bi-lightning-charge-fill text-orange-600 mr-3"></i> Ações Rápidas
-        </h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            <a href="{{ route('events.create') }}" class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all text-center group">
-                <div class="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600 mx-auto mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors">
-                    <i class="bi bi-calendar-plus"></i>
+        <!-- Card: Top Células -->
+        <div
+            class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 hover:shadow-xl transition-all duration-500 group">
+            <div class="flex items-center justify-between mb-4">
+                <div class="bg-blue-50 p-4 rounded-2xl group-hover:bg-blue-600 transition-colors duration-500">
+                    <i
+                        class="bi bi-trophy-fill text-blue-600 text-2xl group-hover:text-white transition-colors duration-500"></i>
                 </div>
-                <span class="text-[10px] font-black uppercase tracking-widest text-gray-600">Novo Evento</span>
-            </a>
-            <a href="{{ route('services.create') }}" class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all text-center group">
-                <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 mx-auto mb-3 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                    <i class="bi bi-journal-plus"></i>
-                </div>
-                <span class="text-[10px] font-black uppercase tracking-widest text-gray-600">Novo Culto</span>
-            </a>
-            <a href="{{ route('users.create') }}" class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all text-center group">
-                <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center text-green-600 mx-auto mb-3 group-hover:bg-green-600 group-hover:text-white transition-colors">
-                    <i class="bi bi-person-plus"></i>
-                </div>
-                <span class="text-[10px] font-black uppercase tracking-widest text-gray-600">Novo Membro</span>
-            </a>
-            <a href="{{ route('contributions.create') }}" class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all text-center group">
-                <div class="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600 mx-auto mb-3 group-hover:bg-purple-600 group-hover:text-white transition-colors">
-                    <i class="bi bi-cash-stack"></i>
-                </div>
-                <span class="text-[10px] font-black uppercase tracking-widest text-gray-600">Lançar Oferta</span>
-            </a>
-            <a href="{{ route('quarterly-reports.create') }}" class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all text-center group">
-                <div class="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center text-red-600 mx-auto mb-3 group-hover:bg-red-600 group-hover:text-white transition-colors">
-                    <i class="bi bi-file-earmark-bar-graph"></i>
-                </div>
-                <span class="text-[10px] font-black uppercase tracking-widest text-gray-600">Relat. Trimestral</span>
-            </a>
-            <a href="{{ route('quarterly-reports.export') }}" class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all text-center group">
-                <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 mx-auto mb-3 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                    <i class="bi bi-file-earmark-spreadsheet"></i>
-                </div>
-                <span class="text-[10px] font-black uppercase tracking-widest text-gray-600">Exportar Excel</span>
-            </a>
+                <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Ranking</span>
+            </div>
+            <div>
+                <p class="text-gray-500 text-sm font-bold uppercase tracking-wider">Top Células</p>
+                <p class="text-3xl font-black text-gray-900 mt-2 tracking-tighter">{{ count($topCells) }}</p>
+                <a href="#top-cells"
+                    class="inline-flex items-center mt-4 text-xs font-black text-blue-600 uppercase tracking-widest hover:text-blue-700">
+                    Ver Ranking <i class="bi bi-arrow-down ml-1"></i>
+                </a>
+            </div>
         </div>
     </div>
 
@@ -151,7 +285,7 @@
         </div>
 
         <!-- Top Células -->
-        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
+        <div id="top-cells" class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
             <h3 class="text-xl font-black text-gray-900 tracking-tight mb-8">Top 10 Células</h3>
             <div class="space-y-4">
                 @foreach($topCells as $index => $cell)
@@ -173,42 +307,6 @@
                         </div>
                     </div>
                 @endforeach
-            </div>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-        <!-- Growth Chart -->
-        <div class="lg:col-span-2 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
-            <div class="flex items-center justify-between mb-8">
-                <h3 class="text-xl font-black text-gray-900 tracking-tight">Crescimento de Membros</h3>
-                <span class="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-bold uppercase tracking-widest">Últimos 6 Meses</span>
-            </div>
-            <div class="h-[350px] relative">
-                <canvas id="growthChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Atividade Recente -->
-        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
-            <h3 class="text-xl font-black text-gray-900 tracking-tight mb-8">Atividade Recente</h3>
-            <div class="space-y-6">
-                @forelse($recentActivity as $activity)
-                    <div class="flex items-start space-x-4">
-                        <div class="w-10 h-10 {{ $activity['bg'] }} {{ $activity['color'] }} rounded-xl flex items-center justify-center flex-shrink-0">
-                            <i class="bi {{ $activity['icon'] }}"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-black text-gray-900">{{ $activity['title'] }}</p>
-                            <p class="text-xs text-gray-500 truncate">{{ $activity['description'] }}</p>
-                            <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">
-                                {{ $activity['time']->diffForHumans() }}
-                            </p>
-                        </div>
-                    </div>
-                @empty
-                    <p class="text-center text-gray-400 py-10">Nenhuma atividade recente.</p>
-                @endforelse
             </div>
         </div>
     </div>

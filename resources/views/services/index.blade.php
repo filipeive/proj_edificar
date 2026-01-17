@@ -32,10 +32,20 @@
                     </button>
                 </div>
 
-                <a href="{{ route('services.create') }}" class="group flex items-center bg-blue-600 text-white px-8 py-4 rounded-[1.5rem] hover:bg-blue-700 transition-all font-black shadow-xl shadow-blue-200 hover:-translate-y-1 text-sm md:text-base">
-                    <i class="bi bi-plus-lg mr-2 text-lg"></i>
-                    Registrar Culto
-                </a>
+                <div class="flex flex-wrap items-center gap-3">
+                    <a href="{{ route('services.report') }}"
+                        class="flex items-center bg-gray-50 text-gray-500 px-6 py-4 rounded-2xl hover:bg-gray-100 transition-all font-black text-xs uppercase tracking-widest border border-gray-100">
+                        <i class="bi bi-graph-up text-lg mr-2 text-blue-600"></i>
+                        Análise de Tendência
+                    </a>
+                    @can('create', App\Models\Service::class)
+                        <a href="{{ route('services.create') }}"
+                            class="flex items-center bg-blue-600 text-white px-6 py-4 rounded-2xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-600/20">
+                            <i class="bi bi-plus-lg text-lg mr-2"></i>
+                            Registrar Culto
+                        </a>
+                    @endcan
+                </div>
             </div>
         </div>
 

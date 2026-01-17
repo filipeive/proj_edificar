@@ -105,16 +105,27 @@
                                         <td class="px-8 py-6">
                                             <div class="flex items-center">
                                                 <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-bold mr-4">
-                                                    {{ substr($enrollment->user->name, 0, 1) }}
+                                                    @if($enrollment->user_id)
+                                                        {{ substr($enrollment->user->name, 0, 1) }}
+                                                    @else
+                                                        <i class="bi bi-heart-fill text-red-500"></i>
+                                                    @endif
                                                 </div>
                                                 <div>
-                                                    <p class="font-bold text-gray-900">{{ $enrollment->user->name }}</p>
-                                                    <p class="text-xs text-gray-400">{{ $enrollment->user->email }}</p>
+                                                    @if($enrollment->user_id)
+                                                        <p class="font-bold text-gray-900">{{ $enrollment->user->name }}</p>
+                                                        <p class="text-xs text-gray-400">{{ $enrollment->user->email }}</p>
+                                                    @else
+                                                        <p class="font-bold text-gray-900">
+                                                            {{ $enrollment->malePartner->name ?? 'N/A' }} & {{ $enrollment->femalePartner->name ?? 'N/A' }}
+                                                        </p>
+                                                        <p class="text-xs text-gray-400">Casal (Pré-Nupcial)</p>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </td>
                                         <td class="px-8 py-6 text-sm text-gray-600">
-                                            {{ $enrollment->enrolled_at->format('d/m/Y') }}
+                                            {{ optional($enrollment->enrolled_at)->format('d/m/Y') ?? $enrollment->created_at->format('d/m/Y') }}
                                         </td>
                                         <td class="px-8 py-6">
                                             @if($enrollment->status === 'completed')

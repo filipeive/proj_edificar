@@ -234,4 +234,21 @@ class ServiceController extends Controller
 
         return $pdf->download("relatorio_culto_" . \Carbon\Carbon::parse($service->date)->format('Y-m-d') . ".pdf");
     }
+
+    public function report()
+    {
+        Gate::authorize('viewAny', Service::class);
+
+        // Get last 12 services for trend analysis
+        $trendServices = Service::orderBy('date', 'desc')->take(12)->get()->reverse();
+
+        $stats = [
+            'labels' => $trendServices->map(fn($s) => \Carbon\Carbon::parse($s->date)->format('d/m')),
+            'attendance' => $trendServices->map(fn($s) => $s->adults_members + $s->adults_visitors + $s->children_members + $s->children_visitors),
+            'visitors' => $trendServices->map(fn($s) => $s->adults_visitors + $s->children_visitors),
+            'salvations' => $trendServices->map(fn($s) => $s->adults_salvations + $s->children_salvations),
+        ];
+
+        return view('services.report', compact('stats', 'trendServices'));
+    }
 }

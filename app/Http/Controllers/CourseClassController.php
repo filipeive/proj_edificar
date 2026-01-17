@@ -10,31 +10,39 @@ use App\Models\CourseEnrollment;
 use App\Models\CoupleEnrollment;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\CourseClassReportExport;
 
 class CourseClassController extends Controller
 {
     public function index(Request $request)
     {
         $courseId = $request->query('course_id');
-        $query = CourseClass::with(['course', 'leaderHusband', 'leaderWife']);
+        $type = $request->query('type');
+
+        $query = CourseClass::with(['course', 'teacherMale', 'teacherFemale', 'assistantMale', 'assistantFemale']);
 
         if ($courseId) {
             $query->where('course_id', $courseId);
         }
 
+        if ($type) {
+            $query->where('type', $type);
+        }
+
         $classes = $query->latest()->paginate(10);
-        $courses = Course::where('is_active', true)->get();
+        $courses = Course::all();
 
         return view('course_classes.index', compact('classes', 'courses'));
     }
 
     public function create(Request $request)
     {
-        $courses = Course::where('is_active', true)->get();
-        $leaders = User::whereIn('role', ['pastor', 'supervisor', 'membro'])->get();
+        $courses = Course::all();
+        $teachers = User::whereIn('role', ['pastor', 'supervisor', 'membro', 'admin', 'secretaria'])->orderBy('name')->get();
         $selectedCourseId = $request->query('course_id');
 
-        return view('course_classes.create', compact('courses', 'leaders', 'selectedCourseId'));
+        return view('course_classes.create', compact('courses', 'teachers', 'selectedCourseId'));
     }
 
     public function store(Request $request)
@@ -42,41 +50,49 @@ class CourseClassController extends Controller
         $validated = $request->validate([
             'course_id' => 'required|exists:courses,id',
             'name' => 'required|string|max:255',
-            'leader_husband_id' => 'nullable|exists:users,id',
-            'leader_wife_id' => 'nullable|exists:users,id',
+            'type' => 'required|in:casais_vivendo,pre_nupcial',
+            'teacher_male_id' => 'nullable|exists:users,id',
+            'teacher_female_id' => 'nullable|exists:users,id',
+            'assistant_male_id' => 'nullable|exists:users,id',
+            'assistant_female_id' => 'nullable|exists:users,id',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
+            'notes' => 'nullable|string',
         ]);
 
-        CourseClass::create($validated);
+        $validated['created_by'] = auth()->id();
+        $validated['status'] = 'em_andamento';
 
-        return redirect()->route('course-classes.index', ['course_id' => $request->course_id])
+        $courseClass = CourseClass::create($validated);
+
+        return redirect()->route('course-classes.show', $courseClass)
             ->with('success', 'Turma criada com sucesso!');
     }
 
     public function show(CourseClass $courseClass)
     {
-        $courseClass->load(['course', 'leaderHusband', 'leaderWife', 'meetings.attendances', 'courseEnrollments.user', 'coupleEnrollments']);
+        $courseClass->load([
+            'course',
+            'teacherMale',
+            'teacherFemale',
+            'assistantMale',
+            'assistantFemale',
+            'meetings.attendances',
+            'courseEnrollments.malePartner',
+            'courseEnrollments.femalePartner'
+        ]);
 
-        // Available enrollments for this course that are not yet assigned to a class
-        $availableCourseEnrollments = CourseEnrollment::where('course_id', $courseClass->course_id)
-            ->whereNull('course_class_id')
-            ->with('user')
-            ->get();
+        $availableUsers = User::orderBy('name')->get();
 
-        $availableCoupleEnrollments = CoupleEnrollment::where('course_id', $courseClass->course_id)
-            ->whereNull('course_class_id')
-            ->get();
-
-        return view('course_classes.show', compact('courseClass', 'availableCourseEnrollments', 'availableCoupleEnrollments'));
+        return view('course_classes.show', compact('courseClass', 'availableUsers'));
     }
 
     public function edit(CourseClass $courseClass)
     {
         $courses = Course::where('is_active', true)->get();
-        $leaders = User::whereIn('role', ['pastor', 'supervisor', 'membro'])->get();
+        $teachers = User::whereIn('role', ['pastor', 'supervisor', 'membro', 'admin', 'secretaria', 'pastor_zona'])->get();
 
-        return view('course_classes.edit', compact('courseClass', 'courses', 'leaders'));
+        return view('course_classes.edit', compact('courseClass', 'courses', 'teachers'));
     }
 
     public function update(Request $request, CourseClass $courseClass)
@@ -84,11 +100,15 @@ class CourseClassController extends Controller
         $validated = $request->validate([
             'course_id' => 'required|exists:courses,id',
             'name' => 'required|string|max:255',
-            'leader_husband_id' => 'nullable|exists:users,id',
-            'leader_wife_id' => 'nullable|exists:users,id',
-            'status' => 'required|in:active,completed,cancelled',
+            'type' => 'required|in:casais_vivendo,pre_nupcial',
+            'teacher_male_id' => 'nullable|exists:users,id',
+            'teacher_female_id' => 'nullable|exists:users,id',
+            'assistant_male_id' => 'nullable|exists:users,id',
+            'assistant_female_id' => 'nullable|exists:users,id',
+            'status' => 'required|in:em_andamento,concluida,cancelada',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
+            'notes' => 'nullable|string',
         ]);
 
         $courseClass->update($validated);
@@ -130,21 +150,22 @@ class CourseClassController extends Controller
     {
         $attendances = $request->input('attendance', []);
 
-        foreach ($attendances as $key => $status) {
-            list($type, $id) = explode(':', $key);
-
+        foreach ($attendances as $enrollmentId => $status) {
             CourseClassAttendance::updateOrCreate(
                 [
                     'course_class_meeting_id' => $meeting->id,
-                    'enrollable_type' => $type == 'course' ? CourseEnrollment::class : CoupleEnrollment::class,
-                    'enrollable_id' => $id,
+                    'enrollable_type' => CourseEnrollment::class,
+                    'enrollable_id' => $enrollmentId,
                 ],
                 ['status' => $status]
             );
-        }
 
-        // Check for failure logic (more than 2 absences)
-        $this->checkCompletionStatus($courseClass);
+            // Update attendance counts in enrollment
+            $enrollment = CourseEnrollment::find($enrollmentId);
+            if ($enrollment) {
+                $enrollment->syncAttendanceCounts();
+            }
+        }
 
         return redirect()->route('course-classes.show', $courseClass)
             ->with('success', 'Presenças registradas com sucesso!');
@@ -153,32 +174,50 @@ class CourseClassController extends Controller
     public function addEnrollment(Request $request, CourseClass $courseClass)
     {
         $validated = $request->validate([
-            'enrollment_type' => 'required|in:course,couple',
-            'enrollment_id' => 'required|integer',
+            'male_partner_id' => 'nullable|exists:users,id',
+            'female_partner_id' => 'nullable|exists:users,id',
+            'wedding_date' => 'nullable|date',
+            'is_church_member' => 'required|boolean',
         ]);
 
-        if ($validated['enrollment_type'] == 'course') {
-            CourseEnrollment::where('id', $validated['enrollment_id'])->update(['course_class_id' => $courseClass->id]);
-        } else {
-            CoupleEnrollment::where('id', $validated['enrollment_id'])->update(['course_class_id' => $courseClass->id]);
+        if (!$validated['male_partner_id'] && !$validated['female_partner_id']) {
+            return back()->with('error', 'Selecione pelo menos um parceiro.');
+        }
+
+        $enrollment = CourseEnrollment::create([
+            'course_id' => $courseClass->course_id,
+            'course_class_id' => $courseClass->id,
+            'male_partner_id' => $validated['male_partner_id'],
+            'female_partner_id' => $validated['female_partner_id'],
+            'wedding_date' => $validated['wedding_date'],
+            'is_church_member' => $validated['is_church_member'],
+            'status' => 'cursando',
+        ]);
+
+        if (!empty($validated['wedding_date'])) {
+            \App\Models\Wedding::updateOrCreate(
+                [
+                    'groom_name' => $enrollment->malePartner->name ?? 'N/A',
+                    'bride_name' => $enrollment->femalePartner->name ?? 'N/A',
+                ],
+                [
+                    'date' => $validated['wedding_date'],
+                    'status' => 'scheduled'
+                ]
+            );
         }
 
         return redirect()->route('course-classes.show', $courseClass)
-            ->with('success', 'Inscrito adicionado à turma!');
+            ->with('success', 'Matrícula realizada com sucesso!');
     }
 
     public function removeEnrollment(Request $request, CourseClass $courseClass)
     {
         $validated = $request->validate([
-            'enrollment_type' => 'required|in:course,couple',
-            'enrollment_id' => 'required|integer',
+            'enrollment_id' => 'required|exists:course_enrollments,id',
         ]);
 
-        if ($validated['enrollment_type'] == 'course') {
-            CourseEnrollment::where('id', $validated['enrollment_id'])->update(['course_class_id' => null]);
-        } else {
-            CoupleEnrollment::where('id', $validated['enrollment_id'])->update(['course_class_id' => null]);
-        }
+        CourseEnrollment::where('id', $validated['enrollment_id'])->delete();
 
         return redirect()->route('course-classes.show', $courseClass)
             ->with('success', 'Inscrito removido da turma!');
@@ -186,43 +225,34 @@ class CourseClassController extends Controller
 
     public function report(CourseClass $courseClass)
     {
-        $courseClass->load(['course', 'meetings.attendances', 'courseEnrollments.user', 'coupleEnrollments']);
+        $courseClass->load(['course', 'meetings.attendances', 'courseEnrollments.malePartner', 'courseEnrollments.femalePartner']);
 
         $stats = [
-            'total_enrolled' => $courseClass->enrollments_count,
-            'started' => 0,
-            'completed' => 0,
-            'failed' => 0,
-            'active' => 0,
+            'total_enrolled' => $courseClass->courseEnrollments->count(),
+            'started' => $courseClass->courseEnrollments->where('attendance_count', '>', 0)->count(),
+            'completed' => $courseClass->courseEnrollments->where('status', 'aprovado')->count(),
+            'failed' => $courseClass->courseEnrollments->where('status', 'reprovado')->count(),
+            'active' => $courseClass->courseEnrollments->where('status', 'cursando')->count(),
+            'average_attendance' => $courseClass->courseEnrollments->avg('attendance_count') ?? 0,
         ];
 
-        foreach ($courseClass->courseEnrollments as $enrollment) {
-            $hasAttended = $enrollment->attendances()->where('status', 'present')->exists();
-            if ($hasAttended)
-                $stats['started']++;
-
-            if ($enrollment->status == 'completed')
-                $stats['completed']++;
-            elseif ($enrollment->status == 'failed')
-                $stats['failed']++;
-            else
-                $stats['active']++;
-        }
-
-        foreach ($courseClass->coupleEnrollments as $enrollment) {
-            $hasAttended = $enrollment->attendances()->where('status', 'present')->exists();
-            if ($hasAttended)
-                $stats['started']++;
-
-            if ($enrollment->status == 'completed')
-                $stats['completed']++;
-            elseif ($enrollment->status == 'failed')
-                $stats['failed']++;
-            else
-                $stats['active']++;
-        }
-
         return view('course_classes.report', compact('courseClass', 'stats'));
+    }
+
+    public function upcomingWeddings()
+    {
+        $enrollments = CourseEnrollment::whereNotNull('wedding_date')
+            ->where('wedding_date', '>=', now())
+            ->orderBy('wedding_date')
+            ->with(['malePartner', 'femalePartner', 'courseClass.course'])
+            ->get();
+
+        return view('course_classes.upcoming_weddings', compact('enrollments'));
+    }
+
+    public function exportReport(CourseClass $courseClass)
+    {
+        return Excel::download(new CourseClassReportExport($courseClass), 'relatorio_turma_' . $courseClass->id . '.xlsx');
     }
 
     private function checkCompletionStatus(CourseClass $courseClass)

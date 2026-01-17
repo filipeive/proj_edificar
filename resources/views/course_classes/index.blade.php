@@ -40,7 +40,7 @@
                     <tr class="bg-gray-50 border-b border-gray-200">
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Turma</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Curso</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Líderes</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Professores</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">Inscritos</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">Status</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Ações</th>
@@ -61,10 +61,10 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="text-sm text-gray-900">
-                                    {{ $class->leaderHusband->name ?? 'N/A' }}
+                                    {{ $class->teacherMale->name ?? 'N/A' }}
                                 </div>
                                 <div class="text-sm text-gray-900">
-                                    {{ $class->leaderWife->name ?? '' }}
+                                    {{ $class->teacherFemale->name ?? '' }}
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-center">
@@ -75,11 +75,17 @@
                             <td class="px-6 py-4 text-center">
                                 @php
                                     $statusClasses = [
-                                        'active' => 'bg-green-100 text-green-800',
+                                        'em_andamento' => 'bg-green-100 text-green-800',
+                                        'concluida' => 'bg-blue-100 text-blue-800',
+                                        'cancelada' => 'bg-red-100 text-red-800',
+                                        'active' => 'bg-green-100 text-green-800', // Backward compatibility
                                         'completed' => 'bg-blue-100 text-blue-800',
                                         'cancelled' => 'bg-red-100 text-red-800',
                                     ];
                                     $statusLabels = [
+                                        'em_andamento' => 'Em Andamento',
+                                        'concluida' => 'Concluída',
+                                        'cancelada' => 'Cancelada',
                                         'active' => 'Ativa',
                                         'completed' => 'Concluída',
                                         'cancelled' => 'Cancelada',

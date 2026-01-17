@@ -35,37 +35,75 @@
                                 @error('course_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
 
-                            <div class="md:col-span-2">
+                            <div class="md:col-span-1">
+                                <label for="type" class="block text-sm font-bold text-gray-700 mb-2">Tipo de Turma *</label>
+                                <select name="type" id="type" required
+                                    class="w-full rounded-xl border-gray-200 focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="casais_vivendo" {{ old('type', $courseClass->type) == 'casais_vivendo' ? 'selected' : '' }}>Casais Vivendo Juntos</option>
+                                    <option value="pre_nupcial" {{ old('type', $courseClass->type) == 'pre_nupcial' ? 'selected' : '' }}>Pré-Nupcial</option>
+                                </select>
+                                @error('type') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                            </div>
+
+                            <div class="md:col-span-1">
                                 <label for="name" class="block text-sm font-bold text-gray-700 mb-2">Nome da Turma *</label>
                                 <input type="text" name="name" id="name" value="{{ old('name', $courseClass->name) }}"
-                                    required
+                                    required placeholder="Ex: Turma A - 2026"
                                     class="w-full rounded-xl border-gray-200 focus:ring-blue-500 focus:border-blue-500">
                                 @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
 
                             <div>
-                                <label for="leader_husband_id" class="block text-sm font-bold text-gray-700 mb-2">Líder
+                                <label for="teacher_male_id" class="block text-sm font-bold text-gray-700 mb-2">Professor
                                     (Esposo)</label>
-                                <select name="leader_husband_id" id="leader_husband_id"
+                                <select name="teacher_male_id" id="teacher_male_id"
                                     class="w-full rounded-xl border-gray-200 focus:ring-blue-500 focus:border-blue-500">
-                                    <option value="">Selecione um líder</option>
-                                    @foreach($leaders as $leader)
-                                        <option value="{{ $leader->id }}" {{ old('leader_husband_id', $courseClass->leader_husband_id) == $leader->id ? 'selected' : '' }}>
-                                            {{ $leader->name }}
+                                    <option value="">Selecione...</option>
+                                    @foreach($teachers as $teacher)
+                                        <option value="{{ $teacher->id }}" {{ old('teacher_male_id', $courseClass->teacher_male_id) == $teacher->id ? 'selected' : '' }}>
+                                            {{ $teacher->name }}
                                         </option>
                                     @endforeach
                                 </select>
                             </div>
 
                             <div>
-                                <label for="leader_wife_id" class="block text-sm font-bold text-gray-700 mb-2">Líder
+                                <label for="teacher_female_id" class="block text-sm font-bold text-gray-700 mb-2">Professor
                                     (Esposa)</label>
-                                <select name="leader_wife_id" id="leader_wife_id"
+                                <select name="teacher_female_id" id="teacher_female_id"
                                     class="w-full rounded-xl border-gray-200 focus:ring-blue-500 focus:border-blue-500">
-                                    <option value="">Selecione um líder</option>
-                                    @foreach($leaders as $leader)
-                                        <option value="{{ $leader->id }}" {{ old('leader_wife_id', $courseClass->leader_wife_id) == $leader->id ? 'selected' : '' }}>
-                                            {{ $leader->name }}
+                                    <option value="">Selecione...</option>
+                                    @foreach($teachers as $teacher)
+                                        <option value="{{ $teacher->id }}" {{ old('teacher_female_id', $courseClass->teacher_female_id) == $teacher->id ? 'selected' : '' }}>
+                                            {{ $teacher->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="assistant_male_id" class="block text-sm font-bold text-gray-700 mb-2">Auxiliar
+                                    (Esposo)</label>
+                                <select name="assistant_male_id" id="assistant_male_id"
+                                    class="w-full rounded-xl border-gray-200 focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">Selecione...</option>
+                                    @foreach($teachers as $teacher)
+                                        <option value="{{ $teacher->id }}" {{ old('assistant_male_id', $courseClass->assistant_male_id) == $teacher->id ? 'selected' : '' }}>
+                                            {{ $teacher->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="assistant_female_id" class="block text-sm font-bold text-gray-700 mb-2">Auxiliar
+                                    (Esposa)</label>
+                                <select name="assistant_female_id" id="assistant_female_id"
+                                    class="w-full rounded-xl border-gray-200 focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">Selecione...</option>
+                                    @foreach($teachers as $teacher)
+                                        <option value="{{ $teacher->id }}" {{ old('assistant_female_id', $courseClass->assistant_female_id) == $teacher->id ? 'selected' : '' }}>
+                                            {{ $teacher->name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -75,9 +113,10 @@
                                 <label for="status" class="block text-sm font-bold text-gray-700 mb-2">Status *</label>
                                 <select name="status" id="status" required
                                     class="w-full rounded-xl border-gray-200 focus:ring-blue-500 focus:border-blue-500">
-                                    <option value="active" {{ old('status', $courseClass->status) == 'active' ? 'selected' : '' }}>Ativa</option>
-                                    <option value="completed" {{ old('status', $courseClass->status) == 'completed' ? 'selected' : '' }}>Concluída</option>
-                                    <option value="cancelled" {{ old('status', $courseClass->status) == 'cancelled' ? 'selected' : '' }}>Cancelada</option>
+                                    <option value="em_andamento" {{ old('status', $courseClass->status) == 'em_andamento' ? 'selected' : '' }}>Em Andamento</option>
+                                    <option value="concluida" {{ old('status', $courseClass->status) == 'concluida' ? 'selected' : '' }}>Concluída</option>
+                                    <option value="cancelada" {{ old('status', $courseClass->status) == 'cancelada' ? 'selected' : '' }}>Cancelada</option>
+                                    <option value="active" {{ old('status', $courseClass->status) == 'active' ? 'selected' : '' }}>Ativa (Migrada)</option>
                                 </select>
                             </div>
 
@@ -95,6 +134,11 @@
                                 <input type="date" name="end_date" id="end_date"
                                     value="{{ old('end_date', $courseClass->end_date ? $courseClass->end_date->format('Y-m-d') : '') }}"
                                     class="w-full rounded-xl border-gray-200 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label for="notes" class="block text-sm font-bold text-gray-700 mb-2">Observações</label>
+                                <textarea name="notes" id="notes" rows="3"
+                                    class="w-full rounded-xl border-gray-200 focus:ring-blue-500 focus:border-blue-500">{{ old('notes', $courseClass->notes) }}</textarea>
                             </div>
                         </div>
 

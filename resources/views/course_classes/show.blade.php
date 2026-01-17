@@ -32,19 +32,25 @@
                             <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">Status</p>
                             @php
                                 $statusClasses = [
+                                    'em_andamento' => 'bg-green-100 text-green-800',
+                                    'concluida' => 'bg-blue-100 text-blue-800',
+                                    'cancelada' => 'bg-red-100 text-red-800',
                                     'active' => 'bg-green-100 text-green-800',
                                     'completed' => 'bg-blue-100 text-blue-800',
                                     'cancelled' => 'bg-red-100 text-red-800',
                                 ];
                                 $statusLabels = [
+                                    'em_andamento' => 'Em Andamento',
+                                    'concluida' => 'Concluída',
+                                    'cancelada' => 'Cancelada',
                                     'active' => 'Ativa',
                                     'completed' => 'Concluída',
                                     'cancelled' => 'Cancelada',
                                 ];
                             @endphp
                             <span
-                                class="px-2 py-1 rounded-full text-[10px] font-black uppercase tracking-widest {{ $statusClasses[$courseClass->status] }}">
-                                {{ $statusLabels[$courseClass->status] }}
+                                class="px-2 py-1 rounded-full text-[10px] font-black uppercase tracking-widest {{ $statusClasses[$courseClass->status] ?? 'bg-gray-100' }}">
+                                {{ $statusLabels[$courseClass->status] ?? $courseClass->status }}
                             </span>
                         </div>
                         <div>
@@ -56,28 +62,50 @@
                         </div>
                         <hr class="border-gray-100">
                         <div>
-                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Líderes
-                                Acompanhantes</p>
+                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Professores</p>
                             <div class="flex items-center space-x-3 mb-2">
                                 <div class="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
                                     <i class="bi bi-person-fill"></i>
                                 </div>
-                                <span
-                                    class="text-sm font-bold text-gray-700">{{ $courseClass->leaderHusband->name ?? 'N/A' }}</span>
+                                <span class="text-sm font-bold text-gray-700">{{ $courseClass->teacherMale->name ?? 'N/A' }}</span>
                             </div>
                             <div class="flex items-center space-x-3">
                                 <div class="w-8 h-8 bg-pink-50 rounded-full flex items-center justify-center text-pink-600">
                                     <i class="bi bi-person-fill"></i>
                                 </div>
-                                <span
-                                    class="text-sm font-bold text-gray-700">{{ $courseClass->leaderWife->name ?? 'N/A' }}</span>
+                                <span class="text-sm font-bold text-gray-700">{{ $courseClass->teacherFemale->name ?? 'N/A' }}</span>
                             </div>
                         </div>
+                        @if($courseClass->assistantMale || $courseClass->assistantFemale)
+                        <div class="mt-4">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Auxiliares</p>
+                            @if($courseClass->assistantMale)
+                            <div class="flex items-center space-x-3 mb-2">
+                                <div class="w-8 h-8 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 text-xs">
+                                    <i class="bi bi-person-fill"></i>
+                                </div>
+                                <span class="text-xs font-bold text-gray-600">{{ $courseClass->assistantMale->name }}</span>
+                            </div>
+                            @endif
+                            @if($courseClass->assistantFemale)
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 text-xs">
+                                    <i class="bi bi-person-fill"></i>
+                                </div>
+                                <span class="text-xs font-bold text-gray-600">{{ $courseClass->assistantFemale->name }}</span>
+                            </div>
+                            @endif
+                        </div>
+                        @endif
                     </div>
                     <div class="mt-8 space-y-3">
                         <a href="{{ route('course-classes.report', $courseClass) }}"
                             class="w-full bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition block text-center shadow-lg shadow-blue-600/20">
                             <i class="bi bi-bar-chart-fill mr-2"></i> Ver Relatório Final
+                        </a>
+                        <a href="{{ route('course-classes.export', $courseClass) }}"
+                            class="w-full bg-green-600 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-green-700 transition block text-center shadow-lg shadow-green-600/20">
+                            <i class="bi bi-file-earmark-excel mr-2"></i> Exportar para Excel
                         </a>
                         <a href="{{ route('course-classes.edit', $courseClass) }}"
                             class="w-full bg-gray-50 text-gray-600 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-100 transition block text-center border border-gray-100">
@@ -154,74 +182,54 @@
                                         Ações</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-100">
-                                {{-- Casais --}}
-                                @foreach($courseClass->coupleEnrollments as $couple)
+                             <tbody class="divide-y divide-gray-100">
+                                @forelse($courseClass->courseEnrollments as $enrollment)
                                     <tr class="hover:bg-gray-50 transition-colors">
                                         <td class="px-6 py-4">
-                                            <div class="font-bold text-gray-900">{{ $couple->husband_name }} &
-                                                {{ $couple->wife_name }}</div>
-                                            <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Casal
-                                            </div>
+                                            @if($enrollment->malePartner && $enrollment->femalePartner)
+                                                <div class="font-bold text-gray-900">
+                                                    {{ $enrollment->malePartner->name }} & {{ $enrollment->femalePartner->name }}
+                                                </div>
+                                                <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">CASAL</div>
+                                            @else
+                                                <div class="font-bold text-gray-900">{{ $enrollment->user->name ?? 'N/A' }}</div>
+                                                <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">INDIVIDUAL</div>
+                                            @endif
+                                            
+                                            @if($courseClass->type == 'pre_nupcial' && $enrollment->wedding_date)
+                                                <div class="text-[10px] text-blue-600 font-bold">
+                                                    Casamento: {{ $enrollment->wedding_date->format('d/m/Y') }}
+                                                </div>
+                                            @endif
                                         </td>
                                         <td class="px-6 py-4 text-center">
-                                            @php $absences = $couple->attendances()->where('status', 'absent')->count(); @endphp
-                                            <span class="font-bold {{ $absences > 2 ? 'text-red-600' : 'text-gray-600' }}">
-                                                {{ $absences }}
+                                            <span class="font-bold {{ $enrollment->absence_count > 2 ? 'text-red-600' : 'text-gray-600' }}">
+                                                {{ $enrollment->absence_count }}
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 text-center">
-                                            @if($couple->status == 'failed')
-                                                <span
-                                                    class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-[8px] font-black uppercase tracking-widest">Reprovado</span>
-                                            @else
-                                                <span
-                                                    class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-[8px] font-black uppercase tracking-widest">Ativo</span>
-                                            @endif
-                                        </td>
-                                        <td class="px-6 py-4 text-right">
-                                            <form action="{{ route('course-classes.remove-enrollment', $courseClass) }}"
-                                                method="POST" class="inline-block">
-                                                @csrf
-                                                <input type="hidden" name="enrollment_type" value="couple">
-                                                <input type="hidden" name="enrollment_id" value="{{ $couple->id }}">
-                                                <button type="submit" class="text-gray-400 hover:text-red-600 transition"
-                                                    title="Remover da Turma">
-                                                    <i class="bi bi-x-circle text-lg"></i>
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                @endforeach
-
-                                {{-- Alunos Individuais --}}
-                                @foreach($courseClass->courseEnrollments as $enrollment)
-                                    <tr class="hover:bg-gray-50 transition-colors">
-                                        <td class="px-6 py-4">
-                                            <div class="font-bold text-gray-900">{{ $enrollment->user->name }}</div>
-                                            <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                                                Individual</div>
-                                        </td>
-                                        <td class="px-6 py-4 text-center">
-                                            @php $absences = $enrollment->attendances()->where('status', 'absent')->count(); @endphp
-                                            <span class="font-bold {{ $absences > 2 ? 'text-red-600' : 'text-gray-600' }}">
-                                                {{ $absences }}
+                                            @php
+                                                $enrollStatusClasses = [
+                                                    'cursando' => 'bg-blue-100 text-blue-800',
+                                                    'aprovado' => 'bg-green-100 text-green-800',
+                                                    'reprovado' => 'bg-red-100 text-red-800',
+                                                    'desistente' => 'bg-gray-100 text-gray-800',
+                                                ];
+                                            @endphp
+                                            <span class="px-2 py-1 rounded-full text-[8px] font-black uppercase tracking-widest {{ $enrollStatusClasses[$enrollment->status] ?? 'bg-gray-100' }}">
+                                                {{ $enrollment->status }}
                                             </span>
                                         </td>
-                                        <td class="px-6 py-4 text-center">
-                                            @if($enrollment->status == 'failed')
-                                                <span
-                                                    class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-[8px] font-black uppercase tracking-widest">Reprovado</span>
-                                            @else
-                                                <span
-                                                    class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-[8px] font-black uppercase tracking-widest">Ativo</span>
-                                            @endif
-                                        </td>
-                                        <td class="px-6 py-4 text-right">
+                                        <td class="px-6 py-4 text-right space-x-2">
+                                            <a href="{{ route('course-enrollments.show', $enrollment) }}" class="text-gray-400 hover:text-blue-600" title="Ver Detalhes">
+                                                <i class="bi bi-eye-fill"></i>
+                                            </a>
+                                            <a href="{{ route('course-enrollments.edit', $enrollment) }}" class="text-gray-400 hover:text-blue-600" title="Editar Matrícula">
+                                                <i class="bi bi-pencil-fill"></i>
+                                            </a>
                                             <form action="{{ route('course-classes.remove-enrollment', $courseClass) }}"
                                                 method="POST" class="inline-block">
                                                 @csrf
-                                                <input type="hidden" name="enrollment_type" value="course">
                                                 <input type="hidden" name="enrollment_id" value="{{ $enrollment->id }}">
                                                 <button type="submit" class="text-gray-400 hover:text-red-600 transition"
                                                     title="Remover da Turma">
@@ -230,15 +238,13 @@
                                             </form>
                                         </td>
                                     </tr>
-                                @endforeach
-
-                                @if($courseClass->courseEnrollments->isEmpty() && $courseClass->coupleEnrollments->isEmpty())
+                                @empty
                                     <tr>
                                         <td colspan="4" class="px-6 py-10 text-center text-gray-400 italic">
                                             Nenhum inscrito nesta turma.
                                         </td>
                                     </tr>
-                                @endif
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -250,9 +256,9 @@
     <!-- Modal: Adicionar Inscrito -->
     <div id="enrollmentModal"
         class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-[2.5rem] shadow-2xl max-w-lg w-full overflow-hidden">
+        <div class="bg-white rounded-[2.5rem] shadow-2xl max-w-2xl w-full overflow-hidden">
             <div class="p-8 border-b border-gray-100 flex justify-between items-center">
-                <h4 class="text-xl font-black text-gray-900">Adicionar Inscrito</h4>
+                <h4 class="text-xl font-black text-gray-900">Novo Casal / Inscrito</h4>
                 <button type="button" onclick="document.getElementById('enrollmentModal').classList.add('hidden')"
                     class="text-gray-400 hover:text-gray-600">
                     <i class="bi bi-x-lg text-xl"></i>
@@ -261,33 +267,51 @@
             <div class="p-8">
                 <form action="{{ route('course-classes.add-enrollment', $courseClass) }}" method="POST">
                     @csrf
-                    <div class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">Selecione o Inscrito</label>
-                            <select name="enrollment_data" required
-                                class="w-full rounded-xl border-gray-200 focus:ring-blue-500 focus:border-blue-500">
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Parceiro Masculino</label>
+                            <select name="male_partner_id" class="w-full rounded-xl border-gray-200 focus:ring-blue-500 focus:border-blue-500 select2">
                                 <option value="">Selecione...</option>
-                                <optgroup label="Casais">
-                                    @foreach($availableCoupleEnrollments as $couple)
-                                        <option value="couple:{{ $couple->id }}">{{ $couple->husband_name }} &
-                                            {{ $couple->wife_name }}</option>
-                                    @endforeach
-                                </optgroup>
-                                <optgroup label="Individuais">
-                                    @foreach($availableCourseEnrollments as $enrollment)
-                                        <option value="course:{{ $enrollment->id }}">{{ $enrollment->user->name }}</option>
-                                    @endforeach
-                                </optgroup>
+                                @foreach($availableUsers as $user)
+                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                @endforeach
                             </select>
                         </div>
-                        <input type="hidden" name="enrollment_type" id="modal_type">
-                        <input type="hidden" name="enrollment_id" id="modal_id">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Parceiro Feminino</label>
+                            <select name="female_partner_id" class="w-full rounded-xl border-gray-200 focus:ring-blue-500 focus:border-blue-500 select2">
+                                <option value="">Selecione...</option>
+                                @foreach($availableUsers as $user)
+                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                             <div class="p-4 bg-blue-50 rounded-xl text-blue-700 text-xs">
+                                <i class="bi bi-info-circle mr-2"></i> Se for um curso individual, preencha apenas um dos parceiros ou use o sistema de matrículas individuais.
+                             </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Data do Casamento</label>
+                            <input type="date" name="wedding_date" class="w-full rounded-xl border-gray-200 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Membro da Igreja?</label>
+                            <select name="is_church_member" class="w-full rounded-xl border-gray-200 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="1">Sim</option>
+                                <option value="0">Não</option>
+                            </select>
+                        </div>
                     </div>
+                    
                     <div class="mt-8 flex justify-end space-x-4">
                         <button type="button" onclick="document.getElementById('enrollmentModal').classList.add('hidden')"
                             class="px-6 py-2 text-gray-500 font-bold">Cancelar</button>
-                        <button type="submit" onclick="prepareEnrollmentData()"
-                            class="px-8 py-2 bg-blue-600 text-white rounded-xl font-black uppercase tracking-widest shadow-lg shadow-blue-600/20">Adicionar</button>
+                        <button type="submit"
+                            class="px-8 py-2 bg-blue-600 text-white rounded-xl font-black uppercase tracking-widest shadow-lg shadow-blue-600/20">Matricular</button>
                     </div>
                 </form>
             </div>
