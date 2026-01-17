@@ -10,14 +10,17 @@ class CommitmentPackage extends Model
 
     protected $fillable = [
         'name',
-        'amount',
+        'min_amount',
+        'max_amount',
         'description',
+        'whatsapp_link',
         'is_active',
         'order',
     ];
 
     protected $casts = [
-        'amount' => 'decimal:2',
+        'min_amount' => 'decimal:2',
+        'max_amount' => 'decimal:2',
         'is_active' => 'boolean',
         'order' => 'integer',
     ];
@@ -58,15 +61,17 @@ class CommitmentPackage extends Model
             ->where('status', 'verificada')
             ->sum('amount');
     }
-    public function userCommitments() {
+    public function userCommitments()
+    {
         return $this->hasMany(UserCommitment::class, 'package_id');
     }
 
-    public function getActiveMembersCount() {
+    public function getActiveMembersCount()
+    {
         return $this->userCommitments()
             ->where(function ($q) {
                 $q->whereNull('end_date')
-                  ->orWhere('end_date', '>', now());
+                    ->orWhere('end_date', '>', now());
             })
             ->count();
     }

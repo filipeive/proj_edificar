@@ -312,20 +312,19 @@ Route::middleware('auth')->group(function () {
     Route::get('financial-dashboard', [\App\Http\Controllers\FinancialDashboardController::class, 'index'])->name('financial.dashboard');
 
     // ===== CURSOS E FORMAÇÃO (COURSES) ROUTES =====
+    Route::get('courses/export-global', [\App\Http\Controllers\CourseController::class, 'exportGlobalReport'])->name('courses.export-global');
     Route::resource('courses', \App\Http\Controllers\CourseController::class);
     Route::resource('course-classes', \App\Http\Controllers\CourseClassController::class);
+    Route::get('course-classes/upcoming-weddings', [\App\Http\Controllers\CourseClassController::class, 'upcomingWeddings'])->name('course-classes.upcoming-weddings');
     Route::get('course-classes/{course_class}/attendance/{meeting}', [\App\Http\Controllers\CourseClassController::class, 'attendance'])->name('course-classes.attendance');
     Route::post('course-classes/{course_class}/attendance/{meeting}', [\App\Http\Controllers\CourseClassController::class, 'storeAttendance'])->name('course-classes.attendance.store');
     Route::post('course-classes/{course_class}/add-enrollment', [\App\Http\Controllers\CourseClassController::class, 'addEnrollment'])->name('course-classes.add-enrollment');
     Route::post('course-classes/{course_class}/remove-enrollment', [\App\Http\Controllers\CourseClassController::class, 'removeEnrollment'])->name('course-classes.remove-enrollment');
     Route::post('course-classes/{course_class}/meetings', [\App\Http\Controllers\CourseClassController::class, 'storeMeeting'])->name('course-classes.meetings.store');
-
-    Route::resource('course-enrollments', \App\Http\Controllers\CourseEnrollmentController::class);
-    Route::get('course-classes/upcoming-weddings', [\App\Http\Controllers\CourseClassController::class, 'upcomingWeddings'])->name('course-classes.upcoming-weddings');
     Route::get('course-classes/{course_class}/report', [\App\Http\Controllers\CourseClassController::class, 'report'])->name('course-classes.report');
     Route::get('course-classes/{course_class}/export', [\App\Http\Controllers\CourseClassController::class, 'exportReport'])->name('course-classes.export');
 
-    Route::get('courses/export-global', [\App\Http\Controllers\CourseController::class, 'exportGlobalReport'])->name('courses.export-global');
+    Route::resource('course-enrollments', \App\Http\Controllers\CourseEnrollmentController::class);
     Route::post('courses/{course}/enroll', [\App\Http\Controllers\CourseEnrollmentController::class, 'enroll'])->name('courses.enroll');
     Route::post('enrollments/{course_enrollment}/status', [\App\Http\Controllers\CourseEnrollmentController::class, 'updateStatus'])->name('enrollments.status');
 

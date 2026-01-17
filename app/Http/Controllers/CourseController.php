@@ -107,8 +107,9 @@ class CourseController extends Controller
         return redirect()->route('courses.index')->with('success', 'Curso excluído com sucesso!');
     }
 
-    public function exportGlobalReport()
+    public function exportGlobalReport(Request $request)
     {
-        return Excel::download(new GlobalCourseReportExport(), 'relatorio_geral_cursos.xlsx');
+        $classIds = $request->input('class_ids', []);
+        return Excel::download(new GlobalCourseReportExport($classIds), 'relatorio_geral_cursos.xlsx');
     }
 }

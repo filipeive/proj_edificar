@@ -14,16 +14,10 @@
                 <p class="text-gray-500 font-medium">Desenvolvimento ministerial e crescimento espiritual.</p>
             </div>
             @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
-                <div class="flex gap-4">
-                    <a href="{{ route('courses.export-global') }}"
-                        class="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-2xl flex items-center transition shadow-lg shadow-green-600/20 font-black text-sm uppercase tracking-widest">
-                        <i class="bi bi-file-earmark-spreadsheet mr-2"></i> Relatório Geral
-                    </a>
-                    <a href="{{ route('courses.create') }}"
-                        class="bg-orange-600 hover:bg-orange-700 text-white px-8 py-4 rounded-2xl flex items-center transition shadow-lg shadow-orange-600/20 font-black text-sm uppercase tracking-widest">
-                        <i class="bi bi-plus-lg mr-2"></i> Novo Curso
-                    </a>
-                </div>
+                <a href="{{ route('courses.create') }}"
+                    class="bg-orange-600 hover:bg-orange-700 text-white px-8 py-4 rounded-2xl flex items-center transition shadow-lg shadow-orange-600/20 font-black text-sm uppercase tracking-widest">
+                    <i class="bi bi-plus-lg mr-2"></i> Novo Curso
+                </a>
             @endif
         </div>
 

@@ -15,19 +15,31 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class GlobalCourseReportExport implements WithMultipleSheets
 {
+    protected $classIds;
+
+    public function __construct(array $classIds = [])
+    {
+        $this->classIds = $classIds;
+    }
+
     public function sheets(): array
     {
         $sheets = [];
 
         // Overview Sheet
-        $sheets[] = new CourseOverviewSheet();
+        $sheets[] = new CourseOverviewSheet($this->classIds);
 
-        // individual Sheets for active/recent classes
-        $classes = CourseClass::with(['course', 'courseEnrollments.malePartner', 'courseEnrollments.femalePartner'])
-            ->where('status', '!=', 'cancelada')
-            ->orderBy('start_date', 'desc')
-            ->take(10) // Limit to recent 10 to not explode file size if too many
-            ->get();
+        // individual Sheets for selected or recent classes
+        $query = CourseClass::with(['course', 'courseEnrollments.malePartner', 'courseEnrollments.femalePartner'])
+            ->where('status', '!=', 'cancelada');
+
+        if (!empty($this->classIds)) {
+            $query->whereIn('id', $this->classIds);
+        } else {
+            $query->orderBy('start_date', 'desc')->take(10);
+        }
+
+        $classes = $query->get();
 
         foreach ($classes as $courseClass) {
             $sheets[] = new CourseClassReportExport($courseClass);
@@ -39,9 +51,22 @@ class GlobalCourseReportExport implements WithMultipleSheets
 
 class CourseOverviewSheet implements FromCollection, WithHeadings, WithMapping, WithTitle, ShouldAutoSize, WithStyles
 {
+    protected $classIds;
+
+    public function __construct(array $classIds = [])
+    {
+        $this->classIds = $classIds;
+    }
+
     public function collection()
     {
-        return CourseClass::with('course')->withCount('courseEnrollments')->get();
+        $query = CourseClass::with('course')->withCount('courseEnrollments');
+
+        if (!empty($this->classIds)) {
+            $query->whereIn('id', $this->classIds);
+        }
+
+        return $query->get();
     }
 
     public function title(): string
