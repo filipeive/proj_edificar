@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\CommitmentPackage;
+use App\Services\Sms\SmsService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -106,5 +107,29 @@ class PackageController
         ]);
 
         return back()->with('success', 'Membro adicionado ao pacote com sucesso!');
+    }
+
+    public function sendBulkSms(Request $request, CommitmentPackage $package, SmsService $smsService)
+    {
+        $membros = $package->userCommitments()->with('user')->get();
+        $phones = $membros->pluck('user.phone')->filter()->toArray();
+
+        if (empty($phones)) {
+            return back()->with('error', 'Nenhuns membros com telefone encontrados neste pacote.');
+        }
+
+        $template = $package->whatsapp_template ?? "Olá [NOME], lembrete de contribuição para o Projetor Edificar.";
+
+        $successCount = 0;
+        foreach ($membros as $membro) {
+            if ($membro->user->phone) {
+                $message = str_replace('[NOME]', $membro->user->name, $template);
+                if ($smsService->send($membro->user->phone, $message)) {
+                    $successCount++;
+                }
+            }
+        }
+
+        return back()->with('success', "SMS enviado com sucesso para $successCount membros!");
     }
 }
