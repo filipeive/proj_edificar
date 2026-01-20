@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Contribution;
 use App\Models\OfferingType;
 use App\Models\ServiceOffering;
+use App\Models\Expense; // Add import
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -53,6 +54,13 @@ class FinancialDashboardController extends Controller
 
         $grandTotal = collect($totals)->sum('total');
 
-        return view('financial_dashboard.index', compact('totals', 'grandTotal', 'month', 'year'));
+        // 4. Expenses (Saídas)
+        $totalExpenses = Expense::whereMonth('date', $month)
+            ->whereYear('date', $year)
+            ->sum('amount');
+
+        $balance = $grandTotal - $totalExpenses;
+
+        return view('financial_dashboard.index', compact('totals', 'grandTotal', 'totalExpenses', 'balance', 'month', 'year'));
     }
 }

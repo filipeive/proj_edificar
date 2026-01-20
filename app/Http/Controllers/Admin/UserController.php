@@ -23,6 +23,11 @@ class UserController
 
     public function index(Request $request): View
     {
+        // Bloquear acesso para secretaria e outros não-admins
+        if (!auth()->user()->isAdmin()) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
         $query = User::with('cell');
 
         // Filtro por role

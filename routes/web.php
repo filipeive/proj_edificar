@@ -303,6 +303,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('quarterly-reports', \App\Http\Controllers\QuarterlyReportController::class);
     Route::post('packages/{package}/assign', [\App\Http\Controllers\Admin\PackageController::class, 'assignMember'])->name('packages.assign');
     Route::post('packages/{package}/send-bulk-sms', [\App\Http\Controllers\Admin\PackageController::class, 'sendBulkSms'])->name('packages.send-bulk-sms');
+    Route::get('project-edificar/dashboard', [\App\Http\Controllers\Admin\EdificarDashboardController::class, 'index'])->name('edificar.dashboard');
 
     // ===== EVENTOS E CERIMÓNIAS (EVENTS) ROUTES =====
     Route::get('events/feed', [\App\Http\Controllers\EventController::class, 'feed'])->name('events.feed');
@@ -311,7 +312,16 @@ Route::middleware('auth')->group(function () {
     Route::resource('events', \App\Http\Controllers\EventController::class);
 
     // ===== PAINEL FINANCEIRO (FINANCIAL DASHBOARD) ROUTES =====
+    // ===== PAINEL FINANCEIRO (FINANCIAL DASHBOARD) ROUTES =====
     Route::get('financial-dashboard', [\App\Http\Controllers\FinancialDashboardController::class, 'index'])->name('financial.dashboard');
+
+    // Requisitions Routes
+    Route::post('requisitions/{requisition}/approve', [\App\Http\Controllers\Admin\RequisitionController::class, 'approve'])->name('requisitions.approve');
+    Route::post('requisitions/{requisition}/reject', [\App\Http\Controllers\Admin\RequisitionController::class, 'reject'])->name('requisitions.reject');
+    Route::resource('requisitions', \App\Http\Controllers\Admin\RequisitionController::class);
+
+    // Expenses Routes
+    Route::resource('expenses', \App\Http\Controllers\Admin\ExpenseController::class);
 
     // ===== CURSOS E FORMAÇÃO (COURSES) ROUTES =====
     Route::get('courses/export-global', [\App\Http\Controllers\CourseController::class, 'exportGlobalReport'])->name('courses.export-global');

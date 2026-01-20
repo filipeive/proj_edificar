@@ -79,6 +79,8 @@
                         <option value="supervisor" {{ old('role') == 'supervisor' ? 'selected' : '' }}>Supervisor</option>
                         <option value="pastor_zona" {{ old('role') == 'pastor_zona' ? 'selected' : '' }}>Pastor de Zona</option>
                         <option value="secretaria" {{ old('role') == 'secretaria' ? 'selected' : '' }}>Secretaria</option>
+                        <option value="comissao_obra" {{ old('role') == 'comissao_obra' ? 'selected' : '' }}>Comissão de Obra</option>
+                        <option value="responsavel_pacote" {{ old('role') == 'responsavel_pacote' ? 'selected' : '' }}>Responsável de Pacote</option>
                         <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Administrador</option>
                     </select>
                     @error('role')

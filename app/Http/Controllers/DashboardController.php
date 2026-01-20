@@ -11,12 +11,13 @@ class DashboardController
 
         // Redirecionar baseado no role
         return match ($user->role) {
-            'admin', 'pastor_senior' => redirect()->route('dashboard.admin'),
+            'admin', 'pastor_senior', 'comissao_obra' => redirect()->route('edificar.dashboard'),
+            'responsavel_pacote' => redirect()->route('packages.index'),
             'pastor_zona' => redirect()->route('dashboard.pastor'),
             'supervisor' => redirect()->route('dashboard.supervisor'),
             'lider_celula' => redirect()->route('dashboard.lider'),
             'secretaria' => redirect()->route('dashboard.secretaria'),
-            'tesouraria' => redirect()->route('dashboard.admin'), // Por enquanto usa o admin ou criamos um específico
+            'tesouraria' => redirect()->route('financial.dashboard'),
             'membro' => redirect()->route('dashboard.membro'),
             default => redirect()->route('dashboard.membro'),
         };

@@ -10,13 +10,19 @@ class PackageController
 {
     public function index(): View
     {
-        $packages = CommitmentPackage::orderBy('order')->get();
+        $user = auth()->user();
+        if ($user->isResponsavelPacote()) {
+            $packages = CommitmentPackage::where('responsible_id', $user->id)->get();
+        } else {
+            $packages = CommitmentPackage::orderBy('order')->get();
+        }
         return view('admin.packages.index', ['packages' => $packages]);
     }
 
     public function create(): View
     {
-        return view('admin.packages.create');
+        $users = \App\Models\User::orderBy('name')->get();
+        return view('admin.packages.create', compact('users'));
     }
 
     public function store(Request $request)
@@ -30,6 +36,7 @@ class PackageController
             'sms_template' => 'nullable|string',
             'whatsapp_template' => 'nullable|string',
             'order' => 'required|integer',
+            'responsible_id' => 'nullable|exists:users,id',
         ]);
 
         CommitmentPackage::create($validated);
@@ -40,15 +47,21 @@ class PackageController
 
     public function show(CommitmentPackage $package): View
     {
+        $user = auth()->user();
+        if ($user->isResponsavelPacote() && $package->responsible_id !== $user->id) {
+            abort(403, 'Acesso negado a este pacote.');
+        }
+
         return view(
             'admin.packages.show',
-            ['package' => $package->load('userCommitments')]
+            ['package' => $package->load('userCommitments.user')]
         );
     }
 
     public function edit(CommitmentPackage $package): View
     {
-        return view('admin.packages.edit', ['package' => $package]);
+        $users = \App\Models\User::orderBy('name')->get();
+        return view('admin.packages.edit', ['package' => $package, 'users' => $users]);
     }
 
     public function update(Request $request, CommitmentPackage $package)
@@ -63,6 +76,7 @@ class PackageController
             'whatsapp_template' => 'nullable|string',
             'order' => 'required|integer',
             'is_active' => 'boolean',
+            'responsible_id' => 'nullable|exists:users,id',
         ]);
 
         $package->update($validated);

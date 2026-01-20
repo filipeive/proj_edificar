@@ -78,7 +78,7 @@ class User extends Authenticatable
     // Helpers
     public function isAdmin()
     {
-        return in_array($this->role, ['admin', 'pastor_senior', 'secretaria', 'tesouraria']);
+        return $this->role === 'admin';
     }
 
     public function isPastorSenior()
@@ -121,17 +121,39 @@ class User extends Authenticatable
         return $this->role === 'tesouraria' || $this->role === 'secretaria';
     }
 
+    public function isEdificarManager()
+    {
+        return in_array($this->role, ['admin', 'pastor_senior', 'comissao_obra']);
+    }
+
+    public function isComissaoObra()
+    {
+        return $this->role === 'comissao_obra';
+    }
+
+    public function isResponsavelPacote()
+    {
+        return $this->role === 'responsavel_pacote';
+    }
+
     public function hasRole($role)
     {
-        if ($role === 'admin' && in_array($this->role, ['pastor_senior', 'secretaria', 'tesouraria'])) {
+        // Admin total
+        if ($this->role === 'admin') {
             return true;
         }
 
+        // Secretaria vê coisas de tesouraria
+        if ($role === 'tesouraria' && $this->role === 'secretaria') {
+            return true;
+        }
+
+        // Tesouraria vê coisas de secretaria
         if ($role === 'secretaria' && $this->role === 'tesouraria') {
             return true;
         }
 
-        if ($role === 'tesouraria' && $this->role === 'secretaria') {
+        if ($role === 'edificar_manager' && $this->isEdificarManager()) {
             return true;
         }
 

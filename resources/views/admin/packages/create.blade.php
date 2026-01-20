@@ -85,6 +85,20 @@
                         value="{{ old('order', 0) }}" required>
                 </div>
 
+                <div class="mb-6">
+                    <label for="responsible_id" class="block text-sm font-medium text-gray-700 mb-2">Irmão Responsável pelo
+                        Pacote</label>
+                    <select name="responsible_id" id="responsible_id"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="">Nenhum responsável atribuído</option>
+                        @foreach($users as $u)
+                            <option value="{{ $u->id }}" {{ old('responsible_id') == $u->id ? 'selected' : '' }}>
+                                {{ $u->name }} ({{ $u->role }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <div class="flex space-x-4">
                     <button type="submit" class="flex-1 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
                         Criar Pacote

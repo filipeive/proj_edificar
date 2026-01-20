@@ -96,12 +96,13 @@
                                 <td class="px-10 py-6 text-center">
                                     <span
                                         class="px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border 
-                                                        {{ $package->is_active ? 'bg-green-50 text-green-600 border-green-100' : 'bg-gray-50 text-gray-600 border-gray-100' }}">
+                                                                {{ $package->is_active ? 'bg-green-50 text-green-600 border-green-100' : 'bg-gray-50 text-gray-600 border-gray-100' }}">
                                         {{ $package->is_active ? 'Ativo' : 'Inativo' }}
                                     </span>
                                 </td>
                                 <td class="px-10 py-6 text-right">
-                                    <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                    <div
+                                        class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
                                         <a href="{{ route('packages.show', $package) }}"
                                             class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all shadow-sm">
                                             <i class="bi bi-eye-fill"></i>
@@ -109,6 +110,11 @@
                                         <a href="{{ route('packages.edit', $package) }}"
                                             class="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white flex items-center justify-center transition-all shadow-sm">
                                             <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <a href="{{ route('contributions.create') }}?package_id={{ $package->id }}"
+                                            class="w-10 h-10 rounded-xl bg-green-50 text-green-600 hover:bg-green-600 hover:text-white flex items-center justify-center transition-all shadow-sm"
+                                            title="Nova Contribuição">
+                                            <i class="bi bi-plus-lg"></i>
                                         </a>
                                         <form action="{{ route('packages.destroy', $package) }}" method="POST"
                                             onsubmit="return confirm('Tem certeza que deseja excluir este pacote?')">

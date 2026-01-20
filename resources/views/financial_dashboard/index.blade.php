@@ -58,23 +58,61 @@
         </div>
 
         <!-- Stats Overview Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 relative group overflow-hidden">
-                <i
-                    class="bi bi-cash-stack absolute right-8 top-1/2 -translate-y-1/2 text-7xl text-gray-50 opacity-50 group-hover:scale-110 transition-transform duration-500"></i>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <!-- Entradas -->
+            <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 relative group overflow-hidden">
+                <i class="bi bi-cash-stack absolute right-6 top-1/2 -translate-y-1/2 text-5xl text-gray-50 opacity-50"></i>
                 <div class="relative z-10">
-                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Geral Arrecadado
-                    </p>
-                    <h3 class="text-4xl font-black text-gray-900 tracking-tighter">
-                        {{ number_format($grandTotal, 0, ',', '.') }}<span
-                            class="text-lg ml-1 uppercase opacity-50">MT</span></h3>
-                    <div
-                        class="mt-4 flex items-center gap-1.5 text-[10px] font-bold text-blue-600 bg-blue-50 w-fit px-3 py-1 rounded-full border border-blue-100">
-                        <i class="bi bi-calendar3"></i> Período Consolidado
-                    </div>
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Entradas</p>
+                    <h3 class="text-3xl font-black text-green-600 tracking-tighter">
+                        {{ number_format($grandTotal, 0, ',', '.') }}<span class="text-sm ml-1 opacity-60">MT</span>
+                    </h3>
                 </div>
             </div>
 
+            <!-- Saídas -->
+            <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 relative group overflow-hidden">
+                <i class="bi bi-dash-circle absolute right-6 top-1/2 -translate-y-1/2 text-5xl text-red-50 opacity-50"></i>
+                <div class="relative z-10">
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Saídas</p>
+                    <h3 class="text-3xl font-black text-red-600 tracking-tighter">
+                        {{ number_format($totalExpenses, 0, ',', '.') }}<span class="text-sm ml-1 opacity-60">MT</span>
+                    </h3>
+                </div>
+            </div>
+
+            <!-- Saldo -->
+            <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 relative group overflow-hidden">
+                <i class="bi bi-wallet2 absolute right-6 top-1/2 -translate-y-1/2 text-5xl text-blue-50 opacity-50"></i>
+                <div class="relative z-10">
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Saldo Atual</p>
+                    <h3 class="text-3xl font-black {{ $balance >= 0 ? 'text-blue-600' : 'text-red-500' }} tracking-tighter">
+                        {{ number_format($balance, 0, ',', '.') }}<span class="text-sm ml-1 opacity-60">MT</span>
+                    </h3>
+                </div>
+            </div>
+
+            <!-- Ações Rápidas -->
+            <div
+                class="bg-gray-900 p-6 rounded-[2rem] text-white shadow-xl relative overflow-hidden flex flex-col justify-center gap-3">
+                <h4 class="text-xs font-black uppercase tracking-widest text-gray-400 mb-1">Ações Rápidas</h4>
+                <a href="{{ route('requisitions.create') }}"
+                    class="flex items-center text-sm font-bold hover:text-blue-300 transition">
+                    <i class="bi bi-plus-circle mr-2"></i> Nova Requisição
+                </a>
+                <a href="{{ route('expenses.index') }}"
+                    class="flex items-center text-sm font-bold hover:text-red-300 transition">
+                    <i class="bi bi-list-check mr-2"></i> Gerir Despesas
+                </a>
+                <a href="{{ route('requisitions.index') }}"
+                    class="flex items-center text-sm font-bold hover:text-yellow-300 transition">
+                    <i class="bi bi-clock-history mr-2"></i> Aprovar Requisições
+                </a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Membros Link -->
             <div
                 class="bg-gradient-to-br from-green-500 to-green-600 p-8 rounded-[2.5rem] text-white shadow-xl shadow-green-100 relative group overflow-hidden">
                 <i
@@ -83,13 +121,11 @@
                     <p class="text-[10px] font-black text-green-100 uppercase tracking-widest mb-1">Membros
                         (Dízimos/Ofertas)</p>
                     @php $memberTotal = collect($totals)->sum('contributions'); @endphp
-                    <h3 class="text-4xl font-black tracking-tighter">{{ number_format($memberTotal, 0, ',', '.') }}<span
-                            class="text-lg ml-1 uppercase opacity-60">MT</span></h3>
-                    <p class="mt-4 text-[10px] font-black text-green-200 uppercase tracking-tighter">Fluxo de Entradas
-                        Diretas</p>
+                    <h3 class="text-3xl font-black tracking-tighter">{{ number_format($memberTotal, 0, ',', '.') }} MT</h3>
                 </div>
             </div>
 
+            <!-- Cultos Link -->
             <div
                 class="bg-gradient-to-br from-blue-500 to-blue-600 p-8 rounded-[2.5rem] text-white shadow-xl shadow-blue-100 relative group overflow-hidden">
                 <i
@@ -97,10 +133,7 @@
                 <div class="relative z-10">
                     <p class="text-[10px] font-black text-blue-100 uppercase tracking-widest mb-1">Cultos / Celebrações</p>
                     @php $serviceTotal = collect($totals)->sum('services'); @endphp
-                    <h3 class="text-4xl font-black tracking-tighter">{{ number_format($serviceTotal, 0, ',', '.') }}<span
-                            class="text-lg ml-1 uppercase opacity-60">MT</span></h3>
-                    <p class="mt-4 text-[10px] font-black text-blue-200 uppercase tracking-tighter">Fluxo Coletivo
-                        Presencial</p>
+                    <h3 class="text-3xl font-black tracking-tighter">{{ number_format($serviceTotal, 0, ',', '.') }} MT</h3>
                 </div>
             </div>
         </div>
@@ -108,24 +141,24 @@
         <!-- Detailed Audit Table -->
         <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
             <div class="p-8 border-b border-gray-50 bg-gray-50/30 flex items-center justify-between">
-                <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Detalhamento Analítico por Tipo</h3>
-                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Base de Dados Integrada</span>
+                <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Detalhamento Analítico de Entradas
+                </h3>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead>
                         <tr class="bg-gray-50/50">
                             <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                Segmentação / Tipo de Contribuição</th>
+                                Segmentação</th>
                             <th
                                 class="px-10 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                Membros (Individual)</th>
+                                Membros</th>
                             <th
                                 class="px-10 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                Cultos (Celebração)</th>
+                                Cultos</th>
                             <th
                                 class="px-10 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                Consolidação Total</th>
+                                Total</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50">
@@ -147,19 +180,6 @@
                             </tr>
                         @endforeach
                     </tbody>
-                    <tfoot class="bg-gray-900 text-white">
-                        <tr>
-                            <td class="px-10 py-8 text-[10px] font-black uppercase tracking-[0.2em]">Fluxo Financeiro Total
-                            </td>
-                            <td class="px-10 py-8 text-right font-black text-lg">
-                                {{ number_format($memberTotal, 0, ',', '.') }} MT</td>
-                            <td class="px-10 py-8 text-right font-black text-lg">
-                                {{ number_format($serviceTotal, 0, ',', '.') }} MT</td>
-                            <td class="px-10 py-8 text-right font-black text-3xl text-green-400 tracking-tighter">
-                                {{ number_format($grandTotal, 0, ',', '.') }}<span class="text-sm ml-1 opacity-60">MT</span>
-                            </td>
-                        </tr>
-                    </tfoot>
                 </table>
             </div>
         </div>
