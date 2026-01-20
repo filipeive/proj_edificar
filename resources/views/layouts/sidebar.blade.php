@@ -107,7 +107,7 @@
                 </a>
             @endif
 
-            @if (!$authUser->hasRole('membro'))
+            @if ($authUser->role !== 'membro')
                 <a href="{{ route('cell-meetings.index') }}"
                     class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('cell-meetings.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                     <i class="bi bi-people-fill text-xl flex-shrink-0"></i>
@@ -160,7 +160,7 @@
             @endif
         @endif
 
-        @if (!$authUser->hasRole('membro'))
+        @if ($authUser->role !== 'membro')
             <!-- ACADEMIA & ENSINO -->
             <div
                 class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-4">
@@ -183,14 +183,14 @@
             @endif
         @endif
 
-        @if (!$authUser->hasRole('membro'))
+        @if ($authUser->role !== 'membro')
             <!-- PESSOAS & RELATÓRIOS -->
             <div
                 class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-4">
                 Pessoas & Relatórios</div>
 
 
-            @if ($authUser->isAdmi())
+            @if ($authUser->isAdmin())
                 <a href="{{ route('users.index') }}"
                     class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('users.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                     <i class="bi bi-person-lock text-xl flex-shrink-0"></i>
