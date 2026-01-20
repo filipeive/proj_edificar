@@ -190,7 +190,7 @@
                 Pessoas & Relatórios</div>
 
 
-            @if ($authUser->isAdmin())
+            @if ($authUser->isAdmi())
                 <a href="{{ route('users.index') }}"
                     class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('users.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                     <i class="bi bi-person-lock text-xl flex-shrink-0"></i>
@@ -267,7 +267,7 @@
             Gestão Financeira & Edificar
         </div>
 
-        @if ($authUser->isAdmin())
+        @if ($authUser->isAdmin() || $authUser->isEdificarManager() || $authUser->isResponsavelPacote())
             <a href="{{ route('packages.index') }}"
                 class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('packages.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                 <i class="bi bi-box-seam-fill text-xl flex-shrink-0"></i>
@@ -345,7 +345,7 @@
             <a href="{{ route('contributions.pending') }}"
                 class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('contributions.pending') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                 <i class="bi bi-shield-lock-fill text-xl flex-shrink-0"></i>
-                <span class="sidebar-text ml-4 font-bold tracking-tight">Pendentes</span>
+                <span class="sidebar-text ml-4 font-bold tracking-tight">Confirmar Contribuição</span>
                 @if ($pendingCount > 0)
                     <span
                         class="absolute right-4 top-1/2 -translate-y-1/2 bg-orange-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-lg shadow-orange-600/20">{{ $pendingCount }}</span>

@@ -92,7 +92,7 @@ class UserController
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6|confirmed',
             'phone' => 'nullable|string',
-            'role' => 'required|in:membro,lider_celula,supervisor,pastor_zona,secretaria,admin',
+            'role' => 'required|in:membro,lider_celula,supervisor,pastor_zona,secretaria,admin,comissao_obra,responsavel_pacote,tesouraria,pastor_senior',
             'cell_id' => 'nullable|exists:cells,id',
             'is_active' => 'boolean',
         ]);
@@ -132,7 +132,7 @@ class UserController
             'name' => 'required|string|max:255',
             'email' => "required|email|unique:users,email,{$user->id}",
             'phone' => 'nullable|string',
-            'role' => 'required|in:membro,lider_celula,supervisor,pastor_zona,secretaria,admin',
+            'role' => 'required|in:membro,lider_celula,supervisor,pastor_zona,secretaria,admin,comissao_obra,responsavel_pacote,tesouraria,pastor_senior',
             'cell_id' => 'nullable|exists:cells,id',
             'is_active' => 'boolean',
         ]);
