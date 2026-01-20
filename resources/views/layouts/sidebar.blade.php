@@ -267,7 +267,7 @@
             Gestão Financeira & Edificar
         </div>
 
-        @if ($authUser->isAdmin() || $authUser->isEdificarManager() || $authUser->isResponsavelPacote())
+        @if ($authUser->isAdmin() || $authUser->isEdificarManager() || $authUser->isResponsavelPacote() || $authUser->isComissaoObra())
             <a href="{{ route('packages.index') }}"
                 class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('packages.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                 <i class="bi bi-box-seam-fill text-xl flex-shrink-0"></i>
@@ -276,7 +276,7 @@
             </a>
         @endif
 
-        @if ($authUser->isAdmin() || $authUser->isEdificarManager() || $authUser->isTesouraria())
+        @if ($authUser->isAdmin() || $authUser->isPastorSenior() || $authUser->isTesouraria())
             <!-- GESTÃO DE DESPESAS (NEW) -->
             <a href="{{ route('requisitions.index') }}"
                 class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('requisitions.*') ? 'bg-zinc-900 text-red-500 border border-white/5' : 'text-slate-400' }}">
@@ -288,12 +288,13 @@
                         class="absolute right-4 top-1/2 -translate-y-1/2 bg-yellow-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-lg shadow-yellow-600/20">{{ $pendingReqs }}</span>
                 @endif
             </a>
-
-            <a href="{{ route('expenses.index') }}"
-                class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('expenses.*') ? 'bg-zinc-900 text-red-500 border border-white/5' : 'text-slate-400' }}">
-                <i class="bi bi-receipt text-xl flex-shrink-0"></i>
-                <span class="sidebar-text ml-4 font-bold tracking-tight">Despesas</span>
-            </a>
+            @if($authUser->isPastorSenior() || $authUser->isTesouraria() || $authUser->isPastorSenior())
+                <a href="{{ route('expenses.index') }}"
+                    class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('expenses.*') ? 'bg-zinc-900 text-red-500 border border-white/5' : 'text-slate-400' }}">
+                    <i class="bi bi-receipt text-xl flex-shrink-0"></i>
+                    <span class="sidebar-text ml-4 font-bold tracking-tight">Despesas</span>
+                </a>
+            @endif
         @endif
 
         <div>

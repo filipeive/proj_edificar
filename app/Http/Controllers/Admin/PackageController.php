@@ -21,7 +21,9 @@ class PackageController
 
     public function create(): View
     {
-        $users = \App\Models\User::orderBy('name')->get();
+        $users = \App\Models\User::whereIn('role', ['admin', 'comissao_obra', 'responsavel_pacote', 'secretaria', 'tesouraria', 'pastor_senior'])
+            ->orderBy('name')
+            ->get();
         return view('admin.packages.create', compact('users'));
     }
 
@@ -60,12 +62,24 @@ class PackageController
 
     public function edit(CommitmentPackage $package): View
     {
-        $users = \App\Models\User::orderBy('name')->get();
+        $user = auth()->user();
+        if ($user->isResponsavelPacote() && $package->responsible_id !== $user->id) {
+            abort(403, 'Acesso negado a este pacote.');
+        }
+
+        $users = \App\Models\User::whereIn('role', ['admin', 'comissao_obra', 'responsavel_pacote', 'secretaria', 'tesouraria', 'pastor_senior'])
+            ->orderBy('name')
+            ->get();
         return view('admin.packages.edit', ['package' => $package, 'users' => $users]);
     }
 
     public function update(Request $request, CommitmentPackage $package)
     {
+        $user = auth()->user();
+        if ($user->isResponsavelPacote() && $package->responsible_id !== $user->id) {
+            abort(403, 'Acesso negado a este pacote.');
+        }
+
         $validated = $request->validate([
             'name' => "required|unique:commitment_packages,name,{$package->id}|string|max:255",
             'min_amount' => 'required|numeric|min:0',
@@ -87,6 +101,11 @@ class PackageController
 
     public function destroy(CommitmentPackage $package)
     {
+        $user = auth()->user();
+        if ($user->isResponsavelPacote() && $package->responsible_id !== $user->id) {
+            abort(403, 'Acesso negado a este pacote.');
+        }
+
         if ($package->userCommitments()->exists()) {
             return back()->with('error', 'Não pode deletar pacote com membros comprometidos!');
         }

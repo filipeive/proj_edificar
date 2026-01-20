@@ -190,7 +190,7 @@ Route::middleware('auth')->group(function () {
             Route::resource('users', UserController::class);
             Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
             // Gestão de Pacotes
-            Route::resource('packages', PackageController::class);
+            Route::resource('packages', PackageController::class)->middleware('role:admin,secretaria,comissao_obra,responsavel_pacote');
         });
     });
 

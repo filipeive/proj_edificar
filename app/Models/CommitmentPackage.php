@@ -18,6 +18,7 @@ class CommitmentPackage extends Model
         'whatsapp_template',
         'is_active',
         'order',
+        'responsible_id',
     ];
 
     protected $casts = [
@@ -36,6 +37,11 @@ class CommitmentPackage extends Model
     public function contributions()
     {
         return $this->hasMany(Contribution::class, 'package_id');
+    }
+
+    public function responsible()
+    {
+        return $this->belongsTo(User::class, 'responsible_id');
     }
 
     // ESCOPOS
