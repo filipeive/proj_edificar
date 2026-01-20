@@ -142,7 +142,7 @@ class ContributionController
             $currentPackage = $activeCommitment->package;
             $currentPackage->committed_amount = $activeCommitment->committed_amount ?? $currentPackage->min_amount;
         } else {
-            $currentPackage = (object)['name' => 'Nenhum', 'min_amount' => 0, 'max_amount' => 0, 'committed_amount' => 0];
+            $currentPackage = (object) ['name' => 'Nenhum', 'min_amount' => 0, 'max_amount' => 0, 'committed_amount' => 0];
         }
 
         $packages = CommitmentPackage::where('is_active', true)->orderBy('order')->get();
@@ -305,8 +305,8 @@ class ContributionController
     {
         $user = auth()->user();
 
-        if ($user->role !== 'admin' && $user->role !== 'pastor_zona') {
-            abort(403, 'Apenas admin e pastor_zona pode verificar contribuições');
+        if ($user->role !== 'admin' && $user->role !== 'pastor_zona' && $user->role !== 'comissao_obra') {
+            abort(403, 'Apenas admin, comissão de obra e pastor_zona pode verificar contribuições');
         }
 
         $contribution->update([
@@ -327,8 +327,8 @@ class ContributionController
     {
         $user = auth()->user();
 
-        if ($user->role !== 'admin' && $user->role !== 'pastor_zona') {
-            abort(403, 'Apenas admin ou pastor_zona pode rejeitar contribuições');
+        if ($user->role !== 'admin' && $user->role !== 'pastor_zona' && $user->role !== 'comissao_obra') {
+            abort(403, 'Apenas admin, comissão de obra ou pastor_zona pode rejeitar contribuições');
         }
 
         $validated = $request->validate([

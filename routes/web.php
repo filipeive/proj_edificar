@@ -208,7 +208,7 @@ Route::middleware('auth')->group(function () {
         ->middleware('role:admin,pastor_zona,supervisor')
         ->name('users.commitment.assign');
     // Validar contribuições
-    Route::prefix('contributions')->middleware('role:admin,pastor_zona')->group(function () {
+    Route::prefix('contributions')->middleware('role:admin,pastor_zona,comissao_obra')->group(function () {
         Route::get('/pending', [ContributionController::class, 'pendingAdmin'])
             ->name('contributions.pending');
         Route::post('/{contribution}/verify', [ContributionController::class, 'verify'])

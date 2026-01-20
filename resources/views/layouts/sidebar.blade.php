@@ -342,7 +342,7 @@
             </a>
         @endif
 
-        @if ($authUser->isAdmin() || $authUser->isSecretaria())
+        @if ($authUser->isAdmin() || $authUser->isSecretaria() || $authUser->isComissaoObra())
             <a href="{{ route('contributions.pending') }}"
                 class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('contributions.pending') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                 <i class="bi bi-shield-lock-fill text-xl flex-shrink-0"></i>
