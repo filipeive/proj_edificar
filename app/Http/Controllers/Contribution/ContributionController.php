@@ -62,6 +62,7 @@ class ContributionController
                     }
                     break;
                 case 'admin':
+                case 'comissao_obra':
                     break;
                 default:
                     $contributions->where('user_id', $user->id);
@@ -89,7 +90,7 @@ class ContributionController
         }
 
         return match ($role) {
-            'admin' => 'Todas as Contribuições',
+            'admin', 'comissao_obra' => 'Todas as Contribuições',
             'pastor_zona' => 'Contribuições da Zona',
             'supervisor' => 'Contribuições da Supervisão',
             'lider_celula' => 'Contribuições da Célula',

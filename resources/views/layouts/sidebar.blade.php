@@ -160,7 +160,7 @@
             @endif
         @endif
 
-        @if ($authUser->role !== 'membro')
+        @if ($authUser->role !== 'comissao_obra')
             <!-- ACADEMIA & ENSINO -->
             <div
                 class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-4">
@@ -183,7 +183,7 @@
             @endif
         @endif
 
-        @if ($authUser->role !== 'membro')
+        @if ($authUser->role !== 'membro' && $authUser->role !== 'comissao_obra')
             <!-- PESSOAS & RELATÓRIOS -->
             <div
                 class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-4">
@@ -199,7 +199,7 @@
                 </a>
             @endif
 
-            @if ($authUser->isAdmin() || $authUser->isPastor() || $authUser->isPastorZona() || $authUser->isSupervisor())
+            @if ($authUser->isAdmin() || $authUser->isPastor() || $authUser->isPastorZona() || $authUser->isSupervisor() || $authUser->isComissaoObra())
                 <div>
                     <button
                         class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('reports.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}"
@@ -225,7 +225,7 @@
                                     class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('reports.zone') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Zona</a>
                             @endif
 
-                            @if ($authUser->isAdmin())
+                            @if ($authUser->isAdmin() || $authUser->isComissaoObra())
                                 <a href="{{ route('reports.global') }}"
                                     class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('reports.global') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Global</a>
                                 <a href="{{ route('course-classes.upcoming-weddings') }}"
@@ -316,10 +316,10 @@
                         </a>
                     @endif
 
-                    @if ($authUser->isAdmin() || $authUser->isPastorZona() || $authUser->isSupervisor() || $authUser->isLider())
+                    @if ($authUser->isAdmin() || $authUser->isPastorZona() || $authUser->isSupervisor() || $authUser->isLider() || $authUser->isComissaoObra())
                         <a href="{{ route('contributions.index') }}"
                             class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('contributions.index') && !request()->query('mine') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">
-                            @if ($authUser->isAdmin()) Todas
+                            @if ($authUser->isAdmin() || $authUser->isComissaoObra())Todas
                             @elseif ($authUser->isPastorZona()) Da Zona
                             @elseif ($authUser->isSupervisor()) Da Supervisão @else Da Célula @endif
                         </a>

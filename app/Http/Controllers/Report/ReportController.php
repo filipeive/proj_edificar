@@ -298,6 +298,11 @@ class ReportController
 
         $user = auth()->user();
 
+        // Admin e Comissão de Obra podem ver tudo
+        if ($type === 'global' && !$user->isAdmin() && !$user->isComissaoObra()) {
+            abort(403, 'Acesso negado ao relatório global');
+        }
+
         return match ($type) {
             'cell' => Excel::download(
                 new \App\Exports\CellReportExport(

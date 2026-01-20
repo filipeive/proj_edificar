@@ -282,9 +282,9 @@ Route::middleware('auth')->group(function () {
             ->middleware('role:pastor_zona,admin')
             ->name('reports.zone');
 
-        // Relatório global (admin)
+        // Relatório global (admin e comissao_obra)
         Route::get('/global', [ReportController::class, 'globalReport'])
-            ->middleware('role:admin')
+            ->middleware('role:admin,comissao_obra')
             ->name('reports.global');
 
         // Exportar PDF
