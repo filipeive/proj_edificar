@@ -189,9 +189,13 @@ Route::middleware('auth')->group(function () {
             // Gestão de Utilizadores
             Route::resource('users', UserController::class);
             Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
-            // Gestão de Pacotes
-            Route::resource('packages', PackageController::class)->middleware('role:admin,secretaria,comissao_obra,responsavel_pacote');
+
         });
+    });
+
+    // Gestão de Pacotes (Acesso Expandido)
+    Route::prefix('admin')->middleware('role:admin,secretaria,comissao_obra,responsavel_pacote')->group(function () {
+        Route::resource('packages', PackageController::class);
     });
 
     // Rota de FORMULÁRIO GET para atribuir/modificar o compromisso de OUTRO usuário
