@@ -123,8 +123,11 @@ class ContributionController
             } else {
                 $members = collect();
             }
-        } elseif ($user->role === 'admin') {
-            $members = User::where('is_active', true)->where('role', 'membro')->get();
+        } elseif ($user->role === 'admin' || $user->role === 'comissao_obra') {
+            $members = User::where('is_active', true)
+                ->whereIn('role', ['membro', 'lider_celula', 'supervisor', 'pastor_zona', 'pastor_senior', 'responsavel_pacote'])
+                ->orderBy('name')
+                ->get();
         } else {
             $members = collect();
         }
@@ -149,7 +152,7 @@ class ContributionController
         $packages = CommitmentPackage::where('is_active', true)->orderBy('order')->get();
 
         // 3. Variável de Controle para alternar membro na view
-        $canRegisterForOthers = in_array($user->role, ['lider_celula', 'supervisor', 'pastor_zona', 'admin']);
+        $canRegisterForOthers = in_array($user->role, ['lider_celula', 'supervisor', 'pastor_zona', 'admin', 'comissao_obra']);
 
         return view('contributions.create', [
             'members' => $members,
@@ -420,8 +423,8 @@ class ContributionController
             return;
         }
 
-        // Admin pode registar para qualquer membro
-        if ($user->role === 'admin') {
+        // Admin e Comissão de Obra pode registar para qualquer membro
+        if ($user->role === 'admin' || $user->role === 'comissao_obra') {
             return;
         }
 
