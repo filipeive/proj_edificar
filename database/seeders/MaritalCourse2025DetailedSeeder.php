@@ -18,8 +18,7 @@ class MaritalCourse2025DetailedSeeder extends Seeder
 {
     public function run(): void
     {
-        // Limpar dados de 2025 para evitar duplicatas
-        CourseClass::where('name', 'like', '%2025%')->delete();
+        // idempotency: we do NOT delete anymore. We update or create.
 
         $cursoCasais = Course::firstOrCreate(['name' => 'Curso de Casais'], [
             'description' => 'Curso para casais vivendo juntos ou casados.',
@@ -42,19 +41,21 @@ class MaritalCourse2025DetailedSeeder extends Seeder
         $auxNando = $this->getOrCreateUser('Nando', 'nando@lifechurch.com');
         $auxPaulla = $this->getOrCreateUser('Paulla', 'paulla@lifechurch.com');
 
-        $turma1 = CourseClass::create([
-            'course_id' => $cursoCasais->id,
-            'name' => 'Turma Filipe & Ivete 2025',
-            'type' => 'casais_vivendo',
-            'teacher_male_id' => $profFilipe->id,
-            'teacher_female_id' => $profIvete->id,
-            'assistant_male_id' => $auxNando->id,
-            'assistant_female_id' => $auxPaulla->id,
-            'status' => 'concluida',
-            'start_date' => $startDate,
-            'end_date' => $endDate,
-            'notes' => 'Casais vivendo juntos.'
-        ]);
+        $turma1 = CourseClass::updateOrCreate(
+            ['name' => 'Turma Filipe & Ivete 2025'],
+            [
+                'course_id' => $cursoCasais->id,
+                'type' => 'casais_vivendo',
+                'teacher_male_id' => $profFilipe->id,
+                'teacher_female_id' => $profIvete->id,
+                'assistant_male_id' => $auxNando->id,
+                'assistant_female_id' => $auxPaulla->id,
+                'status' => 'concluida',
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+                'notes' => 'Casais vivendo juntos.'
+            ]
+        );
 
         $this->createEnrollment($turma1, 'Leine', 'Chorona');
         $this->createEnrollment($turma1, 'Manuel', 'Siloia');
@@ -64,16 +65,18 @@ class MaritalCourse2025DetailedSeeder extends Seeder
         $profDany = $this->getOrCreateUser('Dany', 'dany@lifechurch.com');
         $profGervasia = $this->getOrCreateUser('Gervasia', 'gervasia@lifechurch.com');
 
-        $turma2 = CourseClass::create([
-            'course_id' => $cursoCasais->id,
-            'name' => 'Turma Dany & Gervasia 2025',
-            'type' => 'casais_vivendo',
-            'teacher_male_id' => $profDany->id,
-            'teacher_female_id' => $profGervasia->id,
-            'status' => 'concluida',
-            'start_date' => $startDate,
-            'end_date' => $endDate
-        ]);
+        $turma2 = CourseClass::updateOrCreate(
+            ['name' => 'Turma Dany & Gervasia 2025'],
+            [
+                'course_id' => $cursoCasais->id,
+                'type' => 'casais_vivendo',
+                'teacher_male_id' => $profDany->id,
+                'teacher_female_id' => $profGervasia->id,
+                'status' => 'concluida',
+                'start_date' => $startDate,
+                'end_date' => $endDate
+            ]
+        );
 
         $meetings2 = [
             ['date' => '2025-09-13', 'topic' => 'Um firme fundamento'],
@@ -89,12 +92,16 @@ class MaritalCourse2025DetailedSeeder extends Seeder
 
         $m2 = [];
         foreach ($meetings2 as $idx => $meetInfo) {
-            $m2[] = CourseClassMeeting::create([
-                'course_class_id' => $turma2->id,
-                'meeting_number' => $idx + 1,
-                'date' => $meetInfo['date'],
-                'topic' => $meetInfo['topic']
-            ]);
+            $m2[] = CourseClassMeeting::firstOrCreate(
+                [
+                    'course_class_id' => $turma2->id,
+                    'meeting_number' => $idx + 1,
+                ],
+                [
+                    'date' => $meetInfo['date'],
+                    'topic' => $meetInfo['topic']
+                ]
+            );
         }
 
         $couples2 = [
@@ -112,18 +119,22 @@ class MaritalCourse2025DetailedSeeder extends Seeder
             $absences = 0;
 
             foreach ($c['attendance'] as $idx => $statusChar) {
-                $status = (strtolower($statusChar) === 'p') ? 'present' : 'absent';
-                if ($status === 'present')
-                    $presences++;
-                else
-                    $absences++;
+                if (isset($m2[$idx])) {
+                    $status = (strtolower($statusChar) === 'p') ? 'present' : 'absent';
+                    if ($status === 'present')
+                        $presences++;
+                    else
+                        $absences++;
 
-                CourseClassAttendance::create([
-                    'course_class_meeting_id' => $m2[$idx]->id,
-                    'enrollable_type' => CourseEnrollment::class,
-                    'enrollable_id' => $en->id,
-                    'status' => $status
-                ]);
+                    CourseClassAttendance::updateOrCreate(
+                        [
+                            'course_class_meeting_id' => $m2[$idx]->id,
+                            'enrollable_type' => CourseEnrollment::class,
+                            'enrollable_id' => $en->id,
+                        ],
+                        ['status' => $status]
+                    );
+                }
             }
             $en->status = ($absences > 2 || ($c['m'] === 'Eunício')) ? 'reprovado' : 'aprovado';
             $en->attendance_count = $presences;
@@ -134,16 +145,18 @@ class MaritalCourse2025DetailedSeeder extends Seeder
         // --- TURMA 3: Nando e Helena ---
         $profHelena = $this->getOrCreateUser('Helena', 'helena@lifechurch.com');
 
-        $turma3 = CourseClass::create([
-            'course_id' => $cursoCasais->id,
-            'name' => 'Turma Nando & Helena 2025',
-            'type' => 'casais_vivendo',
-            'teacher_male_id' => $auxNando->id, // Reutilizando Nando
-            'teacher_female_id' => $profHelena->id,
-            'status' => 'concluida',
-            'start_date' => $startDate,
-            'end_date' => Carbon::parse('2025-11-15')
-        ]);
+        $turma3 = CourseClass::updateOrCreate(
+            ['name' => 'Turma Nando & Helena 2025'],
+            [
+                'course_id' => $cursoCasais->id,
+                'type' => 'casais_vivendo',
+                'teacher_male_id' => $auxNando->id, // Reutilizando Nando
+                'teacher_female_id' => $profHelena->id,
+                'status' => 'concluida',
+                'start_date' => $startDate,
+                'end_date' => Carbon::parse('2025-11-15')
+            ]
+        );
 
         $couples3 = [
             ['m' => 'Elísio', 'f' => 'Neusa', 'absences' => 1, 'is_member' => true],
@@ -156,12 +169,16 @@ class MaritalCourse2025DetailedSeeder extends Seeder
         // Criar 10 encontros para teste de faltas
         $meetings = [];
         for ($i = 1; $i <= 10; $i++) {
-            $meetings[] = CourseClassMeeting::create([
-                'course_class_id' => $turma3->id,
-                'meeting_number' => $i,
-                'date' => $startDate->copy()->addWeeks($i - 1),
-                'topic' => "Encontro $i"
-            ]);
+            $meetings[] = CourseClassMeeting::firstOrCreate(
+                [
+                    'course_class_id' => $turma3->id,
+                    'meeting_number' => $i,
+                ],
+                [
+                    'date' => $startDate->copy()->addWeeks($i - 1),
+                    'topic' => "Encontro $i"
+                ]
+            );
         }
 
         foreach ($couples3 as $c) {
@@ -171,12 +188,14 @@ class MaritalCourse2025DetailedSeeder extends Seeder
             // Simular presenças/faltas
             foreach ($meetings as $idx => $m) {
                 $status = ($idx < $c['absences']) ? 'absent' : 'present';
-                CourseClassAttendance::create([
-                    'course_class_meeting_id' => $m->id,
-                    'enrollable_type' => CourseEnrollment::class,
-                    'enrollable_id' => $en->id,
-                    'status' => $status
-                ]);
+                CourseClassAttendance::updateOrCreate(
+                    [
+                        'course_class_meeting_id' => $m->id,
+                        'enrollable_type' => CourseEnrollment::class,
+                        'enrollable_id' => $en->id,
+                    ],
+                    ['status' => $status]
+                );
             }
             $en->attendance_count = 10 - $c['absences'];
             $en->absence_count = $c['absences'];
@@ -187,16 +206,18 @@ class MaritalCourse2025DetailedSeeder extends Seeder
         $profPaulo = $this->getOrCreateUser('Paulo Nazare', 'paulo.nazare@lifechurch.com');
         $profJoaquina = $this->getOrCreateUser('Joaquina', 'joaquina@lifechurch.com');
 
-        $turma4 = CourseClass::create([
-            'course_id' => $cursoPreNupcial->id,
-            'name' => 'Turma Paulo & Joaquina 2025',
-            'type' => 'pre_nupcial',
-            'teacher_male_id' => $profPaulo->id,
-            'teacher_female_id' => $profJoaquina->id,
-            'status' => 'concluida',
-            'start_date' => $startDate,
-            'end_date' => $endDate
-        ]);
+        $turma4 = CourseClass::updateOrCreate(
+            ['name' => 'Turma Paulo & Joaquina 2025'],
+            [
+                'course_id' => $cursoPreNupcial->id,
+                'type' => 'pre_nupcial',
+                'teacher_male_id' => $profPaulo->id,
+                'teacher_female_id' => $profJoaquina->id,
+                'status' => 'concluida',
+                'start_date' => $startDate,
+                'end_date' => $endDate
+            ]
+        );
 
         // João & Laurinda - Wedding: 6 June 2026
         $en1 = $this->createEnrollment($turma4, 'João Máfia', 'Laurinda');
@@ -246,8 +267,8 @@ class MaritalCourse2025DetailedSeeder extends Seeder
 
     private function getOrCreateUser($name, $email)
     {
-        return User::firstOrCreate(['name' => $name], [
-            'email' => $email,
+        return User::firstOrCreate(['email' => $email], [
+            'name' => $name,
             'password' => Hash::make('password'),
             'role' => 'membro'
         ]);
@@ -258,25 +279,33 @@ class MaritalCourse2025DetailedSeeder extends Seeder
         $maleUser = $this->getOrCreateUser($male, strtolower(str_replace(' ', '.', $male)) . '@example.com');
         $femaleUser = $this->getOrCreateUser($female, strtolower(str_replace(' ', '.', $female)) . '@example.com');
 
-        return CourseEnrollment::create([
-            'course_id' => $class->course_id,
-            'course_class_id' => $class->id,
-            'male_partner_id' => $maleUser->id,
-            'female_partner_id' => $femaleUser->id,
-            'is_church_member' => $isMember,
-            'status' => 'cursando',
-            'notes' => $notes
-        ]);
+        return CourseEnrollment::firstOrCreate(
+            [
+                'course_class_id' => $class->id,
+                'male_partner_id' => $maleUser->id,
+                'female_partner_id' => $femaleUser->id,
+            ],
+            [
+                'course_id' => $class->course_id,
+                'is_church_member' => $isMember,
+                'status' => 'cursando',
+                'notes' => $notes
+            ]
+        );
     }
 
     private function createWedding($groom, $bride, $date, $godparents = null)
     {
-        Wedding::create([
-            'groom_name' => $groom,
-            'bride_name' => $bride,
-            'date' => $date,
-            'godparents' => $godparents,
-            'status' => 'scheduled'
-        ]);
+        Wedding::firstOrCreate(
+            [
+                'groom_name' => $groom,
+                'bride_name' => $bride,
+                'date' => $date
+            ],
+            [
+                'godparents' => $godparents,
+                'status' => 'scheduled'
+            ]
+        );
     }
 }
