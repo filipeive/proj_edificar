@@ -52,9 +52,15 @@
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-6 pb-6 border-b border-gray-50">
                     <div class="md:col-span-4 relative">
                         <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Pesquisa Global</label>
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Nome, email ou telefone..." 
+                        <input type="text" name="search" id="liveSearch" value="{{ request('search') }}" placeholder="Nome, email ou telefone..." 
                             class="w-full pl-12 pr-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold text-sm">
                         <i class="bi bi-search absolute left-5 top-11 text-gray-400"></i>
+                        <div id="searchSpinner" class="hidden absolute right-5 top-11">
+                            <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </div>
                     </div>
                     <div class="md:col-span-2">
                         <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Papel Hierárquico</label>
@@ -90,7 +96,7 @@
                             </button>
                         </div>
 
-                        <button type="submit" class="flex-1 h-14 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-100 flex items-center justify-center gap-2">
+                        <button type="submit" id="filterBtn" class="flex-1 h-14 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-100 flex items-center justify-center gap-2 hover:bg-blue-700 transition-all">
                             <i class="bi bi-funnel-fill"></i> Filtrar
                         </button>
                         
@@ -197,6 +203,12 @@
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
                                         @if($user->role !== 'admin')
+                                            <form action="{{ route('users.reset-password', $user) }}" method="POST" class="inline" onsubmit="return confirm('Redefinir senha de {{ $user->name }} para mudar123?');">
+                                                @csrf
+                                                <button type="submit" class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-purple-600 hover:text-white flex items-center justify-center transition-all shadow-sm" title="Redefinir Senha">
+                                                    <i class="bi bi-key-fill"></i>
+                                                </button>
+                                            </form>
                                             <form action="{{ route('users.destroy', $user) }}" method="POST" class="inline" onsubmit="return confirm('Deletar?');">
                                                 @csrf @method('DELETE')
                                                 <button type="submit" class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all shadow-sm">
@@ -297,13 +309,21 @@
                         </div>
                     </div>
 
-                    <div class="mt-auto grid grid-cols-2 gap-3">
-                        <a href="{{ route('users.show', $user) }}" class="flex-1 bg-gray-900 text-white text-center py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition-all shadow-lg hover:shadow-blue-200 active:scale-95">
+                    <div class="mt-auto grid grid-cols-3 gap-2">
+                        <a href="{{ route('users.show', $user) }}" class="bg-gray-900 text-white text-center py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition-all shadow-lg hover:shadow-blue-200 active:scale-95">
                             Ver
                         </a>
-                        <a href="{{ route('users.edit', $user) }}" class="flex-1 bg-gray-50 text-gray-400 text-center py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all active:scale-95">
+                        <a href="{{ route('users.edit', $user) }}" class="bg-gray-50 text-gray-400 text-center py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all active:scale-95">
                             Editar
                         </a>
+                        @if($user->role !== 'admin')
+                            <form action="{{ route('users.reset-password', $user) }}" method="POST" onsubmit="return confirm('Redefinir senha para mudar123?');">
+                                @csrf
+                                <button type="submit" class="w-full bg-purple-50 text-purple-600 text-center py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-purple-600 hover:text-white transition-all active:scale-95" title="Redefinir Senha">
+                                    <i class="bi bi-key-fill"></i>
+                                </button>
+                            </form>
+                        @endif
                     </div>
                 </div>
             @empty
@@ -314,4 +334,43 @@
             @endforelse
         </div>
     </div>
+
+    <script>
+        // Live search with debouncing
+        const liveSearchInput = document.getElementById('liveSearch');
+        const searchSpinner = document.getElementById('searchSpinner');
+        const filterBtn = document.getElementById('filterBtn');
+        let searchTimeout;
+
+        if (liveSearchInput) {
+            liveSearchInput.addEventListener('input', function(e) {
+                clearTimeout(searchTimeout);
+                
+                // Show spinner
+                searchSpinner.classList.remove('hidden');
+                
+                // Debounce: wait 500ms after user stops typing
+                searchTimeout = setTimeout(() => {
+                    // Auto-submit the form
+                    this.form.submit();
+                }, 500);
+            });
+
+            // Also trigger on role/status change
+            const roleSelect = document.querySelector('select[name="role"]');
+            const statusSelect = document.querySelector('select[name="status"]');
+            
+            if (roleSelect) {
+                roleSelect.addEventListener('change', function() {
+                    this.form.submit();
+                });
+            }
+            
+            if (statusSelect) {
+                statusSelect.addEventListener('change', function() {
+                    this.form.submit();
+                });
+            }
+        }
+    </script>
 @endsection

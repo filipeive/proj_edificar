@@ -198,6 +198,12 @@
                                         class="px-8 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
                                         Valor</th>
                                     <th
+                                        class="px-8 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                        Célula</th>
+                                    <th
+                                        class="px-8 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                        Zona</th>
+                                    <th
                                         class="px-8 py-4 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
                                         Ações</th>
                                     <th
@@ -226,6 +232,16 @@
                                             <span
                                                 class="text-sm font-black text-gray-900">{{ number_format($commitment->committed_amount, 2, ',', '.') }}
                                                 MT</span>
+                                        </td>
+                                        <td class="px-8 py-6">
+                                            <span class="text-xs font-bold text-gray-600">
+                                                {{ $commitment->user->cell->name ?? 'N/A' }}
+                                            </span>
+                                        </td>
+                                        <td class="px-8 py-6">
+                                            <span class="text-xs font-bold text-gray-600">
+                                                {{ $commitment->user->cell->supervision->zone->name ?? 'N/A' }}
+                                            </span>
                                         </td>
                                         <td class="px-8 py-6 text-center">
                                             <div class="flex items-center justify-center gap-2">
@@ -261,14 +277,14 @@
                                         <td class="px-8 py-6 text-right">
                                             <span
                                                 class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border 
-                                                                {{ $commitment->isActive() ? 'bg-green-50 text-green-600 border-green-100' : 'bg-red-50 text-red-600 border-red-100' }}">
+                                                                        {{ $commitment->isActive() ? 'bg-green-50 text-green-600 border-green-100' : 'bg-red-50 text-red-600 border-red-100' }}">
                                                 {{ $commitment->isActive() ? 'Ativo' : 'Encerrado' }}
                                             </span>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="px-8 py-10 text-center">
+                                        <td colspan="6" class="px-8 py-10 text-center">
                                             <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Nenhum membro
                                                 encontrado neste pacote.</p>
                                         </td>

@@ -165,19 +165,15 @@ class UserController
      */
     public function resetPassword(User $user)
     {
-        // Apenas admin ou quem pode editar
-        $this->authorize('update', $user);
+        if ($user->role === 'admin') {
+            return back()->with('error', 'Não pode redefinir senha de admin!');
+        }
 
-        // Gerar nova senha aleatória
-        $newPassword = \Illuminate\Support\Str::random(10);
+        $user->update([
+            'password' => Hash::make('mudar123')
+        ]);
 
-        $user->password = Hash::make($newPassword);
-        $user->save();
-
-        // Notificar utilizador (Email + DB)
-        $user->notify(new \App\Notifications\AdminPasswordResetNotification($newPassword));
-
-        return back()->with('success', 'Senha redefinida com sucesso. Nova senha enviada por email.');
+        return back()->with('success', "Senha de {$user->name} redefinida para: mudar123");
     }
 
     // ==================== MEMBERS CONTEXT ROUTES ====================

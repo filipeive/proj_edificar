@@ -56,7 +56,7 @@ class PackageController
 
         return view(
             'admin.packages.show',
-            ['package' => $package->load('userCommitments.user')]
+            ['package' => $package->load('userCommitments.user.cell.supervision.zone')]
         );
     }
 
