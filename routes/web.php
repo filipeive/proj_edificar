@@ -78,6 +78,10 @@ Route::prefix('notifications')->middleware('auth')->name('notifications.')->grou
     // Contagem de não lidas (AJAX)
     Route::get('/unread-count', [NotificationController::class, 'unreadCount'])
         ->name('unread-count');
+
+    // Bulk delete notifications
+    Route::post('/bulk-delete', [NotificationController::class, 'bulkDestroy'])
+        ->name('bulk-delete');
 });
 
 
@@ -137,6 +141,7 @@ Route::middleware('auth')->group(function () {
     // Visitantes (Admin, Secretaria, Pastor de Zona)
     Route::middleware('role:admin,secretaria,pastor_zona')->prefix('visitors')->name('visitors.')->group(function () {
         Route::get('/', [\App\Http\Controllers\VisitorController::class, 'index'])->name('index');
+        Route::post('/bulk-delete', [\App\Http\Controllers\VisitorController::class, 'bulkDestroy'])->name('bulk-delete');
         Route::get('/export', [\App\Http\Controllers\VisitorController::class, 'export'])->name('export');
         Route::get('/create', [\App\Http\Controllers\VisitorController::class, 'create'])->name('create');
         Route::post('/', [\App\Http\Controllers\VisitorController::class, 'store'])->name('store');
@@ -179,6 +184,7 @@ Route::middleware('auth')->group(function () {
             // Cultos (Relatórios de Celebração)
             Route::get('/services/{service}/pdf', [\App\Http\Controllers\ServiceController::class, 'downloadPdf'])->name('services.download-pdf');
             Route::get('services/report', [\App\Http\Controllers\ServiceController::class, 'report'])->name('services.report');
+            Route::post('services/bulk-delete', [\App\Http\Controllers\ServiceController::class, 'bulkDestroy'])->name('services.bulk-delete');
             Route::resource('services', \App\Http\Controllers\ServiceController::class);
         });
 
@@ -196,6 +202,10 @@ Route::middleware('auth')->group(function () {
 
     // Gestão de Pacotes (Acesso Expandido)
     Route::prefix('admin')->middleware('role:admin,secretaria,comissao_obra,responsavel_pacote')->group(function () {
+        Route::post('packages/{package}/assign', [PackageController::class, 'assignMember'])->name('packages.assign');
+        Route::post('packages/{package}/update-member', [PackageController::class, 'updateMember'])->name('packages.update-member');
+        Route::post('packages/{package}/bulk-sms', [PackageController::class, 'sendBulkSms'])->name('packages.send-bulk-sms');
+        Route::get('packages/{package}/export', [PackageController::class, 'export'])->name('packages.export');
         Route::resource('packages', PackageController::class);
     });
 
@@ -314,6 +324,7 @@ Route::middleware('auth')->group(function () {
     Route::get('events/feed', [\App\Http\Controllers\EventController::class, 'feed'])->name('events.feed');
     Route::get('events/{event}/pdf', [\App\Http\Controllers\EventController::class, 'downloadPdf'])->name('events.pdf');
     Route::post('events/{event}/email', [\App\Http\Controllers\EventController::class, 'sendEmail'])->name('events.email');
+    Route::post('events/bulk-delete', [\App\Http\Controllers\EventController::class, 'bulkDestroy'])->name('events.bulk-delete');
     Route::resource('events', \App\Http\Controllers\EventController::class);
 
     // ===== PAINEL FINANCEIRO (FINANCIAL DASHBOARD) ROUTES =====
@@ -329,10 +340,10 @@ Route::middleware('auth')->group(function () {
     Route::resource('expenses', \App\Http\Controllers\Admin\ExpenseController::class);
 
     // ===== CURSOS E FORMAÇÃO (COURSES) ROUTES =====
-    Route::get('courses/export-global', [\App\Http\Controllers\CourseController::class, 'exportGlobalReport'])->name('courses.export-global');
-    Route::resource('courses', \App\Http\Controllers\CourseController::class);
-    Route::resource('course-classes', \App\Http\Controllers\CourseClassController::class);
     Route::get('course-classes/upcoming-weddings', [\App\Http\Controllers\CourseClassController::class, 'upcomingWeddings'])->name('course-classes.upcoming-weddings');
+    Route::get('course-classes/export-all', [\App\Http\Controllers\CourseClassController::class, 'exportAll'])->name('course-classes.export-all');
+    Route::post('course-classes/bulk-delete', [\App\Http\Controllers\CourseClassController::class, 'bulkDestroy'])->name('course-classes.bulk-delete');
+    Route::get('course-classes/{course_class}/export-pdf', [\App\Http\Controllers\CourseClassController::class, 'exportPdf'])->name('course-classes.export-pdf');
     Route::get('course-classes/{course_class}/attendance/{meeting}', [\App\Http\Controllers\CourseClassController::class, 'attendance'])->name('course-classes.attendance');
     Route::post('course-classes/{course_class}/attendance/{meeting}', [\App\Http\Controllers\CourseClassController::class, 'storeAttendance'])->name('course-classes.attendance.store');
     Route::post('course-classes/{course_class}/add-enrollment', [\App\Http\Controllers\CourseClassController::class, 'addEnrollment'])->name('course-classes.add-enrollment');
@@ -341,6 +352,13 @@ Route::middleware('auth')->group(function () {
     Route::get('course-classes/{course_class}/report', [\App\Http\Controllers\CourseClassController::class, 'report'])->name('course-classes.report');
     Route::get('course-classes/{course_class}/export', [\App\Http\Controllers\CourseClassController::class, 'exportReport'])->name('course-classes.export');
 
+    Route::resource('course-classes', \App\Http\Controllers\CourseClassController::class);
+
+    Route::get('courses/export-global', [\App\Http\Controllers\CourseController::class, 'exportGlobalReport'])->name('courses.export-global');
+    Route::post('courses/bulk-delete', [\App\Http\Controllers\CourseController::class, 'bulkDestroy'])->name('courses.bulk-delete');
+    Route::resource('courses', \App\Http\Controllers\CourseController::class);
+
+    Route::post('course-enrollments/bulk-destroy', [\App\Http\Controllers\CourseEnrollmentController::class, 'bulkDestroy'])->name('course-enrollments.bulk-destroy');
     Route::resource('course-enrollments', \App\Http\Controllers\CourseEnrollmentController::class);
     Route::post('courses/{course}/enroll', [\App\Http\Controllers\CourseEnrollmentController::class, 'enroll'])->name('courses.enroll');
     Route::post('enrollments/{course_enrollment}/status', [\App\Http\Controllers\CourseEnrollmentController::class, 'updateStatus'])->name('enrollments.status');
@@ -355,6 +373,7 @@ Route::middleware('auth')->group(function () {
     // Weddings
     Route::get('weddings/feed', [App\Http\Controllers\Admin\WeddingController::class, 'feed'])->name('weddings.feed');
     Route::get('weddings/pdf', [App\Http\Controllers\Admin\WeddingController::class, 'downloadPdf'])->name('weddings.pdf');
+    Route::post('weddings/bulk-delete', [App\Http\Controllers\Admin\WeddingController::class, 'bulkDestroy'])->name('weddings.bulk-delete');
     Route::resource('weddings', App\Http\Controllers\Admin\WeddingController::class);
     Route::post('/test-email', [App\Http\Controllers\Admin\WeddingController::class, 'testEmail'])->name('test.email');
 });

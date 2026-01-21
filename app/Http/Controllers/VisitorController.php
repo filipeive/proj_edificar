@@ -255,4 +255,24 @@ class VisitorController extends Controller
             $filename
         );
     }
+
+    /**
+     * Bulk delete visitors
+     */
+    public function bulkDestroy(Request $request)
+    {
+        if (!Auth::user()->isAdmin()) {
+            return redirect()->back()->with('error', 'Apenas administradores podem realizar esta ação.');
+        }
+
+        $validated = $request->validate([
+            'visitor_ids' => 'required|array',
+            'visitor_ids.*' => 'exists:visitors,id'
+        ]);
+
+        $deletedCount = Visitor::whereIn('id', $validated['visitor_ids'])->delete();
+
+        return redirect()->route('visitors.index')
+            ->with('success', "{$deletedCount} visitante(s) removido(s) com sucesso!");
+    }
 }

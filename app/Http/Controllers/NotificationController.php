@@ -80,7 +80,7 @@ class NotificationController extends Controller
 
     /**
      * Marca todas as notificações não lidas como lidas.
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
     public function markAllAsRead(Request $request)
     {
@@ -113,12 +113,12 @@ class NotificationController extends Controller
     public function markAsRead($id)
     {
         $user = Auth::user();
-        
+
         $notification = $user->notifications()->find($id);
 
         if ($notification) {
             $notification->markAsRead();
-            
+
             // Redirecionar para o link da notificação se existir
             $link = $notification->data['link'] ?? route('notifications.all');
             return redirect($link);
@@ -136,7 +136,7 @@ class NotificationController extends Controller
     public function destroy($id)
     {
         $user = Auth::user();
-        
+
         $notification = $user->notifications()->find($id);
 
         if ($notification) {
@@ -156,7 +156,7 @@ class NotificationController extends Controller
     public function clearRead()
     {
         $user = Auth::user();
-        
+
         $deleted = $user->notifications()
             ->whereNotNull('read_at')
             ->delete();
@@ -172,9 +172,34 @@ class NotificationController extends Controller
     public function unreadCount()
     {
         $user = Auth::user();
-        
+
         $count = $user->unreadNotifications()->count();
 
         return response()->json(['count' => $count]);
+    }
+
+    /**
+     * Bulk delete notifications
+     */
+    public function bulkDestroy(Request $request)
+    {
+        $user = Auth::user();
+
+        $validated = $request->validate([
+            'notification_ids' => 'required|array',
+            'notification_ids.*' => 'exists:notifications,id'
+        ]);
+
+        $notificationIds = $validated['notification_ids'];
+
+        // Ensure user only deletes their own notifications
+        $deletedCount = DB::table('notifications')
+            ->whereIn('id', $notificationIds)
+            ->where('notifiable_id', $user->id)
+            ->where('notifiable_type', get_class($user))
+            ->delete();
+
+        return redirect()->back()
+            ->with('success', "{$deletedCount} notificação(ões) removida(s) com sucesso!");
     }
 }

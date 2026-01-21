@@ -22,14 +22,22 @@
                 </form>
             </div>
             <div class="flex items-center space-x-3">
-                @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor' || auth()->user()->role === 'secretaria')
-                    <button type="button" onclick="exportSelected()" id="exportBtn" disabled
-                        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center transition shadow-md opacity-50 cursor-not-allowed">
-                        <i class="bi bi-file-earmark-spreadsheet mr-2"></i> Exportar Selecionadas
+                <a href="{{ route('course-classes.export-all') }}"
+                    class="bg-indigo-50 text-indigo-600 border border-indigo-100 hover:bg-indigo-100 px-4 py-2 rounded-lg flex items-center transition shadow-sm font-bold text-sm">
+                    <i class="bi bi-file-earmark-spreadsheet mr-2"></i> Relatório Geral (Excel)
+                </a>
+                <button type="button" id="exportBtn" onclick="exportSelected()" disabled
+                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center transition shadow-md font-bold text-sm opacity-50 cursor-not-allowed">
+                    <i class="bi bi-check-all mr-2"></i> Exportar Selecionadas
+                </button>
+                @if(auth()->user()->role === 'admin')
+                    <button type="button" id="bulkDeleteBtn" onclick="bulkDelete()" disabled
+                        class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center transition shadow-md font-bold text-sm opacity-50 cursor-not-allowed hidden">
+                        <i class="bi bi-trash-fill mr-2"></i> Excluir Selecionadas
                     </button>
                 @endif
                 <a href="{{ route('course-classes.create', ['course_id' => request('course_id')]) }}"
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center transition shadow-md">
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center transition shadow-md font-bold text-sm">
                     <i class="bi bi-plus-lg mr-2"></i> Nova Turma
                 </a>
             </div>
@@ -43,13 +51,13 @@
         @endif
 
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <form id="exportForm" action="{{ route('courses.export-global') }}" method="GET">
+            <form id="exportForm" action="{{ route('course-classes.export-all') }}" method="GET">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-gray-50 border-b border-gray-200">
                                 <th class="px-6 py-4 w-10">
-                                    <input type="checkbox" id="selectAll"
+                                    <input type="checkbox" id="selectAllCheckbox"
                                         class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                                 </th>
                                 <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Turma</th>
@@ -79,7 +87,7 @@
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 text-sm text-gray-600">
-                                        {{ $class->course->name }}
+                                        {{ $class->course->name ?? 'Curso não definido' }}
                                     </td>
                                     <td class="px-6 py-4">
                                         <div class="text-sm text-gray-900">
@@ -114,25 +122,28 @@
                                             ];
                                         @endphp
                                         <span
-                                            class="px-2 py-1 rounded-full text-[10px] font-black uppercase tracking-widest {{ $statusClasses[$class->status] }}">
-                                            {{ $statusLabels[$class->status] }}
+                                            class="px-2 py-1 rounded-full text-[10px] font-black uppercase tracking-widest {{ $statusClasses[$class->status] ?? 'bg-gray-100' }}">
+                                            {{ $statusLabels[$class->status] ?? $class->status }}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 text-right space-x-2">
                                         <a href="{{ route('course-classes.show', $class) }}"
-                                            class="text-blue-600 hover:text-blue-900" title="Ver Detalhes">
+                                            class="text-blue-600 hover:text-blue-900 border border-transparent hover:border-blue-200 p-1 rounded transition-all"
+                                            title="Ver Detalhes">
                                             <i class="bi bi-eye-fill text-lg"></i>
                                         </a>
                                         <a href="{{ route('course-classes.edit', $class) }}"
-                                            class="text-amber-600 hover:text-amber-900" title="Editar">
+                                            class="text-amber-600 hover:text-amber-900 border border-transparent hover:border-amber-200 p-1 rounded transition-all"
+                                            title="Editar">
                                             <i class="bi bi-pencil-square text-lg"></i>
                                         </a>
                                         <form action="{{ route('course-classes.destroy', $class) }}" method="POST"
-                                            class="inline-block"
-                                            onsubmit="return confirm('Tem certeza que deseja excluir esta turma?')">
+                                            id="delete-form-{{ $class->id }}" class="inline-block">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-900">
+                                            <button type="button"
+                                                onclick="confirmDelete('delete-form-{{ $class->id }}', 'Deseja excluir permanentemente esta turma?')"
+                                                class="text-red-600 hover:text-red-900 border border-transparent hover:border-red-200 p-1 rounded transition-all">
                                                 <i class="bi bi-trash-fill text-lg"></i>
                                             </button>
                                         </form>
@@ -159,32 +170,77 @@
     </div>
 
     <script>
-        document.getElementById('selectAll').addEventListener('change', function () {
+        document.getElementById('selectAllCheckbox').addEventListener('change', function () {
             const checkboxes = document.querySelectorAll('.class-checkbox');
             checkboxes.forEach(cb => cb.checked = this.checked);
-            updateExportButton();
+            updateActionButtons();
         });
 
         document.querySelectorAll('.class-checkbox').forEach(cb => {
-            cb.addEventListener('change', updateExportButton);
+            cb.addEventListener('change', updateActionButtons);
         });
 
-        function updateExportButton() {
+        function updateActionButtons() {
             const selectedCount = document.querySelectorAll('.class-checkbox:checked').length;
-            const btn = document.getElementById('exportBtn');
+            
+            // Update Export Button
+            const exportBtn = document.getElementById('exportBtn');
             if (selectedCount > 0) {
-                btn.disabled = false;
-                btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                btn.innerText = `Exportar ${selectedCount} Selecionada(s)`;
+                exportBtn.disabled = false;
+                exportBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                exportBtn.innerText = `Exportar ${selectedCount} Turma(s)`;
             } else {
-                btn.disabled = true;
-                btn.classList.add('opacity-50', 'cursor-not-allowed');
-                btn.innerText = 'Exportar Selecionadas';
+                exportBtn.disabled = true;
+                exportBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                exportBtn.innerText = 'Exportar Selecionadas';
+            }
+
+            // Update Bulk Delete Button (Admin Only)
+            const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+            if (bulkDeleteBtn) {
+                if (selectedCount > 0) {
+                    bulkDeleteBtn.disabled = false;
+                    bulkDeleteBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'hidden');
+                    bulkDeleteBtn.innerText = `Excluir ${selectedCount} Turma(s)`;
+                } else {
+                    bulkDeleteBtn.disabled = true;
+                    bulkDeleteBtn.classList.add('opacity-50', 'cursor-not-allowed', 'hidden');
+                    bulkDeleteBtn.innerText = 'Excluir Selecionadas';
+                }
             }
         }
 
         function exportSelected() {
+            document.getElementById('exportForm').action = "{{ route('course-classes.export-all') }}";
+            document.getElementById('exportForm').method = "GET";
             document.getElementById('exportForm').submit();
+        }
+
+        function bulkDelete() {
+            confirmAction(
+                'Confirmação de Exclusão em Massa',
+                'Você tem certeza que deseja excluir as turmas selecionadas? Esta ação é irreversível.',
+                'warning',
+                'Sim, excluir tudo!',
+                null
+            ).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.getElementById('exportForm');
+                    form.action = "{{ route('course-classes.bulk-delete') }}";
+                    form.method = "POST";
+                    
+                    // Add CSRF token if not present in the form (highly likely it is)
+                    if (!form.querySelector('input[name="_token"]')) {
+                        const csrf = document.createElement('input');
+                        csrf.type = 'hidden';
+                        csrf.name = '_token';
+                        csrf.value = "{{ csrf_token() }}";
+                        form.appendChild(csrf);
+                    }
+                    
+                    form.submit();
+                }
+            });
         }
     </script>
 @endsection

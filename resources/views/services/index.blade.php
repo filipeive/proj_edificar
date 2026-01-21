@@ -3,44 +3,53 @@
 @section('title', 'Gestão de Cultos - Portal Life Church')
 
 @section('content')
-    <div class="space-y-8" x-data="{ view: localStorage.getItem('serviceView') || 'grid' }" x-init="$watch('view', val => localStorage.setItem('serviceView', val))">
+    <div class="container-fluid space-y-12" x-data="{ view: localStorage.getItem('serviceView') || 'grid' }" x-init="$watch('view', val => localStorage.setItem('serviceView', val))">
         <!-- Header Section -->
         <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div class="space-y-1">
                 <div class="flex items-center gap-2 text-xs font-bold text-blue-600 uppercase tracking-widest mb-1">
-                    <i class="bi bi-calendar-event"></i>
+                    <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                        <i class="bi bi-calendar-event"></i>
+                    </div>
                     <span>Eclesiástico</span>
                 </div>
-                <h1 class="text-3xl font-black text-gray-900 tracking-tight">Celebrações</h1>
+                <h1 class="text-3xl font-black text-gray-900 tracking-tight tracking-tighter uppercase">Celebrações</h1>
                 <p class="text-gray-500 font-medium">Controle de participação e financeiro dos cultos</p>
             </div>
             
-            <div class="flex items-center gap-4">
+            <div class="flex flex-wrap items-center gap-4">
                 <!-- View Toggle -->
-                <div class="flex bg-gray-100 p-1.5 rounded-2xl mr-4">
+                <div class="flex bg-gray-100 p-1.5 rounded-2xl">
                     <button @click="view = 'grid'" 
                         :class="view === 'grid' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400 hover:text-gray-600'"
-                        class="p-2.5 rounded-xl transition-all flex items-center gap-2 font-bold text-xs">
+                        class="p-2.5 rounded-xl transition-all flex items-center gap-2 font-bold text-xs uppercase tracking-widest">
                         <i class="bi bi-grid-fill"></i>
                         <span class="hidden sm:inline">Grid</span>
                     </button>
                     <button @click="view = 'list'" 
                         :class="view === 'list' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400 hover:text-gray-600'"
-                        class="p-2.5 rounded-xl transition-all flex items-center gap-2 font-bold text-xs">
+                        class="p-2.5 rounded-xl transition-all flex items-center gap-2 font-bold text-xs uppercase tracking-widest">
                         <i class="bi bi-list-task"></i>
                         <span class="hidden sm:inline">Lista</span>
                     </button>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-3">
+                    @if(auth()->user()->role === 'admin')
+                        <button type="button" id="bulkDeleteBtn" onclick="bulkDelete()" disabled
+                            class="bg-red-600 hover:bg-red-700 text-white px-6 py-4 rounded-2xl flex items-center transition shadow-lg shadow-red-600/20 font-black text-xs uppercase tracking-widest hidden">
+                            <i class="bi bi-trash-fill mr-2"></i> Excluir Selecionados
+                        </button>
+                    @endif
                     <a href="{{ route('services.report') }}"
-                        class="flex items-center bg-gray-50 text-gray-500 px-6 py-4 rounded-2xl hover:bg-gray-100 transition-all font-black text-xs uppercase tracking-widest border border-gray-100">
+                        class="flex items-center bg-gray-50 text-gray-400 px-6 py-4 rounded-2xl hover:bg-gray-100 transition-all font-black text-xs uppercase tracking-widest border border-gray-100">
                         <i class="bi bi-graph-up text-lg mr-2 text-blue-600"></i>
-                        Análise de Tendência
+                        <span class="hidden lg:inline">Análise de Tendência</span>
+                        <span class="lg:hidden">Relatório</span>
                     </a>
                     @can('create', App\Models\Service::class)
                         <a href="{{ route('services.create') }}"
-                            class="flex items-center bg-blue-600 text-white px-6 py-4 rounded-2xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-600/20">
+                            class="flex items-center bg-blue-600 text-white px-8 py-4 rounded-2xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-600/20">
                             <i class="bi bi-plus-lg text-lg mr-2"></i>
                             Registrar Culto
                         </a>
@@ -49,13 +58,25 @@
             </div>
         </div>
 
+        <form id="bulkActionForm" action="{{ route('services.bulk-delete') }}" method="POST">
+            @csrf
+        </form>
+
         <!-- Services Grid View -->
         <div x-show="view === 'grid'" x-transition.fade.duration.300ms class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
             @foreach($services as $service)
-                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 transition-all group flex flex-col">
+                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 transition-all group flex flex-col relative">
+                    <!-- Checkbox for Bulk Actions (Grid) -->
+                    @if(auth()->user()->role === 'admin')
+                        <div class="absolute top-6 left-6 z-10">
+                            <input type="checkbox" name="service_ids[]" value="{{ $service->id }}" form="bulkActionForm"
+                                class="service-checkbox rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-6 h-6 bg-white/80 backdrop-blur-sm">
+                        </div>
+                    @endif
+
                     <div class="p-8 space-y-6 flex-1">
                         <!-- Card Header -->
-                        <div class="flex justify-between items-start">
+                        <div class="flex justify-between items-start {{ auth()->user()->role === 'admin' ? 'pl-8' : '' }}">
                             <div class="space-y-1">
                                 <div class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest inline-block mb-1">
                                     @switch($service->service_type)
@@ -119,10 +140,12 @@
                                 <i class="bi bi-pencil-square"></i>
                             </a>
                         </div>
-                        <form action="{{ route('services.destroy', $service) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir este registro?')">
+                        <form action="{{ route('services.destroy', $service) }}" method="POST"
+                            id="delete-form-grid-{{ $service->id }}">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="p-3 bg-white text-gray-400 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm border border-gray-100">
+                            <button type="button" onclick="confirmDelete('delete-form-grid-{{ $service->id }}', 'Deseja excluir este culto?')" 
+                                class="p-3 bg-white text-gray-400 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm border border-gray-100">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </form>
@@ -137,6 +160,12 @@
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-gray-50/50">
+                            @if(auth()->user()->role === 'admin')
+                                <th class="px-8 py-6 text-[10px] font-black w-10">
+                                    <input type="checkbox" id="selectAllCheckbox" 
+                                        class="rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
+                                </th>
+                            @endif
                             <th class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Data</th>
                             <th class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Tipo</th>
                             <th class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Pregador</th>
@@ -148,10 +177,22 @@
                     <tbody class="divide-y divide-gray-50 text-sm">
                         @foreach($services as $service)
                             <tr class="hover:bg-gray-50/50 transition-all group">
+                                @if(auth()->user()->role === 'admin')
+                                    <td class="px-8 py-6">
+                                        <input type="checkbox" name="service_ids[]" value="{{ $service->id }}" form="bulkActionForm"
+                                            class="service-checkbox rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
+                                    </td>
+                                @endif
                                 <td class="px-8 py-6 font-black text-gray-900">{{ $service->date->format('d/m/Y') }}</td>
                                 <td class="px-8 py-6">
                                     <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-bold uppercase">
-                                        {{ $service->service_type }}
+                                        @switch($service->service_type)
+                                            @case('1st') 1º @break
+                                            @case('2nd') 2º @break
+                                            @case('3rd') 3º @break
+                                            @case('4th') 4º @break
+                                            @default Especial
+                                        @endswitch
                                     </span>
                                 </td>
                                 <td class="px-8 py-6">
@@ -179,10 +220,12 @@
                                         <a href="{{ route('services.edit', $service) }}" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                                             <i class="bi bi-pencil-square text-lg"></i>
                                         </a>
-                                        <form action="{{ route('services.destroy', $service) }}" method="POST" onsubmit="return confirm('Excluir?')">
+                                        <form action="{{ route('services.destroy', $service) }}" method="POST"
+                                            id="delete-form-list-{{ $service->id }}">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                                            <button type="button" onclick="confirmDelete('delete-form-list-{{ $service->id }}', 'Deseja excluir este culto?')" 
+                                                class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
                                                 <i class="bi bi-trash text-lg"></i>
                                             </button>
                                         </form>
@@ -195,9 +238,56 @@
             </div>
         </div>
 
+
+
         <!-- Pagination -->
         <div class="mt-12">
             {{ $services->links() }}
         </div>
     </div>
+
+    @if(auth()->user()->role === 'admin')
+    <script>
+        const selectAll = document.getElementById('selectAllCheckbox');
+        const checkboxes = document.querySelectorAll('.service-checkbox');
+        const bulkBtn = document.getElementById('bulkDeleteBtn');
+
+        if (selectAll) {
+            selectAll.addEventListener('change', function() {
+                checkboxes.forEach(cb => cb.checked = this.checked);
+                updateBulkBtn();
+            });
+        }
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', updateBulkBtn);
+        });
+
+        function updateBulkBtn() {
+            const count = document.querySelectorAll('.service-checkbox:checked').length;
+            if (count > 0) {
+                bulkBtn.disabled = false;
+                bulkBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'hidden');
+                bulkBtn.innerHTML = `<i class="bi bi-trash-fill mr-2"></i> Excluir ${count} Culto(s)`;
+            } else {
+                bulkBtn.disabled = true;
+                bulkBtn.classList.add('opacity-50', 'cursor-not-allowed', 'hidden');
+            }
+        }
+
+        function bulkDelete() {
+            confirmAction(
+                'Confirmação de Exclusão em Massa',
+                'Você tem certeza que deseja excluir os registros de culto selecionados? Esta ação é irreversível.',
+                'warning',
+                'Sim, excluir tudo!',
+                null
+            ).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('bulkActionForm').submit();
+                }
+            });
+        }
+    </script>
+    @endif
 @endsection

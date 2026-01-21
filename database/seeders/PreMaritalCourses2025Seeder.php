@@ -80,9 +80,8 @@ class PreMaritalCourses2025Seeder extends Seeder
             ]);
 
         // 3. Criar Turmas
-        $turma1 = CourseClass::create([
+        $turma1 = CourseClass::updateOrCreate(['name' => 'Turma Filipe & Ivete 2025'], [
             'course_id' => $cursoCasais->id,
-            'name' => 'Turma Filipe & Ivete 2025',
             'type' => 'casais_vivendo',
             'teacher_male_id' => $filipe->id,
             'teacher_female_id' => $ivete->id,
@@ -91,9 +90,8 @@ class PreMaritalCourses2025Seeder extends Seeder
             'notes' => 'Turma de casais vcs'
         ]);
 
-        $turma2 = CourseClass::create([
+        $turma2 = CourseClass::updateOrCreate(['name' => 'Turma Dany & Gervasia 2025'], [
             'course_id' => $cursoCasais->id,
-            'name' => 'Turma Dany & Gervasia 2025',
             'type' => 'casais_vivendo',
             'teacher_male_id' => $dany->id,
             'teacher_female_id' => $gervasia->id,
@@ -101,9 +99,8 @@ class PreMaritalCourses2025Seeder extends Seeder
             'start_date' => '2025-02-01',
         ]);
 
-        $turma3 = CourseClass::create([
+        $turma3 = CourseClass::updateOrCreate(['name' => 'Turma Nando & Helena 2025'], [
             'course_id' => $cursoCasais->id,
-            'name' => 'Turma Nando & Helena 2025',
             'type' => 'casais_vivendo',
             'teacher_male_id' => $nandoLider->id,
             'teacher_female_id' => $helena->id,
@@ -112,9 +109,8 @@ class PreMaritalCourses2025Seeder extends Seeder
             'notes' => '5 casais matriculados'
         ]);
 
-        $turma4 = CourseClass::create([
+        $turma4 = CourseClass::updateOrCreate(['name' => 'Turma Paulo & Joaquina 2025'], [
             'course_id' => $cursoPreNupcial->id,
-            'name' => 'Turma Paulo & Joaquina 2025',
             'type' => 'pre_nupcial',
             'teacher_male_id' => $paulo->id,
             'teacher_female_id' => $joaquina->id,
@@ -123,23 +119,24 @@ class PreMaritalCourses2025Seeder extends Seeder
         ]);
 
         // 4. Exemplo de Inscrição (Casal Nando & Paulla na Turma 1)
-        $paulla = User::firstOrCreate(['name' => 'Paulla'], [
-            'email' => 'paulla@example.com',
+        $paulla = User::firstOrCreate(['email' => 'paulla@example.com'], [
+            'name' => 'Paulla',
             'password' => Hash::make('password'),
             'role' => 'membro'
         ]);
 
-        $nandoMembro = User::firstOrCreate(['name' => 'Nando Membro'], [
-            'email' => 'nando.membro@example.com',
+        $nandoMembro = User::firstOrCreate(['email' => 'nando.membro@example.com'], [
+            'name' => 'Nando Membro',
             'password' => Hash::make('password'),
             'role' => 'membro'
         ]);
 
-        CourseEnrollment::create([
-            'course_id' => $cursoCasais->id,
+        CourseEnrollment::firstOrCreate([
             'course_class_id' => $turma1->id,
             'male_partner_id' => $nandoMembro->id,
             'female_partner_id' => $paulla->id,
+        ], [
+            'course_id' => $cursoCasais->id,
             'status' => 'cursando',
             'is_church_member' => true
         ]);

@@ -252,16 +252,16 @@
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
                                         @if($user->role !== 'admin')
-                                            <form action="{{ route('users.reset-password', $user) }}" method="POST" class="inline">
+                                            <form action="{{ route('users.reset-password', $user) }}" method="POST" id="reset-password-{{ $user->id }}" class="inline">
                                                 @csrf
-                                                <button type="button" onclick="confirmAction('Redefinir senha de {{ $user->name }} para mudar123?', 'Redefinir Senha').then(result => { if(result.isConfirmed) this.closest('form').submit(); })" 
+                                                <button type="button" onclick="confirmAction('Redefinir Senha', 'Redefinir senha de {{ $user->name }} para mudar123?', 'question', 'Sim, redefinir', 'reset-password-{{ $user->id }}')" 
                                                     class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-purple-600 hover:text-white flex items-center justify-center transition-all shadow-sm" title="Redefinir Senha">
                                                     <i class="bi bi-key-fill"></i>
                                                 </button>
                                             </form>
-                                            <form action="{{ route('users.destroy', $user) }}" method="POST" class="inline">
+                                            <form action="{{ route('users.destroy', $user) }}" method="POST" id="delete-user-{{ $user->id }}" class="inline">
                                                 @csrf @method('DELETE')
-                                                <button type="button" onclick="confirmDelete('Deletar {{ $user->name }}?').then(result => { if(result.isConfirmed) this.closest('form').submit(); })" 
+                                                <button type="button" onclick="confirmDelete('delete-user-{{ $user->id }}', 'Deletar {{ $user->name }}?')" 
                                                     class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all shadow-sm">
                                                     <i class="bi bi-trash-fill"></i>
                                                 </button>

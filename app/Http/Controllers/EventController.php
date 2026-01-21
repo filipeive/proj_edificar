@@ -43,8 +43,8 @@ class EventController extends Controller
             return [
                 'id' => $event->id,
                 'title' => $title,
-                'start' => $event->date->format('Y-m-d'),
-                'end' => $event->end_date ? $event->end_date->addDay()->format('Y-m-d') : null,
+                'start' => \Carbon\Carbon::parse($event->date)->format('Y-m-d'),
+                'end' => $event->end_date ? \Carbon\Carbon::parse($event->end_date)->addDay()->format('Y-m-d') : null,
                 'url' => route('events.show', $event),
                 'backgroundColor' => $color,
                 'borderColor' => $color,
@@ -69,7 +69,7 @@ class EventController extends Controller
         $event->load(['eventType', 'zone', 'cell']);
 
         $pdf = Pdf::loadView('events.pdf', compact('event'));
-        return $pdf->download('Relatorio_Culto_' . $event->date->format('d_m_Y') . '.pdf');
+        return $pdf->download('Relatorio_Culto_' . \Carbon\Carbon::parse($event->date)->format('d_m_Y') . '.pdf');
     }
 
     public function sendEmail(Request $request, Event $event)
@@ -85,10 +85,11 @@ class EventController extends Controller
         $pdfContent = $pdf->output();
 
         \Illuminate\Support\Facades\Mail::send([], [], function ($message) use ($request, $event, $pdfContent) {
+            $formattedDate = \Carbon\Carbon::parse($event->date)->format('d/m/Y');
             $message->to($request->email)
-                ->subject('Relatório de Culto - ' . $event->date->format('d/m/Y'))
-                ->html('Olá,<br><br>Segue em anexo o relatório do culto/evento realizado em ' . $event->date->format('d/m/Y') . '.<br><br>Atenciosamente,<br>Portal Life Church')
-                ->attachData($pdfContent, 'Relatorio_Culto_' . $event->date->format('d_m_Y') . '.pdf', [
+                ->subject('Relatório de Culto - ' . $formattedDate)
+                ->html('Olá,<br><br>Segue em anexo o relatório do culto/evento realizado em ' . $formattedDate . '.<br><br>Atenciosamente,<br>Portal Life Church')
+                ->attachData($pdfContent, 'Relatorio_Culto_' . \Carbon\Carbon::parse($event->date)->format('d_m_Y') . '.pdf', [
                     'mime' => 'application/pdf',
                 ]);
         });
@@ -256,5 +257,25 @@ class EventController extends Controller
         $event->delete();
 
         return redirect()->route('events.index')->with('success', 'Evento excluído com sucesso!');
+    }
+
+    /**
+     * Bulk delete events
+     */
+    public function bulkDestroy(Request $request)
+    {
+        if (auth()->user()->role !== 'admin') {
+            return redirect()->back()->with('error', 'Apenas administradores podem realizar esta ação.');
+        }
+
+        $validated = $request->validate([
+            'event_ids' => 'required|array',
+            'event_ids.*' => 'exists:events,id'
+        ]);
+
+        $deletedCount = Event::whereIn('id', $validated['event_ids'])->delete();
+
+        return redirect()->route('events.index')
+            ->with('success', "{$deletedCount} evento(s) excluído(s) com sucesso!");
     }
 }

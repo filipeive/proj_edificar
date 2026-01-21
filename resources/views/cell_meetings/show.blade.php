@@ -28,10 +28,10 @@
                 @endcan
                 @can('delete', $cellMeeting)
                     <form action="{{ route('cell-meetings.destroy', $cellMeeting) }}" method="POST"
-                        onsubmit="return confirm('Tem certeza que deseja excluir este encontro?')">
+                        id="delete-form">
                         @csrf
                         @method('DELETE')
-                        <button type="submit"
+                        <button type="button" onclick="confirmDelete('{{ route('cell-meetings.destroy', $cellMeeting) }}', 'delete-form')"
                             class="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-5 py-2.5 rounded-2xl flex items-center transition-all font-bold text-sm">
                             <i class="bi bi-trash mr-2"></i> Excluir
                         </button>

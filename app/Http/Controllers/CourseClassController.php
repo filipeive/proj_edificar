@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\CourseClassReportExport;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class CourseClassController extends Controller
 {
@@ -253,6 +254,41 @@ class CourseClassController extends Controller
     public function exportReport(CourseClass $courseClass)
     {
         return Excel::download(new CourseClassReportExport($courseClass), 'relatorio_turma_' . $courseClass->id . '.xlsx');
+    }
+
+    public function exportPdf(CourseClass $courseClass)
+    {
+        $courseClass->load(['course', 'teacherMale', 'teacherFemale', 'courseEnrollments.malePartner', 'courseEnrollments.femalePartner']);
+
+        $pdf = Pdf::loadView('reports.course_class_pdf', compact('courseClass'));
+
+        return $pdf->download('relatorio_turma_' . str_replace(' ', '_', $courseClass->name) . '.pdf');
+    }
+
+    public function exportAll(Request $request)
+    {
+        $classIds = $request->input('class_ids');
+        return Excel::download(new \App\Exports\AllClassesExport($classIds), 'relatorio_geral_turmas.xlsx');
+    }
+
+    /**
+     * Bulk delete course classes
+     */
+    public function bulkDestroy(Request $request)
+    {
+        if (auth()->user()->role !== 'admin') {
+            return redirect()->back()->with('error', 'Apenas administradores podem realizar esta ação.');
+        }
+
+        $validated = $request->validate([
+            'class_ids' => 'required|array',
+            'class_ids.*' => 'exists:course_classes,id'
+        ]);
+
+        $deletedCount = CourseClass::whereIn('id', $validated['class_ids'])->delete();
+
+        return redirect()->route('course-classes.index')
+            ->with('success', "{$deletedCount} turma(s) excluída(s) com sucesso!");
     }
 
     private function checkCompletionStatus(CourseClass $courseClass)

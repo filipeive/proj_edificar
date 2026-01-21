@@ -130,4 +130,20 @@ class CourseEnrollmentController extends Controller
 
         return back()->with('success', 'Status da matrícula atualizado!');
     }
+
+    public function bulkDestroy(Request $request)
+    {
+        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'pastor') {
+            return redirect()->back()->with('error', 'Acesso negado.');
+        }
+
+        $validated = $request->validate([
+            'enrollment_ids' => 'required|array',
+            'enrollment_ids.*' => 'exists:course_enrollments,id'
+        ]);
+
+        $deletedCount = CourseEnrollment::whereIn('id', $validated['enrollment_ids'])->delete();
+
+        return redirect()->back()->with('success', "{$deletedCount} matrícula(s) removida(s) com sucesso!");
+    }
 }

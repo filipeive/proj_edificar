@@ -16,8 +16,7 @@
                 <span class="font-bold text-sm">Voltar para o Calendário</span>
             </a>
 
-            <button type="button"
-                onclick="if(confirm('Tem certeza que deseja remover este casamento?')) document.getElementById('delete-form').submit();"
+            <button type="button" onclick="confirmDelete('{{ route('weddings.destroy', $wedding) }}', 'delete-form')"
                 class="group flex items-center justify-center px-4 py-2 text-red-500 hover:text-white hover:bg-red-500 rounded-xl transition-all duration-300 font-bold text-xs uppercase tracking-wider border border-red-100 hover:border-red-500">
                 <i class="bi bi-trash3-fill mr-2"></i> Remover
             </button>

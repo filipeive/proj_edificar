@@ -98,7 +98,7 @@ class ContributionController
         };
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
         $user = auth()->user();
         $members = collect();
@@ -123,7 +123,7 @@ class ContributionController
             } else {
                 $members = collect();
             }
-        } elseif ($user->role === 'admin' || $user->role === 'comissao_obra') {
+        } elseif ($user->role === 'admin' || $user->role === 'comissao_obra' || $user->role === 'responsavel_pacote') {
             $members = User::where('is_active', true)
                 ->whereIn('role', ['membro', 'lider_celula', 'supervisor', 'pastor_zona', 'pastor_senior', 'responsavel_pacote'])
                 ->orderBy('name')
@@ -132,10 +132,11 @@ class ContributionController
             $members = collect();
         }
 
-
         // 2. Lógica para Pacotes de Compromisso (usada na view para info/seleção)
+        $targetUserId = $request->query('user_id', $user->id);
+
         $activeCommitment = UserCommitment::with('package')
-            ->where('user_id', $user->id)
+            ->where('user_id', $targetUserId)
             ->where('start_date', '<=', now())
             ->where(function ($query) {
                 $query->whereNull('end_date')->orWhere('end_date', '>', now());
@@ -152,7 +153,7 @@ class ContributionController
         $packages = CommitmentPackage::where('is_active', true)->orderBy('order')->get();
 
         // 3. Variável de Controle para alternar membro na view
-        $canRegisterForOthers = in_array($user->role, ['lider_celula', 'supervisor', 'pastor_zona', 'admin', 'comissao_obra']);
+        $canRegisterForOthers = in_array($user->role, ['lider_celula', 'supervisor', 'pastor_zona', 'admin', 'comissao_obra', 'responsavel_pacote']);
 
         return view('contributions.create', [
             'members' => $members,
@@ -160,6 +161,8 @@ class ContributionController
             'currentPackage' => $currentPackage,
             'packages' => $packages,
             'canRegisterForOthers' => $canRegisterForOthers,
+            'preselectedUserId' => $request->query('user_id'),
+            'preselectedPackageId' => $request->query('package_id'),
         ]);
     }
 
@@ -199,7 +202,7 @@ class ContributionController
         ]);
     }
 
-    public function edit(Contribution $contribution): View
+    public function edit(Contribution $contribution): View|\Illuminate\Http\RedirectResponse
     {
         if (auth()->id() !== $contribution->user_id && auth()->user()->role !== 'admin') {
             abort(403, 'Você não tem permissão para editar esta contribuição');
@@ -423,8 +426,8 @@ class ContributionController
             return;
         }
 
-        // Admin e Comissão de Obra pode registar para qualquer membro
-        if ($user->role === 'admin' || $user->role === 'comissao_obra') {
+        // Admin, Comissão de Obra e Responsável de Pacote pode registar para qualquer membro
+        if ($user->role === 'admin' || $user->role === 'comissao_obra' || $user->role === 'responsavel_pacote') {
             return;
         }
 

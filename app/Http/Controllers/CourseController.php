@@ -70,10 +70,30 @@ class CourseController extends Controller
         return redirect()->route('courses.index')->with('success', 'Curso criado com sucesso!');
     }
 
-    public function show(Course $course)
+    public function show(Request $request, Course $course)
     {
-        $course->load(['enrollments.user']);
-        return view('courses.show', compact('course'));
+        $search = $request->input('search');
+
+        $query = $course->enrollments()->with(['user', 'malePartner', 'femalePartner']);
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('user', function ($qu) use ($search) {
+                    $qu->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                })
+                    ->orWhereHas('malePartner', function ($qu) use ($search) {
+                        $qu->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('femalePartner', function ($qu) use ($search) {
+                        $qu->where('name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $enrollments = $query->latest()->get();
+
+        return view('courses.show', compact('course', 'enrollments', 'search'));
     }
 
     public function edit(Course $course)
@@ -111,5 +131,25 @@ class CourseController extends Controller
     {
         $classIds = $request->input('class_ids', []);
         return Excel::download(new GlobalCourseReportExport($classIds), 'relatorio_geral_cursos.xlsx');
+    }
+
+    /**
+     * Bulk delete courses
+     */
+    public function bulkDestroy(Request $request)
+    {
+        if (auth()->user()->role !== 'admin') {
+            return redirect()->back()->with('error', 'Apenas administradores podem realizar esta ação.');
+        }
+
+        $validated = $request->validate([
+            'course_ids' => 'required|array',
+            'course_ids.*' => 'exists:courses,id'
+        ]);
+
+        $deletedCount = Course::whereIn('id', $validated['course_ids'])->delete();
+
+        return redirect()->route('courses.index')
+            ->with('success', "{$deletedCount} curso(s) excluído(s) com sucesso!");
     }
 }

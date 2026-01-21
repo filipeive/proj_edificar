@@ -3,7 +3,7 @@
 @section('title', 'Detalhes do Pacote - ' . $package->name)
 
 @section('content')
-    <div class="space-y-8">
+    <div class="space-y-8" x-data="{}">
         <!-- Header -->
         <div
             class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
@@ -25,6 +25,10 @@
                         <i class="bi bi-whatsapp mr-2 text-lg"></i> Grupo do WhatsApp
                     </a>
                 @endif
+                <a href="{{ route('packages.export', $package) }}"
+                    class="bg-blue-600 text-white px-8 py-4 rounded-2xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest flex items-center shadow-lg shadow-blue-100">
+                    <i class="bi bi-file-earmark-excel mr-2"></i> Exportar Lista
+                </a>
                 <a href="{{ route('packages.edit', $package) }}"
                     class="bg-orange-600 text-white px-8 py-4 rounded-2xl hover:bg-orange-700 transition-all font-black text-xs uppercase tracking-widest flex items-center shadow-lg shadow-orange-100">
                     <i class="bi bi-pencil-square mr-2"></i> Editar Pacote
@@ -245,6 +249,26 @@
                                         </td>
                                         <td class="px-8 py-6 text-center">
                                             <div class="flex items-center justify-center gap-2">
+                                                <!-- Add Contribution Shortcut -->
+                                                <a href="{{ route('contributions.create') }}?user_id={{ $commitment->user_id }}&package_id={{ $package->id }}"
+                                                    class="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center hover:bg-orange-600 hover:text-white transition-all shadow-sm"
+                                                    title="Adicionar Contribuição">
+                                                    <i class="bi bi-plus-circle-fill"></i>
+                                                </a>
+
+                                                <!-- Edit Member Info Modal Trigger -->
+                                                <button type="button" @click="$dispatch('open-edit-member-modal', { 
+                                                                        userId: {{ $commitment->user_id }}, 
+                                                                        userName: '{{ $commitment->user->name }}', 
+                                                                        phone: '{{ $commitment->user->phone }}', 
+                                                                        cellId: '{{ $commitment->user->cell_id }}',
+                                                                        amount: '{{ $commitment->committed_amount }}'
+                                                                    })"
+                                                    class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                                                    title="Editar Dados">
+                                                    <i class="bi bi-pencil-fill"></i>
+                                                </button>
+
                                                 @if($commitment->user->phone)
                                                     @php
                                                         $name = $commitment->user->name;
@@ -253,31 +277,23 @@
                                                         $cleanPhone = preg_replace('/[^0-9]/', '', $commitment->user->phone);
                                                     @endphp
                                                     <a href="sms:{{ $commitment->user->phone }}?body={{ urlencode($smsBody) }}"
-                                                        class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                                                        class="w-8 h-8 rounded-lg bg-gray-50 text-gray-400 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all shadow-sm"
                                                         title="Mandar SMS">
-                                                        <i class="bi bi-chat-dots-fill"></i>
+                                                        <i class="bi bi-chat-dots"></i>
                                                     </a>
                                                     <a href="https://wa.me/{{ $cleanPhone }}?text={{ urlencode($whatsappBody) }}"
                                                         target="_blank"
-                                                        class="w-8 h-8 rounded-lg bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-600 hover:text-white transition-all shadow-sm"
+                                                        class="w-8 h-8 rounded-lg bg-gray-50 text-gray-400 flex items-center justify-center hover:bg-green-600 hover:text-white transition-all shadow-sm"
                                                         title="Mandar WhatsApp Individual">
                                                         <i class="bi bi-whatsapp"></i>
                                                     </a>
-                                                    <button
-                                                        onclick="copyToClipboard('{{ $commitment->user->phone }}', 'Copiado!', this)"
-                                                        class="w-8 h-8 rounded-lg bg-gray-50 text-gray-600 flex items-center justify-center hover:bg-gray-600 hover:text-white transition-all shadow-sm"
-                                                        title="Copiar Número">
-                                                        <i class="bi bi-telephone-outbound"></i>
-                                                    </button>
-                                                @else
-                                                    <span class="text-[10px] text-gray-300 font-bold uppercase">Sem contacto</span>
                                                 @endif
                                             </div>
                                         </td>
                                         <td class="px-8 py-6 text-right">
                                             <span
                                                 class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border 
-                                                                                {{ $commitment->isActive() ? 'bg-green-50 text-green-600 border-green-100' : 'bg-red-50 text-red-600 border-red-100' }}">
+                                                                                                {{ $commitment->isActive() ? 'bg-green-50 text-green-600 border-green-100' : 'bg-red-50 text-red-600 border-red-100' }}">
                                                 {{ $commitment->isActive() ? 'Ativo' : 'Encerrado' }}
                                             </span>
                                         </td>
@@ -293,6 +309,88 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Member Modal -->
+        <div x-data="{ 
+                    show: false, 
+                    userId: '', 
+                    userName: '', 
+                    phone: '', 
+                    cellId: '',
+                    amount: ''
+                }" @open-edit-member-modal.window="
+                    show = true; 
+                    userId = $event.detail.userId; 
+                    userName = $event.detail.userName; 
+                    phone = $event.detail.phone; 
+                    cellId = $event.detail.cellId;
+                    amount = $event.detail.amount;
+                " x-show="show" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+            <div class="flex items-center justify-center min-h-screen px-4">
+                <div @click="show = false" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"></div>
+
+                <div
+                    class="bg-white rounded-[2.5rem] overflow-hidden shadow-2xl transform transition-all sm:max-w-lg sm:w-full z-10 border border-gray-100">
+                    <div class="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                        <div>
+                            <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Editar Dados do Membro
+                            </h3>
+                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1" x-text="userName">
+                            </p>
+                        </div>
+                        <button @click="show = false" class="text-gray-400 hover:text-gray-600 transition-colors">
+                            <i class="bi bi-x-lg text-lg"></i>
+                        </button>
+                    </div>
+
+                    <form action="{{ route('packages.update-member', $package) }}" method="POST" class="p-8 space-y-6">
+                        @csrf
+                        <input type="hidden" name="user_id" :value="userId">
+
+                        <div class="space-y-4">
+                            <div>
+                                <label
+                                    class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Telefone</label>
+                                <input type="text" name="phone" x-model="phone"
+                                    class="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500">
+                            </div>
+
+                            <div>
+                                <label
+                                    class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Célula</label>
+                                <select name="cell_id" x-model="cellId"
+                                    class="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Sem Célula</option>
+                                    @foreach(\App\Models\Cell::orderBy('name')->get() as $cell)
+                                        <option value="{{ $cell->id }}">{{ $cell->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div>
+                                <label
+                                    class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Valor
+                                    do Compromisso (MT)</label>
+                                <input type="number" name="committed_amount" x-model="amount" step="0.01"
+                                    class="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500"
+                                    required>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-3 pt-4">
+                            <button type="button" @click="show = false"
+                                class="flex-1 bg-gray-100 text-gray-600 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-gray-200 transition-all">
+                                Cancelar
+                            </button>
+                            <button type="submit"
+                                class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
+                                Salvar Alterações
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

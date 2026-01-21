@@ -16,6 +16,13 @@
             </div>
 
             <div class="flex gap-3">
+                @if(auth()->user()->role === 'admin')
+                    <button type="button" id="bulkDeleteBtn" onclick="bulkDelete()" disabled
+                        class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-xl flex items-center transition shadow-lg shadow-red-600/20 font-black text-xs uppercase tracking-widest hidden">
+                        <i class="bi bi-trash-fill mr-2"></i> Excluir Selecionados
+                    </button>
+                @endif
+
                 <!-- View Toggle -->
                 <div class="bg-gray-100 p-1 rounded-xl flex items-center">
                     <button onclick="toggleView('list')" id="btn-list"
@@ -40,10 +47,17 @@
         <!-- List View -->
         <div id="view-list" class="transition-opacity duration-300">
             <div class="bg-white rounded-[2rem] shadow-xl shadow-gray-100/50 border border-gray-100 overflow-hidden">
-                <div class="overflow-x-auto">
+                <form id="bulkActionForm" method="POST">
+                    @csrf
                     <table class="w-full">
                         <thead>
                             <tr class="bg-gray-50/50 border-b border-gray-100">
+                                @if(auth()->user()->role === 'admin')
+                                    <th class="px-8 py-5 text-left w-10">
+                                        <input type="checkbox" id="selectAllCheckbox"
+                                            class="rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
+                                    </th>
+                                @endif
                                 <th
                                     class="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
                                     Data</th>
@@ -64,6 +78,12 @@
                         <tbody class="divide-y divide-gray-100">
                             @forelse($events as $event)
                                                 <tr class="group hover:bg-gray-50/50 transition-colors duration-200">
+                                                    @if(auth()->user()->role === 'admin')
+                                                        <td class="px-8 py-5">
+                                                            <input type="checkbox" name="event_ids[]" value="{{ $event->id }}"
+                                                                class="event-checkbox rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
+                                                        </td>
+                                                    @endif
                                                     <td class="px-8 py-5 whitespace-nowrap">
                                                         <div class="flex flex-col">
                                                             <span
@@ -80,7 +100,7 @@
                                                         <div class="flex items-center">
                                                             <div
                                                                 class="w-10 h-10 rounded-xl flex items-center justify-center mr-4 
-                                                                                            {{ $event->eventType->name == 'Culto' ? 'bg-amber-100 text-amber-600' :
+                                                                                                                                                                    {{ $event->eventType->name == 'Culto' ? 'bg-amber-100 text-amber-600' :
                                 ($event->eventType->name == 'Batismo' ? 'bg-cyan-100 text-cyan-600' : 'bg-blue-100 text-blue-600') }}">
                                                                 <i
                                                                     class="bi {{ $event->eventType->name == 'Culto' ? 'bi-church' : ($event->eventType->name == 'Batismo' ? 'bi-droplet-fill' : 'bi-calendar-event') }} text-lg"></i>
@@ -132,11 +152,12 @@
                                                                 </a>
                                                             @endcan
                                                             @can('delete', $event)
-                                                                <form action="{{ route('events.destroy', $event) }}" method="POST" class="inline"
-                                                                    onsubmit="return confirm('Tem certeza que deseja excluir este evento?');">
+                                                                <form action="{{ route('events.destroy', $event) }}" method="POST"
+                                                                    id="delete-event-{{ $event->id }}">
                                                                     @csrf
                                                                     @method('DELETE')
-                                                                    <button type="submit"
+                                                                    <button type="button"
+                                                                        onclick="confirmDelete('delete-event-{{ $event->id }}', 'Deseja excluir este evento?')"
                                                                         class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                                                                         title="Excluir">
                                                                         <i class="bi bi-trash-fill"></i>
@@ -156,19 +177,20 @@
                             @endforelse
                         </tbody>
                     </table>
-                </div>
-                <div class="px-8 py-6 border-t border-gray-100">
-                    {{ $events->links() }}
-                </div>
+                </form>
+            </div>
+            <div class="px-8 py-6 border-t border-gray-100">
+                {{ $events->links() }}
             </div>
         </div>
+    </div>
 
-        <!-- Calendar View -->
-        <div id="view-calendar" class="hidden transition-opacity duration-300">
-            <div class="bg-white rounded-[2rem] shadow-xl shadow-gray-100/50 border border-gray-100 overflow-hidden p-6">
-                <div id="calendar"></div>
-            </div>
+    <!-- Calendar View -->
+    <div id="view-calendar" class="hidden transition-opacity duration-300">
+        <div class="bg-white rounded-[2rem] shadow-xl shadow-gray-100/50 border border-gray-100 overflow-hidden p-6">
+            <div id="calendar"></div>
         </div>
+    </div>
     </div>
 
     <!-- FullCalendar CSS -->
@@ -325,60 +347,105 @@
             }
         }
 
-        function createTooltip() {
-            tooltip = document.createElement('div');
-            tooltip.className = 'event-tooltip';
-            document.body.appendChild(tooltip);
-        }
+        @if(auth()->user()->role === 'admin')
+            const selectAll = document.getElementById('selectAllCheckbox');
+            const checkboxes = document.querySelectorAll('.event-checkbox');
+            const bulkBtn = document.getElementById('bulkDeleteBtn');
+
+            if (selectAll) {
+                selectAll.addEventListener('change', function () {
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                    updateBulkBtn();
+                });
+            }
+
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', updateBulkBtn);
+            });
+
+            function updateBulkBtn() {
+                const count = document.querySelectorAll('.event-checkbox:checked').length;
+                if (count > 0) {
+                    bulkBtn.disabled = false;
+                    bulkBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'hidden');
+                    bulkBtn.innerHTML = `<i class="bi bi-trash-fill mr-2"></i> Excluir ${count} Evento(s)`;
+                } else {
+                    bulkBtn.disabled = true;
+                    bulkBtn.classList.add('opacity-50', 'cursor-not-allowed', 'hidden');
+                }
+            }
+
+            function bulkDelete() {
+                confirmAction(
+                    'Confirmação de Exclusão em Massa',
+                    'Você tem certeza que deseja excluir os eventos selecionados? Esta ação é irreversível.',
+                    'warning',
+                    'Sim, excluir tudo!',
+                    null
+                ).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.getElementById('bulkActionForm');
+                        form.action = "{{ route('events.bulk-delete') }}";
+                        form.submit();
+                    }
+                });
+            }
+        @endif
+
+            function createTooltip() {
+                tooltip = document.createElement('div');
+                tooltip.className = 'event-tooltip';
+                document.body.appendChild(tooltip);
+            }
 
         function showTooltip(info) {
             const event = info.event;
             const props = event.extendedProps;
 
             let tooltipContent = `
-                    <div class="tooltip-header">${event.title}</div>
-                    <div class="tooltip-row">
-                        <i class="bi bi-calendar-event"></i>
-                        <span>${event.start.toLocaleDateString('pt-BR')}</span>
-                    </div>
-                `;
+                                <div class="tooltip-header">${event.title}</div>
+                                <div class="tooltip-row">
+                                    <i class="bi bi-calendar-event"></i>
+                                    <span>${event.start.toLocaleDateString('pt-BR')}</span>
+                                </div>
+                            `;
 
             if (event.end && event.end.getTime() !== event.start.getTime()) {
                 const endDate = new Date(event.end);
                 endDate.setDate(endDate.getDate() - 1); // FullCalendar exclusive end
                 tooltipContent += `
-                        <div class="tooltip-row">
-                            <i class="bi bi-arrow-right"></i>
-                            <span>${endDate.toLocaleDateString('pt-BR')}</span>
-                        </div>
-                    `;
+                                    <div class="tooltip-row">
+                                        <i class="bi bi-arrow-right"></i>
+                                        <span>${endDate.toLocaleDateString('pt-BR')}</span>
+                                    </div>
+                                `;
             }
 
             if (props.location) {
                 tooltipContent += `
-                        <div class="tooltip-row">
-                            <i class="bi bi-geo-alt-fill"></i>
-                            <span>${props.location}</span>
-                        </div>
-                    `;
+                                    <div class="tooltip-row">
+                                        <i class="bi bi-geo-alt-fill"></i>
+                                        <span>${props.location}</span>
+                                    </div>
+                                `;
             }
 
             if (props.participants_count !== undefined) {
                 tooltipContent += `
-                        <div class="tooltip-row">
-                            <i class="bi bi-people-fill"></i>
-                            <span>${props.participants_count} participantes</span>
-                        </div>
-                    `;
+                                    <div class="tooltip-row">
+                                        <i class="bi bi-people-fill"></i>
+                                        <span>${props.participants_count} participantes</span>
+                                    </div>
+                                `;
             }
 
             if (props.description) {
                 tooltipContent += `
-                        <div class="tooltip-row" style="margin-top: 0.5rem; font-style: italic;">
-                            <i class="bi bi-info-circle"></i>
-                            <span>${props.description.substring(0, 100)}${props.description.length > 100 ? '...' : ''}</span>
-                        </div>
-                    `;
+                                    <div class="tooltip-row" style="margin-top: 0.5rem; font-style: italic;">
+                                        <i class="bi bi-info-circle"></i>
+                                        <span>${props.description.substring(0, 100)}${props.description.length > 100 ? '...' : ''}</span>
+                                    </div>
+                                `;
             }
 
             tooltip.innerHTML = tooltipContent;

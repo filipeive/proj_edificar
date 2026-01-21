@@ -176,4 +176,24 @@ class WeddingController extends Controller
             return back()->with('error', 'Erro ao enviar email: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Bulk delete weddings
+     */
+    public function bulkDestroy(Request $request)
+    {
+        if (auth()->user()->role !== 'admin') {
+            return redirect()->back()->with('error', 'Apenas administradores podem realizar esta ação.');
+        }
+
+        $validated = $request->validate([
+            'wedding_ids' => 'required|array',
+            'wedding_ids.*' => 'exists:weddings,id'
+        ]);
+
+        $deletedCount = Wedding::whereIn('id', $validated['wedding_ids'])->delete();
+
+        return redirect()->route('weddings.index')
+            ->with('success', "{$deletedCount} casamento(s) removido(s) com sucesso!");
+    }
 }

@@ -107,6 +107,10 @@
                             class="w-full bg-green-600 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-green-700 transition block text-center shadow-lg shadow-green-600/20">
                             <i class="bi bi-file-earmark-excel mr-2"></i> Exportar para Excel
                         </a>
+                        <a href="{{ route('course-classes.export-pdf', $courseClass) }}"
+                            class="w-full bg-red-600 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-red-700 transition block text-center shadow-lg shadow-red-600/20">
+                            <i class="bi bi-file-earmark-pdf mr-2"></i> Exportar Relatório PDF
+                        </a>
                         <a href="{{ route('course-classes.edit', $courseClass) }}"
                             class="w-full bg-gray-50 text-gray-600 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-100 transition block text-center border border-gray-100">
                             Editar Turma
@@ -220,22 +224,54 @@
                                                 {{ $enrollment->status }}
                                             </span>
                                         </td>
-                                        <td class="px-6 py-4 text-right space-x-2">
-                                            <a href="{{ route('course-enrollments.show', $enrollment) }}" class="text-gray-400 hover:text-blue-600" title="Ver Detalhes">
-                                                <i class="bi bi-eye-fill"></i>
-                                            </a>
-                                            <a href="{{ route('course-enrollments.edit', $enrollment) }}" class="text-gray-400 hover:text-blue-600" title="Editar Matrícula">
-                                                <i class="bi bi-pencil-fill"></i>
-                                            </a>
-                                            <form action="{{ route('course-classes.remove-enrollment', $courseClass) }}"
-                                                method="POST" class="inline-block">
-                                                @csrf
-                                                <input type="hidden" name="enrollment_id" value="{{ $enrollment->id }}">
-                                                <button type="submit" class="text-gray-400 hover:text-red-600 transition"
-                                                    title="Remover da Turma">
-                                                    <i class="bi bi-x-circle text-lg"></i>
-                                                </button>
-                                            </form>
+                                        <td class="px-6 py-4 text-right">
+                                            <div class="flex items-center justify-end space-x-2">
+                                                <!-- Status Dropdown -->
+                                                <div x-data="{ open: false }" class="relative inline-block text-left">
+                                                    <button @click="open = !open" type="button" 
+                                                        class="p-2 text-gray-400 hover:text-blue-600 transition-colors">
+                                                        <i class="bi bi-arrow-repeat text-lg"></i>
+                                                    </button>
+                                                    
+                                                    <div x-show="open" @click.away="open = false" 
+                                                        class="origin-top-right absolute right-0 mt-2 w-48 rounded-2xl shadow-xl bg-white ring-1 ring-black ring-opacity-5 z-20 overflow-hidden border border-gray-100">
+                                                        <div class="py-1">
+                                                            @foreach(['cursando', 'aprovado', 'reprovado', 'desistente'] as $status)
+                                                                <form action="{{ route('enrollments.status', $enrollment) }}" method="POST">
+                                                                    @csrf
+                                                                    <input type="hidden" name="status" value="{{ $status }}">
+                                                                    <button type="submit" 
+                                                                        class="w-full text-left px-4 py-3 text-xs font-bold uppercase tracking-widest hover:bg-gray-50 transition-colors {{ $enrollment->status == $status ? 'text-blue-600 bg-blue-50/50' : 'text-gray-600' }}">
+                                                                        {{ ucfirst($status) }}
+                                                                    </button>
+                                                                </form>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <a href="{{ route('course-enrollments.show', $enrollment) }}" 
+                                                    class="p-2 text-gray-400 hover:text-blue-600 transition-colors" title="Ver Detalhes">
+                                                    <i class="bi bi-eye-fill text-lg"></i>
+                                                </a>
+                                                
+                                                <a href="{{ route('course-enrollments.edit', $enrollment) }}" 
+                                                    class="p-2 text-gray-400 hover:text-blue-600 transition-colors" title="Editar Matrícula">
+                                                    <i class="bi bi-pencil-fill text-lg"></i>
+                                                </a>
+
+                                                <form action="{{ route('course-classes.remove-enrollment', $courseClass) }}"
+                                                    method="POST" id="remove-enrollment-{{ $enrollment->id }}" class="inline-block">
+                                                    @csrf
+                                                    <input type="hidden" name="enrollment_id" value="{{ $enrollment->id }}">
+                                                    <button type="button" 
+                                                        onclick="confirmAction('Remover da Turma?', 'Esta ação irá excluir a matrícula deste aluno/casal desta turma.', 'warning', 'Sim, remover!', 'remove-enrollment-{{ $enrollment->id }}')"
+                                                        class="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                                                        title="Remover da Turma">
+                                                        <i class="bi bi-trash-fill text-lg"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty

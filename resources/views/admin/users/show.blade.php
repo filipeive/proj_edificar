@@ -55,10 +55,9 @@
                         <i class="bi bi-pencil-square"></i> Editar Perfil
                     </a>
                     @if($user->role !== 'admin')
-                        <form action="{{ route('users.destroy', $user) }}" method="POST" class="w-full">
+                        <form action="{{ route('users.destroy', $user) }}" method="POST" id="delete-user-form" class="w-full">
                             @csrf @method('DELETE')
-                            <button type="button"
-                                onclick="confirmDelete('Deletar {{ $user->name }}?').then(result => { if(result.isConfirmed) this.closest('form').submit(); })"
+                            <button type="button" onclick="confirmDelete('delete-user-form', 'Deletar {{ $user->name }}?')"
                                 class="w-full py-4 bg-red-50 text-red-600 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-100 transition-all">
                                 <i class="bi bi-trash-fill mr-2"></i> Eliminar Registro
                             </button>
@@ -248,10 +247,11 @@
                             <span>Lançar Oferta</span>
                             <i class="bi bi-plus-lg"></i>
                         </a>
-                        <form action="{{ route('users.reset-password', $user) }}" method="POST" class="w-full">
+                        <form action="{{ route('users.reset-password', $user) }}" method="POST" id="reset-password-form"
+                            class="w-full">
                             @csrf
                             <button type="button"
-                                onclick="confirmAction('Redefinir senha de {{ $user->name }} para mudar123?', 'Redefinir Senha').then(result => { if(result.isConfirmed) this.closest('form').submit(); })"
+                                onclick="confirmAction('Redefinir Senha', 'Redefinir senha de {{ $user->name }} para mudar123?', 'question', 'Sim, redefinir', 'reset-password-form')"
                                 class="w-full py-4 bg-gray-50 text-gray-700 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all flex items-center justify-between px-6">
                                 <span>Redefinir Senha</span>
                                 <i class="bi bi-key-fill"></i>

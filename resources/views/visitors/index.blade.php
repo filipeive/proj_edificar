@@ -57,6 +57,12 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
             <h3 class="text-xl font-black text-gray-900">Filtros</h3>
             <div class="flex gap-3">
+                @if(auth()->user()->role === 'admin')
+                    <button type="button" id="bulkDeleteBtn" onclick="bulkDelete()" disabled
+                        class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-all hidden">
+                        <i class="bi bi-trash-fill mr-2"></i>Remover Selecionados
+                    </button>
+                @endif
                 <a href="https://chat.whatsapp.com/DxAf8sMvMDYDDhrIV1wRxC" target="_blank"
                     class="bg-[#25D366] text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#128C7E] transition-all flex items-center">
                     <i class="bi bi-whatsapp mr-2"></i>Grupo Supervisores
@@ -88,7 +94,8 @@
                     <option value="pendente" {{ request('status') == 'pendente' ? 'selected' : '' }}>Pendente</option>
                     <option value="contatado" {{ request('status') == 'contatado' ? 'selected' : '' }}>Contatado</option>
                     <option value="integrado" {{ request('status') == 'integrado' ? 'selected' : '' }}>Integrado</option>
-                    <option value="sem_interesse" {{ request('status') == 'sem_interesse' ? 'selected' : '' }}>Sem Interesse</option>
+                    <option value="sem_interesse" {{ request('status') == 'sem_interesse' ? 'selected' : '' }}>Sem Interesse
+                    </option>
                 </select>
             </div>
 
@@ -130,6 +137,12 @@
             <table class="w-full">
                 <thead>
                     <tr class="text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-100">
+                        @if(auth()->user()->role === 'admin')
+                            <th class="px-6 py-4 text-left w-10">
+                                <input type="checkbox" id="selectAllCheckbox"
+                                    class="rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
+                            </th>
+                        @endif
                         <th class="px-6 py-4 text-left">Visitante</th>
                         <th class="px-6 py-4 text-left">Contato</th>
                         <th class="px-6 py-4 text-left">Data Visita</th>
@@ -140,75 +153,86 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
-                    @forelse($visitors as $visitor)
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-4">
-                                <div>
-                                    <p class="font-bold text-gray-900">{{ $visitor->name }}</p>
-                                    <p class="text-xs text-gray-500">
-                                        @if($visitor->age) {{ $visitor->age }} anos @endif
-                                        @if($visitor->gender) • {{ ucfirst($visitor->gender) }} @endif
-                                    </p>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div>
-                                    @if($visitor->phone)
-                                        <p class="text-sm text-gray-900"><i class="bi bi-telephone mr-1"></i>{{ $visitor->phone }}</p>
-                                    @endif
-                                    @if($visitor->neighborhood)
-                                        <p class="text-xs text-gray-500"><i class="bi bi-geo-alt mr-1"></i>{{ $visitor->neighborhood }}</p>
-                                    @endif
-                                </div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <p class="text-sm font-bold text-gray-900">{{ $visitor->visit_date->format('d/m/Y') }}</p>
-                                <p class="text-xs text-gray-500">{{ $visitor->visit_date->diffForHumans() }}</p>
-                            </td>
-                            <td class="px-6 py-4">
-                                @if($visitor->service)
-                                    <p class="text-sm text-gray-900">{{ $visitor->service->service_type }}</p>
-                                    <p class="text-xs text-gray-500">{{ $visitor->service->date->format('d/m/Y') }}</p>
-                                @else
-                                    <span class="text-xs text-gray-400">Não informado</span>
+                    <form id="bulkActionForm" method="POST">
+                        @csrf
+                        @forelse($visitors as $visitor)
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                @if(auth()->user()->role === 'admin')
+                                    <td class="px-6 py-4">
+                                        <input type="checkbox" name="visitor_ids[]" value="{{ $visitor->id }}"
+                                            class="visitor-checkbox rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
+                                    </td>
                                 @endif
-                            </td>
-                            <td class="px-6 py-4">
-                                @if($visitor->zone)
-                                    <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-bold">
-                                        {{ $visitor->zone->name }}
-                                    </span>
-                                @else
-                                    <span class="text-xs text-gray-400">Não atribuído</span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 text-center">
-                                {!! $visitor->status_badge !!}
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="flex items-center justify-center gap-2">
-                                    <a href="{{ route('visitors.show', $visitor) }}"
-                                        class="text-blue-600 hover:text-blue-700 p-2 hover:bg-blue-50 rounded-lg transition-all"
-                                        title="Ver detalhes">
-                                        <i class="bi bi-eye-fill"></i>
-                                    </a>
-                                    <a href="{{ route('visitors.edit', $visitor) }}"
-                                        class="text-orange-600 hover:text-orange-700 p-2 hover:bg-orange-50 rounded-lg transition-all"
-                                        title="Editar">
-                                        <i class="bi bi-pencil-fill"></i>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="px-6 py-12 text-center text-gray-400">
-                                <i class="bi bi-inbox text-4xl mb-4 block"></i>
-                                <p class="font-bold">Nenhum visitante encontrado</p>
-                                <p class="text-sm mt-2">Cadastre o primeiro visitante para começar</p>
-                            </td>
-                        </tr>
-                    @endforelse
+                                <td class="px-6 py-4">
+                                    <div>
+                                        <p class="font-bold text-gray-900">{{ $visitor->name }}</p>
+                                        <p class="text-xs text-gray-500">
+                                            @if($visitor->age) {{ $visitor->age }} anos @endif
+                                            @if($visitor->gender) • {{ ucfirst($visitor->gender) }} @endif
+                                        </p>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div>
+                                        @if($visitor->phone)
+                                            <p class="text-sm text-gray-900"><i
+                                                    class="bi bi-telephone mr-1"></i>{{ $visitor->phone }}</p>
+                                        @endif
+                                        @if($visitor->neighborhood)
+                                            <p class="text-xs text-gray-500"><i
+                                                    class="bi bi-geo-alt mr-1"></i>{{ $visitor->neighborhood }}</p>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="text-sm font-bold text-gray-900">{{ $visitor->visit_date->format('d/m/Y') }}</p>
+                                    <p class="text-xs text-gray-500">{{ $visitor->visit_date->diffForHumans() }}</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    @if($visitor->service)
+                                        <p class="text-sm text-gray-900">{{ $visitor->service->service_type }}</p>
+                                        <p class="text-xs text-gray-500">{{ $visitor->service->date->format('d/m/Y') }}</p>
+                                    @else
+                                        <span class="text-xs text-gray-400">Não informado</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4">
+                                    @if($visitor->zone)
+                                        <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-bold">
+                                            {{ $visitor->zone->name }}
+                                        </span>
+                                    @else
+                                        <span class="text-xs text-gray-400">Não atribuído</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    {!! $visitor->status_badge !!}
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <a href="{{ route('visitors.show', $visitor) }}"
+                                            class="text-blue-600 hover:text-blue-700 p-2 hover:bg-blue-50 rounded-lg transition-all"
+                                            title="Ver detalhes">
+                                            <i class="bi bi-eye-fill"></i>
+                                        </a>
+                                        <a href="{{ route('visitors.edit', $visitor) }}"
+                                            class="text-orange-600 hover:text-orange-700 p-2 hover:bg-orange-50 rounded-lg transition-all"
+                                            title="Editar">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="px-6 py-12 text-center text-gray-400">
+                                    <i class="bi bi-inbox text-4xl mb-4 block"></i>
+                                    <p class="font-bold">Nenhum visitante encontrado</p>
+                                    <p class="text-sm mt-2">Cadastre o primeiro visitante para começar</p>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </form>
                 </tbody>
             </table>
         </div>
@@ -219,4 +243,51 @@
             </div>
         @endif
     </div>
+
+    @if(auth()->user()->role === 'admin')
+        <script>
+            const selectAll = document.getElementById('selectAllCheckbox');
+            const checkboxes = document.querySelectorAll('.visitor-checkbox');
+            const bulkBtn = document.getElementById('bulkDeleteBtn');
+
+            if (selectAll) {
+                selectAll.addEventListener('change', function () {
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                    updateBulkBtn();
+                });
+            }
+
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', updateBulkBtn);
+            });
+
+            function updateBulkBtn() {
+                const count = document.querySelectorAll('.visitor-checkbox:checked').length;
+                if (count > 0) {
+                    bulkBtn.disabled = false;
+                    bulkBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'hidden');
+                    bulkBtn.innerHTML = `<i class="bi bi-trash-fill mr-2"></i> Remover ${count}`;
+                } else {
+                    bulkBtn.disabled = true;
+                    bulkBtn.classList.add('opacity-50', 'cursor-not-allowed', 'hidden');
+                }
+            }
+
+            function bulkDelete() {
+                confirmAction(
+                    'Confirmação de Remoção',
+                    'Deseja remover os visitantes selecionados?',
+                    'warning',
+                    'Sim, remover!',
+                    null
+                ).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.getElementById('bulkActionForm');
+                        form.action = "{{ route('visitors.bulk-delete') }}";
+                        form.submit();
+                    }
+                });
+            }
+        </script>
+    @endif
 @endsection

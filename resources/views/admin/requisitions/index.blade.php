@@ -71,9 +71,11 @@
                                 @if($requisition->status === 'pending' && (auth()->user()->isAdmin() || auth()->user()->isTesouraria()))
                                     <div class="flex justify-center space-x-2">
                                         <form action="{{ route('requisitions.approve', $requisition) }}" method="POST"
-                                            onsubmit="return confirm('Aprovar esta requisição? Isso gerará uma despesa automaticamente.')">
+                                            id="approve-form-{{ $requisition->id }}">
                                             @csrf
-                                            <button type="submit" class="text-green-600 hover:text-green-900" title="Aprovar">
+                                            <button type="button"
+                                                onclick="confirmAction('Aprovar esta requisição? Isso gerará uma despesa automaticamente.', 'Aprovar').then(result => { if(result.isConfirmed) document.getElementById('approve-form-{{ $requisition->id }}').submit(); })"
+                                                class="text-green-600 hover:text-green-900" title="Aprovar">
                                                 <i class="bi bi-check-circle-fill text-xl"></i>
                                             </button>
                                         </form>

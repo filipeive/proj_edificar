@@ -125,10 +125,10 @@
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
                                 <form action="{{ route('cells.destroy', $cell) }}" method="POST"
-                                    onsubmit="return confirm('Excluir esta célula?');">
+                                    id="delete-form-{{ $cell->id }}">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit"
+                                    <button type="button" onclick="confirmDelete('{{ route('cells.destroy', $cell) }}', 'delete-form-{{ $cell->id }}')"
                                         class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-500 flex items-center justify-center transition-all shadow-sm">
                                         <i class="bi bi-trash"></i>
                                     </button>

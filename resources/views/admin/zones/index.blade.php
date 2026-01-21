@@ -52,10 +52,12 @@
                                         <i class="bi bi-pencil-square"></i>
                                     </a>
                                     @if($zone->supervisions->count() === 0)
-                                        <form action="{{ route('zones.destroy', $zone) }}" method="POST" onsubmit="return confirm('Excluir esta zona?');">
+                                        <form action="{{ route('zones.destroy', $zone) }}" method="POST"
+                                            id="delete-form-{{ $zone->id }}">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-500 flex items-center justify-center transition-all">
+                                            <button type="button" onclick="confirmDelete('{{ route('zones.destroy', $zone) }}', 'delete-form-{{ $zone->id }}')"
+                                                class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-500 flex items-center justify-center transition-all">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>

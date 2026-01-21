@@ -106,7 +106,7 @@
                                 <td class="px-10 py-6 text-center">
                                     <span
                                         class="px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border 
-                                                {{ $report->status == 'submitted' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-yellow-50 text-yellow-600 border-yellow-100' }}">
+                                                                {{ $report->status == 'submitted' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-yellow-50 text-yellow-600 border-yellow-100' }}">
                                         {{ $report->status == 'submitted' ? 'Submetido' : 'Rascunho' }}
                                     </span>
                                 </td>
@@ -125,10 +125,11 @@
                                         @endcan
                                         @can('delete', $report)
                                             <form action="{{ route('quarterly-reports.destroy', $report) }}" method="POST"
-                                                onsubmit="return confirm('Tem certeza que deseja excluir este relatório?')">
+                                                id="delete-report-{{ $report->id }}">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit"
+                                                <button type="button"
+                                                    onclick="confirmDelete('delete-report-{{ $report->id }}', 'Deseja excluir este relatório?')"
                                                     class="w-10 h-10 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all font-black">
                                                     <i class="bi bi-trash-fill"></i>
                                                 </button>

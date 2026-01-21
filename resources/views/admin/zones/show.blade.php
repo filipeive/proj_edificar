@@ -200,9 +200,10 @@
                 @if($zone->supervisions->count() === 0)
                     <div class="bg-red-50 p-6 rounded-[2rem] border border-red-100">
                         <h4 class="text-sm font-black text-red-900 uppercase mb-2">Zona de Perigo</h4>
-                        <form action="{{ route('zones.destroy', $zone) }}" method="POST" onsubmit="return confirm('ATENÇÃO: Deseja realmente excluir esta zona permanentemente?');">
+                        <form action="{{ route('zones.destroy', $zone) }}" method="POST" id="delete-form">
                             @csrf @method('DELETE')
-                            <button type="submit" class="w-full py-3 bg-white text-red-600 rounded-xl font-bold border border-red-100 hover:bg-red-600 hover:text-white transition-all text-xs uppercase">
+                            <button type="button" onclick="confirmDelete('{{ route('zones.destroy', $zone) }}', 'delete-form')"
+                                class="w-full py-3 bg-white text-red-600 rounded-xl font-bold border border-red-100 hover:bg-red-600 hover:text-white transition-all text-xs uppercase">
                                 Excluir Zona
                             </button>
                         </form>

@@ -142,6 +142,57 @@ class PackageController
         return back()->with('success', 'Membro adicionado ao pacote com sucesso!');
     }
 
+    public function updateMember(Request $request, CommitmentPackage $package)
+    {
+        $authUser = auth()->user();
+        $isAuthorized = $authUser->isAdmin() ||
+            $authUser->isSecretaria() ||
+            $authUser->isComissaoObra() ||
+            ($authUser->isResponsavelPacote() && $package->responsible_id === $authUser->id);
+
+        if (!$isAuthorized) {
+            return back()->with('error', 'Não tem permissão para editar membros deste pacote.');
+        }
+
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'phone' => 'nullable|string|max:20',
+            'cell_id' => 'nullable|exists:cells,id',
+            'committed_amount' => 'required|numeric|min:0',
+        ]);
+
+        $user = \App\Models\User::findOrFail($validated['user_id']);
+
+        // Update user data if applicable
+        $user->update([
+            'phone' => $validated['phone'],
+            'cell_id' => $validated['cell_id']
+        ]);
+
+        // Update the active commitment for this user and package
+        $commitment = \App\Models\UserCommitment::where('user_id', $user->id)
+            ->where('package_id', $package->id)
+            ->where(function ($q) {
+                $q->whereNull('end_date')->orWhere('end_date', '>', now());
+            })
+            ->first();
+
+        if ($commitment) {
+            $commitment->update([
+                'committed_amount' => $validated['committed_amount'],
+                'cell_id' => $validated['cell_id']
+            ]);
+        }
+
+        return back()->with('success', 'Dados do membro atualizados com sucesso!');
+    }
+
+    public function export(CommitmentPackage $package)
+    {
+        $filename = 'membros_' . \Illuminate\Support\Str::slug($package->name) . '_' . now()->format('Y_m_d') . '.xlsx';
+        return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\PackageMembersExport($package), $filename);
+    }
+
     public function sendBulkSms(Request $request, CommitmentPackage $package, SmsService $smsService)
     {
         $membros = $package->userCommitments()->with('user')->get();

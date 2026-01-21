@@ -251,4 +251,24 @@ class ServiceController extends Controller
 
         return view('services.report', compact('stats', 'trendServices'));
     }
+
+    /**
+     * Bulk delete services
+     */
+    public function bulkDestroy(Request $request)
+    {
+        if (auth()->user()->role !== 'admin') {
+            return redirect()->back()->with('error', 'Apenas administradores podem realizar esta ação.');
+        }
+
+        $validated = $request->validate([
+            'service_ids' => 'required|array',
+            'service_ids.*' => 'exists:services,id'
+        ]);
+
+        $deletedCount = Service::whereIn('id', $validated['service_ids'])->delete();
+
+        return redirect()->route('services.index')
+            ->with('success', "{$deletedCount} culto(s) excluído(s) com sucesso!");
+    }
 }

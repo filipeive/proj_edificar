@@ -68,24 +68,162 @@
         @if((auth()->user()->role === 'admin' || auth()->user()->role === 'pastor') && $allCourses->isNotEmpty())
             <!-- Admin: Todos os Cursos Monitoramento -->
             <section class="mt-20 pt-10 border-t border-gray-100">
-                <h2 class="text-xl font-black text-gray-400 uppercase tracking-widest mb-8">Monitoramento Global (Admin)</h2>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    @foreach($allCourses as $course)
-                        <a href="{{ route('courses.show', $course) }}"
-                            class="bg-gray-50 p-4 rounded-2xl border border-gray-100 hover:bg-white hover:shadow-md transition-all group">
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
-                                {{ $course->category ?? 'ACADEMIA' }}</p>
-                            <h5 class="font-bold text-gray-900 group-hover:text-orange-600 transition-colors">{{ $course->name }}
-                            </h5>
-                            <div class="flex items-center justify-between mt-3">
-                                <span class="text-[10px] font-bold text-gray-500 uppercase">{{ $course->enrollments_count }}
-                                    Alunos</span>
-                                <i class="bi bi-arrow-right-short text-gray-300 group-hover:text-orange-600 transition-colors"></i>
-                            </div>
-                        </a>
-                    @endforeach
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
+                    <h2 class="text-xl font-black text-gray-400 uppercase tracking-widest">Monitoramento Global (Admin)</h2>
+                    @if(auth()->user()->role === 'admin')
+                        <button type="button" id="bulkDeleteBtn" onclick="bulkDelete()" disabled
+                            class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-2xl flex items-center transition shadow-lg shadow-red-600/20 font-black text-xs uppercase tracking-widest hidden">
+                            <i class="bi bi-trash-fill mr-2"></i> Excluir Selecionados
+                        </button>
+                    @endif
+                </div>
+
+                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+                    <form id="bulkActionForm" method="POST">
+                        @csrf
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50/50 border-b border-gray-100">
+                                        @if(auth()->user()->role === 'admin')
+                                            <th class="px-8 py-6 w-10">
+                                                <input type="checkbox" id="selectAllCheckbox"
+                                                    class="rounded-lg border-gray-300 text-orange-600 shadow-sm focus:border-orange-300 focus:ring focus:ring-orange-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
+                                            </th>
+                                        @endif
+                                        <th class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                            Curso</th>
+                                        <th class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                            Categoria</th>
+                                        <th
+                                            class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">
+                                            Alunos</th>
+                                        <th
+                                            class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">
+                                            Inscrições</th>
+                                        <th
+                                            class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">
+                                            Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-50">
+                                    @foreach($allCourses as $course)
+                                        <tr class="hover:bg-gray-50/50 transition-colors group">
+                                            @if(auth()->user()->role === 'admin')
+                                                <td class="px-8 py-6">
+                                                    <input type="checkbox" name="course_ids[]" value="{{ $course->id }}"
+                                                        class="course-checkbox rounded-lg border-gray-300 text-orange-600 shadow-sm focus:border-orange-300 focus:ring focus:ring-orange-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
+                                                </td>
+                                            @endif
+                                            <td class="px-8 py-6">
+                                                <div class="flex items-center gap-4">
+                                                    <div
+                                                        class="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center font-black group-hover:scale-110 transition-transform">
+                                                        {{ strtoupper(substr($course->name, 0, 1)) }}
+                                                    </div>
+                                                    <div>
+                                                        <h5 class="font-bold text-gray-900 leading-tight">{{ $course->name }}</h5>
+                                                        <span
+                                                            class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">{{ $course->slug }}</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-8 py-6">
+                                                <span
+                                                    class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-[10px] font-black uppercase tracking-widest">
+                                                    {{ $course->category ?? 'ACADEMIA' }}
+                                                </span>
+                                            </td>
+                                            <td class="px-8 py-6 text-center">
+                                                <span
+                                                    class="text-sm font-black text-gray-700">{{ $course->enrollments_count }}</span>
+                                            </td>
+                                            <td class="px-8 py-6 text-center text-xs font-bold">
+                                                @if($course->registration_open)
+                                                    <span class="text-green-600">ABERTAS</span>
+                                                @else
+                                                    <span class="text-red-500">FECHADAS</span>
+                                                @endif
+                                            </td>
+                                            <td class="px-8 py-6 text-right">
+                                                <div
+                                                    class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <a href="{{ route('courses.show', $course) }}"
+                                                        class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-orange-500 hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                                        <i class="bi bi-eye-fill"></i>
+                                                    </a>
+                                                    <a href="{{ route('courses.edit', $course) }}"
+                                                        class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                                        <i class="bi bi-pencil-fill"></i>
+                                                    </a>
+                                                    @if(auth()->user()->role === 'admin')
+                                                        <form action="{{ route('courses.destroy', $course) }}" method="POST"
+                                                            id="delete-course-{{ $course->id }}" class="inline">
+                                                            @csrf @method('DELETE')
+                                                            <button type="button"
+                                                                onclick="confirmDelete('delete-course-{{ $course->id }}', 'Deseja excluir este curso permanentemente?')"
+                                                                class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                                                <i class="bi bi-trash-fill"></i>
+                                                            </button>
+                                                        </form>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </form>
                 </div>
             </section>
         @endif
     </div>
+
+    @if(auth()->user()->role === 'admin')
+        <script>
+            const selectAll = document.getElementById('selectAllCheckbox');
+            const checkboxes = document.querySelectorAll('.course-checkbox');
+            const bulkBtn = document.getElementById('bulkDeleteBtn');
+
+            if (selectAll) {
+                selectAll.addEventListener('change', function () {
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                    updateBulkBtn();
+                });
+            }
+
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', updateBulkBtn);
+            });
+
+            function updateBulkBtn() {
+                const count = document.querySelectorAll('.course-checkbox:checked').length;
+                if (count > 0) {
+                    bulkBtn.disabled = false;
+                    bulkBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'hidden');
+                    bulkBtn.innerHTML = `<i class="bi bi-trash-fill mr-2"></i> Excluir ${count} Curso(s)`;
+                } else {
+                    bulkBtn.disabled = true;
+                    bulkBtn.classList.add('opacity-50', 'cursor-not-allowed', 'hidden');
+                }
+            }
+
+            function bulkDelete() {
+                confirmAction(
+                    'Confirmação de Exclusão em Massa',
+                    'Você tem certeza que deseja excluir os cursos selecionados? Esta ação é irreversível e removerá todas as matrículas associadas.',
+                    'warning',
+                    'Sim, excluir tudo!',
+                    null
+                ).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.getElementById('bulkActionForm');
+                        form.action = "{{ route('courses.bulk-delete') }}";
+                        form.submit();
+                    }
+                });
+            }
+        </script>
+    @endif
 @endsection

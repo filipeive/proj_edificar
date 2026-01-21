@@ -1089,7 +1089,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         // SweetAlert2 Helper Functions
-        window.confirmDelete = function (message = 'Tem certeza que deseja deletar?', title = 'Confirmar Exclusão') {
+        window.confirmDelete = function (formId, message = 'Tem certeza que deseja deletar?', title = 'Confirmar Exclusão') {
             return Swal.fire({
                 title: title,
                 text: message,
@@ -1100,20 +1100,30 @@
                 confirmButtonText: 'Sim, deletar!',
                 cancelButtonText: 'Cancelar',
                 reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed && formId) {
+                    document.getElementById(formId).submit();
+                }
+                return result;
             });
         };
 
-        window.confirmAction = function (message, title = 'Confirmar Ação') {
+        window.confirmAction = function (title, message, icon = 'question', confirmText = 'Sim, confirmar!', formId = null) {
             return Swal.fire({
                 title: title,
                 text: message,
-                icon: 'question',
+                icon: icon,
                 showCancelButton: true,
                 confirmButtonColor: '#2563eb',
                 cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Sim, confirmar!',
+                confirmButtonText: confirmText,
                 cancelButtonText: 'Cancelar',
                 reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed && formId) {
+                    document.getElementById(formId).submit();
+                }
+                return result;
             });
         };
 

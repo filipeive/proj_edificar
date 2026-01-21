@@ -38,10 +38,12 @@
                     </a>
                 @endcan
                 @can('delete', $service)
-                    <form action="{{ route('services.destroy', $service) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir?')">
+                    <form action="{{ route('services.destroy', $service) }}" method="POST"
+                        id="delete-form">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="flex items-center bg-gray-50 text-gray-400 px-6 py-4 rounded-2xl hover:bg-red-500 hover:text-white transition-all font-black text-xs uppercase tracking-widest shadow-sm">
+                        <button type="button" onclick="confirmDelete('delete-form', 'Deseja excluir este culto?')"
+                            class="flex items-center bg-gray-50 text-gray-400 px-6 py-4 rounded-2xl hover:bg-red-500 hover:text-white transition-all font-black text-xs uppercase tracking-widest shadow-sm">
                             <i class="bi bi-trash text-lg mr-2"></i>
                             Excluir
                         </button>
