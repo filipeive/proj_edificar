@@ -176,6 +176,27 @@ class UserController
         return back()->with('success', "Senha de {$user->name} redefinida para: mudar123");
     }
 
+    /**
+     * Bulk delete users
+     */
+    public function bulkDestroy(Request $request)
+    {
+        $validated = $request->validate([
+            'user_ids' => 'required|array',
+            'user_ids.*' => 'exists:users,id'
+        ]);
+
+        $userIds = $validated['user_ids'];
+
+        // Prevent deleting admins
+        $deletedCount = User::whereIn('id', $userIds)
+            ->where('role', '!=', 'admin')
+            ->delete();
+
+        return redirect()->route('users.index')
+            ->with('success', "{$deletedCount} utilizador(es) deletado(s) com sucesso!");
+    }
+
     // ==================== MEMBERS CONTEXT ROUTES ====================
 
     /**

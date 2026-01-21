@@ -32,7 +32,8 @@
                         @endif
                     </div>
                     <p class="text-lg font-bold text-gray-400">{{ $user->email }} •
-                        {{ $user->phone ?? 'Sem contato registrado' }}</p>
+                        {{ $user->phone ?? 'Sem contato registrado' }}
+                    </p>
 
                     <div class="flex flex-wrap justify-center md:justify-start gap-3">
                         <div
@@ -54,10 +55,10 @@
                         <i class="bi bi-pencil-square"></i> Editar Perfil
                     </a>
                     @if($user->role !== 'admin')
-                        <form action="{{ route('users.destroy', $user) }}" method="POST" class="w-full"
-                            onsubmit="return confirm('Deletar?');">
+                        <form action="{{ route('users.destroy', $user) }}" method="POST" class="w-full">
                             @csrf @method('DELETE')
-                            <button type="submit"
+                            <button type="button"
+                                onclick="confirmDelete('Deletar {{ $user->name }}?').then(result => { if(result.isConfirmed) this.closest('form').submit(); })"
                                 class="w-full py-4 bg-red-50 text-red-600 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-100 transition-all">
                                 <i class="bi bi-trash-fill mr-2"></i> Eliminar Registro
                             </button>
@@ -85,7 +86,8 @@
                                 <div class="space-y-4">
                                     <div class="p-6 bg-green-50 rounded-3xl border border-green-100">
                                         <p class="text-[10px] font-black text-green-600 uppercase tracking-widest mb-1">
-                                            {{ $activeCommitment->package->name ?? 'Pacote Selecionado' }}</p>
+                                            {{ $activeCommitment->package->name ?? 'Pacote Selecionado' }}
+                                        </p>
                                         <div class="flex items-baseline gap-2">
                                             <span
                                                 class="text-3xl font-black text-green-700">{{ number_format($activeCommitment->committed_amount, 0, ',', '.') }}</span>
@@ -93,7 +95,8 @@
                                         </div>
                                     </div>
                                     <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest text-center">Início:
-                                        {{ $activeCommitment->start_date->format('d/m/Y') }}</p>
+                                        {{ $activeCommitment->start_date->format('d/m/Y') }}
+                                    </p>
                                 </div>
                             @else
                                 <div class="py-10 text-center space-y-3">
@@ -168,9 +171,11 @@
                                 @forelse($user->contributions->take(5) as $contribution)
                                     <tr class="hover:bg-gray-50/70 transition-colors">
                                         <td class="px-8 py-5 text-sm font-bold text-gray-900">
-                                            {{ $contribution->contribution_date->format('d/m/Y') }}</td>
+                                            {{ $contribution->contribution_date->format('d/m/Y') }}
+                                        </td>
                                         <td class="px-8 py-5 text-sm font-black text-green-600">
-                                            {{ number_format($contribution->amount, 0, ',', '.') }} MT</td>
+                                            {{ number_format($contribution->amount, 0, ',', '.') }} MT
+                                        </td>
                                         <td class="px-8 py-5 text-center">
                                             @if($contribution->status == 'verificada')
                                                 <span class="w-2 h-2 bg-green-500 rounded-full inline-block"></span>
@@ -227,7 +232,8 @@
                             <div>
                                 <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Último Acesso</p>
                                 <p class="text-sm font-bold text-white">
-                                    {{ $user->last_login_at ? $user->last_login_at->diffForHumans() : 'Sem registros' }}</p>
+                                    {{ $user->last_login_at ? $user->last_login_at->diffForHumans() : 'Sem registros' }}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -242,10 +248,10 @@
                             <span>Lançar Oferta</span>
                             <i class="bi bi-plus-lg"></i>
                         </a>
-                        <form action="{{ route('users.reset-password', $user) }}" method="POST" class="w-full"
-                            onsubmit="return confirm('Tem certeza que deseja redefinir a senha deste utilizador? Um email será enviado com as novas credenciais.');">
+                        <form action="{{ route('users.reset-password', $user) }}" method="POST" class="w-full">
                             @csrf
-                            <button type="submit"
+                            <button type="button"
+                                onclick="confirmAction('Redefinir senha de {{ $user->name }} para mudar123?', 'Redefinir Senha').then(result => { if(result.isConfirmed) this.closest('form').submit(); })"
                                 class="w-full py-4 bg-gray-50 text-gray-700 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all flex items-center justify-between px-6">
                                 <span>Redefinir Senha</span>
                                 <i class="bi bi-key-fill"></i>

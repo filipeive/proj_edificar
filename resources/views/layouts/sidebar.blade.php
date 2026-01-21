@@ -315,8 +315,7 @@
                             Minhas Contribuições
                         </a>
                     @endif
-
-                    @if ($authUser->isAdmin() || $authUser->isPastorZona() || $authUser->isSupervisor() || $authUser->isLider() || $authUser->isComissaoObra())
+                    @if ($authUser->isAdmin() || $authUser->isPastorSenior() || $authUser->isPastorZona() || $authUser->isSupervisor() || $authUser->isLider() || $authUser->isComissaoObra())
                         <a href="{{ route('contributions.index') }}"
                             class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('contributions.index') && !request()->query('mine') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">
                             @if ($authUser->isAdmin() || $authUser->isComissaoObra())Todas

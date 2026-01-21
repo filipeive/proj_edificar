@@ -1084,6 +1084,57 @@
             });
         });
     </script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // SweetAlert2 Helper Functions
+        window.confirmDelete = function (message = 'Tem certeza que deseja deletar?', title = 'Confirmar Exclusão') {
+            return Swal.fire({
+                title: title,
+                text: message,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Sim, deletar!',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            });
+        };
+
+        window.confirmAction = function (message, title = 'Confirmar Ação') {
+            return Swal.fire({
+                title: title,
+                text: message,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#2563eb',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Sim, confirmar!',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            });
+        };
+
+        window.showSuccess = function (message, title = 'Sucesso!') {
+            Swal.fire({
+                icon: 'success',
+                title: title,
+                text: message,
+                timer: 3000,
+                showConfirmButton: false
+            });
+        };
+
+        window.showError = function (message, title = 'Erro!') {
+            Swal.fire({
+                icon: 'error',
+                title: title,
+                text: message
+            });
+        };
+    </script>
 </body>
 
 </html>

@@ -5,7 +5,36 @@
 @section('page-subtitle', 'Gestão de membros e líderes da igreja')
 
 @section('content')
-    <div class="space-y-8" x-data="{ view: 'list' }">
+    <div class="space-y-8" x-data="{
+        view: 'list',
+        selectedUsers: [],
+        selectAll: false,
+        toggleAll() {
+            if (this.selectAll) {
+                this.selectedUsers = Array.from(document.querySelectorAll('.user-checkbox:not(:disabled)')).map(cb => parseInt(cb.value));
+            } else {
+                this.selectedUsers = [];
+            }
+        },
+        toggleUser(userId) {
+            const index = this.selectedUsers.indexOf(userId);
+            if (index > -1) {
+                this.selectedUsers.splice(index, 1);
+            } else {
+                this.selectedUsers.push(userId);
+            }
+            this.selectAll = this.selectedUsers.length === document.querySelectorAll('.user-checkbox:not(:disabled)').length;
+        },
+        async bulkDelete() {
+            const result = await confirmDelete(
+                `Deseja deletar ${this.selectedUsers.length} utilizador(es) selecionado(s)?`,
+                'Exclusão em Massa'
+            );
+            if (result.isConfirmed) {
+                document.getElementById('bulkDeleteForm').submit();
+            }
+        }
+    }">
         <!-- Global Stats Row -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex items-center justify-between group hover:shadow-xl transition-all">
@@ -100,6 +129,12 @@
                             <i class="bi bi-funnel-fill"></i> Filtrar
                         </button>
                         
+                        <!-- Bulk Delete Button -->
+                        <button type="button" x-show="selectedUsers.length > 0" x-cloak @click="bulkDelete()"
+                            class="flex-1 h-14 bg-red-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-red-100 flex items-center justify-center gap-2 hover:bg-red-700 transition-all">
+                            <i class="bi bi-trash-fill"></i> Deletar (<span x-text="selectedUsers.length"></span>)
+                        </button>
+                        
                         <a href="{{ route('users.create') }}" class="w-14 h-14 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center hover:bg-green-600 hover:text-white transition-all shadow-sm">
                             <i class="bi bi-plus-lg text-xl"></i>
                         </a>
@@ -132,6 +167,10 @@
                 <table class="w-full">
                     <thead>
                         <tr class="bg-gray-50/50">
+                            <th class="px-6 py-6 text-center">
+                                <input type="checkbox" x-model="selectAll" @change="toggleAll()" 
+                                    class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                            </th>
                             <th class="px-10 py-6 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Perfil & Identificação</th>
                             <th class="px-10 py-6 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Comunicação</th>
                             <th class="px-10 py-6 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Nível de Acesso</th>
@@ -143,6 +182,16 @@
                     <tbody class="divide-y divide-gray-50">
                         @forelse($users as $user)
                             <tr class="hover:bg-gray-50/70 transition-colors group">
+                                <td class="px-6 py-6 text-center">
+                                    @if($user->role !== 'admin')
+                                        <input type="checkbox" value="{{ $user->id }}" 
+                                            class="user-checkbox w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                                            :checked="selectedUsers.includes({{ $user->id }})" 
+                                            @change="toggleUser({{ $user->id }})">
+                                    @else
+                                        <input type="checkbox" disabled class="w-5 h-5 rounded border-gray-200 cursor-not-allowed opacity-50">
+                                    @endif
+                                </td>
                                 <td class="px-10 py-6">
                                     <div class="flex items-center gap-4">
                                         <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 text-white flex items-center justify-center font-black text-xl shadow-lg shadow-blue-100 group-hover:scale-110 transition-transform">
@@ -203,15 +252,17 @@
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
                                         @if($user->role !== 'admin')
-                                            <form action="{{ route('users.reset-password', $user) }}" method="POST" class="inline" onsubmit="return confirm('Redefinir senha de {{ $user->name }} para mudar123?');">
+                                            <form action="{{ route('users.reset-password', $user) }}" method="POST" class="inline">
                                                 @csrf
-                                                <button type="submit" class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-purple-600 hover:text-white flex items-center justify-center transition-all shadow-sm" title="Redefinir Senha">
+                                                <button type="button" onclick="confirmAction('Redefinir senha de {{ $user->name }} para mudar123?', 'Redefinir Senha').then(result => { if(result.isConfirmed) this.closest('form').submit(); })" 
+                                                    class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-purple-600 hover:text-white flex items-center justify-center transition-all shadow-sm" title="Redefinir Senha">
                                                     <i class="bi bi-key-fill"></i>
                                                 </button>
                                             </form>
-                                            <form action="{{ route('users.destroy', $user) }}" method="POST" class="inline" onsubmit="return confirm('Deletar?');">
+                                            <form action="{{ route('users.destroy', $user) }}" method="POST" class="inline">
                                                 @csrf @method('DELETE')
-                                                <button type="submit" class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                                <button type="button" onclick="confirmDelete('Deletar {{ $user->name }}?').then(result => { if(result.isConfirmed) this.closest('form').submit(); })" 
+                                                    class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all shadow-sm">
                                                     <i class="bi bi-trash-fill"></i>
                                                 </button>
                                             </form>
@@ -221,7 +272,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="px-10 py-20 text-center">
+                                <td colspan="7" class="px-10 py-20 text-center">
                                     <div class="flex flex-col items-center gap-4 text-gray-200">
                                         <i class="bi bi-people text-7xl"></i>
                                         <p class="font-black text-xl text-gray-300 tracking-tighter uppercase">Nenhum utilizador encontrado no sistema</p>
@@ -317,9 +368,10 @@
                             Editar
                         </a>
                         @if($user->role !== 'admin')
-                            <form action="{{ route('users.reset-password', $user) }}" method="POST" onsubmit="return confirm('Redefinir senha para mudar123?');">
+                            <form action="{{ route('users.reset-password', $user) }}" method="POST">
                                 @csrf
-                                <button type="submit" class="w-full bg-purple-50 text-purple-600 text-center py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-purple-600 hover:text-white transition-all active:scale-95" title="Redefinir Senha">
+                                <button type="button" onclick="confirmAction('Redefinir senha para mudar123?', 'Redefinir Senha').then(result => { if(result.isConfirmed) this.closest('form').submit(); })" 
+                                    class="w-full bg-purple-50 text-purple-600 text-center py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-purple-600 hover:text-white transition-all active:scale-95" title="Redefinir Senha">
                                     <i class="bi bi-key-fill"></i>
                                 </button>
                             </form>
