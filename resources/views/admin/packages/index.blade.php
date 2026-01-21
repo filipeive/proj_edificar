@@ -97,7 +97,7 @@
                                     </div>
                                 </td>
                                 <!-- responsavel -->
-                                 <td class="px-10 py-6 text-center">   
+                                <td class="px-10 py-6 text-center">
                                     <div class="flex flex-col items-center">
                                         <span class="text-lg font-black text-gray-900 tracking-tighter">
                                             {{ $package->getResponsavelName() }}
@@ -105,11 +105,11 @@
                                         <span
                                             class="text-[9px] text-gray-400 font-black uppercase tracking-widest">Responsável</span>
                                     </div>
-                                 </td>
+                                </td>
                                 <td class="px-10 py-6 text-center">
                                     <span
                                         class="px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border 
-                                                                {{ $package->is_active ? 'bg-green-50 text-green-600 border-green-100' : 'bg-gray-50 text-gray-600 border-gray-100' }}">
+                                                                        {{ $package->is_active ? 'bg-green-50 text-green-600 border-green-100' : 'bg-gray-50 text-gray-600 border-gray-100' }}">
                                         {{ $package->is_active ? 'Ativo' : 'Inativo' }}
                                     </span>
                                 </td>
@@ -129,11 +129,11 @@
                                             title="Nova Contribuição">
                                             <i class="bi bi-plus-lg"></i>
                                         </a>
-                                        <form action="{{ route('packages.destroy', $package) }}" method="POST"
-                                            onsubmit="return confirm('Tem certeza que deseja excluir este pacote?')">
+                                        <form action="{{ route('packages.destroy', $package) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit"
+                                            <button type="button"
+                                                onclick="confirmDelete('Tem certeza que deseja excluir o pacote {{ $package->name }}?').then(result => { if(result.isConfirmed) this.closest('form').submit(); })"
                                                 class="w-10 h-10 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all shadow-sm font-black">
                                                 <i class="bi bi-trash-fill"></i>
                                             </button>

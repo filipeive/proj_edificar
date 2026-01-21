@@ -385,6 +385,15 @@
                 </div>
             @endforelse
         </div>
+
+        <!-- Hidden Bulk Delete Form -->
+        <form id="bulkDeleteForm" action="{{ route('users.bulk-destroy') }}" method="POST" class="hidden">
+            @csrf
+            @method('DELETE')
+            <template x-for="userId in selectedUsers" :key="userId">
+                <input type="hidden" name="user_ids[]" :value="userId">
+            </template>
+        </form>
     </div>
 
     <script>

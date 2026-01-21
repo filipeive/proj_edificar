@@ -48,7 +48,8 @@
                     {{ number_format($contribution->amount, 0, ',', '.') }}<span class="text-sm ml-1 uppercase">MT</span>
                 </p>
                 <p class="text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-widest">
-                    {{ $contribution->contribution_date->format('d/m/Y') }}</p>
+                    {{ $contribution->contribution_date->format('d/m/Y') }}
+                </p>
             </div>
 
             <!-- Global Action -->
@@ -80,7 +81,8 @@
                             <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Operador Responsável
                             </p>
                             <p class="text-lg font-black text-gray-900">
-                                {{ $contribution->registeredBy->name ?? 'Sistema Automático' }}</p>
+                                {{ $contribution->registeredBy->name ?? 'Sistema Automático' }}
+                            </p>
                         </div>
                         @if($contribution->status !== 'pendente')
                             <div class="space-y-1">
@@ -92,7 +94,8 @@
                                 <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Validador /
                                     Autorizador</p>
                                 <p class="text-lg font-black text-gray-900 italic text-blue-600">
-                                    {{ $contribution->verifiedBy->name ?? 'N/A' }}</p>
+                                    {{ $contribution->verifiedBy->name ?? 'N/A' }}
+                                </p>
                             </div>
                         @endif
                     </div>
@@ -142,10 +145,10 @@
                     <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 space-y-6">
                         <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Controlo Administrativo</h3>
                         <div class="space-y-3">
-                            <form action="{{ route('contributions.verify', $contribution) }}" method="POST"
-                                onsubmit="return confirm('Deseja validar esta oferta?')">
+                            <form action="{{ route('contributions.verify', $contribution) }}" method="POST">
                                 @csrf
-                                <button type="submit"
+                                <button type="button"
+                                    onclick="confirmAction('Deseja validar esta oferta?', 'Validar Oferta').then(result => { if(result.isConfirmed) this.closest('form').submit(); })"
                                     class="w-full py-5 bg-green-600 text-white rounded-2xl hover:bg-green-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-green-100">
                                     <i class="bi bi-patch-check mr-2"></i> Validar Oferta
                                 </button>

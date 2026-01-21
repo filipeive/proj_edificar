@@ -1,37 +1,42 @@
 @extends('layouts.app')
 
-@section('title', 'Acesso Negado')
+@section('title', 'Acesso Negado - Life Church')
 
 @section('content')
-    <div class="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
-        <div class="bg-red-100 rounded-full p-6 mb-6">
-            <i class="bi bi-shield-lock-fill text-6xl text-red-500"></i>
+    <div class="min-h-[70vh] flex flex-col items-center justify-center text-center p-6">
+        <div class="relative mb-12">
+            <h1 class="text-[12rem] font-black text-red-600 opacity-10 leading-none">403</h1>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <i class="bi bi-shield-lock-fill text-8xl text-red-600"></i>
+            </div>
         </div>
 
-        <h1 class="text-3xl font-black text-slate-800 mb-2">Acesso Negado</h1>
-
-        <p class="text-slate-500 max-w-md mb-8">
-            Você não tem permissão para acessar esta página. Se acredita que isto é um erro, por favor contacte o
-            administrador do sistema.
+        <h2 class="text-4xl font-black text-gray-900 tracking-tighter mb-4 uppercase">Acesso Interditado</h2>
+        <p class="text-lg font-medium text-gray-400 mb-12 max-w-md mx-auto">
+            Desculpe, mas suas credenciais de acesso não permitem visualizar este conteúdo. Se acredita que isto é um erro,
+            contacte o administrador.
         </p>
 
-        <div class="flex gap-4">
+        <div class="flex flex-wrap items-center justify-center gap-4">
             <a href="{{ url()->previous() }}"
-                class="px-6 py-2 bg-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-300 transition-colors">
-                Voltar
+                class="px-10 py-5 bg-gray-100 text-gray-600 rounded-3xl font-black text-xs uppercase tracking-widest hover:bg-gray-200 transition-all flex items-center gap-3">
+                <i class="bi bi-arrow-left"></i> Voltar Agora
             </a>
             <a href="{{ route('dashboard') }}"
-                class="px-6 py-2 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors">
-                Ir para Dashboard
+                class="px-10 py-5 bg-blue-600 text-white rounded-3xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-xl shadow-blue-100">
+                Painel Principal
             </a>
         </div>
 
         @if(config('app.debug'))
             <div
-                class="mt-12 p-4 bg-slate-100 rounded-lg text-left w-full max-w-lg overflow-auto text-xs font-mono text-slate-600">
-                <p class="font-bold mb-2">Debug Info:</p>
-                <p>User Role: {{ auth()->user()->role ?? 'Guest' }}</p>
-                <p>Route: {{ request()->route()->getName() }}</p>
+                class="mt-12 p-6 bg-gray-50 rounded-2xl text-left w-full max-w-lg overflow-auto text-[10px] font-mono text-gray-400 border border-gray-100">
+                <p class="font-black mb-2 uppercase tracking-widest">Debug Intelligence:</p>
+                <div class="space-y-1">
+                    <p>USER_ROLE: {{ auth()->user()->role ?? 'GUEST' }}</p>
+                    <p>TARGET_ROUTE: {{ request()->route() ? request()->route()->getName() : 'N/A' }}</p>
+                    <p>AUTH_STATUS: {{ auth()->check() ? 'AUTHENTICATED' : 'GUEST_MODE' }}</p>
+                </div>
             </div>
         @endif
     </div>

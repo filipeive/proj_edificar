@@ -82,10 +82,10 @@
                             <i class="bi bi-clipboard-check"></i> Copiar Mensagem
                         </button>
 
-                        <form action="{{ route('packages.send-bulk-sms', $package) }}" method="POST"
-                            onsubmit="return confirm('Tem certeza que deseja disparar SMS para todos os membros deste pacote?')">
+                        <form action="{{ route('packages.send-bulk-sms', $package) }}" method="POST">
                             @csrf
-                            <button type="submit"
+                            <button type="button"
+                                onclick="confirmAction('Tem certeza que deseja disparar SMS para todos os membros deste pacote?', 'Disparar SMS em Massa').then(result => { if(result.isConfirmed) this.closest('form').submit(); })"
                                 class="w-full bg-blue-500 text-white border border-blue-400/30 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl flex items-center justify-center gap-2">
                                 <i class="bi bi-broadcast"></i> Disparar SMS em Massa
                             </button>
@@ -277,7 +277,7 @@
                                         <td class="px-8 py-6 text-right">
                                             <span
                                                 class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border 
-                                                                        {{ $commitment->isActive() ? 'bg-green-50 text-green-600 border-green-100' : 'bg-red-50 text-red-600 border-red-100' }}">
+                                                                                {{ $commitment->isActive() ? 'bg-green-50 text-green-600 border-green-100' : 'bg-red-50 text-red-600 border-red-100' }}">
                                                 {{ $commitment->isActive() ? 'Ativo' : 'Encerrado' }}
                                             </span>
                                         </td>

@@ -187,9 +187,9 @@ Route::middleware('auth')->group(function () {
             // Gestão de Zonas
             Route::resource('zones', ZoneController::class);
             // Gestão de Utilizadores
-            Route::resource('users', UserController::class);
-            Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
             Route::delete('/users/bulk-destroy', [UserController::class, 'bulkDestroy'])->name('users.bulk-destroy');
+            Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
+            Route::resource('users', UserController::class);
 
         });
     });
