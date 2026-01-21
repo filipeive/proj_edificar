@@ -45,6 +45,9 @@
                                 Membros Ativos</th>
                             <th
                                 class="px-10 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                Responsável</th>
+                            <th
+                                class="px-10 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
                                 Estado</th>
                             <th
                                 class="px-10 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">
@@ -93,6 +96,16 @@
                                             class="text-[9px] text-gray-400 font-black uppercase tracking-widest">Inscritos</span>
                                     </div>
                                 </td>
+                                <!-- responsavel -->
+                                 <td class="px-10 py-6 text-center">   
+                                    <div class="flex flex-col items-center">
+                                        <span class="text-lg font-black text-gray-900 tracking-tighter">
+                                            {{ $package->getResponsavelName() }}
+                                        </span>
+                                        <span
+                                            class="text-[9px] text-gray-400 font-black uppercase tracking-widest">Responsável</span>
+                                    </div>
+                                 </td>
                                 <td class="px-10 py-6 text-center">
                                     <span
                                         class="px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border 

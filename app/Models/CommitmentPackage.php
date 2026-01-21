@@ -41,7 +41,7 @@ class CommitmentPackage extends Model
 
     public function responsible()
     {
-        return $this->belongsTo(User::class, 'responsible_id');
+        return $this->belongsTo(User::class, 'responsible_id')->select('id', 'name');
     }
 
     // ESCOPOS
@@ -57,7 +57,10 @@ class CommitmentPackage extends Model
             ->active()
             ->count();
     }
-
+    public function getResponsavelName()
+    {
+        return $this->responsible ? $this->responsible->name : 'Sem responsável';
+    }
     public function getTotalContributionsThisMonth()
     {
         $now = now();
