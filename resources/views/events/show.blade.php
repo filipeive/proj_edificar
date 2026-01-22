@@ -5,7 +5,7 @@
 @section('page-subtitle', 'Informações completas sobre o culto ou evento')
 
 @section('content')
-    <div class="container-fluid">
+    <div class="w-full">
         <div class="mb-6 flex justify-between items-center">
             <a href="{{ route('events.index') }}" class="text-blue-600 hover:text-blue-800 flex items-center transition">
                 <i class="bi bi-arrow-left mr-2"></i> Voltar para Lista
@@ -28,7 +28,7 @@
             </div>
         </div>
 
-        <div class="max-w-4xl mx-auto space-y-8">
+        <div class="w-full">
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <div class="bg-orange-600 px-8 py-10 text-white relative">
                     <div class="relative z-10">

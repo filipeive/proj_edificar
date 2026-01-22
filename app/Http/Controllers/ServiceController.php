@@ -88,6 +88,11 @@ class ServiceController extends Controller
             'individual_offerings.*.amount' => 'nullable|numeric|min:0',
             'individual_offerings.*.member_name' => 'nullable|string|max:255',
             'individual_offerings.*.description' => 'nullable|string|max:255',
+            'individual_contributions' => 'nullable|array',
+            'individual_contributions.*.type' => 'required|in:tithe,offering',
+            'individual_contributions.*.amount' => 'required|numeric|min:0',
+            'individual_contributions.*.member_name' => 'nullable|string|max:255',
+            'individual_contributions.*.description' => 'nullable|string|max:255',
         ]);
 
         foreach ($numericFields as $field) {
@@ -101,6 +106,26 @@ class ServiceController extends Controller
                 foreach ($validated['offerings'] as $offeringData) {
                     if ($offeringData['amount'] > 0) {
                         $service->offerings()->create($offeringData);
+                    }
+                }
+            }
+
+            // Handle Unified Contributions
+            if (isset($validated['individual_contributions'])) {
+                foreach ($validated['individual_contributions'] as $contribution) {
+                    if ($contribution['amount'] > 0) {
+                        if ($contribution['type'] === 'tithe') {
+                            $service->tithes()->create([
+                                'member_name' => $contribution['member_name'],
+                                'amount' => $contribution['amount']
+                            ]);
+                        } else {
+                            $service->individualOfferings()->create([
+                                'member_name' => $contribution['member_name'],
+                                'amount' => $contribution['amount'],
+                                'description' => $contribution['description'] ?? null
+                            ]);
+                        }
                     }
                 }
             }
@@ -199,6 +224,11 @@ class ServiceController extends Controller
             'individual_offerings.*.amount' => 'nullable|numeric|min:0',
             'individual_offerings.*.member_name' => 'nullable|string|max:255',
             'individual_offerings.*.description' => 'nullable|string|max:255',
+            'individual_contributions' => 'nullable|array',
+            'individual_contributions.*.type' => 'required|in:tithe,offering',
+            'individual_contributions.*.amount' => 'required|numeric|min:0',
+            'individual_contributions.*.member_name' => 'nullable|string|max:255',
+            'individual_contributions.*.description' => 'nullable|string|max:255',
         ]);
 
         foreach ($numericFields as $field) {
@@ -220,6 +250,27 @@ class ServiceController extends Controller
                 }
             }
 
+            // Handle Unified Contributions
+            if (isset($validated['individual_contributions'])) {
+                foreach ($validated['individual_contributions'] as $contribution) {
+                    if ($contribution['amount'] > 0) {
+                        if ($contribution['type'] === 'tithe') {
+                            $service->tithes()->create([
+                                'member_name' => $contribution['member_name'],
+                                'amount' => $contribution['amount']
+                            ]);
+                        } else {
+                            $service->individualOfferings()->create([
+                                'member_name' => $contribution['member_name'],
+                                'amount' => $contribution['amount'],
+                                'description' => $contribution['description'] ?? null
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            // Legacy support if needed, but UI will likely use unified array
             if (isset($validated['tithes'])) {
                 foreach ($validated['tithes'] as $titheData) {
                     if ($titheData['amount'] > 0) {

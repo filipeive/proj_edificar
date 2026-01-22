@@ -250,58 +250,119 @@
                     </div>
                 </div>
 
-                <!-- Ofertas Individuais -->
+                <!-- Contribuições Individuais (Dízimos e Ofertas) -->
                 <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden flex flex-col">
                     <div class="p-8 border-b border-gray-50 bg-gray-50/50 flex items-center justify-between">
                         <h2 class="text-lg font-black text-gray-900 flex items-center gap-2">
-                            <i class="bi bi-gift text-orange-600"></i>
-                            Ofertas Individuais
+                            <i class="bi bi-people text-blue-600"></i>
+                            Contribuições Individuais
                         </h2>
-                        <button type="button" @click="addIndividualOffering()" id="addIndOfferingBtn"
-                            class="px-4 py-2 bg-orange-50 text-orange-600 rounded-xl font-bold text-xs hover:bg-orange-600 hover:text-white transition-all flex items-center gap-2">
-                            <i class="bi bi-plus-lg"></i> Adicionar Manual
+                        <button type="button" @click="addContribution()" id="addContributionBtn"
+                            class="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl font-bold text-xs hover:bg-blue-600 hover:text-white transition-all flex items-center gap-2">
+                            <i class="bi bi-plus-lg"></i> Adicionar
                         </button>
                     </div>
-                    <div class="p-8 flex-1 space-y-4 max-h-[500px] overflow-y-auto" id="indOfferingsContainer">
-                        @foreach($service->individualOfferings as $indOffering)
+                    <div class="p-8 flex-1 space-y-4 max-h-[500px] overflow-y-auto" id="contributionsContainer">
+                        @php $globalIndex = 0; @endphp
+
+                        {{-- Load Existing Tithes --}}
+                        @foreach($service->tithes as $tithe)
                             <div
-                                class="ind-offering-row space-y-2 p-4 bg-gray-50 rounded-2xl group relative border border-transparent hover:border-orange-100 transition-all">
-                                <div class="flex items-center gap-4">
-                                    <div class="flex-1 relative">
-                                        <i class="bi bi-person absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"></i>
-                                        <input type="text" name="individual_offerings[{{ $loop->index }}][member_name]"
-                                            placeholder="Nome do Ofertante (opcional)"
-                                            value="{{ old("individual_offerings.{$loop->index}.member_name", $indOffering->member_name) }}"
-                                            class="w-full pl-10 pr-4 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-orange-500 focus:ring-0 text-sm font-bold text-gray-700">
+                                class="contribution-row space-y-2 p-4 bg-gray-50 rounded-2xl group relative border border-transparent hover:border-blue-100 transition-all">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-32">
+                                        <select name="individual_contributions[{{ $globalIndex }}][type]"
+                                            class="contribution-type w-full px-3 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-blue-500 focus:ring-0 text-xs font-bold text-gray-700">
+                                            <option value="tithe" selected>Dízimo</option>
+                                            <option value="offering">Oferta</option>
+                                        </select>
                                     </div>
-                                    <div class="relative w-32">
-                                        <input type="number" step="0.01" name="individual_offerings[{{ $loop->index }}][amount]"
-                                            placeholder="Valor"
-                                            value="{{ old("individual_offerings.{$loop->index}.amount", $indOffering->amount) }}"
-                                            class="ind-offering-amount-input w-full pl-8 pr-4 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-orange-500 focus:ring-0 text-sm font-black text-right text-orange-700">
+                                    <div class="flex-1 relative">
+                                        <i
+                                            class="bi bi-person absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-xs"></i>
+                                        <input type="text" name="individual_contributions[{{ $globalIndex }}][member_name]"
+                                            value="{{ $tithe->member_name }}" placeholder="Nome do Contribuinte"
+                                            class="w-full pl-8 pr-3 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-blue-500 focus:ring-0 text-sm font-bold text-gray-700">
+                                    </div>
+                                    <div class="relative w-28">
+                                        <input type="number" step="0.01"
+                                            name="individual_contributions[{{ $globalIndex }}][amount]"
+                                            value="{{ $tithe->amount }}" placeholder="0.00"
+                                            class="contribution-amount w-full pl-3 pr-8 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-blue-500 focus:ring-0 text-sm font-black text-right text-gray-900">
                                         <span
-                                            class="absolute left-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-400">MT</span>
+                                            class="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-400">MT</span>
                                     </div>
                                     <button type="button"
-                                        class="remove-ind-offering text-gray-300 hover:text-red-500 transition-colors p-2">
+                                        class="remove-contribution text-gray-300 hover:text-red-500 transition-colors bg-white hover:bg-red-50 p-2 rounded-lg">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
                                 <div class="relative">
-                                    <i class="bi bi-chat-left-text absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"></i>
-                                    <input type="text" name="individual_offerings[{{ $loop->index }}][description]"
-                                        placeholder="Voto / Descrição da oferta"
-                                        value="{{ old("individual_offerings.{$loop->index}.description", $indOffering->description) }}"
-                                        class="w-full pl-10 pr-4 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-orange-500 focus:ring-0 text-xs font-medium text-gray-500 italic">
+                                    <i
+                                        class="bi bi-chat-left-text absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-xs"></i>
+                                    <input type="text" name="individual_contributions[{{ $globalIndex }}][description]"
+                                        placeholder="Observação (Opcional)"
+                                        class="w-full pl-8 pr-4 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-blue-500 focus:ring-0 text-xs font-medium text-gray-500 italic">
                                 </div>
                             </div>
+                            @php $globalIndex++; @endphp
+                        @endforeach
+
+                        {{-- Load Existing Individual Offerings --}}
+                        @foreach($service->individualOfferings as $offering)
+                            <div
+                                class="contribution-row space-y-2 p-4 bg-gray-50 rounded-2xl group relative border border-transparent hover:border-blue-100 transition-all">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-32">
+                                        <select name="individual_contributions[{{ $globalIndex }}][type]"
+                                            class="contribution-type w-full px-3 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-blue-500 focus:ring-0 text-xs font-bold text-gray-700">
+                                            <option value="tithe">Dízimo</option>
+                                            <option value="offering" selected>Oferta</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex-1 relative">
+                                        <i
+                                            class="bi bi-person absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-xs"></i>
+                                        <input type="text" name="individual_contributions[{{ $globalIndex }}][member_name]"
+                                            value="{{ $offering->member_name }}" placeholder="Nome do Contribuinte"
+                                            class="w-full pl-8 pr-3 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-blue-500 focus:ring-0 text-sm font-bold text-gray-700">
+                                    </div>
+                                    <div class="relative w-28">
+                                        <input type="number" step="0.01"
+                                            name="individual_contributions[{{ $globalIndex }}][amount]"
+                                            value="{{ $offering->amount }}" placeholder="0.00"
+                                            class="contribution-amount w-full pl-3 pr-8 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-blue-500 focus:ring-0 text-sm font-black text-right text-gray-900">
+                                        <span
+                                            class="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-400">MT</span>
+                                    </div>
+                                    <button type="button"
+                                        class="remove-contribution text-gray-300 hover:text-red-500 transition-colors bg-white hover:bg-red-50 p-2 rounded-lg">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                                <div class="relative">
+                                    <i
+                                        class="bi bi-chat-left-text absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-xs"></i>
+                                    <input type="text" name="individual_contributions[{{ $globalIndex }}][description]"
+                                        value="{{ $offering->description }}" placeholder="Observação (Opcional)"
+                                        class="w-full pl-8 pr-4 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-blue-500 focus:ring-0 text-xs font-medium text-gray-500 italic">
+                                </div>
+                            </div>
+                            @php $globalIndex++; @endphp
                         @endforeach
                     </div>
-                    <div class="p-8 mt-auto bg-gray-50/50 border-t border-gray-50">
-                        <div
-                            class="p-6 bg-orange-600 rounded-[1.5rem] flex items-center justify-between text-white shadow-lg shadow-orange-100">
-                            <span class="text-xs font-black uppercase tracking-widest">Total Indiv.</span>
-                            <span class="text-2xl font-black" id="total_ind_offerings_display">0,00 MT</span>
+                    <div class="p-8 mt-auto bg-gray-50/50 border-t border-gray-50 space-y-3">
+                        <div class="flex justify-between items-center text-xs font-bold text-gray-500">
+                            <span>Total Dízimos:</span>
+                            <span id="total_tithes_display" class="text-blue-600">0,00 MT</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs font-bold text-gray-500">
+                            <span>Total Ofertas:</span>
+                            <span id="total_ind_offerings_display" class="text-orange-600">0,00 MT</span>
+                        </div>
+                        <div class="p-4 bg-gray-900 rounded-2xl flex items-center justify-between text-white shadow-lg">
+                            <span class="text-xs font-black uppercase tracking-widest">Total Geral</span>
+                            <span class="text-xl font-black" id="total_contributions_display">0,00 MT</span>
                         </div>
                     </div>
                 </div>
@@ -322,16 +383,16 @@
                     <h3 class="text-lg font-black uppercase tracking-widest text-blue-200">Resumo Atualizado</h3>
                     <div class="space-y-4">
                         <div class="flex justify-between items-center border-b border-blue-500/50 pb-4">
-                            <span class="text-sm font-bold opacity-80">Total de Ofertas</span>
+                            <span class="text-sm font-bold opacity-80">Ofertas Gerais</span>
                             <span class="text-sm font-black" id="summary_offerings">0,00 MT</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-blue-500/50 pb-4">
+                            <span class="text-sm font-bold opacity-80">Dízimos</span>
+                            <span class="text-sm font-black" id="summary_tithes">0,00 MT</span>
                         </div>
                         <div class="flex justify-between items-center border-b border-blue-500/50 pb-4">
                             <span class="text-sm font-bold opacity-80">Ofertas Individuais</span>
                             <span class="text-sm font-black" id="summary_ind_offerings">0,00 MT</span>
-                        </div>
-                        <div class="flex justify-between items-center border-b border-blue-500/50 pb-4">
-                            <span class="text-sm font-bold opacity-80">Total de Dízimos</span>
-                            <span class="text-sm font-black" id="summary_tithes">0,00 MT</span>
                         </div>
                         <div class="flex justify-between items-center border-b border-blue-500/50 pb-4">
                             <span class="text-sm font-bold opacity-80">Especiais</span>
@@ -352,162 +413,148 @@
         </form>
     </div>
 
-    <!-- Template para Dízimo -->
-    <template id="titheRowTemplate">
-        <div class="tithe-row flex items-center gap-4 group">
-            <div class="flex-1 relative">
-                <i class="bi bi-person absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"></i>
-                <input type="text" name="tithes[INDEX][member_name]" placeholder="Nome do Dizimista"
-                    class="w-full pl-10 pr-4 py-2 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:border-blue-500 focus:ring-0 text-sm font-bold text-gray-700">
-            </div>
-            <div class="relative w-32">
-                <input type="number" step="0.01" name="tithes[INDEX][amount]" placeholder="Valor"
-                    class="tithe-amount-input w-full pl-8 pr-4 py-2 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:border-blue-500 focus:ring-0 text-sm font-black text-right text-blue-700">
-                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-400">MT</span>
-            </div>
-            <button type="button" class="remove-tithe text-gray-300 hover:text-red-500 transition-colors p-2">
-                <i class="bi bi-trash"></i>
-            </button>
-        </div>
-    </template>
-
-    <!-- Template para Oferta Individual -->
-    <template id="indOfferingRowTemplate">
+    <!-- Template Unificado -->
+    <template id="contributionRowTemplate">
         <div
-            class="ind-offering-row space-y-2 p-4 bg-gray-50 rounded-2xl group relative border border-transparent hover:border-orange-100 transition-all">
-            <div class="flex items-center gap-4">
-                <div class="flex-1 relative">
-                    <i class="bi bi-person absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"></i>
-                    <input type="text" name="individual_offerings[INDEX][member_name]"
-                        placeholder="Nome do Ofertante (opcional)"
-                        class="w-full pl-10 pr-4 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-orange-500 focus:ring-0 text-sm font-bold text-gray-700">
+            class="contribution-row space-y-2 p-4 bg-gray-50 rounded-2xl group relative border border-transparent hover:border-blue-100 transition-all">
+            <div class="flex items-center gap-3">
+                <div class="w-32">
+                    <select name="individual_contributions[INDEX][type]"
+                        class="contribution-type w-full px-3 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-blue-500 focus:ring-0 text-xs font-bold text-gray-700">
+                        <option value="tithe">Dízimo</option>
+                        <option value="offering">Oferta</option>
+                    </select>
                 </div>
-                <div class="relative w-32">
-                    <input type="number" step="0.01" name="individual_offerings[INDEX][amount]" placeholder="Valor"
-                        class="ind-offering-amount-input w-full pl-8 pr-4 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-orange-500 focus:ring-0 text-sm font-black text-right text-orange-700">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-400">MT</span>
+                <div class="flex-1 relative">
+                    <i class="bi bi-person absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-xs"></i>
+                    <input type="text" name="individual_contributions[INDEX][member_name]"
+                        placeholder="Nome do Contribuinte"
+                        class="w-full pl-8 pr-3 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-blue-500 focus:ring-0 text-sm font-bold text-gray-700">
+                </div>
+                <div class="relative w-28">
+                    <input type="number" step="0.01" name="individual_contributions[INDEX][amount]" placeholder="0.00"
+                        class="contribution-amount w-full pl-3 pr-8 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-blue-500 focus:ring-0 text-sm font-black text-right text-gray-900">
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-400">MT</span>
                 </div>
                 <button type="button"
-                    class="remove-ind-offering text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 p-2">
+                    class="remove-contribution text-gray-300 hover:text-red-500 transition-colors bg-white hover:bg-red-50 p-2 rounded-lg">
                     <i class="bi bi-trash"></i>
                 </button>
             </div>
             <div class="relative">
-                <i class="bi bi-chat-left-text absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"></i>
-                <input type="text" name="individual_offerings[INDEX][description]" placeholder="Voto / Descrição da oferta"
-                    class="w-full pl-10 pr-4 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-orange-500 focus:ring-0 text-xs font-medium text-gray-500 italic">
+                <i class="bi bi-chat-left-text absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-xs"></i>
+                <input type="text" name="individual_contributions[INDEX][description]" placeholder="Observação (Opcional)"
+                    class="w-full pl-8 pr-4 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-blue-500 focus:ring-0 text-xs font-medium text-gray-500 italic">
             </div>
         </div>
     </template>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const tithesContainer = document.getElementById('tithesContainer');
-            const titheTemplate = document.getElementById('titheRowTemplate');
-            let titheIndex = {{ $service->tithes->count() }};
+            // ----- Participation Logic -----
+            function updateParticipation() {
+                const getVal = (name) => parseInt(document.querySelector(`[name="${name}"]`)?.value) || 0;
 
-            const indOfferingsContainer = document.getElementById('indOfferingsContainer');
-            const indOfferingTemplate = document.getElementById('indOfferingRowTemplate');
-            let indOfferingIndex = {{ $service->individualOfferings->count() }};
+                const am = getVal('adults_members');
+                const av = getVal('adults_visitors');
+                const as = getVal('adults_salvations');
+                const cm = getVal('children_members');
+                const cv = getVal('children_visitors');
+                const cs = getVal('children_salvations');
 
-            function addTithe() {
-                const clone = titheTemplate.content.cloneNode(true);
-                const container = clone.querySelector('.tithe-row');
+                const adultsTotal = am + av + as;
+                const childrenTotal = cm + cv + cs;
+                const membersTotal = am + cm;
+                const visitorsTotal = av + cv;
+                const salvationsTotal = as + cs;
+                const grandTotal = adultsTotal + childrenTotal;
 
-                container.querySelectorAll('input').forEach(input => {
-                    input.name = input.name.replace('INDEX', titheIndex);
-                    input.addEventListener('input', updateFinancials);
+                document.getElementById('row_adults_total').innerText = adultsTotal;
+                document.getElementById('row_children_total').innerText = childrenTotal;
+                document.getElementById('col_members_total').innerText = membersTotal;
+                document.getElementById('col_visitors_total').innerText = visitorsTotal;
+                document.getElementById('col_salvations_total').innerText = salvationsTotal;
+                document.getElementById('grand_total_display').innerText = grandTotal;
+                document.getElementById('total_general_participation').innerText = grandTotal;
+            }
+
+            document.querySelectorAll('.participation-input').forEach(input => {
+                input.addEventListener('input', updateParticipation);
+            });
+            updateParticipation();
+
+            // ----- Financial Logic -----
+            const contributionsContainer = document.getElementById('contributionsContainer');
+            const contributionTemplate = document.getElementById('contributionRowTemplate');
+            let contributionIndex = {{ $globalIndex }};
+
+            window.addContribution = function () {
+                const clone = contributionTemplate.content.cloneNode(true);
+                const row = clone.querySelector('.contribution-row');
+
+                row.querySelectorAll('input, select').forEach(el => {
+                    el.name = el.name.replace('INDEX', contributionIndex);
+                    el.addEventListener('input', updateFinancials);
                 });
 
-                container.querySelector('.remove-tithe').addEventListener('click', () => {
-                    container.remove();
+                row.querySelector('.remove-contribution').addEventListener('click', () => {
+                    row.remove();
                     updateFinancials();
                 });
 
-                tithesContainer.appendChild(container);
-                titheIndex++;
-            }
+                contributionsContainer.appendChild(row);
+                contributionIndex++;
+            };
 
-            function addIndividualOffering() {
-                const clone = indOfferingTemplate.content.cloneNode(true);
-                const container = clone.querySelector('.ind-offering-row');
+            // Add listener to 'Adicionar' button
+            document.getElementById('addContributionBtn').addEventListener('click', window.addContribution);
 
-                container.querySelectorAll('input').forEach(input => {
-                    input.name = input.name.replace('INDEX', indOfferingIndex);
-                    input.addEventListener('input', updateFinancials);
-                });
-
-                container.querySelector('.remove-ind-offering').addEventListener('click', () => {
-                    container.remove();
+            // Activate Remove buttons for existing rows
+            document.querySelectorAll('.remove-contribution').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    this.closest('.contribution-row').remove();
                     updateFinancials();
                 });
+            });
 
-                indOfferingsContainer.appendChild(container);
-                indOfferingIndex++;
-            }
-
-            document.getElementById('addTitheBtn').addEventListener('click', addTithe);
-            document.getElementById('addIndOfferingBtn').addEventListener('click', addIndividualOffering);
 
             function formatMT(value) {
                 return value.toLocaleString('pt-MZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' MT';
             }
 
-            function updateParticipation() {
-                const inputs = {
-                    am: parseInt(document.querySelector('[name="adults_members"]').value) || 0,
-                    av: parseInt(document.querySelector('[name="adults_visitors"]').value) || 0,
-                    as: parseInt(document.querySelector('[name="adults_salvations"]').value) || 0,
-                    cm: parseInt(document.querySelector('[name="children_members"]').value) || 0,
-                    cv: parseInt(document.querySelector('[name="children_visitors"]').value) || 0,
-                    cs: parseInt(document.querySelector('[name="children_salvations"]').value) || 0
-                };
-
-                const rows = {
-                    adults: inputs.am + inputs.av + inputs.as,
-                    children: inputs.cm + inputs.cv + inputs.cs
-                };
-
-                const cols = {
-                    members: inputs.am + inputs.cm,
-                    visitors: inputs.av + inputs.cv,
-                    salvations: inputs.as + inputs.cs
-                };
-
-                const total = rows.adults + rows.children;
-
-                document.getElementById('row_adults_total').innerText = rows.adults;
-                document.getElementById('row_children_total').innerText = rows.children;
-                document.getElementById('col_members_total').innerText = cols.members;
-                document.getElementById('col_visitors_total').innerText = cols.visitors;
-                document.getElementById('col_salvations_total').innerText = cols.salvations;
-                document.getElementById('grand_total_display').innerText = total;
-                document.getElementById('total_general_participation').innerText = total;
-            }
-
             function updateFinancials() {
+                // 1. General Offerings
                 let offeringsTotal = 0;
                 document.querySelectorAll('.offering-input').forEach(input => {
                     offeringsTotal += parseFloat(input.value) || 0;
                 });
 
+                // 2. Individual Contributions
                 let tithesTotal = 0;
-                document.querySelectorAll('.tithe-amount-input').forEach(input => {
-                    tithesTotal += parseFloat(input.value) || 0;
-                });
-
                 let indOfferingsTotal = 0;
-                document.querySelectorAll('.ind-offering-amount-input').forEach(input => {
-                    indOfferingsTotal += parseFloat(input.value) || 0;
+
+                document.querySelectorAll('.contribution-row').forEach(row => {
+                    const type = row.querySelector('.contribution-type').value;
+                    const amount = parseFloat(row.querySelector('.contribution-amount').value) || 0;
+
+                    if (type === 'tithe') {
+                        tithesTotal += amount;
+                    } else {
+                        indOfferingsTotal += amount;
+                    }
                 });
 
+                // 3. Special Offerings
                 let specialOffer = parseFloat(document.getElementById('special_offer_input').value) || 0;
 
                 const grandTotal = offeringsTotal + tithesTotal + indOfferingsTotal + specialOffer;
 
+                // Update UI
                 document.getElementById('total_offerings_display').innerText = formatMT(offeringsTotal);
+
                 document.getElementById('total_tithes_display').innerText = formatMT(tithesTotal);
                 document.getElementById('total_ind_offerings_display').innerText = formatMT(indOfferingsTotal);
+                document.getElementById('total_contributions_display').innerText = formatMT(tithesTotal + indOfferingsTotal);
 
                 document.getElementById('summary_offerings').innerText = formatMT(offeringsTotal);
                 document.getElementById('summary_tithes').innerText = formatMT(tithesTotal);
@@ -516,31 +563,16 @@
                 document.getElementById('summary_grand_total').innerText = formatMT(grandTotal);
             }
 
-            // Listeners for existing elements
-            document.querySelectorAll('.participation-input').forEach(input => {
-                input.addEventListener('input', updateParticipation);
-            });
-
-            document.querySelectorAll('.offering-input, #special_offer_input, .tithe-amount-input, .ind-offering-amount-input').forEach(input => {
+            // Listeners for inputs
+            document.querySelectorAll('.offering-input, #special_offer_input').forEach(input => {
                 input.addEventListener('input', updateFinancials);
             });
 
-            document.querySelectorAll('.remove-tithe').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    this.closest('.tithe-row').remove();
-                    updateFinancials();
-                });
+            // Listeners for existing contribution inputs
+            document.querySelectorAll('.contribution-type, .contribution-amount').forEach(input => {
+                input.addEventListener('input', updateFinancials);
             });
 
-            document.querySelectorAll('.remove-ind-offering').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    this.closest('.ind-offering-row').remove();
-                    updateFinancials();
-                });
-            });
-
-            // Initial Calculations
-            updateParticipation();
             updateFinancials();
         });
     </script>

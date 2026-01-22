@@ -55,8 +55,26 @@ class WeddingController extends Controller
 
         $year = $date->year;
 
+        // Start Query for Weddings
+        $query = Wedding::query();
+
+        // Search Filter
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('groom_name', 'like', "%{$search}%")
+                    ->orWhere('bride_name', 'like', "%{$search}%")
+                    ->orWhere('location', 'like', "%{$search}%");
+            });
+        }
+
+        // Status Filter
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
         // Fetch Weddings for List/Grid Views (Paginated)
-        $weddings = Wedding::orderBy('date', 'desc')->paginate(12);
+        $weddings = $query->orderBy('date', 'desc')->paginate(12);
 
         // Sidebar Data
         $upcoming = Wedding::where('date', '>=', now())

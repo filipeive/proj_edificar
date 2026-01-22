@@ -5,7 +5,7 @@
 @section('page-subtitle', 'Informações e acompanhamento do visitante')
 
 @section('content')
-    <div class="max-w-6xl mx-auto">
+    <div class="w-full">
         <!-- Ações Rápidas -->
         <div class="flex items-center justify-between mb-8">
             <a href="{{ route('visitors.index') }}" class="text-gray-600 hover:text-gray-900 font-bold flex items-center">

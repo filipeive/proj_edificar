@@ -66,42 +66,43 @@
         </section>
 
         @if((auth()->user()->role === 'admin' || auth()->user()->role === 'pastor') && $allCourses->isNotEmpty())
-                <!-- Admin: Todos os Cursos Monitoramento -->
-                <section class="mt-20 pt-10 border-t border-gray-100">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
-                        <h2 class="text-xl font-black text-gray-400 uppercase tracking-widest">Monitoramento Global (Admin)</h2>
-                        @if(auth()->user()->role === 'admin')
-                            <button type="button" id="bulkDeleteBtn" onclick="bulkDelete()" disabled
-                                class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-2xl flex items-center transition shadow-lg shadow-red-600/20 font-black text-xs uppercase tracking-widest hidden">
-                                <i class="bi bi-trash-fill mr-2"></i> Excluir Selecionados
-                            </button>
-                        @endif
-                    </div>
+            <!-- Admin: Todos os Cursos Monitoramento -->
+            <section class="mt-20 pt-10 border-t border-gray-100">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
+                    <h2 class="text-xl font-black text-gray-400 uppercase tracking-widest">Monitoramento Global (Admin)</h2>
+                    @if(auth()->user()->role === 'admin')
+                        <button type="button" id="bulkDeleteBtn" onclick="bulkDelete()" disabled
+                            class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-2xl flex items-center transition shadow-lg shadow-red-600/20 font-black text-xs uppercase tracking-widest hidden">
+                            <i class="bi bi-trash-fill mr-2"></i> Excluir Selecionados
+                        </button>
+                    @endif
+                </div>
 
-                    <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden"
-                        x-data="{ view: 'list' }">
-                        <div class="p-8 border-b border-gray-50 flex justify-between items-center bg-gray-50/10">
-                            <div class="flex items-center gap-4">
-                                <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Lista de Cursos</h3>
-                                <div class="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
-                                    <button @click="view = 'list'"
-                                        :class="view === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
-                                        class="px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
-                                        <i class="bi bi-list-ul"></i>
-                                    </button>
-                                    <button @click="view = 'grid'"
-                                        :class="view === 'grid' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
-                                        class="px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
-                                        <i class="bi bi-grid-fill"></i>
-                                    </button>
-                                </div>
+                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden"
+                    x-data="{ view: 'list' }">
+                    <div class="p-8 border-b border-gray-50 flex justify-between items-center bg-gray-50/10">
+                        <div class="flex items-center gap-4">
+                            <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Lista de Cursos</h3>
+                            <div class="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
+                                <button @click="view = 'list'"
+                                    :class="view === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
+                                    class="px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
+                                    <i class="bi bi-list-ul"></i>
+                                </button>
+                                <button @click="view = 'grid'"
+                                    :class="view === 'grid' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
+                                    class="px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
+                                    <i class="bi bi-grid-fill"></i>
+                                </button>
                             </div>
                         </div>
+                    </div>
 
-                        <form id="bulkActionForm" method="POST" x-show="view === 'list'"
+                    <form id="bulkActionForm" method="POST" action="{{ route('courses.bulk-delete') }}">
+                        @csrf
+                        <div x-show="view === 'list'"
                             x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4"
                             x-transition:enter-end="opacity-100 translate-y-0">
-                            @csrf
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left border-collapse">
                                     <thead>
@@ -178,11 +179,17 @@
                                                             <i class="bi bi-pencil-fill"></i>
                                                         </a>
                                                         @if(auth()->user()->role === 'admin')
-                                                        <button type="button"
-                                                            onclick="deleteCourse({{ $course->id }})"
-                                                            class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all shadow-sm">
-                                                            <i class="bi bi-trash-fill"></i>
-                                                        </button>
+                                                            <form id="list-delete-course-{{ $course->id }}"
+                                                                action="{{ route('courses.destroy', $course) }}" method="POST"
+                                                                class="inline">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="button"
+                                                                    onclick="confirmDelete('list-delete-course-{{ $course->id }}')"
+                                                                    class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                                                    <i class="bi bi-trash-fill"></i>
+                                                                </button>
+                                                            </form>
                                                         @endif
                                                     </div>
                                                 </td>
@@ -191,9 +198,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                        </form>
-                    </div>
-                    </form>
+                        </div>
 
                     <!-- Grid View for Admin -->
                     <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300"
@@ -209,6 +214,10 @@
                                     @else
                                         <span
                                             class="px-3 py-1 bg-red-50 text-red-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-red-100">Fechadas</span>
+                                    @endif
+                                    @if(auth()->user()->role === 'admin')
+                                        <input type="checkbox" form="bulkActionForm" name="course_ids[]" value="{{ $course->id }}"
+                                            class="course-checkbox rounded-lg border-gray-300 text-orange-600 shadow-sm focus:border-orange-300 focus:ring focus:ring-orange-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
                                     @endif
                                 </div>
 
@@ -245,16 +254,21 @@
                                         <i class="bi bi-pencil-fill"></i>
                                     </a>
                                     @if(auth()->user()->role === 'admin')
-                                            <button type="button"
-                                                onclick="deleteCourse({{ $course->id }})"
-                                                class="col-span-1 bg-red-50 text-red-400 text-center py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all flex items-center justify-center">
+                                        <form id="grid-delete-course-{{ $course->id }}" action="{{ route('courses.destroy', $course) }}"
+                                            method="POST" class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" onclick="confirmDelete('grid-delete-course-{{ $course->id }}')"
+                                                class="w-full h-full bg-red-50 text-red-400 text-center py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all flex items-center justify-center">
                                                 <i class="bi bi-trash-fill"></i>
                                             </button>
+                                        </form>
                                     @endif
                                 </div>
                             </div>
                         @endforeach
                     </div>
+                </form>
             </div>
             </section>
         @endif
@@ -268,38 +282,25 @@
         </form>
 
         <script>
-            function deleteCourse(id) {
-                confirmAction(
-                    'Deseja excluir este curso?',
-                    'Esta ação é irreversível e removerá todas as matrículas associadas.',
-                    'warning',
-                    'Sim, excluir'
-                ).then((result) => {
-                    if (result.isConfirmed) {
-                        const form = document.getElementById('singleDeleteForm');
-                        form.action = `/courses/${id}`; 
-                        form.submit();
-                    }
-                });
-            }
+            // Bulk Action Logic with Event Delegation
+            document.addEventListener('change', function (e) {
+                if (e.target.id === 'selectAllCheckbox') {
+                    const checkboxes = document.querySelectorAll('.course-checkbox');
+                    checkboxes.forEach(cb => cb.checked = e.target.checked);
+                    updateBulkBtnState();
+                }
 
-            const selectAll = document.getElementById('selectAllCheckbox');
-            const checkboxes = document.querySelectorAll('.course-checkbox');
-            const bulkBtn = document.getElementById('bulkDeleteBtn');
-
-            if (selectAll) {
-                selectAll.addEventListener('change', function () {
-                    checkboxes.forEach(cb => cb.checked = this.checked);
-                    updateBulkBtn();
-                });
-            }
-
-            checkboxes.forEach(cb => {
-                cb.addEventListener('change', updateBulkBtn);
+                if (e.target.classList.contains('course-checkbox')) {
+                    updateBulkBtnState();
+                }
             });
 
-            function updateBulkBtn() {
+            function updateBulkBtnState() {
+                const bulkBtn = document.getElementById('bulkDeleteBtn');
                 const count = document.querySelectorAll('.course-checkbox:checked').length;
+
+                if (!bulkBtn) return;
+
                 if (count > 0) {
                     bulkBtn.disabled = false;
                     bulkBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'hidden');
@@ -320,7 +321,6 @@
                 ).then((result) => {
                     if (result.isConfirmed) {
                         const form = document.getElementById('bulkActionForm');
-                        form.action = "{{ route('courses.bulk-delete') }}";
                         form.submit();
                     }
                 });
