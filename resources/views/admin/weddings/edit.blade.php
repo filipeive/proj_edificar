@@ -5,7 +5,7 @@
 @section('page-subtitle', 'Atualizar detalhes do evento')
 
 @section('content')
-    <div class="max-w-5xl mx-auto">
+    <div class="w-full">
         <div class="mb-8 flex items-center justify-between">
             <a href="{{ route('weddings.index') }}"
                 class="group flex items-center text-gray-500 hover:text-orange-600 transition-colors">

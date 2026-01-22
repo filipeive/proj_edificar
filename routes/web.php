@@ -206,6 +206,12 @@ Route::middleware('auth')->group(function () {
         Route::post('packages/{package}/update-member', [PackageController::class, 'updateMember'])->name('packages.update-member');
         Route::post('packages/{package}/bulk-sms', [PackageController::class, 'sendBulkSms'])->name('packages.send-bulk-sms');
         Route::get('packages/{package}/export', [PackageController::class, 'export'])->name('packages.export');
+
+        // Members Management
+        Route::delete('packages/{package}/members/{user}', [PackageController::class, 'removeMember'])->name('packages.members.remove');
+        Route::post('packages/{package}/members/{user}/change-package', [PackageController::class, 'changePackage'])->name('packages.members.change-package');
+        Route::post('packages/{package}/bulk-remove-members', [PackageController::class, 'bulkRemoveMembers'])->name('packages.members.bulk-remove');
+
         Route::resource('packages', PackageController::class);
     });
 

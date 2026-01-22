@@ -142,7 +142,8 @@ class EventController extends Controller
         Gate::authorize('create', Event::class);
 
         $user = auth()->user();
-        $eventTypes = EventType::where('is_active', true)->get();
+        $eventTypes = EventType::where('is_active', 1)->get();
+        \Log::info('EventTypes count: ' . $eventTypes->count());
         $zones = collect();
         $cells = collect();
 
@@ -203,7 +204,8 @@ class EventController extends Controller
         Gate::authorize('update', $event);
 
         $user = auth()->user();
-        $eventTypes = EventType::where('is_active', true)->get();
+        $eventTypes = EventType::where('is_active', 1)->get();
+        \Log::info('EventTypes count (edit): ' . $eventTypes->count());
         $zones = collect();
         $cells = collect();
 

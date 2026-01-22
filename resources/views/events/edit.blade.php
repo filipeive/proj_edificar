@@ -27,10 +27,10 @@
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo de Evento *</label>
                             <select name="event_type_id" required
-                                class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">Selecione o tipo</option>
+                                class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white">
+                                <option value="" class="text-gray-500">Selecione o tipo ({{ $eventTypes->count() }} disponíveis)</option>
                                 @foreach($eventTypes as $type)
-                                    <option value="{{ $type->id }}" {{ old('event_type_id', $event->event_type_id) == $type->id ? 'selected' : '' }}>
+                                    <option value="{{ $type->id }}" class="text-gray-900" {{ old('event_type_id', $event->event_type_id) == $type->id ? 'selected' : '' }}>
                                         {{ $type->name }}</option>
                                 @endforeach
                             </select>

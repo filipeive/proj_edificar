@@ -244,26 +244,26 @@
                     </div>
                 </div>
 
-                <!-- Dízimos -->
+                <!-- Ofertas Individuais -->
                 <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden flex flex-col">
                     <div class="p-8 border-b border-gray-50 bg-gray-50/50 flex items-center justify-between">
                         <h2 class="text-lg font-black text-gray-900 flex items-center gap-2">
-                            <i class="bi bi-person-check text-blue-600"></i>
-                            Dízimos Individuais
+                            <i class="bi bi-gift text-orange-600"></i>
+                            Ofertas Individuais
                         </h2>
-                        <button type="button" @click="addTithe()" id="addTitheBtn"
-                            class="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl font-bold text-xs hover:bg-blue-600 hover:text-white transition-all flex items-center gap-2">
+                        <button type="button" @click="addIndividualOffering()" id="addIndOfferingBtn"
+                            class="px-4 py-2 bg-orange-50 text-orange-600 rounded-xl font-bold text-xs hover:bg-orange-600 hover:text-white transition-all flex items-center gap-2">
                             <i class="bi bi-plus-lg"></i> Adicionar Manual
                         </button>
                     </div>
-                    <div class="p-8 flex-1 space-y-4 max-h-[500px] overflow-y-auto" id="tithesContainer">
-                        <!-- Tithe rows will be added here -->
+                    <div class="p-8 flex-1 space-y-4 max-h-[500px] overflow-y-auto" id="indOfferingsContainer">
+                        <!-- Individual offering rows will be added here -->
                     </div>
                     <div class="p-8 mt-auto bg-gray-50/50 border-t border-gray-50">
                         <div
-                            class="p-6 bg-blue-900 rounded-[1.5rem] flex items-center justify-between text-white shadow-lg shadow-blue-100">
-                            <span class="text-xs font-black uppercase tracking-widest">Total de Dízimos</span>
-                            <span class="text-2xl font-black" id="total_tithes_display">0,00 MT</span>
+                            class="p-6 bg-orange-600 rounded-[1.5rem] flex items-center justify-between text-white shadow-lg shadow-orange-100">
+                            <span class="text-xs font-black uppercase tracking-widest">Total Indiv.</span>
+                            <span class="text-2xl font-black" id="total_ind_offerings_display">0,00 MT</span>
                         </div>
                     </div>
                 </div>
@@ -288,6 +288,10 @@
                             <span class="text-sm font-black" id="summary_offerings">0,00 MT</span>
                         </div>
                         <div class="flex justify-between items-center border-b border-blue-500/50 pb-4">
+                            <span class="text-sm font-bold opacity-80">Ofertas Individuais</span>
+                            <span class="text-sm font-black" id="summary_ind_offerings">0,00 MT</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-blue-500/50 pb-4">
                             <span class="text-sm font-bold opacity-80">Total de Dízimos</span>
                             <span class="text-sm font-black" id="summary_tithes">0,00 MT</span>
                         </div>
@@ -295,7 +299,7 @@
                             <span class="text-sm font-bold opacity-80">Especiais</span>
                             <span class="text-sm font-black" id="summary_specials">0,00 MT</span>
                         </div>
-                        <div class="flex justify-between items-center pt-2">
+                        <div class="flex justify-between items-center pt-2 border-t border-blue-400 mt-2 pt-4">
                             <span class="text-lg font-black tracking-tighter uppercase">Total Final</span>
                             <span class="text-3xl font-black tabular-nums" id="summary_grand_total">0,00 MT</span>
                         </div>
@@ -330,17 +334,49 @@
         </div>
     </template>
 
+    <!-- Template para Oferta Individual -->
+    <template id="indOfferingRowTemplate">
+        <div
+            class="ind-offering-row space-y-2 p-4 bg-gray-50 rounded-2xl group relative border border-transparent hover:border-orange-100 transition-all">
+            <div class="flex items-center gap-4">
+                <div class="flex-1 relative">
+                    <i class="bi bi-person absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"></i>
+                    <input type="text" name="individual_offerings[INDEX][member_name]"
+                        placeholder="Nome do Ofertante (opcional)"
+                        class="w-full pl-10 pr-4 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-orange-500 focus:ring-0 text-sm font-bold text-gray-700">
+                </div>
+                <div class="relative w-32">
+                    <input type="number" step="0.01" name="individual_offerings[INDEX][amount]" placeholder="Valor"
+                        class="ind-offering-amount-input w-full pl-8 pr-4 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-orange-500 focus:ring-0 text-sm font-black text-right text-orange-700">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-400">MT</span>
+                </div>
+                <button type="button"
+                    class="remove-ind-offering text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 p-2">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+            <div class="relative">
+                <i class="bi bi-chat-left-text absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"></i>
+                <input type="text" name="individual_offerings[INDEX][description]" placeholder="Voto / Descrição da oferta"
+                    class="w-full pl-10 pr-4 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-orange-500 focus:ring-0 text-xs font-medium text-gray-500 italic">
+            </div>
+        </div>
+    </template>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const tithesContainer = document.getElementById('tithesContainer');
             const titheTemplate = document.getElementById('titheRowTemplate');
             let titheIndex = 0;
 
+            const indOfferingsContainer = document.getElementById('indOfferingsContainer');
+            const indOfferingTemplate = document.getElementById('indOfferingRowTemplate');
+            let indOfferingIndex = 0;
+
             function addTithe() {
                 const clone = titheTemplate.content.cloneNode(true);
                 const container = clone.querySelector('.tithe-row');
 
-                // Replace INDEX in names
                 container.querySelectorAll('input').forEach(input => {
                     input.name = input.name.replace('INDEX', titheIndex);
                     input.addEventListener('input', updateFinancials);
@@ -355,10 +391,32 @@
                 titheIndex++;
             }
 
-            // Add Initial 5 tithe rows
-            for (let i = 0; i < 5; i++) addTithe();
+            function addIndividualOffering() {
+                const clone = indOfferingTemplate.content.cloneNode(true);
+                const container = clone.querySelector('.ind-offering-row');
+
+                container.querySelectorAll('input').forEach(input => {
+                    input.name = input.name.replace('INDEX', indOfferingIndex);
+                    input.addEventListener('input', updateFinancials);
+                });
+
+                container.querySelector('.remove-ind-offering').addEventListener('click', () => {
+                    container.remove();
+                    updateFinancials();
+                });
+
+                indOfferingsContainer.appendChild(container);
+                indOfferingIndex++;
+            }
+
+            // Add Initial rows
+            for (let i = 0; i < 5; i++) {
+                addTithe();
+                addIndividualOffering();
+            }
 
             document.getElementById('addTitheBtn').addEventListener('click', addTithe);
+            document.getElementById('addIndOfferingBtn').addEventListener('click', addIndividualOffering);
 
             function formatMT(value) {
                 return value.toLocaleString('pt-MZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' MT';
@@ -407,15 +465,22 @@
                     tithesTotal += parseFloat(input.value) || 0;
                 });
 
+                let indOfferingsTotal = 0;
+                document.querySelectorAll('.ind-offering-amount-input').forEach(input => {
+                    indOfferingsTotal += parseFloat(input.value) || 0;
+                });
+
                 let specialOffer = parseFloat(document.getElementById('special_offer_input').value) || 0;
 
-                const grandTotal = offeringsTotal + tithesTotal + specialOffer;
+                const grandTotal = offeringsTotal + tithesTotal + indOfferingsTotal + specialOffer;
 
                 document.getElementById('total_offerings_display').innerText = formatMT(offeringsTotal);
                 document.getElementById('total_tithes_display').innerText = formatMT(tithesTotal);
+                document.getElementById('total_ind_offerings_display').innerText = formatMT(indOfferingsTotal);
 
                 document.getElementById('summary_offerings').innerText = formatMT(offeringsTotal);
                 document.getElementById('summary_tithes').innerText = formatMT(tithesTotal);
+                document.getElementById('summary_ind_offerings').innerText = formatMT(indOfferingsTotal);
                 document.getElementById('summary_specials').innerText = formatMT(specialOffer);
                 document.getElementById('summary_grand_total').innerText = formatMT(grandTotal);
             }

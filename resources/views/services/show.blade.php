@@ -232,6 +232,35 @@
                         </div>
                     </div>
                 @endif
+
+                <!-- Individual Offerings List -->
+                @if($service->individualOfferings->count() > 0)
+                    <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="p-8 border-b border-gray-50 bg-gray-50/30">
+                            <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Ofertas Individuais</h3>
+                        </div>
+                        <div class="max-h-72 overflow-y-auto">
+                            <div class="p-8 space-y-4">
+                                @foreach($service->individualOfferings as $offering)
+                                    <div class="bg-gray-50/50 p-4 rounded-2xl hover:bg-gray-50 transition-colors space-y-2">
+                                        <div class="flex justify-between items-center">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-[10px] font-black">
+                                                    <i class="bi bi-gift-fill"></i>
+                                                </div>
+                                                <p class="text-xs font-bold text-gray-700 uppercase tracking-tighter">{{ $offering->member_name ?? 'Anônimo' }}</p>
+                                            </div>
+                                            <span class="text-sm font-black text-gray-900 tracking-tighter">{{ number_format($offering->amount, 0, ',', '.') }} MT</span>
+                                        </div>
+                                        @if($offering->description)
+                                            <p class="text-[10px] font-medium text-gray-500 italic ml-11">"{{ $offering->description }}"</p>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
     </div>

@@ -5,7 +5,21 @@
 @section('page-subtitle', 'Gestão de casamentos e eventos matrimoniais')
 
 @section('content')
-    <div class="container-fluid">
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
+    <div class="container-fluid" x-data="{ 
+                            view: window.innerWidth < 768 ? 'grid' : 'list',
+                            updateView() {
+                                if (window.innerWidth < 768 && this.view === 'list') {
+                                    this.view = 'grid'; 
+                                }
+                            }
+                        }"
+        x-init="$watch('view', value => { if(value !== 'calendar') localStorage.setItem('weddings_view', value) }); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('weddings_view') || 'list')"
+        @resize.window.debounce.500ms="updateView()" x-cloak>
         <!-- Header Section -->
         <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-6">
             <div>
@@ -17,6 +31,32 @@
             </div>
 
             <div class="flex gap-3">
+                @if(auth()->user()->role === 'admin')
+                    <button type="button" id="bulkDeleteBtn" onclick="bulkDelete()" disabled
+                        class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-xl flex items-center transition shadow-lg shadow-red-600/20 font-black text-xs uppercase tracking-widest hidden">
+                        <i class="bi bi-trash-fill mr-2"></i> Excluir Selecionados
+                    </button>
+                @endif
+
+                <!-- View Toggle -->
+                <div class="bg-gray-100 p-1 rounded-xl flex items-center">
+                    <button @click="view = 'list'"
+                        :class="view === 'list' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
+                        class="px-4 py-2 rounded-lg text-sm font-bold transition-all duration-300">
+                        <i class="bi bi-list-ul mr-2"></i> Lista
+                    </button>
+                    <button @click="view = 'grid'"
+                        :class="view === 'grid' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
+                        class="px-4 py-2 rounded-lg text-sm font-bold transition-all duration-300">
+                        <i class="bi bi-grid-fill mr-2"></i> Grelha
+                    </button>
+                    <button @click="view = 'calendar'; setTimeout(() => initCalendar(), 100)"
+                        :class="view === 'calendar' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
+                        class="px-4 py-2 rounded-lg text-sm font-bold transition-all duration-300">
+                        <i class="bi bi-calendar-week mr-2"></i> Calendário
+                    </button>
+                </div>
+
                 <a href="{{ route('weddings.pdf', ['year' => now()->year]) }}" target="_blank"
                     class="flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-gray-200 text-gray-400 hover:text-orange-600 hover:border-orange-200 transition-all duration-300 shadow-sm"
                     title="Exportar PDF do Ano">
@@ -30,6 +70,304 @@
             </div>
         </div>
 
+        <!-- Search Form -->
+        <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6 mb-8">
+            <form action="{{ route('weddings.index') }}" method="GET" class="flex flex-col md:flex-row gap-4 items-end">
+                <div class="flex-1 w-full">
+                    <label class="block text-xs font-bold text-gray-700 mb-2">Buscar</label>
+                    <div class="relative">
+                        <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" name="search" value="{{ request('search') }}"
+                            class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            placeholder="Nome dos noivos, local...">
+                    </div>
+                </div>
+                <div class="w-full md:w-auto">
+                    <label class="block text-xs font-bold text-gray-700 mb-2">Status</label>
+                    <select name="status"
+                        class="w-full md:w-48 px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+                        <option value="">Todos</option>
+                        <option value="scheduled" {{ request('status') == 'scheduled' ? 'selected' : '' }}>Agendado</option>
+                        <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Realizado</option>
+                        <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelado</option>
+                    </select>
+                </div>
+                <button type="submit"
+                    class="w-full md:w-auto px-6 py-2 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-all">
+                    Filtrar
+                </button>
+            </form>
+        </div>
+
+        <!-- List View -->
+        <div id="view-list" x-show="view === 'list'" class="transition-opacity duration-300">
+            <div class="bg-white rounded-[2rem] shadow-xl shadow-gray-100/50 border border-gray-100 overflow-hidden">
+                <form id="bulkActionForm" method="POST">
+                    @csrf
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-gray-50/50 border-b border-gray-100">
+                                @if(auth()->user()->role === 'admin')
+                                    <th class="px-8 py-5 text-left w-10">
+                                        <input type="checkbox" id="selectAllCheckbox"
+                                            class="rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
+                                    </th>
+                                @endif
+                                <th
+                                    class="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                    Data</th>
+                                <th
+                                    class="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                    Noivos</th>
+                                <th
+                                    class="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                    Local</th>
+                                <!-- padrinhos -->
+                                <th
+                                    class="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                    Padrinhos</th>
+                                <th
+                                    class="px-8 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                    Status</th>
+                                <th
+                                    class="px-8 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                    Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @forelse($weddings as $wedding)
+                                <tr class="group hover:bg-gray-50/50 transition-colors duration-200">
+                                    @if(auth()->user()->role === 'admin')
+                                        <td class="px-8 py-5">
+                                            <input type="checkbox" name="wedding_ids[]" value="{{ $wedding->id }}"
+                                                class="wedding-checkbox rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
+                                        </td>
+                                    @endif
+                                    <td class="px-8 py-5 whitespace-nowrap">
+                                        <div class="flex flex-col">
+                                            <span
+                                                class="text-sm font-black text-gray-900">{{ $wedding->date->format('d/m/Y') }}</span>
+                                            <span
+                                                class="text-[10px] font-bold text-gray-400 uppercase">{{ $wedding->date->translatedFormat('l') }}</span>
+                                            @if($wedding->time)
+                                                <span
+                                                    class="text-[10px] font-bold text-orange-500 mt-1">{{ $wedding->time->format('H:i') }}</span>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td class="px-8 py-5">
+                                        <div class="flex items-center">
+                                            <div
+                                                class="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center mr-4">
+                                                <i class="bi bi-heart-fill"></i>
+                                            </div>
+                                            <div>
+                                                <span
+                                                    class="block text-sm font-bold text-gray-900">{{ $wedding->groom_name }}</span>
+                                                <span class="text-xs text-gray-500">& {{ $wedding->bride_name }}</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-8 py-5">
+                                        <div class="flex items-center text-gray-500">
+                                            <i class="bi bi-geo-alt-fill mr-2 text-gray-300"></i>
+                                            <span
+                                                class="text-sm font-medium">{{ $wedding->location ?? 'Local não definido' }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-8 py-5">
+                                        <div class="flex flex-col">
+                                            @if($wedding->godparents)
+                                                <span
+                                                    class="text-xs font-bold text-gray-700">{{ Illuminate\Support\Str::limit($wedding->godparents, 30) }}</span>
+                                            @else
+                                                <span class="text-xs text-gray-400 italic">Não informado</span>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td class="px-8 py-5 text-center">
+                                        @php
+                                            $statusClasses = [
+                                                'scheduled' => 'bg-orange-100 text-orange-600',
+                                                'completed' => 'bg-green-100 text-green-600',
+                                                'cancelled' => 'bg-red-100 text-red-600'
+                                            ];
+                                            $statusLabels = [
+                                                'scheduled' => 'Agendado',
+                                                'completed' => 'Realizado',
+                                                'cancelled' => 'Cancelado'
+                                            ];
+                                            $status = $wedding->status ?? 'scheduled';
+                                        @endphp
+                                        <span
+                                            class="inline-flex items-center px-3 py-1 rounded-lg {{ $statusClasses[$status] ?? 'bg-gray-100 text-gray-600' }} text-xs font-bold uppercase tracking-wider">
+                                            {{ $statusLabels[$status] ?? $status }}
+                                        </span>
+                                    </td>
+                                    <td class="px-8 py-5 text-right">
+                                        <div
+                                            class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                            <a href="{{ route('weddings.edit', $wedding) }}"
+                                                class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                                                title="Editar">
+                                                <i class="bi bi-pencil-fill"></i>
+                                            </a>
+                                            <a href="{{ route('weddings.show', $wedding) }}"
+                                                class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-orange-600 hover:bg-orange-50 transition-colors"
+                                                title="Ver Detalhes">
+                                                <i class="bi bi-eye-fill"></i>
+                                            </a>
+                                            </a>
+                                            @if(in_array(auth()->user()->role, ['admin', 'secretaria']))
+                                                <form id="delete-wedding-{{ $wedding->id }}"
+                                                    action="{{ route('weddings.destroy', $wedding->id) }}" method="POST"
+                                                    class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+
+                                                    <button type="button" onclick="confirmDelete({{ $wedding->id }})"
+                                                        class="w-10 h-10 bg-gray-50 text-gray-400 flex items-center justify-center rounded-xl hover:bg-red-500 hover:text-white transition-all">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="px-8 py-12 text-center text-gray-400">
+                                        <i class="bi bi-calendar-x text-4xl mb-4 block opacity-20"></i>
+                                        <p class="text-sm font-medium">Nenhum casamento encontrado.</p>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+        </div>
+        <div class="mt-6">
+            {{ $weddings->links() }}
+        </div>
+    </div>
+
+    <!-- Grid View -->
+    <div id="view-grid" x-show="view === 'grid'" class="transition-opacity duration-300">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            @forelse($weddings as $wedding)
+                <div
+                    class="bg-white p-6 md:p-8 rounded-2xl md:rounded-[2rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 relative">
+                    <div class="absolute top-6 right-6 flex flex-col items-end gap-2">
+                        @php
+                            $status = $wedding->status ?? 'scheduled';
+                            $statusColors = [
+                                'scheduled' => 'bg-orange-50 text-orange-600',
+                                'completed' => 'bg-green-50 text-green-600',
+                                'cancelled' => 'bg-red-50 text-red-600'
+                            ];
+                        @endphp
+                        <span
+                            class="px-3 py-1 rounded-lg {{ $statusColors[$status] }} text-[10px] font-black uppercase tracking-widest">
+                            {{ $statusLabels[$status] ?? $status }}
+                        </span>
+                        @if(auth()->user()->role === 'admin')
+                            <input type="checkbox" form="bulkActionForm" name="wedding_ids[]" value="{{ $wedding->id }}"
+                                class="wedding-checkbox rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
+                        @endif
+                    </div>
+
+                    <div
+                        class="w-10 h-10 md:w-14 md:h-14 rounded-2xl bg-orange-50 text-orange-500 flex items-center justify-center font-black text-lg md:text-2xl group-hover:bg-orange-500 group-hover:text-white transition-all duration-500 mb-6">
+                        <i class="bi bi-heart-fill"></i>
+                    </div>
+
+                    <div class="mb-4">
+                        <h4
+                            class="text-lg font-black text-gray-900 leading-tight mb-1 group-hover:text-orange-600 transition-colors">
+                            {{ explode(' ', $wedding->groom_name)[0] }} & {{ explode(' ', $wedding->bride_name)[0] }}
+                        </h4>
+                        <span
+                            class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $wedding->date->diffForHumans() }}</span>
+                    </div>
+
+                    <div class="space-y-3 mb-6 flex-1">
+                        <div class="flex items-center gap-3 text-gray-500">
+                            <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-sm">
+                                <i class="bi bi-calendar-event text-blue-500"></i>
+                            </div>
+                            <div class="flex flex-col">
+                                <span
+                                    class="text-xs font-black uppercase text-gray-900">{{ $wedding->date->format('d/m/Y') }}</span>
+                                <span
+                                    class="text-[10px] font-bold text-gray-400 uppercase">{{ $wedding->date->translatedFormat('l') }}</span>
+                            </div>
+                            <!-- padrinhos -->
+                            <div class="flex items-center gap-3 text-gray-500">
+                                <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-sm">
+                                    <i class="bi bi-people text-green-500"></i>
+                                </div>
+                                <span class="text-xs font-bold text-gray-700">{{ $wedding->godparents}}</span>
+                            </div>
+                        </div>
+
+                        @if($wedding->time)
+                            <div class="flex items-center gap-3 text-gray-500">
+                                <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-sm">
+                                    <i class="bi bi-clock text-orange-500"></i>
+                                </div>
+                                <span class="text-xs font-bold text-gray-700">{{ $wedding->time->format('H:i') }}</span>
+                            </div>
+                        @endif
+
+                        @if($wedding->location)
+                            <div class="flex items-center gap-3 text-gray-500">
+                                <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-sm">
+                                    <i class="bi bi-geo-alt text-red-500"></i>
+                                </div>
+                                <span class="text-xs font-bold text-gray-700 truncate">{{ $wedding->location }}</span>
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="flex items-center gap-2 pt-4 border-t border-gray-50">
+                        <a href="{{ route('weddings.show', $wedding) }}"
+                            class="flex-1 bg-gray-50 text-gray-400 text-center py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 hover:text-white transition-all flex items-center justify-center gap-2">
+                            <i class="bi bi-eye"></i> Ver
+                        </a>
+                        <a href="{{ route('weddings.edit', $wedding) }}"
+                            class="w-10 h-10 bg-gray-50 text-gray-400 flex items-center justify-center rounded-xl hover:bg-blue-500 hover:text-white transition-all">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        @if(auth()->user()->role === 'admin' || 'secretaria')
+                            <form id="delete-wedding-{{ $wedding->id }}" action="{{ route('weddings.destroy', $wedding) }}"
+                                method="POST" class="inline">
+                                @csrf
+                                @method('DELETE')
+
+                                <button type="button" onclick="confirmDelete({{ $wedding->id }})"
+                                    class="w-10 h-10 bg-gray-50 text-gray-400 flex items-center justify-center rounded-xl hover:bg-red-500 hover:text-white transition-all">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+
+                        @endif
+                    </div>
+                </div>
+            @empty
+                <div
+                    class="col-span-full py-20 bg-white rounded-[2rem] border border-dashed border-gray-200 flex flex-col items-center gap-4 text-gray-300">
+                    <i class="bi bi-calendar-x text-7xl opacity-20"></i>
+                    <p class="font-bold text-lg">Nenhum casamento encontrado</p>
+                </div>
+            @endforelse
+        </div>
+        <div class="mt-6">
+            {{ $weddings->links() }}
+        </div>
+    </div>
+
+    <div id="view-calendar" x-show="view === 'calendar'" class="transition-opacity duration-300">
         <div class="flex flex-col xl:flex-row gap-8">
             <!-- Calendar Grid -->
             <div
@@ -103,6 +441,7 @@
                 @endif
             </div>
         </div>
+    </div>
     </div>
 
     <!-- FullCalendar CSS -->
@@ -259,7 +598,33 @@
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
     <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/locales/pt.global.min.js'></script>
     <script>
+        let calendar;
         let tooltip = null;
+
+        let calendar;
+        let tooltip = null;
+
+
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Confirmar exclusão',
+                text: 'Tem certeza que deseja eliminar este registo? Esta ação não pode ser desfeita.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sim, eliminar',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-wedding-' + id).submit();
+                }
+            });
+        }
+        function toggleView(view) {
+            // Deprecated: Logic moved to AlpineJS
+        }
 
         function createTooltip() {
             tooltip = document.createElement('div');
@@ -278,49 +643,49 @@
             };
 
             let tooltipContent = `
-                    <div class="tooltip-header">
-                        <i class="bi bi-heart-fill"></i>
-                        <span>${event.title}</span>
-                    </div>
-                    <div class="tooltip-row">
-                        <i class="bi bi-calendar-event"></i>
-                        <span>${event.start.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                    </div>
-                `;
+                                            <div class="tooltip-header">
+                                                <i class="bi bi-heart-fill"></i>
+                                                <span>${event.title}</span>
+                                            </div>
+                                            <div class="tooltip-row">
+                                                <i class="bi bi-calendar-event"></i>
+                                                <span>${event.start.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                                            </div>
+                                        `;
 
             if (props.time) {
                 tooltipContent += `
-                        <div class="tooltip-row">
-                            <i class="bi bi-clock-fill"></i>
-                            <span>${props.time}</span>
-                        </div>
-                    `;
+                                                <div class="tooltip-row">
+                                                    <i class="bi bi-clock-fill"></i>
+                                                    <span>${props.time}</span>
+                                                </div>
+                                            `;
             }
 
             if (props.location) {
                 tooltipContent += `
-                        <div class="tooltip-row">
-                            <i class="bi bi-geo-alt-fill"></i>
-                            <span>${props.location}</span>
-                        </div>
-                    `;
+                                                <div class="tooltip-row">
+                                                    <i class="bi bi-geo-alt-fill"></i>
+                                                    <span>${props.location}</span>
+                                                </div>
+                                            `;
             }
 
             if (props.godparents) {
                 tooltipContent += `
-                        <div class="tooltip-row">
-                            <i class="bi bi-people-fill"></i>
-                            <span>Padrinhos: ${props.godparents.substring(0, 50)}${props.godparents.length > 50 ? '...' : ''}</span>
-                        </div>
-                    `;
+                                                <div class="tooltip-row">
+                                                    <i class="bi bi-people-fill"></i>
+                                                    <span>Padrinhos: ${props.godparents.substring(0, 50)}${props.godparents.length > 50 ? '...' : ''}</span>
+                                                </div>
+                                            `;
             }
 
             if (props.status) {
                 tooltipContent += `
-                        <div class="tooltip-status status-${props.status}">
-                            ${statusLabels[props.status] || props.status}
-                        </div>
-                    `;
+                                                <div class="tooltip-status status-${props.status}">
+                                                    ${statusLabels[props.status] || props.status}
+                                                </div>
+                                            `;
             }
 
             tooltip.innerHTML = tooltipContent;
@@ -337,11 +702,9 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
-            createTooltip();
-
+        function initCalendar() {
             var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
+            calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 locale: 'pt',
                 headerToolbar: {
@@ -392,6 +755,103 @@
                 }
             });
             calendar.render();
-        });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            createTooltip();
+            // view logic handled by alpine
+
+            // Dynamic Search Script
+            const searchInput = document.querySelector('input[name="search"]');
+            if (searchInput) {
+                const filterForm = searchInput.closest('form');
+                let timeout = null;
+                searchInput.addEventListener('input', function () {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(function () {
+                        const formData = new FormData(filterForm);
+                        const params = new URLSearchParams(formData);
+
+                        document.body.style.cursor = 'wait';
+
+                        fetch(`${filterForm.action}?${params.toString()}`, {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        })
+                            .then(response => response.text())
+                            .then(html => {
+                                const parser = new DOMParser();
+                                const doc = parser.parseFromString(html, 'text/html');
+
+                                // Replace List and Grid Views
+                                ['view-list', 'view-grid'].forEach(id => {
+                                    const newEl = doc.getElementById(id);
+                                    const currentEl = document.getElementById(id);
+                                    if (newEl && currentEl) currentEl.innerHTML = newEl.innerHTML;
+                                });
+
+                                document.body.style.cursor = 'default';
+                            })
+                            .catch(err => {
+                                console.error('Search failed', err);
+                                document.body.style.cursor = 'default';
+                            });
+                    }, 500);
+                });
+            }
+
+            // Bulk Action Logic
+            @if(auth()->user()->role === 'admin')
+                const selectAll = document.getElementById('selectAllCheckbox');
+                const bulkBtn = document.getElementById('bulkDeleteBtn');
+
+                // Helper to update button state
+                const updateBulkBtn = () => {
+                    const count = document.querySelectorAll('.wedding-checkbox:checked').length;
+                    if (count > 0 && bulkBtn) {
+                        bulkBtn.disabled = false;
+                        bulkBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'hidden');
+                        bulkBtn.innerHTML = `<i class="bi bi-trash-fill mr-2"></i> Excluir ${count} Selecionados`;
+                    } else if (bulkBtn) {
+                        bulkBtn.disabled = true;
+                        bulkBtn.classList.add('opacity-50', 'cursor-not-allowed', 'hidden');
+                    }
+                };
+
+                if (selectAll) {
+                    selectAll.addEventListener('change', function () {
+                        const checkboxes = document.querySelectorAll('.wedding-checkbox');
+                        checkboxes.forEach(cb => cb.checked = this.checked);
+                        updateBulkBtn();
+                    });
+                }
+
+                // Delegate event for dynamic content (checkboxes)
+                document.addEventListener('change', function (e) {
+                    if (e.target.classList.contains('wedding-checkbox')) {
+                        updateBulkBtn();
+                    }
+                });
+
+                // Global function for bulk delete
+                window.bulkDelete = function () {
+                    Swal.fire({
+                        title: 'Excluir Selecionados?',
+                        text: "Você tem certeza que deseja excluir os casamentos selecionados?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Sim, excluir!',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const form = document.getElementById('bulkActionForm');
+                            form.action = "{{ route('weddings.bulk-delete') }}";
+                            form.submit();
+                        }
+                    })
+                }
+            @endif
+                            });
     </script>
 @endsection

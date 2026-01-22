@@ -84,6 +84,10 @@ class ServiceController extends Controller
             'tithes' => 'nullable|array',
             'tithes.*.amount' => 'nullable|numeric|min:0',
             'tithes.*.member_name' => 'nullable|string|max:255',
+            'individual_offerings' => 'nullable|array',
+            'individual_offerings.*.amount' => 'nullable|numeric|min:0',
+            'individual_offerings.*.member_name' => 'nullable|string|max:255',
+            'individual_offerings.*.description' => 'nullable|string|max:255',
         ]);
 
         foreach ($numericFields as $field) {
@@ -108,6 +112,14 @@ class ServiceController extends Controller
                     }
                 }
             }
+
+            if (isset($validated['individual_offerings'])) {
+                foreach ($validated['individual_offerings'] as $offeringData) {
+                    if ($offeringData['amount'] > 0) {
+                        $service->individualOfferings()->create($offeringData);
+                    }
+                }
+            }
         });
 
         return redirect()->route('services.index')->with('success', 'Culto registrado com sucesso!');
@@ -117,7 +129,7 @@ class ServiceController extends Controller
     {
         Gate::authorize('view', $service);
 
-        $service->load(['preacher', 'offerings.offeringType']);
+        $service->load(['preacher', 'offerings.offeringType', 'tithes', 'individualOfferings']);
 
         return view('services.show', compact('service'));
     }
@@ -128,7 +140,7 @@ class ServiceController extends Controller
 
         $preachers = User::whereIn('role', ['admin', 'pastor', 'pastor_zona', 'supervisor'])->get();
         $offeringTypes = OfferingType::where('is_active', true)->orderBy('order')->get();
-        $service->load('offerings');
+        $service->load(['offerings', 'tithes', 'individualOfferings']);
 
         return view('services.edit', compact('service', 'preachers', 'offeringTypes'));
     }
@@ -183,6 +195,10 @@ class ServiceController extends Controller
             'tithes' => 'nullable|array',
             'tithes.*.amount' => 'nullable|numeric|min:0',
             'tithes.*.member_name' => 'nullable|string|max:255',
+            'individual_offerings' => 'nullable|array',
+            'individual_offerings.*.amount' => 'nullable|numeric|min:0',
+            'individual_offerings.*.member_name' => 'nullable|string|max:255',
+            'individual_offerings.*.description' => 'nullable|string|max:255',
         ]);
 
         foreach ($numericFields as $field) {
@@ -194,6 +210,7 @@ class ServiceController extends Controller
 
             $service->offerings()->delete();
             $service->tithes()->delete();
+            $service->individualOfferings()->delete();
 
             if (isset($validated['offerings'])) {
                 foreach ($validated['offerings'] as $offeringData) {
@@ -207,6 +224,14 @@ class ServiceController extends Controller
                 foreach ($validated['tithes'] as $titheData) {
                     if ($titheData['amount'] > 0) {
                         $service->tithes()->create($titheData);
+                    }
+                }
+            }
+
+            if (isset($validated['individual_offerings'])) {
+                foreach ($validated['individual_offerings'] as $offeringData) {
+                    if ($offeringData['amount'] > 0) {
+                        $service->individualOfferings()->create($offeringData);
                     }
                 }
             }
@@ -228,7 +253,7 @@ class ServiceController extends Controller
     {
         Gate::authorize('view', $service);
 
-        $service->load(['preacher', 'offerings.offeringType', 'tithes']);
+        $service->load(['preacher', 'offerings.offeringType', 'tithes', 'individualOfferings']);
 
         $pdf = Pdf::loadView('services.pdf', compact('service'));
 

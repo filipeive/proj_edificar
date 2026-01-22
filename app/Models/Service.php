@@ -46,6 +46,11 @@ class Service extends Model
         return $this->hasMany(ServiceTithe::class);
     }
 
+    public function individualOfferings()
+    {
+        return $this->hasMany(ServiceIndividualOffering::class);
+    }
+
     public function getTotalOfferingsAttribute()
     {
         return $this->offerings->sum('amount');
@@ -56,9 +61,14 @@ class Service extends Model
         return $this->tithes->sum('amount');
     }
 
+    public function getTotalIndividualOfferingsAttribute()
+    {
+        return $this->individualOfferings->sum('amount');
+    }
+
     public function getTotalFinancialAttribute()
     {
-        return $this->total_offerings + $this->total_tithes + $this->special_offerings_total;
+        return $this->total_offerings + $this->total_tithes + $this->total_individual_offerings + $this->special_offerings_total;
     }
 
     public function getTotalParticipationAttribute()

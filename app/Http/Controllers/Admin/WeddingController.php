@@ -54,28 +54,11 @@ class WeddingController extends Controller
             : now();
 
         $year = $date->year;
-        $month = $date->month;
 
-        // Calendar Logic
-        $startOfMonth = $date->copy()->startOfMonth();
-        $endOfMonth = $date->copy()->endOfMonth();
+        // Fetch Weddings for List/Grid Views (Paginated)
+        $weddings = Wedding::orderBy('date', 'desc')->paginate(12);
 
-        $startOfWeek = $startOfMonth->copy()->startOfWeek(\Carbon\Carbon::SUNDAY);
-        $endOfWeek = $endOfMonth->copy()->endOfWeek(\Carbon\Carbon::SUNDAY);
-
-        $calendar = [];
-        $currentDate = $startOfWeek->copy();
-
-        while ($currentDate->lte($endOfWeek)) {
-            $calendar[] = $currentDate->copy();
-            $currentDate->addDay();
-        }
-
-        // Fetch Weddings
-        $weddings = Wedding::whereBetween('date', [$startOfWeek, $endOfWeek])
-            ->orderBy('time')
-            ->get();
-
+        // Sidebar Data
         $upcoming = Wedding::where('date', '>=', now())
             ->where('status', '!=', 'completed')
             ->orderBy('date')
@@ -88,7 +71,6 @@ class WeddingController extends Controller
         $totalCount = Wedding::whereYear('date', $year)->count();
 
         return view('admin.weddings.index', compact(
-            'calendar',
             'weddings',
             'date',
             'upcoming',

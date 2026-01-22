@@ -56,7 +56,10 @@ class PackageController
 
         return view(
             'admin.packages.show',
-            ['package' => $package->load('userCommitments.user.cell.supervision.zone')]
+            [
+                'package' => $package->load('userCommitments.user.cell.supervision.zone'),
+                'allPackages' => CommitmentPackage::orderBy('order')->get()
+            ]
         );
     }
 
@@ -215,5 +218,87 @@ class PackageController
         }
 
         return back()->with('success', "SMS enviado com sucesso para $successCount membros!");
+    }
+
+    public function removeMember(CommitmentPackage $package, \App\Models\User $user)
+    {
+        $authUser = auth()->user();
+        $isAuthorized = $authUser->isAdmin() ||
+            $authUser->isSecretaria() ||
+            $authUser->isComissaoObra() ||
+            ($authUser->isResponsavelPacote() && $package->responsible_id === $authUser->id);
+
+        if (!$isAuthorized) {
+            return back()->with('error', 'Não tem permissão para remover membros.');
+        }
+
+        $commitment = \App\Models\UserCommitment::where('user_id', $user->id)
+            ->where('package_id', $package->id)
+            ->where(function ($q) {
+                $q->whereNull('end_date')->orWhere('end_date', '>', now());
+            })
+            ->first();
+
+        if ($commitment) {
+            $commitment->update(['end_date' => now()]);
+            return back()->with('success', 'Membro removido do pacote com sucesso!');
+        }
+
+        return back()->with('error', 'Membro não encontrado ou já removido.');
+    }
+
+    public function changePackage(Request $request, CommitmentPackage $package, \App\Models\User $user)
+    {
+        $request->validate([
+            'new_package_id' => 'required|exists:commitment_packages,id',
+            'committed_amount' => 'required|numeric|min:0'
+        ]);
+
+        $newPackage = CommitmentPackage::findOrFail($request->new_package_id);
+
+        // Remove from current
+        $currentCommitment = \App\Models\UserCommitment::where('user_id', $user->id)
+            ->where('package_id', $package->id)
+            ->where(function ($q) {
+                $q->whereNull('end_date')->orWhere('end_date', '>', now());
+            })
+            ->first();
+
+        if ($currentCommitment) {
+            $currentCommitment->update(['end_date' => now()]);
+        }
+
+        // Add to new
+        \App\Models\UserCommitment::create([
+            'user_id' => $user->id,
+            'package_id' => $newPackage->id,
+            'committed_amount' => $request->committed_amount,
+            'start_date' => now(),
+            'cell_id' => $user->cell_id, // Preserve cell info
+        ]);
+
+        return back()->with('success', "Membro movido para o pacote {$newPackage->name} com sucesso!");
+    }
+
+    public function bulkRemoveMembers(Request $request, CommitmentPackage $package)
+    {
+        $authUser = auth()->user();
+        if (!$authUser->isAdmin() && !$authUser->isSecretaria()) {
+            return back()->with('error', 'Apenas Admin e Secretaria podem realizar remoção em massa.');
+        }
+
+        $request->validate([
+            'user_ids' => 'required|array',
+            'user_ids.*' => 'exists:users,id'
+        ]);
+
+        \App\Models\UserCommitment::whereIn('user_id', $request->user_ids)
+            ->where('package_id', $package->id)
+            ->where(function ($q) {
+                $q->whereNull('end_date')->orWhere('end_date', '>', now());
+            })
+            ->update(['end_date' => now()]);
+
+        return back()->with('success', 'Membros selecionados foram removidos do pacote.');
     }
 }

@@ -11,6 +11,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         /* Theme Variables */
@@ -510,6 +511,11 @@
                                 <div id="searchResults" class="search-results hidden"></div>
                             </div>
                         </div>
+
+                        <!-- Mobile Page Actions (Yield area for Add buttons on mobile) -->
+                        <div class="md:hidden flex items-center ml-2">
+                            @yield('header-actions')
+                        </div>
                     </div>
 
                     <div class="flex items-center space-x-2 md:space-x-4">
@@ -569,6 +575,16 @@
                                 </div>
                             </div>
                             <i class="bi bi-moon text-gray-600 text-sm"></i>
+                        </div>
+
+                        <!-- Mobile Logout Button -->
+                        <div class="md:hidden">
+                            <form method="POST" action="{{ route('logout') }}" id="mobile-logout-form">
+                                @csrf
+                                <button type="submit" class="text-red-500 hover:text-red-700 p-2 transition-colors">
+                                    <i class="bi bi-power text-2xl"></i>
+                                </button>
+                            </form>
                         </div>
 
                         <div class="hidden md:block border-l border-gray-300 pl-4">

@@ -4,8 +4,29 @@
 @section('page-title', 'Eventos e Cerimônias')
 @section('page-subtitle', 'Gestão de cultos, batismos e eventos especiais')
 
+@section('header-actions')
+    <a href="{{ route('events.create') }}"
+        class="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
+        <i class="bi bi-calendar-plus text-xl"></i>
+    </a>
+@endsection
+
 @section('content')
-    <div class="container-fluid">
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
+    <div class="container-fluid" x-data="{ 
+            view: window.innerWidth < 768 ? 'grid' : 'list',
+            updateView() {
+                if (window.innerWidth < 768 && this.view === 'list') {
+                    this.view = 'grid'; 
+                }
+            }
+        }"
+        x-init="$watch('view', value => { if(value !== 'calendar') localStorage.setItem('events_view', value) }); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('events_view') || 'list')"
+        @resize.window.debounce.500ms="updateView()" x-cloak>
         <!-- Header Section -->
         <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-6">
             <div>
@@ -24,28 +45,64 @@
                 @endif
 
                 <!-- View Toggle -->
-                <div class="bg-gray-100 p-1 rounded-xl flex items-center">
-                    <button onclick="toggleView('list')" id="btn-list"
-                        class="px-4 py-2 rounded-lg text-sm font-bold transition-all duration-300 bg-white text-gray-900 shadow-sm">
+                <div class="bg-gray-100 p-1 rounded-xl flex items-center" x-data>
+                    <button @click="view = 'list'"
+                        :class="view === 'list' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
+                        class="px-4 py-2 rounded-lg text-sm font-bold transition-all duration-300">
                         <i class="bi bi-list-ul mr-2"></i> Lista
                     </button>
-                    <button onclick="toggleView('calendar')" id="btn-calendar"
-                        class="px-4 py-2 rounded-lg text-sm font-bold text-gray-500 hover:text-gray-900 transition-all duration-300">
+                    <button @click="view = 'grid'"
+                        :class="view === 'grid' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
+                        class="px-4 py-2 rounded-lg text-sm font-bold transition-all duration-300">
+                        <i class="bi bi-grid-fill mr-2"></i> Grelha
+                    </button>
+                    <button @click="view = 'calendar'; setTimeout(() => initCalendar(), 100)"
+                        :class="view === 'calendar' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
+                        class="px-4 py-2 rounded-lg text-sm font-bold transition-all duration-300">
                         <i class="bi bi-calendar-week mr-2"></i> Calendário
                     </button>
                 </div>
 
                 @can('create', App\Models\Event::class)
                     <a href="{{ route('events.create') }}"
-                        class="flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-all duration-300 shadow-lg shadow-blue-600/30">
+                        class="hidden md:flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-all duration-300 shadow-lg shadow-blue-600/30">
                         <i class="bi bi-plus-lg mr-2"></i> Novo Evento
                     </a>
                 @endcan
             </div>
         </div>
 
+        <!-- Search Form -->
+        <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6 mb-8">
+            <form action="{{ route('events.index') }}" method="GET" class="flex flex-col md:flex-row gap-4 items-end">
+                <div class="flex-1 w-full">
+                    <label class="block text-xs font-bold text-gray-700 mb-2">Buscar</label>
+                    <div class="relative">
+                        <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" name="search" value="{{ request('search') }}"
+                            class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            placeholder="Nome do evento, local...">
+                    </div>
+                </div>
+                <div class="w-full md:w-auto">
+                    <label class="block text-xs font-bold text-gray-700 mb-2">Tipo</label>
+                    <select name="type"
+                        class="w-full md:w-48 px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+                        <option value="">Todos</option>
+                        <option value="culto" {{ request('type') == 'culto' ? 'selected' : '' }}>Culto</option>
+                        <option value="batismo" {{ request('type') == 'batismo' ? 'selected' : '' }}>Batismo</option>
+                        <option value="evento" {{ request('type') == 'evento' ? 'selected' : '' }}>Outros</option>
+                    </select>
+                </div>
+                <button type="submit"
+                    class="w-full md:w-auto px-6 py-2 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-all">
+                    Filtrar
+                </button>
+            </form>
+        </div>
+
         <!-- List View -->
-        <div id="view-list" class="transition-opacity duration-300">
+        <div id="view-list" x-show="view === 'list'" class="transition-opacity duration-300">
             <div class="bg-white rounded-[2rem] shadow-xl shadow-gray-100/50 border border-gray-100 overflow-hidden">
                 <form id="bulkActionForm" method="POST">
                     @csrf
@@ -100,7 +157,7 @@
                                                         <div class="flex items-center">
                                                             <div
                                                                 class="w-10 h-10 rounded-xl flex items-center justify-center mr-4 
-                                                                                                                                                                    {{ $event->eventType->name == 'Culto' ? 'bg-amber-100 text-amber-600' :
+                                                                                                                                                                                                                    {{ $event->eventType->name == 'Culto' ? 'bg-amber-100 text-amber-600' :
                                 ($event->eventType->name == 'Batismo' ? 'bg-cyan-100 text-cyan-600' : 'bg-blue-100 text-blue-600') }}">
                                                                 <i
                                                                     class="bi {{ $event->eventType->name == 'Culto' ? 'bi-church' : ($event->eventType->name == 'Batismo' ? 'bi-droplet-fill' : 'bi-calendar-event') }} text-lg"></i>
@@ -183,14 +240,103 @@
                 {{ $events->links() }}
             </div>
         </div>
-    </div>
 
-    <!-- Calendar View -->
-    <div id="view-calendar" class="hidden transition-opacity duration-300">
-        <div class="bg-white rounded-[2rem] shadow-xl shadow-gray-100/50 border border-gray-100 overflow-hidden p-6">
-            <div id="calendar"></div>
+        <!-- Grid View -->
+        <div id="view-grid" x-show="view === 'grid'" class="transition-opacity duration-300">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                @forelse($events as $event)
+                        <div
+                            class="bg-white p-6 md:p-8 rounded-2xl md:rounded-[2rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 relative">
+                            <div class="absolute top-6 right-6 flex flex-col gap-2 items-end">
+                                <span
+                                    class="px-3 py-1 rounded-lg bg-gray-50 text-gray-600 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                                    <i class="bi bi-people-fill text-gray-300"></i> {{ $event->participants_count }}
+                                </span>
+                            </div>
+
+                            <div
+                                class="w-10 h-10 md:w-14 md:h-14 rounded-2xl flex items-center justify-center font-black text-lg md:text-2xl group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 mb-6 
+                                                        {{ $event->eventType->name == 'Culto' ? 'bg-amber-100 text-amber-600' :
+                    ($event->eventType->name == 'Batismo' ? 'bg-cyan-100 text-cyan-600' : 'bg-blue-100 text-blue-600') }}">
+                                <i
+                                    class="bi {{ $event->eventType->name == 'Culto' ? 'bi-church' : ($event->eventType->name == 'Batismo' ? 'bi-droplet-fill' : 'bi-calendar-event') }}"></i>
+                            </div>
+
+                            <div class="mb-4">
+                                <h4
+                                    class="text-lg font-black text-gray-900 leading-tight mb-1 group-hover:text-blue-600 transition-colors uppercase tracking-tighter">
+                                    {{ $event->name }}
+                                </h4>
+                                <span
+                                    class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $event->eventType->name }}</span>
+                            </div>
+
+                            <div class="space-y-3 mb-6 flex-1">
+                                <div class="flex items-center gap-3 text-gray-500">
+                                    <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-sm">
+                                        <i class="bi bi-calendar-event text-blue-500"></i>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span
+                                            class="text-xs font-black uppercase text-gray-900">{{ $event->date->format('d/m/Y') }}</span>
+                                        <span
+                                            class="text-[10px] font-bold text-gray-400 uppercase">{{ $event->date->translatedFormat('l') }}</span>
+                                    </div>
+                                </div>
+
+                                @if($event->location)
+                                    <div class="flex items-center gap-3 text-gray-500">
+                                        <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-sm font-bold">
+                                            <i class="bi bi-geo-alt text-red-500"></i>
+                                        </div>
+                                        <span class="text-xs font-bold text-gray-700 truncate">{{ $event->location }}</span>
+                                    </div>
+                                @endif
+
+                                @if($event->cell || $event->zone)
+                                    <div class="flex items-center gap-3 text-gray-500">
+                                        <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-sm font-bold">
+                                            <i class="bi bi-diagram-3 text-purple-500"></i>
+                                        </div>
+                                        <span class="text-[10px] font-black uppercase text-gray-900">
+                                            {{ $event->cell ? 'Célula: ' . $event->cell->name : 'Zona: ' . $event->zone->name }}
+                                        </span>
+                                    </div>
+                                @endif
+                            </div>
+
+                            <div class="flex items-center gap-2 pt-4 border-t border-gray-50">
+                                <a href="{{ route('events.show', $event) }}"
+                                    class="flex-1 bg-gray-50 text-gray-400 text-center py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all flex items-center justify-center gap-2">
+                                    <i class="bi bi-eye"></i> Ver
+                                </a>
+                                @can('update', $event)
+                                    <a href="{{ route('events.edit', $event) }}"
+                                        class="w-10 h-10 bg-gray-50 text-gray-400 flex items-center justify-center rounded-xl hover:bg-orange-500 hover:text-white transition-all">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                @endcan
+                            </div>
+                        </div>
+                @empty
+                    <div
+                        class="col-span-full py-20 bg-white rounded-[2rem] border border-dashed border-gray-200 flex flex-col items-center gap-4 text-gray-300">
+                        <i class="bi bi-calendar-x text-7xl opacity-20"></i>
+                        <p class="font-bold text-lg">Nenhum evento encontrado</p>
+                    </div>
+                @endforelse
+            </div>
+            <div class="px-8 py-6">
+                {{ $events->links() }}
+            </div>
         </div>
-    </div>
+
+        <!-- Calendar View -->
+        <div id="view-calendar" x-show="view === 'calendar'" class="transition-opacity duration-300">
+            <div class="bg-white rounded-[2rem] shadow-xl shadow-gray-100/50 border border-gray-100 overflow-hidden p-6">
+                <div id="calendar"></div>
+            </div>
+        </div>
     </div>
 
     <!-- FullCalendar CSS -->
@@ -316,35 +462,11 @@
         let calendar;
         let tooltip = null;
 
+        let calendar;
+        let tooltip = null;
+
         function toggleView(view) {
-            const listBtn = document.getElementById('btn-list');
-            const calendarBtn = document.getElementById('btn-calendar');
-            const listView = document.getElementById('view-list');
-            const calendarView = document.getElementById('view-calendar');
-
-            if (view === 'list') {
-                listBtn.classList.add('bg-white', 'text-gray-900', 'shadow-sm');
-                listBtn.classList.remove('text-gray-500');
-                calendarBtn.classList.remove('bg-white', 'text-gray-900', 'shadow-sm');
-                calendarBtn.classList.add('text-gray-500');
-
-                listView.classList.remove('hidden');
-                calendarView.classList.add('hidden');
-            } else {
-                calendarBtn.classList.add('bg-white', 'text-gray-900', 'shadow-sm');
-                calendarBtn.classList.remove('text-gray-500');
-                listBtn.classList.remove('bg-white', 'text-gray-900', 'shadow-sm');
-                listBtn.classList.add('text-gray-500');
-
-                listView.classList.add('hidden');
-                calendarView.classList.remove('hidden');
-
-                if (!calendar) {
-                    initCalendar();
-                } else {
-                    calendar.render();
-                }
-            }
+            // Deprecated: Logic moved to AlpineJS
         }
 
         @if(auth()->user()->role === 'admin')
@@ -403,49 +525,49 @@
             const props = event.extendedProps;
 
             let tooltipContent = `
-                                <div class="tooltip-header">${event.title}</div>
-                                <div class="tooltip-row">
-                                    <i class="bi bi-calendar-event"></i>
-                                    <span>${event.start.toLocaleDateString('pt-BR')}</span>
-                                </div>
-                            `;
+                                        <div class="tooltip-header">${event.title}</div>
+                                        <div class="tooltip-row">
+                                            <i class="bi bi-calendar-event"></i>
+                                            <span>${event.start.toLocaleDateString('pt-BR')}</span>
+                                        </div>
+                                    `;
 
             if (event.end && event.end.getTime() !== event.start.getTime()) {
                 const endDate = new Date(event.end);
                 endDate.setDate(endDate.getDate() - 1); // FullCalendar exclusive end
                 tooltipContent += `
-                                    <div class="tooltip-row">
-                                        <i class="bi bi-arrow-right"></i>
-                                        <span>${endDate.toLocaleDateString('pt-BR')}</span>
-                                    </div>
-                                `;
+                                            <div class="tooltip-row">
+                                                <i class="bi bi-arrow-right"></i>
+                                                <span>${endDate.toLocaleDateString('pt-BR')}</span>
+                                            </div>
+                                        `;
             }
 
             if (props.location) {
                 tooltipContent += `
-                                    <div class="tooltip-row">
-                                        <i class="bi bi-geo-alt-fill"></i>
-                                        <span>${props.location}</span>
-                                    </div>
-                                `;
+                                            <div class="tooltip-row">
+                                                <i class="bi bi-geo-alt-fill"></i>
+                                                <span>${props.location}</span>
+                                            </div>
+                                        `;
             }
 
             if (props.participants_count !== undefined) {
                 tooltipContent += `
-                                    <div class="tooltip-row">
-                                        <i class="bi bi-people-fill"></i>
-                                        <span>${props.participants_count} participantes</span>
-                                    </div>
-                                `;
+                                            <div class="tooltip-row">
+                                                <i class="bi bi-people-fill"></i>
+                                                <span>${props.participants_count} participantes</span>
+                                            </div>
+                                        `;
             }
 
             if (props.description) {
                 tooltipContent += `
-                                    <div class="tooltip-row" style="margin-top: 0.5rem; font-style: italic;">
-                                        <i class="bi bi-info-circle"></i>
-                                        <span>${props.description.substring(0, 100)}${props.description.length > 100 ? '...' : ''}</span>
-                                    </div>
-                                `;
+                                            <div class="tooltip-row" style="margin-top: 0.5rem; font-style: italic;">
+                                                <i class="bi bi-info-circle"></i>
+                                                <span>${props.description.substring(0, 100)}${props.description.length > 100 ? '...' : ''}</span>
+                                            </div>
+                                        `;
             }
 
             tooltip.innerHTML = tooltipContent;
@@ -522,5 +644,51 @@
             });
             calendar.render();
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            createTooltip();
+            // view logic handled by alpine
+        });
+
+        // Dynamic Search Script
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.querySelector('input[name="search"]');
+            const filterForm = searchInput.closest('form');
+
+            if (searchInput) {
+                let timeout = null;
+                searchInput.addEventListener('input', function () {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(function () {
+                        const formData = new FormData(filterForm);
+                        const params = new URLSearchParams(formData);
+
+                        document.body.style.cursor = 'wait';
+
+                        fetch(`${filterForm.action}?${params.toString()}`, {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        })
+                            .then(response => response.text())
+                            .then(html => {
+                                const parser = new DOMParser();
+                                const doc = parser.parseFromString(html, 'text/html');
+
+                                // Replace Views
+                                ['view-list', 'view-grid'].forEach(id => {
+                                    const newEl = doc.getElementById(id);
+                                    const currentEl = document.getElementById(id);
+                                    if (newEl && currentEl) currentEl.innerHTML = newEl.innerHTML;
+                                });
+
+                                document.body.style.cursor = 'default';
+                            })
+                            .catch(err => {
+                                console.error('Search failed', err);
+                                document.body.style.cursor = 'default';
+                            });
+                    }, 500);
+                });
+            }
+        });
     </script>
 @endsection

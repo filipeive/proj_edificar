@@ -11,8 +11,8 @@
                 <i class="bi bi-arrow-left mr-2"></i> Voltar para Lista
             </a>
         </div>
-
-        <div class="max-w-4xl mx-auto">
+        <!-- ocupar toda area -->
+        <div class="w-full">
             <form action="{{ route('events.store') }}" method="POST"
                 class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 @csrf
@@ -24,12 +24,13 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo de Evento *</label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo de Evento <span class="text-red-500">*</span></label>
                             <select name="event_type_id" required
-                                class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">Selecione o tipo</option>
+                                class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white">
+                                <option value="" class="text-gray-500">Selecione o tipo ({{ $eventTypes->count() }}
+                                    disponíveis)</option>
                                 @foreach($eventTypes as $type)
-                                    <option value="{{ $type->id }}" {{ old('event_type_id') == $type->id ? 'selected' : '' }}>
+                                    <option value="{{ $type->id }}" class="text-gray-900" {{ old('event_type_id') == $type->id ? 'selected' : '' }}>
                                         {{ $type->name }}
                                     </option>
                                 @endforeach
@@ -38,7 +39,7 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Nome do Evento *</label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Nome do Evento <span class="text-red-500">*</span></label>
                             <input type="text" name="name" value="{{ old('name') }}" required
                                 placeholder="Ex: Culto da Virada"
                                 class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
@@ -46,7 +47,7 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Data de Início *</label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Data de Início <span class="text-red-500">*</span></label>
                             <input type="date" name="date" value="{{ old('date', request('date', date('Y-m-d'))) }}"
                                 required
                                 class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
@@ -95,7 +96,7 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Qtd. Participantes *</label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Qtd. Participantes <span class="text-red-500">*</span></label>
                             <input type="number" name="participants_count" value="{{ old('participants_count', 0) }}"
                                 min="0" required
                                 class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-center font-bold">

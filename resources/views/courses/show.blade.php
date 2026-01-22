@@ -5,7 +5,7 @@
 @section('page-subtitle', 'Informações e lista de alunos matriculados')
 
 @section('content')
-    <div class="container-fluid">
+    <div x-data="{ view: 'list' }" class="container-fluid">
         <div class="mb-6 flex justify-between items-center">
             <a href="{{ route('courses.index') }}" class="text-gray-600 hover:text-orange-600 flex items-center transition font-semibold">
                 <i class="bi bi-arrow-left mr-2"></i> Voltar para Lista
@@ -93,14 +93,28 @@
             <!-- Lista de Alunos -->
             <div class="lg:col-span-2">
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center">
+                    <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/10">
                         <h4 class="text-xl font-bold text-gray-800">Alunos Matriculados</h4>
-                        @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
-                            <button type="button" id="bulkDeleteBtn" onclick="bulkDelete()" disabled
-                                class="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl flex items-center transition shadow-lg shadow-red-600/20 font-bold text-xs uppercase tracking-widest hidden">
-                                <i class="bi bi-trash-fill mr-2"></i> Remover Selecionados
-                            </button>
-                        @endif
+                        <div class="flex items-center gap-4">
+                            <div class="flex bg-white p-1 rounded-xl border border-gray-100">
+                                <button @click="view = 'list'" 
+                                    :class="view === 'list' ? 'bg-gray-100 text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
+                                    class="px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
+                                    <i class="bi bi-list-ul"></i>
+                                </button>
+                                <button @click="view = 'grid'" 
+                                    :class="view === 'grid' ? 'bg-gray-100 text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
+                                    class="px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
+                                    <i class="bi bi-grid-fill"></i>
+                                </button>
+                            </div>
+                            @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
+                                <button type="button" id="bulkDeleteBtn" onclick="bulkDelete()" disabled
+                                    class="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl flex items-center transition shadow-lg shadow-red-600/20 font-bold text-xs uppercase tracking-widest hidden">
+                                    <i class="bi bi-trash-fill mr-2"></i> Remover Selecionados
+                                </button>
+                            @endif
+                        </div>
                     </div>
                     
                     <div class="px-8 py-4 bg-gray-50/50 border-b border-gray-100">
@@ -120,7 +134,8 @@
                         @csrf
                     </form>
 
-                    <div class="overflow-x-auto">
+                    <div x-show="view === 'list'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
+                        class="overflow-x-auto">
                         <table class="w-full text-left">
                             <thead>
                                 <tr class="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
@@ -231,6 +246,90 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                    <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
+                        class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50/30">
+                        @forelse($enrollments as $enrollment)
+                            <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-md transition-all relative">
+                                <div class="absolute top-6 right-6">
+                                    @if($enrollment->status === 'completed')
+                                        <span class="px-3 py-1 bg-green-100 text-green-700 text-[10px] font-bold uppercase rounded-full tracking-widest">Concluído</span>
+                                    @elseif($enrollment->status === 'dropped')
+                                        <span class="px-3 py-1 bg-red-100 text-red-700 text-[10px] font-bold uppercase rounded-full tracking-widest">Desistiu</span>
+                                    @else
+                                        <span class="px-3 py-1 bg-blue-100 text-blue-700 text-[10px] font-bold uppercase rounded-full tracking-widest">Em Curso</span>
+                                    @endif
+                                </div>
+
+                                <div class="flex items-center gap-4 mb-4">
+                                    <div class="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600 font-bold group-hover:bg-orange-600 group-hover:text-white transition-all text-xl">
+                                        @if($enrollment->user_id)
+                                            {{ substr($enrollment->user->name, 0, 1) }}
+                                        @else
+                                            <i class="bi bi-heart-fill"></i>
+                                        @endif
+                                    </div>
+                                    <div class="flex flex-col">
+                                        @if($enrollment->user_id)
+                                            <h4 class="text-sm font-black text-gray-900">{{ $enrollment->user->name }}</h4>
+                                            <span class="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">{{ $enrollment->user->email }}</span>
+                                        @else
+                                            <h4 class="text-sm font-black text-gray-900 truncate max-w-[150px]">
+                                                {{ $enrollment->malePartner->name ?? 'N/A' }} & {{ $enrollment->femalePartner->name ?? 'N/A' }}
+                                            </h4>
+                                            <span class="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">Casal (Pré-Nupcial)</span>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="bg-gray-50 p-4 rounded-2xl mb-6 flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
+                                    <span class="text-gray-400">Matrícula</span>
+                                    <span class="text-gray-900">
+                                        {{ optional($enrollment->enrolled_at)->format('d/m/Y') ?? $enrollment->created_at->format('d/m/Y') }}
+                                    </span>
+                                </div>
+
+                                @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
+                                    <div class="flex items-center gap-2 mt-auto">
+                                        <div x-data="{ open: false }" class="flex-1 relative">
+                                            <button @click="open = !open" type="button" 
+                                                class="w-full bg-gray-900 text-white text-center py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-orange-200">
+                                                <i class="bi bi-arrow-repeat"></i> Alterar Status
+                                            </button>
+                                            
+                                            <div x-show="open" @click.away="open = false" 
+                                                class="origin-bottom-left absolute left-0 bottom-full mb-2 w-48 rounded-2xl shadow-2xl bg-white ring-1 ring-black ring-opacity-5 z-20 overflow-hidden border border-gray-100">
+                                                <div class="py-1">
+                                                    @foreach(['enrolled' => 'Ativo', 'completed' => 'Concluído', 'dropped' => 'Desistir'] as $s => $label)
+                                                        <form action="{{ route('enrollments.status', $enrollment) }}" method="POST">
+                                                            @csrf
+                                                            <input type="hidden" name="status" value="{{ $s }}">
+                                                            <button type="submit" 
+                                                                class="w-full text-left px-4 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 transition-colors {{ $enrollment->status == $s ? 'text-orange-600 bg-orange-50/50' : 'text-gray-600' }}">
+                                                                {{ $label }}
+                                                            </button>
+                                                        </form>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <form action="{{ route('course-enrollments.destroy', $enrollment) }}" method="POST" id="delete-enrollment-grid-{{ $enrollment->id }}">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" 
+                                                onclick="confirmDelete('delete-enrollment-grid-{{ $enrollment->id }}')"
+                                                class="w-12 h-12 bg-red-50 text-red-600 flex items-center justify-center rounded-2xl hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                @endif
+                            </div>
+                        @empty
+                            <div class="col-span-full py-12 text-center text-gray-400">
+                                <p class="text-xs font-bold uppercase tracking-widest italic">Nenhum aluno matriculado.</p>
+                            </div>
+                        @endforelse
                     </div>
                 </div>
             </div>

@@ -3,7 +3,8 @@
 @section('title', 'Editar Culto - Portal Life Church')
 
 @section('content')
-    <div class="space-y-8" x-data="{ guestPreacher: {{ $service->preacher_id === null && $service->preacher_name ? 'true' : 'false' }} }">
+    <div class="space-y-8"
+        x-data="{ guestPreacher: {{ $service->preacher_id === null && $service->preacher_name ? 'true' : 'false' }} }">
         <!-- Header -->
         <div
             class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -25,7 +26,7 @@
         <form action="{{ route('services.update', $service) }}" method="POST" id="serviceForm" class="space-y-8 pb-12">
             @csrf
             @method('PUT')
-            
+
             @if($errors->any())
                 <div class="bg-red-50 border-l-4 border-red-500 p-6 rounded-[2rem] shadow-sm mb-8">
                     <div class="flex items-center mb-4">
@@ -72,8 +73,7 @@
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Pregador</label>
                         <div class="space-y-4">
-                            <select name="preacher_id"
-                                @change="guestPreacher = $event.target.value === 'other'"
+                            <select name="preacher_id" @change="guestPreacher = $event.target.value === 'other'"
                                 class="w-full px-5 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700 appearance-none">
                                 <option value="">Selecione o pregador</option>
                                 @foreach($preachers as $preacher)
@@ -85,7 +85,8 @@
                             </select>
 
                             <template x-if="guestPreacher">
-                                <input type="text" name="preacher_name" value="{{ old('preacher_name', $service->preacher_name) }}"
+                                <input type="text" name="preacher_name"
+                                    value="{{ old('preacher_name', $service->preacher_name) }}"
                                     placeholder="Nome do pregador convidado"
                                     class="w-full px-5 py-4 bg-blue-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700 placeholder-blue-300">
                             </template>
@@ -210,7 +211,8 @@
                                 <div class="flex-1">
                                     <p
                                         class="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-green-600 transition-colors">
-                                        {{ $type->name }}</p>
+                                        {{ $type->name }}
+                                    </p>
                                 </div>
                                 <div class="relative w-40">
                                     <input type="hidden" name="offerings[{{ $index }}][offering_type_id]"
@@ -248,47 +250,58 @@
                     </div>
                 </div>
 
-                <!-- Dízimos -->
+                <!-- Ofertas Individuais -->
                 <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden flex flex-col">
                     <div class="p-8 border-b border-gray-50 bg-gray-50/50 flex items-center justify-between">
                         <h2 class="text-lg font-black text-gray-900 flex items-center gap-2">
-                            <i class="bi bi-person-check text-blue-600"></i>
-                            Dízimos Individuais
+                            <i class="bi bi-gift text-orange-600"></i>
+                            Ofertas Individuais
                         </h2>
-                        <button type="button" @click="addTithe()" id="addTitheBtn"
-                            class="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl font-bold text-xs hover:bg-blue-600 hover:text-white transition-all flex items-center gap-2">
+                        <button type="button" @click="addIndividualOffering()" id="addIndOfferingBtn"
+                            class="px-4 py-2 bg-orange-50 text-orange-600 rounded-xl font-bold text-xs hover:bg-orange-600 hover:text-white transition-all flex items-center gap-2">
                             <i class="bi bi-plus-lg"></i> Adicionar Manual
                         </button>
                     </div>
-                    <div class="p-8 flex-1 space-y-4 max-h-[500px] overflow-y-auto" id="tithesContainer">
-                        @foreach($service->tithes as $tithe)
-                            <div class="tithe-row flex items-center gap-4 group">
-                                <div class="flex-1 relative">
-                                    <i class="bi bi-person absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"></i>
-                                    <input type="text" name="tithes[{{ $loop->index }}][member_name]"
-                                        placeholder="Nome do Dizimista"
-                                        value="{{ old("tithes.{$loop->index}.member_name", $tithe->member_name) }}"
-                                        class="w-full pl-10 pr-4 py-2 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:border-blue-500 focus:ring-0 text-sm font-bold text-gray-700">
+                    <div class="p-8 flex-1 space-y-4 max-h-[500px] overflow-y-auto" id="indOfferingsContainer">
+                        @foreach($service->individualOfferings as $indOffering)
+                            <div
+                                class="ind-offering-row space-y-2 p-4 bg-gray-50 rounded-2xl group relative border border-transparent hover:border-orange-100 transition-all">
+                                <div class="flex items-center gap-4">
+                                    <div class="flex-1 relative">
+                                        <i class="bi bi-person absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"></i>
+                                        <input type="text" name="individual_offerings[{{ $loop->index }}][member_name]"
+                                            placeholder="Nome do Ofertante (opcional)"
+                                            value="{{ old("individual_offerings.{$loop->index}.member_name", $indOffering->member_name) }}"
+                                            class="w-full pl-10 pr-4 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-orange-500 focus:ring-0 text-sm font-bold text-gray-700">
+                                    </div>
+                                    <div class="relative w-32">
+                                        <input type="number" step="0.01" name="individual_offerings[{{ $loop->index }}][amount]"
+                                            placeholder="Valor"
+                                            value="{{ old("individual_offerings.{$loop->index}.amount", $indOffering->amount) }}"
+                                            class="ind-offering-amount-input w-full pl-8 pr-4 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-orange-500 focus:ring-0 text-sm font-black text-right text-orange-700">
+                                        <span
+                                            class="absolute left-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-400">MT</span>
+                                    </div>
+                                    <button type="button"
+                                        class="remove-ind-offering text-gray-300 hover:text-red-500 transition-colors p-2">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
                                 </div>
-                                <div class="relative w-32">
-                                    <input type="number" step="0.01" name="tithes[{{ $loop->index }}][amount]"
-                                        placeholder="Valor" value="{{ old("tithes.{$loop->index}.amount", $tithe->amount) }}"
-                                        class="tithe-amount-input w-full pl-8 pr-4 py-2 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:border-blue-500 focus:ring-0 text-sm font-black text-right text-blue-700">
-                                    <span
-                                        class="absolute left-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-400">MT</span>
+                                <div class="relative">
+                                    <i class="bi bi-chat-left-text absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"></i>
+                                    <input type="text" name="individual_offerings[{{ $loop->index }}][description]"
+                                        placeholder="Voto / Descrição da oferta"
+                                        value="{{ old("individual_offerings.{$loop->index}.description", $indOffering->description) }}"
+                                        class="w-full pl-10 pr-4 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-orange-500 focus:ring-0 text-xs font-medium text-gray-500 italic">
                                 </div>
-                                <button type="button"
-                                    class="remove-tithe text-gray-300 hover:text-red-500 transition-colors p-2">
-                                    <i class="bi bi-trash"></i>
-                                </button>
                             </div>
                         @endforeach
                     </div>
                     <div class="p-8 mt-auto bg-gray-50/50 border-t border-gray-50">
                         <div
-                            class="p-6 bg-blue-900 rounded-[1.5rem] flex items-center justify-between text-white shadow-lg shadow-blue-100">
-                            <span class="text-xs font-black uppercase tracking-widest">Total de Dízimos</span>
-                            <span class="text-2xl font-black" id="total_tithes_display">0,00 MT</span>
+                            class="p-6 bg-orange-600 rounded-[1.5rem] flex items-center justify-between text-white shadow-lg shadow-orange-100">
+                            <span class="text-xs font-black uppercase tracking-widest">Total Indiv.</span>
+                            <span class="text-2xl font-black" id="total_ind_offerings_display">0,00 MT</span>
                         </div>
                     </div>
                 </div>
@@ -313,6 +326,10 @@
                             <span class="text-sm font-black" id="summary_offerings">0,00 MT</span>
                         </div>
                         <div class="flex justify-between items-center border-b border-blue-500/50 pb-4">
+                            <span class="text-sm font-bold opacity-80">Ofertas Individuais</span>
+                            <span class="text-sm font-black" id="summary_ind_offerings">0,00 MT</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-blue-500/50 pb-4">
                             <span class="text-sm font-bold opacity-80">Total de Dízimos</span>
                             <span class="text-sm font-black" id="summary_tithes">0,00 MT</span>
                         </div>
@@ -320,7 +337,7 @@
                             <span class="text-sm font-bold opacity-80">Especiais</span>
                             <span class="text-sm font-black" id="summary_specials">0,00 MT</span>
                         </div>
-                        <div class="flex justify-between items-center pt-2">
+                        <div class="flex justify-between items-center pt-2 border-t border-blue-400 mt-2 pt-4">
                             <span class="text-lg font-black tracking-tighter uppercase">Total Final</span>
                             <span class="text-3xl font-black tabular-nums" id="summary_grand_total">0,00 MT</span>
                         </div>
@@ -354,11 +371,44 @@
         </div>
     </template>
 
+    <!-- Template para Oferta Individual -->
+    <template id="indOfferingRowTemplate">
+        <div
+            class="ind-offering-row space-y-2 p-4 bg-gray-50 rounded-2xl group relative border border-transparent hover:border-orange-100 transition-all">
+            <div class="flex items-center gap-4">
+                <div class="flex-1 relative">
+                    <i class="bi bi-person absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"></i>
+                    <input type="text" name="individual_offerings[INDEX][member_name]"
+                        placeholder="Nome do Ofertante (opcional)"
+                        class="w-full pl-10 pr-4 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-orange-500 focus:ring-0 text-sm font-bold text-gray-700">
+                </div>
+                <div class="relative w-32">
+                    <input type="number" step="0.01" name="individual_offerings[INDEX][amount]" placeholder="Valor"
+                        class="ind-offering-amount-input w-full pl-8 pr-4 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-orange-500 focus:ring-0 text-sm font-black text-right text-orange-700">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-400">MT</span>
+                </div>
+                <button type="button"
+                    class="remove-ind-offering text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 p-2">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+            <div class="relative">
+                <i class="bi bi-chat-left-text absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"></i>
+                <input type="text" name="individual_offerings[INDEX][description]" placeholder="Voto / Descrição da oferta"
+                    class="w-full pl-10 pr-4 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-orange-500 focus:ring-0 text-xs font-medium text-gray-500 italic">
+            </div>
+        </div>
+    </template>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const tithesContainer = document.getElementById('tithesContainer');
             const titheTemplate = document.getElementById('titheRowTemplate');
             let titheIndex = {{ $service->tithes->count() }};
+
+            const indOfferingsContainer = document.getElementById('indOfferingsContainer');
+            const indOfferingTemplate = document.getElementById('indOfferingRowTemplate');
+            let indOfferingIndex = {{ $service->individualOfferings->count() }};
 
             function addTithe() {
                 const clone = titheTemplate.content.cloneNode(true);
@@ -378,7 +428,26 @@
                 titheIndex++;
             }
 
+            function addIndividualOffering() {
+                const clone = indOfferingTemplate.content.cloneNode(true);
+                const container = clone.querySelector('.ind-offering-row');
+
+                container.querySelectorAll('input').forEach(input => {
+                    input.name = input.name.replace('INDEX', indOfferingIndex);
+                    input.addEventListener('input', updateFinancials);
+                });
+
+                container.querySelector('.remove-ind-offering').addEventListener('click', () => {
+                    container.remove();
+                    updateFinancials();
+                });
+
+                indOfferingsContainer.appendChild(container);
+                indOfferingIndex++;
+            }
+
             document.getElementById('addTitheBtn').addEventListener('click', addTithe);
+            document.getElementById('addIndOfferingBtn').addEventListener('click', addIndividualOffering);
 
             function formatMT(value) {
                 return value.toLocaleString('pt-MZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' MT';
@@ -427,15 +496,22 @@
                     tithesTotal += parseFloat(input.value) || 0;
                 });
 
+                let indOfferingsTotal = 0;
+                document.querySelectorAll('.ind-offering-amount-input').forEach(input => {
+                    indOfferingsTotal += parseFloat(input.value) || 0;
+                });
+
                 let specialOffer = parseFloat(document.getElementById('special_offer_input').value) || 0;
 
-                const grandTotal = offeringsTotal + tithesTotal + specialOffer;
+                const grandTotal = offeringsTotal + tithesTotal + indOfferingsTotal + specialOffer;
 
                 document.getElementById('total_offerings_display').innerText = formatMT(offeringsTotal);
                 document.getElementById('total_tithes_display').innerText = formatMT(tithesTotal);
+                document.getElementById('total_ind_offerings_display').innerText = formatMT(indOfferingsTotal);
 
                 document.getElementById('summary_offerings').innerText = formatMT(offeringsTotal);
                 document.getElementById('summary_tithes').innerText = formatMT(tithesTotal);
+                document.getElementById('summary_ind_offerings').innerText = formatMT(indOfferingsTotal);
                 document.getElementById('summary_specials').innerText = formatMT(specialOffer);
                 document.getElementById('summary_grand_total').innerText = formatMT(grandTotal);
             }
@@ -445,13 +521,20 @@
                 input.addEventListener('input', updateParticipation);
             });
 
-            document.querySelectorAll('.offering-input, #special_offer_input, .tithe-amount-input').forEach(input => {
+            document.querySelectorAll('.offering-input, #special_offer_input, .tithe-amount-input, .ind-offering-amount-input').forEach(input => {
                 input.addEventListener('input', updateFinancials);
             });
 
             document.querySelectorAll('.remove-tithe').forEach(btn => {
                 btn.addEventListener('click', function () {
                     this.closest('.tithe-row').remove();
+                    updateFinancials();
+                });
+            });
+
+            document.querySelectorAll('.remove-ind-offering').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    this.closest('.ind-offering-row').remove();
                     updateFinancials();
                 });
             });
