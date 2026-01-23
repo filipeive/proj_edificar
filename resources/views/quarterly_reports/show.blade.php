@@ -50,10 +50,13 @@
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
                         @php
                             $stats = [
+                                ['label' => 'Pastores', 'value' => $quarterlyReport->pastors_count, 'icon' => 'bi-person-workspace', 'color' => 'red'],
+                                ['label' => 'Supervisores', 'value' => $quarterlyReport->supervisors_count, 'icon' => 'bi-person-check', 'color' => 'purple'],
                                 ['label' => 'Líderes Ativos', 'value' => $quarterlyReport->leaders_count, 'icon' => 'bi-person-badge', 'color' => 'blue'],
                                 ['label' => 'Células Totais', 'value' => $quarterlyReport->cells_count, 'icon' => 'bi-grid-3x3-gap', 'color' => 'purple'],
                                 ['label' => 'Timóteos (Aux)', 'value' => $quarterlyReport->timoteos_count, 'icon' => 'bi-award', 'color' => 'indigo'],
                                 ['label' => 'Membros Arrolados', 'value' => $quarterlyReport->members_count, 'icon' => 'bi-people', 'color' => 'green'],
+                                ['label' => 'Visitantes', 'value' => $quarterlyReport->visitors_count, 'icon' => 'bi-person-plus', 'color' => 'orange'],
                                 ['label' => 'Média Participação', 'value' => $quarterlyReport->participants_count, 'icon' => 'bi-graph-up', 'color' => 'orange'],
                                 ['label' => 'Novas Conversões', 'value' => $quarterlyReport->saved_count, 'icon' => 'bi-heart-pulse', 'color' => 'red'],
                             ];
@@ -78,18 +81,23 @@
                             <i class="bi bi-activity text-blue-600"></i>
                             Avaliação de Saúde Ministerial
                         </h3>
-                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Escala 0-10</span>
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Escala 0-3</span>
                     </div>
                     <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
                         @php
                             $assessments = [
-                                'discipleship_score' => 'Discipulado e Mentoria',
-                                'pastoral_score' => 'Cuidado e Pastoreio',
-                                'cell_participation_score' => 'Frequência em Células',
-                                'service_participation_score' => 'Frequência em Celebrações',
-                                'communion_in_cells_score' => 'Koinonia (Comunhão/Unidade)',
-                                'relationship_building_score' => 'Consolidação e Integração',
-                                'prayer_intercession_score' => 'Vida de Oração e Intercessão'
+                                'discipleship_score' => 'Discipulado um a um',
+                                'evangelism_strategy' => 'Estratégia de Evangelismo',
+                                'consolidation_growth' => 'Consolidação de Novos',
+                                'pastoral_score' => 'Cuidado Pastoral (Líderes)',
+                                'visitation_routine' => 'Rotina de Visitação',
+                                'leader_support' => 'Apoio aos Líderes',
+                                'cell_participation_score' => 'Participação em Células',
+                                'service_participation_score' => 'Presença nos Cultos',
+                                'tadium_participation' => 'Envolvimento no TADEL',
+                                'communion_in_cells_score' => 'Comunhão Interna',
+                                'relationship_building_score' => 'Integração de Novos',
+                                'prayer_intercession_score' => 'Vida de Oração'
                             ];
                         @endphp
                         @foreach($assessments as $field => $label)
@@ -99,11 +107,11 @@
                                         class="text-[10px] font-black text-gray-500 uppercase tracking-widest">{{ $label }}</span>
                                     <span
                                         class="text-lg font-black text-blue-600 tracking-tighter">{{ $quarterlyReport->$field }}<span
-                                            class="text-[10px] text-gray-400 ml-0.5 opacity-50">/10</span></span>
+                                            class="text-[10px] text-gray-400 ml-0.5 opacity-50">/3</span></span>
                                 </div>
                                 <div class="h-3 bg-gray-100 rounded-full overflow-hidden p-0.5">
                                     <div class="h-full bg-blue-600 rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(37,99,235,0.3)]"
-                                        style="width: {{ ($quarterlyReport->$field / 10) * 100 }}%"></div>
+                                        style="width: {{ ($quarterlyReport->$field / 3) * 100 }}%"></div>
                                 </div>
                             </div>
                         @endforeach
@@ -252,12 +260,12 @@
                         datasets: [{
                             label: 'Pontuação Real',
                             data: [
-                                    {{ $quarterlyReport->discipleship_score }},
-                                    {{ $quarterlyReport->pastoral_score }},
-                                    {{ $quarterlyReport->cell_participation_score }},
-                                    {{ $quarterlyReport->service_participation_score }},
-                                    {{ $quarterlyReport->communion_in_cells_score }},
-                                    {{ $quarterlyReport->relationship_building_score }},
+                                                    {{ $quarterlyReport->discipleship_score }},
+                                                    {{ $quarterlyReport->pastoral_score }},
+                                                    {{ $quarterlyReport->cell_participation_score }},
+                                                    {{ $quarterlyReport->service_participation_score }},
+                                                    {{ $quarterlyReport->communion_in_cells_score }},
+                                                    {{ $quarterlyReport->relationship_building_score }},
                                 {{ $quarterlyReport->prayer_intercession_score }}
                             ],
                             backgroundColor: 'rgba(37, 99, 235, 0.2)',
@@ -268,7 +276,7 @@
                             pointHoverBorderColor: 'rgb(37, 99, 235)'
                         }, {
                             label: 'Meta Mínima',
-                            data: [7, 7, 7, 7, 7, 7, 7],
+                            data: [2, 2, 2, 2, 2, 2, 2],
                             backgroundColor: 'rgba(209, 213, 219, 0.1)',
                             borderColor: 'rgba(209, 213, 219, 0.5)',
                             borderDash: [5, 5],
@@ -281,8 +289,8 @@
                         scales: {
                             r: {
                                 beginAtZero: true,
-                                max: 10,
-                                ticks: { stepSize: 2 }
+                                max: 3,
+                                ticks: { stepSize: 1 }
                             }
                         },
                         plugins: {
@@ -300,9 +308,9 @@
                         datasets: [{
                             label: 'Quantidade',
                             data: [
-                                    {{ $quarterlyReport->leaders_count }},
-                                    {{ $quarterlyReport->cells_count }},
-                                    {{ $quarterlyReport->timoteos_count }},
+                                                    {{ $quarterlyReport->leaders_count }},
+                                                    {{ $quarterlyReport->cells_count }},
+                                                    {{ $quarterlyReport->timoteos_count }},
                                 {{ $quarterlyReport->members_count }}
                             ],
                             backgroundColor: [

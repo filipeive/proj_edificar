@@ -3,7 +3,26 @@
 @section('title', 'Novo Relatório Trimestral - Portal Life Church')
 
 @section('content')
-    <div class="max-w-6xl mx-auto space-y-8" x-data="reportForm()">
+    <div class="w-full space-y-8" x-data="reportForm()">
+        @if ($errors->any())
+            <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-2xl mb-8">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="bi bi-exclamation-triangle-fill text-red-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-black text-red-800 uppercase tracking-widest">Existem erros no formulário</h3>
+                        <div class="mt-2 text-sm text-red-700">
+                            <ul class="list-disc pl-5 space-y-1">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
         <!-- Header -->
         <div
             class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -292,8 +311,8 @@
                                                             required @if($i == 2) checked @endif>
                                                         <div
                                                             class="w-full py-3 text-center rounded-xl bg-white border border-gray-100 text-sm font-black transition-all cursor-pointer
-                                                                                                            peer-checked:bg-{{ $section['color'] }}-600 peer-checked:text-white peer-checked:shadow-lg peer-checked:shadow-{{ $section['color'] }}-200
-                                                                                                            hover:border-{{ $section['color'] }}-500 text-gray-400">
+                                                                                                                            peer-checked:bg-{{ $section['color'] }}-600 peer-checked:text-white peer-checked:shadow-lg peer-checked:shadow-{{ $section['color'] }}-200
+                                                                                                                            hover:border-{{ $section['color'] }}-500 text-gray-400">
                                                             {{ $i }}
                                                         </div>
                                                     </label>

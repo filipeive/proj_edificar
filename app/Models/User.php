@@ -80,6 +80,45 @@ class User extends Authenticatable
         return $this->hasMany(CommitmentPackage::class, 'responsible_id');
     }
 
+    public function courseEnrollments()
+    {
+        return $this->hasMany(CourseEnrollment::class);
+    }
+
+    public function courseEnrollmentsAsPartner()
+    {
+        return $this->hasMany(CourseEnrollment::class, 'male_partner_id')
+            ->orWhere('female_partner_id', $this->id);
+    }
+
+    public function hasAnyCourseEnrollment()
+    {
+        return $this->courseEnrollments()->exists() ||
+            CourseEnrollment::where('male_partner_id', $this->id)
+                ->orWhere('female_partner_id', $this->id)
+                ->exists();
+    }
+
+    public function isEnrolledInClass($classId)
+    {
+        return $this->courseEnrollments()->where('course_class_id', $classId)->exists() ||
+            CourseEnrollment::where('course_class_id', $classId)
+                ->where(function ($q) {
+                    $q->where('male_partner_id', $this->id)
+                        ->orWhere('female_partner_id', $this->id);
+                })->exists();
+    }
+
+    public function isEnrolledInCourse($courseId)
+    {
+        return $this->courseEnrollments()->where('course_id', $courseId)->exists() ||
+            CourseEnrollment::where('course_id', $courseId)
+                ->where(function ($q) {
+                    $q->where('male_partner_id', $this->id)
+                        ->orWhere('female_partner_id', $this->id);
+                })->exists();
+    }
+
     // Helpers
     public function isAdmin()
     {
@@ -172,15 +211,44 @@ class User extends Authenticatable
 
     public function getZoneId()
     {
-        if ($this->role === 'pastor_zona') {
-            return Zone::where('pastor_id', $this->id)->first()?->id;
+        return $this->getManagedZoneIds()->first();
+    }
+
+    /**
+     * Get IDs of zones managed by this user (if pastor) or containing their managed supervisions (if supervisor)
+     */
+    public function getManagedZoneIds()
+    {
+        if ($this->isPastorZona()) {
+            return Zone::where('pastor_id', $this->id)->pluck('id');
         }
 
-        if ($this->role === 'supervisor') {
-            return $this->supervisedSupervisions()->first()?->zone_id;
+        if ($this->isSupervisor()) {
+            return Supervision::whereIn('id', $this->getManagedSupervisionIds())->pluck('zone_id')->unique();
         }
 
-        return null;
+        return collect();
+    }
+
+    /**
+     * Get IDs of supervisions managed by this user (if supervisor or pastor)
+     */
+    public function getManagedSupervisionIds()
+    {
+        if ($this->isPastorZona()) {
+            return Supervision::whereIn('zone_id', $this->getManagedZoneIds())->pluck('id');
+        }
+
+        if ($this->isSupervisor()) {
+            $ids = $this->supervisedSupervisions()->pluck('id');
+            // Robust fallback: use cell context if no explicit assignment
+            if ($ids->isEmpty() && $this->cell) {
+                $ids = collect([$this->cell->supervision_id]);
+            }
+            return $ids;
+        }
+
+        return collect();
     }
 
     public function getActiveCommitment()

@@ -158,6 +158,7 @@
 
             <!-- Coluna Direita: Lista de Inscritos -->
             <div class="lg:col-span-2 space-y-8">
+                @if(!auth()->user()->isSupervisor() || auth()->user()->isEnrolledInClass($courseClass->id))
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                     <div class="p-6 border-b border-gray-100 flex justify-between items-center">
                         <h4 class="text-lg font-black text-gray-900 flex items-center">

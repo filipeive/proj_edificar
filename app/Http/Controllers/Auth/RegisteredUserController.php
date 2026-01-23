@@ -41,11 +41,16 @@ class RegisteredUserController extends Controller
         ]);
 
         // Atribuir pacote padrão (Pacote 1)
-        UserCommitment::create([
-            'user_id' => $user->id,
-            'package_id' => 1,
-            'start_date' => now(),
-        ]);
+        $defaultPackage = \App\Models\CommitmentPackage::find(1);
+        if ($defaultPackage) {
+            UserCommitment::create([
+                'user_id' => $user->id,
+                'package_id' => $defaultPackage->id,
+                'cell_id' => $user->cell_id,
+                'committed_amount' => $defaultPackage->min_amount,
+                'start_date' => now(),
+            ]);
+        }
 
         event(new Registered($user));
 

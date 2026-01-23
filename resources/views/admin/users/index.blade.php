@@ -51,7 +51,7 @@
     @resize.window.debounce.500ms="updateView()">
         <!-- Global Stats Row -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex items-center justify-between group hover:shadow-xl transition-all">
+            <div class="hidden md:flex bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 items-center justify-between group hover:shadow-xl transition-all">
                 <div class="space-y-1">
                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Geral</p>
                     <p class="text-3xl font-black text-gray-900">{{ $totalUsers }}</p>
@@ -60,7 +60,7 @@
                     <i class="bi bi-people-fill"></i>
                 </div>
             </div>
-            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex items-center justify-between group hover:shadow-xl transition-all">
+            <div class="hidden md:flex bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 items-center justify-between group hover:shadow-xl transition-all">
                 <div class="space-y-1">
                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Membros Ativos</p>
                     <p class="text-3xl font-black text-green-600">{{ $totalMembers }}</p>
@@ -69,7 +69,7 @@
                     <i class="bi bi-person-check-fill"></i>
                 </div>
             </div>
-            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex items-center justify-between group hover:shadow-xl transition-all">
+            <div class="hidden md:flex bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 items-center justify-between group hover:shadow-xl transition-all">
                 <div class="space-y-1">
                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Corpo de Liderança</p>
                     <p class="text-3xl font-black text-purple-600">{{ $totalLeaders }}</p>
@@ -78,7 +78,7 @@
                     <i class="bi bi-person-badge-fill"></i>
                 </div>
             </div>
-            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex items-center justify-between group hover:shadow-xl transition-all">
+            <div class="hidden md:flex bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 items-center justify-between group hover:shadow-xl transition-all">
                 <div class="space-y-1">
                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Acessos Ativos</p>
                     <p class="text-3xl font-black text-orange-600">{{ $totalActive }}</p>
@@ -309,7 +309,7 @@
         <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
             class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
             @forelse($users as $user)
-                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300">
+                <div class="bg-white p-5 md:p-8 rounded-[2rem] md:rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300">
                     <div class="flex justify-between items-start mb-6">
                         <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 text-white flex items-center justify-center font-black text-2xl group-hover:scale-110 transition-all duration-500 shadow-lg shadow-blue-100">
                             {{ strtoupper(substr($user->name, 0, 1)) }}

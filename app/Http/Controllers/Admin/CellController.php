@@ -20,11 +20,11 @@ class CellController
         $supervisionsQuery = Supervision::orderBy('name');
 
         if ($user->isPastorZona()) {
-            $zoneId = $user->getZoneId();
-            $zonesQuery->where('id', $zoneId);
-            $supervisionsQuery->where('zone_id', $zoneId);
+            $zoneIds = $user->getManagedZoneIds();
+            $zonesQuery->whereIn('id', $zoneIds);
+            $supervisionsQuery->whereIn('zone_id', $zoneIds);
         } elseif ($user->isSupervisor()) {
-            $supervisionIds = $user->supervisedSupervisions()->pluck('id');
+            $supervisionIds = $user->getManagedSupervisionIds();
             $supervisionsQuery->whereIn('id', $supervisionIds);
             $zonesQuery->whereHas('supervisions', function ($q) use ($supervisionIds) {
                 $q->whereIn('id', $supervisionIds);
@@ -39,13 +39,11 @@ class CellController
 
         // --- SCOPED ACCESS FOR PASTORS AND SUPERVISORS ---
         if ($user->isPastorZona()) {
-            $zoneId = $user->getZoneId();
-            $cellsQuery->whereHas('supervision', function ($q) use ($zoneId) {
-                $q->where('zone_id', $zoneId);
+            $cellsQuery->whereHas('supervision', function ($q) use ($user) {
+                $q->whereIn('zone_id', $user->getManagedZoneIds());
             });
         } elseif ($user->isSupervisor()) {
-            $supervisionIds = $user->supervisedSupervisions()->pluck('id');
-            $cellsQuery->whereIn('supervision_id', $supervisionIds);
+            $cellsQuery->whereIn('supervision_id', $user->getManagedSupervisionIds());
         }
 
         // --- 1. FILTRO POR ZONA ---

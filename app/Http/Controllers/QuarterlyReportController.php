@@ -87,15 +87,16 @@ class QuarterlyReportController extends Controller
             $zones = Zone::with('supervisions')->get();
             $supervisions = Supervision::all();
         } elseif ($user->role === 'pastor_zona') {
-            $zones = Zone::where('pastor_id', $user->id)->with('supervisions')->get();
+            $zoneIds = $user->getManagedZoneIds();
+            $zones = Zone::whereIn('id', $zoneIds)->with('supervisions')->get();
             if ($zones->isNotEmpty()) {
-                $supervisions = Supervision::whereIn('zone_id', $zones->pluck('id'))->get();
+                $supervisions = Supervision::whereIn('zone_id', $zoneIds)->get();
             }
         } elseif ($user->role === 'supervisor') {
-            $userSupervisions = Supervision::where('supervisor_id', $user->id)->get();
-            if ($userSupervisions->isNotEmpty()) {
-                $supervisions = $userSupervisions;
-                $zones = Zone::whereIn('id', $userSupervisions->pluck('zone_id'))->get();
+            $supervisionIds = $user->getManagedSupervisionIds();
+            if ($supervisionIds->isNotEmpty()) {
+                $supervisions = Supervision::whereIn('id', $supervisionIds)->get();
+                $zones = Zone::whereIn('id', $supervisions->pluck('zone_id'))->get();
             }
         }
 
@@ -111,7 +112,7 @@ class QuarterlyReportController extends Controller
         $validated = $request->validate([
             'zone_id' => 'required|exists:zones,id',
             'supervision_id' => 'required|exists:supervisions,id',
-            'year' => 'required|integer|min:2020|max:2100',
+            'year' => 'required|integer|min:2000|max:2100',
             'quarter' => 'required|integer|min:1|max:4',
             'leaders_count' => 'required|integer|min:0',
             'cells_count' => 'required|integer|min:0',
@@ -128,13 +129,18 @@ class QuarterlyReportController extends Controller
             'disciplined_leaders_count' => 'required|integer|min:0',
             'closed_cells_count' => 'required|integer|min:0',
             'ministerial_observations' => 'nullable|string',
-            'discipleship_score' => 'required|integer|min:1|max:10',
-            'pastoral_score' => 'required|integer|min:1|max:10',
-            'cell_participation_score' => 'required|integer|min:1|max:10',
-            'service_participation_score' => 'required|integer|min:1|max:10',
-            'communion_in_cells_score' => 'required|integer|min:1|max:10',
-            'relationship_building_score' => 'required|integer|min:1|max:10',
-            'prayer_intercession_score' => 'required|integer|min:1|max:10',
+            'discipleship_score' => 'required|integer|min:0|max:3',
+            'evangelism_strategy' => 'required|integer|min:0|max:3',
+            'consolidation_growth' => 'required|integer|min:0|max:3',
+            'pastoral_score' => 'required|integer|min:0|max:3',
+            'visitation_routine' => 'required|integer|min:0|max:3',
+            'leader_support' => 'required|integer|min:0|max:3',
+            'cell_participation_score' => 'required|integer|min:0|max:3',
+            'service_participation_score' => 'required|integer|min:0|max:3',
+            'tadium_participation' => 'required|integer|min:0|max:3',
+            'communion_in_cells_score' => 'required|integer|min:0|max:3',
+            'relationship_building_score' => 'required|integer|min:0|max:3',
+            'prayer_intercession_score' => 'required|integer|min:0|max:3',
             'events' => 'nullable|array',
             'events.*.event_type_id' => 'required|exists:event_types,id',
             'events.*.count' => 'required|integer|min:0',
@@ -219,7 +225,7 @@ class QuarterlyReportController extends Controller
         $validated = $request->validate([
             'zone_id' => 'required|exists:zones,id',
             'supervision_id' => 'required|exists:supervisions,id',
-            'year' => 'required|integer|min:2020|max:2100',
+            'year' => 'required|integer|min:2000|max:2100',
             'quarter' => 'required|integer|min:1|max:4',
             'leaders_count' => 'required|integer|min:0',
             'cells_count' => 'required|integer|min:0',
@@ -236,13 +242,18 @@ class QuarterlyReportController extends Controller
             'disciplined_leaders_count' => 'required|integer|min:0',
             'closed_cells_count' => 'required|integer|min:0',
             'ministerial_observations' => 'nullable|string',
-            'discipleship_score' => 'required|integer|min:1|max:10',
-            'pastoral_score' => 'required|integer|min:1|max:10',
-            'cell_participation_score' => 'required|integer|min:1|max:10',
-            'service_participation_score' => 'required|integer|min:1|max:10',
-            'communion_in_cells_score' => 'required|integer|min:1|max:10',
-            'relationship_building_score' => 'required|integer|min:1|max:10',
-            'prayer_intercession_score' => 'required|integer|min:1|max:10',
+            'discipleship_score' => 'required|integer|min:0|max:3',
+            'evangelism_strategy' => 'required|integer|min:0|max:3',
+            'consolidation_growth' => 'required|integer|min:0|max:3',
+            'pastoral_score' => 'required|integer|min:0|max:3',
+            'visitation_routine' => 'required|integer|min:0|max:3',
+            'leader_support' => 'required|integer|min:0|max:3',
+            'cell_participation_score' => 'required|integer|min:0|max:3',
+            'service_participation_score' => 'required|integer|min:0|max:3',
+            'tadium_participation' => 'required|integer|min:0|max:3',
+            'communion_in_cells_score' => 'required|integer|min:0|max:3',
+            'relationship_building_score' => 'required|integer|min:0|max:3',
+            'prayer_intercession_score' => 'required|integer|min:0|max:3',
             'events' => 'nullable|array',
             'events.*.event_type_id' => 'required|exists:event_types,id',
             'events.*.count' => 'required|integer|min:0',

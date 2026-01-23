@@ -157,7 +157,7 @@
                                 <option value="">Nenhum (pode escolher depois)</option>
                                 @foreach($packages as $package)
                                     <option value="{{ $package->id }}" {{ old('package_id') == $package->id ? 'selected' : '' }}>
-                                        {{ $package->name }} - {{ number_format($package->amount, 2, ',', '.') }} MT
+                                        {{ $package->name }} - {{ number_format($package->min_amount, 2, ',', '.') }} MT
                                     </option>
                                 @endforeach
                             </select>

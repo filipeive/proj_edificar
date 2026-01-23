@@ -91,6 +91,7 @@
             </div>
 
             <!-- Lista de Alunos -->
+            @if(!auth()->user()->isSupervisor() || auth()->user()->isEnrolledInCourse($course->id))
             <div class="lg:col-span-2">
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                     <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/10">
@@ -333,6 +334,7 @@
                     </div>
                 </div>
             </div>
+            @endif
         </div>
     </div>
 
