@@ -7,7 +7,7 @@
 @section('content')
     <div class="space-y-8" x-data="{ activeTab: localStorage.getItem('cell_active_tab') || 'members' }" x-init="$watch('activeTab', value => localStorage.setItem('cell_active_tab', value))">
         <!-- Header & Stats Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <!-- Info Célula -->
             <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col justify-center">
                 <div class="flex items-center gap-2 text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] mb-3">
@@ -62,20 +62,20 @@
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <div class="lg:col-span-3 space-y-6">
                 <!-- Tab Navigation -->
-                <div class="flex items-center gap-4 bg-white p-2 rounded-[2rem] shadow-sm border border-gray-100 w-fit">
+                <div class="flex items-center gap-2 md:gap-4 bg-white p-1.5 md:p-2 rounded-2xl md:rounded-[2rem] shadow-sm border border-gray-100 w-full md:w-fit overflow-x-auto no-scrollbar">
                     <button @click="activeTab = 'members'"
                         :class="activeTab === 'members' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-gray-500 hover:bg-gray-50'"
-                        class="px-8 py-3 rounded-[1.5rem] text-sm font-black uppercase tracking-widest transition-all">
+                        class="px-4 md:px-8 py-2 md:py-3 rounded-xl md:rounded-[1.5rem] text-[10px] md:text-sm font-black uppercase tracking-widest transition-all whitespace-nowrap">
                         Membros
                     </button>
                     <button @click="activeTab = 'meetings'"
                         :class="activeTab === 'meetings' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-gray-500 hover:bg-gray-50'"
-                        class="px-8 py-3 rounded-[1.5rem] text-sm font-black uppercase tracking-widest transition-all">
+                        class="px-4 md:px-8 py-2 md:py-3 rounded-xl md:rounded-[1.5rem] text-[10px] md:text-sm font-black uppercase tracking-widest transition-all whitespace-nowrap">
                         Encontros
                     </button>
                     <button @click="activeTab = 'stats'"
                         :class="activeTab === 'stats' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-gray-500 hover:bg-gray-50'"
-                        class="px-8 py-3 rounded-[1.5rem] text-sm font-black uppercase tracking-widest transition-all">
+                        class="px-4 md:px-8 py-2 md:py-3 rounded-xl md:rounded-[1.5rem] text-[10px] md:text-sm font-black uppercase tracking-widest transition-all whitespace-nowrap">
                         Desempenho
                     </button>
                 </div>

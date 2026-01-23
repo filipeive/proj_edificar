@@ -5,11 +5,117 @@
 @section('page-subtitle', 'Tendências de Frequência e Crescimento')
 
 @section('content')
-    <div class="container-fluid">
-        <div class="mb-6">
-            <a href="{{ route('services.index') }}" class="text-gray-500 hover:text-gray-700 flex items-center">
-                <i class="bi bi-arrow-left mr-2"></i> Voltar para a lista
+    <div class="container-fluid space-y-8">
+        <div class="flex items-center justify-between">
+            <a href="{{ route('services.index') }}" class="px-6 py-2 bg-white border border-gray-200 rounded-xl text-gray-400 hover:text-gray-900 transition-all font-bold text-xs uppercase tracking-widest flex items-center gap-2 shadow-sm">
+                <i class="bi bi-arrow-left"></i> Voltar
             </a>
+            <div class="flex gap-2">
+                <!-- Dropdown de Exportação rápida can be added here -->
+            </div>
+        </div>
+
+        <!-- Filtros e Exportações -->
+        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-12">
+                <!-- Filtros de Visualização -->
+                <div class="space-y-6">
+                    <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                        <i class="bi bi-funnel-fill text-blue-600"></i> Filtros de Análise
+                    </h3>
+                    <form action="{{ route('services.report') }}" method="GET" class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase mb-2">Início</label>
+                                <input type="date" name="date_from" value="{{ request('date_from') }}"
+                                    class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase mb-2">Fim</label>
+                                <input type="date" name="date_to" value="{{ request('date_to') }}"
+                                    class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase mb-2">Tipo de Culto</label>
+                            <select name="service_type" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+                                <option value="">Todos os Tipos</option>
+                                <option value="1st" {{ request('service_type') == '1st' ? 'selected' : '' }}>1º Culto</option>
+                                <option value="2nd" {{ request('service_type') == '2nd' ? 'selected' : '' }}>2º Culto</option>
+                                <option value="3rd" {{ request('service_type') == '3rd' ? 'selected' : '' }}>3º Culto</option>
+                                <option value="4th" {{ request('service_type') == '4th' ? 'selected' : '' }}>4º Culto</option>
+                                <option value="special" {{ request('service_type') == 'special' ? 'selected' : '' }}>Especial</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full py-3 bg-gray-900 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-black transition-all">
+                            Atualizar Análise
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Exportação Mensal -->
+                <div class="space-y-6">
+                    <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                        <i class="bi bi-file-earmark-pdf text-orange-600"></i> Relatório Mensal (PDF)
+                    </h3>
+                    <form action="{{ route('services.export.monthly') }}" method="GET" class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase mb-2">Mês</label>
+                                <select name="month" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500">
+                                    @for($m=1; $m<=12; $m++)
+                                        <option value="{{ $m }}" {{ now()->month == $m ? 'selected' : '' }}>
+                                            {{ \Carbon\Carbon::create(null, $m)->translatedFormat('F') }}
+                                        </option>
+                                    @endfor
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase mb-2">Ano</label>
+                                <select name="year" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500">
+                                    @for($y=now()->year; $y>=2023; $y--)
+                                        <option value="{{ $y }}">{{ $y }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full py-3 bg-orange-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-700 transition-all flex items-center justify-center gap-2">
+                            <i class="bi bi-download"></i> Gerar Mensal
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Exportação Trimestral -->
+                <div class="space-y-6">
+                    <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                        <i class="bi bi-layers-half text-green-600"></i> Relatório Trimestral (PDF)
+                    </h3>
+                    <form action="{{ route('services.export.quarterly') }}" method="GET" class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase mb-2">Trimestre</label>
+                                <select name="quarter" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500">
+                                    <option value="1">1º Trimestre</option>
+                                    <option value="2">2º Trimestre</option>
+                                    <option value="3">3º Trimestre</option>
+                                    <option value="4">4º Trimestre</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase mb-2">Ano</label>
+                                <select name="year" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500">
+                                    @for($y=now()->year; $y>=2023; $y--)
+                                        <option value="{{ $y }}">{{ $y }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full py-3 bg-green-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-green-700 transition-all flex items-center justify-center gap-2">
+                            <i class="bi bi-download"></i> Gerar Trimestral
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -18,7 +124,7 @@
                 <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
                     <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-8 flex items-center gap-2">
                         <i class="bi bi-graph-up text-blue-600"></i>
-                        Tendência de Frequência (Últimos 12 Cultos)
+                        Tendência de Frequência
                     </h3>
                     <div class="aspect-[16/9] relative">
                         <canvas id="attendanceTrendChart"></canvas>
@@ -29,17 +135,22 @@
             <!-- Stats Rápidas -->
             <div class="lg:col-span-4 space-y-6">
                 <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
-                    <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-6">Métrica de Visitantes</h3>
-                    <div class="aspect-square relative">
+                    <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-6 text-center">Configuração de Público</h3>
+                    <div class="aspect-square relative flex items-center justify-center">
+                        <div class="absolute text-center z-10">
+                            <p class="text-[10px] font-black text-gray-400 uppercase leading-none">Total</p>
+                            <p class="text-3xl font-black text-gray-900 tracking-tighter">{{ $trendServices->sum(fn($s) => $s->adults_members + $s->children_members + $s->adults_visitors + $s->children_visitors) }}</p>
+                        </div>
                         <canvas id="visitorsChart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="mt-8 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-            <div class="p-8 border-b border-gray-50">
-                <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Resumo dos Últimos 12 Cultos</h3>
+        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-8 border-b border-gray-50 flex items-center justify-between">
+                <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Resumo Detalhado</h3>
+                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ count($trendServices) }} Cultos Analisados</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">

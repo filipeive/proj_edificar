@@ -3,7 +3,16 @@
 @section('title', 'Gestão de Pacotes - Portal Life Church')
 
 @section('content')
-    <div x-data="{ view: 'list' }">
+    <div x-data="{ 
+                        view: window.innerWidth < 768 ? 'grid' : 'list',
+                        updateView() {
+                            if (window.innerWidth < 768 && this.view === 'list') {
+                                this.view = 'grid';
+                            }
+                        }
+                    }"
+        x-init="$watch('view', value => localStorage.setItem('packages_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('packages_view') || 'list')"
+        @resize.window.debounce.500ms="updateView()">
         @section('header-actions')
             <a href="{{ route('packages.create') }}"
                 class="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">

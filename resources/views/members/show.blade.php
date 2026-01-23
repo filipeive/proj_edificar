@@ -9,13 +9,13 @@
         <!-- Header & Profile Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <!-- Profile Info -->
-            <div class="lg:col-span-2 bg-white rounded-[2rem] shadow-sm border border-gray-100 p-10 flex items-center gap-8">
-                <div class="w-32 h-32 rounded-[2.5rem] bg-blue-50 text-blue-600 flex items-center justify-center font-black text-5xl shadow-lg shadow-blue-50">
+            <div class="lg:col-span-2 bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6 md:p-10 flex flex-col md:flex-row items-center gap-6 md:gap-8">
+                <div class="w-24 h-24 md:w-32 md:h-32 rounded-[2rem] md:rounded-[2.5rem] bg-blue-50 text-blue-600 flex items-center justify-center font-black text-4xl md:text-5xl shadow-lg shadow-blue-50">
                     {{ strtoupper(substr($member->name, 0, 1)) }}
                 </div>
-                <div class="space-y-2">
-                    <div class="flex items-center gap-3">
-                        <h1 class="text-4xl font-black text-gray-900 tracking-tighter">{{ $member->name }}</h1>
+                <div class="space-y-2 text-center md:text-left">
+                    <div class="flex flex-col md:flex-row items-center gap-2 md:gap-3">
+                        <h1 class="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter">{{ $member->name }}</h1>
                         @if($member->is_active)
                             <span class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-black uppercase tracking-widest">Ativo</span>
                         @else
@@ -28,10 +28,10 @@
                             <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-100">Membro</span>
                         @endif
                     </div>
-                    <p class="text-gray-400 font-medium flex items-center gap-2">
+                    <p class="text-gray-400 font-medium flex items-center justify-center md:justify-start gap-2 text-sm">
                         <i class="bi bi-envelope-fill"></i> {{ $member->email }}
                     </p>
-                    <div class="flex gap-4 pt-2">
+                    <div class="flex justify-center md:justify-start gap-4 pt-2">
                         <div class="flex flex-col">
                             <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Membro desde</span>
                             <span class="text-sm font-bold text-gray-700">{{ $member->created_at->format('d/m/Y') }}</span>

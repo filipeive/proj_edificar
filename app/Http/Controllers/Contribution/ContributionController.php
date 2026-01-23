@@ -64,22 +64,54 @@ class ContributionController
                 case 'admin':
                 case 'comissao_obra':
                     break;
+                case 'responsavel_pacote':
+                    $packageIds = $user->managedPackages->pluck('id');
+                    $contributions->whereIn('package_id', $packageIds);
+                    break;
                 default:
                     $contributions->where('user_id', $user->id);
                     break;
             }
         }
 
+        // Filtros Adicionais
+        if ($request->filled('search')) {
+            $search = $request->query('search');
+            $contributions->whereHas('user', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('status')) {
+            $contributions->where('status', $request->query('status'));
+        }
+
+        if ($request->filled('package_id')) {
+            $contributions->where('package_id', $request->query('package_id'));
+        }
+
+        if ($request->filled('date_from')) {
+            $contributions->where('contribution_date', '>=', $request->query('date_from'));
+        }
+
+        if ($request->filled('date_to')) {
+            $contributions->where('contribution_date', '<=', $request->query('date_to'));
+        }
+
         $contributions = $contributions
             ->orderBy('contribution_date', 'desc')
-            ->paginate(10);
+            ->paginate(15);
 
         $pageTitle = $this->getPageTitle($user->role, $isMine);
+
+        $packages = CommitmentPackage::where('is_active', true)->orderBy('order')->get();
 
         return view('contributions.index', [
             'contributions' => $contributions,
             'pageTitle' => $pageTitle,
             'showUserColumn' => !$isMine && $user->role !== 'membro',
+            'packages' => $packages,
+            'filters' => $request->all(),
         ]);
     }
 
@@ -94,6 +126,7 @@ class ContributionController
             'pastor_zona' => 'Contribuições da Zona',
             'supervisor' => 'Contribuições da Supervisão',
             'lider_celula' => 'Contribuições da Célula',
+            'responsavel_pacote' => 'Contribuições dos Meus Pacotes',
             default => 'Histórico de Contribuições',
         };
     }
@@ -123,7 +156,19 @@ class ContributionController
             } else {
                 $members = collect();
             }
-        } elseif ($user->role === 'admin' || $user->role === 'comissao_obra' || $user->role === 'responsavel_pacote') {
+        } elseif ($user->role === 'responsavel_pacote') {
+            $packageIds = $user->managedPackages->pluck('id');
+            $members = User::whereHas('commitments', function ($query) use ($packageIds) {
+                $query->whereIn('package_id', $packageIds)
+                    ->where('start_date', '<=', now())
+                    ->where(function ($q) {
+                        $q->whereNull('end_date')->orWhere('end_date', '>', now());
+                    });
+            })
+                ->where('is_active', true)
+                ->orderBy('name')
+                ->get();
+        } elseif ($user->role === 'admin' || $user->role === 'comissao_obra') {
             $members = User::where('is_active', true)
                 ->whereIn('role', ['membro', 'lider_celula', 'supervisor', 'pastor_zona', 'pastor_senior', 'responsavel_pacote'])
                 ->orderBy('name')
@@ -150,16 +195,29 @@ class ContributionController
             $currentPackage = (object) ['name' => 'Nenhum', 'min_amount' => 0, 'max_amount' => 0, 'committed_amount' => 0];
         }
 
-        $packages = CommitmentPackage::where('is_active', true)->orderBy('order')->get();
+        if ($user->role === 'responsavel_pacote') {
+            $packages = $user->managedPackages()->where('is_active', true)->orderBy('order')->get();
+
+            // Se o usuário tiver um pacote atual que não está na lista gerenciada, adicioná-lo para que ele possa selecioná-lo
+            if (isset($currentPackage) && $currentPackage->id && !$packages->contains('id', $currentPackage->id)) {
+                $packages->push($currentPackage);
+            }
+        } else {
+            $packages = CommitmentPackage::where('is_active', true)->orderBy('order')->get();
+        }
 
         // 3. Variável de Controle para alternar membro na view
         $canRegisterForOthers = in_array($user->role, ['lider_celula', 'supervisor', 'pastor_zona', 'admin', 'comissao_obra', 'responsavel_pacote']);
+
+        // IDs dos pacotes gerenciados para filtro via JS
+        $managedPackageIds = ($user->role === 'responsavel_pacote') ? $user->managedPackages->pluck('id')->toArray() : [];
 
         return view('contributions.create', [
             'members' => $members,
             'currentUser' => $user,
             'currentPackage' => $currentPackage,
             'packages' => $packages,
+            'managedPackageIds' => $managedPackageIds,
             'canRegisterForOthers' => $canRegisterForOthers,
             'preselectedUserId' => $request->query('user_id'),
             'preselectedPackageId' => $request->query('package_id'),
@@ -221,6 +279,7 @@ class ContributionController
             'user_id' => 'required|exists:users,id',
             'amount' => 'required|numeric|min:0.01',
             'contribution_date' => 'required|date|before_or_equal:today',
+            'package_id' => 'nullable|exists:commitment_packages,id',
             'proof_path' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
 
@@ -245,9 +304,9 @@ class ContributionController
             'zone_id' => $cell->supervision->zone_id, // Assume que supervisão tem zone_id
             'amount' => $validated['amount'],
             'contribution_date' => $validated['contribution_date'],
+            'package_id' => $validated['package_id'] ?? null,
             'proof_path' => $proofPath,
             'status' => 'pendente',
-            'registered_by_id' => auth()->id(),
         ]);
 
         // ----------------------------------------------------
@@ -272,6 +331,14 @@ class ContributionController
         // 3. Notificar o usuário final (se ele mesmo não registrou)
         if ($targetUser->id !== $user->id) {
             $targetUser->notify(new ContributionCreatedNotification($contribution));
+        }
+
+        // 4. Notificar a Comissão da Obra (se registrado por um Responsável de Pacote)
+        if ($user->role === 'responsavel_pacote') {
+            $commissionMembers = User::where('role', 'comissao_obra')->get();
+            foreach ($commissionMembers as $member) {
+                $member->notify(new ContributionCreatedNotification($contribution));
+            }
         }
         // ----------------------------------------------------
 
@@ -381,6 +448,36 @@ class ContributionController
             ->orderBy('created_at', 'desc')
             ->paginate(15);
         return view('admin.contributions.pending', ['contributions' => $contributions]);
+    }
+
+    public function notifyCommission(Request $request, CommitmentPackage $package)
+    {
+        $user = auth()->user();
+        if ($user->role !== 'responsavel_pacote' && $user->role !== 'admin') {
+            abort(403);
+        }
+
+        $pendingCount = $package->contributions()->where('status', 'pendente')->count();
+
+        if ($pendingCount === 0) {
+            return back()->with('info', 'Não existem contribuições pendentes para notificar.');
+        }
+
+        $commissionMembers = User::where('role', 'comissao_obra')->get();
+        $smsService = app(\App\Services\Sms\SmsService::class);
+        $message = "PROJETO EDIFICAR: Olá, o responsável do pacote {$package->name} acabou de registar contribuições. Por favor, aceda ao sistema para validar {$pendingCount} registos pendentes.";
+
+        foreach ($commissionMembers as $member) {
+            // Notificação Interna
+            $member->notify(new \App\Notifications\PendingContributionsNotification($pendingCount, $package->name));
+
+            // SMS
+            if ($member->phone) {
+                $smsService->send($member->phone, $message);
+            }
+        }
+
+        return back()->with('success', 'A Comissão da Obra foi notificada com sucesso!');
     }
 
     private function validateContributionPermission($user, $targetUser)

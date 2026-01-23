@@ -4,6 +4,19 @@
 @section('page-title', 'Calendário de Casamentos')
 @section('page-subtitle', 'Gestão de casamentos e eventos matrimoniais')
 
+@section('header-actions')
+    <div class="flex items-center gap-2">
+        <a href="{{ route('weddings.pdf', ['year' => now()->year]) }}" target="_blank"
+            class="bg-white text-gray-400 p-2 rounded-lg hover:text-orange-600 hover:border-orange-200 transition-all border border-gray-200 shadow-sm flex items-center justify-center">
+            <i class="bi bi-file-earmark-pdf-fill text-xl"></i>
+        </a>
+        <a href="{{ route('weddings.create') }}"
+            class="bg-gray-900 text-white p-2 rounded-lg hover:bg-black transition-all flex items-center justify-center shadow-lg shadow-gray-900/20">
+            <i class="bi bi-plus-lg text-xl"></i>
+        </a>
+    </div>
+@endsection
+
 @section('content')
     <style>
         [x-cloak] {
@@ -11,17 +24,18 @@
         }
     </style>
     <div class="container-fluid" x-data="{ 
-                                                        view: window.innerWidth < 768 ? 'grid' : 'grid',
-                                                        updateView() {
-                                                            if (window.innerWidth < 768 && this.view === 'list') {
-                                                                this.view = 'grid'; 
+                                                            view: window.innerWidth < 768 ? 'grid' : 'grid',
+                                                            updateView() {
+                                                                if (window.innerWidth < 768 && this.view === 'list') {
+                                                                    this.view = 'grid'; 
+                                                                }
                                                             }
-                                                        }
-                                                    }"
+                                                        }"
         x-init="$watch('view', value => { if(value !== 'calendar') localStorage.setItem('weddings_view', value) }); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('weddings_view') || 'grid')"
         @resize.window.debounce.500ms="updateView()" x-cloak>
         <!-- Header Section -->
-        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-6">
+        <div
+            class="flex flex-col md:flex-row justify-between items-center mb-8 gap-6 bg-white p-4 md:p-0 rounded-2xl md:rounded-none shadow-sm md:shadow-none border border-gray-100 md:border-none">
             <div>
                 <h2 class="text-4xl font-black text-gray-900 tracking-tighter uppercase leading-none">
                     <span
@@ -39,7 +53,7 @@
                 @endif
 
                 <!-- View Toggle -->
-                <div class="bg-gray-100 p-1 rounded-xl flex items-center">
+                <div class="hidden md:flex bg-gray-100 p-1 rounded-xl items-center">
                     <button @click="view = 'list'"
                         :class="view === 'list' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
                         class="px-4 py-2 rounded-lg text-sm font-bold transition-all duration-300">
@@ -58,13 +72,13 @@
                 </div>
 
                 <a href="{{ route('weddings.pdf', ['year' => now()->year]) }}" target="_blank"
-                    class="flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-gray-200 text-gray-400 hover:text-orange-600 hover:border-orange-200 transition-all duration-300 shadow-sm"
+                    class="hidden md:flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-gray-200 text-gray-400 hover:text-orange-600 hover:border-orange-200 transition-all duration-300 shadow-sm"
                     title="Exportar PDF do Ano">
                     <i class="bi bi-file-earmark-pdf-fill text-lg"></i>
                 </a>
 
                 <a href="{{ route('weddings.create') }}"
-                    class="flex items-center px-6 py-2 bg-gray-900 hover:bg-black text-white rounded-xl font-bold text-sm transition-all duration-300 shadow-lg shadow-gray-900/20">
+                    class="hidden md:flex items-center px-6 py-2 bg-gray-900 hover:bg-black text-white rounded-xl font-bold text-sm transition-all duration-300 shadow-lg shadow-gray-900/20">
                     <i class="bi bi-plus-lg mr-2"></i> Novo Agendamento
                 </a>
             </div>
@@ -625,51 +639,51 @@
             };
 
             let tooltipContent = `
-        <div class="tooltip-header">
-            <i class="bi bi-heart-fill"></i>
-            <span>${event.title}</span>
-        </div>
-        <div class="tooltip-row">
-            <i class="bi bi-calendar-event"></i>
-            <span>${event.start.toLocaleDateString('pt-BR', {
+            <div class="tooltip-header">
+                <i class="bi bi-heart-fill"></i>
+                <span>${event.title}</span>
+            </div>
+            <div class="tooltip-row">
+                <i class="bi bi-calendar-event"></i>
+                <span>${event.start.toLocaleDateString('pt-BR', {
                 weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
             })}</span>
-        </div>
-        `;
+            </div>
+            `;
 
             if (props.time) {
                 tooltipContent += `
-        <div class="tooltip-row">
-            <i class="bi bi-clock-fill"></i>
-            <span>${props.time}</span>
-        </div>
-        `;
+            <div class="tooltip-row">
+                <i class="bi bi-clock-fill"></i>
+                <span>${props.time}</span>
+            </div>
+            `;
             }
 
             if (props.location) {
                 tooltipContent += `
-        <div class="tooltip-row">
-            <i class="bi bi-geo-alt-fill"></i>
-            <span>${props.location}</span>
-        </div>
-        `;
+            <div class="tooltip-row">
+                <i class="bi bi-geo-alt-fill"></i>
+                <span>${props.location}</span>
+            </div>
+            `;
             }
 
             if (props.godparents) {
                 tooltipContent += `
-        <div class="tooltip-row">
-            <i class="bi bi-people-fill"></i>
-            <span>Padrinhos: ${props.godparents.substring(0, 50)}${props.godparents.length > 50 ? '...' : ''}</span>
-        </div>
-        `;
+            <div class="tooltip-row">
+                <i class="bi bi-people-fill"></i>
+                <span>Padrinhos: ${props.godparents.substring(0, 50)}${props.godparents.length > 50 ? '...' : ''}</span>
+            </div>
+            `;
             }
 
             if (props.status) {
                 tooltipContent += `
-        <div class="tooltip-status status-${props.status}">
-            ${statusLabels[props.status] || props.status}
-        </div>
-        `;
+            <div class="tooltip-status status-${props.status}">
+                ${statusLabels[props.status] || props.status}
+            </div>
+            `;
             }
 
             tooltip.innerHTML = tooltipContent;
@@ -805,7 +819,7 @@
                         checkboxes.forEach(cb => cb.checked = e.target.checked);
                         updateBulkBtn();
                     }
-                    
+
                     if (e.target.classList.contains('wedding-checkbox')) {
                         updateBulkBtn();
                     }
@@ -834,6 +848,6 @@
                     })
                 }
             @endif
-        });
+            });
     </script>
 @endsection

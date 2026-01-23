@@ -11,18 +11,18 @@
             <a href="{{ route('visitors.index') }}" class="text-gray-600 hover:text-gray-900 font-bold flex items-center">
                 <i class="bi bi-arrow-left mr-2"></i>Voltar
             </a>
-            <div class="flex gap-3">
+            <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto mt-4 sm:mt-0">
                 @if($visitor->isPending())
-                    <form method="POST" action="{{ route('visitors.mark-contacted', $visitor) }}" class="inline">
+                    <form method="POST" action="{{ route('visitors.mark-contacted', $visitor) }}" class="w-full sm:w-auto">
                         @csrf
                         <button type="submit"
-                            class="px-6 py-3 bg-blue-600 text-white rounded-xl font-bold text-sm hover:bg-blue-700 transition-all">
-                            <i class="bi bi-telephone-fill mr-2"></i>Marcar como Contatado
+                            class="w-full px-6 py-3 bg-blue-600 text-white rounded-xl font-bold text-sm hover:bg-blue-700 transition-all flex items-center justify-center">
+                            <i class="bi bi-telephone-fill mr-2"></i>Marcar Contatado
                         </button>
                     </form>
                 @endif
                 <a href="{{ route('visitors.edit', $visitor) }}"
-                    class="px-6 py-3 bg-orange-600 text-white rounded-xl font-bold text-sm hover:bg-orange-700 transition-all">
+                    class="w-full sm:w-auto px-6 py-3 bg-orange-600 text-white rounded-xl font-bold text-sm hover:bg-orange-700 transition-all flex items-center justify-center">
                     <i class="bi bi-pencil-fill mr-2"></i>Editar
                 </a>
             </div>
@@ -38,7 +38,7 @@
                         Dados Pessoais
                     </h3>
 
-                    <div class="grid grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Nome Completo</p>
                             <p class="text-lg font-bold text-gray-900">{{ $visitor->name }}</p>
@@ -83,7 +83,7 @@
                         Contato e Localização
                     </h3>
 
-                    <div class="grid grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Telefone</p>
                             <p class="text-lg font-bold text-gray-900">

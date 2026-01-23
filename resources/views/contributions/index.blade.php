@@ -3,9 +3,29 @@
 @section('title', $pageTitle . ' - Portal Life Church') 
 
 @section('content')
-    <div class="space-y-8">
+@section('header-actions')
+    @if (in_array(auth()->user()->role, ['membro', 'lider_celula', 'supervisor', 'pastor_zona', 'admin']))
+        <a href="{{ route('contributions.create') }}"
+            class="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
+            <i class="bi bi-plus-circle-fill text-xl"></i>
+        </a>
+    @endif
+@endsection
+
+@section('content')
+    <div class="space-y-8" 
+        x-data="{ 
+            view: window.innerWidth < 768 ? 'grid' : 'list',
+            updateView() {
+                if (window.innerWidth < 768 && this.view === 'list') {
+                    this.view = 'grid';
+                }
+            }
+        }"
+        x-init="$watch('view', value => localStorage.setItem('contributions_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('contributions_view') || 'list')"
+        @resize.window.debounce.500ms="updateView()">
         <!-- Actions & Filter Header -->
-        <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="bg-white p-4 md:p-8 rounded-2xl md:rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
             <div class="space-y-1 text-center md:text-left">
                 <div class="flex items-center justify-center md:justify-start gap-2 text-xs font-bold text-blue-600 uppercase tracking-widest mb-1">
                     <i class="bi bi-piggy-bank"></i>
@@ -15,10 +35,22 @@
                 <p class="text-gray-500 font-medium">Histórico consolidado de contribuições e ofertas</p>
             </div>
 
-            <div class="flex gap-4">
+            <div class="flex items-center gap-4">
+                <div class="hidden md:flex bg-gray-100 p-1 rounded-xl items-center">
+                    <button @click="view = 'list'"
+                        :class="view === 'list' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-900'"
+                        class="px-4 py-2 rounded-lg text-sm font-bold transition-all duration-300">
+                        <i class="bi bi-list-ul mr-2"></i> Lista
+                    </button>
+                    <button @click="view = 'grid'"
+                        :class="view === 'grid' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-900'"
+                        class="px-4 py-2 rounded-lg text-sm font-bold transition-all duration-300">
+                        <i class="bi bi-grid-fill mr-2"></i> Grid
+                    </button>
+                </div>
                 @if (in_array(auth()->user()->role, ['membro', 'lider_celula', 'supervisor', 'pastor_zona', 'admin']))
                     <a href="{{ route('contributions.create') }}"
-                        class="px-8 py-4 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 hover:shadow-blue-200 transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-blue-100">
+                        class="hidden md:flex px-8 py-4 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 hover:shadow-blue-200 transition-all font-black text-xs uppercase tracking-widest items-center justify-center gap-2 shadow-lg shadow-blue-100">
                         <i class="bi bi-plus-lg text-lg"></i>
                         Nova Oferta
                     </a>
@@ -26,8 +58,54 @@
             </div>
         </div>
 
-        <!-- Contributions Table Container -->
-        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+        <!-- Filters & Search -->
+        <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100">
+            <form action="{{ route('contributions.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                @if(request()->filled('mine'))
+                    <input type="hidden" name="mine" value="1">
+                @endif
+                
+                <div class="space-y-1">
+                    <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 px-2">Pesquisar Membro</label>
+                    <div class="relative">
+                        <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Nome do membro..." 
+                            class="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500 transition-all">
+                    </div>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 px-2">Estado</label>
+                    <select name="status" class="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500 transition-all">
+                        <option value="">Todos Estados</option>
+                        <option value="pendente" {{ request('status') === 'pendente' ? 'selected' : '' }}>Pendente</option>
+                        <option value="verificada" {{ request('status') === 'verificada' ? 'selected' : '' }}>Verificada</option>
+                        <option value="rejeitada" {{ request('status') === 'rejeitada' ? 'selected' : '' }}>Rejeitada</option>
+                    </select>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 px-2">Pacote</label>
+                    <select name="package_id" class="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500 transition-all">
+                        <option value="">Todos Pacotes</option>
+                        @foreach($packages as $package)
+                            <option value="{{ $package->id }}" {{ request('package_id') == $package->id ? 'selected' : '' }}>{{ $package->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="flex gap-2">
+                    <button type="submit" class="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">Filtrar</button>
+                    <a href="{{ route('contributions.index', request()->only('mine')) }}" class="p-3 bg-gray-50 text-gray-400 rounded-2xl hover:bg-gray-100 transition-all">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <div x-show="view === 'list'" x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
+            class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
             <div class="p-8 border-b border-gray-50 bg-gray-50/30 flex items-center justify-between">
                 <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Listagem de Movimentações</h3>
                 <div class="flex items-center gap-2">
@@ -107,13 +185,36 @@
                                             class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all">
                                             <i class="bi bi-eye-fill"></i>
                                         </a>
-                                        @if ($contribution->status === 'pendente' && auth()->id() === $contribution->user_id)
-                                            <a href="{{ route('contributions.edit', $contribution) }}"
-                                                class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-orange-500 hover:text-white flex items-center justify-center transition-all">
-                                                <i class="bi bi-pencil-square"></i>
-                                            </a>
+                                        @if ($contribution->status === 'pendente')
+                                            @if(auth()->user()->isComissaoObra() || auth()->user()->isAdmin())
+                                                <form action="{{ route('contributions.verify', $contribution) }}" method="POST" onsubmit="return confirm('Confirmar verificação desta contribuição?');">
+                                                    @csrf
+                                                    <button type="submit" class="w-10 h-10 rounded-xl bg-green-50 text-green-600 hover:bg-green-600 hover:text-white flex items-center justify-center transition-all">
+                                                        <i class="bi bi-check-lg"></i>
+                                                    </button>
+                                                </form>
+                                                <button onclick="document.getElementById('reject-form-{{ $contribution->id }}').classList.toggle('hidden')" 
+                                                    class="w-10 h-10 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all">
+                                                    <i class="bi bi-x-lg"></i>
+                                                </button>
+                                            @elseif(auth()->id() === $contribution->user_id)
+                                                <a href="{{ route('contributions.edit', $contribution) }}"
+                                                    class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-orange-500 hover:text-white flex items-center justify-center transition-all">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </a>
+                                            @endif
                                         @endif
                                     </div>
+                                    @if(auth()->user()->isComissaoObra() || auth()->user()->isAdmin())
+                                    <div id="reject-form-{{ $contribution->id }}" class="hidden mt-2 p-4 bg-gray-50 rounded-2xl border border-gray-100 text-left">
+                                        <form action="{{ route('contributions.reject', $contribution) }}" method="POST">
+                                            @csrf
+                                            <label class="text-[10px] font-black uppercase text-gray-400 block mb-2">Motivo da Rejeição</label>
+                                            <textarea name="notes" required class="w-full p-3 rounded-xl border-gray-200 text-sm mb-2" placeholder="Descreva o motivo..."></textarea>
+                                            <button type="submit" class="w-full py-2 bg-red-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest">Rejeitar Agora</button>
+                                        </form>
+                                    </div>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
@@ -132,13 +233,78 @@
                     </tbody>
                 </table>
             </div>
-
-            <!-- Custom Pagination -->
-            @if($contributions->hasPages())
-                <div class="p-8 bg-gray-50/50 border-t border-gray-50">
-                    {{ $contributions->appends(request()->query())->links() }}
-                </div>
-            @endif
         </div>
+
+        <!-- Grid View -->
+        <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            @foreach($contributions as $contribution)
+                <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 relative">
+                    <div class="absolute top-6 right-6">
+                        @if ($contribution->status === 'verificada')
+                            <span class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-green-100">Validado</span>
+                        @elseif($contribution->status === 'pendente')
+                            <span class="px-3 py-1 bg-yellow-50 text-yellow-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-yellow-100 animate-pulse">Pendente</span>
+                        @else
+                            <span class="px-3 py-1 bg-red-50 text-red-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-red-100">Rejeitado</span>
+                        @endif
+                    </div>
+
+                    <div class="w-14 h-14 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center font-black text-2xl group-hover:bg-green-600 group-hover:text-white transition-all duration-500 mb-6">
+                        <i class="bi bi-piggy-bank"></i>
+                    </div>
+
+                    <div class="mb-4">
+                        <h4 class="text-xl font-black text-green-600 tracking-tighter mb-1">
+                            {{ number_format($contribution->amount, 0, ',', '.') }} MT
+                        </h4>
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $contribution->contribution_date->format('d/m/Y') }}</p>
+                    </div>
+
+                    <div class="space-y-3 mb-6 flex-1 bg-gray-50 p-4 rounded-2xl">
+                        @if (isset($showUserColumn) && $showUserColumn)
+                            <div class="flex flex-col border-b border-gray-100 pb-2">
+                                <span class="text-[9px] font-black uppercase text-gray-400">Membro</span>
+                                <span class="text-xs font-bold text-gray-700 truncate">{{ $contribution->user->name }}</span>
+                            </div>
+                        @endif
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-black uppercase text-gray-400">Referência</span>
+                            <span class="text-xs font-mono text-gray-600">#{{ str_pad($contribution->id, 6, '0', STR_PAD_LEFT) }}</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 pt-4 border-t border-gray-50">
+                        <a href="{{ route('contributions.show', $contribution) }}"
+                            class="flex-1 bg-gray-900 text-white text-center py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 transition-all flex items-center justify-center gap-2">
+                            <i class="bi bi-eye"></i> Detalhes
+                        </a>
+                        @if ($contribution->status === 'pendente')
+                            @if(auth()->user()->isComissaoObra() || auth()->user()->isAdmin())
+                                <form action="{{ route('contributions.verify', $contribution) }}" method="POST" onsubmit="return confirm('Confirmar verificação desta contribuição?');">
+                                    @csrf
+                                    <button type="submit" class="w-10 h-10 bg-green-50 text-green-600 flex items-center justify-center rounded-xl hover:bg-green-600 hover:text-white transition-all">
+                                        <i class="bi bi-check-lg"></i>
+                                    </button>
+                                </form>
+                            @elseif(auth()->id() === $contribution->user_id)
+                                <a href="{{ route('contributions.edit', $contribution) }}"
+                                    class="w-10 h-10 bg-gray-50 text-gray-400 flex items-center justify-center rounded-xl hover:bg-orange-500 hover:text-white transition-all">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            @endif
+                        @endif
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
+        <!-- Custom Pagination -->
+        @if($contributions->hasPages())
+            <div class="pt-4">
+                {{ $contributions->appends(request()->query())->links() }}
+            </div>
+        @endif
     </div>
 @endsection

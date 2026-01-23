@@ -13,7 +13,7 @@ class DashboardController
         return match ($user->role) {
             'admin' => redirect()->route('dashboard.admin'),
             'pastor_senior', 'comissao_obra' => redirect()->route('edificar.dashboard'),
-            'responsavel_pacote' => redirect()->route('packages.index'),
+            'responsavel_pacote' => redirect()->route('packages.dashboard'),
             'pastor_zona' => redirect()->route('dashboard.pastor'),
             'supervisor' => redirect()->route('dashboard.supervisor'),
             'lider_celula' => redirect()->route('dashboard.lider'),

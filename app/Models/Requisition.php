@@ -14,6 +14,7 @@ class Requisition extends Model
         'amount',
         'description',
         'category',
+        'scope',
         'status',
         'approver_id',
         'proof_file',

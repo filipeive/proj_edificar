@@ -16,6 +16,11 @@ class ExpenseController extends Controller
         return view('admin.expenses.index', compact('expenses', 'totalExpenses'));
     }
 
+    public function create(): View
+    {
+        return view('admin.expenses.create');
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -23,6 +28,7 @@ class ExpenseController extends Controller
             'amount' => 'required|numeric|min:0.01',
             'date' => 'required|date',
             'category' => 'required|string',
+            'scope' => 'required|in:eclesiastico,edificar',
         ]);
 
         Expense::create([
@@ -31,8 +37,35 @@ class ExpenseController extends Controller
             'description' => $validated['description'],
             'date' => $validated['date'],
             'category' => $validated['category'],
+            'scope' => $validated['scope'],
         ]);
 
-        return back()->with('success', 'Despesa registada com sucesso!');
+        return redirect()->route('expenses.index')->with('success', 'Despesa registada com sucesso!');
+    }
+
+    public function edit(Expense $expense): View
+    {
+        return view('admin.expenses.edit', compact('expense'));
+    }
+
+    public function update(Request $request, Expense $expense)
+    {
+        $validated = $request->validate([
+            'description' => 'required|string',
+            'amount' => 'required|numeric|min:0.01',
+            'date' => 'required|date',
+            'category' => 'required|string',
+            'scope' => 'required|in:eclesiastico,edificar',
+        ]);
+
+        $expense->update($validated);
+
+        return redirect()->route('expenses.index')->with('success', 'Despesa atualizada com sucesso!');
+    }
+
+    public function destroy(Expense $expense)
+    {
+        $expense->delete();
+        return redirect()->route('expenses.index')->with('success', 'Despesa removida com sucesso!');
     }
 }

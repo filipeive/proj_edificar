@@ -33,28 +33,72 @@
                     <i class="bi bi-people text-3xl"></i>
                 </div>
                 <div>
-                    <p class="text-xs font-black uppercase tracking-widest text-blue-100">Compromissos Ativos</p>
-                    <h3 class="text-2xl font-black">{{ $pacotes->sum('membros') }} Membros</h3>
+                    <p class="text-xs font-black uppercase tracking-widest text-blue-100">Compromissos</p>
+                    <h3 class="text-2xl font-black">{{ $pacotes->sum('membros') }} Membros Ativos</h3>
                 </div>
             </div>
         </div>
 
-        <!-- Charts and Table -->
+        <!-- Quick Actions -->
+        @if($authUser->isComissaoObra() || $authUser->isAdmin())
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <a href="{{ route('contributions.create') }}"
+                    class="bg-white p-6 rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all group">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all">
+                        <i class="bi bi-plus-lg text-xl"></i>
+                    </div>
+                    <span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Registrar</span>
+                </a>
+
+                <a href="{{ route('contributions.index', ['status' => 'pendente']) }}"
+                    class="bg-white p-6 rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all group">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-yellow-50 text-yellow-600 flex items-center justify-center group-hover:bg-yellow-600 group-hover:text-white transition-all">
+                        <i class="bi bi-patch-check text-xl"></i>
+                    </div>
+                    <span class="text-[10px] font-black text-gray-900 uppercase tracking-widest text-center">Validar
+                        Pendentes</span>
+                </a>
+
+                <a href="{{ route('reports.global') }}"
+                    class="bg-white p-6 rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all group">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-all">
+                        <i class="bi bi-bar-chart-line text-xl"></i>
+                    </div>
+                    <span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Relatório Global</span>
+                </a>
+
+                <a href="{{ route('dashboard.admin') }}"
+                    class="bg-white p-6 rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all group opacity-75 hover:opacity-100">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-gray-50 text-gray-600 flex items-center justify-center group-hover:bg-gray-600 group-hover:text-white transition-all">
+                        <i class="bi bi-arrow-left text-xl"></i>
+                    </div>
+                    <span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Voltar Admin</span>
+                </a>
+            </div>
+        @endif
+
+        <!-- Main Charts: Evolution & Packages -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- Evolution Chart -->
             <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
                 <h3 class="text-lg font-black text-gray-800 mb-6 flex items-center gap-2">
                     <i class="bi bi-activity text-blue-600"></i> Evolução Mensal
                 </h3>
-                <canvas id="evolutionChart" height="250"></canvas>
+                <div class="relative h-[300px]">
+                    <canvas id="evolutionChart"></canvas>
+                </div>
             </div>
 
             <!-- Pacotes Performance -->
-            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
+            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 relative overflow-hidden">
                 <h3 class="text-lg font-black text-gray-800 mb-6 flex items-center gap-2">
                     <i class="bi bi-box-seam text-blue-600"></i> Desempenho por Pacote
                 </h3>
-                <div class="space-y-6">
+                <div class="space-y-6 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                     @foreach($pacotes as $pacote)
                         <div class="space-y-2">
                             <div class="flex justify-between items-end">
@@ -75,10 +119,59 @@
                 </div>
             </div>
         </div>
+
+        <!-- Secondary Stats: Zones & Cells (New Section) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Zone Chart -->
+            <div class="lg:col-span-2 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
+                <div class="flex items-center justify-between mb-8">
+                    <h3 class="text-lg font-black text-gray-800 flex items-center gap-2">
+                        <i class="bi bi-geo-alt text-orange-500"></i> Contribuições por Zona
+                    </h3>
+                    <div class="flex space-x-2">
+                        <span
+                            class="px-3 py-1 bg-orange-50 text-orange-600 rounded-lg text-xs font-bold uppercase tracking-widest">Este
+                            Ano</span>
+                    </div>
+                </div>
+                <div class="h-[300px] relative">
+                    <canvas id="zoneChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Top Cells -->
+            <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
+                <h3 class="text-lg font-black text-gray-800 mb-8 flex items-center gap-2">
+                    <i class="bi bi-trophy text-yellow-500"></i> Top Células (Edificar)
+                </h3>
+                <div class="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                    @forelse($topCells as $index => $cell)
+                        <div
+                            class="flex items-center p-4 bg-gray-50 rounded-2xl hover:bg-white hover:shadow-lg transition-all duration-300 border border-transparent hover:border-gray-100 group">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-white flex items-center justify-center font-black text-gray-400 mr-3 group-hover:bg-yellow-500 group-hover:text-white transition-colors text-xs">
+                                {{ $index + 1 }}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="font-bold text-gray-900 text-sm truncate">{{ $cell['name'] }}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-black text-green-600 tracking-tight text-sm">
+                                    {{ number_format($cell['total'], 0, ',', '.') }} MT
+                                </p>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="text-center text-gray-400 text-xs py-4">Nenhum dado disponível.</p>
+                    @endforelse
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Evolution Chart
             const ctx = document.getElementById('evolutionChart').getContext('2d');
             new Chart(ctx, {
                 type: 'line',
@@ -100,20 +193,57 @@
                 },
                 options: {
                     responsive: true,
-                    plugins: {
-                        legend: { display: false }
-                    },
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { display: false }
-                        },
-                        x: {
-                            grid: { display: false }
-                        }
+                        y: { beginAtZero: true, grid: { display: false } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Zone Chart (New)
+            const zoneCtx = document.getElementById('zoneChart').getContext('2d');
+            new Chart(zoneCtx, {
+                type: 'bar',
+                data: {
+                    labels: @json($zoneStats->pluck('name')),
+                    datasets: [{
+                        label: 'Total Arrecadado (MT)',
+                        data: @json($zoneStats->pluck('total')),
+                        backgroundColor: 'rgba(249, 115, 22, 0.8)',
+                        borderRadius: 8,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { drawBorder: false, color: 'rgba(0, 0, 0, 0.05)' } },
+                        x: { grid: { display: false } }
                     }
                 }
             });
         });
     </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+    </style>
 @endsection

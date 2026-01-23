@@ -272,6 +272,14 @@
             box-shadow: 0 10px 25px var(--shadow);
         }
 
+        @media (max-width: 640px) {
+            .notifications-panel {
+                right: -80px;
+                /* Adjust to center more on mobile */
+                width: calc(100vw - 1rem);
+            }
+        }
+
         /* Theme Toggle Switch */
         .theme-switch {
             position: relative;
@@ -662,7 +670,7 @@
             </header>
 
             <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
-                <div class="px-4 md:px-8 py-6 md:py-8">
+                <div class="px-2 sm:px-4 md:px-8 py-4 sm:py-6 md:py-8">
                     @yield('content')
                 </div>
             </main>
@@ -1161,6 +1169,7 @@
             });
         };
     </script>
+    @stack('scripts')
 </body>
 
 </html>

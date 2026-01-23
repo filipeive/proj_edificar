@@ -3,9 +3,35 @@
 @section('title', 'Gestão de Cultos - Portal Life Church')
 
 @section('content')
-    <div class="container-fluid space-y-12" x-data="{ view: localStorage.getItem('serviceView') || 'grid' }" x-init="$watch('view', val => localStorage.setItem('serviceView', val))">
+@section('header-actions')
+    <div class="flex items-center gap-2">
+        <a href="{{ route('services.report') }}"
+            class="bg-white text-blue-600 p-2 rounded-lg hover:bg-blue-50 transition-all flex items-center justify-center border border-blue-100 shadow-sm">
+            <i class="bi bi-graph-up text-xl"></i>
+        </a>
+        @can('create', App\Models\Service::class)
+            <a href="{{ route('services.create') }}"
+                class="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
+                <i class="bi bi-calendar-plus text-xl"></i>
+            </a>
+        @endcan
+    </div>
+@endsection
+
+@section('content')
+    <div class="container-fluid space-y-12" 
+        x-data="{ 
+            view: window.innerWidth < 768 ? 'grid' : 'grid',
+            updateView() {
+                if (window.innerWidth < 768 && this.view === 'list') {
+                    this.view = 'grid';
+                }
+            }
+        }"
+        x-init="$watch('view', value => localStorage.setItem('services_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('services_view') || 'grid')"
+        @resize.window.debounce.500ms="updateView()">
         <!-- Header Section -->
-        <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div class="bg-white p-4 md:p-8 rounded-2xl md:rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div class="space-y-1">
                 <div class="flex items-center gap-2 text-xs font-bold text-blue-600 uppercase tracking-widest mb-1">
                     <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
@@ -19,7 +45,7 @@
             
             <div class="flex flex-wrap items-center gap-4">
                 <!-- View Toggle -->
-                <div class="flex bg-gray-100 p-1.5 rounded-2xl">
+                <div class="hidden md:flex bg-gray-100 p-1.5 rounded-2xl">
                     <button @click="view = 'grid'" 
                         :class="view === 'grid' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400 hover:text-gray-600'"
                         class="p-2.5 rounded-xl transition-all flex items-center gap-2 font-bold text-xs uppercase tracking-widest">
@@ -34,7 +60,7 @@
                     </button>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-3">
+                <div class="hidden md:flex flex-wrap items-center gap-3">
                     @if(auth()->user()->role === 'admin')
                         <button type="button" id="bulkDeleteBtn" onclick="bulkDelete()" disabled
                             class="bg-red-600 hover:bg-red-700 text-white px-6 py-4 rounded-2xl flex items-center transition shadow-lg shadow-red-600/20 font-black text-xs uppercase tracking-widest hidden">

@@ -4,18 +4,27 @@
 @section('page-title', 'Academia & Cursos')
 @section('page-subtitle', 'Gerencie a formação ministerial e cursos da igreja')
 
+@section('header-actions')
+    @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
+        <a href="{{ route('courses.create') }}"
+            class="bg-orange-600 text-white p-2 rounded-lg hover:bg-orange-700 transition-all flex items-center justify-center shadow-lg shadow-orange-600/20">
+            <i class="bi bi-journal-plus text-xl"></i>
+        </a>
+    @endif
+@endsection
+
 @section('content')
     <div class="container-fluid space-y-12">
         <!-- Header -->
         <div
-            class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 mb-8">
+            class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white p-4 md:p-8 rounded-2xl md:rounded-[2.5rem] shadow-sm border border-gray-100 mb-8">
             <div class="space-y-1">
                 <h1 class="text-3xl font-black text-gray-900 tracking-tight">Academia & Formação</h1>
                 <p class="text-gray-500 font-medium">Desenvolvimento ministerial e crescimento espiritual.</p>
             </div>
             @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
                 <a href="{{ route('courses.create') }}"
-                    class="bg-orange-600 hover:bg-orange-700 text-white px-8 py-4 rounded-2xl flex items-center transition shadow-lg shadow-orange-600/20 font-black text-sm uppercase tracking-widest">
+                    class="hidden md:flex bg-orange-600 hover:bg-orange-700 text-white px-8 py-4 rounded-2xl flex items-center transition shadow-lg shadow-orange-600/20 font-black text-sm uppercase tracking-widest">
                     <i class="bi bi-plus-lg mr-2"></i> Novo Curso
                 </a>
             @endif
@@ -79,11 +88,20 @@
                 </div>
 
                 <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden"
-                    x-data="{ view: 'list' }">
+                    x-data="{ 
+                        view: window.innerWidth < 768 ? 'grid' : 'list',
+                        updateView() {
+                            if (window.innerWidth < 768 && this.view === 'list') {
+                                this.view = 'grid';
+                            }
+                        }
+                    }"
+                    x-init="$watch('view', value => localStorage.setItem('courses_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('courses_view') || 'list')"
+                    @resize.window.debounce.500ms="updateView()">
                     <div class="p-8 border-b border-gray-50 flex justify-between items-center bg-gray-50/10">
                         <div class="flex items-center gap-4">
                             <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Lista de Cursos</h3>
-                            <div class="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
+                            <div class="hidden md:flex bg-gray-50 p-1 rounded-xl border border-gray-100">
                                 <button @click="view = 'list'"
                                     :class="view === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
                                     class="px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2 text-xs font-bold uppercase tracking-widest">

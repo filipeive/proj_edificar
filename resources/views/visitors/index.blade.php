@@ -11,13 +11,13 @@
         }
     </style>
     <div x-data="{ 
-                        view: window.innerWidth < 768 ? 'grid' : 'list',
-                        updateView() {
-                            if (window.innerWidth < 768 && this.view === 'list') {
-                                this.view = 'grid'; // Optional: force grid on mobile resize
+                            view: window.innerWidth < 768 ? 'grid' : 'list',
+                            updateView() {
+                                if (window.innerWidth < 768 && this.view === 'list') {
+                                    this.view = 'grid'; // Optional: force grid on mobile resize
+                                }
                             }
-                        }
-                    }"
+                        }"
         x-init="$watch('view', value => localStorage.setItem('visitors_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('visitors_view') || 'list')"
         @resize.window.debounce.500ms="updateView()" x-cloak>
         @section('header-actions')
@@ -27,7 +27,7 @@
             </a>
         @endsection
         <!-- Estatísticas -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="hidden md:grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6">
                 <div class="flex items-center justify-between mb-4">
                     <div class="bg-blue-50 p-3 rounded-xl">

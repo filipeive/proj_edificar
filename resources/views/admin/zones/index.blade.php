@@ -3,9 +3,27 @@
 @section('title', 'Gestão de Zonas - Portal Life Church')
 
 @section('content')
-    <div class="space-y-8" x-data="{ view: 'grid' }">
+@section('header-actions')
+    <a href="{{ route('zones.create') }}"
+        class="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
+        <i class="bi bi-plus-circle-fill text-xl"></i>
+    </a>
+@endsection
+
+@section('content')
+    <div class="space-y-8" 
+        x-data="{ 
+            view: window.innerWidth < 768 ? 'grid' : 'grid',
+            updateView() {
+                if (window.innerWidth < 768 && this.view === 'list') {
+                    this.view = 'grid';
+                }
+            }
+        }"
+        x-init="$watch('view', value => localStorage.setItem('zones_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('zones_view') || 'grid')"
+        @resize.window.debounce.500ms="updateView()">
         <!-- Header -->
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white p-4 md:p-8 rounded-2xl md:rounded-[2.5rem] shadow-sm border border-gray-100">
             <div class="space-y-1">
                 <h1 class="text-3xl font-black text-gray-900 tracking-tight">Zonas Pastorais</h1>
                 <p class="text-gray-500 font-medium">Divisão territorial e estratégica para o crescimento da igreja.</p>
@@ -13,7 +31,7 @@
             
             <div class="flex flex-wrap items-center gap-4 w-full md:w-auto">
                 <!-- View Switcher -->
-                <div class="bg-gray-100/50 p-1.5 rounded-2xl flex items-center gap-1">
+                <div class="hidden md:flex bg-gray-100/50 p-1.5 rounded-2xl items-center gap-1">
                     <button @click="view = 'grid'" 
                         :class="view === 'grid' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
                         class="px-4 py-2 rounded-xl transition-all duration-300 flex items-center gap-2">
@@ -28,7 +46,7 @@
                     </button>
                 </div>
 
-                <a href="{{ route('zones.create') }}" class="group flex items-center bg-blue-600 text-white px-6 py-4 rounded-2xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-200">
+                <a href="{{ route('zones.create') }}" class="hidden md:flex group items-center bg-blue-600 text-white px-6 py-4 rounded-2xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-200">
                     <i class="bi bi-plus-circle text-lg mr-2 group-hover:scale-110 transition-transform"></i>
                     Nova Zona
                 </a>

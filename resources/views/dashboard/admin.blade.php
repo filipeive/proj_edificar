@@ -2,7 +2,7 @@
 
 @section('title', 'Dashboard Admin - Portal Life Church')
 @section('page-title', 'Dashboard Administrativo')
-@section('page-subtitle', 'Visão geral de todas as atividades e contribuições')
+@section('page-subtitle', 'Visão geral de todas as atividades e contribuições Eclesiásticas')
 
 @section('content')
     <!-- Métricas Eclesiásticas -->
@@ -29,23 +29,29 @@
             </div>
         </div>
 
-        <!-- Card: Células Ativas -->
+        <!-- Card: Total Dízimos/Ofertas -->
         <div
             class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 hover:shadow-xl transition-all duration-500 group">
             <div class="flex items-center justify-between mb-4">
                 <div class="bg-green-50 p-4 rounded-2xl group-hover:bg-green-600 transition-colors duration-500">
                     <i
-                        class="bi bi-diagram-3-fill text-green-600 text-2xl group-hover:text-white transition-colors duration-500"></i>
+                        class="bi bi-cash-coin text-green-600 text-2xl group-hover:text-white transition-colors duration-500"></i>
                 </div>
-                <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Células</span>
+                <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Eclesiástico</span>
             </div>
             <div>
-                <p class="text-gray-500 text-sm font-bold uppercase tracking-wider">Células Ativas</p>
-                <p class="text-3xl font-black text-gray-900 mt-2 tracking-tighter">{{ count($topCells) }}</p>
-                <a href="{{ route('cells.index') }}"
-                    class="inline-flex items-center mt-4 text-xs font-black text-green-600 uppercase tracking-widest hover:text-green-700">
-                    Ver Todas <i class="bi bi-arrow-right ml-1"></i>
-                </a>
+                <p class="text-gray-500 text-sm font-bold uppercase tracking-wider">Dízimos e Ofertas</p>
+                <p class="text-3xl font-black text-gray-900 mt-2 tracking-tighter">
+                    {{ number_format($totalContributed, 2, ',', '.') }} MT</p>
+                <div class="flex items-center mt-4 text-xs">
+                    @if($totalContributed == 0)
+                        <span class="text-yellow-600 font-bold flex items-center">
+                            <i class="bi bi-info-circle mr-1"></i> Sem registos este mês
+                        </span>
+                    @else
+                        <span class="text-gray-400">Total do Mês (Calendário)</span>
+                    @endif
+                </div>
             </div>
         </div>
 
@@ -96,198 +102,123 @@
             <i class="bi bi-lightning-charge-fill text-orange-600 mr-3"></i> Ações Rápidas
         </h3>
         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            <a href="{{ route('events.create') }}" class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all text-center group">
-                <div class="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600 mx-auto mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors">
+            <!-- Link to Edificar Dashboard -->
+            <a href="{{ route('edificar.dashboard') }}"
+                class="bg-blue-600 p-4 rounded-2xl border border-blue-600 shadow-lg shadow-blue-200 hover:shadow-xl hover:bg-blue-700 transition-all text-center group">
+                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center text-white mx-auto mb-3">
+                    <i class="bi bi-bricks"></i>
+                </div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-white">Painel Edificar</span>
+            </a>
+
+            <a href="{{ route('events.create') }}"
+                class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all text-center group">
+                <div
+                    class="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600 mx-auto mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors">
                     <i class="bi bi-calendar-plus"></i>
                 </div>
                 <span class="text-[10px] font-black uppercase tracking-widest text-gray-600">Novo Evento</span>
             </a>
-            <a href="{{ route('services.create') }}" class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all text-center group">
-                <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 mx-auto mb-3 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+            <a href="{{ route('services.create') }}"
+                class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all text-center group">
+                <div
+                    class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 mx-auto mb-3 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                     <i class="bi bi-journal-plus"></i>
                 </div>
                 <span class="text-[10px] font-black uppercase tracking-widest text-gray-600">Novo Culto</span>
             </a>
-            <a href="{{ route('users.create') }}" class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all text-center group">
-                <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center text-green-600 mx-auto mb-3 group-hover:bg-green-600 group-hover:text-white transition-colors">
+            <a href="{{ route('users.create') }}"
+                class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all text-center group">
+                <div
+                    class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center text-green-600 mx-auto mb-3 group-hover:bg-green-600 group-hover:text-white transition-colors">
                     <i class="bi bi-person-plus"></i>
                 </div>
                 <span class="text-[10px] font-black uppercase tracking-widest text-gray-600">Novo Membro</span>
             </a>
-            <a href="{{ route('cells.create') }}" class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all text-center group">
-                <div class="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600 mx-auto mb-3 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+            <a href="{{ route('cells.create') }}"
+                class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all text-center group">
+                <div
+                    class="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600 mx-auto mb-3 group-hover:bg-purple-600 group-hover:text-white transition-colors">
                     <i class="bi bi-diagram-3"></i>
                 </div>
                 <span class="text-[10px] font-black uppercase tracking-widest text-gray-600">Nova Célula</span>
             </a>
-            <a href="{{ route('quarterly-reports.create') }}" class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all text-center group">
-                <div class="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center text-red-600 mx-auto mb-3 group-hover:bg-red-600 group-hover:text-white transition-colors">
+            <a href="{{ route('quarterly-reports.create') }}"
+                class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all text-center group">
+                <div
+                    class="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center text-red-600 mx-auto mb-3 group-hover:bg-red-600 group-hover:text-white transition-colors">
                     <i class="bi bi-file-earmark-bar-graph"></i>
                 </div>
                 <span class="text-[10px] font-black uppercase tracking-widest text-gray-600">Relat. Trimestral</span>
             </a>
-            <a href="{{ route('quarterly-reports.export') }}" class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all text-center group">
-                <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 mx-auto mb-3 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                    <i class="bi bi-file-earmark-spreadsheet"></i>
-                </div>
-                <span class="text-[10px] font-black uppercase tracking-widest text-gray-600">Exportar Excel</span>
-            </a>
         </div>
     </div>
 
-    <!-- Gestão Eclesiástica -->
-    <div class="mb-8">
-        <h3 class="text-2xl font-black text-gray-900 tracking-tight mb-6 flex items-center">
-            <i class="bi bi-building text-orange-600 mr-3"></i> Gestão Eclesiástica
-        </h3>
+    <!-- Geo & Structure Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <!-- Members by Zone -->
+        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
+            <h3 class="text-xl font-black text-gray-900 tracking-tight mb-8">Membros por Zona</h3>
+            <div class="h-[350px] relative">
+                <canvas id="zoneMembersChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Structure by Zone (Cells/Supervisions) -->
+        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
+            <h3 class="text-xl font-black text-gray-900 tracking-tight mb-8">Estrutura (Células e Supervisões)</h3>
+            <div class="h-[350px] relative">
+                <canvas id="zoneStructureChart"></canvas>
+            </div>
+        </div>
     </div>
 
+    <!-- Map Placeholder (Requested Feature) -->
+    <div class="mb-8">
+        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
+            <h3 class="text-xl font-black text-gray-900 tracking-tight mb-8 flex items-center">
+                <i class="bi bi-map-fill text-blue-600 mr-3"></i> Mapa de Quelimane
+            </h3>
+            <div
+                class="bg-blue-50/50 rounded-3xl h-[400px] flex flex-col items-center justify-center border-2 border-dashed border-blue-200">
+                <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mb-4">
+                    <i class="bi bi-geo-alt-fill text-4xl"></i>
+                </div>
+                <h4 class="text-lg font-black text-gray-900">Mapeamento em Breve</h4>
+                <p class="text-gray-500 text-sm max-w-md text-center mt-2">
+                    Estamos preparando o mapeamento geográfico das zonas e células na cidade de Quelimane.
+                </p>
+                <div class="mt-6 flex gap-2">
+                    <span
+                        class="px-3 py-1 bg-white rounded-lg text-xs font-bold text-gray-600 shadow-sm border border-gray-100">10
+                        Zonas</span>
+                    <span
+                        class="px-3 py-1 bg-white rounded-lg text-xs font-bold text-gray-600 shadow-sm border border-gray-100">{{ $totalMembers }}
+                        Membros</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gestão Eclesiástica Stats -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
         <!-- Crescimento de Membros -->
         <div class="lg:col-span-2 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
             <div class="flex items-center justify-between mb-8">
                 <h3 class="text-xl font-black text-gray-900 tracking-tight">Crescimento de Membros</h3>
-                <span class="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-bold uppercase tracking-widest">Últimos 6 Meses</span>
+                <span
+                    class="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-bold uppercase tracking-widest">Últimos
+                    6 Meses</span>
             </div>
             <div class="h-[350px] relative">
                 <canvas id="growthChart"></canvas>
             </div>
         </div>
 
-        <!-- Atividade Recente -->
-        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
-            <h3 class="text-xl font-black text-gray-900 tracking-tight mb-8">Atividade Recente</h3>
-            <div class="space-y-6">
-                @forelse($recentActivity as $activity)
-                    <div class="flex items-start space-x-4">
-                        <div class="w-10 h-10 {{ $activity['bg'] }} {{ $activity['color'] }} rounded-xl flex items-center justify-center flex-shrink-0">
-                            <i class="bi {{ $activity['icon'] }}"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-black text-gray-900">{{ $activity['title'] }}</p>
-                            <p class="text-xs text-gray-500 truncate">{{ $activity['description'] }}</p>
-                            <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">
-                                {{ $activity['time']->diffForHumans() }}
-                            </p>
-                        </div>
-                    </div>
-                @empty
-                    <p class="text-center text-gray-400 py-10">Nenhuma atividade recente.</p>
-                @endforelse
-            </div>
-        </div>
-    </div>
-
-    <!-- Projeto Edificar - Métricas Financeiras -->
-    <div class="mb-8 mt-12">
-        <h3 class="text-2xl font-black text-gray-900 tracking-tight mb-6 flex items-center">
-            <i class="bi bi-cash-stack text-green-600 mr-3"></i> Projeto Edificar - Contribuições
-        </h3>
-    </div>
-
-    <!-- Métricas Financeiras -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <!-- Card: Total Arrecadado -->
-        <div
-            class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 hover:shadow-xl transition-all duration-500 group">
-            <div class="flex items-center justify-between mb-4">
-                <div class="bg-green-50 p-4 rounded-2xl group-hover:bg-green-600 transition-colors duration-500">
-                    <i
-                        class="bi bi-cash-coin text-green-600 text-2xl group-hover:text-white transition-colors duration-500"></i>
-                </div>
-                <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Financeiro</span>
-            </div>
-            <div>
-                <p class="text-gray-500 text-sm font-bold uppercase tracking-wider">Total Arrecadado</p>
-                <p class="text-3xl font-black text-gray-900 mt-2 tracking-tighter">
-                    {{ number_format($totalContributed, 2, ',', '.') }} MT</p>
-                <div class="flex items-center mt-4 text-xs">
-                    <span class="text-green-500 font-bold flex items-center">
-                        <i class="bi bi-arrow-up-short text-lg"></i> 12%
-                    </span>
-                    <span class="text-gray-400 ml-2">vs mês anterior</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Card: Taxa de Participação -->
-        <div
-            class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 hover:shadow-xl transition-all duration-500 group">
-            <div class="flex items-center justify-between mb-4">
-                <div class="bg-purple-50 p-4 rounded-2xl group-hover:bg-purple-600 transition-colors duration-500">
-                    <i
-                        class="bi bi-percent text-purple-600 text-2xl group-hover:text-white transition-colors duration-500"></i>
-                </div>
-                <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Desempenho</span>
-            </div>
-            <div>
-                <p class="text-gray-500 text-sm font-bold uppercase tracking-wider">Participação</p>
-                <p class="text-3xl font-black text-gray-900 mt-2 tracking-tighter">{{ $percentageContributed }}%</p>
-                <div class="w-full bg-gray-100 h-1.5 rounded-full mt-4 overflow-hidden">
-                    <div class="bg-purple-600 h-full rounded-full" style="width: {{ $percentageContributed }}%"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Card: Pendentes Verificação -->
-        <div
-            class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 hover:shadow-xl transition-all duration-500 group">
-            <div class="flex items-center justify-between mb-4">
-                <div class="bg-orange-50 p-4 rounded-2xl group-hover:bg-orange-600 transition-colors duration-500">
-                    <i
-                        class="bi bi-clock-history text-orange-600 text-2xl group-hover:text-white transition-colors duration-500"></i>
-                </div>
-                <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Pendentes</span>
-            </div>
-            <div>
-                <p class="text-gray-500 text-sm font-bold uppercase tracking-wider">Aguardando</p>
-                <p class="text-3xl font-black text-orange-600 mt-2 tracking-tighter">{{ $pendingContributions }}</p>
-                <a href="{{ route('contributions.pending') }}"
-                    class="inline-flex items-center mt-4 text-xs font-black text-orange-600 uppercase tracking-widest hover:text-orange-700">
-                    Verificar Agora <i class="bi bi-arrow-right ml-1"></i>
-                </a>
-            </div>
-        </div>
-
-        <!-- Card: Top Células -->
-        <div
-            class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 hover:shadow-xl transition-all duration-500 group">
-            <div class="flex items-center justify-between mb-4">
-                <div class="bg-blue-50 p-4 rounded-2xl group-hover:bg-blue-600 transition-colors duration-500">
-                    <i
-                        class="bi bi-trophy-fill text-blue-600 text-2xl group-hover:text-white transition-colors duration-500"></i>
-                </div>
-                <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Ranking</span>
-            </div>
-            <div>
-                <p class="text-gray-500 text-sm font-bold uppercase tracking-wider">Top Células</p>
-                <p class="text-3xl font-black text-gray-900 mt-2 tracking-tighter">{{ count($topCells) }}</p>
-                <a href="#top-cells"
-                    class="inline-flex items-center mt-4 text-xs font-black text-blue-600 uppercase tracking-widest hover:text-blue-700">
-                    Ver Ranking <i class="bi bi-arrow-down ml-1"></i>
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-        <!-- Contribuições por Zona (Chart) -->
-        <div class="lg:col-span-2 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
-            <div class="flex items-center justify-between mb-8">
-                <h3 class="text-xl font-black text-gray-900 tracking-tight">Contribuições por Zona</h3>
-                <div class="flex space-x-2">
-                    <button class="px-4 py-2 bg-orange-600 text-white rounded-xl text-xs font-bold uppercase tracking-widest shadow-lg shadow-orange-600/20">Este Mês</button>
-                </div>
-            </div>
-            <div class="h-[350px] relative">
-                <canvas id="zoneChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Top Células -->
+        <!-- Top Células (Ecclesiastical) -->
         <div id="top-cells" class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
-            <h3 class="text-xl font-black text-gray-900 tracking-tight mb-8">Top 10 Células</h3>
-            <div class="space-y-4">
+            <h3 class="text-xl font-black text-gray-900 tracking-tight mb-8">Top Células (Dízimos)</h3>
+            <div class="space-y-4 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
                 @foreach($topCells as $index => $cell)
                     <div
                         class="flex items-center p-4 bg-gray-50 rounded-2xl hover:bg-white hover:shadow-lg transition-all duration-300 border border-transparent hover:border-gray-100 group">
@@ -298,7 +229,8 @@
                         <div class="flex-1 min-w-0">
                             <p class="font-black text-gray-900 truncate">{{ $cell['name'] }}</p>
                             <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                                {{ $cell['contributed'] }}/{{ $cell['members'] }} Membros</p>
+                                {{ $cell['contributed'] }}/{{ $cell['members'] }} Membros
+                            </p>
                         </div>
                         <div class="text-right">
                             <p class="font-black text-green-600 tracking-tight">{{ number_format($cell['total'], 0, ',', '.') }}
@@ -310,6 +242,7 @@
             </div>
         </div>
     </div>
+
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         <!-- Próximos Eventos -->
@@ -375,11 +308,9 @@
                             <p class="font-black text-gray-900">{{ $service->total_participation ?? 0 }}</p>
                             <p class="text-[8px] text-gray-400 font-bold uppercase tracking-widest">Presentes</p>
                         </div>
-                        <!-- ver detalhes -->
                         <a href="{{ route('services.show', $service->id) }}"
                             class="text-xs font-black text-orange-600 uppercase tracking-widest hover:text-orange-700">
-                            <i class="bi bi-arrow-right ml-1"></i>
-                            Detalhes
+                            <i class="bi bi-arrow-right ml-1"></i> Detalhes
                         </a>
                     </div>
                 @empty
@@ -389,52 +320,60 @@
         </div>
     </div>
 
+    <!-- Chart Scripts -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Zone Chart
-            const zoneCtx = document.getElementById('zoneChart').getContext('2d');
-            const zoneGradient = zoneCtx.createLinearGradient(0, 0, 0, 400);
-            zoneGradient.addColorStop(0, 'rgba(249, 115, 22, 0.8)');
-            zoneGradient.addColorStop(1, 'rgba(249, 115, 22, 0.1)');
-
-            new Chart(zoneCtx, {
+            // Zone Members Chart (Renamed from zoneChart)
+            const zoneMemCtx = document.getElementById('zoneMembersChart').getContext('2d');
+            new Chart(zoneMemCtx, {
                 type: 'bar',
                 data: {
                     labels: @json($zoneStats->pluck('name')),
                     datasets: [{
-                        label: 'Total Arrecadado (MT)',
+                        label: 'Membros',
                         data: @json($zoneStats->pluck('total')),
-                        backgroundColor: zoneGradient,
-                        borderColor: 'rgba(249, 115, 22, 1)',
-                        borderWidth: 2,
-                        borderRadius: 12,
-                        borderSkipped: false,
+                        backgroundColor: 'rgba(59, 130, 246, 0.8)', // Blue
+                        borderRadius: 8,
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#111827',
-                            titleFont: { size: 14, weight: 'bold' },
-                            bodyFont: { size: 13 },
-                            padding: 12,
-                            cornerRadius: 12,
-                            displayColors: false
-                        }
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { drawBorder: false, color: 'rgba(0, 0, 0, 0.05)' },
-                            ticks: { font: { size: 11, weight: 'bold' }, color: '#9ca3af' }
+                        y: { beginAtZero: true, grid: { drawBorder: false, color: 'rgba(0, 0, 0, 0.05)' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Zone Structure Chart (New)
+            const zoneStrCtx = document.getElementById('zoneStructureChart').getContext('2d');
+            new Chart(zoneStrCtx, {
+                type: 'bar',
+                data: {
+                    labels: @json($zoneStructures->pluck('name')),
+                    datasets: [
+                        {
+                            label: 'Células',
+                            data: @json($zoneStructures->pluck('cells')),
+                            backgroundColor: 'rgba(168, 85, 247, 0.8)', // Purple
+                            borderRadius: 6,
                         },
-                        x: {
-                            grid: { display: false },
-                            ticks: { font: { size: 11, weight: 'bold' }, color: '#9ca3af' }
+                        {
+                            label: 'Supervisões',
+                            data: @json($zoneStructures->pluck('supervisions')),
+                            backgroundColor: 'rgba(234, 179, 8, 0.8)', // Yellow
+                            borderRadius: 6,
                         }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, grid: { drawBorder: false, color: 'rgba(0, 0, 0, 0.05)' } },
+                        x: { grid: { display: false } }
                     }
                 }
             });
@@ -458,37 +397,38 @@
                         fill: true,
                         tension: 0.4,
                         pointBackgroundColor: 'rgba(59, 130, 246, 1)',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 6,
-                        pointHoverRadius: 8
+                        pointBorderColor: '#fff'
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#111827',
-                            padding: 12,
-                            cornerRadius: 12,
-                            displayColors: false
-                        }
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
-                        y: {
-                            beginAtZero: false,
-                            grid: { color: 'rgba(0, 0, 0, 0.05)' },
-                            ticks: { font: { size: 11, weight: 'bold' }, color: '#9ca3af' }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { font: { size: 11, weight: 'bold' }, color: '#9ca3af' }
-                        }
+                        y: { beginAtZero: false, grid: { color: 'rgba(0, 0, 0, 0.05)' } },
+                        x: { grid: { display: false } }
                     }
                 }
             });
         });
     </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+    </style>
 @endsection

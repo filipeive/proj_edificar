@@ -75,6 +75,11 @@ class User extends Authenticatable
         return $this->hasMany(Service::class, 'preacher_id');
     }
 
+    public function managedPackages()
+    {
+        return $this->hasMany(CommitmentPackage::class, 'responsible_id');
+    }
+
     // Helpers
     public function isAdmin()
     {
@@ -134,6 +139,11 @@ class User extends Authenticatable
     public function isResponsavelPacote()
     {
         return $this->role === 'responsavel_pacote';
+    }
+
+    public function managesPackage(CommitmentPackage $package)
+    {
+        return $this->isAdmin() || $package->responsible_id === $this->id;
     }
 
     public function hasRole($role)

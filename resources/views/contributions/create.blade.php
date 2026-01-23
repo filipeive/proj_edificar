@@ -223,40 +223,101 @@
         const btnOtherMember = document.getElementById('btnOtherMember');
         const memberInfoBlock = document.getElementById('memberInfo');
 
+        // Variáveis de Contexto (Passadas do Controller)
+        const managedPackageIds = @json($managedPackageIds);
+        const myPackageId = "{{ $currentPackage->id ?? '' }}";
+        const isResponsavelPacote = {{ $currentUser->role === 'responsavel_pacote' ? 'true' : 'false' }};
+
         // Função para alternar entre "Minha Contribuição" e "Outro Membro"
         function toggleMemberSelection(isOther) {
             if (isOther) {
                 // Mudar para "Outro Membro"
                 memberSelectionBlock?.classList.remove('hidden');
-                memberSelect?.setAttribute('name', 'user_id'); // Habilita o SELECT
-                userIdHidden?.removeAttribute('name');         // Desabilita o HIDDEN
+                memberSelect?.setAttribute('name', 'user_id');
+                userIdHidden?.removeAttribute('name');
 
-                // Atualiza os estilos dos botões
                 btnOtherMember?.classList.remove('bg-gray-200', 'text-gray-700');
                 btnOtherMember?.classList.add('bg-blue-600', 'text-white');
                 btnMyContribution?.classList.add('bg-gray-200', 'text-gray-700');
                 btnMyContribution?.classList.remove('bg-blue-600', 'text-white');
 
-                // Preenche info do membro selecionado
                 updateSelectedMemberInfo();
+
+                // Filtro de Pacotes: Se for Responsável, mostrar apenas os gerenciados
+                if (isResponsavelPacote) {
+                    filterPackagesForOthers();
+                }
 
             } else {
                 // Mudar para "Minha Contribuição"
                 memberSelectionBlock?.classList.add('hidden');
-                userIdHidden?.setAttribute('name', 'user_id'); // Habilita o HIDDEN (Padrão)
-                memberSelect?.removeAttribute('name');         // Desabilita o SELECT
+                userIdHidden?.setAttribute('name', 'user_id');
+                memberSelect?.removeAttribute('name');
 
-                // Atualiza os estilos dos botões
                 btnMyContribution?.classList.remove('bg-gray-200', 'text-gray-700');
                 btnMyContribution?.classList.add('bg-blue-600', 'text-white');
                 btnOtherMember?.classList.add('bg-gray-200', 'text-gray-700');
                 btnOtherMember?.classList.remove('bg-blue-600', 'text-white');
 
-                // Reseta info para o usuário logado
                 memberInfoBlock?.classList.add('hidden');
                 if (summaryMemberDisplay) {
                     summaryMemberDisplay.textContent = '{{ $currentUser->name }}';
                 }
+
+                // Filtro de Pacotes: Se for Responsável, mostrar apenas o próprio
+                if (isResponsavelPacote) {
+                    filterPackagesForMe();
+                }
+            }
+        }
+
+        function filterPackagesForMe() {
+            const packageSelect = document.getElementById('package_id');
+            if (!packageSelect) return;
+
+            // Iterar opções e mostrar apenas o meu pacote
+            Array.from(packageSelect.options).forEach(option => {
+                if (option.value === "") return; // Pular placeholder
+
+                // Mostrar apenas se for o ID do meu pacote
+                if (option.value == myPackageId) {
+                    option.hidden = false;
+                    option.disabled = false;
+                    if (!packageSelect.value) packageSelect.value = option.value; // Auto-selecionar se vazio
+                } else {
+                    option.hidden = true;
+                    option.disabled = true;
+                }
+            });
+
+            // Se o atual selecionado ficou escondido, resetar
+            if (packageSelect.value != myPackageId && myPackageId) {
+                packageSelect.value = myPackageId;
+            }
+        }
+
+        function filterPackagesForOthers() {
+            const packageSelect = document.getElementById('package_id');
+            if (!packageSelect) return;
+
+            Array.from(packageSelect.options).forEach(option => {
+                if (option.value === "") return;
+
+                // Mostrar apenas se estiver na lista de gerenciados
+                // managedPackageIds é array de numeros/strings
+                if (managedPackageIds.includes(parseInt(option.value))) {
+                    option.hidden = false;
+                    option.disabled = false;
+                } else {
+                    option.hidden = true;
+                    option.disabled = true;
+                }
+            });
+
+            // Se o valor selecionado agora for inválido (escondido), resetar
+            // Mas cuidado para não desmarcar se for válido.
+            if (packageSelect.value && !managedPackageIds.includes(parseInt(packageSelect.value))) {
+                packageSelect.value = "";
             }
         }
 

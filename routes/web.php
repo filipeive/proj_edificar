@@ -184,6 +184,8 @@ Route::middleware('auth')->group(function () {
             // Cultos (Relatórios de Celebração)
             Route::get('/services/{service}/pdf', [\App\Http\Controllers\ServiceController::class, 'downloadPdf'])->name('services.download-pdf');
             Route::get('services/report', [\App\Http\Controllers\ServiceController::class, 'report'])->name('services.report');
+            Route::get('services/export/monthly', [\App\Http\Controllers\ServiceController::class, 'exportMonthly'])->name('services.export.monthly');
+            Route::get('services/export/quarterly', [\App\Http\Controllers\ServiceController::class, 'exportQuarterly'])->name('services.export.quarterly');
             Route::post('services/bulk-delete', [\App\Http\Controllers\ServiceController::class, 'bulkDestroy'])->name('services.bulk-delete');
             Route::resource('services', \App\Http\Controllers\ServiceController::class);
         });
@@ -211,7 +213,10 @@ Route::middleware('auth')->group(function () {
         Route::delete('packages/{package}/members/{user}', [PackageController::class, 'removeMember'])->name('packages.members.remove');
         Route::post('packages/{package}/members/{user}/change-package', [PackageController::class, 'changePackage'])->name('packages.members.change-package');
         Route::post('packages/{package}/bulk-remove-members', [PackageController::class, 'bulkRemoveMembers'])->name('packages.members.bulk-remove');
+        Route::post('packages/{package}/notify-commission', [ContributionController::class, 'notifyCommission'])->name('packages.notify-commission');
 
+        Route::get('packages/dashboard', \App\Http\Controllers\Dashboard\PackageManagerDashboardController::class)
+            ->name('packages.dashboard');
         Route::resource('packages', PackageController::class);
     });
 
@@ -246,11 +251,11 @@ Route::middleware('auth')->group(function () {
 
         // Criar contribuição (membro, líder, supervisor, pastor, admin)
         Route::get('/create', [ContributionController::class, 'create'])
-            ->middleware('role:membro,lider_celula,supervisor,pastor_zona,admin')
+            ->middleware('role:membro,lider_celula,supervisor,pastor_zona,admin,responsavel_pacote,comissao_obra')
             ->name('contributions.create');
 
         Route::post('/', [ContributionController::class, 'store'])
-            ->middleware('role:membro,lider_celula,supervisor,pastor_zona,admin')
+            ->middleware('role:membro,lider_celula,supervisor,pastor_zona,admin,responsavel_pacote,comissao_obra')
             ->name('contributions.store');
         // Editar contribuição pendente
         Route::get('/{contribution}/edit', [ContributionController::class, 'edit'])
@@ -282,7 +287,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // ===== RELATÓRIOS ROUTES =====
-    Route::prefix('reports')->middleware('role:lider_celula,supervisor,pastor_zona,admin')->group(function () {
+    Route::prefix('reports')->middleware('role:lider_celula,supervisor,pastor_zona,admin,comissao_obra')->group(function () {
 
         // Relatório da célula (líder)
         Route::get('/cell', [ReportController::class, 'cellReport'])
@@ -324,7 +329,10 @@ Route::middleware('auth')->group(function () {
     Route::resource('quarterly-reports', \App\Http\Controllers\QuarterlyReportController::class);
     Route::post('packages/{package}/assign', [\App\Http\Controllers\Admin\PackageController::class, 'assignMember'])->name('packages.assign');
     Route::post('packages/{package}/send-bulk-sms', [\App\Http\Controllers\Admin\PackageController::class, 'sendBulkSms'])->name('packages.send-bulk-sms');
-    Route::get('project-edificar/dashboard', [\App\Http\Controllers\Admin\EdificarDashboardController::class, 'index'])->name('edificar.dashboard');
+    // Edificar Dashboard
+    Route::get('project-edificar/dashboard', [\App\Http\Controllers\Admin\EdificarDashboardController::class, 'index'])
+        ->middleware('role:admin,comissao_obra,pastor_senior')
+        ->name('edificar.dashboard');
 
     // ===== EVENTOS E CERIMÓNIAS (EVENTS) ROUTES =====
     Route::get('events/feed', [\App\Http\Controllers\EventController::class, 'feed'])->name('events.feed');
@@ -382,6 +390,9 @@ Route::middleware('auth')->group(function () {
     Route::post('weddings/bulk-delete', [App\Http\Controllers\Admin\WeddingController::class, 'bulkDestroy'])->name('weddings.bulk-delete');
     Route::resource('weddings', App\Http\Controllers\Admin\WeddingController::class);
     Route::post('/test-email', [App\Http\Controllers\Admin\WeddingController::class, 'testEmail'])->name('test.email');
+
+    // Inventário (Ecclesiastical)
+    Route::resource('inventory-items', App\Http\Controllers\InventoryItemController::class);
 });
 # ============================================
 # ROTA DE REGISTRO (PÚBLICA MAS CONTROLADA)

@@ -11,44 +11,109 @@ class AdminDashboardController
 {
     public function __invoke(): View
     {
+        // Fix: Use Calendar Month to avoid 'Zero' confusion if outside fiscal range
         $now = now();
-        $monthStart = $now->copy()->startOfMonth()->addDays(19);
-        $monthEnd = $now->copy()->addMonth()->startOfMonth()->addDays(4);
+        $monthStart = $now->copy()->startOfMonth();
+        $monthEnd = $now->copy()->endOfMonth();
 
-        $totalContributed = Contribution::whereBetween('contribution_date', [$monthStart, $monthEnd])
-            ->where('status', 'verificada')
-            ->sum('amount');
+        // Calculate Tithes and Offerings from Services (not Contributions)
+        // Services contain the actual church tithes/offerings from worship services
+        $services = \App\Models\Service::with(['tithes', 'offerings'])
+            ->whereBetween('date', [$monthStart, $monthEnd])
+            ->get();
+
+        $totalContributed = $services->sum(function ($service) {
+            return $service->total_tithes + $service->total_offerings;
+        });
 
         $totalMembers = User::where('role', 'membro')->where('is_active', true)->count();
         $membersContributed = User::where('role', 'membro')
             ->where('is_active', true)
             ->whereHas('contributions', function ($q) use ($monthStart, $monthEnd) {
                 $q->whereBetween('contribution_date', [$monthStart, $monthEnd])
-                    ->where('status', 'verificada');
+                    ->where('status', 'verificada')
+                    ->whereNull('package_id'); // Strict Isolation
             })
             ->count();
 
-        $pendingContributions = Contribution::where('status', 'pendente')->count();
+        $pendingContributions = Contribution::where('status', 'pendente')
+            ->whereNull('package_id')
+            ->count();
 
-        $zones = Zone::with('supervisions')->get();
-        $zoneStats = [];
+        // 1. Members per Zone (Requested Change)
+        $zones = Zone::withCount(['supervisions', 'cells'])->get(); // Eager load counts if relationships exist on Zone (Need to check model)
+        // Zone model might NOT have 'cells' relation directly (Zone -> Supervision -> Cell).
+        // I will calculate manually to be safe or assuming relations exist.
+
+        $zoneStats = []; // Reusing name but for Members
+        $zoneStructures = []; // New chart data: Cells & Supervisions
+
         foreach ($zones as $zone) {
+            // Count Members in this Zone
+            // Zone hasMany Supervisions? Supervision hasMany Cells? Cell hasMany Members?
+            // Or Zone hasMany Users through relations? 
+            // Often efficient to query User where zone_id (if exists) or via cell.
+            // Assuming User doesn't have direct zone_id (it's on Cell->Supervision->Zone).
+            // Let's check Zone model if I can. But for now I'll assume standard nested relation.
+            // Actually, Contribution has zone_id, but User? 
+            // I'll filter Users who belong to a cell in a supervision in this zone.
+
+            // To be faster/easier:
+            // $zoneMembers = User::whereHas('cell.supervision', fn($q) => $q->where('zone_id', $zone->id))->count();
+
+            // However, let's look at `User.php`: `getZoneId()` exists.
+            // I'll try to use the relationships if they exist.
+            // Zone -> hasMany Supervisions.
+            // Supervision -> hasMany Cells.
+            // Cell -> hasMany Members (User).
+
+            $membersCount = User::whereHas('cell.supervision', function ($q) use ($zone) {
+                $q->where('zone_id', $zone->id);
+            })->where('role', 'membro')->where('is_active', true)->count();
+
             $zoneStats[] = [
                 'name' => $zone->name,
-                'total' => $zone->getTotalContributedThisMonth(),
+                'total' => $membersCount, // "Total" here means Members
+            ];
+
+            $supervisionsCount = $zone->supervisions()->count();
+            // Cells: Zone->Supervisions->Cells
+            $cellsCount = Cell::whereHas('supervision', function ($q) use ($zone) {
+                $q->where('zone_id', $zone->id);
+            })->count();
+
+            $zoneStructures[] = [
+                'name' => $zone->name,
+                'supervisions' => $supervisionsCount,
+                'cells' => $cellsCount,
             ];
         }
         $zoneStats = collect($zoneStats);
+        $zoneStructures = collect($zoneStructures);
 
 
+        // Top Cells (Ecclesiastical Only)
         $topCells = Cell::with('supervision')
             ->get()
-            ->map(function ($cell) {
+            ->map(function ($cell) use ($monthStart, $monthEnd) {
+                $totalCell = Contribution::where('cell_id', $cell->id)
+                    ->whereBetween('contribution_date', [$monthStart, $monthEnd])
+                    ->where('status', 'verificada')
+                    ->whereNull('package_id')
+                    ->sum('amount');
+
+                $membersContributedCount = User::where('cell_id', $cell->id)
+                    ->whereHas('contributions', function ($q) use ($monthStart, $monthEnd) {
+                        $q->whereBetween('contribution_date', [$monthStart, $monthEnd])
+                            ->where('status', 'verificada')
+                            ->whereNull('package_id');
+                    })->count();
+
                 return [
                     'name' => $cell->name,
-                    'total' => $cell->getTotalContributedThisMonth(),
+                    'total' => $totalCell,
                     'members' => $cell->getMembersCount(),
-                    'contributed' => $cell->getMembersContributedThisMonth(),
+                    'contributed' => $membersContributedCount,
                 ];
             })
             ->sortByDesc('total')
@@ -70,16 +135,17 @@ class AdminDashboardController
 
         $recentActivity = collect();
 
-        // Latest 5 verified contributions
+        // Latest 5 verified contributions (Ecclesiastical)
         $latestContributions = Contribution::with(['user', 'zone'])
             ->where('status', 'verificada')
+            ->whereNull('package_id')
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get()
             ->map(function ($c) {
                 return [
                     'type' => 'contribution',
-                    'title' => 'Nova Contribuição',
+                    'title' => 'Dízimo/Oferta',
                     'description' => $c->user->name . ' contribuiu com ' . number_format((float) $c->amount, 0) . ' MT',
                     'time' => $c->created_at,
                     'icon' => 'bi-cash-coin',
@@ -124,7 +190,8 @@ class AdminDashboardController
             'membersContributed' => $membersContributed,
             'percentageContributed' => $percentageContributed,
             'pendingContributions' => $pendingContributions,
-            'zoneStats' => $zoneStats,
+            'zoneStats' => $zoneStats, // Now Members per Zone
+            'zoneStructures' => $zoneStructures, // New: Cells/Supervisions per Zone
             'topCells' => $topCells,
             'upcomingEvents' => $upcomingEvents,
             'recentServices' => $recentServices,

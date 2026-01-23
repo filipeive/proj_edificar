@@ -15,10 +15,27 @@
     @endif
 @endsection
 
+@section('header-actions')
+    <a href="{{ route('members.create') }}" 
+        class="bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 transition-all flex items-center justify-center shadow-lg shadow-green-600/20">
+        <i class="bi bi-person-plus-fill text-xl"></i>
+    </a>
+@endsection
+
 @section('content')
-    <div class="space-y-8" x-data="{ view: 'list' }">
+    <div class="space-y-8" 
+        x-data="{ 
+            view: window.innerWidth < 768 ? 'grid' : 'list',
+            updateView() {
+                if (window.innerWidth < 768 && this.view === 'list') {
+                    this.view = 'grid';
+                }
+            }
+        }"
+        x-init="$watch('view', value => localStorage.setItem('members_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('members_view') || 'list')"
+        @resize.window.debounce.500ms="updateView()">
         <!-- Search & Actions Header -->
-        <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
+        <div class="bg-white p-4 md:p-8 rounded-2xl md:rounded-[2.5rem] shadow-sm border border-gray-100">
             <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
                 <!-- Search & Filters -->
                 <div class="flex-1 w-full xl:max-w-4xl">
@@ -26,7 +43,7 @@
                         <div class="flex-1 relative">
                             <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
                             <input type="text" name="search" value="{{ request('search') }}" 
-                                placeholder="Buscar por nome, email ou telefone..."
+                                placeholder="Buscar por nome..."
                                 class="w-full pl-12 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-medium text-sm">
                         </div>
 
@@ -43,7 +60,7 @@
                         @endif
 
                         <div class="flex gap-2">
-                            <button type="submit" class="px-8 py-4 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest">
+                            <button type="submit" class="px-8 py-4 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest flex-1 md:flex-none">
                                 Filtrar
                             </button>
                             @if(request('search') || request('cell_id'))
@@ -56,8 +73,8 @@
                 </div>
 
                 <!-- View Toggles & Actions -->
-                <div class="flex flex-wrap items-center gap-3 w-full xl:w-auto">
-                    <div class="flex bg-gray-50 p-1 rounded-2xl border border-gray-100">
+                <div class="flex items-center gap-3 w-full xl:w-auto">
+                    <div class="hidden md:flex bg-gray-50 p-1 rounded-2xl border border-gray-100">
                         <button @click="view = 'list'" 
                             :class="view === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
                             class="p-3 rounded-xl transition-all duration-300">
@@ -71,16 +88,16 @@
                     </div>
 
                     <a href="{{ route('members.create') }}" 
-                        class="flex-1 xl:flex-none px-8 py-4 bg-green-600 text-white rounded-2xl hover:bg-green-700 transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 shadow-lg shadow-green-100">
+                        class="hidden md:flex flex-1 xl:flex-none px-8 py-4 bg-green-600 text-white rounded-2xl hover:bg-green-700 transition-all font-black text-xs uppercase tracking-widest items-center justify-center gap-3 shadow-lg shadow-green-100">
                         <i class="bi bi-person-plus-fill text-lg"></i>
-                        @if ($userRole === 'lider_celula') Novo Membro @else Novo Membro / Líder @endif
+                        <span>@if ($userRole === 'lider_celula') Novo Membro @else Novo Membro / Líder @endif</span>
                     </a>
                 </div>
             </div>
         </div>
 
         <!-- Global Stats Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="hidden md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col justify-center text-center group hover:bg-blue-50 transition-colors">
                 <p class="text-5xl font-black text-blue-600 tracking-tighter">{{ $members->total() }}</p>
                 <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mt-2 group-hover:text-blue-400">Total de Membros</p>

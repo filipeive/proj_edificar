@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Cell;
 use App\Models\CommitmentPackage;
 use App\Models\Contribution;
-use App\Models\UserCommitment;
+use App\Models\Zone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -62,11 +63,57 @@ class EdificarDashboardController extends Controller
                 ];
             });
 
+        // 4. Top Células (EDIFICAR ONLY)
+        $topCells = Cell::with('supervision')
+            ->get()
+            ->map(function ($cell) {
+                // Sum ONLY Edificar Contributions
+                $totalCell = Contribution::verified()
+                    ->whereNotNull('package_id')
+                    ->where('cell_id', $cell->id)
+                    ->whereMonth('contribution_date', now()->month)
+                    ->whereYear('contribution_date', now()->year)
+                    ->sum('amount');
+
+                return [
+                    'name' => $cell->name,
+                    'total' => $totalCell,
+                ];
+            })
+            ->filter(function ($item) {
+                return $item['total'] > 0;
+            })
+            ->sortByDesc('total')
+            ->take(10)
+            ->values();
+
+        // 5. Zone Stats (EDIFICAR ONLY)
+        $zones = Zone::with('supervisions')->get();
+        $zoneStats = [];
+        foreach ($zones as $zone) {
+            // Sum ONLY Edificar Contributions
+            $totalZone = Contribution::verified()
+                ->whereNotNull('package_id')
+                ->where('zone_id', $zone->id)
+                ->whereMonth('contribution_date', now()->month)
+                ->whereYear('contribution_date', now()->year)
+                ->sum('amount');
+
+            $zoneStats[] = [
+                'name' => $zone->name,
+                'total' => $totalZone,
+            ];
+        }
+        $zoneStats = collect($zoneStats);
+
+
         return view('admin.edificar.dashboard', compact(
             'totalArrecadado',
             'arrecadadoMes',
             'evolucaoMensal',
-            'pacotes'
+            'pacotes',
+            'topCells',
+            'zoneStats'
         ));
     }
 }

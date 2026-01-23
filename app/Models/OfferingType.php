@@ -13,6 +13,7 @@ class OfferingType extends Model
         'name',
         'code',
         'description',
+        'scope',
         'is_active',
         'order',
     ];

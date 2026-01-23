@@ -4,11 +4,23 @@
 @section('page-title', 'Utilizadores')
 @section('page-subtitle', 'Gestão de membros e líderes da igreja')
 
+@section('header-actions')
+    <a href="{{ route('users.create') }}"
+        class="bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 transition-all flex items-center justify-center shadow-lg shadow-green-600/20">
+        <i class="bi bi-person-plus-fill text-xl"></i>
+    </a>
+@endsection
+
 @section('content')
     <div class="space-y-8" x-data="{
-        view: 'list',
+        view: window.innerWidth < 768 ? 'grid' : 'list',
         selectedUsers: [],
         selectAll: false,
+        updateView() {
+            if (window.innerWidth < 768 && this.view === 'list') {
+                this.view = 'grid';
+            }
+        },
         toggleAll() {
             if (this.selectAll) {
                 this.selectedUsers = Array.from(document.querySelectorAll('.user-checkbox:not(:disabled)')).map(cb => parseInt(cb.value));
@@ -34,7 +46,9 @@
                 document.getElementById('bulkDeleteForm').submit();
             }
         }
-    }">
+    }"
+    x-init="$watch('view', value => localStorage.setItem('users_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('users_view') || 'list')"
+    @resize.window.debounce.500ms="updateView()">
         <!-- Global Stats Row -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex items-center justify-between group hover:shadow-xl transition-all">
@@ -112,7 +126,7 @@
                     </div>
                     <div class="md:col-span-4 flex items-end gap-3">
                         <!-- View Toggle -->
-                        <div class="flex bg-gray-50 p-1 rounded-2xl border border-gray-100 h-14">
+                        <div class="hidden md:flex bg-gray-50 p-1 rounded-2xl border border-gray-100 h-14">
                             <button type="button" @click="view = 'list'" 
                                 :class="view === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
                                 class="px-4 rounded-xl transition-all duration-300">
@@ -135,7 +149,7 @@
                             <i class="bi bi-trash-fill"></i> Deletar (<span x-text="selectedUsers.length"></span>)
                         </button>
                         
-                        <a href="{{ route('users.create') }}" class="w-14 h-14 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center hover:bg-green-600 hover:text-white transition-all shadow-sm">
+                        <a href="{{ route('users.create') }}" class="hidden md:flex w-14 h-14 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center hover:bg-green-600 hover:text-white transition-all shadow-sm">
                             <i class="bi bi-plus-lg text-xl"></i>
                         </a>
                     </div>

@@ -5,7 +5,7 @@
 @section('page-subtitle', 'Gestão de informações pessoais e segurança')
 
 @section('content')
-    <div class="space-y-8 max-w-5xl mx-auto">
+    <div class="w-full">
         <!-- Header Profile Card -->
         <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-10 overflow-hidden relative group">
             <div

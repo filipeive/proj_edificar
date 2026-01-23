@@ -311,12 +311,24 @@ class ServiceController extends Controller
         return $pdf->download("relatorio_culto_" . \Carbon\Carbon::parse($service->date)->format('Y-m-d') . ".pdf");
     }
 
-    public function report()
+    public function report(Request $request)
     {
         Gate::authorize('viewAny', Service::class);
 
-        // Get last 12 services for trend analysis
-        $trendServices = Service::orderBy('date', 'desc')->take(12)->get()->reverse();
+        $query = Service::query();
+
+        // Filters
+        if ($request->filled('date_from')) {
+            $query->where('date', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->where('date', '<=', $request->date_to);
+        }
+        if ($request->filled('service_type')) {
+            $query->where('service_type', $request->service_type);
+        }
+
+        $trendServices = $query->orderBy('date', 'desc')->get()->reverse();
 
         $stats = [
             'labels' => $trendServices->map(fn($s) => \Carbon\Carbon::parse($s->date)->format('d/m')),
@@ -326,6 +338,53 @@ class ServiceController extends Controller
         ];
 
         return view('services.report', compact('stats', 'trendServices'));
+    }
+
+    public function exportMonthly(Request $request)
+    {
+        Gate::authorize('viewAny', Service::class);
+
+        $request->validate([
+            'month' => 'required|integer|between:1,12',
+            'year' => 'required|integer',
+        ]);
+
+        $services = Service::whereYear('date', $request->year)
+            ->whereMonth('date', $request->month)
+            ->orderBy('date', 'asc')
+            ->get();
+
+        $title = "Relatório Mensal de Cultos - " . \Carbon\Carbon::createFromDate($request->year, $request->month)->translatedFormat('F/Y');
+
+        $pdf = Pdf::loadView('services.report-pdf', compact('services', 'title'));
+        return $pdf->download("relatorio_mensal_cultos_{$request->year}_{$request->month}.pdf");
+    }
+
+    public function exportQuarterly(Request $request)
+    {
+        Gate::authorize('viewAny', Service::class);
+
+        $request->validate([
+            'quarter' => 'required|integer|between:1,4',
+            'year' => 'required|integer',
+        ]);
+
+        $months = match ((int) $request->quarter) {
+            1 => [1, 2, 3],
+            2 => [4, 5, 6],
+            3 => [7, 8, 9],
+            4 => [10, 11, 12],
+        };
+
+        $services = Service::whereYear('date', $request->year)
+            ->whereIn(DB::raw('MONTH(date)'), $months)
+            ->orderBy('date', 'asc')
+            ->get();
+
+        $title = "Relatório Trimestral de Cultos - {$request->quarter}º Trimestre / {$request->year}";
+
+        $pdf = Pdf::loadView('services.report-pdf', compact('services', 'title'));
+        return $pdf->download("relatorio_trimestral_cultos_{$request->year}_Q{$request->quarter}.pdf");
     }
 
     /**
