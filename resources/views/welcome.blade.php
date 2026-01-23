@@ -288,6 +288,12 @@
                         <span
                             class="absolute bottom-0 left-0 w-0 h-0.5 orange-gradient transition-all duration-300 group-hover:w-full"></span>
                     </a>
+                    <a href="#courses"
+                        class="text-xs font-bold text-gray-600 hover:text-orange-600 transition-all uppercase tracking-wider relative group">
+                        Cursos
+                        <span
+                            class="absolute bottom-0 left-0 w-0 h-0.5 orange-gradient transition-all duration-300 group-hover:w-full"></span>
+                    </a>
                     <a href="#online"
                         class="text-xs font-bold text-gray-600 hover:text-orange-600 transition-all uppercase tracking-wider relative group">
                         Online
@@ -329,6 +335,8 @@
                     onclick="toggleMobileMenu()">Eventos</a>
                 <a href="#services" class="block text-lg font-bold text-gray-900 hover:text-orange-600 transition"
                     onclick="toggleMobileMenu()">Cultos</a>
+                <a href="#courses" class="block text-lg font-bold text-gray-900 hover:text-orange-600 transition"
+                    onclick="toggleMobileMenu()">Cursos</a>
                 <a href="#online" class="block text-lg font-bold text-gray-900 hover:text-orange-600 transition"
                     onclick="toggleMobileMenu()">Online</a>
                 @auth
@@ -1080,6 +1088,54 @@
         </div>
     </section>
 
+    <!-- Courses Section -->
+    <section id="courses" class="py-32 bg-white">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="text-center mb-20">
+                <span class="text-orange-600 font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Formação &
+                    Crescimento</span>
+                <h2 class="text-4xl md:text-6xl font-black text-gray-900 mb-6 tracking-tighter">
+                    Conheça Nossos <span class="orange-gradient-text">Cursos</span>
+                </h2>
+                <p class="text-gray-500 max-w-2xl mx-auto">Invista no seu crescimento espiritual e ministerial através
+                    de nossas escolas de formação.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                @forelse($activeCourses as $course)
+                    <div
+                        class="bg-gray-50 p-8 rounded-[3rem] border border-gray-100 group hover:bg-white hover:shadow-2xl transition-all duration-500">
+                        <div
+                            class="w-16 h-16 orange-gradient rounded-2xl flex items-center justify-center text-white text-3xl mb-8 group-hover:scale-110 transition-transform">
+                            <i class="bi bi-mortarboard-fill"></i>
+                        </div>
+                        <h3 class="text-2xl font-black text-gray-900 mb-4">{{ $course->name }}</h3>
+                        <p class="text-gray-500 text-sm leading-relaxed mb-8 line-clamp-3">
+                            {{ $course->description }}
+                        </p>
+                        <div class="flex items-center justify-between mt-auto">
+                            <div class="flex flex-col">
+                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Estado</span>
+                                <span class="text-xs font-bold text-green-600 uppercase">Inscrições Abertas</span>
+                            </div>
+                            <a href="{{ route('public.courses.register', $course->slug) }}"
+                                class="bg-blue-600 text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
+                                Inscrever-se
+                            </a>
+                        </div>
+                    </div>
+                @empty
+                    <div class="lg:col-span-3 text-center py-12">
+                        <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i class="bi bi-calendar-x text-3xl text-gray-300"></i>
+                        </div>
+                        <p class="text-gray-400 italic">No momento não há cursos com inscrições abertas via portal.</p>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+    </section>
+
     <!-- CTA Section -->
     <section class="py-32 bg-gray-900 relative overflow-hidden">
         <div class="absolute inset-0 opacity-10">
@@ -1294,7 +1350,7 @@
 
         // Scroll to Top Button
         const scrollToTopBtn = document.getElementById('scrollToTop');
-        
+
         window.addEventListener('scroll', () => {
             if (window.scrollY > 500) {
                 scrollToTopBtn.classList.remove('opacity-0', 'pointer-events-none');
@@ -1314,7 +1370,7 @@
     </script>
 
     <!-- Scroll to Top Button -->
-    <button id="scrollToTop" 
+    <button id="scrollToTop"
         class="fixed bottom-8 right-8 z-50 w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-full shadow-2xl hover:shadow-orange-500/50 transition-all duration-300 opacity-0 pointer-events-none hover:scale-110 group">
         <i class="bi bi-arrow-up text-xl group-hover:animate-bounce"></i>
     </button>

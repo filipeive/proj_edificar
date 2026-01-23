@@ -51,6 +51,11 @@ class Service extends Model
         return $this->hasMany(ServiceIndividualOffering::class);
     }
 
+    public function zoneParticipations()
+    {
+        return $this->hasMany(ServiceZoneParticipation::class);
+    }
+
     public function getTotalOfferingsAttribute()
     {
         return $this->offerings->sum('amount');
@@ -71,9 +76,32 @@ class Service extends Model
         return $this->total_offerings + $this->total_tithes + $this->total_individual_offerings + $this->special_offerings_total;
     }
 
+    public function getTotalMembersAttribute()
+    {
+        if ($this->service_type === 'teaching') {
+            return $this->zoneParticipations->sum(function ($p) {
+                return $p->adults_members + $p->children_members + $p->leaders +
+                    $p->auxiliary_leaders + $p->supervisors + $p->zone_pastors;
+            });
+        }
+
+        return ($this->adults_members ?? 0) + ($this->children_members ?? 0);
+    }
+
+    public function getTotalVisitorsAttribute()
+    {
+        if ($this->service_type === 'teaching') {
+            return ($this->adults_visitors ?? 0) + ($this->children_visitors ?? 0) +
+                $this->zoneParticipations->sum(function ($p) {
+                    return $p->adults_visitors + $p->children_visitors;
+                });
+        }
+
+        return ($this->adults_visitors ?? 0) + ($this->children_visitors ?? 0);
+    }
+
     public function getTotalParticipationAttribute()
     {
-        return $this->adults_members + $this->adults_visitors + $this->adults_salvations +
-            $this->children_members + $this->children_visitors + $this->children_salvations;
+        return $this->total_members + $this->total_visitors + ($this->adults_salvations ?? 0) + ($this->children_salvations ?? 0);
     }
 }

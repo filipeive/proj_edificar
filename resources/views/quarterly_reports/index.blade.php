@@ -88,10 +88,24 @@
                 <h2 class="text-2xl font-black text-gray-900">Histórico de Relatórios</h2>
                 <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Todos os períodos registrados</p>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center gap-3">
+                <form action="{{ route('quarterly-reports.export-annual') }}" method="GET"
+                    class="flex items-center gap-2 bg-gray-50 p-2 rounded-2xl border border-gray-100">
+                    <select name="year"
+                        class="bg-transparent border-transparent focus:ring-0 text-xs font-black text-gray-700 uppercase tracking-widest px-4">
+                        @for($y = date('Y'); $y >= 2024; $y--)
+                            <option value="{{ $y }}">{{ $y }}</option>
+                        @endfor
+                    </select>
+                    <button type="submit"
+                        class="bg-purple-50 text-purple-600 px-6 py-2.5 rounded-xl hover:bg-purple-600 hover:text-white transition-all font-black text-[10px] uppercase tracking-widest flex items-center border border-purple-100">
+                        <i class="bi bi-calendar-check mr-2"></i> Consolidado Anual
+                    </button>
+                </form>
+
                 <a href="{{ route('quarterly-reports.export') }}"
                     class="bg-green-50 text-green-600 px-6 py-4 rounded-2xl hover:bg-green-600 hover:text-white transition-all font-black text-xs uppercase tracking-widest flex items-center border border-green-100">
-                    <i class="bi bi-file-earmark-spreadsheet mr-2"></i> Exportar
+                    <i class="bi bi-file-earmark-spreadsheet mr-2"></i> Exportar Tudo
                 </a>
                 @can('create', App\Models\QuarterlyReport::class)
                     <a href="{{ route('quarterly-reports.create') }}"
@@ -172,7 +186,7 @@
                                 <td class="px-10 py-6 text-center">
                                     <span
                                         class="px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border 
-                                                {{ $report->status == 'submitted' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-yellow-50 text-yellow-600 border-yellow-100' }}">
+                                                        {{ $report->status == 'submitted' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-yellow-50 text-yellow-600 border-yellow-100' }}">
                                         {{ $report->status == 'submitted' ? 'Submetido' : 'Rascunho' }}
                                     </span>
                                 </td>

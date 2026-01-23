@@ -10,6 +10,10 @@
             <i class="bi bi-graph-up text-xl"></i>
         </a>
         @can('create', App\Models\Service::class)
+            <a href="{{ route('services.create-teaching') }}"
+                class="bg-orange-600 text-white p-2 rounded-lg hover:bg-orange-700 transition-all flex items-center justify-center shadow-lg shadow-orange-600/20">
+                <i class="bi bi-book text-xl"></i>
+            </a>
             <a href="{{ route('services.create') }}"
                 class="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
                 <i class="bi bi-calendar-plus text-xl"></i>
@@ -74,14 +78,62 @@
                         <span class="lg:hidden">Relatório</span>
                     </a>
                     @can('create', App\Models\Service::class)
-                        <a href="{{ route('services.create') }}"
-                            class="flex items-center bg-blue-600 text-white px-8 py-4 rounded-2xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-600/20">
-                            <i class="bi bi-plus-lg text-lg mr-2"></i>
-                            Registrar Culto
-                        </a>
+                        <div class="flex gap-2">
+                            <a href="{{ route('services.create-teaching') }}"
+                                class="flex items-center bg-orange-50 text-orange-600 px-6 py-4 rounded-2xl hover:bg-orange-600 hover:text-white transition-all font-black text-xs uppercase tracking-widest border border-orange-100">
+                                <i class="bi bi-book text-lg mr-2"></i>
+                                Culto de Ensino
+                            </a>
+                            <a href="{{ route('services.create') }}"
+                                class="flex items-center bg-blue-600 text-white px-8 py-4 rounded-2xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-600/20">
+                                <i class="bi bi-plus-lg text-lg mr-2"></i>
+                                Registrar Culto
+                            </a>
+                        </div>
                     @endcan
                 </div>
             </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="bg-gray-50 p-6 rounded-[2rem] border border-gray-100">
+            <form action="{{ route('services.index') }}" method="GET" class="flex flex-wrap items-end gap-4">
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Início</label>
+                    <input type="date" name="date_from" value="{{ request('date_from') }}"
+                        class="px-4 py-2 bg-white border border-gray-100 rounded-xl focus:ring-2 focus:ring-blue-500 text-xs font-bold text-gray-600">
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Fim</label>
+                    <input type="date" name="date_to" value="{{ request('date_to') }}"
+                        class="px-4 py-2 bg-white border border-gray-100 rounded-xl focus:ring-2 focus:ring-blue-500 text-xs font-bold text-gray-600">
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Tipo de Culto</label>
+                    <select name="service_type" 
+                        class="px-4 py-2 bg-white border border-gray-100 rounded-xl focus:ring-2 focus:ring-blue-500 text-xs font-bold text-gray-600 min-w-[150px]">
+                        <option value="">Todos</option>
+                        <option value="1st" {{ request('service_type') === '1st' ? 'selected' : '' }}>1º Culto</option>
+                        <option value="2nd" {{ request('service_type') === '2nd' ? 'selected' : '' }}>2º Culto</option>
+                        <option value="3rd" {{ request('service_type') === '3rd' ? 'selected' : '' }}>3º Culto</option>
+                        <option value="4th" {{ request('service_type') === '4th' ? 'selected' : '' }}>4º Culto</option>
+                        <option value="teaching" {{ request('service_type') === 'teaching' ? 'selected' : '' }}>Ensino</option>
+                        <option value="special" {{ request('service_type') === 'special' ? 'selected' : '' }}>Especial</option>
+                    </select>
+                </div>
+                <div class="flex gap-2">
+                    <button type="submit" 
+                        class="px-6 py-2 bg-blue-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20">
+                        Filtrar
+                    </button>
+                    @if(request()->anyFilled(['date_from', 'date_to', 'service_type']))
+                        <a href="{{ route('services.index') }}" 
+                            class="px-6 py-2 bg-gray-200 text-gray-600 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-300 transition-all">
+                            Limpar
+                        </a>
+                    @endif
+                </div>
+            </form>
         </div>
 
         <form id="bulkActionForm" action="{{ route('services.bulk-delete') }}" method="POST">
@@ -91,12 +143,12 @@
         <!-- Services Grid View -->
         <div x-show="view === 'grid'" x-transition.fade.duration.300ms class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
             @foreach($services as $service)
-                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 transition-all group flex flex-col relative">
+                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 transition-all group flex flex-col relative border-t-4 {{ $service->service_type === 'teaching' ? 'border-t-orange-500' : 'border-t-blue-500' }}">
                     <!-- Checkbox for Bulk Actions (Grid) -->
                     @if(auth()->user()->role === 'admin')
                         <div class="absolute top-6 left-6 z-10">
                             <input type="checkbox" name="service_ids[]" value="{{ $service->id }}" form="bulkActionForm"
-                                class="service-checkbox rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-6 h-6 bg-white/80 backdrop-blur-sm">
+                                class="service-checkbox rounded-lg border-gray-300 {{ $service->service_type === 'teaching' ? 'text-orange-600 focus:border-orange-300 focus:ring-orange-200' : 'text-blue-600 focus:border-blue-300 focus:ring-blue-200' }} shadow-sm focus:ring focus:ring-opacity-50 transition-all cursor-pointer w-6 h-6 bg-white/80 backdrop-blur-sm">
                         </div>
                     @endif
 
@@ -104,12 +156,13 @@
                         <!-- Card Header -->
                         <div class="flex justify-between items-start {{ auth()->user()->role === 'admin' ? 'pl-8' : '' }}">
                             <div class="space-y-1">
-                                <div class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest inline-block mb-1">
+                                <div class="px-3 py-1 {{ $service->service_type === 'teaching' ? 'bg-orange-50 text-orange-600' : 'bg-blue-50 text-blue-600' }} rounded-full text-[10px] font-black uppercase tracking-widest inline-block mb-1">
                                     @switch($service->service_type)
                                         @case('1st') 1º Culto @break
                                         @case('2nd') 2º Culto @break
                                         @case('3rd') 3º Culto @break
                                         @case('4th') 4º Culto @break
+                                        @case('teaching') Ensino @break
                                         @default Especial
                                     @endswitch
                                 </div>
@@ -129,7 +182,7 @@
                             </div>
                             <div class="text-right">
                                 <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Participação</span>
-                                <span class="text-2xl font-black text-blue-600">{{ $service->total_participation }}</span>
+                                <span class="text-2xl font-black {{ $service->service_type === 'teaching' ? 'text-orange-600' : 'text-blue-600' }}">{{ $service->total_participation }}</span>
                             </div>
                         </div>
 
@@ -146,9 +199,9 @@
                                 <span class="text-[9px] font-black text-green-600 uppercase tracking-widest block mb-1">Ofertas</span>
                                 <span class="text-sm font-black text-green-700">{{ number_format($service->total_offerings + $service->special_offerings_total, 2) }} MT</span>
                             </div>
-                            <div class="p-4 bg-blue-50 rounded-2xl border border-blue-100">
-                                <span class="text-[9px] font-black text-blue-600 uppercase tracking-widest block mb-1">Dízimos</span>
-                                <span class="text-sm font-black text-blue-700">{{ number_format($service->total_tithes, 2) }} MT</span>
+                            <div class="p-4 {{ $service->service_type === 'teaching' ? 'bg-orange-50 border-orange-100' : 'bg-blue-50 border-blue-100' }} rounded-2xl border">
+                                <span class="text-[9px] font-black {{ $service->service_type === 'teaching' ? 'text-orange-600' : 'text-blue-600' }} uppercase tracking-widest block mb-1">Dízimos</span>
+                                <span class="text-sm font-black {{ $service->service_type === 'teaching' ? 'text-orange-700' : 'text-blue-700' }}">{{ number_format($service->total_tithes, 2) }} MT</span>
                             </div>
                         </div>
                     </div>
@@ -156,13 +209,13 @@
                     <!-- Card Actions -->
                     <div class="px-8 py-6 bg-gray-50/50 border-t border-gray-50 flex items-center justify-between">
                         <div class="flex gap-2">
-                            <a href="{{ route('services.show', $service) }}" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                            <a href="{{ route('services.show', $service) }}" class="p-2 {{ $service->service_type === 'teaching' ? 'text-orange-600 hover:bg-orange-50' : 'text-blue-600 hover:bg-blue-50' }} rounded-lg transition-colors">
                                 <i class="bi bi-info-circle text-lg"></i>
                             </a>
                             <a href="{{ route('services.download-pdf', $service) }}" class="p-3 bg-white text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm border border-gray-100" title="Baixar PDF">
                                 <i class="bi bi-file-earmark-pdf"></i>
                             </a>
-                            <a href="{{ route('services.edit', $service) }}" class="p-3 bg-white text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm border border-gray-100" title="Editar">
+                            <a href="{{ route('services.edit', $service) }}" class="p-3 bg-white {{ $service->service_type === 'teaching' ? 'text-orange-600 hover:bg-orange-600' : 'text-blue-600 hover:bg-blue-600' }} rounded-xl hover:text-white transition-all shadow-sm border border-gray-100" title="Editar">
                                 <i class="bi bi-pencil-square"></i>
                             </a>
                         </div>
@@ -211,12 +264,13 @@
                                 @endif
                                 <td class="px-8 py-6 font-black text-gray-900">{{ $service->date->format('d/m/Y') }}</td>
                                 <td class="px-8 py-6">
-                                    <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-bold uppercase">
+                                    <span class="px-3 py-1 {{ $service->service_type === 'teaching' ? 'bg-orange-50 text-orange-600' : 'bg-blue-50 text-blue-600' }} rounded-full text-[10px] font-bold uppercase">
                                         @switch($service->service_type)
                                             @case('1st') 1º @break
                                             @case('2nd') 2º @break
                                             @case('3rd') 3º @break
                                             @case('4th') 4º @break
+                                            @case('teaching') Ensino @break
                                             @default Especial
                                         @endswitch
                                     </span>
@@ -230,12 +284,12 @@
                                         @endif
                                     </span>
                                 </td>
-                                <td class="px-8 py-6 text-center font-black text-blue-600">{{ $service->total_participation }}</td>
-                                <td class="px-8 py-6 text-right font-black text-blue-600">{{ number_format($service->total_financial, 0, ',', '.') }} MT</td>
+                                <td class="px-8 py-6 text-center font-black {{ $service->service_type === 'teaching' ? 'text-orange-600' : 'text-blue-600' }}">{{ $service->total_participation }}</td>
+                                <td class="px-8 py-6 text-right font-black {{ $service->service_type === 'teaching' ? 'text-orange-600' : 'text-blue-600' }}">{{ number_format($service->total_financial, 0, ',', '.') }} MT</td>
                                 <td class="px-8 py-6">
                                     <div class="flex justify-end gap-2 transition-all">
                                         <!-- detalhes do culto -->
-                                        <a href="{{ route('services.show', $service) }}" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                                        <a href="{{ route('services.show', $service) }}" class="p-2 {{ $service->service_type === 'teaching' ? 'text-orange-600 hover:bg-orange-50' : 'text-blue-600 hover:bg-blue-50' }} rounded-lg transition-colors">
                                             <i class="bi bi-info-circle text-lg"></i>
                                         </a>
                                         <!-- download pdf -->
@@ -243,7 +297,7 @@
                                             <i class="bi bi-file-earmark-pdf text-lg"></i>
                                         </a>
                                         <!-- editar -->
-                                        <a href="{{ route('services.edit', $service) }}" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                                        <a href="{{ route('services.edit', $service) }}" class="p-2 {{ $service->service_type === 'teaching' ? 'text-orange-600 hover:bg-orange-50' : 'text-blue-600 hover:bg-blue-50' }} rounded-lg transition-colors">
                                             <i class="bi bi-pencil-square text-lg"></i>
                                         </a>
                                         <form action="{{ route('services.destroy', $service) }}" method="POST"

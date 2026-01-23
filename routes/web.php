@@ -182,6 +182,8 @@ Route::middleware('auth')->group(function () {
             Route::resource('cells', CellController::class);
 
             // Cultos (Relatórios de Celebração)
+            Route::get('/services/create-teaching', [\App\Http\Controllers\ServiceController::class, 'createTeaching'])->name('services.create-teaching');
+            Route::get('/services/{service}/edit-teaching', [\App\Http\Controllers\ServiceController::class, 'editTeaching'])->name('services.edit-teaching');
             Route::get('/services/{service}/pdf', [\App\Http\Controllers\ServiceController::class, 'downloadPdf'])->name('services.download-pdf');
             Route::get('services/report', [\App\Http\Controllers\ServiceController::class, 'report'])->name('services.report');
             Route::get('services/export/monthly', [\App\Http\Controllers\ServiceController::class, 'exportMonthly'])->name('services.export.monthly');
@@ -326,6 +328,7 @@ Route::middleware('auth')->group(function () {
 
     // ===== RELATÓRIOS TRIMESTRAIS (QUARTERLY REPORTS) ROUTES =====
     Route::get('quarterly-reports/export', [\App\Http\Controllers\QuarterlyReportController::class, 'export'])->name('quarterly-reports.export');
+    Route::get('quarterly-reports/export-annual', [\App\Http\Controllers\QuarterlyReportController::class, 'exportAnnual'])->name('quarterly-reports.export-annual');
     Route::resource('quarterly-reports', \App\Http\Controllers\QuarterlyReportController::class);
     Route::post('packages/{package}/assign', [\App\Http\Controllers\Admin\PackageController::class, 'assignMember'])->name('packages.assign');
     Route::post('packages/{package}/send-bulk-sms', [\App\Http\Controllers\Admin\PackageController::class, 'sendBulkSms'])->name('packages.send-bulk-sms');

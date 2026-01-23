@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\AnnualQuarterlyReportExport;
 use App\Models\EventType;
 use App\Models\QuarterlyReport;
 use App\Models\QuarterlyReportEvent;
@@ -117,6 +118,9 @@ class QuarterlyReportController extends Controller
             'timoteos_count' => 'required|integer|min:0',
             'members_count' => 'required|integer|min:0',
             'participants_count' => 'required|integer|min:0',
+            'pastors_count' => 'required|integer|min:0',
+            'supervisors_count' => 'required|integer|min:0',
+            'visitors_count' => 'required|integer|min:0',
             'saved_count' => 'required|integer|min:0',
             'planned_baptism_count' => 'required|integer|min:0',
             'baptized_count' => 'required|integer|min:0',
@@ -222,6 +226,9 @@ class QuarterlyReportController extends Controller
             'timoteos_count' => 'required|integer|min:0',
             'members_count' => 'required|integer|min:0',
             'participants_count' => 'required|integer|min:0',
+            'pastors_count' => 'required|integer|min:0',
+            'supervisors_count' => 'required|integer|min:0',
+            'visitors_count' => 'required|integer|min:0',
             'saved_count' => 'required|integer|min:0',
             'planned_baptism_count' => 'required|integer|min:0',
             'baptized_count' => 'required|integer|min:0',
@@ -284,6 +291,16 @@ class QuarterlyReportController extends Controller
         return \Maatwebsite\Excel\Facades\Excel::download(
             new \App\Exports\QuarterlyReportExport(),
             'relatorios_trimestrais_' . now()->format('Y-m-d') . '.xlsx'
+        );
+    }
+
+    public function exportAnnual(Request $request)
+    {
+        $year = $request->input('year', date('Y'));
+
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new AnnualQuarterlyReportExport($year),
+            "consolidado_anual_{$year}_" . now()->format('Y-m-d') . '.xlsx'
         );
     }
 }

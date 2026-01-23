@@ -114,46 +114,90 @@
                 <!-- Detailed Participation Grid -->
                 <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
                     <div class="p-8 border-b border-gray-50 bg-gray-50/30 flex items-center justify-between">
-                        <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Grelha de Presença Detalhada</h3>
-                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Contraste: Adultos vs Crianças</span>
+                        <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">
+                            {{ $service->service_type === 'teaching' ? 'Participação por Zona' : 'Grelha de Presença Detalhada' }}
+                        </h3>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead>
-                                <tr class="bg-gray-50/50">
-                                    <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Categoria</th>
-                                    <th class="px-10 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Membros</th>
-                                    <th class="px-10 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Visitantes</th>
-                                    <th class="px-10 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Decisões</th>
-                                    <th class="px-10 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-50">
-                                <tr class="hover:bg-gray-50/50 transition-colors">
-                                    <td class="px-10 py-6 font-black text-gray-900 uppercase tracking-tight">Adultos</td>
-                                    <td class="px-10 py-6 text-center font-bold text-gray-600">{{ $service->adults_members }}</td>
-                                    <td class="px-10 py-6 text-center font-bold text-gray-600">{{ $service->adults_visitors }}</td>
-                                    <td class="px-10 py-6 text-center font-black text-green-600">{{ $service->adults_salvations }}</td>
-                                    <td class="px-10 py-6 text-right font-black text-blue-600">{{ $service->adults_members + $service->adults_visitors + $service->adults_salvations }}</td>
-                                </tr>
-                                <tr class="hover:bg-gray-50/50 transition-colors">
-                                    <td class="px-10 py-6 font-black text-gray-900 uppercase tracking-tight">Crianças (Life Kids)</td>
-                                    <td class="px-10 py-6 text-center font-bold text-gray-600">{{ $service->children_members }}</td>
-                                    <td class="px-10 py-6 text-center font-bold text-gray-600">{{ $service->children_visitors }}</td>
-                                    <td class="px-10 py-6 text-center font-black text-green-600">{{ $service->children_salvations }}</td>
-                                    <td class="px-10 py-6 text-right font-black text-blue-600">{{ $service->children_members + $service->children_visitors + $service->children_salvations }}</td>
-                                </tr>
-                            </tbody>
-                            <tfoot class="bg-gray-900 text-white">
-                                <tr>
-                                    <td class="px-10 py-6 text-[10px] font-black uppercase tracking-widest">TOTAIS CONSOLIDADOS</td>
-                                    <td class="px-10 py-6 text-center font-black">{{ $service->adults_members + $service->children_members }}</td>
-                                    <td class="px-10 py-6 text-center font-black">{{ $service->adults_visitors + $service->children_visitors }}</td>
-                                    <td class="px-10 py-6 text-center font-black text-green-400">{{ $service->adults_salvations + $service->children_salvations }}</td>
-                                    <td class="px-10 py-6 text-right font-black text-xl tracking-tighter">{{ $service->total_participation }}</td>
-                                </tr>
-                            </tfoot>
-                        </table>
+                        @if($service->service_type === 'teaching')
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="bg-gray-50/50">
+                                        <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Zona</th>
+                                        <th class="px-10 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Membros</th>
+                                        <th class="px-10 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Visit.</th>
+                                        <th class="px-10 py-5 text-center text-[10px] font-black text-orange-600 uppercase tracking-widest">Líderes</th>
+                                        <th class="px-10 py-5 text-center text-[10px] font-black text-orange-400 uppercase tracking-widest">Timótio</th>
+                                        <th class="px-10 py-5 text-center text-[10px] font-black text-purple-600 uppercase tracking-widest">Superv.</th>
+                                        <th class="px-10 py-5 text-center text-[10px] font-black text-red-600 uppercase tracking-widest">Pastores Z.</th>
+                                        <th class="px-10 py-5 text-right text-[10px] font-black text-blue-600 uppercase tracking-widest">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-50">
+                                    @foreach($service->zoneParticipations as $participation)
+                                        <tr class="hover:bg-gray-50/50 transition-colors text-xs font-bold">
+                                            <td class="px-10 py-6 font-black text-gray-900 uppercase tracking-tight">{{ $participation->zone->name }}</td>
+                                            <td class="px-10 py-6 text-center text-gray-600">{{ $participation->adults_members + $participation->children_members }}</td>
+                                            <td class="px-10 py-6 text-center text-gray-600">{{ $participation->adults_visitors + $participation->children_visitors }}</td>
+                                            <td class="px-10 py-6 text-center text-orange-600">{{ $participation->leaders }}</td>
+                                            <td class="px-10 py-6 text-center text-orange-400">{{ $participation->auxiliary_leaders }}</td>
+                                            <td class="px-10 py-6 text-center text-purple-600">{{ $participation->supervisors }}</td>
+                                            <td class="px-10 py-6 text-center text-red-600">{{ $participation->zone_pastors }}</td>
+                                            <td class="px-10 py-6 text-right font-black text-blue-600">{{ $participation->total }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                                <tfoot class="bg-blue-600 text-white">
+                                    <tr>
+                                        <td class="px-10 py-6 text-[10px] font-black uppercase tracking-widest">TOTAIS ENSINO</td>
+                                        <td class="px-10 py-6 text-center font-black">{{ $service->zoneParticipations->sum('adults_members') + $service->zoneParticipations->sum('children_members') }}</td>
+                                        <td class="px-10 py-6 text-center font-black">{{ $service->zoneParticipations->sum('adults_visitors') + $service->zoneParticipations->sum('children_visitors') + ($service->adults_visitors ?? 0) + ($service->children_visitors ?? 0) }}</td>
+                                        <td class="px-10 py-6 text-center font-black">{{ $service->zoneParticipations->sum('leaders') }}</td>
+                                        <td class="px-10 py-6 text-center font-black">{{ $service->zoneParticipations->sum('auxiliary_leaders') }}</td>
+                                        <td class="px-10 py-6 text-center font-black">{{ $service->zoneParticipations->sum('supervisors') }}</td>
+                                        <td class="px-10 py-6 text-center font-black">{{ $service->zoneParticipations->sum('zone_pastors') }}</td>
+                                        <td class="px-10 py-6 text-right font-black text-xl tracking-tighter">{{ $service->total_participation }}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        @else
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="bg-gray-50/50">
+                                        <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Categoria</th>
+                                        <th class="px-10 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Membros</th>
+                                        <th class="px-10 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Visitantes</th>
+                                        <th class="px-10 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Decisões</th>
+                                        <th class="px-10 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-50">
+                                    <tr class="hover:bg-gray-50/50 transition-colors">
+                                        <td class="px-10 py-6 font-black text-gray-900 uppercase tracking-tight">Adultos</td>
+                                        <td class="px-10 py-6 text-center font-bold text-gray-600">{{ $service->adults_members }}</td>
+                                        <td class="px-10 py-6 text-center font-bold text-gray-600">{{ $service->adults_visitors }}</td>
+                                        <td class="px-10 py-6 text-center font-black text-green-600">{{ $service->adults_salvations }}</td>
+                                        <td class="px-10 py-6 text-right font-black text-blue-600">{{ $service->adults_members + $service->adults_visitors + $service->adults_salvations }}</td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50/50 transition-colors">
+                                        <td class="px-10 py-6 font-black text-gray-900 uppercase tracking-tight">Crianças (Life Kids)</td>
+                                        <td class="px-10 py-6 text-center font-bold text-gray-600">{{ $service->children_members }}</td>
+                                        <td class="px-10 py-6 text-center font-bold text-gray-600">{{ $service->children_visitors }}</td>
+                                        <td class="px-10 py-6 text-center font-black text-green-600">{{ $service->children_salvations }}</td>
+                                        <td class="px-10 py-6 text-right font-black text-blue-600">{{ $service->children_members + $service->children_visitors + $service->children_salvations }}</td>
+                                    </tr>
+                                </tbody>
+                                <tfoot class="bg-gray-900 text-white">
+                                    <tr>
+                                        <td class="px-10 py-6 text-[10px] font-black uppercase tracking-widest">TOTAIS CONSOLIDADOS</td>
+                                        <td class="px-10 py-6 text-center font-black">{{ $service->adults_members + $service->children_members }}</td>
+                                        <td class="px-10 py-6 text-center font-black">{{ $service->adults_visitors + $service->children_visitors }}</td>
+                                        <td class="px-10 py-6 text-center font-black text-green-400">{{ $service->adults_salvations + $service->children_salvations }}</td>
+                                        <td class="px-10 py-6 text-right font-black text-xl tracking-tighter">{{ $service->total_participation }}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        @endif
                     </div>
                 </div>
             </div>

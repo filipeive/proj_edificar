@@ -7,7 +7,8 @@
 @section('content')
     <div class="container-fluid space-y-8">
         <div class="flex items-center justify-between">
-            <a href="{{ route('services.index') }}" class="px-6 py-2 bg-white border border-gray-200 rounded-xl text-gray-400 hover:text-gray-900 transition-all font-bold text-xs uppercase tracking-widest flex items-center gap-2 shadow-sm">
+            <a href="{{ route('services.index') }}"
+                class="px-6 py-2 bg-white border border-gray-200 rounded-xl text-gray-400 hover:text-gray-900 transition-all font-bold text-xs uppercase tracking-widest flex items-center gap-2 shadow-sm">
                 <i class="bi bi-arrow-left"></i> Voltar
             </a>
             <div class="flex gap-2">
@@ -38,16 +39,22 @@
                         </div>
                         <div>
                             <label class="block text-[10px] font-black text-gray-500 uppercase mb-2">Tipo de Culto</label>
-                            <select name="service_type" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+                            <select name="service_type"
+                                class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500">
                                 <option value="">Todos os Tipos</option>
                                 <option value="1st" {{ request('service_type') == '1st' ? 'selected' : '' }}>1º Culto</option>
                                 <option value="2nd" {{ request('service_type') == '2nd' ? 'selected' : '' }}>2º Culto</option>
                                 <option value="3rd" {{ request('service_type') == '3rd' ? 'selected' : '' }}>3º Culto</option>
                                 <option value="4th" {{ request('service_type') == '4th' ? 'selected' : '' }}>4º Culto</option>
-                                <option value="special" {{ request('service_type') == 'special' ? 'selected' : '' }}>Especial</option>
+                                <option value="normal" {{ request('service_type') == 'normal' ? 'selected' : '' }}>Todos os Cultos Normais</option>
+                                <option value="teaching" {{ request('service_type') == 'teaching' ? 'selected' : '' }}>Ensino
+                                </option>
+                                <option value="special" {{ request('service_type') == 'special' ? 'selected' : '' }}>Especial
+                                </option>
                             </select>
                         </div>
-                        <button type="submit" class="w-full py-3 bg-gray-900 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-black transition-all">
+                        <button type="submit"
+                            class="w-full py-3 bg-gray-900 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-black transition-all">
                             Atualizar Análise
                         </button>
                     </form>
@@ -62,8 +69,9 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase mb-2">Mês</label>
-                                <select name="month" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500">
-                                    @for($m=1; $m<=12; $m++)
+                                <select name="month"
+                                    class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500">
+                                    @for($m = 1; $m <= 12; $m++)
                                         <option value="{{ $m }}" {{ now()->month == $m ? 'selected' : '' }}>
                                             {{ \Carbon\Carbon::create(null, $m)->translatedFormat('F') }}
                                         </option>
@@ -72,14 +80,25 @@
                             </div>
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase mb-2">Ano</label>
-                                <select name="year" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500">
-                                    @for($y=now()->year; $y>=2023; $y--)
+                                <select name="year"
+                                    class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500">
+                                    @for($y = now()->year; $y >= 2023; $y--)
                                         <option value="{{ $y }}">{{ $y }}</option>
                                     @endfor
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" class="w-full py-3 bg-orange-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-700 transition-all flex items-center justify-center gap-2">
+                        <div class="mt-4">
+                            <label class="block text-[10px] font-black text-gray-400 uppercase mb-2">Tipo de Culto</label>
+                            <select name="service_type"
+                                class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500">
+                                <option value="all">Todos (Separados)</option>
+                                <option value="normal">Cultos Normais</option>
+                                <option value="teaching">Cultos de Ensino</option>
+                            </select>
+                        </div>
+                        <button type="submit"
+                            class="w-full py-3 bg-orange-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-700 transition-all flex items-center justify-center gap-2">
                             <i class="bi bi-download"></i> Gerar Mensal
                         </button>
                     </form>
@@ -94,7 +113,8 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase mb-2">Trimestre</label>
-                                <select name="quarter" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500">
+                                <select name="quarter"
+                                    class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500">
                                     <option value="1">1º Trimestre</option>
                                     <option value="2">2º Trimestre</option>
                                     <option value="3">3º Trimestre</option>
@@ -103,14 +123,16 @@
                             </div>
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase mb-2">Ano</label>
-                                <select name="year" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500">
-                                    @for($y=now()->year; $y>=2023; $y--)
+                                <select name="year"
+                                    class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500">
+                                    @for($y = now()->year; $y >= 2023; $y--)
                                         <option value="{{ $y }}">{{ $y }}</option>
                                     @endfor
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" class="w-full py-3 bg-green-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-green-700 transition-all flex items-center justify-center gap-2">
+                        <button type="submit"
+                            class="w-full py-3 bg-green-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-green-700 transition-all flex items-center justify-center gap-2">
                             <i class="bi bi-download"></i> Gerar Trimestral
                         </button>
                     </form>
@@ -135,11 +157,14 @@
             <!-- Stats Rápidas -->
             <div class="lg:col-span-4 space-y-6">
                 <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
-                    <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-6 text-center">Configuração de Público</h3>
+                    <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-6 text-center">Configuração de
+                        Público</h3>
                     <div class="aspect-square relative flex items-center justify-center">
                         <div class="absolute text-center z-10">
                             <p class="text-[10px] font-black text-gray-400 uppercase leading-none">Total</p>
-                            <p class="text-3xl font-black text-gray-900 tracking-tighter">{{ $trendServices->sum(fn($s) => $s->adults_members + $s->children_members + $s->adults_visitors + $s->children_visitors) }}</p>
+                            <p class="text-3xl font-black text-gray-900 tracking-tighter">
+                                {{ $trendServices->sum('total_participation') }}
+                            </p>
                         </div>
                         <canvas id="visitorsChart"></canvas>
                     </div>
@@ -150,7 +175,8 @@
         <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
             <div class="p-8 border-b border-gray-50 flex items-center justify-between">
                 <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Resumo Detalhado</h3>
-                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ count($trendServices) }} Cultos Analisados</span>
+                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ count($trendServices) }}
+                    Cultos Analisados</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -165,19 +191,23 @@
                             </th>
                             <th class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Decisões
                             </th>
+                            <!-- culto -->
+                            <th class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Culto
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50">
                         @foreach($trendServices as $service)
                             @php
-                                $total = $service->adults_members + $service->adults_visitors + $service->children_members + $service->children_visitors;
-                                $members = $service->adults_members + $service->children_members;
-                                $visitors = $service->adults_visitors + $service->children_visitors;
+                                $total = $service->total_participation;
+                                $members = $service->total_members;
+                                $visitors = $service->total_visitors;
                                 $salvations = $service->adults_salvations + $service->children_salvations;
                             @endphp
                             <tr class="hover:bg-gray-50/50 transition-colors">
                                 <td class="px-8 py-4 font-bold text-gray-900">
-                                    {{ \Carbon\Carbon::parse($service->date)->format('d/m/Y') }}</td>
+                                    {{ \Carbon\Carbon::parse($service->date)->format('d/m/Y') }}
+                                </td>
                                 <td class="px-8 py-4 font-black text-blue-600">{{ $total }}</td>
                                 <td class="px-8 py-4 text-gray-600">{{ $members }}</td>
                                 <td class="px-8 py-4 text-gray-600">{{ $visitors }}</td>
@@ -185,7 +215,8 @@
                                     <span
                                         class="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-[10px] font-black">{{ $salvations }}</span>
                                 </td>
-                            </tr>
+                                <td class="px-8 py-4 text-gray-600">{{ $service->service_type }}</td>
+                            </tr>   
                         @endforeach
                     </tbody>
                 </table>
@@ -235,8 +266,8 @@
                         labels: ['Membros', 'Visitantes'],
                         datasets: [{
                             data: [
-                                    {{ $trendServices->sum(fn($s) => $s->adults_members + $s->children_members) }},
-                                {{ $trendServices->sum(fn($s) => $s->adults_visitors + $s->children_visitors) }}
+                                                                    {{ $trendServices->sum('total_members') }},
+                                {{ $trendServices->sum('total_visitors') }}
                             ],
                             backgroundColor: ['#2563eb', '#eab308'],
                             borderWidth: 0

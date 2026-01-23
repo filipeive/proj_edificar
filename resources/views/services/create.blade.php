@@ -3,7 +3,9 @@
 @section('title', 'Novo Culto - Portal Life Church')
 
 @section('content')
-    <div class="space-y-8" x-data="{ guestPreacher: {{ old('preacher_id') === 'other' ? 'true' : 'false' }} }">
+    <div class="space-y-8" x-data="{ 
+                        guestPreacher: {{ old('preacher_id') === 'other' ? 'true' : 'false' }}
+                    }">
         <!-- Header -->
         <div
             class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -58,7 +60,7 @@
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Tipo de
                             Celebração</label>
-                        <select name="service_type" required
+                        <select name="service_type" required x-model="serviceType"
                             class="w-full px-5 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700 appearance-none">
                             <option value="1st">1º Culto</option>
                             <option value="2nd">2º Culto</option>
@@ -181,7 +183,8 @@
                                 <td class="p-6 text-center font-black" id="col_visitors_total">0</td>
                                 <td class="p-6 text-center font-black text-orange-400" id="col_salvations_total">0</td>
                                 <td class="p-6 text-center font-black bg-blue-600 rounded-r-[1.5rem]"
-                                    id="grand_total_display">0</td>
+                                    id="grand_total_display">0
+                                </td>
                             </tr>
                         </tfoot>
                     </table>

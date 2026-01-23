@@ -93,12 +93,15 @@
                     <div class="p-8 grid grid-cols-2 md:grid-cols-6 gap-6 pt-0">
                         @php
                             $stats = [
+                                'pastors_count' => ['icon' => 'bi-person-workspace', 'label' => 'Pastores', 'color' => 'red'],
+                                'supervisors_count' => ['icon' => 'bi-person-check', 'label' => 'Supervisores', 'color' => 'purple'],
                                 'leaders_count' => ['icon' => 'bi-person-badge', 'label' => 'Líderes', 'color' => 'blue'],
-                                'cells_count' => ['icon' => 'bi-grid-3x3-gap', 'label' => 'Células', 'color' => 'purple'],
-                                'timoteos_count' => ['icon' => 'bi-award', 'label' => 'Timóteos', 'color' => 'indigo'],
+                                'timoteos_count' => ['icon' => 'bi-award', 'label' => 'Auxiliares', 'color' => 'indigo'],
                                 'members_count' => ['icon' => 'bi-people', 'label' => 'Membros', 'color' => 'green'],
+                                'visitors_count' => ['icon' => 'bi-person-plus', 'label' => 'Visitantes', 'color' => 'orange'],
+                                'saved_count' => ['icon' => 'bi-heart-pulse', 'label' => 'Decisões', 'color' => 'red'],
+                                'cells_count' => ['icon' => 'bi-grid-3x3-gap', 'label' => 'Células', 'color' => 'purple'],
                                 'participants_count' => ['icon' => 'bi-graph-up', 'label' => 'Part. Médios', 'color' => 'orange'],
-                                'saved_count' => ['icon' => 'bi-heart-pulse', 'label' => 'Novas Almas', 'color' => 'red'],
                             ];
                         @endphp
                         @foreach($stats as $field => $data)

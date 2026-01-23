@@ -13,13 +13,25 @@ use Illuminate\Support\Facades\Gate;
 
 class ServiceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         Gate::authorize('viewAny', Service::class);
 
-        $services = Service::with(['preacher', 'offerings.offeringType'])
-            ->orderBy('date', 'desc')
-            ->paginate(15);
+        $query = Service::with(['preacher', 'offerings.offeringType']);
+
+        if ($request->filled('date_from')) {
+            $query->where('date', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->where('date', '<=', $request->date_to);
+        }
+        if ($request->filled('service_type')) {
+            $query->where('service_type', $request->service_type);
+        }
+
+        $services = $query->orderBy('date', 'desc')
+            ->paginate(15)
+            ->withQueryString();
 
         return view('services.index', compact('services'));
     }
@@ -30,8 +42,20 @@ class ServiceController extends Controller
 
         $preachers = User::whereIn('role', ['admin', 'pastor', 'pastor_zona', 'supervisor'])->get();
         $offeringTypes = OfferingType::where('is_active', true)->orderBy('order')->get();
+        $zones = \App\Models\Zone::orderBy('name')->get();
 
-        return view('services.create', compact('preachers', 'offeringTypes'));
+        return view('services.create', compact('preachers', 'offeringTypes', 'zones'));
+    }
+
+    public function createTeaching()
+    {
+        Gate::authorize('create', Service::class);
+
+        $preachers = User::whereIn('role', ['admin', 'pastor', 'pastor_zona', 'supervisor'])->get();
+        $offeringTypes = OfferingType::where('is_active', true)->orderBy('order')->get();
+        $zones = \App\Models\Zone::orderBy('name')->get();
+
+        return view('services.create-teaching', compact('preachers', 'offeringTypes', 'zones'));
     }
 
     public function store(Request $request)
@@ -65,7 +89,7 @@ class ServiceController extends Controller
 
         $validated = $request->validate([
             'date' => 'required|date',
-            'service_type' => 'required|in:1st,2nd,3rd,4th,special',
+            'service_type' => 'required|in:1st,2nd,3rd,4th,special,teaching',
             'preacher_id' => 'nullable|exists:users,id',
             'preacher_name' => 'nullable|string|max:255',
             'theme' => 'nullable|string|max:255',
@@ -89,10 +113,20 @@ class ServiceController extends Controller
             'individual_offerings.*.member_name' => 'nullable|string|max:255',
             'individual_offerings.*.description' => 'nullable|string|max:255',
             'individual_contributions' => 'nullable|array',
-            'individual_contributions.*.type' => 'required|in:tithe,offering',
-            'individual_contributions.*.amount' => 'required|numeric|min:0',
+            'individual_contributions.*.type' => 'required_with:individual_contributions.*.amount|in:tithe,offering',
+            'individual_contributions.*.amount' => 'nullable|numeric|min:0',
             'individual_contributions.*.member_name' => 'nullable|string|max:255',
             'individual_contributions.*.description' => 'nullable|string|max:255',
+            'zone_participations' => 'nullable|array',
+            'zone_participations.*.zone_id' => 'required|exists:zones,id',
+            'zone_participations.*.adults_members' => 'nullable|integer|min:0',
+            'zone_participations.*.adults_visitors' => 'nullable|integer|min:0',
+            'zone_participations.*.leaders' => 'nullable|integer|min:0',
+            'zone_participations.*.auxiliary_leaders' => 'nullable|integer|min:0',
+            'zone_participations.*.supervisors' => 'nullable|integer|min:0',
+            'zone_participations.*.zone_pastors' => 'nullable|integer|min:0',
+            'zone_participations.*.children_members' => 'nullable|integer|min:0',
+            'zone_participations.*.children_visitors' => 'nullable|integer|min:0',
         ]);
 
         foreach ($numericFields as $field) {
@@ -145,6 +179,12 @@ class ServiceController extends Controller
                     }
                 }
             }
+
+            if ($validated['service_type'] === 'teaching' && isset($validated['zone_participations'])) {
+                foreach ($validated['zone_participations'] as $partData) {
+                    $service->zoneParticipations()->create($partData);
+                }
+            }
         });
 
         return redirect()->route('services.index')->with('success', 'Culto registrado com sucesso!');
@@ -163,11 +203,28 @@ class ServiceController extends Controller
     {
         Gate::authorize('update', $service);
 
+        if ($service->service_type === 'teaching') {
+            return redirect()->route('services.edit-teaching', $service);
+        }
+
         $preachers = User::whereIn('role', ['admin', 'pastor', 'pastor_zona', 'supervisor'])->get();
         $offeringTypes = OfferingType::where('is_active', true)->orderBy('order')->get();
-        $service->load(['offerings', 'tithes', 'individualOfferings']);
+        $zones = \App\Models\Zone::orderBy('name')->get();
+        $service->load(['offerings', 'tithes', 'individualOfferings', 'zoneParticipations']);
 
-        return view('services.edit', compact('service', 'preachers', 'offeringTypes'));
+        return view('services.edit', compact('service', 'preachers', 'offeringTypes', 'zones'));
+    }
+
+    public function editTeaching(Service $service)
+    {
+        Gate::authorize('update', $service);
+
+        $preachers = User::whereIn('role', ['admin', 'pastor', 'pastor_zona', 'supervisor'])->get();
+        $offeringTypes = OfferingType::where('is_active', true)->orderBy('order')->get();
+        $zones = \App\Models\Zone::orderBy('name')->get();
+        $service->load(['offerings', 'tithes', 'individualOfferings', 'zoneParticipations']);
+
+        return view('services.edit-teaching', compact('service', 'preachers', 'offeringTypes', 'zones'));
     }
 
     public function update(Request $request, Service $service)
@@ -201,7 +258,7 @@ class ServiceController extends Controller
 
         $validated = $request->validate([
             'date' => 'required|date',
-            'service_type' => 'required|in:1st,2nd,3rd,4th,special',
+            'service_type' => 'required|in:1st,2nd,3rd,4th,special,teaching',
             'preacher_id' => 'nullable|exists:users,id',
             'preacher_name' => 'nullable|string|max:255',
             'theme' => 'nullable|string|max:255',
@@ -225,10 +282,20 @@ class ServiceController extends Controller
             'individual_offerings.*.member_name' => 'nullable|string|max:255',
             'individual_offerings.*.description' => 'nullable|string|max:255',
             'individual_contributions' => 'nullable|array',
-            'individual_contributions.*.type' => 'required|in:tithe,offering',
-            'individual_contributions.*.amount' => 'required|numeric|min:0',
+            'individual_contributions.*.type' => 'required_with:individual_contributions.*.amount|in:tithe,offering',
+            'individual_contributions.*.amount' => 'nullable|numeric|min:0',
             'individual_contributions.*.member_name' => 'nullable|string|max:255',
             'individual_contributions.*.description' => 'nullable|string|max:255',
+            'zone_participations' => 'nullable|array',
+            'zone_participations.*.zone_id' => 'required|exists:zones,id',
+            'zone_participations.*.adults_members' => 'nullable|integer|min:0',
+            'zone_participations.*.adults_visitors' => 'nullable|integer|min:0',
+            'zone_participations.*.leaders' => 'nullable|integer|min:0',
+            'zone_participations.*.auxiliary_leaders' => 'nullable|integer|min:0',
+            'zone_participations.*.supervisors' => 'nullable|integer|min:0',
+            'zone_participations.*.zone_pastors' => 'nullable|integer|min:0',
+            'zone_participations.*.children_members' => 'nullable|integer|min:0',
+            'zone_participations.*.children_visitors' => 'nullable|integer|min:0',
         ]);
 
         foreach ($numericFields as $field) {
@@ -286,6 +353,13 @@ class ServiceController extends Controller
                     }
                 }
             }
+
+            if ($validated['service_type'] === 'teaching' && isset($validated['zone_participations'])) {
+                $service->zoneParticipations()->delete();
+                foreach ($validated['zone_participations'] as $partData) {
+                    $service->zoneParticipations()->create($partData);
+                }
+            }
         });
 
         return redirect()->route('services.index')->with('success', 'Culto atualizado com sucesso!');
@@ -325,16 +399,20 @@ class ServiceController extends Controller
             $query->where('date', '<=', $request->date_to);
         }
         if ($request->filled('service_type')) {
-            $query->where('service_type', $request->service_type);
+            if ($request->service_type === 'normal') {
+                $query->whereIn('service_type', ['1st', '2nd', '3rd', '4th']);
+            } else {
+                $query->where('service_type', $request->service_type);
+            }
         }
 
-        $trendServices = $query->orderBy('date', 'desc')->get()->reverse();
+        $trendServices = $query->with('zoneParticipations')->orderBy('date', 'desc')->get()->reverse();
 
         $stats = [
-            'labels' => $trendServices->map(fn($s) => \Carbon\Carbon::parse($s->date)->format('d/m')),
-            'attendance' => $trendServices->map(fn($s) => $s->adults_members + $s->adults_visitors + $s->children_members + $s->children_visitors),
-            'visitors' => $trendServices->map(fn($s) => $s->adults_visitors + $s->children_visitors),
-            'salvations' => $trendServices->map(fn($s) => $s->adults_salvations + $s->children_salvations),
+            'labels' => $trendServices->map(fn($s) => \Carbon\Carbon::parse($s->date)->format('d/m'))->values(),
+            'attendance' => $trendServices->map(fn($s) => $s->total_participation)->values(),
+            'visitors' => $trendServices->map(fn($s) => $s->total_visitors)->values(),
+            'salvations' => $trendServices->map(fn($s) => $s->adults_salvations + $s->children_salvations)->values(),
         ];
 
         return view('services.report', compact('stats', 'trendServices'));
@@ -347,14 +425,28 @@ class ServiceController extends Controller
         $request->validate([
             'month' => 'required|integer|between:1,12',
             'year' => 'required|integer',
+            'service_type' => 'nullable|string',
         ]);
 
-        $services = Service::whereYear('date', $request->year)
-            ->whereMonth('date', $request->month)
-            ->orderBy('date', 'asc')
-            ->get();
+        $query = Service::with(['zoneParticipations', 'offerings', 'tithes', 'individualOfferings'])
+            ->whereYear('date', $request->year)
+            ->whereMonth('date', $request->month);
 
-        $title = "Relatório Mensal de Cultos - " . \Carbon\Carbon::createFromDate($request->year, $request->month)->translatedFormat('F/Y');
+        if ($request->service_type === 'normal') {
+            $query->whereIn('service_type', ['1st', '2nd', '3rd', '4th']);
+        } elseif ($request->service_type === 'teaching') {
+            $query->where('service_type', 'teaching');
+        }
+
+        $services = $query->orderBy('date', 'asc')->get();
+
+        $typeLabel = match ($request->service_type) {
+            'normal' => ' (Cultos Normais)',
+            'teaching' => ' (Cultos de Ensino)',
+            default => '',
+        };
+
+        $title = "Relatório Mensal de Cultos{$typeLabel} - " . \Carbon\Carbon::createFromDate($request->year, $request->month)->translatedFormat('F/Y');
 
         $pdf = Pdf::loadView('services.report-pdf', compact('services', 'title'));
         return $pdf->download("relatorio_mensal_cultos_{$request->year}_{$request->month}.pdf");
@@ -367,6 +459,7 @@ class ServiceController extends Controller
         $request->validate([
             'quarter' => 'required|integer|between:1,4',
             'year' => 'required|integer',
+            'service_type' => 'nullable|string',
         ]);
 
         $months = match ((int) $request->quarter) {
@@ -376,12 +469,25 @@ class ServiceController extends Controller
             4 => [10, 11, 12],
         };
 
-        $services = Service::whereYear('date', $request->year)
-            ->whereIn(DB::raw('MONTH(date)'), $months)
-            ->orderBy('date', 'asc')
-            ->get();
+        $query = Service::with(['zoneParticipations', 'offerings', 'tithes', 'individualOfferings'])
+            ->whereYear('date', $request->year)
+            ->whereIn(DB::raw('MONTH(date)'), $months);
 
-        $title = "Relatório Trimestral de Cultos - {$request->quarter}º Trimestre / {$request->year}";
+        if ($request->service_type === 'normal') {
+            $query->whereIn('service_type', ['1st', '2nd', '3rd', '4th']);
+        } elseif ($request->service_type === 'teaching') {
+            $query->where('service_type', 'teaching');
+        }
+
+        $services = $query->orderBy('date', 'asc')->get();
+
+        $typeLabel = match ($request->service_type) {
+            'normal' => ' (Cultos Normais)',
+            'teaching' => ' (Cultos de Ensino)',
+            default => '',
+        };
+
+        $title = "Relatório Trimestral de Cultos{$typeLabel} - {$request->quarter}º Trimestre / {$request->year}";
 
         $pdf = Pdf::loadView('services.report-pdf', compact('services', 'title'));
         return $pdf->download("relatorio_trimestral_cultos_{$request->year}_Q{$request->quarter}.pdf");
