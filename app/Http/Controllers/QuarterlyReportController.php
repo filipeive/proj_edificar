@@ -33,7 +33,44 @@ class QuarterlyReportController extends Controller
             ->orderBy('quarter', 'desc')
             ->paginate(15);
 
-        return view('quarterly_reports.index', compact('reports'));
+        // Analytics for Charts (Last 4 Quarters)
+        $analyticsQuery = QuarterlyReport::query();
+        if ($user->role === 'pastor_zona') {
+            $analyticsQuery->where('zone_id', $user->getZoneId());
+        } elseif ($user->role === 'supervisor') {
+            $analyticsQuery->where('supervisor_id', $user->id);
+        }
+
+        $recentReports = $analyticsQuery->orderBy('year', 'desc')
+            ->orderBy('quarter', 'desc')
+            ->limit(8)
+            ->get();
+
+        // Prepare chart data
+        $chartLabels = $recentReports->map(fn($r) => "Q{$r->quarter}/{$r->year}")->reverse();
+        $membersData = $recentReports->pluck('members_count')->reverse();
+        $cellsData = $recentReports->pluck('cells_count')->reverse();
+        $savedData = $recentReports->pluck('saved_count')->reverse();
+        $baptizedData = $recentReports->pluck('baptized_count')->reverse();
+
+        // Summary Stats
+        $totalMembers = $recentReports->first()->members_count ?? 0;
+        $totalCells = $recentReports->first()->cells_count ?? 0;
+        $totalSaved = $recentReports->sum('saved_count');
+        $totalBaptized = $recentReports->sum('baptized_count');
+
+        return view('quarterly_reports.index', compact(
+            'reports',
+            'chartLabels',
+            'membersData',
+            'cellsData',
+            'savedData',
+            'baptizedData',
+            'totalMembers',
+            'totalCells',
+            'totalSaved',
+            'totalBaptized'
+        ));
     }
 
     public function create()
