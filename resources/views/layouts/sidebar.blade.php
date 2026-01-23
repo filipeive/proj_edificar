@@ -153,6 +153,20 @@
                             </div>
                         </div>
                     @endif
+
+                    @if ($authUser->isAdmin() || $authUser->isPastor() || $authUser->isPastorZona() || $authUser->isSupervisor())
+                        <a href="{{ route('quarterly-reports.index') }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('quarterly-reports.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                            <i class="bi bi-file-earmark-bar-graph-fill text-xl flex-shrink-0"></i>
+                            <span class="sidebar-text ml-4 font-bold tracking-tight">Relatórios Trimestrais</span>
+                        </a>
+                    @endif
+
+                    @if ($authUser->isAdmin() || $authUser->isSecretaria())
+                        <a href="{{ route('inventory-items.index') }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('inventory-items.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                            <i class="bi bi-box-seam-fill text-xl flex-shrink-0"></i>
+                            <span class="sidebar-text ml-4 font-bold tracking-tight">Inventário</span>
+                        </a>
+                    @endif
                 @endif
             @elseif($sectionName === 'celulas')
                 @if ($authUser->isAdmin() || $authUser->isPastor() || $authUser->isPastorZona() || $authUser->isSupervisor() || $authUser->isLider() || $authUser->isTimoteo() || $authUser->isSecretaria() || $authUser->hasRole('membro'))
