@@ -13,7 +13,7 @@
             </div>
 
             <!-- Login Card -->
-            <div class="bg-white rounded-lg shadow-2xl p-8">
+            <div class="glass-card rounded-3xl shadow-2xl p-8 relative z-10">
                 <!-- Display Validation Errors -->
                 @if ($errors->any())
                     <div class="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
