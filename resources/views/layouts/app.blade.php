@@ -278,9 +278,9 @@
 
         @media (max-width: 640px) {
             .notifications-panel {
-                right: -80px;
-                /* Adjust to center more on mobile */
-                width: calc(100vw - 1rem);
+                right: 50%;
+                transform: translateX(50%);
+                width: calc(100vw - 2rem);
             }
         }
 
