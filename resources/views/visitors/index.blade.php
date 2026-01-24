@@ -432,14 +432,7 @@
 
                 if (!bulkBtn) return;
 
-                if (count > 0) {
-                    bulkBtn.disabled = false;
-                    bulkBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'hidden');
-                    bulkBtn.innerHTML = `<i class="bi bi-trash-fill mr-2"></i> Remover ${count}`;
-                } else {
-                    bulkBtn.disabled = true;
-                    bulkBtn.classList.add('opacity-50', 'cursor-not-allowed', 'hidden');
-                }
+                
             }
 
             function bulkDelete() {
@@ -448,7 +441,14 @@
                     'Deseja remover os visitantes selecionados?',
                     'warning',
                     'Sim, remover!',
-                    null
+                    nullif (count > 0) {
+                    bulkBtn.disabled = false;
+                    bulkBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'hidden');
+                    bulkBtn.innerHTML = `<i class="bi bi-trash-fill mr-2"></i> Remover ${count}`;
+                } else {
+                    bulkBtn.disabled = true;
+                    bulkBtn.classList.add('opacity-50', 'cursor-not-allowed', 'hidden');
+                }
                 ).then((result) => {
                     if (result.isConfirmed) {
                         const form = document.getElementById('bulkActionForm');

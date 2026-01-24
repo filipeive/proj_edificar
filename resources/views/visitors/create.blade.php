@@ -5,7 +5,7 @@
 @section('page-subtitle', 'Registrar informações do visitante')
 
 @section('content')
-    <div class="max-w-4xl mx-auto">
+    <div class="w-full">
         <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
             <form method="POST" action="{{ route('visitors.store') }}">
                 @csrf

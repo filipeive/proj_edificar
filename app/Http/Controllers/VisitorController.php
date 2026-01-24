@@ -265,6 +265,10 @@ class VisitorController extends Controller
             return redirect()->back()->with('error', 'Apenas administradores podem realizar esta ação.');
         }
 
+        if ($request->isMethod('get')) {
+            return redirect()->route('visitors.index');
+        }
+
         $validated = $request->validate([
             'visitor_ids' => 'required|array',
             'visitor_ids.*' => 'exists:visitors,id'
