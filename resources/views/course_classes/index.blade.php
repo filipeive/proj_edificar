@@ -75,7 +75,7 @@
                     </button>
                 </div>
 
-                <div class="flex items-center gap-3">
+                <div class="hidden md:flex items-center gap-3">
                     <a href="{{ route('course-classes.export-all') }}"
                         class="bg-white text-indigo-600 border border-indigo-50 hover:bg-indigo-600 hover:text-white px-6 py-4 rounded-2xl transition-all font-black text-[10px] uppercase tracking-widest flex items-center gap-2 shadow-sm">
                         <i class="bi bi-file-earmark-spreadsheet text-lg"></i>
