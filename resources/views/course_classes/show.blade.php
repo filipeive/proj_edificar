@@ -4,12 +4,35 @@
 @section('page-title', $courseClass->name)
 @section('page-subtitle', $courseClass->course->name)
 
+@section('header-actions')
+    <div class="flex items-center gap-2">
+        <a href="{{ route('course-classes.report', $courseClass) }}"
+            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+            title="Relatório Final">
+            <i class="bi bi-bar-chart-fill text-2xl"></i>
+        </a>
+        <a href="{{ route('course-classes.export-pdf', $courseClass) }}"
+            class="text-gray-600 hover:text-red-600 p-2.5 hover:bg-red-50 rounded-xl transition-all duration-300 border border-transparent hover:border-red-100"
+            title="Relatório PDF">
+            <i class="bi bi-file-earmark-pdf text-2xl"></i>
+        </a>
+        @if(auth()->user()->isAdmin() || auth()->user()->isPastorSenior())
+            <a href="{{ route('course-classes.edit', $courseClass) }}"
+                class="text-gray-600 hover:text-orange-600 p-2.5 hover:bg-orange-50 rounded-xl transition-all duration-300 border border-transparent hover:border-orange-100"
+                title="Editar Turma">
+                <i class="bi bi-pencil-square text-2xl"></i>
+            </a>
+        @endif
+    </div>
+@endsection
+
 @section('content')
     <div class="container-fluid">
-        <div class="mb-6">
+        <div class="mb-8">
             <a href="{{ route('course-classes.index', ['course_id' => $courseClass->course_id]) }}"
-                class="text-gray-500 hover:text-gray-700 flex items-center">
-                <i class="bi bi-arrow-left mr-2"></i> Voltar para a lista
+                class="inline-flex items-center gap-2 px-4 py-2 bg-white text-gray-500 hover:text-blue-600 rounded-xl border border-gray-100 shadow-sm transition-all group">
+                <i class="bi bi-arrow-left group-hover:-translate-x-1 transition-transform"></i>
+                <span class="font-bold text-xs uppercase tracking-widest">Painel de Turmas</span>
             </a>
         </div>
 
@@ -168,15 +191,67 @@
                         <h4 class="text-lg font-black text-gray-900 flex items-center">
                             <i class="bi bi-people-fill text-blue-600 mr-2"></i> Alunos e Casais Inscritos
                         </h4>
-                        @if(auth()->user()->isAdmin() || auth()->user()->isPastorSenior())
-                        <button type="button"
-                            onclick="document.getElementById('enrollmentModal').classList.remove('hidden')"
-                            class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition shadow-lg shadow-blue-600/20">
-                            Adicionar Inscrito
-                        </button>
-                        @endif
+                        <div class="flex items-center gap-3">
+                            <span class="hidden md:inline text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $courseClass->courseEnrollments->count() }} Inscritos</span>
+                            @if(auth()->user()->isAdmin() || auth()->user()->isPastorSenior())
+                            <button type="button"
+                                onclick="document.getElementById('enrollmentModal').classList.remove('hidden')"
+                                class="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition shadow-lg shadow-blue-600/20 flex items-center gap-2">
+                                <i class="bi bi-plus-lg"></i>
+                                <span class="hidden sm:inline">Adicionar</span>
+                            </button>
+                            @endif
+                        </div>
                     </div>
-                    <div class="overflow-x-auto">
+                    
+                    <!-- Mobile List (Hidden on MD up) -->
+                    <div class="md:hidden divide-y divide-gray-50">
+                        @forelse($courseClass->courseEnrollments as $enrollment)
+                            <div class="p-6 space-y-4">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        @if($enrollment->malePartner && $enrollment->femalePartner)
+                                            <div class="font-black text-gray-900 leading-tight">
+                                                {{ $enrollment->malePartner->name }} & {{ $enrollment->femalePartner->name }}
+                                            </div>
+                                            <div class="text-[9px] text-blue-600 font-black uppercase tracking-widest mt-1">CASAL</div>
+                                        @else
+                                            <div class="font-black text-gray-900 leading-tight">{{ $enrollment->user->name ?? 'N/A' }}</div>
+                                            <div class="text-[9px] text-gray-400 font-black uppercase tracking-widest mt-1">INDIVIDUAL</div>
+                                        @endif
+                                    </div>
+                                    <div class="flex flex-col items-end gap-2">
+                                        <span class="px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest {{ $enrollStatusClasses[$enrollment->status] ?? 'bg-gray-100' }}">
+                                            {{ $enrollment->status }}
+                                        </span>
+                                        <div class="flex items-center gap-1 text-[10px] text-gray-400 font-black">
+                                            <i class="bi bi-x-circle"></i>
+                                            <span>{{ $enrollment->absence_count }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex gap-2">
+                                    <a href="{{ route('course-enrollments.show', $enrollment) }}" 
+                                        class="flex-1 bg-gray-50 text-gray-500 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest text-center border border-gray-100">
+                                        Detalhes
+                                    </a>
+                                    @if(auth()->user()->isAdmin() || auth()->user()->isPastorSenior())
+                                    <a href="{{ route('course-enrollments.edit', $enrollment) }}" 
+                                        class="w-11 h-11 bg-orange-50 text-orange-600 flex items-center justify-center rounded-xl border border-orange-100">
+                                        <i class="bi bi-pencil-fill"></i>
+                                    </a>
+                                    @endif
+                                </div>
+                            </div>
+                        @empty
+                            <div class="p-12 text-center text-gray-400 italic text-xs">
+                                Nenhum inscrito nesta turma.
+                            </div>
+                        @endforelse
+                    </div>
+
+                    <div class="hidden md:block overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="bg-gray-50 border-b border-gray-100">
