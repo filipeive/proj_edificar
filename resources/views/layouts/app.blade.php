@@ -1109,7 +1109,6 @@
     </script>
 
     <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         // SweetAlert2 Helper Functions
         window.confirmDelete = function (formId, message = 'Tem certeza que deseja deletar?', title = 'Confirmar Exclusão') {

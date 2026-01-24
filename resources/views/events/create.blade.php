@@ -24,7 +24,14 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo de Evento <span class="text-red-500">*</span></label>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="block text-sm font-semibold text-gray-700">Tipo de Evento <span
+                                        class="text-red-500">*</span></label>
+                                <a href="{{ route('event-types.index') }}"
+                                    class="text-xs text-blue-600 hover:text-blue-800 font-bold hover:underline transition">
+                                    <i class="bi bi-gear-fill mr-1"></i> Gerir Tipos
+                                </a>
+                            </div>
                             <select name="event_type_id" required
                                 class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white">
                                 <option value="" class="text-gray-500">Selecione o tipo ({{ $eventTypes->count() }}
@@ -39,7 +46,8 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Nome do Evento <span class="text-red-500">*</span></label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Nome do Evento <span
+                                    class="text-red-500">*</span></label>
                             <input type="text" name="name" value="{{ old('name') }}" required
                                 placeholder="Ex: Culto da Virada"
                                 class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
@@ -47,7 +55,8 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Data de Início <span class="text-red-500">*</span></label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Data de Início <span
+                                    class="text-red-500">*</span></label>
                             <input type="date" name="date" value="{{ old('date', request('date', date('Y-m-d'))) }}"
                                 required
                                 class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
@@ -96,7 +105,8 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Qtd. Participantes <span class="text-red-500">*</span></label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Qtd. Participantes <span
+                                    class="text-red-500">*</span></label>
                             <input type="number" name="participants_count" value="{{ old('participants_count', 0) }}"
                                 min="0" required
                                 class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-center font-bold">

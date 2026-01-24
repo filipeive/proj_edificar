@@ -11,13 +11,13 @@
         }
     </style>
     <div x-data="{ 
-                                view: window.innerWidth < 768 ? 'grid' : 'list',
-                                updateView() {
-                                    if (window.innerWidth < 768 && this.view === 'list') {
-                                        this.view = 'grid'; // Optional: force grid on mobile resize
-                                    }
-                                }
-                            }"
+                                            view: window.innerWidth < 768 ? 'grid' : 'list',
+                                            updateView() {
+                                                if (window.innerWidth < 768 && this.view === 'list') {
+                                                    this.view = 'grid'; // Optional: force grid on mobile resize
+                                                }
+                                            }
+                                        }"
         x-init="$watch('view', value => localStorage.setItem('visitors_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('visitors_view') || 'list')"
         @resize.window.debounce.500ms="updateView()" x-cloak>
         @section('header-actions')
@@ -174,233 +174,233 @@
         <div class="relative">
             <form id="bulkActionForm" method="POST" action="{{ route('visitors.bulk-delete') }}">
                 @csrf
-                <!-- Grid View -->
-                <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                    @forelse($visitors as $visitor)
+            </form>
+            <!-- Grid View -->
+            <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                @forelse($visitors as $visitor)
+                    <div
+                        class="bg-white p-4 md:p-8 rounded-2xl md:rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 relative">
+                        <div class="absolute top-4 right-4 md:top-6 md:right-6 flex flex-col items-end gap-2">
+                            {!! $visitor->status_badge !!}
+                            @if(auth()->user()->role === 'admin')
+                                <input type="checkbox" form="bulkActionForm" name="visitor_ids[]" value="{{ $visitor->id }}"
+                                    class="visitor-checkbox rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
+                            @endif
+                        </div>
+
                         <div
-                            class="bg-white p-4 md:p-8 rounded-2xl md:rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 relative">
-                            <div class="absolute top-4 right-4 md:top-6 md:right-6 flex flex-col items-end gap-2">
-                                {!! $visitor->status_badge !!}
-                                @if(auth()->user()->role === 'admin')
-                                    <input type="checkbox" form="bulkActionForm" name="visitor_ids[]" value="{{ $visitor->id }}"
-                                        class="visitor-checkbox rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
-                                @endif
-                            </div>
+                            class="w-10 h-10 md:w-14 md:h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-black text-lg md:text-2xl group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 mb-4 md:mb-6">
+                            {{ strtoupper(substr($visitor->name, 0, 1)) }}
+                        </div>
 
-                            <div
-                                class="w-10 h-10 md:w-14 md:h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-black text-lg md:text-2xl group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 mb-4 md:mb-6">
-                                {{ strtoupper(substr($visitor->name, 0, 1)) }}
-                            </div>
+                        <div class="mb-6">
+                            <h4
+                                class="text-xl font-black text-gray-900 leading-tight mb-1 group-hover:text-blue-600 transition-colors">
+                                {{ $visitor->name }}
+                            </h4>
+                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                                @if($visitor->age) {{ $visitor->age }} anos @endif
+                                @if($visitor->gender) • {{ ucfirst($visitor->gender) }} @endif
+                            </p>
+                        </div>
 
-                            <div class="mb-6">
-                                <h4
-                                    class="text-xl font-black text-gray-900 leading-tight mb-1 group-hover:text-blue-600 transition-colors">
-                                    {{ $visitor->name }}
-                                </h4>
-                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                                    @if($visitor->age) {{ $visitor->age }} anos @endif
-                                    @if($visitor->gender) • {{ ucfirst($visitor->gender) }} @endif
-                                </p>
-                            </div>
-
-                            <div class="space-y-4 mb-8 flex-1">
-                                @if($visitor->phone)
-                                    <div class="flex items-center gap-3 text-gray-500">
-                                        <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-sm">
-                                            <i class="bi bi-telephone text-blue-500"></i>
-                                        </div>
-                                        <span class="text-sm font-bold">{{ $visitor->phone }}</span>
-                                    </div>
-                                @endif
-
+                        <div class="space-y-4 mb-8 flex-1">
+                            @if($visitor->phone)
                                 <div class="flex items-center gap-3 text-gray-500">
                                     <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-sm">
-                                        <i class="bi bi-calendar-event text-orange-500"></i>
+                                        <i class="bi bi-telephone text-blue-500"></i>
                                     </div>
-                                    <div class="flex flex-col">
-                                        <span class="text-xs font-black uppercase text-gray-900">Visita:
-                                            {{ $visitor->visit_date->format('d/m/Y') }}</span>
-                                        <span
-                                            class="text-[10px] text-gray-400 font-medium">{{ $visitor->visit_date->diffForHumans() }}</span>
-                                    </div>
+                                    <span class="text-sm font-bold">{{ $visitor->phone }}</span>
                                 </div>
+                            @endif
 
-                                @if($visitor->zone)
-                                    <div class="flex items-center gap-3 text-gray-500">
-                                        <div
-                                            class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-sm font-bold">
-                                            <i class="bi bi-geo-alt text-red-500"></i>
-                                        </div>
-                                        <span class="text-xs font-black uppercase text-gray-900">
-                                            {{ $visitor->zone->name }}
-                                        </span>
-                                    </div>
-                                @endif
-
-                                @if($visitor->neighborhood)
-                                    <div class="flex items-center gap-3 text-gray-500">
-                                        <i class="bi bi-house-door text-[10px] ml-2"></i>
-                                        <span class="text-[10px] font-medium italic">{{ $visitor->neighborhood }}</span>
-                                    </div>
-                                @endif
+                            <div class="flex items-center gap-3 text-gray-500">
+                                <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-sm">
+                                    <i class="bi bi-calendar-event text-orange-500"></i>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-xs font-black uppercase text-gray-900">Visita:
+                                        {{ $visitor->visit_date->format('d/m/Y') }}</span>
+                                    <span
+                                        class="text-[10px] text-gray-400 font-medium">{{ $visitor->visit_date->diffForHumans() }}</span>
+                                </div>
                             </div>
 
-                            <div class="flex gap-2">
-                                <a href="{{ route('visitors.show', $visitor) }}"
-                                    class="flex-1 bg-gray-900 text-white text-center py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition-all shadow-lg hover:shadow-blue-200 active:scale-95 flex items-center justify-center gap-2">
-                                    <i class="bi bi-eye"></i> Ver
-                                </a>
-                                <a href="{{ route('visitors.edit', $visitor) }}"
-                                    class="flex-1 bg-gray-50 text-gray-400 text-center py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2">
-                                    <i class="bi bi-pencil"></i> Editar
-                                </a>
-                                @if(auth()->user()->role === 'admin')
-                                    <form id="grid-delete-visitor-{{ $visitor->id }}"
-                                        action="{{ route('visitors.destroy', $visitor) }}" method="POST" class="inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="button" onclick="confirmDelete('grid-delete-visitor-{{ $visitor->id }}')"
-                                            class="w-12 bg-red-50 text-red-400 text-center py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all active:scale-95 flex items-center justify-center">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
-                                @endif
-                            </div>
-                        </div>
-                    @empty
-                        <div
-                            class="col-span-full py-20 bg-white rounded-[2.5rem] border border-dashed border-gray-200 flex flex-col items-center gap-4 text-gray-300">
-                            <i class="bi bi-inbox text-7xl"></i>
-                            <p class="font-bold text-lg">Nenhum visitante encontrado</p>
-                        </div>
-                    @endforelse
-                </div>
+                            @if($visitor->zone)
+                                <div class="flex items-center gap-3 text-gray-500">
+                                    <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-sm font-bold">
+                                        <i class="bi bi-geo-alt text-red-500"></i>
+                                    </div>
+                                    <span class="text-xs font-black uppercase text-gray-900">
+                                        {{ $visitor->zone->name }}
+                                    </span>
+                                </div>
+                            @endif
 
-                <!-- List View -->
-                <div x-show="view === 'list'" x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-                    class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead>
-                                <tr
-                                    class="text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-100">
-                                    @if(auth()->user()->role === 'admin')
-                                        <th class="px-6 py-4 text-left w-10">
-                                            <input type="checkbox" id="selectAllCheckbox"
-                                                class="rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
-                                        </th>
-                                    @endif
-                                    <th class="px-6 py-4 text-left">Visitante</th>
-                                    <th class="px-6 py-4 text-left">Contato</th>
-                                    <th class="px-6 py-4 text-left">Data Visita</th>
-                                    <th class="px-6 py-4 text-left">Culto</th>
-                                    <th class="px-6 py-4 text-left">Zona</th>
-                                    <th class="px-6 py-4 text-center">Status</th>
-                                    <th class="px-6 py-4 text-center">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-50">
-                                @forelse($visitors as $visitor)
-                                    <tr class="hover:bg-gray-50 transition-colors">
-                                        @if(auth()->user()->role === 'admin')
-                                            <td class="px-6 py-4">
-                                                <input type="checkbox" name="visitor_ids[]" value="{{ $visitor->id }}"
-                                                    class="visitor-checkbox rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
-                                            </td>
-                                        @endif
-                                        <td class="px-6 py-4">
-                                            <div>
-                                                <p class="font-bold text-gray-900">{{ $visitor->name }}</p>
-                                                <p class="text-xs text-gray-500">
-                                                    @if($visitor->age) {{ $visitor->age }} anos @endif
-                                                    @if($visitor->gender) • {{ ucfirst($visitor->gender) }} @endif
-                                                </p>
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <div>
-                                                @if($visitor->phone)
-                                                    <p class="text-sm text-gray-900"><i
-                                                            class="bi bi-telephone mr-1"></i>{{ $visitor->phone }}</p>
-                                                @endif
-                                                @if($visitor->neighborhood)
-                                                    <p class="text-xs text-gray-500"><i
-                                                            class="bi bi-geo-alt mr-1"></i>{{ $visitor->neighborhood }}</p>
-                                                @endif
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <p class="text-sm font-bold text-gray-900">
-                                                {{ $visitor->visit_date->format('d/m/Y') }}
-                                            </p>
-                                            <p class="text-xs text-gray-500">{{ $visitor->visit_date->diffForHumans() }}</p>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            @if($visitor->service)
-                                                <p class="text-sm text-gray-900">{{ $visitor->service->service_type }}</p>
-                                                <p class="text-xs text-gray-500">{{ $visitor->service->date->format('d/m/Y') }}</p>
-                                            @else
-                                                <span class="text-xs text-gray-400">Não informado</span>
-                                            @endif
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            @if($visitor->zone)
-                                                <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-bold">
-                                                    {{ $visitor->zone->name }}
-                                                </span>
-                                            @else
-                                                <span class="text-xs text-gray-400">Não atribuído</span>
-                                            @endif
-                                        </td>
-                                        <td class="px-6 py-4 text-center">
-                                            {!! $visitor->status_badge !!}
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <div class="flex items-center justify-center gap-2">
-                                                <a href="{{ route('visitors.show', $visitor) }}"
-                                                    class="text-blue-600 hover:text-blue-700 p-2 hover:bg-blue-50 rounded-lg transition-all"
-                                                    title="Ver detalhes">
-                                                    <i class="bi bi-eye-fill"></i>
-                                                </a>
-                                                <a href="{{ route('visitors.edit', $visitor) }}"
-                                                    class="text-orange-600 hover:text-orange-700 p-2 hover:bg-orange-50 rounded-lg transition-all"
-                                                    title="Editar">
-                                                    <i class="bi bi-pencil-fill"></i>
-                                                </a>
-                                                @if(auth()->user()->role === 'admin')
-                                                    <form id="list-delete-visitor-{{ $visitor->id }}"
-                                                        action="{{ route('visitors.destroy', $visitor) }}" method="POST"
-                                                        class="inline">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="button"
-                                                            onclick="confirmDelete('list-delete-visitor-{{ $visitor->id }}')"
-                                                            class="text-red-600 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-all"
-                                                            title="Eliminar">
-                                                            <i class="bi bi-trash-fill"></i>
-                                                        </button>
-                                                    </form>
-                                                @endif
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="8" class="px-6 py-12 text-center text-gray-400">
-                                            <i class="bi bi-inbox text-4xl mb-4 block"></i>
-                                            <p class="font-bold">Nenhum visitante encontrado</p>
-                                            <p class="text-sm mt-2">Cadastre o primeiro visitante para começar</p>
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                            @if($visitor->neighborhood)
+                                <div class="flex items-center gap-3 text-gray-500">
+                                    <i class="bi bi-house-door text-[10px] ml-2"></i>
+                                    <span class="text-[10px] font-medium italic">{{ $visitor->neighborhood }}</span>
+                                </div>
+                            @endif
+                        </div>
+
+                        <div class="flex gap-2">
+                            <a href="{{ route('visitors.show', $visitor) }}"
+                                class="flex-1 bg-gray-900 text-white text-center py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition-all shadow-lg hover:shadow-blue-200 active:scale-95 flex items-center justify-center gap-2">
+                                <i class="bi bi-eye"></i> Ver
+                            </a>
+                            <a href="{{ route('visitors.edit', $visitor) }}"
+                                class="flex-1 bg-gray-50 text-gray-400 text-center py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                            @if(auth()->user()->role === 'admin')
+                                <form id="grid-delete-visitor-{{ $visitor->id }}" action="{{ route('visitors.destroy', $visitor) }}"
+                                    method="POST" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button" onclick="confirmDelete('grid-delete-visitor-{{ $visitor->id }}')"
+                                        class="w-12 bg-red-50 text-red-400 text-center py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all active:scale-95 flex items-center justify-center">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
                     </div>
+                @empty
+                    <div
+                        class="col-span-full py-20 bg-white rounded-[2.5rem] border border-dashed border-gray-200 flex flex-col items-center gap-4 text-gray-300">
+                        <i class="bi bi-inbox text-7xl"></i>
+                        <p class="font-bold text-lg">Nenhum visitante encontrado</p>
+                    </div>
+                @endforelse
+            </div>
+
+            <!-- List View -->
+            <div x-show="view === 'list'" x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
+                class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr
+                                class="text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-100">
+                                @if(auth()->user()->role === 'admin')
+                                    <th class="px-6 py-4 text-left w-10">
+                                        <input type="checkbox" id="selectAllCheckbox" form="bulkActionForm"
+                                            class="rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
+                                    </th>
+                                @endif
+                                <th class="px-6 py-4 text-left">Visitante</th>
+                                <th class="px-6 py-4 text-left">Contato</th>
+                                <th class="px-6 py-4 text-left">Data Visita</th>
+                                <th class="px-6 py-4 text-left">Culto</th>
+                                <th class="px-6 py-4 text-left">Zona</th>
+                                <th class="px-6 py-4 text-center">Status</th>
+                                <th class="px-6 py-4 text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            @forelse($visitors as $visitor)
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    @if(auth()->user()->role === 'admin')
+                                        <td class="px-6 py-4">
+                                            <input type="checkbox" form="bulkActionForm" name="visitor_ids[]"
+                                                value="{{ $visitor->id }}"
+                                                class="visitor-checkbox rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
+                                        </td>
+                                    @endif
+                                    <td class="px-6 py-4">
+                                        <div>
+                                            <p class="font-bold text-gray-900">{{ $visitor->name }}</p>
+                                            <p class="text-xs text-gray-500">
+                                                @if($visitor->age) {{ $visitor->age }} anos @endif
+                                                @if($visitor->gender) • {{ ucfirst($visitor->gender) }} @endif
+                                            </p>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div>
+                                            @if($visitor->phone)
+                                                <p class="text-sm text-gray-900"><i
+                                                        class="bi bi-telephone mr-1"></i>{{ $visitor->phone }}</p>
+                                            @endif
+                                            @if($visitor->neighborhood)
+                                                <p class="text-xs text-gray-500"><i
+                                                        class="bi bi-geo-alt mr-1"></i>{{ $visitor->neighborhood }}</p>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <p class="text-sm font-bold text-gray-900">
+                                            {{ $visitor->visit_date->format('d/m/Y') }}
+                                        </p>
+                                        <p class="text-xs text-gray-500">{{ $visitor->visit_date->diffForHumans() }}</p>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        @if($visitor->service)
+                                            <p class="text-sm text-gray-900">{{ $visitor->service->service_type }}</p>
+                                            <p class="text-xs text-gray-500">{{ $visitor->service->date->format('d/m/Y') }}</p>
+                                        @else
+                                            <span class="text-xs text-gray-400">Não informado</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        @if($visitor->zone)
+                                            <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-bold">
+                                                {{ $visitor->zone->name }}
+                                            </span>
+                                        @else
+                                            <span class="text-xs text-gray-400">Não atribuído</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        {!! $visitor->status_badge !!}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center justify-center gap-2">
+                                            <a href="{{ route('visitors.show', $visitor) }}"
+                                                class="text-blue-600 hover:text-blue-700 p-2 hover:bg-blue-50 rounded-lg transition-all"
+                                                title="Ver detalhes">
+                                                <i class="bi bi-eye-fill"></i>
+                                            </a>
+                                            <a href="{{ route('visitors.edit', $visitor) }}"
+                                                class="text-orange-600 hover:text-orange-700 p-2 hover:bg-orange-50 rounded-lg transition-all"
+                                                title="Editar">
+                                                <i class="bi bi-pencil-fill"></i>
+                                            </a>
+                                            @if(auth()->user()->role === 'admin')
+                                                <form id="list-delete-visitor-{{ $visitor->id }}"
+                                                    action="{{ route('visitors.destroy', $visitor) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="button"
+                                                        onclick="confirmDelete('list-delete-visitor-{{ $visitor->id }}')"
+                                                        class="text-red-600 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-all"
+                                                        title="Eliminar">
+                                                        <i class="bi bi-trash-fill"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="8" class="px-6 py-12 text-center text-gray-400">
+                                        <i class="bi bi-inbox text-4xl mb-4 block"></i>
+                                        <p class="font-bold">Nenhum visitante encontrado</p>
+                                        <p class="text-sm mt-2">Cadastre o primeiro visitante para começar</p>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
-            </form>
+            </div>
+
         </div>
 
         @if($visitors->hasPages())
@@ -422,17 +422,37 @@
                 }
 
                 if (e.target.classList.contains('visitor-checkbox')) {
+                    // Sync other checkboxes with same value (Grid <-> List)
+                    const val = e.target.value;
+                    const sameValueCheckboxes = document.querySelectorAll(`.visitor-checkbox[value="${val}"]`);
+                    sameValueCheckboxes.forEach(cb => {
+                        if (cb !== e.target) cb.checked = e.target.checked;
+                    });
+
                     updateBulkBtnState();
                 }
             });
 
             function updateBulkBtnState() {
                 const bulkBtn = document.getElementById('bulkDeleteBtn');
-                const count = document.querySelectorAll('.visitor-checkbox:checked').length;
+
+                // Count unique selected IDs to avoid double counting (Grid + List)
+                const selectedIds = new Set(
+                    Array.from(document.querySelectorAll('.visitor-checkbox:checked'))
+                        .map(cb => cb.value)
+                );
+                const count = selectedIds.size;
 
                 if (!bulkBtn) return;
 
-                
+                if (count > 0) {
+                    bulkBtn.disabled = false;
+                    bulkBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'hidden');
+                    bulkBtn.innerHTML = `<i class="bi bi-trash-fill mr-2"></i> Remover ${count}`;
+                } else {
+                    bulkBtn.disabled = true;
+                    bulkBtn.classList.add('opacity-50', 'cursor-not-allowed', 'hidden');
+                }
             }
 
             function bulkDelete() {
@@ -441,14 +461,7 @@
                     'Deseja remover os visitantes selecionados?',
                     'warning',
                     'Sim, remover!',
-                    nullif (count > 0) {
-                    bulkBtn.disabled = false;
-                    bulkBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'hidden');
-                    bulkBtn.innerHTML = `<i class="bi bi-trash-fill mr-2"></i> Remover ${count}`;
-                } else {
-                    bulkBtn.disabled = true;
-                    bulkBtn.classList.add('opacity-50', 'cursor-not-allowed', 'hidden');
-                }
+                    null
                 ).then((result) => {
                     if (result.isConfirmed) {
                         const form = document.getElementById('bulkActionForm');

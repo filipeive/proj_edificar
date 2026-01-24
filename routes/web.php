@@ -126,6 +126,10 @@ Route::middleware('auth')->group(function () {
 
     // Criar Membros contexto das rotas abaixo
     // Criar Membros contexto das rotas abaixo
+    Route::match(['get', 'post'], '/admin/visitors/batch-destroy', [\App\Http\Controllers\VisitorController::class, 'bulkDestroy'])
+        ->middleware('role:admin,secretaria,pastor_zona')
+        ->name('visitors.bulk-delete');
+
     Route::prefix('members')->middleware('role:lider_celula,supervisor,pastor_zona,admin,secretaria')->group(function () {
         Route::get('/', [UserController::class, 'members'])->name('members.index');
         Route::get('/create', [UserController::class, 'createFromContext'])->name('members.create');
@@ -141,7 +145,7 @@ Route::middleware('auth')->group(function () {
     // Visitantes (Admin, Secretaria, Pastor de Zona)
     Route::middleware('role:admin,secretaria,pastor_zona')->prefix('visitors')->name('visitors.')->group(function () {
         Route::get('/', [\App\Http\Controllers\VisitorController::class, 'index'])->name('index');
-        Route::match(['get', 'post'], '/batch-destroy', [\App\Http\Controllers\VisitorController::class, 'bulkDestroy'])->name('bulk-delete');
+
         Route::get('/export', [\App\Http\Controllers\VisitorController::class, 'export'])->name('export');
         Route::get('/create', [\App\Http\Controllers\VisitorController::class, 'create'])->name('create');
         Route::post('/', [\App\Http\Controllers\VisitorController::class, 'store'])->name('store');
@@ -343,6 +347,10 @@ Route::middleware('auth')->group(function () {
     Route::post('events/{event}/email', [\App\Http\Controllers\EventController::class, 'sendEmail'])->name('events.email');
     Route::post('events/bulk-delete', [\App\Http\Controllers\EventController::class, 'bulkDestroy'])->name('events.bulk-delete');
     Route::resource('events', \App\Http\Controllers\EventController::class);
+
+    // Manage Event Types
+    Route::resource('event-types', \App\Http\Controllers\Admin\EventTypeController::class)
+        ->middleware('role:admin,secretaria,pastor_zona');
 
     // ===== PAINEL FINANCEIRO (FINANCIAL DASHBOARD) ROUTES =====
     // ===== PAINEL FINANCEIRO (FINANCIAL DASHBOARD) ROUTES =====

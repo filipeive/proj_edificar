@@ -60,38 +60,38 @@
                 @if($authUser->isSecretaria() || $authUser->isAdmin())
                     <a href="{{ route('services.create') }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-orange-600/20 hover:border-orange-500/50 transition-all group">
                         <i class="bi bi-plus-circle text-orange-500 mb-1 group-hover:scale-110 transition-transform text-xl"></i>
-                        <span class="hidden md:block text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Relatório de Culto</span>
+                        <span class="hidden md:block text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Registar Culto</span>
                     </a>
                 @endif
                 <!-- resgistar encontro de celula -->
                 @if($authUser->isLider() || $authUser->isAdmin() || $authUser->isSupervisor() || $authUser->isPastorZona())
                     <a href="{{ route('cell-meetings.create') }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-orange-600/20 hover:border-orange-500/50 transition-all group">
                         <i class="bi bi-plus-circle text-orange-500 mb-1 group-hover:scale-110 transition-transform"></i>
-                        <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Encontro de Celula</span>
+                        <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Registar Encontro de Célula</span>
                     </a>
                 @endif
                 @if($authUser->isResponsavelPacote() || $authUser->isAdmin())
                     <a href="{{ route('contributions.create') }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-blue-600/20 hover:border-blue-500/50 transition-all group">
                         <i class="bi bi-cash-coin text-blue-500 mb-1 group-hover:scale-110 transition-transform"></i>
-                        <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Contribuição</span>
+                        <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Registar Contribuição</span>
                     </a>
                 @endif
                 @if($authUser->isAdmin() || $authUser->isSecretaria() || $authUser->isPastorZona())
                     <a href="{{ route('visitors.create') }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-green-600/20 hover:border-green-500/50 transition-all group">
                         <i class="bi bi-person-plus text-green-500 mb-1 group-hover:scale-110 transition-transform"></i>
-                        <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Visitante</span>
+                        <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Registar Visitante</span>
                     </a>
                 @endif
                 @if($authUser->isAdmin() || $authUser->isTesouraria())
                     <a href="{{ route('requisitions.create') }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-red-600/20 hover:border-red-500/50 transition-all group">
                         <i class="bi bi-file-earmark-plus text-red-500 mb-1 group-hover:scale-110 transition-transform"></i>
-                        <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Requisição</span>
+                        <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Registar Requisição</span>
                     </a>
                 @endif
                 @if($authUser->isAdmin() || $authUser->isComissaoObra())
                     <a href="{{ route('contributions.index', ['status' => 'pendente']) }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-yellow-600/20 hover:border-yellow-500/50 transition-all group">
                         <i class="bi bi-patch-check text-yellow-500 mb-1 group-hover:scale-110 transition-transform"></i>
-                        <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Validar</span>
+                        <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Validar Contribuição</span>
                     </a>
                 @endif
             </div>
