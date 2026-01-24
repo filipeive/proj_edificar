@@ -143,8 +143,8 @@
             @endforelse
         </div>
 
-        @if($eventTypes->hasPages() && view === 'grid')
-            <div class="mt-6">
+        @if($eventTypes->hasPages())
+            <div class="mt-6" x-show="view === 'grid'">
                 {{ $eventTypes->links() }}
             </div>
         @endif
