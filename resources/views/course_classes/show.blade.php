@@ -85,39 +85,43 @@
                         </div>
                         <hr class="border-gray-100">
                         <div>
-                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Professores</p>
-                            <div class="flex items-center space-x-3 mb-2">
-                                <div class="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
-                                    <i class="bi bi-person-fill"></i>
+                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Professores</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 shrink-0">
+                                        <i class="bi bi-person-fill"></i>
+                                    </div>
+                                    <span class="text-xs font-bold text-gray-700 truncate">{{ $courseClass->teacherMale->name ?? 'N/A' }}</span>
                                 </div>
-                                <span class="text-sm font-bold text-gray-700">{{ $courseClass->teacherMale->name ?? 'N/A' }}</span>
-                            </div>
-                            <div class="flex items-center space-x-3">
-                                <div class="w-8 h-8 bg-pink-50 rounded-full flex items-center justify-center text-pink-600">
-                                    <i class="bi bi-person-fill"></i>
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 bg-pink-50 rounded-full flex items-center justify-center text-pink-600 shrink-0">
+                                        <i class="bi bi-person-fill"></i>
+                                    </div>
+                                    <span class="text-xs font-bold text-gray-700 truncate">{{ $courseClass->teacherFemale->name ?? 'N/A' }}</span>
                                 </div>
-                                <span class="text-sm font-bold text-gray-700">{{ $courseClass->teacherFemale->name ?? 'N/A' }}</span>
                             </div>
                         </div>
                         @if($courseClass->assistantMale || $courseClass->assistantFemale)
-                        <div class="mt-4">
-                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Auxiliares</p>
-                            @if($courseClass->assistantMale)
-                            <div class="flex items-center space-x-3 mb-2">
-                                <div class="w-8 h-8 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 text-xs">
-                                    <i class="bi bi-person-fill"></i>
+                        <div class="mt-6">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Auxiliares</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                @if($courseClass->assistantMale)
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 shrink-0">
+                                        <i class="bi bi-person-fill text-[10px]"></i>
+                                    </div>
+                                    <span class="text-xs font-bold text-gray-600 truncate">{{ $courseClass->assistantMale->name }}</span>
                                 </div>
-                                <span class="text-xs font-bold text-gray-600">{{ $courseClass->assistantMale->name }}</span>
-                            </div>
-                            @endif
-                            @if($courseClass->assistantFemale)
-                            <div class="flex items-center space-x-3">
-                                <div class="w-8 h-8 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 text-xs">
-                                    <i class="bi bi-person-fill"></i>
+                                @endif
+                                @if($courseClass->assistantFemale)
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 shrink-0">
+                                        <i class="bi bi-person-fill text-[10px]"></i>
+                                    </div>
+                                    <span class="text-xs font-bold text-gray-600 truncate">{{ $courseClass->assistantFemale->name }}</span>
                                 </div>
-                                <span class="text-xs font-bold text-gray-600">{{ $courseClass->assistantFemale->name }}</span>
+                                @endif
                             </div>
-                            @endif
                         </div>
                         @endif
                     </div>
