@@ -5,7 +5,16 @@
 @section('page-subtitle', 'Organização e acompanhamento de alunos e casais')
 
 @section('content')
-    <div x-data="{ view: window.innerWidth < 768 ? 'grid' : 'list' }">
+    <div x-data="{ 
+                     view: window.innerWidth < 768 ? 'grid' : 'list',
+                     updateView() {
+                         if (window.innerWidth < 768 && this.view === 'list') {
+                             this.view = 'grid'; 
+                         }
+                     }
+                 }"
+        x-init="$watch('view', value => localStorage.setItem('course_classes_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('course_classes_view') || 'list')"
+        @resize.window.debounce.500ms="updateView()">
         @section('header-actions')
             <div class="flex items-center gap-2">
                 <a href="{{ route('course-classes.export-all') }}"
