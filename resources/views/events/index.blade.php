@@ -6,12 +6,12 @@
 
 @section('header-actions')
     <a href="{{ route('event-types.index') }}"
-        class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 relative group border border-transparent hover:border-blue-100">
-        <i class="bi bi-gear-fill text-2xl"></i>
+        class="w-10 h-10 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-all flex items-center justify-center">
+        <i class="bi bi-gear-fill text-lg"></i>
     </a>
     <a href="{{ route('events.create') }}"
-        class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 relative group border border-transparent hover:border-blue-100">
-        <i class="bi bi-calendar-plus text-2xl"></i>
+        class="w-10 h-10 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
+        <i class="bi bi-calendar-plus text-lg"></i>
     </a>
 @endsection
 
@@ -23,13 +23,13 @@
         }
     </style>
     <div class="container-fluid" x-data="{ 
-                                            view: window.innerWidth < 768 ? 'grid' : 'list',
-                                            updateView() {
-                                                if (window.innerWidth < 768 && this.view === 'list') {
-                                                    this.view = 'grid'; 
+                                                view: window.innerWidth < 768 ? 'grid' : 'list',
+                                                updateView() {
+                                                    if (window.innerWidth < 768 && this.view === 'list') {
+                                                        this.view = 'grid'; 
+                                                    }
                                                 }
-                                            }
-                                        }"
+                                            }"
         x-init="$watch('view', value => { if(value !== 'calendar') localStorage.setItem('events_view', value) }); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('events_view') || 'list')"
         @resize.window.debounce.500ms="updateView()" x-cloak>
         <!-- Header Section -->
@@ -159,7 +159,7 @@
                                                 <div class="flex items-center">
                                                     <div
                                                         class="w-10 h-10 rounded-xl flex items-center justify-center mr-4 
-                                                                                                                                                                                                                                                                                                                                                                                        {{ $event->eventType->name == 'Culto' ? 'bg-amber-100 text-amber-600' :
+                                                                                                                                                                                                                                                                                                                                                                                                            {{ $event->eventType->name == 'Culto' ? 'bg-amber-100 text-amber-600' :
                             ($event->eventType->name == 'Batismo' ? 'bg-cyan-100 text-cyan-600' : 'bg-blue-100 text-blue-600') }}">
                                                         <i
                                                             class="bi {{ $event->eventType->name == 'Culto' ? 'bi-church' : ($event->eventType->name == 'Batismo' ? 'bi-droplet-fill' : 'bi-calendar-event') }} text-lg"></i>
@@ -260,7 +260,7 @@
 
                             <div
                                 class="w-10 h-10 md:w-14 md:h-14 rounded-2xl flex items-center justify-center font-black text-lg md:text-2xl group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 mb-6 
-                                                                                                                                                        {{ $event->eventType->name == 'Culto' ? 'bg-amber-100 text-amber-600' :
+                                                                                                                                                                    {{ $event->eventType->name == 'Culto' ? 'bg-amber-100 text-amber-600' :
                     ($event->eventType->name == 'Batismo' ? 'bg-cyan-100 text-cyan-600' : 'bg-blue-100 text-blue-600') }}">
                                 <i
                                     class="bi {{ $event->eventType->name == 'Culto' ? 'bi-church' : ($event->eventType->name == 'Batismo' ? 'bi-droplet-fill' : 'bi-calendar-event') }}"></i>
@@ -552,49 +552,49 @@
             const props = event.extendedProps;
 
             let tooltipContent = `
-                                                                        <div class="tooltip-header">${event.title}</div>
-                                                                        <div class="tooltip-row">
-                                                                            <i class="bi bi-calendar-event"></i>
-                                                                            <span>${event.start.toLocaleDateString('pt-BR')}</span>
-                                                                        </div>
-                                                                    `;
+                                                                            <div class="tooltip-header">${event.title}</div>
+                                                                            <div class="tooltip-row">
+                                                                                <i class="bi bi-calendar-event"></i>
+                                                                                <span>${event.start.toLocaleDateString('pt-BR')}</span>
+                                                                            </div>
+                                                                        `;
 
             if (event.end && event.end.getTime() !== event.start.getTime()) {
                 const endDate = new Date(event.end);
                 endDate.setDate(endDate.getDate() - 1); // FullCalendar exclusive end
                 tooltipContent += `
-                                                                            <div class="tooltip-row">
-                                                                                <i class="bi bi-arrow-right"></i>
-                                                                                <span>${endDate.toLocaleDateString('pt-BR')}</span>
-                                                                            </div>
-                                                                        `;
+                                                                                <div class="tooltip-row">
+                                                                                    <i class="bi bi-arrow-right"></i>
+                                                                                    <span>${endDate.toLocaleDateString('pt-BR')}</span>
+                                                                                </div>
+                                                                            `;
             }
 
             if (props.location) {
                 tooltipContent += `
-                                                                            <div class="tooltip-row">
-                                                                                <i class="bi bi-geo-alt-fill"></i>
-                                                                                <span>${props.location}</span>
-                                                                            </div>
-                                                                        `;
+                                                                                <div class="tooltip-row">
+                                                                                    <i class="bi bi-geo-alt-fill"></i>
+                                                                                    <span>${props.location}</span>
+                                                                                </div>
+                                                                            `;
             }
 
             if (props.participants_count !== undefined) {
                 tooltipContent += `
-                                                                            <div class="tooltip-row">
-                                                                                <i class="bi bi-people-fill"></i>
-                                                                                <span>${props.participants_count} participantes</span>
-                                                                            </div>
-                                                                        `;
+                                                                                <div class="tooltip-row">
+                                                                                    <i class="bi bi-people-fill"></i>
+                                                                                    <span>${props.participants_count} participantes</span>
+                                                                                </div>
+                                                                            `;
             }
 
             if (props.description) {
                 tooltipContent += `
-                                                                            <div class="tooltip-row" style="margin-top: 0.5rem; font-style: italic;">
-                                                                                <i class="bi bi-info-circle"></i>
-                                                                                <span>${props.description.substring(0, 100)}${props.description.length > 100 ? '...' : ''}</span>
-                                                                            </div>
-                                                                        `;
+                                                                                <div class="tooltip-row" style="margin-top: 0.5rem; font-style: italic;">
+                                                                                    <i class="bi bi-info-circle"></i>
+                                                                                    <span>${props.description.substring(0, 100)}${props.description.length > 100 ? '...' : ''}</span>
+                                                                                </div>
+                                                                            `;
             }
 
             tooltip.innerHTML = tooltipContent;
