@@ -141,7 +141,7 @@ Route::middleware('auth')->group(function () {
     // Visitantes (Admin, Secretaria, Pastor de Zona)
     Route::middleware('role:admin,secretaria,pastor_zona')->prefix('visitors')->name('visitors.')->group(function () {
         Route::get('/', [\App\Http\Controllers\VisitorController::class, 'index'])->name('index');
-        Route::match(['get', 'post'], '/bulk-delete', [\App\Http\Controllers\VisitorController::class, 'bulkDestroy'])->name('bulk-delete');
+        Route::match(['get', 'post'], '/batch-destroy', [\App\Http\Controllers\VisitorController::class, 'bulkDestroy'])->name('bulk-delete');
         Route::get('/export', [\App\Http\Controllers\VisitorController::class, 'export'])->name('export');
         Route::get('/create', [\App\Http\Controllers\VisitorController::class, 'create'])->name('create');
         Route::post('/', [\App\Http\Controllers\VisitorController::class, 'store'])->name('store');
