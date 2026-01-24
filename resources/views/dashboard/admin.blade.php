@@ -5,8 +5,8 @@
 @section('page-subtitle', 'Visão geral de todas as atividades e contribuições Eclesiásticas')
 
 @section('content')
-    <!-- Métricas Eclesiásticas -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Métricas Eclesiásticas (Escondidas no Mobile) -->
+    <div class="hidden md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <!-- Card: Membros Ativos -->
         <div
             class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 hover:shadow-xl transition-all duration-500 group">
@@ -154,8 +154,8 @@
         </div>
     </div>
 
-    <!-- Geo & Structure Charts -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+    <!-- Geo & Structure Charts (Escondidos no Mobile) -->
+    <div class="hidden md:grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         <!-- Members by Zone -->
         <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
             <h3 class="text-xl font-black text-gray-900 tracking-tight mb-8">Membros por Zona</h3>
@@ -173,8 +173,8 @@
         </div>
     </div>
 
-    <!-- Map Placeholder (Requested Feature) -->
-    <div class="mb-8">
+    <!-- Map Placeholder (Escondido no Mobile) -->
+    <div class="hidden md:block mb-8">
         <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
             <h3 class="text-xl font-black text-gray-900 tracking-tight mb-8 flex items-center">
                 <i class="bi bi-map-fill text-blue-600 mr-3"></i> Mapa de Quelimane
@@ -200,8 +200,8 @@
         </div>
     </div>
 
-    <!-- Gestão Eclesiástica Stats -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+    <!-- Gestão Eclesiástica Stats (Escondido no Mobile) -->
+    <div class="hidden md:grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
         <!-- Crescimento de Membros -->
         <div class="lg:col-span-2 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
             <div class="flex items-center justify-between mb-8">
