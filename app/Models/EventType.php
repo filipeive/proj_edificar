@@ -21,6 +21,17 @@ class EventType extends Model
         'is_active' => 'boolean',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($eventType) {
+            if (empty($eventType->code)) {
+                $eventType->code = \Str::slug($eventType->name);
+            }
+        });
+    }
+
     public function events()
     {
         return $this->hasMany(Event::class);
