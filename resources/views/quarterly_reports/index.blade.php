@@ -13,13 +13,13 @@
 
 @section('content')
     <div class="w-full space-y-8" x-data="{ 
-                view: window.innerWidth < 768 ? 'grid' : 'list',
-                updateView() {
-                    if (window.innerWidth < 768 && this.view === 'list') {
-                        this.view = 'grid';
+                    view: window.innerWidth < 768 ? 'grid' : 'list',
+                    updateView() {
+                        if (window.innerWidth < 768 && this.view === 'list') {
+                            this.view = 'grid';
+                        }
                     }
-                }
-            }"
+                }"
         x-init="$watch('view', value => localStorage.setItem('quarterly_reports_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('quarterly_reports_view') || 'list')"
         @resize.window.debounce.500ms="updateView()">
         <!-- Analytics Dashboard (Hidden on Mobile) -->
@@ -188,10 +188,12 @@
                 </a>
 
                 @can('create', App\Models\QuarterlyReport::class)
-                    <a href="{{ route('quarterly-reports.create') }}"
-                        class="bg-blue-600 text-white px-8 py-5 rounded-3xl hover:bg-blue-700 hover:shadow-2xl hover:shadow-blue-200 transition-all font-black text-[10px] uppercase tracking-widest flex items-center shadow-lg shadow-blue-100 group">
-                        <i class="bi bi-plus-lg mr-2 group-hover:rotate-90 transition-transform"></i> Novo Relatório
-                    </a>
+                    <div class="hidden md:flex items-center gap-4">
+                        <a href="{{ route('quarterly-reports.create') }}"
+                            class="bg-blue-600 text-white px-8 py-4 rounded-2xl flex items-center transition shadow-lg shadow-blue-200 font-black text-xs uppercase tracking-widest group">
+                            <i class="bi bi-plus-lg mr-2 group-hover:rotate-90 transition-transform"></i> Novo Relatório
+                        </a>
+                    </div>
                 @endcan
             </div>
         </div>
@@ -268,7 +270,7 @@
                                 <td class="px-10 py-6 text-center">
                                     <span
                                         class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm
-                                                                {{ $report->status == 'submitted' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-yellow-50 text-yellow-600 border-yellow-100' }}">
+                                                                        {{ $report->status == 'submitted' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-yellow-50 text-yellow-600 border-yellow-100' }}">
                                         {{ $report->status == 'submitted' ? 'Submetido' : 'Rascunho' }}
                                     </span>
                                 </td>
@@ -332,7 +334,7 @@
                         </div>
                         <span
                             class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm
-                                                    {{ $report->status == 'submitted' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-yellow-50 text-yellow-600 border-yellow-100' }}">
+                                                            {{ $report->status == 'submitted' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-yellow-50 text-yellow-600 border-yellow-100' }}">
                             {{ $report->status == 'submitted' ? 'Submetido' : 'Rascunho' }}
                         </span>
                     </div>

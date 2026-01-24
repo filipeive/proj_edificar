@@ -86,7 +86,7 @@
                         <hr class="border-gray-100">
                         <div>
                             <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Professores</p>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="grid grid-cols-2 gap-3">
                                 <div class="flex items-center space-x-3">
                                     <div class="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 shrink-0">
                                         <i class="bi bi-person-fill"></i>
@@ -104,7 +104,7 @@
                         @if($courseClass->assistantMale || $courseClass->assistantFemale)
                         <div class="mt-6">
                             <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Auxiliares</p>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="grid grid-cols-2 gap-3">
                                 @if($courseClass->assistantMale)
                                 <div class="flex items-center space-x-3">
                                     <div class="w-8 h-8 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 shrink-0">
