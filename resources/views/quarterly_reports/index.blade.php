@@ -4,19 +4,26 @@
 @section('page-title', 'Relatórios Trimestrais')
 @section('page-subtitle', 'Análise de crescimento e estatísticas ministeriais')
 
+@section('header-actions')
+    <a href="{{ route('quarterly-reports.create') }}"
+        class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100">
+        <i class="bi bi-plus-circle text-2xl"></i>
+    </a>
+@endsection
+
 @section('content')
     <div class="w-full space-y-8" x-data="{ 
-            view: window.innerWidth < 768 ? 'grid' : 'list',
-            updateView() {
-                if (window.innerWidth < 768 && this.view === 'list') {
-                    this.view = 'grid';
+                view: window.innerWidth < 768 ? 'grid' : 'list',
+                updateView() {
+                    if (window.innerWidth < 768 && this.view === 'list') {
+                        this.view = 'grid';
+                    }
                 }
-            }
-        }"
+            }"
         x-init="$watch('view', value => localStorage.setItem('quarterly_reports_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('quarterly_reports_view') || 'list')"
         @resize.window.debounce.500ms="updateView()">
-        <!-- Analytics Dashboard -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <!-- Analytics Dashboard (Hidden on Mobile) -->
+        <div class="hidden md:grid grid-cols-1 md:grid-cols-4 gap-6">
             <div
                 class="bg-white p-7 rounded-[2.5rem] shadow-sm border border-gray-100 hover:shadow-xl transition-all group relative overflow-hidden">
                 <div
@@ -99,7 +106,7 @@
                         <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
                         Crescimento de Membros
                     </h3>
-                    <div class="h-[300px] relative">
+                    <div class="h-[250px] relative">
                         <canvas id="membersChart"></canvas>
                     </div>
                 </div>
@@ -109,7 +116,7 @@
                         <span class="w-1.5 h-1.5 rounded-full bg-purple-600"></span>
                         Multiplicação de Células
                     </h3>
-                    <div class="h-[300px] relative">
+                    <div class="h-[250px] relative">
                         <canvas id="cellsChart"></canvas>
                     </div>
                 </div>
@@ -119,7 +126,7 @@
                         <span class="w-1.5 h-1.5 rounded-full bg-green-600"></span>
                         Salvações por Trimestre
                     </h3>
-                    <div class="h-[300px] relative">
+                    <div class="h-[250px] relative">
                         <canvas id="savedChart"></canvas>
                     </div>
                 </div>
@@ -129,7 +136,7 @@
                         <span class="w-1.5 h-1.5 rounded-full bg-orange-600"></span>
                         Batismos por Trimestre
                     </h3>
-                    <div class="h-[300px] relative">
+                    <div class="h-[250px] relative">
                         <canvas id="baptizedChart"></canvas>
                     </div>
                 </div>
@@ -261,7 +268,7 @@
                                 <td class="px-10 py-6 text-center">
                                     <span
                                         class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm
-                                                        {{ $report->status == 'submitted' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-yellow-50 text-yellow-600 border-yellow-100' }}">
+                                                                {{ $report->status == 'submitted' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-yellow-50 text-yellow-600 border-yellow-100' }}">
                                         {{ $report->status == 'submitted' ? 'Submetido' : 'Rascunho' }}
                                     </span>
                                 </td>
@@ -325,7 +332,7 @@
                         </div>
                         <span
                             class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm
-                                            {{ $report->status == 'submitted' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-yellow-50 text-yellow-600 border-yellow-100' }}">
+                                                    {{ $report->status == 'submitted' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-yellow-50 text-yellow-600 border-yellow-100' }}">
                             {{ $report->status == 'submitted' ? 'Submetido' : 'Rascunho' }}
                         </span>
                     </div>
@@ -427,6 +434,8 @@
         @endif
     </div>
 
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const chartOptions = {
