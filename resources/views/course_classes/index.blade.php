@@ -5,12 +5,18 @@
 @section('page-subtitle', 'Organização e acompanhamento de alunos e casais')
 
 @section('content')
-    <div x-data="{ view: 'list' }">
+    <div x-data="{ view: window.innerWidth < 768 ? 'grid' : 'list' }">
         @section('header-actions')
-            <a href="{{ route('course-classes.create', ['course_id' => request('course_id')]) }}"
-                class="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
-                <i class="bi bi-plus-circle text-xl"></i>
-            </a>
+            <div class="flex items-center gap-2">
+                <a href="{{ route('course-classes.export-all') }}"
+                    class="bg-indigo-50 text-indigo-600 border border-indigo-100 p-2 rounded-lg hover:bg-indigo-100 transition-all flex items-center justify-center shadow-sm">
+                    <i class="bi bi-file-earmark-spreadsheet text-xl"></i>
+                </a>
+                <a href="{{ route('course-classes.create', ['course_id' => request('course_id')]) }}"
+                    class="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
+                    <i class="bi bi-plus-circle text-xl"></i>
+                </a>
+            </div>
         @endsection
     <div class="container-fluid">
         <div class="mb-6 flex justify-between items-center">
@@ -43,8 +49,8 @@
                 </div>
                 
                 <a href="{{ route('course-classes.export-all') }}"
-                    class="bg-indigo-50 text-indigo-600 border border-indigo-100 hover:bg-indigo-100 px-4 py-2 rounded-lg flex items-center transition shadow-sm font-bold text-sm">
-                    <i class="bi bi-file-earmark-spreadsheet mr-2"></i> <span class="hidden md:inline">Relatório Geral (Excel)</span><span class="md:hidden">Exportar</span>
+                    class="hidden md:flex bg-indigo-50 text-indigo-600 border border-indigo-100 hover:bg-indigo-100 px-4 py-2 rounded-lg items-center transition shadow-sm font-bold text-sm">
+                    <i class="bi bi-file-earmark-spreadsheet mr-2"></i> <span>Relatório Geral (Excel)</span>
                 </a>
                 <button type="button" id="exportBtn" onclick="exportSelected()" disabled
                     class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center transition shadow-md font-bold text-sm opacity-50 cursor-not-allowed hidden md:flex">
@@ -193,19 +199,20 @@
         <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             @forelse($classes as $class)
-                <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 relative">
-                    <div class="absolute top-6 right-6">
+                <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-2xl hover:shadow-blue-900/10 transition-all duration-300 relative overflow-hidden">
+                    <!-- Status Badge -->
+                    <div class="absolute top-6 right-6 z-10">
                         @php
                             $statusClasses = [
-                                'em_andamento' => 'bg-green-100 text-green-800',
-                                'concluida' => 'bg-blue-100 text-blue-800',
-                                'cancelada' => 'bg-red-100 text-red-800',
-                                'active' => 'bg-green-100 text-green-800',
-                                'completed' => 'bg-blue-100 text-blue-800',
-                                'cancelled' => 'bg-red-100 text-red-800',
+                                'em_andamento' => 'bg-emerald-100 text-emerald-800 border-emerald-200',
+                                'concluida' => 'bg-blue-100 text-blue-800 border-blue-200',
+                                'cancelada' => 'bg-red-100 text-red-800 border-red-200',
+                                'active' => 'bg-emerald-100 text-emerald-800 border-emerald-200',
+                                'completed' => 'bg-blue-100 text-blue-800 border-blue-200',
+                                'cancelled' => 'bg-red-100 text-red-800 border-red-200',
                             ];
                             $statusLabels = [
-                                'em_andamento' => 'Em Andamento',
+                                'em_andamento' => 'Andamento',
                                 'concluida' => 'Concluída',
                                 'cancelada' => 'Cancelada',
                                 'active' => 'Ativa',
@@ -213,47 +220,77 @@
                                 'cancelled' => 'Cancelada',
                             ];
                         @endphp
-                        <span class="px-2 py-1 rounded-full text-[10px] font-black uppercase tracking-widest {{ $statusClasses[$class->status] ?? 'bg-gray-100' }}">
+                        <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border {{ $statusClasses[$class->status] ?? 'bg-gray-100 border-gray-200' }}">
                             {{ $statusLabels[$class->status] ?? $class->status }}
                         </span>
                     </div>
-                    
-                    <div class="w-14 h-14 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center font-black text-2xl group-hover:bg-orange-600 group-hover:text-white transition-all duration-500 mb-6">
-                        {{ strtoupper(substr($class->name, 0, 1)) }}
-                    </div>
 
-                    <div class="mb-4">
-                        <h4 class="text-lg font-black text-gray-900 leading-tight mb-1 group-hover:text-orange-600 transition-colors uppercase tracking-widest">{{ $class->name }}</h4>
-                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">{{ $class->course->name ?? 'Curso não definido' }}</span>
-                    </div>
-
-                    <div class="space-y-3 mb-6 flex-1 text-sm bg-gray-50 p-4 rounded-2xl">
-                        <div class="flex items-center gap-2 text-gray-600">
-                            <i class="bi bi-people-fill text-blue-500"></i>
-                            <span class="font-bold">{{ $class->enrollments_count }} Alunos</span>
+                    <!-- Card Header / Icon -->
+                    <div class="p-8 pb-4">
+                        <div class="w-16 h-16 rounded-3xl bg-gradient-to-br from-indigo-500 to-blue-600 text-white flex items-center justify-center font-black text-3xl shadow-lg shadow-blue-500/20 mb-6 group-hover:scale-110 transition-transform duration-500">
+                            {{ strtoupper(substr($class->name, 0, 1)) }}
                         </div>
-                        <div class="flex flex-col gap-1 mt-2">
-                            <span class="text-[10px] font-black uppercase text-gray-400">Professores:</span>
-                            <span class="text-xs font-bold text-gray-700">{{ $class->teacherMale->name ?? 'N/A' }}</span>
-                            @if($class->teacherFemale)
-                                <span class="text-xs font-bold text-gray-700">{{ $class->teacherFemale->name }}</span>
-                            @endif
+
+                        <div class="mb-2 min-h-[4rem]">
+                             <h4 class="text-xl font-black text-gray-900 leading-tight mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">{{ $class->name }}</h4>
+                             <span class="inline-block px-2 py-1 bg-gray-50 text-gray-500 text-[10px] font-bold uppercase tracking-wider rounded-lg border border-gray-100">
+                                {{ $class->course->name ?? 'Curso não definido' }}
+                             </span>
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-2 pt-4 border-t border-gray-50">
-                        <a href="{{ route('course-classes.show', $class) }}" class="flex-1 bg-gray-900 text-white text-center py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all flex items-center justify-center gap-2">
-                            <i class="bi bi-eye"></i> Detalhes
-                        </a>
-                        <a href="{{ route('course-classes.edit', $class) }}" class="w-10 h-10 bg-gray-50 text-gray-400 flex items-center justify-center rounded-xl hover:bg-blue-600 hover:text-white transition-all">
-                            <i class="bi bi-pencil"></i>
-                        </a>
+                    <!-- Metrics/Details -->
+                    <div class="px-8 pb-8 flex-1">
+                        <div class="space-y-4">
+                             <div class="flex items-center justify-between p-3 bg-gray-50 rounded-2xl border border-gray-100">
+                                <span class="text-[10px] font-black uppercase text-gray-400">Alunos</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="font-black text-gray-800">{{ $class->enrollments_count }}</span>
+                                    <i class="bi bi-people-fill text-blue-500 text-xs"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-1">
+                                <span class="text-[10px] font-black uppercase text-gray-300 block mb-1">Responsáveis</span>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-[10px]">
+                                        <i class="bi bi-person-fill"></i>
+                                    </div>
+                                    <span class="text-xs font-bold text-gray-600 truncate">{{ $class->teacherMale->name ?? 'N/A' }}</span>
+                                </div>
+                                @if($class->teacherFemale)
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-full bg-pink-100 flex items-center justify-center text-pink-600 text-[10px]">
+                                        <i class="bi bi-person-fill"></i>
+                                    </div>
+                                    <span class="text-xs font-bold text-gray-600 truncate">{{ $class->teacherFemale->name }}</span>
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions Footer -->
+                    <div class="px-8 pb-8 pt-0 mt-auto">
+                        <div class="flex gap-3">
+                            <a href="{{ route('course-classes.show', $class) }}" class="flex-1 bg-gray-900 text-white text-center py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 transition-all shadow-lg hover:shadow-blue-600/30 flex items-center justify-center gap-2">
+                                <i class="bi bi-eye-fill"></i> Detalhes
+                            </a>
+                            <a href="{{ route('course-classes.edit', $class) }}" class="w-12 bg-white border-2 border-gray-100 text-gray-400 flex items-center justify-center rounded-2xl hover:border-blue-500 hover:text-blue-500 transition-all">
+                                <i class="bi bi-pencil-fill"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
             @empty
-                <div class="col-span-full py-20 bg-white rounded-[2rem] border border-dashed border-gray-200 flex flex-col items-center gap-4 text-gray-300">
-                    <i class="bi bi-inbox text-7xl opacity-20"></i>
-                    <p class="font-bold text-lg">Nenhuma turma encontrada</p>
+                <div class="col-span-full py-24 bg-gray-50 rounded-[3rem] border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-6 text-center">
+                    <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-sm">
+                        <i class="bi bi-inbox text-4xl text-gray-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-1">Nenhuma turma encontrada</h3>
+                        <p class="text-gray-500 text-sm max-w-xs mx-auto">Não existem turmas cadastradas para o filtro selecionado.</p>
+                    </div>
                 </div>
             @endforelse
         </div>

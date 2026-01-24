@@ -126,7 +126,7 @@ Route::middleware('auth')->group(function () {
 
     // Criar Membros contexto das rotas abaixo
     // Criar Membros contexto das rotas abaixo
-    Route::prefix('members')->middleware('role:lider_celula,supervisor,pastor_zona,admin')->group(function () {
+    Route::prefix('members')->middleware('role:lider_celula,supervisor,pastor_zona,admin,secretaria')->group(function () {
         Route::get('/', [UserController::class, 'members'])->name('members.index');
         Route::get('/create', [UserController::class, 'createFromContext'])->name('members.create');
         Route::post('/', [UserController::class, 'storeFromContext'])->name('members.store');

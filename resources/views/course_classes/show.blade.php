@@ -111,10 +111,12 @@
                             class="w-full bg-red-600 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-red-700 transition block text-center shadow-lg shadow-red-600/20">
                             <i class="bi bi-file-earmark-pdf mr-2"></i> Exportar Relatório PDF
                         </a>
+                        @if(auth()->user()->isAdmin() || auth()->user()->isPastorSenior())
                         <a href="{{ route('course-classes.edit', $courseClass) }}"
                             class="w-full bg-gray-50 text-gray-600 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-100 transition block text-center border border-gray-100">
                             Editar Turma
                         </a>
+                        @endif
                     </div>
                 </div>
 
@@ -124,10 +126,12 @@
                         <h4 class="text-lg font-black text-gray-900 flex items-center">
                             <i class="bi bi-calendar-check text-orange-600 mr-2"></i> Encontros
                         </h4>
+                        @if(auth()->user()->isAdmin() || auth()->user()->isPastorSenior())
                         <button type="button" onclick="document.getElementById('meetingModal').classList.remove('hidden')"
                             class="text-xs font-black text-orange-600 uppercase tracking-widest hover:text-orange-700">
                             + Novo
                         </button>
+                        @endif
                     </div>
                     <div class="space-y-4">
                         @forelse($courseClass->meetings as $meeting)
@@ -164,11 +168,13 @@
                         <h4 class="text-lg font-black text-gray-900 flex items-center">
                             <i class="bi bi-people-fill text-blue-600 mr-2"></i> Alunos e Casais Inscritos
                         </h4>
+                        @if(auth()->user()->isAdmin() || auth()->user()->isPastorSenior())
                         <button type="button"
                             onclick="document.getElementById('enrollmentModal').classList.remove('hidden')"
                             class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition shadow-lg shadow-blue-600/20">
                             Adicionar Inscrito
                         </button>
+                        @endif
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
@@ -227,6 +233,7 @@
                                         </td>
                                         <td class="px-6 py-4 text-right">
                                             <div class="flex items-center justify-end space-x-2">
+                                                @if(auth()->user()->isAdmin() || auth()->user()->isPastorSenior())
                                                 <!-- Status Dropdown -->
                                                 <div x-data="{ open: false }" class="relative inline-block text-left">
                                                     <button @click="open = !open" type="button" 
@@ -250,12 +257,14 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                                @endif
 
                                                 <a href="{{ route('course-enrollments.show', $enrollment) }}" 
                                                     class="p-2 text-gray-400 hover:text-blue-600 transition-colors" title="Ver Detalhes">
                                                     <i class="bi bi-eye-fill text-lg"></i>
                                                 </a>
                                                 
+                                                @if(auth()->user()->isAdmin() || auth()->user()->isPastorSenior())
                                                 <a href="{{ route('course-enrollments.edit', $enrollment) }}" 
                                                     class="p-2 text-gray-400 hover:text-blue-600 transition-colors" title="Editar Matrícula">
                                                     <i class="bi bi-pencil-fill text-lg"></i>
@@ -272,6 +281,7 @@
                                                         <i class="bi bi-trash-fill text-lg"></i>
                                                     </button>
                                                 </form>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>
@@ -286,6 +296,8 @@
                         </table>
                     </div>
                 </div>
+                </div>
+                @endif
             </div>
         </div>
     </div>

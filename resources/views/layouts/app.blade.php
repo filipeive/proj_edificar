@@ -578,16 +578,11 @@
                             </div>
                         </div>
 
-                        <!-- Theme Toggle -->
-                        <div class="flex items-center space-x-2">
-                            <i class="bi bi-sun text-gray-600 text-sm"></i>
-                            <div onclick="toggleTheme()" class="theme-switch" id="themeSwitch">
-                                <div class="theme-switch-handle">
-                                    <i id="themeIcon" class="bi bi-moon-fill text-xs text-gray-800"></i>
-                                </div>
-                            </div>
-                            <i class="bi bi-moon text-gray-600 text-sm"></i>
-                        </div>
+                        <!-- Theme Toggle (Compact) -->
+                        <button onclick="toggleTheme()"
+                            class="bg-gray-100 hover:bg-gray-200 p-2 rounded-lg transition-colors text-gray-600 dark:text-gray-300 dark:bg-white/5 dark:hover:bg-white/10">
+                            <i id="themeIcon" class="bi bi-moon-fill text-lg"></i>
+                        </button>
 
                         <!-- Mobile Logout Button -->
                         <div class="md:hidden">

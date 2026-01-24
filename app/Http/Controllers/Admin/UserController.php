@@ -241,6 +241,11 @@ class UserController
     public function createFromContext(Request $request): View
     {
         $user = auth()->user();
+
+        if ($user->role === 'secretaria') {
+            abort(403, 'Acesso de leitura apenas.');
+        }
+
         $availableCells = $this->getAvailableCells($user);
         $packages = CommitmentPackage::where('is_active', true)->orderBy('order')->get();
 
@@ -271,6 +276,10 @@ class UserController
     public function storeFromContext(Request $request)
     {
         $user = auth()->user();
+
+        if ($user->role === 'secretaria') {
+            abort(403, 'Acesso de leitura apenas.');
+        }
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -348,6 +357,10 @@ class UserController
     {
         $user = auth()->user();
 
+        if ($user->role === 'secretaria') {
+            abort(403, 'Acesso de leitura apenas.');
+        }
+
         // Validar se pode editar este membro
         $this->validateMemberAccess($user, $member);
 
@@ -375,6 +388,10 @@ class UserController
     public function updateFromContext(Request $request, User $member)
     {
         $user = auth()->user();
+
+        if ($user->role === 'secretaria') {
+            abort(403, 'Acesso de leitura apenas.');
+        }
 
         // Validar se pode editar
         $this->validateMemberAccess($user, $member);
@@ -404,6 +421,10 @@ class UserController
     public function destroyFromContext(User $member)
     {
         $user = auth()->user();
+
+        if ($user->role === 'secretaria') {
+            abort(403, 'Acesso de leitura apenas.');
+        }
 
         // Validar se pode deletar
         $this->validateMemberAccess($user, $member);

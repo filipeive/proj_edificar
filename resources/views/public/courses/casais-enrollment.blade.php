@@ -3,8 +3,7 @@
 @section('title', 'Inscrição - Curso de Casais')
 
 @section('content')
-    <div
-        class="min-h-screen bg-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div class="min-h-screen bg-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative">
         <!-- Background Elements -->
         <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
             <div class="absolute -top-24 -left-24 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl"></div>
@@ -30,7 +29,7 @@
                         <!-- Nome do Esposo -->
                         <div>
                             <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Nome
-                                do Esposo / Namorado</label>
+                                do Noivo / Parceiro</label>
                             <input type="text" name="husband_name" required
                                 class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition placeholder-gray-600"
                                 placeholder="Nome completo">
@@ -39,7 +38,7 @@
                         <!-- Nome da Esposa -->
                         <div>
                             <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Nome
-                                da Esposa / Namorada</label>
+                                da Noiva / Parceira</label>
                             <input type="text" name="wife_name" required
                                 class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition placeholder-gray-600"
                                 placeholder="Nome completo">

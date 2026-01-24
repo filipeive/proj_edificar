@@ -59,8 +59,8 @@
             <div class="grid grid-cols-2 gap-2 px-2 py-2">
                 @if($authUser->isSecretaria() || $authUser->isAdmin())
                     <a href="{{ route('services.create') }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-orange-600/20 hover:border-orange-500/50 transition-all group">
-                        <i class="bi bi-plus-circle text-orange-500 mb-1 group-hover:scale-110 transition-transform"></i>
-                        <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Relatório de Culto</span>
+                        <i class="bi bi-plus-circle text-orange-500 mb-1 group-hover:scale-110 transition-transform text-xl"></i>
+                        <span class="hidden md:block text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Relatório de Culto</span>
                     </a>
                 @endif
                 <!-- resgistar encontro de celula -->
@@ -148,7 +148,7 @@
                             <div id="courses_menu" class="overflow-hidden {{ request()->routeIs('courses.*') || request()->routeIs('course-classes.*') ? '' : 'hidden' }}">
                                 <div class="ml-12 mt-2 space-y-1 border-l border-white/10 pl-4">
                                     <a href="{{ route('courses.index') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('courses.index') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Cursos</a>
-                                    @if (!$authUser->isSupervisor() || ($authUser->isSupervisor() && $authUser->hasAnyCourseEnrollment()))
+                                    @if ((!$authUser->isSupervisor() && !$authUser->isSecretaria()) || (($authUser->isSupervisor() || $authUser->isSecretaria()) && $authUser->hasAnyCourseEnrollment()))
                                         <a href="{{ route('course-classes.index') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('course-classes.*') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Turmas</a>
                                     @endif
                                 </div>
@@ -175,19 +175,21 @@
                     <!-- CÉLULAS & DISCIPULADO -->
                     <div class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-4">Células & Discipulado</div>
 
-                    @if ($authUser->hasRole('membro'))
+                    @if ($authUser->hasRole('membro') || ($authUser->isSupervisor() && $authUser->cell_id))
                         <a href="{{ route('dashboard.membro') }}#minha-celula" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('dashboard.membro') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                             <i class="bi bi-people-fill text-xl flex-shrink-0"></i>
                             <span class="sidebar-text ml-4 font-bold tracking-tight">Minha Célula</span>
                         </a>
                     @endif
 
-                    @if ($authUser->role !== 'membro' && $authUser->role !== 'comissao_obra')
+                    @if ($authUser->role !== 'membro' && $authUser->role !== 'comissao_obra' && $authUser->role !== 'secretaria' && $authUser->role !== 'tesouraria' && $authUser->role !== 'responsavel')
                         <a href="{{ route('cell-meetings.index') }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('cell-meetings.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                             <i class="bi bi-people-fill text-xl flex-shrink-0"></i>
                             <span class="sidebar-text ml-4 font-bold tracking-tight">Encontros</span>
                         </a>
+                    @endif
 
+                    @if ($authUser->isAdmin() || $authUser->isPastor() || $authUser->isPastorZona() || $authUser->isSupervisor() || $authUser->isLider() || $authUser->isTimoteo() || $authUser->isSecretaria() || $authUser->isPastorZona())
                         <a href="{{ route('members.index') }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('members.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                             <i class="bi bi-person-lines-fill text-xl flex-shrink-0"></i>
                             <span class="sidebar-text ml-4 font-bold tracking-tight">Membros</span>
@@ -319,7 +321,7 @@
                 </a>
             @endif
 
-            @if ($authUser->isAdmin() || $authUser->isSecretaria())
+            @if ($authUser->isAdmin() || $authUser->isPastor())
                 <a href="{{ route('settings.index') }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('settings.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                     <i class="bi bi-gear-fill text-xl flex-shrink-0"></i>
                     <span class="sidebar-text ml-4 font-bold tracking-tight">Configurações</span>
@@ -350,6 +352,12 @@
                 <a href="{{ route('profile.edit') }}" class="sidebar-text text-slate-400 hover:text-white transition-all p-2 hover:bg-white/5 rounded-xl border border-transparent hover:border-white/10" title="Editar Perfil">
                     <i class="bi bi-gear-fill"></i>
                 </a>
+                <form method="POST" action="{{ route('logout') }}" class="md:hidden">
+                    @csrf
+                    <button type="submit" class="sidebar-text text-slate-400 hover:text-white transition-all p-2 hover:bg-white/5 rounded-xl border border-transparent hover:border-white/10" title="Sair">
+                        <i class="bi bi-power text-red-500"></i>
+                    </button>
+                </form>
             </div>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf

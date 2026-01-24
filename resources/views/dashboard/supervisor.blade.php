@@ -225,7 +225,7 @@
                             </div>
                         </div>
                         <div class="text-right">
-                            <p class="font-black text-gray-900">{{ $service->attendance_count ?? 0 }}</p>
+                            <p class="font-black text-gray-900">{{ $service-> }}</p>
                             <p class="text-[8px] text-gray-400 font-bold uppercase tracking-widest">Presentes</p>
                         </div>
                     </div>

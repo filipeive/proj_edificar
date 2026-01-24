@@ -11,13 +11,13 @@
         }
     </style>
     <div x-data="{ 
-                            view: window.innerWidth < 768 ? 'grid' : 'list',
-                            updateView() {
-                                if (window.innerWidth < 768 && this.view === 'list') {
-                                    this.view = 'grid'; // Optional: force grid on mobile resize
+                                view: window.innerWidth < 768 ? 'grid' : 'list',
+                                updateView() {
+                                    if (window.innerWidth < 768 && this.view === 'list') {
+                                        this.view = 'grid'; // Optional: force grid on mobile resize
+                                    }
                                 }
-                            }
-                        }"
+                            }"
         x-init="$watch('view', value => localStorage.setItem('visitors_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('visitors_view') || 'list')"
         @resize.window.debounce.500ms="updateView()" x-cloak>
         @section('header-actions')
@@ -109,7 +109,7 @@
                             <i class="bi bi-file-earmark-excel mr-2"></i>Exportar Excel
                         </a>
                         <a href="{{ route('visitors.create') }}"
-                            class="flex bg-blue-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-all items-center">
+                            class="hidden md:flex bg-blue-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-all items-center">
                             <i class="bi bi-plus-lg mr-2"></i>Novo
                         </a>
                     </div>

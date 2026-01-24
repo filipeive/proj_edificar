@@ -18,8 +18,8 @@ class CourseClassController extends Controller
 {
     public function index(Request $request)
     {
-        if (auth()->user()->isSupervisor() && !auth()->user()->hasAnyCourseEnrollment()) {
-            abort(403, 'Acesso não autorizado.');
+        if ((auth()->user()->isSupervisor() || auth()->user()->isSecretaria()) && !auth()->user()->hasAnyCourseEnrollment()) {
+            abort(403, 'Você não está matriculada em nenhuma turma.');
         }
 
         $courseId = $request->query('course_id');
