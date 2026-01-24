@@ -6,7 +6,7 @@
 
 @section('header-actions')
     <a href="{{ route('users.create') }}"
-        class="bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 transition-all flex items-center justify-center shadow-lg shadow-green-600/20">
+        class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100">
         <i class="bi bi-person-plus-fill text-2xl"></i>
     </a>
 @endsection
@@ -374,7 +374,7 @@
                         </div>
                     </div>
 
-                    <div class="mt-auto grid grid-cols-3 gap-2">
+                    <div class="mt-auto grid grid-cols-4 gap-2">
                         <a href="{{ route('users.show', $user) }}" class="bg-gray-900 text-white text-center py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition-all shadow-lg hover:shadow-blue-200 active:scale-95">
                             Ver
                         </a>
@@ -387,6 +387,13 @@
                                 <button type="button" onclick="confirmAction('Redefinir senha para mudar123?', 'Redefinir Senha').then(result => { if(result.isConfirmed) this.closest('form').submit(); })" 
                                     class="w-full bg-purple-50 text-purple-600 text-center py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-purple-600 hover:text-white transition-all active:scale-95" title="Redefinir Senha">
                                     <i class="bi bi-key-fill"></i>
+                                </button>
+                            </form>
+                            <form action="{{ route('users.destroy', $user) }}" method="POST" id="grid-delete-user-{{ $user->id }}">
+                                @csrf @method('DELETE')
+                                <button type="button" onclick="confirmDelete('grid-delete-user-{{ $user->id }}', 'Deletar {{ $user->name }}?')" 
+                                    class="w-full bg-red-50 text-red-600 text-center py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all active:scale-95">
+                                    <i class="bi bi-trash-fill"></i>
                                 </button>
                             </form>
                         @endif
