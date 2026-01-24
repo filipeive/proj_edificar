@@ -121,7 +121,7 @@
                         </div>
                         @endif
                     </div>
-                    <div class="mt-8 space-y-3">
+                    <div class="mt-8 space-y-3 hidden md:block">
                         <a href="{{ route('course-classes.report', $courseClass) }}"
                             class="w-full bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition block text-center shadow-lg shadow-blue-600/20">
                             <i class="bi bi-bar-chart-fill mr-2"></i> Ver Relatório Final
