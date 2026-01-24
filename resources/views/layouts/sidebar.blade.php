@@ -359,7 +359,7 @@
                     </button>
                 </form>
             </div>
-            <form method="POST" action="{{ route('logout') }}">
+            <form method="POST" action="{{ route('logout') }}" class="hidden md:block">
                 @csrf
                 <button type="submit" class="w-full flex items-center justify-center px-4 py-3 text-slate-400 hover:text-white hover:bg-red-600 transition-all duration-300 rounded-2xl font-black text-xs uppercase tracking-widest border border-white/5 hover:border-red-600 shadow-lg hover:shadow-red-600/20">
                     <i class="bi bi-power mr-2 text-lg"></i>
