@@ -18,13 +18,13 @@
         }
     </style>
     <div class="container-fluid" x-data="{ 
-                view: window.innerWidth < 768 ? 'grid' : 'list',
-                updateView() {
-                    if (window.innerWidth < 768 && this.view === 'list') {
-                        this.view = 'grid'; 
+                    view: window.innerWidth < 768 ? 'grid' : 'list',
+                    updateView() {
+                        if (window.innerWidth < 768 && this.view === 'list') {
+                            this.view = 'grid'; 
+                        }
                     }
-                }
-            }"
+                }"
         x-init="$watch('view', value => { if(value !== 'calendar') localStorage.setItem('events_view', value) }); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('events_view') || 'list')"
         @resize.window.debounce.500ms="updateView()" x-cloak>
         <!-- Header Section -->
@@ -43,6 +43,11 @@
                         <i class="bi bi-trash-fill mr-2"></i> Excluir Selecionados
                     </button>
                 @endif
+
+                <a href="{{ route('event-types.index') }}"
+                    class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2 rounded-xl flex items-center transition font-black text-xs uppercase tracking-widest">
+                    <i class="bi bi-gear-fill mr-2"></i> Gerir Tipos
+                </a>
 
                 <!-- View Toggle -->
                 <div class="bg-gray-100 p-1 rounded-xl flex items-center">
@@ -104,137 +109,132 @@
         <!-- List View -->
         <div id="view-list" x-show="view === 'list'" class="transition-opacity duration-300">
             <div class="bg-white rounded-[2rem] shadow-xl shadow-gray-100/50 border border-gray-100 overflow-hidden">
-                <form id="bulkActionForm" method="POST">
+                <form id="bulkActionForm" method="POST" action="{{ route('events.bulk-delete') }}">
                     @csrf
-                    <table class="w-full">
-                        <thead>
-                            <tr class="bg-gray-50/50 border-b border-gray-100">
-                                @if(auth()->user()->role === 'admin')
-                                    <th class="px-8 py-5 text-left w-10">
-                                        <input type="checkbox" id="selectAllCheckbox"
-                                            class="rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
-                                    </th>
-                                @endif
-                                <th
-                                    class="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                    Data</th>
-                                <th
-                                    class="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                    Evento</th>
-                                <th
-                                    class="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                    Localização</th>
-                                <th
-                                    class="px-8 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                    Participantes</th>
-                                <th
-                                    class="px-8 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                    Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            @forelse($events as $event)
-                                                <tr class="group hover:bg-gray-50/50 transition-colors duration-200">
-                                                    @if(auth()->user()->role === 'admin')
-                                                        <td class="px-8 py-5">
-                                                            <input type="checkbox" name="event_ids[]" value="{{ $event->id }}"
-                                                                class="event-checkbox rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
-                                                        </td>
-                                                    @endif
-                                                    <td class="px-8 py-5 whitespace-nowrap">
-                                                        <div class="flex flex-col">
-                                                            <span
-                                                                class="text-sm font-black text-gray-900">{{ $event->date->format('d/m/Y') }}</span>
-                                                            <span
-                                                                class="text-[10px] font-bold text-gray-400 uppercase">{{ $event->date->translatedFormat('l') }}</span>
-                                                            @if($event->end_date)
-                                                                <span class="text-[10px] font-bold text-blue-500 mt-1">até
-                                                                    {{ $event->end_date->format('d/m/Y') }}</span>
-                                                            @endif
-                                                        </div>
-                                                    </td>
-                                                    <td class="px-8 py-5">
-                                                        <div class="flex items-center">
-                                                            <div
-                                                                class="w-10 h-10 rounded-xl flex items-center justify-center mr-4 
-                                                                                                                                                                                                                                            {{ $event->eventType->name == 'Culto' ? 'bg-amber-100 text-amber-600' :
-                                ($event->eventType->name == 'Batismo' ? 'bg-cyan-100 text-cyan-600' : 'bg-blue-100 text-blue-600') }}">
-                                                                <i
-                                                                    class="bi {{ $event->eventType->name == 'Culto' ? 'bi-church' : ($event->eventType->name == 'Batismo' ? 'bi-droplet-fill' : 'bi-calendar-event') }} text-lg"></i>
-                                                            </div>
-                                                            <div>
-                                                                <span class="block text-sm font-bold text-gray-900">{{ $event->name }}</span>
-                                                                <span class="text-xs text-gray-400">{{ $event->eventType->name }}</span>
-                                                                @if($event->cell)
-                                                                    <span class="text-xs text-gray-500 block">Célula:
-                                                                        {{ $event->cell->name }}</span>
-                                                                @elseif($event->zone)
-                                                                    <span class="text-xs text-gray-500 block">Zona: {{ $event->zone->name }}</span>
-                                                                @endif
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td class="px-8 py-5">
-                                                        <div class="flex items-center text-gray-500">
-                                                            <i class="bi bi-geo-alt-fill mr-2 text-gray-300"></i>
-                                                            <span
-                                                                class="text-sm font-medium">{{ $event->location ?? 'Local não definido' }}</span>
-                                                        </div>
-                                                    </td>
-                                                    <td class="px-8 py-5 text-center">
-                                                        <span
-                                                            class="inline-flex items-center px-3 py-1 rounded-lg bg-gray-100 text-gray-600 text-xs font-bold">
-                                                            <i class="bi bi-people-fill mr-2 text-gray-400"></i>
-                                                            {{ $event->participants_count }}
-                                                        </span>
-                                                    </td>
-                                                    <td class="px-8 py-5 text-right">
-                                                        <div
-                                                            class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                                            <a href="{{ route('events.show', $event) }}"
-                                                                class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
-                                                                title="Ver Detalhes">
-                                                                <i class="bi bi-eye-fill"></i>
-                                                            </a>
-                                                            <a href="{{ route('events.pdf', $event) }}" target="_blank"
-                                                                class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                                                                title="PDF">
-                                                                <i class="bi bi-file-earmark-pdf-fill"></i>
-                                                            </a>
-                                                            @can('update', $event)
-                                                                <a href="{{ route('events.edit', $event) }}"
-                                                                    class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
-                                                                    title="Editar">
-                                                                    <i class="bi bi-pencil-fill"></i>
-                                                                </a>
-                                                            @endcan
-                                                            @can('delete', $event)
-                                                                <form action="{{ route('events.destroy', $event) }}" method="POST"
-                                                                    id="delete-event-{{ $event->id }}">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                    <button type="button"
-                                                                        onclick="confirmDelete('delete-event-{{ $event->id }}', 'Deseja excluir este evento?')"
-                                                                        class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                                                                        title="Excluir">
-                                                                        <i class="bi bi-trash-fill"></i>
-                                                                    </button>
-                                                                </form>
-                                                            @endcan
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="px-8 py-12 text-center text-gray-400">
-                                        <i class="bi bi-calendar-x text-4xl mb-4 block opacity-20"></i>
-                                        <p class="text-sm font-medium">Nenhum evento encontrado.</p>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
                 </form>
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gray-50/50 border-b border-gray-100">
+                            @if(auth()->user()->role === 'admin')
+                                <th class="px-8 py-5 text-left w-10">
+                                    <input type="checkbox" id="selectAllCheckbox" form="bulkActionForm"
+                                        class="rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
+                                </th>
+                            @endif
+                            <th class="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                Data</th>
+                            <th class="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                Evento</th>
+                            <th class="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                Localização</th>
+                            <th
+                                class="px-8 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                Participantes</th>
+                            <th class="px-8 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        @forelse($events as $event)
+                                        <tr class="group hover:bg-gray-50/50 transition-colors duration-200">
+                                            @if(auth()->user()->role === 'admin')
+                                                <td class="px-8 py-5">
+                                                    <input type="checkbox" form="bulkActionForm" name="event_ids[]" value="{{ $event->id }}"
+                                                        class="event-checkbox rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
+                                                </td>
+                                            @endif
+                                            <td class="px-8 py-5 whitespace-nowrap">
+                                                <div class="flex flex-col">
+                                                    <span
+                                                        class="text-sm font-black text-gray-900">{{ $event->date->format('d/m/Y') }}</span>
+                                                    <span
+                                                        class="text-[10px] font-bold text-gray-400 uppercase">{{ $event->date->translatedFormat('l') }}</span>
+                                                    @if($event->end_date)
+                                                        <span class="text-[10px] font-bold text-blue-500 mt-1">até
+                                                            {{ $event->end_date->format('d/m/Y') }}</span>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                            <td class="px-8 py-5">
+                                                <div class="flex items-center">
+                                                    <div
+                                                        class="w-10 h-10 rounded-xl flex items-center justify-center mr-4 
+                                                                                                                                                                                                                                                                {{ $event->eventType->name == 'Culto' ? 'bg-amber-100 text-amber-600' :
+                            ($event->eventType->name == 'Batismo' ? 'bg-cyan-100 text-cyan-600' : 'bg-blue-100 text-blue-600') }}">
+                                                        <i
+                                                            class="bi {{ $event->eventType->name == 'Culto' ? 'bi-church' : ($event->eventType->name == 'Batismo' ? 'bi-droplet-fill' : 'bi-calendar-event') }} text-lg"></i>
+                                                    </div>
+                                                    <div>
+                                                        <span class="block text-sm font-bold text-gray-900">{{ $event->name }}</span>
+                                                        <span class="text-xs text-gray-400">{{ $event->eventType->name }}</span>
+                                                        @if($event->cell)
+                                                            <span class="text-xs text-gray-500 block">Célula:
+                                                                {{ $event->cell->name }}</span>
+                                                        @elseif($event->zone)
+                                                            <span class="text-xs text-gray-500 block">Zona: {{ $event->zone->name }}</span>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-8 py-5">
+                                                <div class="flex items-center text-gray-500">
+                                                    <i class="bi bi-geo-alt-fill mr-2 text-gray-300"></i>
+                                                    <span class="text-sm font-medium">{{ $event->location ?? 'Local não definido' }}</span>
+                                                </div>
+                                            </td>
+                                            <td class="px-8 py-5 text-center">
+                                                <span
+                                                    class="inline-flex items-center px-3 py-1 rounded-lg bg-gray-100 text-gray-600 text-xs font-bold">
+                                                    <i class="bi bi-people-fill mr-2 text-gray-400"></i>
+                                                    {{ $event->participants_count }}
+                                                </span>
+                                            </td>
+                                            <td class="px-8 py-5 text-right">
+                                                <div
+                                                    class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                                    <a href="{{ route('events.show', $event) }}"
+                                                        class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                                                        title="Ver Detalhes">
+                                                        <i class="bi bi-eye-fill"></i>
+                                                    </a>
+                                                    <a href="{{ route('events.pdf', $event) }}" target="_blank"
+                                                        class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                                                        title="PDF">
+                                                        <i class="bi bi-file-earmark-pdf-fill"></i>
+                                                    </a>
+                                                    @can('update', $event)
+                                                        <a href="{{ route('events.edit', $event) }}"
+                                                            class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                                                            title="Editar">
+                                                            <i class="bi bi-pencil-fill"></i>
+                                                        </a>
+                                                    @endcan
+                                                    @can('delete', $event)
+                                                        <form action="{{ route('events.destroy', $event) }}" method="POST"
+                                                            id="delete-event-{{ $event->id }}">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="button"
+                                                                onclick="confirmDelete('delete-event-{{ $event->id }}', 'Deseja excluir este evento?')"
+                                                                class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                                                                title="Excluir">
+                                                                <i class="bi bi-trash-fill"></i>
+                                                            </button>
+                                                        </form>
+                                                    @endcan
+                                                </div>
+                                            </td>
+                                        </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="px-8 py-12 text-center text-gray-400">
+                                    <i class="bi bi-calendar-x text-4xl mb-4 block opacity-20"></i>
+                                    <p class="text-sm font-medium">Nenhum evento encontrado.</p>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
             <div class="px-8 py-6 border-t border-gray-100">
                 {{ $events->links() }}
@@ -248,6 +248,10 @@
                         <div
                             class="bg-white p-6 md:p-8 rounded-2xl md:rounded-[2rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 relative">
                             <div class="absolute top-6 right-6 flex flex-col gap-2 items-end">
+                                @if(auth()->user()->role === 'admin')
+                                    <input type="checkbox" form="bulkActionForm" name="event_ids[]" value="{{ $event->id }}"
+                                        class="event-checkbox rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
+                                @endif
                                 <span
                                     class="px-3 py-1 rounded-lg bg-gray-50 text-gray-600 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
                                     <i class="bi bi-people-fill text-gray-300"></i> {{ $event->participants_count }}
@@ -256,7 +260,7 @@
 
                             <div
                                 class="w-10 h-10 md:w-14 md:h-14 rounded-2xl flex items-center justify-center font-black text-lg md:text-2xl group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 mb-6 
-                                                                    {{ $event->eventType->name == 'Culto' ? 'bg-amber-100 text-amber-600' :
+                                                                                {{ $event->eventType->name == 'Culto' ? 'bg-amber-100 text-amber-600' :
                     ($event->eventType->name == 'Batismo' ? 'bg-cyan-100 text-cyan-600' : 'bg-blue-100 text-blue-600') }}">
                                 <i
                                     class="bi {{ $event->eventType->name == 'Culto' ? 'bi-church' : ($event->eventType->name == 'Batismo' ? 'bi-droplet-fill' : 'bi-calendar-event') }}"></i>
@@ -315,6 +319,18 @@
                                         class="w-10 h-10 bg-gray-50 text-gray-400 flex items-center justify-center rounded-xl hover:bg-orange-500 hover:text-white transition-all">
                                         <i class="bi bi-pencil"></i>
                                     </a>
+                                @endcan
+                                @can('delete', $event)
+                                    <form action="{{ route('events.destroy', $event) }}" method="POST"
+                                        id="grid-delete-event-{{ $event->id }}" class="inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button"
+                                            onclick="confirmDelete('grid-delete-event-{{ $event->id }}', 'Deseja excluir este evento?')"
+                                            class="w-10 h-10 bg-red-50 text-red-400 flex items-center justify-center rounded-xl hover:bg-red-600 hover:text-white transition-all">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
                                 @endcan
                             </div>
                         </div>
@@ -467,23 +483,37 @@
         }
 
         @if(auth()->user()->role === 'admin')
-            const selectAll = document.getElementById('selectAllCheckbox');
-            const checkboxes = document.querySelectorAll('.event-checkbox');
-            const bulkBtn = document.getElementById('bulkDeleteBtn');
-
-            if (selectAll) {
-                selectAll.addEventListener('change', function () {
-                    checkboxes.forEach(cb => cb.checked = this.checked);
+            document.addEventListener('change', function (e) {
+                if (e.target.id === 'selectAllCheckbox') {
+                    const checkboxes = document.querySelectorAll('.event-checkbox');
+                    checkboxes.forEach(cb => cb.checked = e.target.checked);
                     updateBulkBtn();
-                });
-            }
+                }
 
-            checkboxes.forEach(cb => {
-                cb.addEventListener('change', updateBulkBtn);
+                if (e.target.classList.contains('event-checkbox')) {
+                    // Sync other checkboxes with same value (Grid <-> List)
+                    const val = e.target.value;
+                    const sameValueCheckboxes = document.querySelectorAll(`.event-checkbox[value="${val}"]`);
+                    sameValueCheckboxes.forEach(cb => {
+                        if (cb !== e.target) cb.checked = e.target.checked;
+                    });
+
+                    updateBulkBtn();
+                }
             });
 
             function updateBulkBtn() {
-                const count = document.querySelectorAll('.event-checkbox:checked').length;
+                const bulkBtn = document.getElementById('bulkDeleteBtn');
+
+                // Count unique selected IDs to avoid double counting (Grid + List)
+                const selectedIds = new Set(
+                    Array.from(document.querySelectorAll('.event-checkbox:checked'))
+                        .map(cb => cb.value)
+                );
+                const count = selectedIds.size;
+
+                if (!bulkBtn) return;
+
                 if (count > 0) {
                     bulkBtn.disabled = false;
                     bulkBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'hidden');
@@ -522,49 +552,49 @@
             const props = event.extendedProps;
 
             let tooltipContent = `
-                                            <div class="tooltip-header">${event.title}</div>
-                                            <div class="tooltip-row">
-                                                <i class="bi bi-calendar-event"></i>
-                                                <span>${event.start.toLocaleDateString('pt-BR')}</span>
-                                            </div>
-                                        `;
+                                                <div class="tooltip-header">${event.title}</div>
+                                                <div class="tooltip-row">
+                                                    <i class="bi bi-calendar-event"></i>
+                                                    <span>${event.start.toLocaleDateString('pt-BR')}</span>
+                                                </div>
+                                            `;
 
             if (event.end && event.end.getTime() !== event.start.getTime()) {
                 const endDate = new Date(event.end);
                 endDate.setDate(endDate.getDate() - 1); // FullCalendar exclusive end
                 tooltipContent += `
-                                                <div class="tooltip-row">
-                                                    <i class="bi bi-arrow-right"></i>
-                                                    <span>${endDate.toLocaleDateString('pt-BR')}</span>
-                                                </div>
-                                            `;
+                                                    <div class="tooltip-row">
+                                                        <i class="bi bi-arrow-right"></i>
+                                                        <span>${endDate.toLocaleDateString('pt-BR')}</span>
+                                                    </div>
+                                                `;
             }
 
             if (props.location) {
                 tooltipContent += `
-                                                <div class="tooltip-row">
-                                                    <i class="bi bi-geo-alt-fill"></i>
-                                                    <span>${props.location}</span>
-                                                </div>
-                                            `;
+                                                    <div class="tooltip-row">
+                                                        <i class="bi bi-geo-alt-fill"></i>
+                                                        <span>${props.location}</span>
+                                                    </div>
+                                                `;
             }
 
             if (props.participants_count !== undefined) {
                 tooltipContent += `
-                                                <div class="tooltip-row">
-                                                    <i class="bi bi-people-fill"></i>
-                                                    <span>${props.participants_count} participantes</span>
-                                                </div>
-                                            `;
+                                                    <div class="tooltip-row">
+                                                        <i class="bi bi-people-fill"></i>
+                                                        <span>${props.participants_count} participantes</span>
+                                                    </div>
+                                                `;
             }
 
             if (props.description) {
                 tooltipContent += `
-                                                <div class="tooltip-row" style="margin-top: 0.5rem; font-style: italic;">
-                                                    <i class="bi bi-info-circle"></i>
-                                                    <span>${props.description.substring(0, 100)}${props.description.length > 100 ? '...' : ''}</span>
-                                                </div>
-                                            `;
+                                                    <div class="tooltip-row" style="margin-top: 0.5rem; font-style: italic;">
+                                                        <i class="bi bi-info-circle"></i>
+                                                        <span>${props.description.substring(0, 100)}${props.description.length > 100 ? '...' : ''}</span>
+                                                    </div>
+                                                `;
             }
 
             tooltip.innerHTML = tooltipContent;

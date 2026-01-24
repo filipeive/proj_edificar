@@ -12,6 +12,16 @@
 @endsection
 
 @section('content')
+    <div class="mb-6 flex justify-between items-center">
+        <a href="{{ route('events.index') }}" class="text-gray-500 hover:text-gray-700 inline-flex items-center transition">
+            <i class="bi bi-arrow-left mr-2"></i> Voltar para Eventos
+        </a>
+        <a href="{{ route('event-types.create') }}"
+            class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition shadow-lg font-bold">
+            <i class="bi bi-plus-lg mr-2"></i> Novo Tipo
+        </a>
+    </div>
+
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <table class="w-full text-left border-collapse">
             <thead>

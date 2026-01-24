@@ -42,6 +42,10 @@
                                     </option>
                                 @endforeach
                             </select>
+                            <a href="{{ route('event-types.create') }}"
+                                class="text-xs text-gray-500 hover:text-blue-600 mt-1 inline-flex items-center transition">
+                                <i class="bi bi-plus-circle mr-1"></i> Não encontrou? Adicione um novo tipo
+                            </a>
                             @error('event_type_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
