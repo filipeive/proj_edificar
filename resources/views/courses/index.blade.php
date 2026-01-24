@@ -7,8 +7,8 @@
 @section('header-actions')
     @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
         <a href="{{ route('courses.create') }}"
-            class="bg-orange-600 text-white p-2 rounded-lg hover:bg-orange-700 transition-all flex items-center justify-center shadow-lg shadow-orange-600/20">
-            <i class="bi bi-journal-plus text-xl"></i>
+            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-orange-600/20">
+            <i class="bi bi-journal-plus text-2xl"></i>
         </a>
     @endif
 @endsection
@@ -35,7 +35,7 @@
             <section class="space-y-6">
                 <div class="flex items-center gap-4">
                     <div class="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center">
-                        <i class="bi bi-mortarboard-fill text-xl"></i>
+                        <i class="bi bi-mortarboard-fill text-2xl"></i>
                     </div>
                     <h2 class="text-2xl font-black text-gray-900 uppercase tracking-tight">Meus Cursos</h2>
                 </div>
@@ -52,7 +52,7 @@
         <section class="space-y-6">
             <div class="flex items-center gap-4">
                 <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
-                    <i class="bi bi-book-half text-xl"></i>
+                    <i class="bi bi-book-half text-2xl"></i>
                 </div>
                 <h2 class="text-2xl font-black text-gray-900 uppercase tracking-tight">Cursos Disponíveis</h2>
             </div>

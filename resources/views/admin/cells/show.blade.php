@@ -28,7 +28,7 @@
                 </div>
                 @if ($cell->leader)
                     <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 font-black text-xl">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 font-black text-2xl">
                             {{ substr($cell->leader->name, 0, 1) }}
                         </div>
                         <a href="{{ route('users.show', $cell->leader) }}" class="text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors leading-tight">

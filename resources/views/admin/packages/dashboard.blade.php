@@ -82,21 +82,21 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <a href="{{ route('contributions.create') }}" class="bg-white p-6 rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all group">
                 <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all">
-                    <i class="bi bi-plus-lg text-xl"></i>
+                    <i class="bi bi-plus-lg text-2xl"></i>
                 </div>
                 <span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Registrar</span>
             </a>
             
             <a href="{{ route('contributions.index') }}" class="bg-white p-6 rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all group">
                 <div class="w-12 h-12 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center group-hover:bg-green-600 group-hover:text-white transition-all">
-                    <i class="bi bi-list-check text-xl"></i>
+                    <i class="bi bi-list-check text-2xl"></i>
                 </div>
                 <span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Histórico</span>
             </a>
 
             <a href="{{ route('members.index') }}" class="bg-white p-6 rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all group">
                 <div class="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-all">
-                    <i class="bi bi-people text-xl"></i>
+                    <i class="bi bi-people text-2xl"></i>
                 </div>
                 <span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Membros</span>
             </a>
@@ -104,7 +104,7 @@
             @if($packages->isNotEmpty())
             <a href="{{ route('packages.export', $packages->first()) }}" class="bg-white p-6 rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all group">
                 <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-all">
-                    <i class="bi bi-file-earmark-arrow-down text-xl"></i>
+                    <i class="bi bi-file-earmark-arrow-down text-2xl"></i>
                 </div>
                 <span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Exportar</span>
             </a>

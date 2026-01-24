@@ -46,7 +46,7 @@
                     class="bg-white p-6 rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all group">
                     <div
                         class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all">
-                        <i class="bi bi-plus-lg text-xl"></i>
+                        <i class="bi bi-plus-lg text-2xl"></i>
                     </div>
                     <span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Registrar</span>
                 </a>
@@ -55,7 +55,7 @@
                     class="bg-white p-6 rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all group">
                     <div
                         class="w-12 h-12 rounded-2xl bg-yellow-50 text-yellow-600 flex items-center justify-center group-hover:bg-yellow-600 group-hover:text-white transition-all">
-                        <i class="bi bi-patch-check text-xl"></i>
+                        <i class="bi bi-patch-check text-2xl"></i>
                     </div>
                     <span class="text-[10px] font-black text-gray-900 uppercase tracking-widest text-center">Validar
                         Pendentes</span>
@@ -65,7 +65,7 @@
                     class="bg-white p-6 rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all group">
                     <div
                         class="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-all">
-                        <i class="bi bi-bar-chart-line text-xl"></i>
+                        <i class="bi bi-bar-chart-line text-2xl"></i>
                     </div>
                     <span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Relatório Global</span>
                 </a>
@@ -74,7 +74,7 @@
                     class="bg-white p-6 rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all group opacity-75 hover:opacity-100">
                     <div
                         class="w-12 h-12 rounded-2xl bg-gray-50 text-gray-600 flex items-center justify-center group-hover:bg-gray-600 group-hover:text-white transition-all">
-                        <i class="bi bi-arrow-left text-xl"></i>
+                        <i class="bi bi-arrow-left text-2xl"></i>
                     </div>
                     <span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Voltar Admin</span>
                 </a>

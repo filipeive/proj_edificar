@@ -263,7 +263,7 @@
                                 </div>
 
                                 <div class="flex items-center gap-4 mb-4">
-                                    <div class="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600 font-bold group-hover:bg-orange-600 group-hover:text-white transition-all text-xl">
+                                    <div class="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600 font-bold group-hover:bg-orange-600 group-hover:text-white transition-all text-2xl">
                                         @if($enrollment->user_id)
                                             {{ substr($enrollment->user->name, 0, 1) }}
                                         @else

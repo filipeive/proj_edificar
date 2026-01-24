@@ -8,11 +8,11 @@
     <div class="flex items-center gap-2">
         <a href="{{ route('weddings.pdf', ['year' => now()->year]) }}" target="_blank"
             class="bg-white text-gray-400 p-2 rounded-lg hover:text-orange-600 hover:border-orange-200 transition-all border border-gray-200 shadow-sm flex items-center justify-center">
-            <i class="bi bi-file-earmark-pdf-fill text-xl"></i>
+            <i class="bi bi-file-earmark-pdf-fill text-2xl"></i>
         </a>
         <a href="{{ route('weddings.create') }}"
             class="bg-gray-900 text-white p-2 rounded-lg hover:bg-black transition-all flex items-center justify-center shadow-lg shadow-gray-900/20">
-            <i class="bi bi-plus-lg text-xl"></i>
+            <i class="bi bi-plus-lg text-2xl"></i>
         </a>
     </div>
 @endsection

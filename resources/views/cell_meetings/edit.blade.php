@@ -167,7 +167,7 @@
             <div class="px-8 md:px-12 py-8 bg-gray-50 border-t border-gray-50 flex justify-end">
                 <button type="submit"
                     class="bg-blue-600 hover:bg-blue-700 text-white font-black px-12 py-4 rounded-2xl shadow-xl shadow-blue-100 transition-all transform hover:-translate-y-1">
-                    <i class="bi bi-check-lg mr-2 text-xl"></i> ATUALIZAR ENCONTRO
+                    <i class="bi bi-check-lg mr-2 text-2xl"></i> ATUALIZAR ENCONTRO
                 </button>
             </div>
         </form>

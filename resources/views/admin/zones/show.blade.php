@@ -68,7 +68,7 @@
                     @forelse($zone->supervisions as $supervision)
                         <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 hover:border-blue-100 transition-all group">
                             <div class="flex items-start justify-between mb-6">
-                                <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-black text-xl">
+                                <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-black text-2xl">
                                     {{ substr($supervision->name, 0, 1) }}
                                 </div>
                                 <a href="{{ route('supervisions.show', $supervision) }}" class="text-gray-300 hover:text-blue-600 transition-colors">

@@ -205,7 +205,7 @@
                     <h3 class="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">Inteligência do Sistema</h3>
                     <div class="space-y-6">
                         <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-xl">
+                            <div class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-2xl">
                                 <i class="bi bi-fingerprint"></i>
                             </div>
                             <div>
@@ -216,7 +216,7 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-xl">
+                            <div class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-2xl">
                                 <i class="bi bi-calendar-plus"></i>
                             </div>
                             <div>
@@ -225,7 +225,7 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-xl">
+                            <div class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-2xl">
                                 <i class="bi bi-box-arrow-in-right"></i>
                             </div>
                             <div>

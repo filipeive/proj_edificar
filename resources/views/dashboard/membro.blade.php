@@ -50,7 +50,7 @@
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-black text-gray-900 tracking-tight">Total Este Mês</h3>
                 <div class="bg-green-50 p-3 rounded-xl">
-                    <i class="bi bi-cash-stack text-green-600 text-xl"></i>
+                    <i class="bi bi-cash-stack text-green-600 text-2xl"></i>
                 </div>
             </div>
             <div
@@ -72,14 +72,14 @@
                 <a href="{{ route('contributions.create') }}"
                     class="flex items-center p-4 bg-orange-600 text-white rounded-2xl shadow-lg shadow-orange-600/20 hover:bg-orange-700 transition-all group">
                     <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mr-4">
-                        <i class="bi bi-plus-lg text-xl"></i>
+                        <i class="bi bi-plus-lg text-2xl"></i>
                     </div>
                     <span class="font-black uppercase tracking-widest text-xs">Nova Contribuição</span>
                 </a>
                 <a href="{{ route('contributions.index', ['mine' => 1]) }}"
                     class="flex items-center p-4 bg-gray-50 text-gray-600 rounded-2xl border border-gray-100 hover:bg-gray-100 transition-all group">
                     <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center mr-4 shadow-sm">
-                        <i class="bi bi-clock-history text-xl"></i>
+                        <i class="bi bi-clock-history text-2xl"></i>
                     </div>
                     <span class="font-black uppercase tracking-widest text-xs">Ver Histórico</span>
                 </a>
@@ -184,7 +184,7 @@
                 <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="activeEvent = null"></div>
                 <div class="relative bg-white rounded-3xl p-8 max-w-lg w-full shadow-2xl animate-fade-in-up">
                     <button @click="activeEvent = null" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-                        <i class="bi bi-x-lg text-xl"></i>
+                        <i class="bi bi-x-lg text-2xl"></i>
                     </button>
                     
                     <div class="text-center mb-6">
@@ -238,7 +238,7 @@
                 <div class="flex items-center justify-between mb-8">
                     <h3 class="text-2xl font-black tracking-tight text-gray-900">Minha Célula</h3>
                     <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 transform group-hover:rotate-12 transition-transform duration-500">
-                        <i class="bi bi-people-fill text-xl"></i>
+                        <i class="bi bi-people-fill text-2xl"></i>
                     </div>
                 </div>
 

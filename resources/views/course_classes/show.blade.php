@@ -15,7 +15,7 @@
 
         @if(session('success'))
             <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded shadow-sm flex items-center">
-                <i class="bi bi-check-circle-fill mr-3 text-xl"></i>
+                <i class="bi bi-check-circle-fill mr-3 text-2xl"></i>
                 <span>{{ session('success') }}</span>
             </div>
         @endif
@@ -310,7 +310,7 @@
                 <h4 class="text-xl font-black text-gray-900">Novo Casal / Inscrito</h4>
                 <button type="button" onclick="document.getElementById('enrollmentModal').classList.add('hidden')"
                     class="text-gray-400 hover:text-gray-600">
-                    <i class="bi bi-x-lg text-xl"></i>
+                    <i class="bi bi-x-lg text-2xl"></i>
                 </button>
             </div>
             <div class="p-8">
@@ -375,7 +375,7 @@
                 <h4 class="text-xl font-black text-gray-900">Agendar Encontro</h4>
                 <button type="button" onclick="document.getElementById('meetingModal').classList.add('hidden')"
                     class="text-gray-400 hover:text-gray-600">
-                    <i class="bi bi-x-lg text-xl"></i>
+                    <i class="bi bi-x-lg text-2xl"></i>
                 </button>
             </div>
             <div class="p-8">

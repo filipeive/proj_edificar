@@ -7,7 +7,7 @@
 @section('header-actions')
     <a href="{{ route('users.create') }}"
         class="bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 transition-all flex items-center justify-center shadow-lg shadow-green-600/20">
-        <i class="bi bi-person-plus-fill text-xl"></i>
+        <i class="bi bi-person-plus-fill text-2xl"></i>
     </a>
 @endsection
 
@@ -150,7 +150,7 @@
                         </button>
                         
                         <a href="{{ route('users.create') }}" class="hidden md:flex w-14 h-14 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center hover:bg-green-600 hover:text-white transition-all shadow-sm">
-                            <i class="bi bi-plus-lg text-xl"></i>
+                            <i class="bi bi-plus-lg text-2xl"></i>
                         </a>
                     </div>
                 </div>

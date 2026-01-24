@@ -81,7 +81,7 @@
                             <div class="flex items-center justify-between p-6 rounded-[2rem] {{ $commitment->end_date === null ? 'bg-blue-50 border border-blue-100' : 'bg-gray-50 opacity-60' }}">
                                 <div class="flex items-center gap-5">
                                     <div class="w-12 h-12 rounded-2xl bg-white text-blue-600 flex items-center justify-center shadow-sm">
-                                        <i class="bi bi-star-fill text-xl"></i>
+                                        <i class="bi bi-star-fill text-2xl"></i>
                                     </div>
                                     <div>
                                         <p class="text-lg font-black text-gray-900 tracking-tight">{{ $commitment->package->name ?? 'Compromisso Personalizado' }}</p>

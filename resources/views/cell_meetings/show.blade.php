@@ -77,7 +77,7 @@
                             <div>
                                 <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Ministrante / Líder</h4>
                                 <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 font-black text-xl">
+                                    <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 font-black text-2xl">
                                         {{ substr($cellMeeting->leader->name, 0, 1) }}
                                     </div>
                                     <div>

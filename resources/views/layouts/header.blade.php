@@ -6,7 +6,7 @@
     
     <div class="flex items-center space-x-6">
         <button class="text-gray-600 hover:text-gray-800">
-            <i class="bi bi-bell text-xl"></i>
+            <i class="bi bi-bell text-2xl"></i>
         </button>
         <div class="border-l border-gray-300 pl-6">
             <p class="text-sm text-gray-600">{{ auth()->user()->email }}</p>

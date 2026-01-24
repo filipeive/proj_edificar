@@ -534,7 +534,7 @@
                         <!-- Mobile Search Button -->
                         <button onclick="toggleMobileSearch()"
                             class="lg:hidden text-gray-600 hover:text-gray-800 p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                            <i class="bi bi-search text-xl"></i>
+                            <i class="bi bi-search text-2xl"></i>
                         </button>
 
                         <!-- Notifications -->

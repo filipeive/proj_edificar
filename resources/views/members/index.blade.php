@@ -19,7 +19,7 @@
     @if($userRole !== 'secretaria')
         <a href="{{ route('members.create') }}" 
             class="bg-blue-600 text-white p-2 rounded-xl hover:bg-blue-700 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20 active:scale-95">
-            <i class="bi bi-person-plus-fill text-xl"></i>
+            <i class="bi bi-person-plus-fill text-2xl"></i>
         </a>
     @endif
 @endsection

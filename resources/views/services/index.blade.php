@@ -6,17 +6,17 @@
 @section('header-actions')
     <div class="flex items-center gap-2">
         <a href="{{ route('services.report') }}"
-            class="bg-white text-blue-600 p-2 rounded-lg hover:bg-blue-50 transition-all flex items-center justify-center border border-blue-100 shadow-sm">
-            <i class="bi bi-graph-up text-xl"></i>
+            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center border border-blue-100 shadow-sm">
+            <i class="bi bi-graph-up text-2xl"></i>
         </a>
         @can('create', App\Models\Service::class)
             <a href="{{ route('services.create-teaching') }}"
-                class="bg-orange-600 text-white p-2 rounded-lg hover:bg-orange-700 transition-all flex items-center justify-center shadow-lg shadow-orange-600/20">
-                <i class="bi bi-book text-xl"></i>
+                class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-orange-600/20">
+                <i class="bi bi-book text-2xl"></i>
             </a>
             <a href="{{ route('services.create') }}"
-                class="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
-                <i class="bi bi-calendar-plus text-xl"></i>
+                class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
+                <i class="bi bi-calendar-plus text-2xl"></i>
             </a>
         @endcan
     </div>

@@ -277,7 +277,7 @@
                         <div class="flex items-center space-x-4">
                             <div
                                 class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-orange-600 shadow-sm">
-                                <i class="bi bi-journal-text text-xl"></i>
+                                <i class="bi bi-journal-text text-2xl"></i>
                             </div>
                             <div>
                                 <h4 class="font-black text-gray-900">Culto de {{ $service->date->translatedFormat('l, d/m') }}</h4>

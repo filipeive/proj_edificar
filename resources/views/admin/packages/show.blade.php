@@ -18,7 +18,7 @@
             <div class="flex items-center gap-4">
                 <a href="{{ route('packages.index') }}"
                     class="w-12 h-12 rounded-2xl bg-gray-50 text-gray-400 flex items-center justify-center hover:bg-gray-100 transition-all">
-                    <i class="bi bi-arrow-left text-xl"></i>
+                    <i class="bi bi-arrow-left text-2xl"></i>
                 </a>
                 <div>
                     <h1 class="text-3xl font-black text-gray-900 tracking-tight">{{ $package->name }}</h1>

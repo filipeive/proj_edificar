@@ -35,7 +35,7 @@
                             @if(!$enrollment->course_class_id)
                                 <div class="mb-6 p-4 bg-orange-50 border border-orange-100 rounded-2xl flex items-center gap-4">
                                     <div class="p-3 bg-orange-100 text-orange-600 rounded-xl">
-                                        <i class="bi bi-exclamation-triangle-fill text-xl"></i>
+                                        <i class="bi bi-exclamation-triangle-fill text-2xl"></i>
                                     </div>
                                     <div>
                                         <p class="text-xs font-black text-orange-900 uppercase tracking-widest">Pendente de Atribuição</p>

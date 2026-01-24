@@ -22,8 +22,8 @@
         @resize.window.debounce.500ms="updateView()" x-cloak>
         @section('header-actions')
             <a href="{{ route('visitors.create') }}"
-                class="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
-                <i class="bi bi-person-plus-fill text-xl"></i>
+                class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
+                <i class="bi bi-person-plus-fill text-2xl"></i>
             </a>
         @endsection
         <!-- Estatísticas -->

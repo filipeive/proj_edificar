@@ -9,7 +9,7 @@
         <div class="mb-6 flex justify-between items-center">
              <div class="flex items-center space-x-4">
                 <div class="p-3 bg-red-100 rounded-2xl">
-                    <i class="bi bi-heart-fill text-red-600 text-xl"></i>
+                    <i class="bi bi-heart-fill text-red-600 text-2xl"></i>
                 </div>
                 <div>
                     <h3 class="text-lg font-black text-gray-900">Planejamento Matrimonial</h3>

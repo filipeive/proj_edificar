@@ -69,7 +69,7 @@
                                                         class="hidden peer">
                                                     <div
                                                         class="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-400 peer-checked:border-green-500 peer-checked:bg-green-500 peer-checked:text-white transition group-hover:border-green-200">
-                                                        <i class="bi bi-check-lg text-xl"></i>
+                                                        <i class="bi bi-check-lg text-2xl"></i>
                                                     </div>
                                                     <span
                                                         class="text-[8px] font-black uppercase tracking-widest mt-1 text-gray-400 peer-checked:text-green-600">Presente</span>
@@ -81,7 +81,7 @@
                                                         class="hidden peer">
                                                     <div
                                                         class="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-400 peer-checked:border-red-500 peer-checked:bg-red-500 peer-checked:text-white transition group-hover:border-red-200">
-                                                        <i class="bi bi-x-lg text-xl"></i>
+                                                        <i class="bi bi-x-lg text-2xl"></i>
                                                     </div>
                                                     <span
                                                         class="text-[8px] font-black uppercase tracking-widest mt-1 text-gray-400 peer-checked:text-red-600">Falta</span>
@@ -93,7 +93,7 @@
                                                         class="hidden peer">
                                                     <div
                                                         class="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-400 peer-checked:border-amber-500 peer-checked:bg-amber-500 peer-checked:text-white transition group-hover:border-amber-200">
-                                                        <i class="bi bi-info-lg text-xl"></i>
+                                                        <i class="bi bi-info-lg text-2xl"></i>
                                                     </div>
                                                     <span
                                                         class="text-[8px] font-black uppercase tracking-widest mt-1 text-gray-400 peer-checked:text-amber-600">Justif.</span>

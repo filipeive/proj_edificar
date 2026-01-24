@@ -106,7 +106,7 @@
                     class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 flex flex-col">
                     <div class="flex justify-between items-start mb-4">
                         <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
-                            <i class="bi bi-tag-fill text-xl"></i>
+                            <i class="bi bi-tag-fill text-2xl"></i>
                         </div>
                         @if($type->is_active)
                             <span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">Ativo</span>

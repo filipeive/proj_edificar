@@ -19,7 +19,7 @@
         </div>
         <button onclick="toggleSidebar()"
             class="hidden md:flex text-gray-400 hover:text-white transition-all p-2 hover:bg-white/5 rounded-xl border border-transparent hover:border-white/10">
-            <i id="sidebarIcon" class="bi bi-layout-sidebar-inset-reverse text-xl"></i>
+            <i id="sidebarIcon" class="bi bi-layout-sidebar-inset-reverse text-2xl"></i>
         </button>
     </div>
 
@@ -59,7 +59,7 @@
             <div class="grid grid-cols-2 gap-2 px-2 py-2">
                 @if($authUser->isSecretaria() || $authUser->isAdmin())
                     <a href="{{ route('services.create') }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-orange-600/20 hover:border-orange-500/50 transition-all group">
-                        <i class="bi bi-plus-circle text-orange-500 mb-1 group-hover:scale-110 transition-transform text-xl"></i>
+                        <i class="bi bi-plus-circle text-orange-500 mb-1 group-hover:scale-110 transition-transform text-2xl"></i>
                         <span class="hidden md:block text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Registar Culto</span>
                     </a>
                 @endif

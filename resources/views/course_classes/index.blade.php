@@ -10,11 +10,11 @@
             <div class="flex items-center gap-2">
                 <a href="{{ route('course-classes.export-all') }}"
                     class="bg-indigo-50 text-indigo-600 border border-indigo-100 p-2 rounded-lg hover:bg-indigo-100 transition-all flex items-center justify-center shadow-sm">
-                    <i class="bi bi-file-earmark-spreadsheet text-xl"></i>
+                    <i class="bi bi-file-earmark-spreadsheet text-2xl"></i>
                 </a>
                 <a href="{{ route('course-classes.create', ['course_id' => request('course_id')]) }}"
-                    class="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
-                    <i class="bi bi-plus-circle text-xl"></i>
+                    class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
+                    <i class="bi bi-plus-circle text-2xl"></i>
                 </a>
             </div>
         @endsection
@@ -71,7 +71,7 @@
 
         @if(session('success'))
             <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded shadow-sm flex items-center">
-                <i class="bi bi-check-circle-fill mr-3 text-xl"></i>
+                <i class="bi bi-check-circle-fill mr-3 text-2xl"></i>
                 <span>{{ session('success') }}</span>
             </div>
         @endif
