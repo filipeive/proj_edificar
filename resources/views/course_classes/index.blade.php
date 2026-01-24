@@ -29,23 +29,23 @@
         @endsection
     <div class="container-fluid">
         <!-- Modern Header Section -->
-        <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col xl:flex-row justify-between items-center gap-8 mb-8">
-            <div class="flex flex-col md:flex-row items-center gap-6">
+        <div class="bg-white p-5 md:p-6 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col xl:flex-row justify-between items-center gap-6 mb-6">
+            <div class="flex flex-col md:flex-row items-center gap-5">
                 <div>
-                    <h2 class="text-4xl font-black text-gray-900 tracking-tighter uppercase leading-none">
+                    <h2 class="text-2xl md:text-3xl font-black text-gray-900 tracking-tighter uppercase leading-none">
                         <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600">Turmas</span>
                         <span class="text-gray-300">& Cursos</span>
                     </h2>
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Gestão de turmas e inscritos</p>
+                    <p class="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Gestão de turmas e inscritos</p>
                 </div>
                 
-                <div class="h-10 w-[1px] bg-gray-100 hidden md:block"></div>
+                <div class="h-8 w-[1px] bg-gray-100 hidden md:block"></div>
 
                 <form action="{{ route('course-classes.index') }}" method="GET" class="flex items-center">
                     <div class="relative group w-full md:w-auto">
                         <i class="bi bi-funnel absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-blue-500 transition-colors"></i>
                         <select name="course_id" onchange="this.form.submit()"
-                            class="pl-11 pr-10 py-3.5 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-black text-[10px] uppercase tracking-widest appearance-none cursor-pointer hover:bg-gray-100 transition-all text-gray-600 min-w-[240px]">
+                            class="pl-11 pr-10 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500 font-black text-[10px] uppercase tracking-widest appearance-none cursor-pointer hover:bg-gray-100 transition-all text-gray-600 min-w-[200px] md:min-w-[240px]">
                             <option value="">Todos os Cursos</option>
                             @foreach($courses as $course)
                                 <option value="{{ $course->id }}" {{ request('course_id') == $course->id ? 'selected' : '' }}>
@@ -58,40 +58,40 @@
                 </form>
             </div>
 
-            <div class="flex flex-wrap items-center justify-center gap-4">
+            <div class="flex flex-wrap items-center justify-center gap-3">
                 <!-- View Toggle -->
-                <div class="flex bg-gray-100 p-1.5 rounded-2xl border border-gray-50">
+                <div class="flex bg-gray-100 p-1 rounded-xl border border-gray-50">
                     <button @click="view = 'list'"
-                        :class="view === 'list' ? 'bg-white text-blue-600 shadow-md' : 'text-gray-400 hover:text-gray-600'"
-                        class="px-5 py-2.5 rounded-xl transition-all duration-300 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
+                        :class="view === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
+                        class="px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
                         <i class="bi bi-list-ul"></i>
                         <span class="hidden sm:inline">Lista</span>
                     </button>
                     <button @click="view = 'grid'"
-                        :class="view === 'grid' ? 'bg-white text-blue-600 shadow-md' : 'text-gray-400 hover:text-gray-600'"
-                        class="px-5 py-2.5 rounded-xl transition-all duration-300 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
+                        :class="view === 'grid' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
+                        class="px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
                         <i class="bi bi-grid-fill"></i>
                         <span class="hidden sm:inline">Grid</span>
                     </button>
                 </div>
 
-                <div class="hidden md:flex items-center gap-3">
+                <div class="hidden md:flex items-center gap-2">
                     <a href="{{ route('course-classes.export-all') }}"
-                        class="bg-white text-indigo-600 border border-indigo-50 hover:bg-indigo-600 hover:text-white px-6 py-4 rounded-2xl transition-all font-black text-[10px] uppercase tracking-widest flex items-center gap-2 shadow-sm">
-                        <i class="bi bi-file-earmark-spreadsheet text-lg"></i>
-                        <span class="hidden lg:inline text-[9px]">Exportar Excel</span>
+                        class="bg-white text-indigo-600 border border-indigo-50 hover:bg-indigo-600 hover:text-white px-5 py-3 rounded-xl transition-all font-black text-[10px] uppercase tracking-widest flex items-center gap-2 shadow-sm">
+                        <i class="bi bi-file-earmark-spreadsheet text-base"></i>
+                        <span class="hidden lg:inline text-[8px]">Excel</span>
                     </a>
                     
                     @if(auth()->user()->role === 'admin')
                         <button type="button" id="bulkDeleteBtn" onclick="bulkDelete()" disabled
-                            class="bg-red-50 text-red-600 px-6 py-4 rounded-2xl hover:bg-red-600 hover:text-white transition-all font-black text-[10px] uppercase tracking-widest border border-red-50 hidden">
+                            class="bg-red-50 text-red-600 px-5 py-3 rounded-xl hover:bg-red-600 hover:text-white transition-all font-black text-[10px] uppercase tracking-widest border border-red-50 hidden">
                             <i class="bi bi-trash-fill"></i>
                         </button>
                     @endif
 
                     <a href="{{ route('course-classes.create', ['course_id' => request('course_id')]) }}"
-                        class="bg-blue-600 text-white px-8 py-5 rounded-3xl hover:bg-blue-700 transition-all font-black text-[10px] uppercase tracking-widest flex items-center shadow-lg shadow-blue-100 gap-2 group">
-                        <i class="bi bi-plus-lg text-lg group-hover:rotate-90 transition-transform duration-300"></i>
+                        class="bg-blue-600 text-white px-6 py-4 rounded-2xl hover:bg-blue-700 transition-all font-black text-[10px] uppercase tracking-widest flex items-center shadow-lg shadow-blue-100 gap-2 group">
+                        <i class="bi bi-plus-lg text-base group-hover:rotate-90 transition-transform duration-300"></i>
                         <span class="hidden sm:inline">Nova Turma</span>
                     </a>
                 </div>
