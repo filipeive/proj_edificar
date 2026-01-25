@@ -179,6 +179,10 @@
                                 </h4>
                                 <p class="text-xs text-gray-500 flex items-center mt-1">
                                     <i class="bi bi-geo-alt mr-1"></i> {{ $event->location ?? 'Life Church' }}
+                                    @if($event->end_date)
+                                        <span class="ml-2 px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[9px] font-bold">Até
+                                            {{ $event->end_date->format('d/m/Y') }}</span>
+                                    @endif
                                 </p>
                             </div>
                             <span
@@ -214,8 +218,15 @@
                                 <div>
                                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Data e Hora
                                     </p>
-                                    <p class="font-bold"
-                                        x-text="new Date(activeEvent?.date).toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })">
+                                    <p class="font-bold">
+                                        <span
+                                            x-text="new Date(activeEvent?.date).toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })"></span>
+                                        <template x-if="activeEvent?.end_date">
+                                            <span class="text-blue-600">
+                                                - até <span
+                                                    x-text="new Date(activeEvent.end_date).toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })"></span>
+                                            </span>
+                                        </template>
                                     </p>
                                 </div>
                             </div>
@@ -284,7 +295,8 @@
                                 <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Últimos 3 Meses
                                 </p>
                                 <p class="text-2xl font-black text-gray-900">
-                                    {{ $attendanceStats['last_3_months_present'] ?? 0 }}</p>
+                                    {{ $attendanceStats['last_3_months_present'] ?? 0 }}
+                                </p>
                             </div>
                         </div>
 

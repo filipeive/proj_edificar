@@ -186,7 +186,10 @@
                             <h4 class="font-black text-gray-900 group-hover:text-orange-600 transition-colors">
                                 {{ $event->name }}</h4>
                             <p class="text-xs text-gray-500 flex items-center mt-1">
-                                <i class="bi bi-geo-alt mr-1"></i> {{ $event->location ?? 'Life Church' }}
+                                <i class="bi bi-geo-alt mr-1"></i> {{ $event->location ?? 'Local a definir' }}
+                                @if($event->end_date)
+                                    <span class="ml-2 px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[9px] font-bold uppercase tracking-widest">Até {{ $event->end_date->format('d/m/Y') }}</span>
+                                @endif
                             </p>
                         </div>
                         <span

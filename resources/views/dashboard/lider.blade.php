@@ -40,7 +40,8 @@
                     <p class="text-gray-500 text-sm font-bold uppercase tracking-wider">Total da Célula</p>
                     <p class="text-3xl font-black text-gray-900 mt-2 tracking-tighter">
                         {{ number_format($total, 2, ',', '.') }}
-                        MT</p>
+                        MT
+                    </p>
                     <p class="text-xs text-gray-400 mt-2 font-bold uppercase tracking-widest">Este Mês</p>
                 </div>
             </div>
@@ -208,7 +209,12 @@
                                     {{ $event->name }}
                                 </h4>
                                 <p class="text-xs text-gray-500 flex items-center mt-1">
-                                    <i class="bi bi-geo-alt mr-1"></i> {{ $event->location ?? 'Life Church' }}
+                                    <i class="bi bi-geo-alt mr-1"></i> {{ $event->location ?? 'Local a definir' }}
+                                    @if($event->end_date)
+                                        <span
+                                            class="ml-2 px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[9px] font-bold uppercase tracking-widest">Até
+                                            {{ $event->end_date->format('d/m/Y') }}</span>
+                                    @endif
                                 </p>
                             </div>
                             <span

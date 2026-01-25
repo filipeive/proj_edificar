@@ -309,6 +309,10 @@
                                     <i class="bi bi-geo-alt mr-1"></i> {{ $event->location ?? 'Life Church' }}
                                     <span class="mx-2">•</span>
                                     <i class="bi bi-clock mr-1"></i> {{ $event->date->format('H:i') }}h
+                                    @if($event->end_date)
+                                        <span class="ml-1 text-blue-500 font-bold">até
+                                            {{ $event->end_date->format('d/m/Y') }}</span>
+                                    @endif
                                 </p>
                             </div>
                             <span

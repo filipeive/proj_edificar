@@ -66,7 +66,11 @@
                         <h3 class="text-4xl font-black mb-4">{{ $event->name ?? $event->eventType->name }}</h3>
                         <div class="flex flex-wrap gap-6 text-sm">
                             <span class="flex items-center"><i class="bi bi-calendar3 mr-2"></i>
-                                {{ $event->date->format('d/m/Y') }}</span>
+                                {{ $event->date->format('d/m/Y') }}
+                                @if($event->end_date)
+                                    - {{ $event->end_date->format('d/m/Y') }}
+                                @endif
+                            </span>
                             <span class="flex items-center"><i class="bi bi-geo-alt mr-2"></i>
                                 {{ $event->location ?? 'Sede' }}</span>
                             <span class="flex items-center"><i class="bi bi-diagram-3 mr-2"></i>
