@@ -1,8 +1,8 @@
+```blade
 @extends('layouts.app')
 
 @section('title', 'Gestão de Cultos - Portal Life Church')
 
-@section('content')
 @section('header-actions')
     <div class="flex items-center gap-2">
         <a href="{{ route('services.report') }}"
@@ -26,14 +26,76 @@
     <div class="container-fluid space-y-12" 
         x-data="{ 
             view: window.innerWidth < 768 ? 'grid' : 'grid',
+            selected: [],
             updateView() {
                 if (window.innerWidth < 768 && this.view === 'list') {
                     this.view = 'grid';
+                }
+            },
+            toggleAll() {
+                const allIds = {{ Js::from($services->pluck('id')) }};
+                if (this.selected.length === allIds.length) {
+                    this.selected = [];
+                } else {
+                    this.selected = allIds;
                 }
             }
         }"
         x-init="$watch('view', value => localStorage.setItem('services_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('services_view') || 'grid')"
         @resize.window.debounce.500ms="updateView()">
+
+        <!-- Bulk Action Bar -->
+        <div x-show="selected.length > 0" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 -translate-y-4"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 translate-y-0"
+             x-transition:leave-end="opacity-0 -translate-y-4"
+             class="fixed top-24 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
+            <div class="bg-gray-900 text-white rounded-2xl shadow-2xl p-4 flex items-center gap-6 pointer-events-auto border border-gray-700/50 backdrop-blur-md bg-opacity-90">
+                <div class="flex items-center gap-3 pl-2">
+                    <span class="bg-blue-600 text-xs font-black px-2.5 py-1 rounded-lg" x-text="selected.length"></span>
+                    <span class="text-sm font-medium">selecionados</span>
+                </div>
+                
+                <div class="h-8 w-px bg-gray-700"></div>
+                
+                <div class="flex items-center gap-2">
+                    <button @click="selected = []" class="px-4 py-2 text-xs font-bold uppercase tracking-wider text-gray-400 hover:text-white transition-colors">
+                        Cancelar
+                    </button>
+                    @if(auth()->user()->role === 'admin')
+                        <form method="POST" action="{{ route('services.bulk-delete') }}" 
+                              @submit.prevent="
+                                Swal.fire({
+                                    title: 'Confirmação de Exclusão',
+                                    text: 'Tem certeza que deseja excluir ' + selected.length + ' culto(s)? Esta ação é irreversível.',
+                                    icon: 'warning',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#d33',
+                                    cancelButtonColor: '#3085d6',
+                                    confirmButtonText: 'Sim, excluir!',
+                                    cancelButtonText: 'Cancelar'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        $el.submit();
+                                    }
+                                })
+                              ">
+                            @csrf
+                            <template x-for="id in selected" :key="id">
+                                <input type="hidden" name="service_ids[]" :value="id">
+                            </template>
+                            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-red-600/20 flex items-center gap-2">
+                                <i class="bi bi-trash-fill"></i> Excluir
+                            </button>
+                        </form>
+                    @endif
+                </div>
+            </div>
+        </div>
+
         <!-- Header Section -->
         <div class="bg-white p-4 md:p-8 rounded-2xl md:rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div class="space-y-1">
@@ -65,12 +127,6 @@
                 </div>
 
                 <div class="hidden md:flex flex-wrap items-center gap-3">
-                    @if(auth()->user()->role === 'admin')
-                        <button type="button" id="bulkDeleteBtn" onclick="bulkDelete()" disabled
-                            class="bg-red-600 hover:bg-red-700 text-white px-6 py-4 rounded-2xl flex items-center transition shadow-lg shadow-red-600/20 font-black text-xs uppercase tracking-widest hidden">
-                            <i class="bi bi-trash-fill mr-2"></i> Excluir Selecionados
-                        </button>
-                    @endif
                     <a href="{{ route('services.report') }}"
                         class="flex items-center bg-gray-50 text-gray-400 px-6 py-4 rounded-2xl hover:bg-gray-100 transition-all font-black text-xs uppercase tracking-widest border border-gray-100">
                         <i class="bi bi-graph-up text-lg mr-2 text-blue-600"></i>
@@ -145,18 +201,15 @@
             </form>
         </div>
 
-        <form id="bulkActionForm" action="{{ route('services.bulk-delete') }}" method="POST">
-            @csrf
-        </form>
-
         <!-- Services Grid View -->
         <div x-show="view === 'grid'" x-transition.fade.duration.300ms class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
             @foreach($services as $service)
-                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 transition-all group flex flex-col relative border-t-4 {{ $service->service_type === 'teaching' ? 'border-t-orange-500' : 'border-t-blue-500' }}">
+                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 transition-all group flex flex-col relative border-t-4 {{ $service->service_type === 'teaching' ? 'border-t-orange-500' : 'border-t-blue-500' }}"
+                     :class="{'ring-2 ring-blue-500 bg-blue-50/10': selected.includes({{ $service->id }})}">
                     <!-- Checkbox for Bulk Actions (Grid) -->
                     @if(auth()->user()->role === 'admin')
                         <div class="absolute top-6 left-6 z-10">
-                            <input type="checkbox" name="service_ids[]" value="{{ $service->id }}" form="bulkActionForm"
+                            <input type="checkbox" value="{{ $service->id }}" x-model="selected"
                                 class="service-checkbox rounded-lg border-gray-300 {{ $service->service_type === 'teaching' ? 'text-orange-600 focus:border-orange-300 focus:ring-orange-200' : 'text-blue-600 focus:border-blue-300 focus:ring-blue-200' }} shadow-sm focus:ring focus:ring-opacity-50 transition-all cursor-pointer w-6 h-6 bg-white/80 backdrop-blur-sm">
                         </div>
                     @endif
@@ -250,7 +303,8 @@
                         <tr class="bg-gray-50/50">
                             @if(auth()->user()->role === 'admin')
                                 <th class="px-8 py-6 text-[10px] font-black w-10">
-                                    <input type="checkbox" id="selectAllCheckbox" 
+                                    <input type="checkbox" @click="toggleAll()" 
+                                        :checked="selected.length === {{ $services->count() }} && selected.length > 0"
                                         class="rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
                                 </th>
                             @endif
@@ -266,8 +320,9 @@
                         @foreach($services as $service)
                             <tr class="hover:bg-gray-50/50 transition-all group">
                                 @if(auth()->user()->role === 'admin')
-                                    <td class="px-8 py-6">
-                                        <input type="checkbox" name="service_ids[]" value="{{ $service->id }}" form="bulkActionForm"
+                                    <td class="px-8 py-6 relative">
+                                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 opacity-0 transition-opacity" :class="{'opacity-100': selected.includes({{ $service->id }})}"></div>
+                                        <input type="checkbox" value="{{ $service->id }}" x-model="selected"
                                             class="service-checkbox rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
                                     </td>
                                 @endif
@@ -327,8 +382,6 @@
             </div>
         </div>
 
-
-
         <!-- Pagination -->
         <div class="mt-12">
             {{ $services->links() }}
@@ -337,47 +390,6 @@
 
     @if(auth()->user()->role === 'admin')
     <script>
-        const selectAll = document.getElementById('selectAllCheckbox');
-        const checkboxes = document.querySelectorAll('.service-checkbox');
-        const bulkBtn = document.getElementById('bulkDeleteBtn');
-
-        if (selectAll) {
-            selectAll.addEventListener('change', function() {
-                checkboxes.forEach(cb => cb.checked = this.checked);
-                updateBulkBtn();
-            });
-        }
-
-        checkboxes.forEach(cb => {
-            cb.addEventListener('change', updateBulkBtn);
-        });
-
-        function updateBulkBtn() {
-            const count = document.querySelectorAll('.service-checkbox:checked').length;
-            if (count > 0) {
-                bulkBtn.disabled = false;
-                bulkBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'hidden');
-                bulkBtn.innerHTML = `<i class="bi bi-trash-fill mr-2"></i> Excluir ${count} Culto(s)`;
-            } else {
-                bulkBtn.disabled = true;
-                bulkBtn.classList.add('opacity-50', 'cursor-not-allowed', 'hidden');
-            }
-        }
-
-        function bulkDelete() {
-            confirmAction(
-                'Confirmação de Exclusão em Massa',
-                'Você tem certeza que deseja excluir os registros de culto selecionados? Esta ação é irreversível.',
-                'warning',
-                'Sim, excluir tudo!',
-                null
-            ).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById('bulkActionForm').submit();
-                }
-            });
-        }
-
         // Dynamic Search Script
         document.addEventListener('DOMContentLoaded', function () {
             const searchInput = document.querySelector('input[name="search"]');
@@ -416,10 +428,6 @@
                             if(newPagination && currentPagination) currentPagination.innerHTML = newPagination.innerHTML;
 
                             document.body.style.cursor = 'default';
-                            
-                            // Re-initialize bulk action listeners if needed
-                            // In this case, checkboxes are part of the innerHTML so they need new listeners
-                            // or we use event delegation
                         })
                         .catch(err => {
                             console.error('Search failed', err);

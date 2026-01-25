@@ -11,21 +11,85 @@
         }
     </style>
     <div x-data="{ 
-                                            view: window.innerWidth < 768 ? 'grid' : 'list',
-                                            updateView() {
-                                                if (window.innerWidth < 768 && this.view === 'list') {
-                                                    this.view = 'grid'; // Optional: force grid on mobile resize
-                                                }
-                                            }
-                                        }"
+                view: window.innerWidth < 768 ? 'grid' : 'list',
+                selected: [],
+                updateView() {
+                    if (window.innerWidth < 768 && this.view === 'list') {
+                        this.view = 'grid'; 
+                    }
+                },
+                toggleAll() {
+                    // We need to get all IDs. Since we are in Blade, we can inject them.
+                    // However, with pagination, 'Select All' usually means 'Select All on Page'.
+                    const allIds = {{ Js::from($visitors->pluck('id')) }};
+                    if (this.selected.length === allIds.length) {
+                        this.selected = [];
+                    } else {
+                        this.selected = allIds;
+                    }
+                }
+            }"
         x-init="$watch('view', value => localStorage.setItem('visitors_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('visitors_view') || 'list')"
-        @resize.window.debounce.500ms="updateView()" x-cloak>
+        @resize.window.debounce.500ms="updateView()" x-cloak class="space-y-8">
+
+        <!-- Bulk Action Bar -->
+        <div x-show="selected.length > 0" x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 -translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0"
+            x-transition:leave-end="opacity-0 -translate-y-4"
+            class="fixed top-24 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
+            <div
+                class="bg-gray-900 text-white rounded-2xl shadow-2xl p-4 flex items-center gap-6 pointer-events-auto border border-gray-700/50 backdrop-blur-md bg-opacity-90">
+                <div class="flex items-center gap-3 pl-2">
+                    <span class="bg-blue-600 text-xs font-black px-2.5 py-1 rounded-lg" x-text="selected.length"></span>
+                    <span class="text-sm font-medium">selecionados</span>
+                </div>
+
+                <div class="h-8 w-px bg-gray-700"></div>
+
+                <div class="flex items-center gap-2">
+                    <button @click="selected = []"
+                        class="px-4 py-2 text-xs font-bold uppercase tracking-wider text-gray-400 hover:text-white transition-colors">
+                        Cancelar
+                    </button>
+                    @if(auth()->user()->role === 'admin')
+                        <form method="POST" action="{{ route('visitors.bulk-delete') }}" @submit.prevent="
+                                        Swal.fire({
+                                            title: 'Confirmação de Remoção',
+                                            text: 'Deseja remover os ' + selected.length + ' visitantes selecionados?',
+                                            icon: 'warning',
+                                            showCancelButton: true,
+                                            confirmButtonColor: '#d33',
+                                            cancelButtonColor: '#3085d6',
+                                            confirmButtonText: 'Sim, remover!',
+                                            cancelButtonText: 'Cancelar'
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                $el.submit();
+                                            }
+                                        })
+                                      ">
+                            @csrf
+                            <template x-for="id in selected" :key="id">
+                                <input type="hidden" name="visitor_ids[]" :value="id">
+                            </template>
+                            <button type="submit"
+                                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-red-600/20 flex items-center gap-2">
+                                <i class="bi bi-trash-fill"></i> Excluir
+                            </button>
+                        </form>
+                    @endif
+                </div>
+            </div>
+        </div>
+
         @section('header-actions')
             <a href="{{ route('visitors.create') }}"
                 class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
                 <i class="bi bi-person-plus-fill text-2xl"></i>
             </a>
         @endsection
+
         <!-- Estatísticas -->
         <div class="hidden md:grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6">
@@ -78,13 +142,6 @@
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                 <h3 class="text-xl font-black text-gray-900">Filtros</h3>
                 <div class="flex gap-3">
-                    @if(auth()->user()->role === 'admin')
-                        <button type="button" id="bulkDeleteBtn" onclick="bulkDelete()" disabled
-                            class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-all hidden">
-                            <i class="bi bi-trash-fill mr-2"></i>Remover Selecionados
-                        </button>
-                    @endif
-
                     <div class="hidden md:flex bg-gray-50 p-1 rounded-2xl border border-gray-100 mr-2">
                         <button @click="view = 'list'"
                             :class="view === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
@@ -172,26 +229,27 @@
 
         <!-- Listagem -->
         <div class="relative">
-            <form id="bulkActionForm" method="POST" action="{{ route('visitors.bulk-delete') }}">
-                @csrf
-            </form>
             <!-- Grid View -->
             <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300"
                 x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
                 class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                 @forelse($visitors as $visitor)
-                    <div
-                        class="bg-white p-4 md:p-8 rounded-2xl md:rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 relative">
-                        <div class="absolute top-4 right-4 md:top-6 md:right-6 flex flex-col items-end gap-2">
-                            {!! $visitor->status_badge !!}
+                    <div class="bg-white p-4 md:p-8 rounded-2xl md:rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 relative"
+                        :class="{'ring-2 ring-blue-500 bg-blue-50/10': selected.includes({{ $visitor->id }})}">
+
+                        <div class="absolute top-4 left-4 z-10">
                             @if(auth()->user()->role === 'admin')
-                                <input type="checkbox" form="bulkActionForm" name="visitor_ids[]" value="{{ $visitor->id }}"
-                                    class="visitor-checkbox rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
+                                <input type="checkbox" value="{{ $visitor->id }}" x-model="selected"
+                                    class="w-5 h-5 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer shadow-sm">
                             @endif
                         </div>
 
+                        <div class="absolute top-4 right-4 md:top-6 md:right-6 flex flex-col items-end gap-2">
+                            {!! $visitor->status_badge !!}
+                        </div>
+
                         <div
-                            class="w-10 h-10 md:w-14 md:h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-black text-lg md:text-2xl group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 mb-4 md:mb-6">
+                            class="w-10 h-10 md:w-14 md:h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-black text-lg md:text-2xl group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 mb-4 md:mb-6 mt-2 ml-4">
                             {{ strtoupper(substr($visitor->name, 0, 1)) }}
                         </div>
 
@@ -256,17 +314,6 @@
                                 class="flex-1 bg-gray-50 text-gray-400 text-center py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2">
                                 <i class="bi bi-pencil"></i> Editar
                             </a>
-                            @if(auth()->user()->role === 'admin')
-                                <form id="grid-delete-visitor-{{ $visitor->id }}" action="{{ route('visitors.destroy', $visitor) }}"
-                                    method="POST" class="inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="button" onclick="confirmDelete('grid-delete-visitor-{{ $visitor->id }}')"
-                                        class="w-12 bg-red-50 text-red-400 text-center py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all active:scale-95 flex items-center justify-center">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                            @endif
                         </div>
                     </div>
                 @empty
@@ -289,7 +336,8 @@
                                 class="text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-100">
                                 @if(auth()->user()->role === 'admin')
                                     <th class="px-6 py-4 text-left w-10">
-                                        <input type="checkbox" id="selectAllCheckbox" form="bulkActionForm"
+                                        <input type="checkbox" @click="toggleAll()"
+                                            :checked="selected.length === {{ $visitors->count() }} && selected.length > 0"
                                             class="rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
                                     </th>
                                 @endif
@@ -306,10 +354,11 @@
                             @forelse($visitors as $visitor)
                                 <tr class="hover:bg-gray-50 transition-colors">
                                     @if(auth()->user()->role === 'admin')
-                                        <td class="px-6 py-4">
-                                            <input type="checkbox" form="bulkActionForm" name="visitor_ids[]"
-                                                value="{{ $visitor->id }}"
-                                                class="visitor-checkbox rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
+                                        <td class="px-6 py-4 relative">
+                                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 opacity-0 transition-opacity"
+                                                :class="{'opacity-100': selected.includes({{ $visitor->id }})}"></div>
+                                            <input type="checkbox" value="{{ $visitor->id }}" x-model="selected"
+                                                class="rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
                                         </td>
                                     @endif
                                     <td class="px-6 py-4">
@@ -410,69 +459,7 @@
         @endif
     </div>
 
-    <!-- Scripts Section -->
-    @if(auth()->user()->role === 'admin')
-        <script>
-            // Bulk Action Logic with Event Delegation
-            document.addEventListener('change', function (e) {
-                if (e.target.id === 'selectAllCheckbox') {
-                    const checkboxes = document.querySelectorAll('.visitor-checkbox');
-                    checkboxes.forEach(cb => cb.checked = e.target.checked);
-                    updateBulkBtnState();
-                }
-
-                if (e.target.classList.contains('visitor-checkbox')) {
-                    // Sync other checkboxes with same value (Grid <-> List)
-                    const val = e.target.value;
-                    const sameValueCheckboxes = document.querySelectorAll(`.visitor-checkbox[value="${val}"]`);
-                    sameValueCheckboxes.forEach(cb => {
-                        if (cb !== e.target) cb.checked = e.target.checked;
-                    });
-
-                    updateBulkBtnState();
-                }
-            });
-
-            function updateBulkBtnState() {
-                const bulkBtn = document.getElementById('bulkDeleteBtn');
-
-                // Count unique selected IDs to avoid double counting (Grid + List)
-                const selectedIds = new Set(
-                    Array.from(document.querySelectorAll('.visitor-checkbox:checked'))
-                        .map(cb => cb.value)
-                );
-                const count = selectedIds.size;
-
-                if (!bulkBtn) return;
-
-                if (count > 0) {
-                    bulkBtn.disabled = false;
-                    bulkBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'hidden');
-                    bulkBtn.innerHTML = `<i class="bi bi-trash-fill mr-2"></i> Remover ${count}`;
-                } else {
-                    bulkBtn.disabled = true;
-                    bulkBtn.classList.add('opacity-50', 'cursor-not-allowed', 'hidden');
-                }
-            }
-
-            function bulkDelete() {
-                confirmAction(
-                    'Confirmação de Remoção',
-                    'Deseja remover os visitantes selecionados?',
-                    'warning',
-                    'Sim, remover!',
-                    null
-                ).then((result) => {
-                    if (result.isConfirmed) {
-                        const form = document.getElementById('bulkActionForm');
-                        form.submit();
-                    }
-                });
-            }
-        </script>
-    @endif
-
-    <!-- Dynamic Search Script -->
+    <!-- Dynamic Search Script (Kept as it is useful for AJAX search outside Alpine scope) -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const searchInput = document.querySelector('input[name="search"]');
@@ -498,29 +485,21 @@
                                 const parser = new DOMParser();
                                 const doc = parser.parseFromString(html, 'text/html');
 
-                                // Replace Grid View Content
-                                const newGrid = doc.querySelector('[x-show="view === \'grid\'"]');
-                                const currentGrid = document.querySelector('[x-show="view === \'grid\'"]');
-                                if (newGrid && currentGrid) currentGrid.innerHTML = newGrid.innerHTML;
+                                // We need to be careful with Alpine.js re-initialization if we swap HTML.
+                                // The valid approach when using Alpine and AJAX replacements is to let standard navigation handle it 
+                                // OR use Livewire. Since we are using standard Laravel + Alpine, full HTML replacement risks breaking Alpine x-data.
+                                // However, in this case, we are only replacing the INNER content of grids/lists, 
+                                // but we wrapped everything in x-data in the parent div.
+                                // So replacing inner content is generally safe IF the replaced content doesn't contain the x-data root.
 
-                                // Replace List View Content
-                                const newList = doc.querySelector('[x-show="view === \'list\'"]');
-                                const currentList = document.querySelector('[x-show="view === \'list\'"]');
-                                if (newList && currentList) currentList.innerHTML = newList.innerHTML;
+                                // Actually, simpler approach for now to avoid Alpine breakage: 
+                                // Just submit the form normally? No, the user likes the "dynamic" feel.
+                                // Let's try to just submit form on debounce as done in Member's index.
+                                // In Member's index we used: @input.debounce.500ms="$el.form.submit()"
+                                // This causes a full page reload but is safe and reliable.
 
-                                // Replace Pagination
-                                const newPagination = doc.querySelector('.mt-6');
-                                const currentPagination = document.querySelector('.mt-6');
-                                if (newPagination && currentPagination) currentPagination.innerHTML = newPagination.innerHTML;
-
-                                document.body.style.cursor = 'default';
-
-                                // Update bulk button state after search refresh
-                                if (typeof updateBulkBtnState === 'function') updateBulkBtnState();
-                            })
-                            .catch(err => {
-                                console.error('Search failed', err);
-                                document.body.style.cursor = 'default';
+                                // Let's switch to the standard submit approach to match Members index and avoid Alpine complexity with AJAX.
+                                filterForm.submit();
                             });
                     }, 500);
                 });
