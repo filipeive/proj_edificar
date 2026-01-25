@@ -593,15 +593,7 @@
                             <i id="themeIcon" class="bi bi-moon-fill text-lg"></i>
                         </button>
 
-                        <!-- Mobile Logout Button -->
-                        <div class="md:hidden">
-                            <form method="POST" action="{{ route('logout') }}" id="mobile-logout-form">
-                                @csrf
-                                <button type="submit" class="text-red-500 hover:text-red-700 p-2 transition-colors">
-                                    <i class="bi bi-power text-2xl"></i>
-                                </button>
-                            </form>
-                        </div>
+
 
                         @if($authUser)
                             <div class="hidden md:block border-l border-gray-300 pl-4">

@@ -355,17 +355,11 @@
                 <a href="{{ route('profile.edit') }}" class="sidebar-text text-slate-400 hover:text-white transition-all p-2 hover:bg-white/5 rounded-xl border border-transparent hover:border-white/10" title="Editar Perfil">
                     <i class="bi bi-gear-fill"></i>
                 </a>
-                <form method="POST" action="{{ route('logout') }}" class="md:hidden">
-                    @csrf
-                    <button type="submit" class="sidebar-text text-slate-400 hover:text-white transition-all p-2 hover:bg-white/5 rounded-xl border border-transparent hover:border-white/10" title="Sair">
-                        <i class="bi bi-power text-red-500"></i>
-                    </button>
-                </form>
-            </div>
-            <form method="POST" action="{{ route('logout') }}" class="hidden md:block">
+            <!-- Logout Button (Universal) -->
+            <form method="POST" action="{{ route('logout') }}" class="mt-2">
                 @csrf
-                <button type="submit" class="w-full flex items-center justify-center px-4 py-3 text-slate-400 hover:text-white hover:bg-red-600 transition-all duration-300 rounded-2xl font-black text-xs uppercase tracking-widest border border-white/5 hover:border-red-600 shadow-lg hover:shadow-red-600/20">
-                    <i class="bi bi-power mr-2 text-lg"></i>
+                <button type="submit" class="w-full flex items-center justify-center px-4 py-3.5 text-slate-400 hover:text-white hover:bg-red-600/90 transition-all duration-300 rounded-2xl font-black text-xs uppercase tracking-widest border border-white/5 hover:border-red-600 shadow-lg hover:shadow-red-600/20 group">
+                    <i class="bi bi-box-arrow-right mr-3 text-lg group-hover:scale-110 transition-transform"></i>
                     <span class="sidebar-text">Sair do Sistema</span>
                 </button>
             </form>
