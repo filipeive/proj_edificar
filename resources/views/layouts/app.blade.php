@@ -282,9 +282,14 @@
 
         @media (max-width: 640px) {
             .notifications-panel {
-                right: 50%;
-                transform: translateX(50%);
+                position: fixed;
+                top: 70px;
+                left: 1rem;
+                right: 1rem;
+                margin: 0 auto;
                 width: calc(100vw - 2rem);
+                transform: none;
+                z-index: 1000;
             }
         }
 
