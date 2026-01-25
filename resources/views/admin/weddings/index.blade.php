@@ -24,15 +24,75 @@
         }
     </style>
     <div class="container-fluid" x-data="{ 
-                                                            view: window.innerWidth < 768 ? 'grid' : 'grid',
-                                                            updateView() {
-                                                                if (window.innerWidth < 768 && this.view === 'list') {
-                                                                    this.view = 'grid'; 
-                                                                }
-                                                            }
-                                                        }"
+                view: window.innerWidth < 768 ? 'grid' : 'grid',
+                selected: [],
+                updateView() {
+                    if (window.innerWidth < 768 && this.view === 'list') {
+                        this.view = 'grid'; 
+                    }
+                },
+                toggleAll() {
+                    const allIds = {{ Js::from($weddings->pluck('id')) }};
+                    if (this.selected.length === allIds.length) {
+                        this.selected = [];
+                    } else {
+                        this.selected = allIds;
+                    }
+                }
+            }"
         x-init="$watch('view', value => { if(value !== 'calendar') localStorage.setItem('weddings_view', value) }); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('weddings_view') || 'grid')"
         @resize.window.debounce.500ms="updateView()" x-cloak>
+
+        <!-- Bulk Action Bar -->
+        <div x-show="selected.length > 0" x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 -translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0"
+            x-transition:leave-end="opacity-0 -translate-y-4"
+            class="fixed top-24 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
+            <div
+                class="bg-gray-900 text-white rounded-2xl shadow-2xl p-4 flex items-center gap-6 pointer-events-auto border border-gray-700/50 backdrop-blur-md bg-opacity-90">
+                <div class="flex items-center gap-3 pl-2">
+                    <span class="bg-blue-600 text-xs font-black px-2.5 py-1 rounded-lg" x-text="selected.length"></span>
+                    <span class="text-sm font-medium">selecionados</span>
+                </div>
+
+                <div class="h-8 w-px bg-gray-700"></div>
+
+                <div class="flex items-center gap-2">
+                    <button @click="selected = []"
+                        class="px-4 py-2 text-xs font-bold uppercase tracking-wider text-gray-400 hover:text-white transition-colors">
+                        Cancelar
+                    </button>
+                    @if(auth()->user()->role === 'admin')
+                        <form method="POST" action="{{ route('weddings.bulk-delete') }}" @submit.prevent="
+                                        Swal.fire({
+                                            title: 'Confirmação de Exclusão',
+                                            text: 'Tem certeza que deseja excluir ' + selected.length + ' casamento(s)? Esta ação é irreversível.',
+                                            icon: 'warning',
+                                            showCancelButton: true,
+                                            confirmButtonColor: '#d33',
+                                            cancelButtonColor: '#3085d6',
+                                            confirmButtonText: 'Sim, excluir!',
+                                            cancelButtonText: 'Cancelar'
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                $el.submit();
+                                            }
+                                        })
+                                      ">
+                            @csrf
+                            <template x-for="id in selected" :key="id">
+                                <input type="hidden" name="wedding_ids[]" :value="id">
+                            </template>
+                            <button type="submit"
+                                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-red-600/20 flex items-center gap-2">
+                                <i class="bi bi-trash-fill"></i> Excluir
+                            </button>
+                        </form>
+                    @endif
+                </div>
+            </div>
+        </div>
         <!-- Header Section -->
         <div
             class="flex flex-col md:flex-row justify-between items-center mb-8 gap-6 bg-white p-4 md:p-0 rounded-2xl md:rounded-none shadow-sm md:shadow-none border border-gray-100 md:border-none">
@@ -45,12 +105,7 @@
             </div>
 
             <div class="flex gap-3">
-                @if(auth()->user()->role === 'admin')
-                    <button type="button" id="bulkDeleteBtn" onclick="bulkDelete()" disabled
-                        class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-xl flex items-center transition shadow-lg shadow-red-600/20 font-black text-xs uppercase tracking-widest hidden">
-                        <i class="bi bi-trash-fill mr-2"></i> Excluir Selecionados
-                    </button>
-                @endif
+                <!-- Old Bulk Button Removed -->
 
                 <!-- View Toggle -->
                 <div class="hidden md:flex bg-gray-100 p-1 rounded-xl items-center">
@@ -116,150 +171,146 @@
         <!-- List View -->
         <div id="view-list" x-show="view === 'list'" class="transition-opacity duration-300">
             <div class="bg-white rounded-[2rem] shadow-xl shadow-gray-100/50 border border-gray-100 overflow-hidden">
-                <form id="bulkActionForm" method="POST">
-                    @csrf
-                    <table class="w-full">
-                        <thead>
-                            <tr class="bg-gray-50/50 border-b border-gray-100">
+                <!-- Form Removed -->
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gray-50/50 border-b border-gray-100">
+                            @if(auth()->user()->role === 'admin')
+                                <th class="px-8 py-5 text-left w-10">
+                                    <input type="checkbox" @click="toggleAll()"
+                                        :checked="selected.length === {{ $weddings->count() }} && selected.length > 0"
+                                        class="rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
+                                </th>
+                            @endif
+                            <th class="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                Data</th>
+                            <th class="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                Noivos</th>
+                            <th class="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                Local</th>
+                            <!-- padrinhos -->
+                            <th class="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                Padrinhos</th>
+                            <th
+                                class="px-8 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                Status</th>
+                            <th class="px-8 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        @forelse($weddings as $wedding)
+                            <tr class="group hover:bg-gray-50/50 transition-colors duration-200">
                                 @if(auth()->user()->role === 'admin')
-                                    <th class="px-8 py-5 text-left w-10">
-                                        <input type="checkbox" id="selectAllCheckbox"
-                                            class="rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
-                                    </th>
+                                    <td class="px-8 py-5 relative">
+                                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-orange-500 opacity-0 transition-opacity"
+                                            :class="{'opacity-100': selected.includes({{ $wedding->id }})}"></div>
+                                        <input type="checkbox" value="{{ $wedding->id }}" x-model="selected"
+                                            class="wedding-checkbox rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
+                                    </td>
                                 @endif
-                                <th
-                                    class="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                    Data</th>
-                                <th
-                                    class="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                    Noivos</th>
-                                <th
-                                    class="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                    Local</th>
-                                <!-- padrinhos -->
-                                <th
-                                    class="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                    Padrinhos</th>
-                                <th
-                                    class="px-8 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                    Status</th>
-                                <th
-                                    class="px-8 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                    Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            @forelse($weddings as $wedding)
-                                <tr class="group hover:bg-gray-50/50 transition-colors duration-200">
-                                    @if(auth()->user()->role === 'admin')
-                                        <td class="px-8 py-5">
-                                            <input type="checkbox" name="wedding_ids[]" value="{{ $wedding->id }}"
-                                                class="wedding-checkbox rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
-                                        </td>
-                                    @endif
-                                    <td class="px-8 py-5 whitespace-nowrap">
-                                        <div class="flex flex-col">
-                                            <span
-                                                class="text-sm font-black text-gray-900">{{ $wedding->date->format('d/m/Y') }}</span>
-                                            <span
-                                                class="text-[10px] font-bold text-gray-400 uppercase">{{ $wedding->date->translatedFormat('l') }}</span>
-                                            @if($wedding->time)
-                                                <span
-                                                    class="text-[10px] font-bold text-orange-500 mt-1">{{ $wedding->time->format('H:i') }}</span>
-                                            @endif
-                                        </div>
-                                    </td>
-                                    <td class="px-8 py-5">
-                                        <div class="flex items-center">
-                                            <div
-                                                class="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center mr-4">
-                                                <i class="bi bi-heart-fill"></i>
-                                            </div>
-                                            <div>
-                                                <span
-                                                    class="block text-sm font-bold text-gray-900">{{ $wedding->groom_name }}</span>
-                                                <span class="text-xs text-gray-500">& {{ $wedding->bride_name }}</span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-8 py-5">
-                                        <div class="flex items-center text-gray-500">
-                                            <i class="bi bi-geo-alt-fill mr-2 text-gray-300"></i>
-                                            <span
-                                                class="text-sm font-medium">{{ $wedding->location ?? 'Local não definido' }}</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-8 py-5">
-                                        <div class="flex flex-col">
-                                            @if($wedding->godparents)
-                                                <span
-                                                    class="text-xs font-bold text-gray-700">{{ Illuminate\Support\Str::limit($wedding->godparents, 30) }}</span>
-                                            @else
-                                                <span class="text-xs text-gray-400 italic">Não informado</span>
-                                            @endif
-                                        </div>
-                                    </td>
-                                    <td class="px-8 py-5 text-center">
-                                        @php
-                                            $statusClasses = [
-                                                'scheduled' => 'bg-orange-100 text-orange-600',
-                                                'completed' => 'bg-green-100 text-green-600',
-                                                'cancelled' => 'bg-red-100 text-red-600'
-                                            ];
-                                            $statusLabels = [
-                                                'scheduled' => 'Agendado',
-                                                'completed' => 'Realizado',
-                                                'cancelled' => 'Cancelado'
-                                            ];
-                                            $status = $wedding->status ?? 'scheduled';
-                                        @endphp
+                                <td class="px-8 py-5 whitespace-nowrap">
+                                    <div class="flex flex-col">
                                         <span
-                                            class="inline-flex items-center px-3 py-1 rounded-lg {{ $statusClasses[$status] ?? 'bg-gray-100 text-gray-600' }} text-xs font-bold uppercase tracking-wider">
-                                            {{ $statusLabels[$status] ?? $status }}
-                                        </span>
-                                    </td>
-                                    <td class="px-8 py-5 text-right">
+                                            class="text-sm font-black text-gray-900">{{ $wedding->date->format('d/m/Y') }}</span>
+                                        <span
+                                            class="text-[10px] font-bold text-gray-400 uppercase">{{ $wedding->date->translatedFormat('l') }}</span>
+                                        @if($wedding->time)
+                                            <span
+                                                class="text-[10px] font-bold text-orange-500 mt-1">{{ $wedding->time->format('H:i') }}</span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td class="px-8 py-5">
+                                    <div class="flex items-center">
                                         <div
-                                            class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                            <a href="{{ route('weddings.edit', $wedding) }}"
-                                                class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
-                                                title="Editar">
-                                                <i class="bi bi-pencil-fill"></i>
-                                            </a>
-                                            <a href="{{ route('weddings.show', $wedding) }}"
-                                                class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-orange-600 hover:bg-orange-50 transition-colors"
-                                                title="Ver Detalhes">
-                                                <i class="bi bi-eye-fill"></i>
-                                            </a>
-                                            </a>
-                                            @if(in_array(auth()->user()->role, ['admin', 'secretaria']))
-                                                <form id="list-delete-wedding-{{ $wedding->id }}"
-                                                    action="{{ route('weddings.destroy', $wedding->id) }}" method="POST"
-                                                    class="inline">
-                                                    @csrf
-                                                    @method('DELETE')
-
-                                                    <button type="button"
-                                                        onclick="confirmDelete('list-delete-wedding-{{ $wedding->id }}')"
-                                                        class="w-10 h-10 bg-gray-50 text-gray-400 flex items-center justify-center rounded-xl hover:bg-red-500 hover:text-white transition-all">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-                                                </form>
-                                            @endif
+                                            class="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center mr-4">
+                                            <i class="bi bi-heart-fill"></i>
                                         </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="px-8 py-12 text-center text-gray-400">
-                                        <i class="bi bi-calendar-x text-4xl mb-4 block opacity-20"></i>
-                                        <p class="text-sm font-medium">Nenhum casamento encontrado.</p>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </form>
+                                        <div>
+                                            <span
+                                                class="block text-sm font-bold text-gray-900">{{ $wedding->groom_name }}</span>
+                                            <span class="text-xs text-gray-500">& {{ $wedding->bride_name }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-8 py-5">
+                                    <div class="flex items-center text-gray-500">
+                                        <i class="bi bi-geo-alt-fill mr-2 text-gray-300"></i>
+                                        <span
+                                            class="text-sm font-medium">{{ $wedding->location ?? 'Local não definido' }}</span>
+                                    </div>
+                                </td>
+                                <td class="px-8 py-5">
+                                    <div class="flex flex-col">
+                                        @if($wedding->godparents)
+                                            <span
+                                                class="text-xs font-bold text-gray-700">{{ Illuminate\Support\Str::limit($wedding->godparents, 30) }}</span>
+                                        @else
+                                            <span class="text-xs text-gray-400 italic">Não informado</span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td class="px-8 py-5 text-center">
+                                    @php
+                                        $statusClasses = [
+                                            'scheduled' => 'bg-orange-100 text-orange-600',
+                                            'completed' => 'bg-green-100 text-green-600',
+                                            'cancelled' => 'bg-red-100 text-red-600'
+                                        ];
+                                        $statusLabels = [
+                                            'scheduled' => 'Agendado',
+                                            'completed' => 'Realizado',
+                                            'cancelled' => 'Cancelado'
+                                        ];
+                                        $status = $wedding->status ?? 'scheduled';
+                                    @endphp
+                                    <span
+                                        class="inline-flex items-center px-3 py-1 rounded-lg {{ $statusClasses[$status] ?? 'bg-gray-100 text-gray-600' }} text-xs font-bold uppercase tracking-wider">
+                                        {{ $statusLabels[$status] ?? $status }}
+                                    </span>
+                                </td>
+                                <td class="px-8 py-5 text-right">
+                                    <div
+                                        class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                        <a href="{{ route('weddings.edit', $wedding) }}"
+                                            class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                                            title="Editar">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </a>
+                                        <a href="{{ route('weddings.show', $wedding) }}"
+                                            class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-orange-600 hover:bg-orange-50 transition-colors"
+                                            title="Ver Detalhes">
+                                            <i class="bi bi-eye-fill"></i>
+                                        </a>
+                                        </a>
+                                        @if(in_array(auth()->user()->role, ['admin', 'secretaria']))
+                                            <form id="list-delete-wedding-{{ $wedding->id }}"
+                                                action="{{ route('weddings.destroy', $wedding->id) }}" method="POST" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+
+                                                <button type="button"
+                                                    onclick="confirmDelete('list-delete-wedding-{{ $wedding->id }}')"
+                                                    class="w-10 h-10 bg-gray-50 text-gray-400 flex items-center justify-center rounded-xl hover:bg-red-500 hover:text-white transition-all">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="px-8 py-12 text-center text-gray-400">
+                                    <i class="bi bi-calendar-x text-4xl mb-4 block opacity-20"></i>
+                                    <p class="text-sm font-medium">Nenhum casamento encontrado.</p>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+                <!-- </form> Removed -->
             </div>
         </div>
         <div class="mt-6">
@@ -273,8 +324,8 @@
                 <div class="flex-1">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         @forelse($weddings->take(6) as $wedding)
-                            <div
-                                class="bg-white p-6 md:p-8 rounded-2xl md:rounded-[2rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 relative">
+                            <div class="bg-white p-6 md:p-8 rounded-2xl md:rounded-[2rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 relative"
+                                :class="{'ring-2 ring-orange-500 bg-orange-50/10': selected.includes({{ $wedding->id }})}">
                                 <div class="absolute top-6 right-6 flex flex-col items-end gap-2">
                                     @php
                                         $status = $wedding->status ?? 'scheduled';
@@ -289,7 +340,7 @@
                                         {{ $statusLabels[$status] ?? $status }}
                                     </span>
                                     @if(auth()->user()->role === 'admin')
-                                        <input type="checkbox" form="bulkActionForm" name="wedding_ids[]" value="{{ $wedding->id }}"
+                                        <input type="checkbox" value="{{ $wedding->id }}" x-model="selected"
                                             class="wedding-checkbox rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
                                     @endif
                                 </div>
@@ -639,51 +690,51 @@
             };
 
             let tooltipContent = `
-            <div class="tooltip-header">
-                <i class="bi bi-heart-fill"></i>
-                <span>${event.title}</span>
-            </div>
-            <div class="tooltip-row">
-                <i class="bi bi-calendar-event"></i>
-                <span>${event.start.toLocaleDateString('pt-BR', {
+                <div class="tooltip-header">
+                    <i class="bi bi-heart-fill"></i>
+                    <span>${event.title}</span>
+                </div>
+                <div class="tooltip-row">
+                    <i class="bi bi-calendar-event"></i>
+                    <span>${event.start.toLocaleDateString('pt-BR', {
                 weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
             })}</span>
-            </div>
-            `;
+                </div>
+                `;
 
             if (props.time) {
                 tooltipContent += `
-            <div class="tooltip-row">
-                <i class="bi bi-clock-fill"></i>
-                <span>${props.time}</span>
-            </div>
-            `;
+                <div class="tooltip-row">
+                    <i class="bi bi-clock-fill"></i>
+                    <span>${props.time}</span>
+                </div>
+                `;
             }
 
             if (props.location) {
                 tooltipContent += `
-            <div class="tooltip-row">
-                <i class="bi bi-geo-alt-fill"></i>
-                <span>${props.location}</span>
-            </div>
-            `;
+                <div class="tooltip-row">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    <span>${props.location}</span>
+                </div>
+                `;
             }
 
             if (props.godparents) {
                 tooltipContent += `
-            <div class="tooltip-row">
-                <i class="bi bi-people-fill"></i>
-                <span>Padrinhos: ${props.godparents.substring(0, 50)}${props.godparents.length > 50 ? '...' : ''}</span>
-            </div>
-            `;
+                <div class="tooltip-row">
+                    <i class="bi bi-people-fill"></i>
+                    <span>Padrinhos: ${props.godparents.substring(0, 50)}${props.godparents.length > 50 ? '...' : ''}</span>
+                </div>
+                `;
             }
 
             if (props.status) {
                 tooltipContent += `
-            <div class="tooltip-status status-${props.status}">
-                ${statusLabels[props.status] || props.status}
-            </div>
-            `;
+                <div class="tooltip-status status-${props.status}">
+                    ${statusLabels[props.status] || props.status}
+                </div>
+                `;
             }
 
             tooltip.innerHTML = tooltipContent;
@@ -797,57 +848,7 @@
                 });
             }
 
-            // Bulk Action Logic
-            @if(auth()->user()->role === 'admin')
-                const updateBulkBtn = () => {
-                    const bulkBtn = document.getElementById('bulkDeleteBtn');
-                    const count = document.querySelectorAll('.wedding-checkbox:checked').length;
-                    if (count > 0 && bulkBtn) {
-                        bulkBtn.disabled = false;
-                        bulkBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'hidden');
-                        bulkBtn.innerHTML = `<i class="bi bi-trash-fill mr-2"></i> Excluir ${count} Selecionados`;
-                    } else if (bulkBtn) {
-                        bulkBtn.disabled = true;
-                        bulkBtn.classList.add('opacity-50', 'cursor-not-allowed', 'hidden');
-                    }
-                };
-
-                // Delegate event for checkboxes and Select All
-                document.addEventListener('change', function (e) {
-                    if (e.target.id === 'selectAllCheckbox') {
-                        const checkboxes = document.querySelectorAll('.wedding-checkbox');
-                        checkboxes.forEach(cb => cb.checked = e.target.checked);
-                        updateBulkBtn();
-                    }
-
-                    if (e.target.classList.contains('wedding-checkbox')) {
-                        updateBulkBtn();
-                    }
-                });
-
-                // Global function for bulk delete
-                window.bulkDelete = function () {
-                    Swal.fire({
-                        title: 'Excluir Selecionados?',
-                        text: "Você tem certeza que deseja excluir os casamentos selecionados?",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#dc2626',
-                        cancelButtonColor: '#6b7280',
-                        confirmButtonText: 'Sim, excluir!',
-                        cancelButtonText: 'Cancelar',
-                        reverseButtons: true
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            const form = document.getElementById('bulkActionForm');
-                            if (form) {
-                                form.action = "{{ route('weddings.bulk-delete') }}";
-                                form.submit();
-                            }
-                        }
-                    })
-                }
-            @endif
-            });
+            // Old bulk logic removed
+        });
     </script>
 @endsection

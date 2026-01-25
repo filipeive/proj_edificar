@@ -25,20 +25,20 @@
         x-init="$watch('view', value => localStorage.setItem('cell_meetings_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('cell_meetings_view') || 'list')"
         @resize.window.debounce.500ms="updateView()">
         <!-- Header & Top Actions -->
-        <div class="bg-white p-4 md:p-8 rounded-2xl md:rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="bg-white dark:bg-gray-800 p-4 md:p-8 rounded-2xl md:rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row justify-between items-center gap-6 transition-colors">
             <div>
-                <h1 class="text-3xl font-black text-gray-900 tracking-tight">Encontros de Célula</h1>
-                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Gestão de Reuniões e Atas</p>
+                <h1 class="text-3xl font-black text-gray-900 dark:text-white tracking-tight">Encontros de Célula</h1>
+                <p class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">Gestão de Reuniões e Atas</p>
             </div>
             <div class="flex items-center gap-4">
-                <div class="hidden md:flex bg-gray-100 p-1 rounded-xl items-center">
+                <div class="hidden md:flex bg-gray-100 dark:bg-gray-700 p-1 rounded-xl items-center">
                     <button @click="view = 'list'"
-                        :class="view === 'list' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-900'"
+                        :class="view === 'list' ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' : 'text-gray-400 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'"
                         class="px-4 py-2 rounded-lg text-sm font-bold transition-all duration-300">
                         <i class="bi bi-list-ul mr-2"></i> Lista
                     </button>
                     <button @click="view = 'grid'"
-                        :class="view === 'grid' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-900'"
+                        :class="view === 'grid' ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' : 'text-gray-400 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'"
                         class="px-4 py-2 rounded-lg text-sm font-bold transition-all duration-300">
                         <i class="bi bi-grid-fill mr-2"></i> Grid
                     </button>
@@ -53,8 +53,8 @@
         </div>
 
         @if(session('success'))
-            <div class="bg-green-50 border border-green-100 text-green-600 p-6 rounded-[2rem] flex items-center gap-4 animate-fade-in">
-                <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+            <div class="bg-green-50 dark:bg-green-900/30 border border-green-100 dark:border-green-800 text-green-600 dark:text-green-400 p-6 rounded-[2rem] flex items-center gap-4 animate-fade-in">
+                <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-800 flex items-center justify-center">
                     <i class="bi bi-check-lg"></i>
                 </div>
                 <p class="font-bold text-sm">{{ session('success') }}</p>
@@ -64,54 +64,54 @@
         <!-- List View -->
         <div x-show="view === 'list'" x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-            class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+            class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead>
-                        <tr class="bg-gray-50/50">
-                            <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Data / Unidade</th>
-                            <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Liderança / Conteúdo</th>
-                            <th class="px-10 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Participação</th>
-                            <th class="px-10 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Tipo de Atividade</th>
-                            <th class="px-10 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">Ações</th>
+                        <tr class="bg-gray-50/50 dark:bg-gray-700/50">
+                            <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Data / Unidade</th>
+                            <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Liderança / Conteúdo</th>
+                            <th class="px-10 py-5 text-center text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Participação</th>
+                            <th class="px-10 py-5 text-center text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Tipo de Atividade</th>
+                            <th class="px-10 py-5 text-right text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Ações</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50">
+                    <tbody class="divide-y divide-gray-50 dark:divide-gray-700">
                         @forelse($meetings as $meeting)
-                            <tr class="group hover:bg-gray-50/50 transition-colors duration-200">
+                            <tr class="group hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors duration-200">
                                 <td class="px-10 py-6">
                                     <div class="flex flex-col">
-                                        <span class="text-sm font-black text-gray-900 leading-tight group-hover:text-blue-600 transition-colors">
+                                        <span class="text-sm font-black text-gray-900 dark:text-white leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                                             {{ $meeting->meeting_date->format('d/m/Y') }}
                                         </span>
-                                        <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                                        <span class="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">
                                             {{ $meeting->cell->name }}
                                         </span>
                                     </div>
                                 </td>
                                 <td class="px-10 py-6">
                                     <div class="flex flex-col">
-                                        <span class="text-sm font-bold text-gray-900 leading-tight">{{ $meeting->leader->name ?? 'N/A' }}</span>
-                                        <span class="text-[10px] text-gray-400 italic">{{ $meeting->theme ?? 'Sem tema registrado' }}</span>
+                                        <span class="text-sm font-bold text-gray-900 dark:text-white leading-tight">{{ $meeting->leader->name ?? 'N/A' }}</span>
+                                        <span class="text-[10px] text-gray-400 dark:text-gray-500 italic">{{ $meeting->theme ?? 'Sem tema registrado' }}</span>
                                     </div>
                                 </td>
                                 <td class="px-10 py-6 text-center">
                                     <div class="flex flex-col items-center">
-                                        <span class="text-lg font-black text-gray-900 tracking-tighter">
+                                        <span class="text-lg font-black text-gray-900 dark:text-white tracking-tighter">
                                             {{ $meeting->adults_count + $meeting->children_count + $meeting->visitors_count }}
                                         </span>
-                                        <span class="text-[9px] text-gray-400 font-black uppercase tracking-widest">Presentes</span>
+                                        <span class="text-[9px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest">Presentes</span>
                                     </div>
                                 </td>
                                 <td class="px-10 py-6 text-center">
                                     @php
                                         $typeStyles = [
-                                            'normal' => 'bg-blue-50 text-blue-600 border-blue-100',
-                                            'leadership' => 'bg-purple-50 text-purple-600 border-purple-100',
-                                            'supervision' => 'bg-orange-50 text-orange-600 border-orange-100',
-                                            'zone' => 'bg-indigo-50 text-indigo-600 border-indigo-100',
+                                            'normal' => 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-800',
+                                            'leadership' => 'bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-800',
+                                            'supervision' => 'bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 border-orange-100 dark:border-orange-800',
+                                            'zone' => 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-800',
                                         ];
-                                        $style = $typeStyles[$meeting->meeting_type] ?? 'bg-gray-50 text-gray-600 border-gray-100';
+                                        $style = $typeStyles[$meeting->meeting_type] ?? 'bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 border-gray-100 dark:border-gray-600';
                                     @endphp
                                     <span class="px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border {{ $style }}">
                                         @switch($meeting->meeting_type)
@@ -125,12 +125,12 @@
                                 <td class="px-10 py-6 text-right">
                                     <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
                                         <a href="{{ route('cell-meetings.show', $meeting) }}"
-                                            class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                            class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white flex items-center justify-center transition-all shadow-sm">
                                             <i class="bi bi-eye-fill"></i>
                                         </a>
                                         @can('update', $meeting)
                                             <a href="{{ route('cell-meetings.edit', $meeting) }}"
-                                                class="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                                class="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 hover:bg-orange-600 hover:text-white dark:hover:bg-orange-600 dark:hover:text-white flex items-center justify-center transition-all shadow-sm">
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
                                         @endcan
@@ -140,7 +140,7 @@
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="button" onclick="confirmDelete('{{ route('cell-meetings.destroy', $meeting) }}', 'list-delete-form-{{ $meeting->id }}')"
-                                                    class="w-10 h-10 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all shadow-sm font-black">
+                                                    class="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white dark:hover:bg-red-600 dark:hover:text-white flex items-center justify-center transition-all shadow-sm font-black">
                                                     <i class="bi bi-trash-fill"></i>
                                                 </button>
                                             </form>
@@ -151,9 +151,9 @@
                         @empty
                             <tr>
                                 <td colspan="5" class="px-10 py-20 text-center">
-                                    <div class="flex flex-col items-center gap-4 text-gray-300">
+                                    <div class="flex flex-col items-center gap-4 text-gray-300 dark:text-gray-600">
                                         <i class="bi bi-calendar-x text-7xl"></i>
-                                        <p class="font-bold text-lg">Nenhum encontro registrado.</p>
+                                        <p class="font-bold text-lg text-gray-400 dark:text-gray-500">Nenhum encontro registrado.</p>
                                     </div>
                                 </td>
                             </tr>
@@ -168,10 +168,16 @@
             x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             @foreach($meetings as $meeting)
-                <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 relative">
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col group hover:shadow-xl transition-all duration-300 relative">
                     <div class="absolute top-6 right-6">
                         @php
-                            $style = $typeStyles[$meeting->meeting_type] ?? 'bg-gray-50 text-gray-600 border-gray-100';
+                            $typeStyles = [
+                                'normal' => 'bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 border-gray-100 dark:border-gray-600',
+                                'leadership' => 'bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-800',
+                                'supervision' => 'bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 border-orange-100 dark:border-orange-800',
+                                'zone' => 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-800',
+                            ];
+                            $style = $typeStyles[$meeting->meeting_type] ?? 'bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 border-gray-100 dark:border-gray-600';
                         @endphp
                         <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border {{ $style }}">
                             @switch($meeting->meeting_type)
@@ -183,36 +189,36 @@
                         </span>
                     </div>
 
-                    <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-black text-2xl group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 mb-6">
+                    <div class="w-14 h-14 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center font-black text-2xl group-hover:bg-blue-600 group-hover:text-white dark:group-hover:bg-blue-600 dark:group-hover:text-white transition-all duration-500 mb-6">
                         <i class="bi bi-calendar-check"></i>
                     </div>
 
                     <div class="mb-4">
-                        <h4 class="text-lg font-black text-gray-900 leading-tight mb-1 group-hover:text-blue-600 transition-colors">
+                        <h4 class="text-lg font-black text-gray-900 dark:text-white leading-tight mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                             {{ $meeting->meeting_date->format('d/m/Y') }}
                         </h4>
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $meeting->cell->name }}</p>
+                        <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">{{ $meeting->cell->name }}</p>
                     </div>
 
-                    <div class="space-y-3 mb-6 flex-1 bg-gray-50 p-4 rounded-2xl">
+                    <div class="space-y-3 mb-6 flex-1 bg-gray-50 dark:bg-gray-700/50 p-4 rounded-2xl">
                         <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-black uppercase text-gray-400">Presença</span>
-                            <span class="text-lg font-black text-gray-900">{{ $meeting->adults_count + $meeting->children_count + $meeting->visitors_count }}</span>
+                            <span class="text-[10px] font-black uppercase text-gray-400 dark:text-gray-500">Presença</span>
+                            <span class="text-lg font-black text-gray-900 dark:text-white">{{ $meeting->adults_count + $meeting->children_count + $meeting->visitors_count }}</span>
                         </div>
-                        <div class="flex flex-col border-t border-gray-100 pt-2">
-                            <span class="text-[9px] font-black uppercase text-gray-400">Responsável</span>
-                            <span class="text-xs font-bold text-gray-700 truncate">{{ $meeting->leader->name ?? 'N/A' }}</span>
+                        <div class="flex flex-col border-t border-gray-100 dark:border-gray-600 pt-2">
+                            <span class="text-[9px] font-black uppercase text-gray-400 dark:text-gray-500">Responsável</span>
+                            <span class="text-xs font-bold text-gray-700 dark:text-gray-300 truncate">{{ $meeting->leader->name ?? 'N/A' }}</span>
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-2 pt-4 border-t border-gray-50">
+                    <div class="flex items-center gap-2 pt-4 border-t border-gray-50 dark:border-gray-700">
                         <a href="{{ route('cell-meetings.show', $meeting) }}"
-                            class="flex-1 bg-gray-900 text-white text-center py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 transition-all flex items-center justify-center gap-2">
+                            class="flex-1 bg-gray-900 dark:bg-black text-white text-center py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 dark:hover:bg-blue-600 transition-all flex items-center justify-center gap-2">
                             <i class="bi bi-eye"></i> Detalhes
                         </a>
                         @can('update', $meeting)
                             <a href="{{ route('cell-meetings.edit', $meeting) }}"
-                                class="w-10 h-10 bg-gray-50 text-gray-400 flex items-center justify-center rounded-xl hover:bg-orange-600 hover:text-white transition-all">
+                                class="w-10 h-10 bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 flex items-center justify-center rounded-xl hover:bg-orange-600 hover:text-white dark:hover:bg-orange-600 dark:hover:text-white transition-all">
                                 <i class="bi bi-pencil"></i>
                             </a>
                         @endcan
@@ -222,7 +228,7 @@
                                 @csrf
                                 @method('DELETE')
                                 <button type="button" onclick="confirmDelete('{{ route('cell-meetings.destroy', $meeting) }}', 'grid-delete-form-{{ $meeting->id }}')"
-                                    class="w-10 h-10 bg-gray-50 text-gray-400 flex items-center justify-center rounded-xl hover:bg-red-600 hover:text-white transition-all">
+                                    class="w-10 h-10 bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 flex items-center justify-center rounded-xl hover:bg-red-600 hover:text-white dark:hover:bg-red-600 dark:hover:text-white transition-all">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
