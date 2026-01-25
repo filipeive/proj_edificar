@@ -236,12 +236,6 @@
                 </table>
             </div>
 
-            <!-- Custom Pagination -->
-            @if($members->hasPages())
-                <div class="p-8 bg-gray-50 border-t border-gray-100">
-                    {{ $members->appends(request()->query())->links() }}
-                </div>
-            @endif
         </div>
 
         <!-- Grid View -->
