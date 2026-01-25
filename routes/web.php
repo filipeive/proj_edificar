@@ -136,6 +136,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/', [UserController::class, 'storeFromContext'])->name('members.store');
 
         // CORREÇÃO CRÍTICA: Mudança de /{user} para /{member}
+        Route::post('/bulk-destroy', [UserController::class, 'bulkDestroyFromContext'])->name('members.bulk-destroy');
         Route::get('/{member}', [UserController::class, 'showFromContext'])->name('members.show');
         Route::get('/{member}/edit', [UserController::class, 'editFromContext'])->name('members.edit');
         Route::put('/{member}', [UserController::class, 'updateFromContext'])->name('members.update');

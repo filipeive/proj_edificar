@@ -28,14 +28,77 @@
     <div class="space-y-8" 
         x-data="{ 
             view: window.innerWidth < 768 ? 'grid' : 'list',
+            selected: [],
+            showBulkModal: false,
             updateView() {
                 if (window.innerWidth < 768 && this.view === 'list') {
                     this.view = 'grid';
+                }
+            },
+            toggleAll() {
+                const allIds = {{ Js::from($members->pluck('id')) }};
+                if (this.selected.length === allIds.length) {
+                    this.selected = [];
+                } else {
+                    this.selected = allIds;
                 }
             }
         }"
         x-init="$watch('view', value => localStorage.setItem('members_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('members_view') || 'list')"
         @resize.window.debounce.500ms="updateView()">
+        
+        <!-- Bulk Action Bar -->
+        <div x-show="selected.length > 0" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 -translate-y-4"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 translate-y-0"
+             x-transition:leave-end="opacity-0 -translate-y-4"
+             class="fixed top-24 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
+            <div class="bg-gray-900 text-white rounded-2xl shadow-2xl p-4 flex items-center gap-6 pointer-events-auto border border-gray-700/50 backdrop-blur-md bg-opacity-90">
+                <div class="flex items-center gap-3 pl-2">
+                    <span class="bg-blue-600 text-xs font-black px-2.5 py-1 rounded-lg" x-text="selected.length"></span>
+                    <span class="text-sm font-medium">selecionados</span>
+                </div>
+                
+                <div class="h-8 w-px bg-gray-700"></div>
+                
+                <div class="flex items-center gap-2">
+                    <button @click="selected = []" class="px-4 py-2 text-xs font-bold uppercase tracking-wider text-gray-400 hover:text-white transition-colors">
+                        Cancelar
+                    </button>
+                    @if($userRole !== 'secretaria')
+                        <form method="POST" action="{{ route('members.bulk-destroy') }}" 
+                              @submit.prevent="
+                                Swal.fire({
+                                    title: 'Tem certeza?',
+                                    text: 'Você está prestes a excluir ' + selected.length + ' membro(s). Esta ação não pode ser desfeita!',
+                                    icon: 'warning',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#d33',
+                                    cancelButtonColor: '#3085d6',
+                                    confirmButtonText: 'Sim, excluir!',
+                                    cancelButtonText: 'Cancelar'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        $el.submit();
+                                    }
+                                })
+                              ">
+                            @csrf
+                            <template x-for="id in selected" :key="id">
+                                <input type="hidden" name="selected_ids[]" :value="id">
+                            </template>
+                            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-red-600/20 flex items-center gap-2">
+                                <i class="bi bi-trash-fill"></i> Excluir
+                            </button>
+                        </form>
+                    @endif
+                </div>
+            </div>
+        </div>
+
         <!-- Search & Actions Header -->
         <div class="bg-white p-4 md:p-6 rounded-[2rem] shadow-sm border border-gray-100">
             <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
@@ -128,7 +191,13 @@
                 <table class="w-full">
                     <thead>
                         <tr class="bg-gray-50/50 border-b border-gray-100">
-                            <th class="px-8 py-6 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest pl-10">Membro</th>
+                             <!-- Checkbox Select All -->
+                             <th class="pl-8 py-6 w-16 text-center">
+                                <input type="checkbox" @click="toggleAll()" 
+                                    :checked="selected.length === {{ $members->count() }} && selected.length > 0"
+                                    class="w-5 h-5 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                            </th>
+                            <th class="px-4 py-6 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Membro</th>
                             <th class="px-6 py-6 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Zona</th>
                             <th class="px-6 py-6 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Cargo</th>
                             <th class="px-6 py-6 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Contacto</th>
@@ -140,7 +209,13 @@
                     <tbody class="divide-y divide-gray-50">
                         @forelse($members as $member)
                             <tr class="hover:bg-blue-50/30 transition-colors group">
-                                <td class="px-8 py-5 pl-10">
+                                <!-- Row Checkbox -->
+                                <td class="pl-8 py-5 text-center relative">
+                                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 opacity-0 transition-opacity" :class="{'opacity-100': selected.includes({{ $member->id }})}"></div>
+                                    <input type="checkbox" value="{{ $member->id }}" x-model="selected"
+                                        class="w-5 h-5 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                                </td>
+                                <td class="px-4 py-5">
                                     <div class="flex items-center gap-4">
                                         <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform duration-300">
                                             {{ strtoupper(substr($member->name, 0, 1)) }}
@@ -219,7 +294,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-10 py-24 text-center">
+                                <td colspan="8" class="px-10 py-24 text-center">
                                     <div class="flex flex-col items-center gap-4 text-gray-300">
                                         <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center">
                                             <i class="bi bi-search text-3xl opacity-50"></i>
@@ -235,14 +310,21 @@
                     </tbody>
                 </table>
             </div>
-
         </div>
 
         <!-- Grid View -->
         <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
             class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
             @forelse($members as $member)
-                <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-2xl hover:shadow-blue-900/10 transition-all duration-300 relative overflow-hidden">
+                <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-2xl hover:shadow-blue-900/10 transition-all duration-300 relative overflow-hidden"
+                     :class="{'ring-2 ring-blue-500 bg-blue-50/10': selected.includes({{ $member->id }})}">
+                    
+                    <!-- Selection Checkbox (Absolute) -->
+                     <div class="absolute top-6 left-6 z-10">
+                        <input type="checkbox" value="{{ $member->id }}" x-model="selected"
+                            class="w-5 h-5 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer shadow-sm">
+                    </div>
+
                     <!-- Status Indicator -->
                     <div class="absolute top-6 right-6">
                          @if($member->is_active)
@@ -252,7 +334,7 @@
                         @endif
                     </div>
 
-                    <div class="flex items-start gap-4 mb-6">
+                    <div class="flex items-start gap-4 mb-6 pl-8"> <!-- Added padding for checkbox -->
                         <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-black text-2xl shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform duration-500">
                             {{ strtoupper(substr($member->name, 0, 1)) }}
                         </div>
@@ -331,9 +413,9 @@
             @endforelse
         </div>
 
-         <!-- Custom Pagination for Grid -->
+         <!-- Custom Pagination (Consolidated) -->
         @if($members->hasPages())
-            <div class="mt-8">
+            <div class="bg-white rounded-[2.5rem] p-8 shadow-sm border border-gray-100 mt-8">
                 {{ $members->appends(request()->query())->links() }}
             </div>
         @endif

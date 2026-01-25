@@ -435,6 +435,47 @@ class UserController
             ->with('success', 'Membro removido com sucesso!');
     }
 
+    /**
+     * Deletar múltiplos membros (contextual)
+     */
+    public function bulkDestroyFromContext(Request $request)
+    {
+        $user = auth()->user();
+
+        if ($user->role === 'secretaria') {
+            abort(403, 'Acesso de leitura apenas.');
+        }
+
+        $validated = $request->validate([
+            'selected_ids' => 'required|array',
+            'selected_ids.*' => 'exists:users,id'
+        ]);
+
+        $count = 0;
+        foreach ($validated['selected_ids'] as $id) {
+            $member = User::find($id);
+            if ($member) {
+                // Check permissions for each member
+                // If validation fails, it usually throws 403. 
+                // We might want to skip instead of aborting the whole process, 
+                // but strictly speaking, the UI shouldn't allow selecting them.
+                // Let's wrap in try/catch or just checking strict access would be safer but slower.
+                // For simplicity and security, we'll verify access.
+                try {
+                    $this->validateMemberAccess($user, $member);
+                    $member->delete();
+                    $count++;
+                } catch (\Exception $e) {
+                    // Skip unauthorized
+                    continue;
+                }
+            }
+        }
+
+        return redirect()->route('members.index')
+            ->with('success', "{$count} membro(s) removido(s) com sucesso!");
+    }
+
     // ==================== HELPER METHODS ====================
 
     /**
