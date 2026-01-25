@@ -2,22 +2,36 @@
     "name": "Portal Life Church",
     "short_name": "Life Church",
     "start_url": "/admin/dashboard",
+    "scope": "/",
     "display": "standalone",
-    "background_color": "#000000",
-    "theme_color": "#000000",
+    "background_color": "#ffffff",
+    "theme_color": "#0D6EFD",
     "description": "Sistema de Gestão Eclesiástica - Life Church",
+    "orientation": "portrait",
     "icons": [
         {
             "src": "/favicon.png",
             "sizes": "192x192",
             "type": "image/png",
-            "purpose": "any maskable"
+            "purpose": "any"
         },
         {
             "src": "/favicon.png",
             "sizes": "512x512",
             "type": "image/png",
-            "purpose": "any maskable"
+            "purpose": "any"
+        },
+        {
+            "src": "/favicon.png",
+            "sizes": "1024x1024",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/favicon.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
         }
     ]
 }

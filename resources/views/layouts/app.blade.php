@@ -1185,33 +1185,66 @@
                     .catch(err => console.log('SW Error', err));
             }
 
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt', (e) => {
+                // Prevent Chrome 67 and earlier from automatically showing the prompt
+                e.preventDefault();
+                // Stash the event so it can be triggered later.
+                deferredPrompt = e;
+                console.log('beforeinstallprompt event fired');
+
+                // If we are on mobile, show the prompt with the Install option
+                showImmersivePrompt(true);
+            });
+
             // check if on mobile
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
+            // Trigger prompt if it's mobile and not standalone, and beforeinstallprompt hasn't fired yet
+            // (or if it's iOS where beforeinstallprompt doesn't fire)
             if (isMobile && !isStandalone) {
                 const hasShownPrompt = sessionStorage.getItem('pwa_prompt_shown');
-
                 if (!hasShownPrompt) {
                     setTimeout(() => {
-                        Swal.fire({
-                            title: 'Experiência Imersiva',
-                            text: 'Para uma melhor experiência no Portal Life Church, você pode usar o modo tela cheia ou adicionar o sistema à sua tela de início.',
-                            icon: 'info',
-                            showCancelButton: true,
-                            confirmButtonColor: '#2563eb',
-                            cancelButtonColor: '#6b7280',
-                            confirmButtonText: 'Tela Cheia',
-                            cancelButtonText: 'Agora não',
-                            footer: '<span class="text-xs text-gray-400">Dica: Use "Adicionar à tela de início" no seu navegador para abrir como um Aplicativo.</span>'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                enterFullScreen();
-                            }
-                            sessionStorage.setItem('pwa_prompt_shown', 'true');
-                        });
-                    }, 2000);
+                        if (!deferredPrompt) {
+                            showImmersivePrompt(false);
+                        }
+                    }, 3000);
                 }
+            }
+
+            function showImmersivePrompt(canInstall) {
+                if (sessionStorage.getItem('pwa_prompt_shown')) return;
+
+                Swal.fire({
+                    title: 'Portal Life Church App',
+                    text: canInstall
+                        ? 'Deseja instalar o aplicativo para acesso rápido e em tela cheia?'
+                        : 'Para uma melhor experiência, você pode usar o modo tela cheia ou adicionar à tela de início.',
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonColor: '#2563eb',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: canInstall ? 'Instalar App' : 'Tela Cheia',
+                    cancelButtonText: 'Agora não',
+                    footer: '<span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Dica: Abrir como app economiza dados e melhora a navegação.</span>'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        if (canInstall && deferredPrompt) {
+                            deferredPrompt.prompt();
+                            deferredPrompt.userChoice.then((choiceResult) => {
+                                if (choiceResult.outcome === 'accepted') {
+                                    console.log('User accepted the install prompt');
+                                }
+                                deferredPrompt = null;
+                            });
+                        } else {
+                            enterFullScreen();
+                        }
+                    }
+                    sessionStorage.setItem('pwa_prompt_shown', 'true');
+                });
             }
 
             function enterFullScreen() {
@@ -1223,10 +1256,9 @@
                 if (requestFullScreen) {
                     requestFullScreen.call(docEl);
                 } else if (isMobile && /iPhone|iPad|iPod/.test(navigator.userAgent)) {
-                    // Safari iOS doesn't support requestFullscreen on documentElement
                     Swal.fire({
-                        title: 'Nota para iPhone/iPad',
-                        text: 'Para abrir em tela cheia no iOS, clique no botão de Compartilhar e selecione "Adicionar à Tela de Início".',
+                        title: 'Instalação no iOS',
+                        text: 'Para instalar o app no iPhone/iPad: clique no botão de Compartilhar e selecione "Adicionar à Tela de Início".',
                         icon: 'info',
                         confirmButtonText: 'Entendido'
                     });
