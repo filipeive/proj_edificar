@@ -15,6 +15,14 @@
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('favicon.png') }}">
 
+    <!-- PWA & Mobile Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Life Church">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -1167,6 +1175,65 @@
         };
     </script>
     @stack('scripts')
+    <!-- PWA & Immersive Experience Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Register Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('SW Registered'))
+                    .catch(err => console.log('SW Error', err));
+            }
+
+            // check if on mobile
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+            if (isMobile && !isStandalone) {
+                const hasShownPrompt = sessionStorage.getItem('pwa_prompt_shown');
+
+                if (!hasShownPrompt) {
+                    setTimeout(() => {
+                        Swal.fire({
+                            title: 'Experiência Imersiva',
+                            text: 'Para uma melhor experiência no Portal Life Church, você pode usar o modo tela cheia ou adicionar o sistema à sua tela de início.',
+                            icon: 'info',
+                            showCancelButton: true,
+                            confirmButtonColor: '#2563eb',
+                            cancelButtonColor: '#6b7280',
+                            confirmButtonText: 'Tela Cheia',
+                            cancelButtonText: 'Agora não',
+                            footer: '<span class="text-xs text-gray-400">Dica: Use "Adicionar à tela de início" no seu navegador para abrir como um Aplicativo.</span>'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                enterFullScreen();
+                            }
+                            sessionStorage.setItem('pwa_prompt_shown', 'true');
+                        });
+                    }, 2000);
+                }
+            }
+
+            function enterFullScreen() {
+                const doc = window.document;
+                const docEl = doc.documentElement;
+
+                const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullScreen;
+
+                if (requestFullScreen) {
+                    requestFullScreen.call(docEl);
+                } else if (isMobile && /iPhone|iPad|iPod/.test(navigator.userAgent)) {
+                    // Safari iOS doesn't support requestFullscreen on documentElement
+                    Swal.fire({
+                        title: 'Nota para iPhone/iPad',
+                        text: 'Para abrir em tela cheia no iOS, clique no botão de Compartilhar e selecione "Adicionar à Tela de Início".',
+                        icon: 'info',
+                        confirmButtonText: 'Entendido'
+                    });
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>
