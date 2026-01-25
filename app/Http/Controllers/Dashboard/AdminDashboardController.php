@@ -184,6 +184,8 @@ class AdminDashboardController
                 ->count();
         }
 
+
+
         return view('dashboard.admin', [
             'totalContributed' => $totalContributed,
             'totalMembers' => $totalMembers,
@@ -198,6 +200,7 @@ class AdminDashboardController
             'recentActivity' => $recentActivity,
             'growthLabels' => $growthLabels,
             'growthData' => $growthData,
+
         ]);
     }
 }

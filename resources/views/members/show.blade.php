@@ -4,6 +4,23 @@
 @section('page-title', $member->name)
 @section('page-subtitle', 'Informações completas do membro')
 
+@section('header-actions')
+    <div class="flex items-center gap-2">
+        @if($userRole !== 'secretaria')
+            <a href="{{ route('members.edit', $member) }}"
+                class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+                title="Editar Perfil">
+                <i class="bi bi-pencil-square text-2xl"></i>
+            </a>
+        @endif
+        <a href="{{ route('contributions.create', ['user_id' => $member->id]) }}"
+            class="text-gray-600 hover:text-green-600 p-2.5 hover:bg-green-50 rounded-xl transition-all duration-300 border border-transparent hover:border-green-100"
+            title="Nova Oferta">
+            <i class="bi bi-plus-circle text-2xl"></i>
+        </a>
+    </div>
+@endsection
+
 @section('content')
     <div class="space-y-8">
         <!-- Header & Profile Grid -->
@@ -53,8 +70,8 @@
                 <p class="text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-widest">{{ $member->contributions->where('status', 'verificada')->count() }} Doações</p>
             </div>
 
-            <!-- Action Card -->
-            <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col justify-center gap-3">
+            <!-- Action Card (Hidden on Mobile) -->
+            <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col justify-center gap-3 hidden md:flex">
                 @if($userRole !== 'secretaria')
                 <a href="{{ route('members.edit', $member) }}" class="w-full py-4 bg-gray-50 text-gray-500 rounded-2xl hover:bg-gray-100 transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2">
                     <i class="bi bi-pencil-square"></i> Editar Perfil

@@ -170,7 +170,7 @@
 
                                 <td class="px-10 py-6 text-center">
                                     @if ($contribution->proof_path)
-                                        <a href="{{ Storage::url($contribution->proof_path) }}" target="_blank"
+                                        <a href="{{ route('contributions.receipt', $contribution) }}" target="_blank"
                                             class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all mx-auto shadow-sm">
                                             <i class="bi bi-file-earmark-pdf-fill"></i>
                                         </a>

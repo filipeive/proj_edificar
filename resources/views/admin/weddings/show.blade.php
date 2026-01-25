@@ -4,24 +4,46 @@
 @section('page-title', 'Detalhes do Casamento')
 @section('page-subtitle', 'Informações completas sobre o agendamento matrimonial')
 
+@section('header-actions')
+    <div class="flex items-center gap-2">
+        <a href="{{ route('weddings.pdf', ['id' => $wedding->id]) }}"
+            class="text-gray-600 hover:text-orange-600 p-2.5 hover:bg-orange-50 rounded-xl transition-all duration-300 border border-transparent hover:border-orange-100"
+            title="Exportar PDF">
+            <i class="bi bi-file-earmark-pdf text-2xl"></i>
+        </a>
+        @if(in_array(auth()->user()->role, ['admin', 'secretaria']))
+            <a href="{{ route('weddings.edit', $wedding) }}"
+                class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+                title="Editar">
+                <i class="bi bi-pencil-square text-2xl"></i>
+            </a>
+        @endif
+        <a href="{{ route('weddings.index') }}"
+            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+            title="Voltar à Lista">
+            <i class="bi bi-arrow-left text-2xl"></i>
+        </a>
+        <a href="{{ route('weddings.pdf', ['id' => $wedding->id]) }}"
+            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+            title="Exportar PDF">
+            <i class="bi bi-file-earmark-pdf text-2xl"></i>
+        </a>
+        @if(in_array(auth()->user()->role, ['admin', 'secretaria']))
+            <a href="{{ route('weddings.edit', $wedding) }}"
+                class="text-gray-600 hover:text-orange-600 p-2.5 hover:bg-orange-50 rounded-xl transition-all duration-300 border border-transparent hover:border-orange-100"
+                title="Editar Casamento">
+                <i class="bi bi-pencil-square text-2xl"></i>
+            </a>
+        @endif
+    </div>
+@endsection
+
 @section('content')
     <div class="w-full">
-        <div class="mb-6 flex justify-between items-center">
+        <div class="mb-6 flex justify-between items-center hidden md:flex">
             <a href="{{ route('weddings.index') }}" class="text-blue-600 hover:text-blue-800 flex items-center transition">
                 <i class="bi bi-arrow-left mr-2"></i> Voltar para Lista
             </a>
-            <div class="flex space-x-2">
-                <a href="{{ route('weddings.pdf', ['id' => $wedding->id]) }}"
-                    class="bg-gray-800 hover:bg-black text-white px-4 py-2 rounded-lg flex items-center transition shadow-sm">
-                    <i class="bi bi-file-earmark-pdf mr-2"></i> Exportar PDF
-                </a>
-                @if(in_array(auth()->user()->role, ['admin', 'secretaria']))
-                    <a href="{{ route('weddings.edit', $wedding) }}"
-                        class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center transition shadow-sm">
-                        <i class="bi bi-pencil mr-2"></i> Editar
-                    </a>
-                @endif
-            </div>
         </div>
 
         <div class="w-full">

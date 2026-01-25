@@ -275,6 +275,10 @@ Route::middleware('auth')->group(function () {
         // Ver detalhes
         Route::get('/{contribution}', [ContributionController::class, 'show'])
             ->name('contributions.show');
+
+        // Ver comprovativo
+        Route::get('/{contribution}/receipt', [ContributionController::class, 'downloadReceipt'])
+            ->name('contributions.receipt');
     });
     // ===== PACOTES DE COMPROMISSO ROUTES =====
     Route::prefix('commitments')->middleware('not.admin')->group(function () {

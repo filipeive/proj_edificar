@@ -45,7 +45,7 @@
             <div class="mt-6">
                 <p class="text-sm text-gray-500">Comprovativo</p>
                 @if($contribution->proof_path)
-                    <a href="{{ \Illuminate\Support\Facades\Storage::url($contribution->proof_path) }}" target="_blank"
+                    <a href="{{ route('contributions.receipt', $contribution) }}" target="_blank"
                         class="inline-block mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                         Ver Comprovativo
                     </a>

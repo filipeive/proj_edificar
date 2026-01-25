@@ -2,6 +2,28 @@
 
 @section('title', 'Detalhes do Pacote - ' . $package->name)
 
+@section('header-actions')
+    <div class="flex items-center gap-2">
+        @if($package->whatsapp_link)
+            <a href="{{ $package->whatsapp_link }}" target="_blank"
+                class="text-gray-600 hover:text-green-600 p-2.5 hover:bg-green-50 rounded-xl transition-all duration-300 border border-transparent hover:border-green-100"
+                title="Grupo WhatsApp">
+                <i class="bi bi-whatsapp text-2xl"></i>
+            </a>
+        @endif
+        <a href="{{ route('packages.export', $package) }}"
+            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+            title="Exportar">
+            <i class="bi bi-file-earmark-excel text-2xl"></i>
+        </a>
+        <a href="{{ route('packages.edit', $package) }}"
+            class="text-gray-600 hover:text-orange-600 p-2.5 hover:bg-orange-50 rounded-xl transition-all duration-300 border border-transparent hover:border-orange-100"
+            title="Editar">
+            <i class="bi bi-pencil-square text-2xl"></i>
+        </a>
+    </div>
+@endsection
+
 @section('content')
     <div class="space-y-8" x-data="{ 
                             view: window.innerWidth < 768 ? 'grid' : 'list', 
@@ -26,7 +48,7 @@
                         Contribuições</p>
                 </div>
             </div>
-            <div class="grid grid-cols-2 sm:flex sm:flex-row flex-wrap items-center gap-2 sm:gap-3 w-full lg:w-auto">
+            <div class="grid grid-cols-2 sm:flex sm:flex-row flex-wrap items-center gap-2 sm:gap-3 w-full lg:w-auto hidden md:flex">
                 @if($package->whatsapp_link)
                     <a href="{{ $package->whatsapp_link }}" target="_blank"
                         class="col-span-2 sm:w-auto bg-green-600 text-white px-4 md:px-8 py-3 md:py-4 rounded-xl sm:rounded-2xl hover:bg-green-700 transition-all font-black text-[10px] sm:text-xs uppercase tracking-widest flex items-center justify-center shadow-lg shadow-green-100">

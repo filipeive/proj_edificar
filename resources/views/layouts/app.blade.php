@@ -1,3 +1,7 @@
+@php
+    $authUser = auth()->user();
+    $role = $authUser->role ?? 'membro';
+@endphp
 <!DOCTYPE html>
 <html lang="pt">
 
@@ -594,65 +598,58 @@
                             </form>
                         </div>
 
-                        <div class="hidden md:block border-l border-gray-300 pl-4">
-                            <div class="relative">
-                                <button type="button" onclick="toggleUserMenu()"
-                                    class="flex items-center space-x-2 hover:bg-gray-100 p-2 rounded-lg transition">
-                                    <div class="text-right">
-                                        <p class="text-sm font-medium text-gray-800 truncate max-w-[150px]">
-                                            {{ $authUser->name }}
-                                        </p>
-                                        <p class="text-xs text-gray-500">{{ ucfirst(str_replace('_', ' ', $role)) }}</p>
-                                    </div>
-                                    <div
-                                        class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0 font-bold text-white">
-                                        {{ strtoupper(substr($authUser->name, 0, 1)) }}
-                                    </div>
-                                    <i
-                                        class="bi bi-chevron-down text-gray-600 text-sm transition-transform duration-200"></i>
-                                </button>
+                        @if($authUser)
+                            <div class="hidden md:block border-l border-gray-300 pl-4">
+                                <div class="relative">
+                                    <button type="button" onclick="toggleUserMenu()"
+                                        class="flex items-center space-x-2 hover:bg-gray-100 p-2 rounded-lg transition">
+                                        <div class="text-right">
+                                            <p class="text-sm font-medium text-gray-800 truncate max-w-[150px]">
+                                                {{ $authUser->name }}
+                                            </p>
+                                            <p class="text-xs text-gray-500">
+                                                {{ ucfirst(str_replace('_', ' ', $role ?? 'membro')) }}
+                                            </p>
+                                        </div>
+                                        <div
+                                            class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0 font-bold text-white">
+                                            {{ strtoupper(substr($authUser->name, 0, 1)) }}
+                                        </div>
+                                        <i
+                                            class="bi bi-chevron-down text-gray-600 text-sm transition-transform duration-200"></i>
+                                    </button>
 
-                                <!-- User Dropdown Menu -->
-                                <div id="userMenu"
-                                    class="hidden absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
-                                    <div class="p-3 border-b border-gray-100">
-                                        <p class="text-sm font-semibold text-gray-800">{{ $authUser->name }}</p>
-                                        <p class="text-xs text-gray-500 truncate">{{ $authUser->email }}</p>
-                                    </div>
-                                    <div class="py-2">
-                                        <a href="{{ route('profile.edit') }}"
-                                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
-                                            <i class="bi bi-person-circle mr-3 text-blue-600"></i>
-                                            Meu Perfil
-                                        </a>
-                                        <a href="{{ route('commitments.index') }}"
-                                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
-                                            <i class="bi bi-handshake mr-3 text-green-600"></i>
-                                            Meus Compromissos
-                                        </a>
-                                        <a href="{{ route('notifications.all') }}"
-                                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
-                                            <i class="bi bi-bell mr-3 text-purple-600"></i>
-                                            Notificações
-                                            @if ($unreadNotifications > 0)
-                                                <span
-                                                    class="ml-auto badge bg-red-500 text-white text-xs">{{ $unreadNotifications }}</span>
-                                            @endif
-                                        </a>
-                                    </div>
-                                    <div class="border-t border-gray-100">
-                                        <form method="POST" action="{{ route('logout') }}">
-                                            @csrf
-                                            <button type="submit"
-                                                class="flex items-center w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition font-medium">
-                                                <i class="bi bi-box-arrow-right mr-3"></i>
-                                                Sair
-                                            </button>
-                                        </form>
+                                    <!-- User Dropdown Menu -->
+                                    <div id="userMenu"
+                                        class="hidden absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+                                        <div class="p-3 border-b border-gray-100">
+                                            <p class="text-sm font-semibold text-gray-800">{{ $authUser->name }}</p>
+                                            <p class="text-xs text-gray-500 truncate">{{ $authUser->email }}</p>
+                                        </div>
+                                        <div class="py-1">
+                                            <a href="{{ route('profile.edit') }}"
+                                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                                <i class="bi bi-person mr-3"></i> O Meu Perfil
+                                            </a>
+                                            <form method="POST" action="{{ route('logout') }}">
+                                                @csrf
+                                                <button type="submit"
+                                                    class="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                                    <i class="bi bi-box-arrow-right mr-3"></i> Sair do Sistema
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        @else
+                            <div class="hidden md:block border-l border-gray-300 pl-4">
+                                <a href="{{ route('login') }}"
+                                    class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-lg shadow-blue-600/20">
+                                    <i class="bi bi-box-arrow-in-right mr-2"></i> Entrar
+                                </a>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
@@ -800,6 +797,11 @@
             }
 
             localStorage.setItem('sidebarCollapsed', !isSidebarExpanded);
+
+            // Notify Leaflet maps to recalculate size after transition
+            setTimeout(() => {
+                window.dispatchEvent(new Event('resize'));
+            }, 300);
         }
 
         function toggleMobileSidebar() {

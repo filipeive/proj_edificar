@@ -2,6 +2,30 @@
 
 @section('title', 'Detalhes da Celebração - Portal Life Church')
 
+@section('header-actions')
+    <div class="flex items-center gap-2">
+        <a href="{{ route('services.download-pdf', $service) }}"
+            class="text-gray-600 hover:text-orange-600 p-2.5 hover:bg-orange-50 rounded-xl transition-all duration-300 border border-transparent hover:border-orange-100"
+            title="Exportar PDF">
+            <i class="bi bi-file-earmark-pdf text-2xl"></i>
+        </a>
+        @can('update', $service)
+            <a href="{{ route('services.edit', $service) }}"
+                class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+                title="Editar">
+                <i class="bi bi-pencil-square text-2xl"></i>
+            </a>
+        @endcan
+        @can('delete', $service)
+            <button type="button" onclick="confirmDelete('delete-form', 'Deseja excluir este culto?')"
+                class="text-gray-600 hover:text-red-600 p-2.5 hover:bg-red-50 rounded-xl transition-all duration-300 border border-transparent hover:border-red-100"
+                title="Excluir">
+                <i class="bi bi-trash text-2xl"></i>
+            </button>
+        @endcan
+    </div>
+@endsection
+
 @section('content')
     <div class="space-y-8">
         <!-- Header Section -->
@@ -26,7 +50,7 @@
                 </p>
             </div>
             
-            <div class="flex flex-wrap items-center gap-3">
+            <div class="flex flex-wrap items-center gap-3 hidden md:flex">
                 <a href="{{ route('services.download-pdf', $service) }}" class="flex items-center bg-red-50 text-red-600 px-6 py-4 rounded-2xl hover:bg-red-600 hover:text-white transition-all font-black text-xs uppercase tracking-widest shadow-sm">
                     <i class="bi bi-file-earmark-pdf text-lg mr-2"></i>
                     Exportar PDF
@@ -50,6 +74,11 @@
                     </form>
                 @endcan
             </div>
+            
+            <form action="{{ route('services.destroy', $service) }}" method="POST" id="delete-form" class="hidden">
+                @csrf
+                @method('DELETE')
+            </form>
         </div>
 
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">

@@ -62,8 +62,13 @@
 
                         <div class="relative z-10 flex flex-col h-full">
                             <div class="flex items-start justify-between mb-6">
-                                <div class="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-2xl font-black shadow-sm group-hover:rotate-6 transition-transform">
+                                <div class="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-2xl font-black shadow-sm group-hover:rotate-6 transition-transform relative">
                                     {{ substr($zone->name, 0, 1) }}
+                                    @if($zone->latitude && $zone->longitude)
+                                        <div class="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white flex items-center justify-center shadow-sm" title="Mapped">
+                                            <i class="bi bi-geo-alt-fill text-white text-[8px]"></i>
+                                        </div>
+                                    @endif
                                 </div>
                                 <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <a href="{{ route('zones.edit', $zone) }}" class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-blue-50 text-gray-400 hover:text-blue-600 flex items-center justify-center transition-all">

@@ -4,9 +4,31 @@
 @section('page-title', 'Detalhes do Evento')
 @section('page-subtitle', 'Informações completas sobre o culto ou evento')
 
+@section('header-actions')
+    <div class="flex items-center gap-2">
+        <button onclick="toggleEmailModal()"
+            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+            title="Partilhar Email">
+            <i class="bi bi-envelope text-2xl"></i>
+        </button>
+        <a href="{{ route('events.pdf', $event) }}"
+            class="text-gray-600 hover:text-orange-600 p-2.5 hover:bg-orange-50 rounded-xl transition-all duration-300 border border-transparent hover:border-orange-100"
+            title="Exportar PDF">
+            <i class="bi bi-file-earmark-pdf text-2xl"></i>
+        </a>
+        @can('update', $event)
+            <a href="{{ route('events.edit', $event) }}"
+                class="text-gray-600 hover:text-yellow-600 p-2.5 hover:bg-yellow-50 rounded-xl transition-all duration-300 border border-transparent hover:border-yellow-100"
+                title="Editar">
+                <i class="bi bi-pencil-square text-2xl"></i>
+            </a>
+        @endcan
+    </div>
+@endsection
+
 @section('content')
     <div class="w-full">
-        <div class="mb-6 flex justify-between items-center">
+        <div class="mb-6 flex justify-between items-center hidden md:flex">
             <a href="{{ route('events.index') }}" class="text-blue-600 hover:text-blue-800 flex items-center transition">
                 <i class="bi bi-arrow-left mr-2"></i> Voltar para Lista
             </a>
@@ -16,16 +38,22 @@
                     <i class="bi bi-envelope mr-2"></i> Partilhar Email
                 </button>
                 <a href="{{ route('events.pdf', $event) }}"
-                    class="bg-gray-800 hover:bg-black text-white px-4 py-2 rounded-lg flex items-center transition shadow-sm">
+                    class="bg-gray-800 hover:bg-black text-white px-4 py-2 rounded-xl flex items-center transition shadow-sm">
                     <i class="bi bi-file-earmark-pdf mr-2"></i> Exportar PDF
                 </a>
                 @can('update', $event)
                     <a href="{{ route('events.edit', $event) }}"
-                        class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center transition shadow-sm">
+                        class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-xl flex items-center transition shadow-sm">
                         <i class="bi bi-pencil mr-2"></i> Editar
                     </a>
                 @endcan
             </div>
+        </div>
+
+        <div class="md:hidden mb-6 flex justify-between items-center">
+            <a href="{{ route('events.index') }}" class="text-blue-600 hover:text-blue-800 flex items-center transition">
+                <i class="bi bi-arrow-left mr-2"></i> Voltar
+            </a>
         </div>
 
         <div class="w-full">
@@ -33,7 +61,8 @@
                 <div class="bg-orange-600 px-8 py-10 text-white relative">
                     <div class="relative z-10">
                         <p class="text-orange-200 text-sm font-bold uppercase tracking-widest mb-2">
-                            {{ $event->eventType->name }}</p>
+                            {{ $event->eventType->name }}
+                        </p>
                         <h3 class="text-4xl font-black mb-4">{{ $event->name ?? $event->eventType->name }}</h3>
                         <div class="flex flex-wrap gap-6 text-sm">
                             <span class="flex items-center"><i class="bi bi-calendar3 mr-2"></i>
@@ -78,7 +107,8 @@
         </div>
     </div>
     <!-- Email Modal -->
-    <div id="emailModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div id="emailModal"
+        class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-fade-in-up">
             <div class="bg-blue-600 p-6 text-white">
                 <h4 class="text-xl font-bold flex items-center">
@@ -88,15 +118,18 @@
             <form action="{{ route('events.email', $event) }}" method="POST" class="p-8 space-y-6">
                 @csrf
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-widest">Endereço de Email</label>
+                    <label class="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-widest">Endereço de
+                        Email</label>
                     <input type="email" name="email" required placeholder="exemplo@email.com"
                         class="w-full rounded-xl border-gray-200 focus:ring-blue-500 focus:border-blue-500 p-4">
                 </div>
                 <div class="flex space-x-3">
-                    <button type="button" onclick="toggleEmailModal()" class="flex-1 bg-gray-100 text-gray-600 font-bold py-3 rounded-xl hover:bg-gray-200 transition">
+                    <button type="button" onclick="toggleEmailModal()"
+                        class="flex-1 bg-gray-100 text-gray-600 font-bold py-3 rounded-xl hover:bg-gray-200 transition">
                         CANCELAR
                     </button>
-                    <button type="submit" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-600/20">
+                    <button type="submit"
+                        class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-600/20">
                         ENVIAR AGORA
                     </button>
                 </div>

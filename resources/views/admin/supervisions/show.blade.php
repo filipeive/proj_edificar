@@ -4,6 +4,21 @@
 @section('page-title', $supervision->name)
 @section('page-subtitle', "Gestão da supervisão e suas células")
 
+@section('header-actions')
+    <div class="flex items-center gap-2">
+        <a href="{{ route('cells.create') }}?supervision_id={{ $supervision->id }}"
+            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+            title="Criar Célula">
+            <i class="bi bi-plus-circle text-2xl"></i>
+        </a>
+        <a href="{{ route('supervisions.edit', $supervision) }}"
+            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+            title="Editar Estrutura">
+            <i class="bi bi-pencil-square text-2xl"></i>
+        </a>
+    </div>
+@endsection
+
 @section('content')
     <div class="space-y-8">
         <!-- Header & Stats Grid -->
@@ -120,8 +135,8 @@
                 </div>
             </div>
 
-            <!-- Coluna de Ações Rápidas -->
-            <div class="space-y-6">
+            <!-- Coluna de Ações Rápidas (Hidden on Mobile) -->
+            <div class="space-y-6 hidden md:block">
                 <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 space-y-6">
                     <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Gestão Regional</h3>
                     <div class="grid grid-cols-1 gap-3">

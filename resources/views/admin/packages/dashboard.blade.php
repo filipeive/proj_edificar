@@ -22,7 +22,7 @@
 @endsection
 
 @section('content')
-    <div class="container-fluid space-y-8">
+    <div class="container-fluid space-y-6 md:space-y-8">
         <!-- Stats Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
@@ -79,34 +79,34 @@
         </div>
 
         <!-- Quick Actions -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <a href="{{ route('contributions.create') }}" class="bg-white p-6 rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all group">
-                <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all">
-                    <i class="bi bi-plus-lg text-2xl"></i>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+            <a href="{{ route('contributions.create') }}" class="bg-white p-5 md:p-6 rounded-3xl md:rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-2 md:gap-3 hover:shadow-lg transition-all group">
+                <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all">
+                    <i class="bi bi-plus-lg text-xl md:text-2xl"></i>
                 </div>
-                <span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Registrar</span>
+                <span class="text-[9px] md:text-[10px] font-black text-gray-900 uppercase tracking-widest">Registrar</span>
             </a>
             
-            <a href="{{ route('contributions.index') }}" class="bg-white p-6 rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all group">
-                <div class="w-12 h-12 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center group-hover:bg-green-600 group-hover:text-white transition-all">
-                    <i class="bi bi-list-check text-2xl"></i>
+            <a href="{{ route('contributions.index') }}" class="bg-white p-5 md:p-6 rounded-3xl md:rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-2 md:gap-3 hover:shadow-lg transition-all group">
+                <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center group-hover:bg-green-600 group-hover:text-white transition-all">
+                    <i class="bi bi-list-check text-xl md:text-2xl"></i>
                 </div>
-                <span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Histórico</span>
+                <span class="text-[9px] md:text-[10px] font-black text-gray-900 uppercase tracking-widest">Histórico</span>
             </a>
 
-            <a href="{{ route('members.index') }}" class="bg-white p-6 rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all group">
-                <div class="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-all">
-                    <i class="bi bi-people text-2xl"></i>
+            <a href="{{ route('members.index') }}" class="bg-white p-5 md:p-6 rounded-3xl md:rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-2 md:gap-3 hover:shadow-lg transition-all group">
+                <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-all">
+                    <i class="bi bi-people text-xl md:text-2xl"></i>
                 </div>
-                <span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Membros</span>
+                <span class="text-[9px] md:text-[10px] font-black text-gray-900 uppercase tracking-widest">Membros</span>
             </a>
 
             @if($packages->isNotEmpty())
-            <a href="{{ route('packages.export', $packages->first()) }}" class="bg-white p-6 rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all group">
-                <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-all">
-                    <i class="bi bi-file-earmark-arrow-down text-2xl"></i>
+            <a href="{{ route('packages.export', $packages->first()) }}" class="bg-white p-5 md:p-6 rounded-3xl md:rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-2 md:gap-3 hover:shadow-lg transition-all group">
+                <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-all">
+                    <i class="bi bi-file-earmark-arrow-down text-xl md:text-2xl"></i>
                 </div>
-                <span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Exportar</span>
+                <span class="text-[9px] md:text-[10px] font-black text-gray-900 uppercase tracking-widest">Exportar</span>
             </a>
             @endif
         </div>
@@ -242,4 +242,6 @@
             });
         </script>
     @endpush
+    </div>
+    </div>
 @endsection

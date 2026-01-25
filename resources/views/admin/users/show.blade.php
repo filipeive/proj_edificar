@@ -4,6 +4,26 @@
 @section('page-title', 'Detalhes do Utilizador')
 @section('page-subtitle', 'Informações completas do utilizador')
 
+@section('header-actions')
+    <div class="flex items-center gap-2">
+        <a href="{{ route('users.edit', $user) }}"
+            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+            title="Editar Perfil">
+            <i class="bi bi-pencil-square text-2xl"></i>
+        </a>
+        @if($user->role !== 'admin')
+            <form action="{{ route('users.destroy', $user) }}" method="POST" id="delete-user-form-header" class="inline">
+                @csrf @method('DELETE')
+                <button type="button" onclick="confirmDelete('delete-user-form-header', 'Deletar {{ $user->name }}?')"
+                    class="text-gray-600 hover:text-red-600 p-2.5 hover:bg-red-50 rounded-xl transition-all duration-300 border border-transparent hover:border-red-100"
+                    title="Eliminar Registro">
+                    <i class="bi bi-trash-fill text-2xl"></i>
+                </button>
+            </form>
+        @endif
+    </div>
+@endsection
+
 @section('content')
     <div class="space-y-8">
         <!-- Header Profile Card -->
@@ -49,7 +69,7 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col gap-3 min-w-[240px]">
+                <div class="flex flex-col gap-3 min-w-[240px] hidden md:flex">
                     <a href="{{ route('users.edit', $user) }}"
                         class="w-full py-4 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-100 flex items-center justify-center gap-3 hover:bg-blue-700 transition-all">
                         <i class="bi bi-pencil-square"></i> Editar Perfil

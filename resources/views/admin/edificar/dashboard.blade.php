@@ -5,78 +5,87 @@
 @section('page-subtitle', 'Acompanhamento financeiro e evolução da construção')
 
 @section('content')
-    <div class="space-y-8">
+    <div class="space-y-6 md:space-y-8">
         <!-- Quick Stats -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex items-center space-x-4">
-                <div class="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600">
-                    <i class="bi bi-cash-stack text-3xl"></i>
+            <div
+                class="bg-white p-5 md:p-6 rounded-3xl md:rounded-[2.5rem] shadow-sm border border-gray-100 flex items-center space-x-4">
+                <div
+                    class="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600">
+                    <i class="bi bi-cash-stack text-2xl md:text-3xl"></i>
                 </div>
                 <div>
-                    <p class="text-xs font-black uppercase tracking-widest text-gray-400">Total Arrecadado</p>
-                    <h3 class="text-2xl font-black text-gray-800">{{ number_format($totalArrecadado, 2, ',', '.') }} MT</h3>
+                    <p class="text-[10px] md:text-xs font-black uppercase tracking-widest text-gray-400">Total Arrecadado
+                    </p>
+                    <h3 class="text-xl md:text-2xl font-black text-gray-800">
+                        {{ number_format($totalArrecadado, 2, ',', '.') }} MT</h3>
                 </div>
             </div>
 
-            <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex items-center space-x-4">
-                <div class="w-16 h-16 rounded-2xl bg-green-50 flex items-center justify-center text-green-600">
-                    <i class="bi bi-graph-up-arrow text-3xl"></i>
+            <div
+                class="bg-white p-5 md:p-6 rounded-3xl md:rounded-[2.5rem] shadow-sm border border-gray-100 flex items-center space-x-4">
+                <div
+                    class="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-green-50 flex items-center justify-center text-green-600">
+                    <i class="bi bi-graph-up-arrow text-2xl md:text-3xl"></i>
                 </div>
                 <div>
-                    <p class="text-xs font-black uppercase tracking-widest text-gray-400">Este Mês</p>
-                    <h3 class="text-2xl font-black text-gray-800">{{ number_format($arrecadadoMes, 2, ',', '.') }} MT</h3>
+                    <p class="text-[10px] md:text-xs font-black uppercase tracking-widest text-gray-400">Este Mês</p>
+                    <h3 class="text-xl md:text-2xl font-black text-gray-800">
+                        {{ number_format($arrecadadoMes, 2, ',', '.') }} MT</h3>
                 </div>
             </div>
 
-            <div class="bg-blue-600 p-6 rounded-[2.5rem] shadow-xl shadow-blue-100 flex items-center space-x-4 text-white">
-                <div class="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center">
-                    <i class="bi bi-people text-3xl"></i>
+            <div
+                class="bg-blue-600 p-5 md:p-6 rounded-3xl md:rounded-[2.5rem] shadow-xl shadow-blue-100 flex items-center space-x-4 text-white">
+                <div class="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-white/20 flex items-center justify-center">
+                    <i class="bi bi-people text-2xl md:text-3xl"></i>
                 </div>
                 <div>
-                    <p class="text-xs font-black uppercase tracking-widest text-blue-100">Compromissos</p>
-                    <h3 class="text-2xl font-black">{{ $pacotes->sum('membros') }} Membros Ativos</h3>
+                    <p class="text-[10px] md:text-xs font-black uppercase tracking-widest text-blue-100">Compromissos</p>
+                    <h3 class="text-xl md:text-2xl font-black">{{ $pacotes->sum('membros') }} Membros Ativos</h3>
                 </div>
             </div>
         </div>
 
         <!-- Quick Actions -->
         @if($authUser->isComissaoObra() || $authUser->isAdmin())
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                 <a href="{{ route('contributions.create') }}"
-                    class="bg-white p-6 rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all group">
+                    class="bg-white p-5 md:p-6 rounded-3xl md:rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-2 md:gap-3 hover:shadow-lg transition-all group">
                     <div
-                        class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all">
-                        <i class="bi bi-plus-lg text-2xl"></i>
+                        class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all">
+                        <i class="bi bi-plus-lg text-xl md:text-2xl"></i>
                     </div>
-                    <span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Registrar</span>
+                    <span class="text-[9px] md:text-[10px] font-black text-gray-900 uppercase tracking-widest">Registrar</span>
                 </a>
 
                 <a href="{{ route('contributions.index', ['status' => 'pendente']) }}"
-                    class="bg-white p-6 rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all group">
+                    class="bg-white p-5 md:p-6 rounded-3xl md:rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-2 md:gap-3 hover:shadow-lg transition-all group">
                     <div
-                        class="w-12 h-12 rounded-2xl bg-yellow-50 text-yellow-600 flex items-center justify-center group-hover:bg-yellow-600 group-hover:text-white transition-all">
-                        <i class="bi bi-patch-check text-2xl"></i>
+                        class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-yellow-50 text-yellow-600 flex items-center justify-center group-hover:bg-yellow-600 group-hover:text-white transition-all">
+                        <i class="bi bi-patch-check text-xl md:text-2xl"></i>
                     </div>
-                    <span class="text-[10px] font-black text-gray-900 uppercase tracking-widest text-center">Validar
+                    <span
+                        class="text-[9px] md:text-[10px] font-black text-gray-900 uppercase tracking-widest text-center leading-tight">Validar
                         Pendentes</span>
                 </a>
 
                 <a href="{{ route('reports.global') }}"
-                    class="bg-white p-6 rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all group">
+                    class="bg-white p-5 md:p-6 rounded-3xl md:rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-2 md:gap-3 hover:shadow-lg transition-all group">
                     <div
-                        class="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-all">
-                        <i class="bi bi-bar-chart-line text-2xl"></i>
+                        class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-all">
+                        <i class="bi bi-bar-chart-line text-xl md:text-2xl"></i>
                     </div>
-                    <span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Relatório Global</span>
+                    <span class="text-[9px] md:text-[10px] font-black text-gray-900 uppercase tracking-widest">Global</span>
                 </a>
 
                 <a href="{{ route('dashboard.admin') }}"
-                    class="bg-white p-6 rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all group opacity-75 hover:opacity-100">
+                    class="bg-white p-5 md:p-6 rounded-3xl md:rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-2 md:gap-3 hover:shadow-lg transition-all group opacity-75 hover:opacity-100">
                     <div
-                        class="w-12 h-12 rounded-2xl bg-gray-50 text-gray-600 flex items-center justify-center group-hover:bg-gray-600 group-hover:text-white transition-all">
-                        <i class="bi bi-arrow-left text-2xl"></i>
+                        class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-gray-50 text-gray-600 flex items-center justify-center group-hover:bg-gray-600 group-hover:text-white transition-all">
+                        <i class="bi bi-arrow-left text-xl md:text-2xl"></i>
                     </div>
-                    <span class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Voltar Admin</span>
+                    <span class="text-[9px] md:text-[10px] font-black text-gray-900 uppercase tracking-widest">Voltar</span>
                 </a>
             </div>
         @endif
@@ -246,4 +255,5 @@
             background: #9ca3af;
         }
     </style>
+    </div>
 @endsection

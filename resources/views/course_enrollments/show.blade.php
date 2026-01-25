@@ -4,10 +4,33 @@
 @section('page-title', 'Detalhes da Matrícula')
 @section('page-subtitle', $enrollment->course->name)
 
+@section('header-actions')
+    <div class="flex items-center gap-2">
+        @if($enrollment->course_class_id)
+            <a href="{{ route('course-classes.show', $enrollment->course_class_id) }}" 
+                class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+                title="Voltar para a turma">
+                <i class="bi bi-arrow-left text-2xl"></i>
+            </a>
+        @else
+            <a href="{{ route('courses.index') }}" 
+                class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+                title="Voltar para cursos">
+                <i class="bi bi-arrow-left text-2xl"></i>
+            </a>
+        @endif
+        <a href="{{ route('course-enrollments.edit', $enrollment) }}"
+            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+            title="Editar Dados">
+            <i class="bi bi-pencil-square text-2xl"></i>
+        </a>
+    </div>
+@endsection
+
 @section('content')
     <div class="container-fluid">
         <div class="w-full">
-            <div class="mb-6 flex justify-between items-center">
+            <div class="mb-6 flex justify-between items-center hidden md:flex">
                 @if($enrollment->course_class_id)
                     <a href="{{ route('course-classes.show', $enrollment->course_class_id) }}" class="text-gray-500 hover:text-gray-700 flex items-center">
                         <i class="bi bi-arrow-left mr-2"></i> Voltar para a turma
@@ -17,10 +40,6 @@
                         <i class="bi bi-arrow-left mr-2"></i> Voltar para cursos
                     </a>
                 @endif
-                <a href="{{ route('course-enrollments.edit', $enrollment) }}" 
-                    class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition shadow-lg shadow-blue-600/20">
-                    <i class="bi bi-pencil mr-2"></i> Editar Dados
-                </a>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">

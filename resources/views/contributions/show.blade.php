@@ -3,6 +3,38 @@
 @section('title', 'Detalhes da Contribuição - Portal Life Church')
 @section('page-title', 'Detalhes da Contribuição')
 
+@section('header-actions')
+    <div class="flex items-center gap-2">
+        <a href="{{ route('contributions.index') }}"
+            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+            title="Voltar à Lista">
+            <i class="bi bi-arrow-left text-2xl"></i>
+        </a>
+        @if($contribution->status === 'pendente' && auth()->id() === $contribution->user_id)
+            <a href="{{ route('contributions.edit', $contribution) }}"
+                class="text-gray-600 hover:text-orange-600 p-2.5 hover:bg-orange-50 rounded-xl transition-all duration-300 border border-transparent hover:border-orange-100"
+                title="Corrigir Registro">
+                <i class="bi bi-pencil-square text-2xl"></i>
+            </a>
+        @endif
+        @if($canManage && $contribution->status === 'pendente')
+            <form action="{{ route('contributions.verify', $contribution) }}" method="POST" class="inline">
+                @csrf
+                <button type="submit"
+                    class="text-gray-600 hover:text-green-600 p-2.5 hover:bg-green-50 rounded-xl transition-all duration-300 border border-transparent hover:border-green-100"
+                    title="Validar Oferta">
+                    <i class="bi bi-patch-check text-2xl"></i>
+                </button>
+            </form>
+            <button onclick="document.getElementById('rejectModal').classList.remove('hidden')"
+                class="text-gray-600 hover:text-red-600 p-2.5 hover:bg-red-50 rounded-xl transition-all duration-300 border border-transparent hover:border-red-100"
+                title="Rejeitar">
+                <i class="bi bi-x-circle text-2xl"></i>
+            </button>
+        @endif
+    </div>
+@endsection
+
 @section('content')
     <div class="space-y-8">
         <!-- Header & Primary Info -->
@@ -52,8 +84,9 @@
                 </p>
             </div>
 
-            <!-- Global Action -->
-            <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col justify-center gap-3">
+            <!-- Global Action (Hidden on Mobile) -->
+            <div
+                class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col justify-center gap-3 hidden md:flex">
                 <a href="{{ route('contributions.index') }}"
                     class="w-full py-4 bg-gray-50 text-gray-500 rounded-2xl hover:bg-gray-100 transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2">
                     <i class="bi bi-arrow-left"></i> Voltar à Lista
@@ -120,7 +153,7 @@
                                 <p class="text-xs font-medium text-gray-400 mt-1 uppercase tracking-widest">Formato: PDF/Imagem
                                 </p>
                             </div>
-                            <a href="{{ Storage::url($contribution->proof_path) }}" target="_blank"
+                            <a href="{{ route('contributions.receipt', $contribution) }}" target="_blank"
                                 class="px-10 py-5 bg-purple-600 text-white rounded-2xl hover:bg-purple-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-purple-100">
                                 Visualizar Documento
                             </a>

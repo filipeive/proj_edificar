@@ -4,45 +4,45 @@
 @section('page-title', 'Detalhes do Curso')
 @section('page-subtitle', 'Informações e lista de alunos matriculados')
 
-@section('content')
-    <div x-data="{ view: 'list' }" class="container-fluid">
-        <div class="mb-6 flex justify-between items-center">
-            <a href="{{ route('courses.index') }}" class="text-gray-600 hover:text-orange-600 flex items-center transition font-semibold">
-                <i class="bi bi-arrow-left mr-2"></i> Voltar para Lista
+@section('header-actions')
+    <div class="flex items-center gap-2">
+        @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
+            <a href="{{ route('courses.edit', $course) }}"
+                class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+                title="Editar">
+                <i class="bi bi-pencil-square text-2xl"></i>
             </a>
-            <div class="flex space-x-3">
-                @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
-                    <a href="{{ route('courses.edit', $course) }}" class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2.5 rounded-xl flex items-center transition shadow-sm font-bold">
-                        <i class="bi bi-pencil mr-2"></i> Editar
-                    </a>
-                    @if(auth()->user()->role === 'admin')
-                        <form action="{{ route('courses.destroy', $course) }}" method="POST" id="delete-course-form" class="inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="button" onclick="confirmDelete('delete-course-form', 'Tem certeza que deseja excluir este curso permanentemente?')" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl flex items-center transition shadow-lg shadow-red-600/20 font-bold">
-                                <i class="bi bi-trash mr-2"></i> Excluir Curso
-                            </button>
-                        </form>
-                    @endif
-                @endif
-                
-                @php
-                    $isEnrolled = $course->enrollments->where('user_id', auth()->id())->first();
-                @endphp
+        @endif
+        
+        @php
+            $isEnrolled = $course->enrollments->where('user_id', auth()->id())->first();
+        @endphp
 
-                @if(!$isEnrolled)
-                    <form action="{{ route('courses.enroll', $course) }}" method="POST">
-                        @csrf
-                        <button type="submit" class="bg-orange-600 hover:bg-orange-700 text-white px-8 py-2.5 rounded-xl flex items-center transition shadow-lg shadow-orange-600/20 font-bold">
-                            <i class="bi bi-person-plus mr-2"></i> Matricular-me
-                        </button>
-                    </form>
-                @else
-                    <span class="bg-green-100 text-green-700 px-6 py-2.5 rounded-xl flex items-center font-bold border border-green-200">
-                        <i class="bi bi-check-circle-fill mr-2"></i> Já Matriculado
-                    </span>
-                @endif
+        @if(!$isEnrolled)
+            <form action="{{ route('courses.enroll', $course) }}" method="POST" class="inline">
+                @csrf
+                <button type="submit"
+                    class="text-gray-600 hover:text-orange-600 p-2.5 hover:bg-orange-50 rounded-xl transition-all duration-300 border border-transparent hover:border-orange-100"
+                    title="Matricular-me">
+                    <i class="bi bi-person-plus text-2xl"></i>
+                </button>
+            </form>
+        @endif
+    </div>
+@endsection
+
+@section('content')
+        <div x-data="{ view: 'list' }" class="container-fluid">
+            <div class="mb-6 flex justify-between items-center hidden md:flex">
+                <a href="{{ route('courses.index') }}" class="text-gray-600 hover:text-orange-600 flex items-center transition font-semibold">
+                    <i class="bi bi-arrow-left mr-2"></i> Voltar para Lista
+                </a>
             </div>
+        
+        <div class="md:hidden mb-6">
+            <a href="{{ route('courses.index') }}" class="text-gray-600 hover:text-orange-600 flex items-center transition font-semibold">
+                <i class="bi bi-arrow-left mr-2"></i> Voltar
+            </a>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -110,6 +110,20 @@
                                 </button>
                             </div>
                             @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
+                                <div class="mt-8 space-y-3 hidden md:block">
+                        <a href="{{ route('course-classes.report', $courseClass) }}"
+                            class="w-full bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition block text-center shadow-lg shadow-blue-600/20">
+                            <i class="bi bi-bar-chart-fill mr-2"></i> Ver Relatório Final
+                        </a>
+                        <a href="{{ route('course-classes.export', $courseClass) }}"
+                            class="w-full bg-green-600 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-green-700 transition block text-center shadow-lg shadow-green-600/20">
+                            <i class="bi bi-file-earmark-excel mr-2"></i> Exportar para Excel
+                        </a>
+                        <a href="{{ route('course-classes.export-pdf', $courseClass) }}"
+                            class="w-full bg-red-600 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-red-700 transition block text-center shadow-lg shadow-red-600/20">
+                            <i class="bi bi-file-earmark-pdf mr-2"></i> Exportar Relatório PDF
+                        </a>
+                    </div>
                                 <button type="button" id="bulkDeleteBtn" onclick="bulkDelete()" disabled
                                     class="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl flex items-center transition shadow-lg shadow-red-600/20 font-bold text-xs uppercase tracking-widest hidden">
                                     <i class="bi bi-trash-fill mr-2"></i> Remover Selecionados

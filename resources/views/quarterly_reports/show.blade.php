@@ -2,9 +2,21 @@
 
 @section('title', 'Detalhes do Relatório - Portal Life Church')
 
+@section('header-actions')
+    <div class="flex items-center gap-2">
+        @can('update', $quarterlyReport)
+            <a href="{{ route('quarterly-reports.edit', $quarterlyReport) }}"
+                class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+                title="Editar Dados">
+                <i class="bi bi-pencil-square text-2xl"></i>
+            </a>
+        @endcan
+    </div>
+@endsection
+
 @section('content')
     <div class="space-y-8">
-        <!-- Header Section -->
+        <!-- Header Section (Hidden md part for mobile optimization) -->
         <div
             class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div class="space-y-1">
@@ -22,7 +34,7 @@
                 </p>
             </div>
 
-            <div class="flex flex-wrap items-center gap-3">
+            <div class="flex flex-wrap items-center gap-3 hidden md:flex">
                 @can('update', $quarterlyReport)
                     <a href="{{ route('quarterly-reports.edit', $quarterlyReport) }}"
                         class="flex items-center bg-blue-50 text-blue-600 px-6 py-4 rounded-2xl hover:bg-blue-600 hover:text-white transition-all font-black text-xs uppercase tracking-widest shadow-sm">
@@ -30,6 +42,14 @@
                         Editar Dados
                     </a>
                 @endcan
+                <a href="{{ route('quarterly-reports.index') }}"
+                    class="flex items-center bg-gray-50 text-gray-400 px-6 py-4 rounded-2xl hover:bg-gray-100 transition-all font-black text-xs uppercase tracking-widest">
+                    <i class="bi bi-arrow-left text-lg mr-2"></i>
+                    Voltar
+                </a>
+            </div>
+
+            <div class="md:hidden">
                 <a href="{{ route('quarterly-reports.index') }}"
                     class="flex items-center bg-gray-50 text-gray-400 px-6 py-4 rounded-2xl hover:bg-gray-100 transition-all font-black text-xs uppercase tracking-widest">
                     <i class="bi bi-arrow-left text-lg mr-2"></i>
@@ -260,12 +280,12 @@
                         datasets: [{
                             label: 'Pontuação Real',
                             data: [
-                                                    {{ $quarterlyReport->discipleship_score }},
-                                                    {{ $quarterlyReport->pastoral_score }},
-                                                    {{ $quarterlyReport->cell_participation_score }},
-                                                    {{ $quarterlyReport->service_participation_score }},
-                                                    {{ $quarterlyReport->communion_in_cells_score }},
-                                                    {{ $quarterlyReport->relationship_building_score }},
+                                                            {{ $quarterlyReport->discipleship_score }},
+                                                            {{ $quarterlyReport->pastoral_score }},
+                                                            {{ $quarterlyReport->cell_participation_score }},
+                                                            {{ $quarterlyReport->service_participation_score }},
+                                                            {{ $quarterlyReport->communion_in_cells_score }},
+                                                            {{ $quarterlyReport->relationship_building_score }},
                                 {{ $quarterlyReport->prayer_intercession_score }}
                             ],
                             backgroundColor: 'rgba(37, 99, 235, 0.2)',
@@ -308,9 +328,9 @@
                         datasets: [{
                             label: 'Quantidade',
                             data: [
-                                                    {{ $quarterlyReport->leaders_count }},
-                                                    {{ $quarterlyReport->cells_count }},
-                                                    {{ $quarterlyReport->timoteos_count }},
+                                                            {{ $quarterlyReport->leaders_count }},
+                                                            {{ $quarterlyReport->cells_count }},
+                                                            {{ $quarterlyReport->timoteos_count }},
                                 {{ $quarterlyReport->members_count }}
                             ],
                             backgroundColor: [

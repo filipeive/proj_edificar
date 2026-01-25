@@ -4,9 +4,38 @@
 @section('page-title', 'Detalhes do Encontro')
 @section('page-subtitle', 'Informações completas sobre a reunião de célula')
 
+@section('header-actions')
+    <div class="flex items-center gap-2">
+        <button onclick="toggleEmailModal()"
+            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+            title="Enviar por Email">
+            <i class="bi bi-envelope text-2xl"></i>
+        </button>
+        <a href="{{ route('cell-meetings.pdf', $cellMeeting) }}"
+            class="text-gray-600 hover:text-orange-600 p-2.5 hover:bg-orange-50 rounded-xl transition-all duration-300 border border-transparent hover:border-orange-100"
+            title="Acta / PDF">
+            <i class="bi bi-file-earmark-pdf text-2xl"></i>
+        </a>
+        @can('update', $cellMeeting)
+            <a href="{{ route('cell-meetings.edit', $cellMeeting) }}"
+                class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+                title="Editar">
+                <i class="bi bi-pencil-square text-2xl"></i>
+            </a>
+        @endcan
+        @can('delete', $cellMeeting)
+            <button type="button" onclick="confirmDelete('{{ route('cell-meetings.destroy', $cellMeeting) }}', 'delete-form')"
+                class="text-gray-600 hover:text-red-600 p-2.5 hover:bg-red-50 rounded-xl transition-all duration-300 border border-transparent hover:border-red-100"
+                title="Excluir">
+                <i class="bi bi-trash text-2xl"></i>
+            </button>
+        @endcan
+    </div>
+@endsection
+
 @section('content')
     <div class="space-y-8">
-        <div class="mb-6 flex justify-between items-center">
+        <div class="mb-6 flex justify-between items-center hidden md:flex">
             <a href="{{ route('cell-meetings.index') }}"
                 class="text-blue-600 hover:text-blue-800 flex items-center transition font-bold">
                 <i class="bi bi-arrow-left mr-2 font-black"></i> Voltar para Lista
@@ -38,6 +67,17 @@
                     </form>
                 @endcan
             </div>
+        </div>
+        
+        <div class="md:hidden mb-6">
+            <a href="{{ route('cell-meetings.index') }}"
+                class="text-blue-600 hover:text-blue-800 flex items-center transition font-bold">
+                <i class="bi bi-arrow-left mr-2 font-black"></i> Voltar
+            </a>
+            <form action="{{ route('cell-meetings.destroy', $cellMeeting) }}" method="POST" id="delete-form" class="hidden">
+                @csrf
+                @method('DELETE')
+            </form>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">

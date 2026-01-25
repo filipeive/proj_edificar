@@ -6,6 +6,11 @@
 
 @section('header-actions')
     <div class="flex items-center gap-2">
+        <a href="{{ route('course-classes.index', ['course_id' => $courseClass->course_id]) }}"
+            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+            title="Voltar à Lista">
+            <i class="bi bi-arrow-left text-2xl"></i>
+        </a>
         <a href="{{ route('course-classes.report', $courseClass) }}"
             class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
             title="Relatório Final">
@@ -28,7 +33,7 @@
 
 @section('content')
     <div class="container-fluid">
-        <div class="mb-8">
+        <div class="mb-8 hidden md:block">
             <a href="{{ route('course-classes.index', ['course_id' => $courseClass->course_id]) }}"
                 class="inline-flex items-center gap-2 px-4 py-2 bg-white text-gray-500 hover:text-blue-600 rounded-xl border border-gray-100 shadow-sm transition-all group">
                 <i class="bi bi-arrow-left group-hover:-translate-x-1 transition-transform"></i>

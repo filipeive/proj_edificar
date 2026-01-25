@@ -1,9 +1,9 @@
 @extends('layouts.app')
 
-@section('title', 'Nova Zona - Portal Life Church')
+@section('title', 'Nova Zona Pastoral - Portal Life Church')
 
-@section('content')
-    <div class="max-w-4xl mx-auto space-y-8">
+@section('header-actions')
+    <div class="w-full">
         <!-- Header -->
         <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex items-center justify-between">
             <div>
@@ -15,7 +15,11 @@
                 <i class="bi bi-x-lg"></i>
             </a>
         </div>
+    </div>
+@endsection
 
+@section('content')
+    <div class="w-full">
         <!-- Form -->
         <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
             <form action="{{ route('zones.store') }}" method="POST" class="p-8 md:p-12 space-y-8">

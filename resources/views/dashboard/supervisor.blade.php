@@ -5,7 +5,8 @@
 @section('page-subtitle', 'Monitorização da Supervisão ' . $supervisionName)
 
 @section('content')
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="space-y-6 md:space-y-8">
+    <div class="hidden md:grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <!-- Supervisão Info -->
         <div
             class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 hover:shadow-xl transition-all duration-500 group">
@@ -69,11 +70,11 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
         <!-- Células da Supervisão -->
-        <div class="lg:col-span-2 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-            <div class="px-8 py-6 border-b border-gray-50 flex items-center justify-between bg-gray-50/50">
-                <h3 class="text-xl font-black text-gray-900 tracking-tight">Células da Supervisão</h3>
+        <div class="lg:col-span-2 bg-white rounded-3xl md:rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-5 md:px-8 py-4 md:py-6 border-b border-gray-50 flex items-center justify-between bg-gray-50/50">
+                <h3 class="text-lg md:text-xl font-black text-gray-900 tracking-tight">Células da Supervisão</h3>
                 <a href="{{ route('cells.index') }}"
-                    class="text-xs font-black text-orange-600 uppercase tracking-widest hover:text-orange-700">Ver Todas</a>
+                    class="text-[10px] font-black text-orange-600 uppercase tracking-widest hover:text-orange-700">Ver Todas</a>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full">
@@ -118,35 +119,32 @@
 
         <!-- Ações Rápidas -->
         <div class="space-y-6">
-            <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
-                <h3 class="text-xl font-black text-gray-900 tracking-tight mb-6">Ações Rápidas</h3>
-                <div class="grid grid-cols-1 gap-4">
+            <div class="bg-white rounded-3xl md:rounded-[2.5rem] shadow-sm border border-gray-100 p-6 md:p-8">
+                <h3 class="text-lg md:text-xl font-black text-gray-900 tracking-tight mb-5 md:mb-6">Ações Rápidas</h3>
+                <div class="grid grid-cols-1 gap-3 md:gap-4">
                     <a href="{{ route('reports.supervision') }}"
-                        class="flex items-center p-4 bg-blue-50 rounded-2xl hover:bg-blue-600 group transition-all duration-300">
+                        class="flex items-center p-3 md:p-4 bg-blue-50 rounded-2xl hover:bg-blue-600 group transition-all duration-300">
                         <div
-                            class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-blue-600 mr-4 shadow-sm">
+                            class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-white flex items-center justify-center text-blue-600 mr-3 md:mr-4 shadow-sm">
                             <i class="bi bi-file-earmark-pdf"></i>
                         </div>
-                        <span class="font-black text-blue-900 group-hover:text-white transition-colors">Relatório
-                            Supervisão</span>
+                        <span class="text-sm md:text-base font-black text-blue-900 group-hover:text-white transition-colors">Relatório Supervisão</span>
                     </a>
                     <a href="{{ route('cell-meetings.index') }}"
-                        class="flex items-center p-4 bg-green-50 rounded-2xl hover:bg-green-600 group transition-all duration-300">
+                        class="flex items-center p-3 md:p-4 bg-green-50 rounded-2xl hover:bg-green-600 group transition-all duration-300">
                         <div
-                            class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-green-600 mr-4 shadow-sm">
+                            class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-white flex items-center justify-center text-green-600 mr-3 md:mr-4 shadow-sm">
                             <i class="bi bi-people"></i>
                         </div>
-                        <span class="font-black text-green-900 group-hover:text-white transition-colors">Encontros de
-                            Célula</span>
+                        <span class="text-sm md:text-base font-black text-green-900 group-hover:text-white transition-colors">Encontros de Célula</span>
                     </a>
                     <a href="{{ route('contributions.index') }}"
-                        class="flex items-center p-4 bg-orange-50 rounded-2xl hover:bg-orange-600 group transition-all duration-300">
+                        class="flex items-center p-3 md:p-4 bg-orange-50 rounded-2xl hover:bg-orange-600 group transition-all duration-300">
                         <div
-                            class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-orange-600 mr-4 shadow-sm">
+                            class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-white flex items-center justify-center text-orange-600 mr-3 md:mr-4 shadow-sm">
                             <i class="bi bi-cash-coin"></i>
                         </div>
-                        <span
-                            class="font-black text-orange-900 group-hover:text-white transition-colors">Contribuições</span>
+                        <span class="text-sm md:text-base font-black text-orange-900 group-hover:text-white transition-colors">Contribuições</span>
                     </a>
                 </div>
             </div>
@@ -234,5 +232,6 @@
                 @endforelse
             </div>
         </div>
+    </div>
     </div>
 @endsection

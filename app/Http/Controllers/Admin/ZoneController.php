@@ -26,7 +26,7 @@ class ZoneController
         $validated = $request->validate([
             'name' => 'required|unique:zones|string|max:255',
             'description' => 'nullable|string',
-            'pastor_id' => 'nullable|exists:users,id', // Validar o Pastor
+            'pastor_id' => 'nullable|exists:users,id',
         ]);
 
         Zone::create($validated);
@@ -61,7 +61,7 @@ class ZoneController
         $validated = $request->validate([
             'name' => "required|unique:zones,name,{$zone->id}|string|max:255",
             'description' => 'nullable|string',
-            'pastor_id' => 'nullable|exists:users,id', // Validar o Pastor
+            'pastor_id' => 'nullable|exists:users,id',
         ]);
 
         $zone->update($validated);

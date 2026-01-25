@@ -424,7 +424,39 @@ class ContributionController
 
         return back()->with('success', 'Contribuição rejeitada!');
     }
+    public function downloadReceipt(Contribution $contribution)
+    {
+        $user = auth()->user();
 
+        // Lógica de Permissão (Mesma do show)
+        if ($user->role === 'membro' && $contribution->user_id !== $user->id) {
+            abort(403, 'Você não tem permissão para ver este comprovativo');
+        }
+        if ($user->role === 'lider_celula' && $contribution->cell_id !== $user->cell_id) {
+            abort(403, 'Você não tem permissão para ver este comprovativo');
+        }
+
+        if ($user->role === 'supervisor') {
+            $cellIds = Cell::where('supervision_id', $user->cell->supervision_id)->pluck('id');
+            if (!$cellIds->contains($contribution->cell_id)) {
+                abort(403, 'Você não tem permissão para ver este comprovativo');
+            }
+        }
+
+        if ($user->role === 'pastor_zona') {
+            $supervisionIds = $user->cell->supervision->zone->supervisions->pluck('id');
+            $cellIds = Cell::whereIn('supervision_id', $supervisionIds)->pluck('id');
+            if (!$cellIds->contains($contribution->cell_id)) {
+                abort(403, 'Você não tem permissão para ver este comprovativo');
+            }
+        }
+
+        if (!$contribution->proof_path || !\Storage::disk('public')->exists($contribution->proof_path)) {
+            abort(404, 'Comprovativo não encontrado.');
+        }
+
+        return \Storage::disk('public')->response($contribution->proof_path);
+    }
     public function adminShow(Contribution $contribution): View
     {
         $contribution->load(['user.cell.supervision.zone', 'registeredBy', 'verifiedBy']);

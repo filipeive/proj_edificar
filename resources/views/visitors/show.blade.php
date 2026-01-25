@@ -4,28 +4,39 @@
 @section('page-title', $visitor->name)
 @section('page-subtitle', 'Informações e acompanhamento do visitante')
 
+@section('header-actions')
+    <div class="flex items-center gap-2">
+        <a href="{{ route('visitors.index') }}"
+            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+            title="Voltar à Lista">
+            <i class="bi bi-arrow-left text-2xl"></i>
+        </a>
+        @if($visitor->isPending())
+            <form method="POST" action="{{ route('visitors.mark-contacted', $visitor) }}" class="inline">
+                @csrf
+                <button type="submit"
+                    class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+                    title="Marcar Contatado">
+                    <i class="bi bi-telephone-plus text-2xl"></i>
+                </button>
+            </form>
+        @endif
+        <a href="{{ route('visitors.edit', $visitor) }}"
+            class="text-gray-600 hover:text-orange-600 p-2.5 hover:bg-orange-50 rounded-xl transition-all duration-300 border border-transparent hover:border-orange-100"
+            title="Editar">
+            <i class="bi bi-pencil-square text-2xl"></i>
+        </a>
+    </div>
+@endsection
+
 @section('content')
     <div class="w-full">
-        <!-- Ações Rápidas -->
-        <div class="flex items-center justify-between mb-8">
-            <a href="{{ route('visitors.index') }}" class="text-gray-600 hover:text-gray-900 font-bold flex items-center">
-                <i class="bi bi-arrow-left mr-2"></i>Voltar
+        <!-- Ações Rápidas (Hidden on Mobile) -->
+        <div class="flex items-center justify-between mb-8 hidden md:flex">
+            <a href="{{ route('visitors.index') }}"
+                class="text-gray-600 hover:text-gray-900 font-bold flex items-center transition">
+                <i class="bi bi-arrow-left mr-2"></i>Voltar para Lista
             </a>
-            <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto mt-4 sm:mt-0">
-                @if($visitor->isPending())
-                    <form method="POST" action="{{ route('visitors.mark-contacted', $visitor) }}" class="w-full sm:w-auto">
-                        @csrf
-                        <button type="submit"
-                            class="w-full px-6 py-3 bg-blue-600 text-white rounded-xl font-bold text-sm hover:bg-blue-700 transition-all flex items-center justify-center">
-                            <i class="bi bi-telephone-fill mr-2"></i>Marcar Contatado
-                        </button>
-                    </form>
-                @endif
-                <a href="{{ route('visitors.edit', $visitor) }}"
-                    class="w-full sm:w-auto px-6 py-3 bg-orange-600 text-white rounded-xl font-bold text-sm hover:bg-orange-700 transition-all flex items-center justify-center">
-                    <i class="bi bi-pencil-fill mr-2"></i>Editar
-                </a>
-            </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">

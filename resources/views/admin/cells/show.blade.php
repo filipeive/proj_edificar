@@ -4,6 +4,26 @@
 @section('page-title', $cell->name)
 @section('page-subtitle', 'Gestão da célula e membros')
 
+@section('header-actions')
+    <div class="flex items-center gap-2">
+        <a href="{{ route('cells.pdf', $cell) }}"
+            class="text-gray-600 hover:text-orange-600 p-2.5 hover:bg-orange-50 rounded-xl transition-all duration-300 border border-transparent hover:border-orange-100"
+            title="Exportar Ficha">
+            <i class="bi bi-file-earmark-pdf text-2xl"></i>
+        </a>
+        <a href="{{ route('cells.attendance', $cell) }}"
+            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+            title="Ficha de Presença">
+            <i class="bi bi-calendar-check text-2xl"></i>
+        </a>
+        <a href="{{ route('cells.edit', $cell) }}"
+            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+            title="Editar Célula">
+            <i class="bi bi-pencil-square text-2xl"></i>
+        </a>
+    </div>
+@endsection
+
 @section('content')
     <div class="space-y-8" x-data="{ activeTab: localStorage.getItem('cell_active_tab') || 'members' }" x-init="$watch('activeTab', value => localStorage.setItem('cell_active_tab', value))">
         <!-- Header & Stats Grid -->
@@ -252,8 +272,8 @@
                 </div>
             </div>
 
-            <!-- Coluna de Ações Rápidas -->
-            <div class="space-y-6">
+            <!-- Coluna de Ações Rápidas (Hidden on Mobile) -->
+            <div class="space-y-6 hidden md:block">
                 <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 space-y-6">
                     <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Gestão da Unidade</h3>
                     <div class="grid grid-cols-1 gap-3">
