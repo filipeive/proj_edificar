@@ -337,7 +337,7 @@
                 <tr style="font-weight: bold; background-color: #f9fafb;">
                     <td>Subtotal Ofertas</td>
                     <td style="text-align: right;">
-                        {{ number_format($service->total_offerings + $service->special_offerings_total, 2, ',', '.') }}
+                        {{ number_format($service->total_offerings, 2, ',', '.') }}
                         MT
                     </td>
                 </tr>

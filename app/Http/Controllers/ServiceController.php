@@ -17,7 +17,18 @@ class ServiceController extends Controller
     {
         Gate::authorize('viewAny', Service::class);
 
-        $query = Service::with(['preacher', 'offerings.offeringType']);
+        $query = Service::with(['preacher', 'offerings.offeringType', 'tithes', 'individualOfferings']);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('theme', 'like', "%{$search}%")
+                    ->orWhere('preacher_name', 'like', "%{$search}%")
+                    ->orWhereHas('preacher', function ($pq) use ($search) {
+                        $pq->where('name', 'like', "%{$search}%");
+                    });
+            });
+        }
 
         if ($request->filled('date_from')) {
             $query->where('date', '>=', $request->date_from);

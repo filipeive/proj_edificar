@@ -98,6 +98,15 @@
         <!-- Filters Section -->
         <div class="bg-gray-50 p-6 rounded-[2rem] border border-gray-100">
             <form action="{{ route('services.index') }}" method="GET" class="flex flex-wrap items-end gap-4">
+                <div class="flex-1 min-w-[250px] space-y-2">
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Pesquisar</label>
+                    <div class="relative">
+                        <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" name="search" value="{{ request('search') }}"
+                            class="w-full pl-10 pr-4 py-2 bg-white border border-gray-100 rounded-xl focus:ring-2 focus:ring-blue-500 text-xs font-bold text-gray-600"
+                            placeholder="Tema ou pregador...">
+                    </div>
+                </div>
                 <div class="space-y-2">
                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Início</label>
                     <input type="date" name="date_from" value="{{ request('date_from') }}"
@@ -126,7 +135,7 @@
                         class="px-6 py-2 bg-blue-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20">
                         Filtrar
                     </button>
-                    @if(request()->anyFilled(['date_from', 'date_to', 'service_type']))
+                    @if(request()->anyFilled(['search', 'date_from', 'date_to', 'service_type']))
                         <a href="{{ route('services.index') }}" 
                             class="px-6 py-2 bg-gray-200 text-gray-600 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-300 transition-all">
                             Limpar
@@ -197,7 +206,7 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div class="p-4 bg-green-50 rounded-2xl border border-green-100">
                                 <span class="text-[9px] font-black text-green-600 uppercase tracking-widest block mb-1">Ofertas</span>
-                                <span class="text-sm font-black text-green-700">{{ number_format($service->total_offerings + $service->special_offerings_total, 2) }} MT</span>
+                                <span class="text-sm font-black text-green-700">{{ number_format($service->total_offerings, 2) }} MT</span>
                             </div>
                             <div class="p-4 {{ $service->service_type === 'teaching' ? 'bg-orange-50 border-orange-100' : 'bg-blue-50 border-blue-100' }} rounded-2xl border">
                                 <span class="text-[9px] font-black {{ $service->service_type === 'teaching' ? 'text-orange-600' : 'text-blue-600' }} uppercase tracking-widest block mb-1">Dízimos</span>
@@ -368,6 +377,59 @@
                 }
             });
         }
+
+        // Dynamic Search Script
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.querySelector('input[name="search"]');
+            const filterForm = searchInput ? searchInput.closest('form') : null;
+
+            if (searchInput && filterForm) {
+                let timeout = null;
+                searchInput.addEventListener('input', function () {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(function () {
+                        const formData = new FormData(filterForm);
+                        const params = new URLSearchParams(formData);
+
+                        document.body.style.cursor = 'wait';
+
+                        fetch(`${filterForm.action}?${params.toString()}`, {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        })
+                        .then(response => response.text())
+                        .then(html => {
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+
+                            // Find and replace the content of grid and list views
+                            const newGrid = doc.querySelector('[x-show="view === \'grid\'"]');
+                            const currentGrid = document.querySelector('[x-show="view === \'grid\'"]');
+                            if (newGrid && currentGrid) currentGrid.innerHTML = newGrid.innerHTML;
+
+                            const newList = doc.querySelector('[x-show="view === \'list\'"]');
+                            const currentList = document.querySelector('[x-show="view === \'list\'"]');
+                            if (newList && currentList) currentList.innerHTML = newList.innerHTML;
+                            
+                            // Replace Pagination if exists
+                            const newPagination = doc.querySelector('.mt-12');
+                            const currentPagination = document.querySelector('.mt-12');
+                            if(newPagination && currentPagination) currentPagination.innerHTML = newPagination.innerHTML;
+
+                            document.body.style.cursor = 'default';
+                            
+                            // Re-initialize bulk action listeners if needed
+                            // In this case, checkboxes are part of the innerHTML so they need new listeners
+                            // or we use event delegation
+                        })
+                        .catch(err => {
+                            console.error('Search failed', err);
+                            document.body.style.cursor = 'default';
+                        });
+                    }, 500);
+                });
+            }
+        });
     </script>
     @endif
+
 @endsection

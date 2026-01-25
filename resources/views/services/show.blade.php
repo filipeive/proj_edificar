@@ -245,7 +245,7 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div class="p-4 bg-white/5 rounded-2xl border border-white/10">
                                 <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest block mb-1">Ofertas (Geral)</span>
-                                <span class="text-sm font-black">{{ number_format($service->total_offerings + $service->special_offerings_total, 0, ',', '.') }} MT</span>
+                                <span class="text-sm font-black">{{ number_format($service->total_offerings, 0, ',', '.') }} MT</span>
                             </div>
                             <div class="p-4 bg-white/5 rounded-2xl border border-white/10">
                                 <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest block mb-1">Dízimos</span>

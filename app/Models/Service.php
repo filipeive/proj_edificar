@@ -58,12 +58,18 @@ class Service extends Model
 
     public function getTotalOfferingsAttribute()
     {
-        return $this->offerings->sum('amount');
+        // General offerings are those registered in service_offerings that are NOT type 1 (Tithes)
+        // plus special_offerings_total and individual offerings
+        $baseOfferings = $this->offerings->where('offering_type_id', '!=', 1)->sum('amount');
+        return $baseOfferings + ($this->special_offerings_total ?? 0) + $this->total_individual_offerings;
     }
 
     public function getTotalTithesAttribute()
     {
-        return $this->tithes->sum('amount');
+        // Combined tithes from both the dedicated table and general offerings marked as type 1
+        $dedicatedTithes = $this->tithes->sum('amount');
+        $offeringTithes = $this->offerings->where('offering_type_id', 1)->sum('amount');
+        return $dedicatedTithes + $offeringTithes;
     }
 
     public function getTotalIndividualOfferingsAttribute()
@@ -73,7 +79,7 @@ class Service extends Model
 
     public function getTotalFinancialAttribute()
     {
-        return $this->total_offerings + $this->total_tithes + $this->total_individual_offerings + $this->special_offerings_total;
+        return $this->total_offerings + $this->total_tithes;
     }
 
     public function getTotalMembersAttribute()
