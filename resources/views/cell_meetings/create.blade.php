@@ -130,13 +130,26 @@
                             <h5 class="text-xs font-black uppercase tracking-widest text-blue-600 mb-6 flex items-center">
                                 <i class="bi bi-check2-square mr-2"></i> Chamada da Célula
                             </h5>
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 @foreach($members as $member)
-                                    <label class="flex items-center p-4 bg-white rounded-2xl border border-blue-100 hover:border-blue-300 transition-all cursor-pointer group shadow-sm">
-                                        <input type="checkbox" name="present_members[]" value="{{ $member->id }}" checked
-                                            class="w-5 h-5 text-blue-600 border-gray-200 rounded-lg focus:ring-blue-500">
-                                        <span class="ml-3 text-sm font-bold text-gray-700 group-hover:text-blue-700">{{ $member->name }}</span>
-                                    </label>
+                                    <div class="bg-white rounded-2xl border border-blue-100 p-6 shadow-sm hover:border-blue-300 transition-all" x-data="{ isPresent: true }">
+                                        <div class="flex items-center justify-between gap-4">
+                                            <label class="flex items-center cursor-pointer group flex-1">
+                                                <input type="checkbox" name="present_members[]" value="{{ $member->id }}" x-model="isPresent"
+                                                    class="w-6 h-6 text-blue-600 border-gray-200 rounded-lg focus:ring-blue-500">
+                                                <span class="ml-4 font-bold text-gray-700 group-hover:text-blue-700">{{ $member->name }}</span>
+                                            </label>
+                                            <div class="flex items-center gap-2">
+                                                <span x-show="isPresent" class="text-[10px] font-black text-green-500 uppercase tracking-widest bg-green-50 px-3 py-1 rounded-full border border-green-100">Presente</span>
+                                                <span x-show="!isPresent" class="text-[10px] font-black text-red-400 uppercase tracking-widest bg-red-50 px-3 py-1 rounded-full border border-red-100">Ausente</span>
+                                            </div>
+                                        </div>
+                                        <div x-show="!isPresent" x-transition class="mt-4 pt-4 border-t border-gray-50">
+                                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Justificação da Ausência</label>
+                                            <input type="text" name="reasons[{{ $member->id }}]" placeholder="Ex: Doença, Trabalho..."
+                                                class="w-full text-xs font-bold bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-blue-100 rounded-xl py-2 px-3 transition-all">
+                                        </div>
+                                    </div>
                                 @endforeach
                             </div>
                         </div>
@@ -209,6 +222,12 @@
                     adultsCountInput.value = checkedCount;
                 });
             });
+
+            // Initial count
+            const initialCheckedCount = document.querySelectorAll('input[name="present_members[]"]:checked').length;
+            if (initialCheckedCount > 0) {
+                adultsCountInput.value = initialCheckedCount;
+            }
         });
     </script>
 @endpush

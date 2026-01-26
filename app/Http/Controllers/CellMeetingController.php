@@ -169,6 +169,10 @@ class CellMeetingController extends Controller
             'participants' => 'nullable|array',
             'participants.*' => 'exists:users,id',
             'observations' => 'nullable|string',
+            'present_members' => 'nullable|array',
+            'present_members.*' => 'exists:users,id',
+            'reasons' => 'nullable|array',
+            'reasons.*' => 'nullable|string|max:255',
         ]);
 
         // Check for duplicate meeting on same date for same cell
@@ -186,21 +190,25 @@ class CellMeetingController extends Controller
             $meeting->participants()->sync($request->participants);
         }
 
-        // Record attendance for present members
-        if ($request->has('present_members')) {
-            foreach ($request->present_members as $userId) {
-                \App\Models\Attendance::updateOrCreate(
-                    [
-                        'user_id' => $userId,
-                        'cell_id' => $meeting->cell_id,
-                        'date' => \Carbon\Carbon::parse($meeting->meeting_date)->format('Y-m-d'),
-                        'type' => 'cell',
-                    ],
-                    [
-                        'status' => true,
-                    ]
-                );
-            }
+        // Record attendance for ALL members of the cell
+        $allCellMembers = User::where('cell_id', $meeting->cell_id)->where('is_active', true)->pluck('id');
+        $presentIds = $request->input('present_members', []);
+        $reasons = $request->input('reasons', []);
+
+        foreach ($allCellMembers as $userId) {
+            $isPresent = in_array($userId, $presentIds);
+            \App\Models\Attendance::updateOrCreate(
+                [
+                    'user_id' => $userId,
+                    'cell_id' => $meeting->cell_id,
+                    'date' => \Carbon\Carbon::parse($meeting->meeting_date)->format('Y-m-d'),
+                    'type' => 'cell',
+                ],
+                [
+                    'status' => $isPresent,
+                    'reason' => $isPresent ? null : ($reasons[$userId] ?? null),
+                ]
+            );
         }
 
         return redirect()->route('cell-meetings.index')->with('success', 'Encontro de célula registrado com sucesso!');

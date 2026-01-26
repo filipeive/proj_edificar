@@ -160,6 +160,33 @@
                     </div>
                 </div>
 
+                <!-- Observations -->
+                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-8 border-b border-gray-50 flex items-center justify-between">
+                        <h2 class="text-lg font-black text-gray-900 flex items-center gap-3">
+                            <i class="bi bi-chat-quote-fill text-orange-600"></i>
+                            Observações e Notas
+                        </h2>
+                    </div>
+                    <div class="p-10">
+                        @if($user->observations)
+                            <div class="p-6 bg-orange-50/30 rounded-3xl border border-orange-100/50">
+                                <p class="text-gray-700 font-bold leading-relaxed italic">
+                                    "{{ $user->observations }}"
+                                </p>
+                            </div>
+                        @else
+                            <div class="py-10 text-center space-y-3">
+                                <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto">
+                                    <i class="bi bi-chat-dots text-2xl text-gray-300"></i>
+                                </div>
+                                <p class="text-sm font-black text-gray-300 uppercase tracking-tighter">Nenhuma observação
+                                    registrada</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
                 <!-- Recent History Table -->
                 <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
                     <div class="p-8 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
@@ -267,6 +294,13 @@
                             <span>Lançar Oferta</span>
                             <i class="bi bi-plus-lg"></i>
                         </a>
+                        @if($user->cell_id)
+                            <a href="{{ route('cell-meetings.create', ['cell_id' => $user->cell_id]) }}"
+                                class="w-full py-4 bg-gray-50 text-gray-700 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all flex items-center justify-between px-6">
+                                <span>Ficha de Célula</span>
+                                <i class="bi bi-file-earmark-plus-fill"></i>
+                            </a>
+                        @endif
                         <form action="{{ route('users.reset-password', $user) }}" method="POST" id="reset-password-form"
                             class="w-full">
                             @csrf
