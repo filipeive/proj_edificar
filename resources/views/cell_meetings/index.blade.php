@@ -151,9 +151,6 @@
             </div>
         </div>
         @endif
-
-
-
         <div class="flex flex-col md:flex-row justify-between items-center gap-6">
             <div class="flex items-center gap-4">
                 <div class="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-xl items-center shadow-inner">
@@ -364,6 +361,16 @@
                                 class="w-14 h-14 bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 flex items-center justify-center rounded-2xl hover:bg-orange-500 hover:text-white dark:hover:bg-orange-500 dark:hover:text-white transition-all shadow-sm active:scale-95">
                                 <i class="bi bi-pencil-square text-lg"></i>
                             </a>
+                        @endcan
+                        @can('delete', $meeting)
+                            <form action="{{ route('cell-meetings.destroy', $meeting) }}" method="POST" class="inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                    class="w-14 h-14 bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 flex items-center justify-center rounded-2xl hover:bg-red-500 hover:text-white dark:hover:bg-red-500 dark:hover:text-white transition-all shadow-sm active:scale-95">
+                                    <i class="bi bi-trash text-lg"></i>
+                                </button>
+                            </form>
                         @endcan
                     </div>
                 </div>
