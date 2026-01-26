@@ -497,6 +497,10 @@
             /* gray-600 with opacity */
             margin-left: 1rem;
         }
+
+        [x-cloak] {
+            display: none !important;
+        }
     </style>
 </head>
 
