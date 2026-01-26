@@ -54,6 +54,11 @@ class ImportQuarterlyReportsBulk extends Command
             try {
                 // 1. Zona
                 $zoneName = trim($row['C']);
+                $area = trim($row['D'] ?? '');
+                if (stripos($area, 'MIA') !== false && stripos($zoneName, 'MIA') === false) {
+                    $zoneName .= ' - MIA';
+                }
+
                 $zone = Zone::where('name', 'LIKE', $zoneName)->first();
                 if (!$zone) {
                     $this->warn("  → Criando Zona: $zoneName");
@@ -95,10 +100,10 @@ class ImportQuarterlyReportsBulk extends Command
                     'zone_pastor_id' => $zone->pastor_id,
                     'year' => 2025,
                     'quarter' => 4,
-                    'leaders_count' => (int) ($row['E'] ?? 0),
-                    'timoteos_count' => (int) ($row['F'] ?? 0),
-                    'members_count' => (int) ($row['G'] ?? 0),
-                    'visitors_count' => (int) ($row['H'] ?? 0),
+                    'cells_count' => (int) ($row['E'] ?? 0),
+                    'leaders_count' => (int) ($row['F'] ?? 0),
+                    'timoteos_count' => (int) ($row['G'] ?? 0),
+                    'members_count' => (int) ($row['H'] ?? 0),
                     'participants_count' => (int) ($row['I'] ?? 0),
                     'saved_count' => (int) ($row['J'] ?? 0),
                     'planned_baptism_count' => (int) ($row['K'] ?? 0),

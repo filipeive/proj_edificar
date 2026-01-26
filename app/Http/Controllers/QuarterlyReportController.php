@@ -14,51 +14,76 @@ use Illuminate\Support\Facades\Gate;
 
 class QuarterlyReportController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         Gate::authorize('viewAny', QuarterlyReport::class);
 
         $user = auth()->user();
         $query = QuarterlyReport::with(['zone', 'supervisor', 'supervision']);
 
+        // Filters
+        if ($request->filled('year')) {
+            $query->where('year', $request->year);
+        }
+        if ($request->filled('quarter')) {
+            $query->where('quarter', $request->quarter);
+        }
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('supervisor', fn($sq) => $sq->where('name', 'LIKE', "%$search%"))
+                    ->orWhereHas('zone', fn($zq) => $zq->where('name', 'LIKE', "%$search%"));
+            });
+        }
+
         if ($user->role === 'pastor_zona') {
             $zoneId = $user->getZoneId();
             $query->where('zone_id', $zoneId);
         } elseif ($user->role === 'supervisor') {
-            // Um supervisor pode preencher múltiplos relatórios se supervisionar mais de uma supervisão?
-            // Geralmente é 1:1, mas vamos filtrar pelo supervisor_id
             $query->where('supervisor_id', $user->id);
         }
 
         $reports = $query->orderBy('year', 'desc')
             ->orderBy('quarter', 'desc')
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
-        // Analytics for Charts (Last 4 Quarters)
-        $analyticsQuery = QuarterlyReport::query();
+        // Aggregated Analytics for Charts (Last 8 combinations of Year/Quarter)
+        $analyticsQuery = QuarterlyReport::query()
+            ->select(
+                'year',
+                'quarter',
+                DB::raw('SUM(members_count) as total_members'),
+                DB::raw('SUM(cells_count) as total_cells'),
+                DB::raw('SUM(saved_count) as total_saved'),
+                DB::raw('SUM(baptized_count) as total_baptized')
+            );
+
         if ($user->role === 'pastor_zona') {
             $analyticsQuery->where('zone_id', $user->getZoneId());
         } elseif ($user->role === 'supervisor') {
             $analyticsQuery->where('supervisor_id', $user->id);
         }
 
-        $recentReports = $analyticsQuery->orderBy('year', 'desc')
+        $recentStats = $analyticsQuery->groupBy('year', 'quarter')
+            ->orderBy('year', 'desc')
             ->orderBy('quarter', 'desc')
             ->limit(8)
             ->get();
 
         // Prepare chart data
-        $chartLabels = $recentReports->map(fn($r) => "Q{$r->quarter}/{$r->year}")->reverse();
-        $membersData = $recentReports->pluck('members_count')->reverse();
-        $cellsData = $recentReports->pluck('cells_count')->reverse();
-        $savedData = $recentReports->pluck('saved_count')->reverse();
-        $baptizedData = $recentReports->pluck('baptized_count')->reverse();
+        $chartLabels = $recentStats->map(fn($s) => "Q{$s->quarter}/{$s->year}")->reverse()->values();
+        $membersData = $recentStats->pluck('total_members')->reverse()->values();
+        $cellsData = $recentStats->pluck('total_cells')->reverse()->values();
+        $savedData = $recentStats->pluck('total_saved')->reverse()->values();
+        $baptizedData = $recentStats->pluck('total_baptized')->reverse()->values();
 
-        // Summary Stats
-        $totalMembers = $recentReports->first()->members_count ?? 0;
-        $totalCells = $recentReports->first()->cells_count ?? 0;
-        $totalSaved = $recentReports->sum('saved_count');
-        $totalBaptized = $recentReports->sum('baptized_count');
+        // Summary Stats (Latest Period)
+        $latest = $recentStats->first();
+        $totalMembers = $latest->total_members ?? 0;
+        $totalCells = $latest->total_cells ?? 0;
+        $totalSaved = $recentStats->sum('total_saved');
+        $totalBaptized = $recentStats->sum('total_baptized');
 
         return view('quarterly_reports.index', compact(
             'reports',
@@ -72,6 +97,20 @@ class QuarterlyReportController extends Controller
             'totalSaved',
             'totalBaptized'
         ));
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        Gate::authorize('deleteAny', QuarterlyReport::class);
+
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return back()->with('error', 'Nenhum relatório selecionado.');
+        }
+
+        QuarterlyReport::whereIn('id', $ids)->delete();
+
+        return back()->with('success', count($ids) . ' relatórios excluídos com sucesso.');
     }
 
     public function create()

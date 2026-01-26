@@ -344,6 +344,7 @@ Route::middleware('auth')->group(function () {
     // ===== RELATÓRIOS TRIMESTRAIS (QUARTERLY REPORTS) ROUTES =====
     Route::get('quarterly-reports/export', [\App\Http\Controllers\QuarterlyReportController::class, 'export'])->name('quarterly-reports.export');
     Route::get('quarterly-reports/export-annual', [\App\Http\Controllers\QuarterlyReportController::class, 'exportAnnual'])->name('quarterly-reports.export-annual');
+    Route::delete('quarterly-reports/bulk-destroy', [\App\Http\Controllers\QuarterlyReportController::class, 'bulkDestroy'])->name('quarterly-reports.bulk-destroy');
     Route::resource('quarterly-reports', \App\Http\Controllers\QuarterlyReportController::class);
     Route::post('packages/{package}/assign', [\App\Http\Controllers\Admin\PackageController::class, 'assignMember'])->name('packages.assign');
     Route::post('packages/{package}/send-bulk-sms', [\App\Http\Controllers\Admin\PackageController::class, 'sendBulkSms'])->name('packages.send-bulk-sms');
