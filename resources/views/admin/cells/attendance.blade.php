@@ -9,6 +9,9 @@
         <div class="bg-black p-6 text-white">
             <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                 <div>
+                    <a href="{{ route('cells.show', $cell) }}" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition text-sm font-bold"><i class="bi bi-arrow-left mr-2"></i> Voltar</a>
+                </div>
+                <div>
                     <h1 class="text-2xl font-black uppercase tracking-tight">Ficha Guia de Participação</h1>
                     <p class="text-orange-500 font-bold text-sm uppercase tracking-widest mt-1">{{ $cell->name }}</p>
                 </div>
