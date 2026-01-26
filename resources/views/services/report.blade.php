@@ -18,7 +18,7 @@
 
         <!-- Filtros e Exportações -->
         <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
-            <div class="grid grid-cols-1 xl:grid-cols-3 gap-12">
+            <div class="grid grid-cols-1 xl:grid-cols-5 gap-8">
                 <!-- Filtros de Visualização -->
                 <div class="space-y-6">
                     <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
@@ -46,7 +46,8 @@
                                 <option value="2nd" {{ request('service_type') == '2nd' ? 'selected' : '' }}>2º Culto</option>
                                 <option value="3rd" {{ request('service_type') == '3rd' ? 'selected' : '' }}>3º Culto</option>
                                 <option value="4th" {{ request('service_type') == '4th' ? 'selected' : '' }}>4º Culto</option>
-                                <option value="normal" {{ request('service_type') == 'normal' ? 'selected' : '' }}>Todos os Cultos Normais</option>
+                                <option value="normal" {{ request('service_type') == 'normal' ? 'selected' : '' }}>Todos os
+                                    Cultos Normais</option>
                                 <option value="teaching" {{ request('service_type') == 'teaching' ? 'selected' : '' }}>Ensino
                                 </option>
                                 <option value="special" {{ request('service_type') == 'special' ? 'selected' : '' }}>Especial
@@ -57,6 +58,52 @@
                             class="w-full py-3 bg-gray-900 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-black transition-all">
                             Atualizar Análise
                         </button>
+                    </form>
+                </div>
+
+                <!-- Exportação Personalizada (Pastor Luis) -->
+                <div class="space-y-6">
+                    <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                        <i class="bi bi-calendar-range text-purple-600"></i> Exportação Personalizada
+                    </h3>
+                    <form action="{{ route('services.export.custom') }}" method="GET" class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase mb-2">Data Início</label>
+                                <input type="date" name="date_from" required
+                                    class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase mb-2">Data Fim</label>
+                                <input type="date" name="date_to" required
+                                    class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-400 uppercase mb-2">Tipo de Culto</label>
+                            <select name="service_type" required
+                                class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500">
+                                <option value="">Selecione...</option>
+                                <option value="all">Todos (Separados)</option>
+                                <option value="1st">Apenas 1º Culto</option>
+                                <option value="2nd">Apenas 2º Culto</option>
+                                <option value="3rd">Apenas 3º Culto</option>
+                                <option value="4th">Apenas 4º Culto</option>
+                                <option value="normal">Todos os Cultos Normais</option>
+                                <option value="teaching">Cultos de Ensino</option>
+                                <option value="special">Cultos Especiais</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="submit" formaction="{{ route('services.export.custom') }}"
+                                class="w-full py-3 bg-purple-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-purple-700 transition-all flex items-center justify-center gap-2">
+                                <i class="bi bi-file-pdf"></i> PDF
+                            </button>
+                            <button type="submit" formaction="{{ route('services.export.custom.excel') }}"
+                                class="w-full py-3 bg-green-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-green-700 transition-all flex items-center justify-center gap-2">
+                                <i class="bi bi-file-earmark-excel"></i> Excel
+                            </button>
+                        </div>
                     </form>
                 </div>
 
@@ -97,10 +144,16 @@
                                 <option value="teaching">Cultos de Ensino</option>
                             </select>
                         </div>
-                        <button type="submit"
-                            class="w-full py-3 bg-orange-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-700 transition-all flex items-center justify-center gap-2">
-                            <i class="bi bi-download"></i> Gerar Mensal
-                        </button>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="submit" formaction="{{ route('services.export.monthly') }}"
+                                class="w-full py-3 bg-orange-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-700 transition-all flex items-center justify-center gap-2">
+                                <i class="bi bi-file-pdf"></i> PDF
+                            </button>
+                            <button type="submit" formaction="{{ route('services.export.monthly.excel') }}"
+                                class="w-full py-3 bg-green-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-green-700 transition-all flex items-center justify-center gap-2">
+                                <i class="bi bi-file-earmark-excel"></i> Excel
+                            </button>
+                        </div>
                     </form>
                 </div>
 
@@ -131,10 +184,54 @@
                                 </select>
                             </div>
                         </div>
-                        <button type="submit"
-                            class="w-full py-3 bg-green-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-green-700 transition-all flex items-center justify-center gap-2">
-                            <i class="bi bi-download"></i> Gerar Trimestral
-                        </button>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="submit" formaction="{{ route('services.export.quarterly') }}"
+                                class="w-full py-3 bg-green-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-green-700 transition-all flex items-center justify-center gap-2">
+                                <i class="bi bi-file-pdf"></i> PDF
+                            </button>
+                            <button type="submit" formaction="{{ route('services.export.quarterly.excel') }}"
+                                class="w-full py-3 bg-teal-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-teal-700 transition-all flex items-center justify-center gap-2">
+                                <i class="bi bi-file-earmark-excel"></i> Excel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Exportação Anual -->
+                <div class="space-y-6">
+                    <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                        <i class="bi bi-calendar-check text-red-600"></i> Relatório Anual (PDF)
+                    </h3>
+                    <form action="{{ route('services.export.annual') }}" method="GET" class="space-y-4">
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase mb-2">Ano</label>
+                            <select name="year"
+                                class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500">
+                                @for($y = now()->year; $y >= 2023; $y--)
+                                    <option value="{{ $y }}">{{ $y }}</option>
+                                @endfor
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-400 uppercase mb-2">Tipo de Culto</label>
+                            <select name="service_type"
+                                class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500">
+                                <option value="all">Todos (Separados)</option>
+                                <option value="normal">Cultos Normais</option>
+                                <option value="teaching">Cultos de Ensino</option>
+                                <option value="special">Cultos Especiais</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="submit" formaction="{{ route('services.export.annual') }}"
+                                class="w-full py-3 bg-red-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-red-700 transition-all flex items-center justify-center gap-2">
+                                <i class="bi bi-file-pdf"></i> PDF
+                            </button>
+                            <button type="submit" formaction="{{ route('services.export.annual.excel') }}"
+                                class="w-full py-3 bg-green-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-green-700 transition-all flex items-center justify-center gap-2">
+                                <i class="bi bi-file-earmark-excel"></i> Excel
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -216,7 +313,7 @@
                                         class="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-[10px] font-black">{{ $salvations }}</span>
                                 </td>
                                 <td class="px-8 py-4 text-gray-600">{{ $service->service_type }}</td>
-                            </tr>   
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -266,7 +363,7 @@
                         labels: ['Membros', 'Visitantes'],
                         datasets: [{
                             data: [
-                                                                    {{ $trendServices->sum('total_members') }},
+                                                                                    {{ $trendServices->sum('total_members') }},
                                 {{ $trendServices->sum('total_visitors') }}
                             ],
                             backgroundColor: ['#2563eb', '#eab308'],

@@ -1201,18 +1201,8 @@
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
-            // Trigger prompt if it's mobile and not standalone, and beforeinstallprompt hasn't fired yet
-            // (or if it's iOS where beforeinstallprompt doesn't fire)
-            if (isMobile && !isStandalone) {
-                const hasShownPrompt = sessionStorage.getItem('pwa_prompt_shown');
-                if (!hasShownPrompt) {
-                    setTimeout(() => {
-                        if (!deferredPrompt) {
-                            showImmersivePrompt(false);
-                        }
-                    }, 3000);
-                }
-            }
+            // DISABLED: Intrusive popup removed per user request
+            // Auto-prompt is now disabled. Users can use the header button instead.
 
             function showImmersivePrompt(canInstall) {
                 if (sessionStorage.getItem('pwa_prompt_shown')) return;
@@ -1251,7 +1241,7 @@
                 const doc = window.document;
                 const docEl = doc.documentElement;
 
-                const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullScreen;
+                const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
 
                 if (requestFullScreen) {
                     requestFullScreen.call(docEl);

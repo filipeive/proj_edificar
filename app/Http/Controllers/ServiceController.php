@@ -505,6 +505,269 @@ class ServiceController extends Controller
     }
 
     /**
+     * Export custom date range report (Pastor Luis request)
+     */
+    public function exportCustom(Request $request)
+    {
+        Gate::authorize('viewAny', Service::class);
+
+        $request->validate([
+            'date_from' => 'required|date',
+            'date_to' => 'required|date|after_or_equal:date_from',
+            'service_type' => 'required|string',
+        ]);
+
+        $query = Service::with(['zoneParticipations', 'offerings', 'tithes', 'individualOfferings'])
+            ->whereBetween('date', [$request->date_from, $request->date_to]);
+
+        // Handle service type filtering
+        if ($request->service_type === 'all') {
+            // Include all services, no filter
+        } elseif ($request->service_type === 'normal') {
+            $query->whereIn('service_type', ['1st', '2nd', '3rd', '4th']);
+        } elseif (in_array($request->service_type, ['1st', '2nd', '3rd', '4th', 'teaching', 'special'])) {
+            $query->where('service_type', $request->service_type);
+        }
+
+        $services = $query->orderBy('date', 'asc')->get();
+
+        // Build title based on service type
+        $typeLabel = match ($request->service_type) {
+            'all' => ' (Todos os Cultos)',
+            '1st' => ' (1º Culto)',
+            '2nd' => ' (2º Culto)',
+            '3rd' => ' (3º Culto)',
+            '4th' => ' (4º Culto)',
+            'normal' => ' (Cultos Normais)',
+            'teaching' => ' (Cultos de Ensino)',
+            'special' => ' (Cultos Especiais)',
+            default => '',
+        };
+
+        $dateFrom = \Carbon\Carbon::parse($request->date_from)->format('d/m/Y');
+        $dateTo = \Carbon\Carbon::parse($request->date_to)->format('d/m/Y');
+        $title = "Relatório Personalizado de Cultos{$typeLabel} - {$dateFrom} a {$dateTo}";
+
+        $pdf = Pdf::loadView('services.report-pdf', compact('services', 'title'));
+
+        $filename = "relatorio_cultos_" . \Carbon\Carbon::parse($request->date_from)->format('Y-m-d') . "_a_" . \Carbon\Carbon::parse($request->date_to)->format('Y-m-d') . ".pdf";
+
+        return $pdf->download($filename);
+    }
+
+    /**
+     * Export annual report
+     */
+    public function exportAnnual(Request $request)
+    {
+        Gate::authorize('viewAny', Service::class);
+
+        $request->validate([
+            'year' => 'required|integer',
+            'service_type' => 'nullable|string',
+        ]);
+
+        $query = Service::with(['zoneParticipations', 'offerings', 'tithes', 'individualOfferings'])
+            ->whereYear('date', $request->year);
+
+        if ($request->service_type === 'normal') {
+            $query->whereIn('service_type', ['1st', '2nd', '3rd', '4th']);
+        } elseif ($request->service_type === 'teaching') {
+            $query->where('service_type', 'teaching');
+        } elseif ($request->service_type === 'special') {
+            $query->where('service_type', 'special');
+        }
+
+        $services = $query->orderBy('date', 'asc')->get();
+
+        $typeLabel = match ($request->service_type) {
+            'normal' => ' (Cultos Normais)',
+            'teaching' => ' (Cultos de Ensino)',
+            'special' => ' (Cultos Especiais)',
+            default => '',
+        };
+
+        $title = "Relatório Anual de Cultos{$typeLabel} - {$request->year}";
+
+        $pdf = Pdf::loadView('services.report-pdf', compact('services', 'title'));
+        return $pdf->download("relatorio_anual_cultos_{$request->year}.pdf");
+    }
+
+    /**
+     * Export custom date range report to Excel
+     */
+    public function exportCustomExcel(Request $request)
+    {
+        Gate::authorize('viewAny', Service::class);
+
+        $request->validate([
+            'date_from' => 'required|date',
+            'date_to' => 'required|date|after_or_equal:date_from',
+            'service_type' => 'required|string',
+        ]);
+
+        $query = Service::with(['preacher', 'zoneParticipations', 'offerings', 'tithes', 'individualOfferings'])
+            ->whereBetween('date', [$request->date_from, $request->date_to]);
+
+        if ($request->service_type === 'all') {
+            // Include all services
+        } elseif ($request->service_type === 'normal') {
+            $query->whereIn('service_type', ['1st', '2nd', '3rd', '4th']);
+        } elseif (in_array($request->service_type, ['1st', '2nd', '3rd', '4th', 'teaching', 'special'])) {
+            $query->where('service_type', $request->service_type);
+        }
+
+        $services = $query->orderBy('date', 'asc')->get();
+
+        $typeLabel = match ($request->service_type) {
+            'all' => 'Todos os Cultos',
+            '1st' => '1º Culto',
+            '2nd' => '2º Culto',
+            '3rd' => '3º Culto',
+            '4th' => '4º Culto',
+            'normal' => 'Cultos Normais',
+            'teaching' => 'Cultos de Ensino',
+            'special' => 'Cultos Especiais',
+            default => '',
+        };
+
+        $dateFrom = \Carbon\Carbon::parse($request->date_from)->format('Y-m-d');
+        $dateTo = \Carbon\Carbon::parse($request->date_to)->format('Y-m-d');
+        $title = "Relatório Personalizado - {$typeLabel}";
+
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new \App\Exports\ServicesExport($services, $title),
+            "relatorio_cultos_{$dateFrom}_a_{$dateTo}.xlsx"
+        );
+    }
+
+    /**
+     * Export monthly report to Excel
+     */
+    public function exportMonthlyExcel(Request $request)
+    {
+        Gate::authorize('viewAny', Service::class);
+
+        $request->validate([
+            'month' => 'required|integer|between:1,12',
+            'year' => 'required|integer',
+            'service_type' => 'nullable|string',
+        ]);
+
+        $query = Service::with(['preacher', 'zoneParticipations', 'offerings', 'tithes', 'individualOfferings'])
+            ->whereYear('date', $request->year)
+            ->whereMonth('date', $request->month);
+
+        if ($request->service_type === 'normal') {
+            $query->whereIn('service_type', ['1st', '2nd', '3rd', '4th']);
+        } elseif ($request->service_type === 'teaching') {
+            $query->where('service_type', 'teaching');
+        }
+
+        $services = $query->orderBy('date', 'asc')->get();
+
+        $typeLabel = match ($request->service_type) {
+            'normal' => 'Cultos Normais',
+            'teaching' => 'Cultos de Ensino',
+            default => 'Todos',
+        };
+
+        $monthName = \Carbon\Carbon::createFromDate($request->year, $request->month)->translatedFormat('F');
+        $title = "Relatório Mensal - {$typeLabel} - {$monthName}/{$request->year}";
+
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new \App\Exports\ServicesExport($services, $title),
+            "relatorio_mensal_cultos_{$request->year}_{$request->month}.xlsx"
+        );
+    }
+
+    /**
+     * Export quarterly report to Excel
+     */
+    public function exportQuarterlyExcel(Request $request)
+    {
+        Gate::authorize('viewAny', Service::class);
+
+        $request->validate([
+            'quarter' => 'required|integer|between:1,4',
+            'year' => 'required|integer',
+            'service_type' => 'nullable|string',
+        ]);
+
+        $months = match ((int) $request->quarter) {
+            1 => [1, 2, 3],
+            2 => [4, 5, 6],
+            3 => [7, 8, 9],
+            4 => [10, 11, 12],
+        };
+
+        $query = Service::with(['preacher', 'zoneParticipations', 'offerings', 'tithes', 'individualOfferings'])
+            ->whereYear('date', $request->year)
+            ->whereIn(DB::raw('MONTH(date)'), $months);
+
+        if ($request->service_type === 'normal') {
+            $query->whereIn('service_type', ['1st', '2nd', '3rd', '4th']);
+        } elseif ($request->service_type === 'teaching') {
+            $query->where('service_type', 'teaching');
+        }
+
+        $services = $query->orderBy('date', 'asc')->get();
+
+        $typeLabel = match ($request->service_type) {
+            'normal' => 'Cultos Normais',
+            'teaching' => 'Cultos de Ensino',
+            default => 'Todos',
+        };
+
+        $title = "Relatório Trimestral - {$typeLabel} - Q{$request->quarter}/{$request->year}";
+
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new \App\Exports\ServicesExport($services, $title),
+            "relatorio_trimestral_cultos_{$request->year}_Q{$request->quarter}.xlsx"
+        );
+    }
+
+    /**
+     * Export annual report to Excel
+     */
+    public function exportAnnualExcel(Request $request)
+    {
+        Gate::authorize('viewAny', Service::class);
+
+        $request->validate([
+            'year' => 'required|integer',
+            'service_type' => 'nullable|string',
+        ]);
+
+        $query = Service::with(['preacher', 'zoneParticipations', 'offerings', 'tithes', 'individualOfferings'])
+            ->whereYear('date', $request->year);
+
+        if ($request->service_type === 'normal') {
+            $query->whereIn('service_type', ['1st', '2nd', '3rd', '4th']);
+        } elseif ($request->service_type === 'teaching') {
+            $query->where('service_type', 'teaching');
+        } elseif ($request->service_type === 'special') {
+            $query->where('service_type', 'special');
+        }
+
+        $services = $query->orderBy('date', 'asc')->get();
+
+        $typeLabel = match ($request->service_type) {
+            'normal' => 'Cultos Normais',
+            'teaching' => 'Cultos de Ensino',
+            'special' => 'Cultos Especiais',
+            default => 'Todos',
+        };
+
+        $title = "Relatório Anual - {$typeLabel} - {$request->year}";
+
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new \App\Exports\ServicesExport($services, $title),
+            "relatorio_anual_cultos_{$request->year}.xlsx"
+        );
+    }
+
+    /**
      * Bulk delete services
      */
     public function bulkDestroy(Request $request)

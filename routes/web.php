@@ -192,7 +192,13 @@ Route::middleware('auth')->group(function () {
             Route::get('/services/{service}/pdf', [\App\Http\Controllers\ServiceController::class, 'downloadPdf'])->name('services.download-pdf');
             Route::get('services/report', [\App\Http\Controllers\ServiceController::class, 'report'])->name('services.report');
             Route::get('services/export/monthly', [\App\Http\Controllers\ServiceController::class, 'exportMonthly'])->name('services.export.monthly');
+            Route::get('services/export/monthly/excel', [\App\Http\Controllers\ServiceController::class, 'exportMonthlyExcel'])->name('services.export.monthly.excel');
             Route::get('services/export/quarterly', [\App\Http\Controllers\ServiceController::class, 'exportQuarterly'])->name('services.export.quarterly');
+            Route::get('services/export/quarterly/excel', [\App\Http\Controllers\ServiceController::class, 'exportQuarterlyExcel'])->name('services.export.quarterly.excel');
+            Route::get('services/export/custom', [\App\Http\Controllers\ServiceController::class, 'exportCustom'])->name('services.export.custom');
+            Route::get('services/export/custom/excel', [\App\Http\Controllers\ServiceController::class, 'exportCustomExcel'])->name('services.export.custom.excel');
+            Route::get('services/export/annual', [\App\Http\Controllers\ServiceController::class, 'exportAnnual'])->name('services.export.annual');
+            Route::get('services/export/annual/excel', [\App\Http\Controllers\ServiceController::class, 'exportAnnualExcel'])->name('services.export.annual.excel');
             Route::post('services/bulk-delete', [\App\Http\Controllers\ServiceController::class, 'bulkDestroy'])->name('services.bulk-delete');
             Route::resource('services', \App\Http\Controllers\ServiceController::class);
         });
