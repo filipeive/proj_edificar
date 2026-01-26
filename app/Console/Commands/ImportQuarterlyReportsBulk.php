@@ -120,26 +120,46 @@ class ImportQuarterlyReportsBulk extends Command
                 ];
 
                 if (!$dryRun) {
-                    $report = QuarterlyReport::create($reportData);
+                    $report = QuarterlyReport::updateOrCreate(
+                        [
+                            'zone_id' => $zone->id,
+                            'supervision_id' => $supervision->id,
+                            'supervisor_id' => $supervisor->id,
+                            'year' => 2025,
+                            'quarter' => 4,
+                        ],
+                        $reportData
+                    );
 
                     // 5. Events
                     $eventMapping = [
-                        'Q' => 1, // training
-                        'R' => 2, // fellowship
-                        'S' => 6, // community_service
-                        'T' => 3, // funeral
-                        'U' => 4, // wedding
-                        'V' => 5, // baby_dedication
+                        'Q' => ['name' => 'Treinamento', 'code' => 'training', 'category' => 'training'],
+                        'R' => ['name' => 'Confraternização', 'code' => 'fellowship', 'category' => 'fellowship'],
+                        'S' => ['name' => 'Ação Comunitária', 'code' => 'community_service', 'category' => 'service'],
+                        'T' => ['name' => 'Funeral', 'code' => 'funeral', 'category' => 'ceremony'],
+                        'U' => ['name' => 'Casamento', 'code' => 'wedding', 'category' => 'ceremony'],
+                        'V' => ['name' => 'Dedicação de Bebé', 'code' => 'baby_dedication', 'category' => 'ceremony'],
                     ];
 
-                    foreach ($eventMapping as $col => $typeId) {
+                    foreach ($eventMapping as $col => $typeInfo) {
                         $countVal = (int) ($row[$col] ?? 0);
                         if ($countVal > 0) {
-                            QuarterlyReportEvent::create([
-                                'quarterly_report_id' => $report->id,
-                                'event_type_id' => $typeId,
-                                'count' => $countVal
-                            ]);
+                            $eventType = EventType::firstOrCreate(
+                                ['code' => $typeInfo['code']],
+                                [
+                                    'name' => $typeInfo['name'],
+                                    'category' => $typeInfo['category'],
+                                    'is_active' => true
+                                ]
+                            );
+
+                            QuarterlyReportEvent::updateOrCreate(
+                                [
+                                    'quarterly_report_id' => $report->id,
+                                    'event_type_id' => $eventType->id,
+                                ],
+                                ['count' => $countVal]
+                            );
                         }
                     }
                 }
