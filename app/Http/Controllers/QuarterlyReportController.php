@@ -213,9 +213,8 @@ class QuarterlyReportController extends Controller
         }
 
         $eventTypes = EventType::where('is_active', true)->get();
-        $quarterlyReport->load(['events', 'supervision']);
-
-        return view('quarterly_reports.edit', compact('quarterlyReport', 'zones', 'supervisions', 'eventTypes'));
+        $report = $quarterlyReport;
+        return view('quarterly_reports.edit', compact('report', 'zones', 'supervisions', 'eventTypes'));
     }
 
     public function update(Request $request, QuarterlyReport $quarterlyReport)

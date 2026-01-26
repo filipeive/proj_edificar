@@ -24,7 +24,7 @@
 @section('content')
     <div class="container-fluid space-y-12" 
         x-data="{ 
-            view: window.innerWidth < 768 ? 'grid' : 'grid',
+            view: window.innerWidth < 768 ? 'grid' : 'list',
             selected: [],
             updateView() {
                 if (window.innerWidth < 768 && this.view === 'list') {
@@ -201,7 +201,7 @@
         </div>
 
         <!-- Services Grid View -->
-        <div x-show="view === 'grid'" x-transition.fade.duration.300ms class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+        <div x-show="view === 'grid'" x-cloak x-transition.fade.duration.300ms class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
             @foreach($services as $service)
                 <div class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 dark:hover:shadow-gray-900/50 transition-all group flex flex-col relative border-t-4 {{ $service->service_type === 'teaching' ? 'border-t-orange-500' : 'border-t-blue-500' }}"
                      :class="{'ring-2 ring-blue-500 bg-blue-50/10 dark:bg-blue-900/10': selected.includes({{ $service->id }})}">
@@ -295,7 +295,7 @@
         </div>
 
         <!-- Services List View -->
-        <div x-show="view === 'list'" x-transition.fade.duration.300ms class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div x-show="view === 'list'" x-cloak x-transition.fade.duration.300ms class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
