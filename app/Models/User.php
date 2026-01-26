@@ -18,6 +18,7 @@ class User extends Authenticatable
         'role',
         'cell_id',
         'is_active',
+        'observations',
     ];
 
     protected $hidden = [

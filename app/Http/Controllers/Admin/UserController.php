@@ -594,6 +594,36 @@ class UserController
         }
     }
 
+    public function reassignCell(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'cell_id' => 'required|exists:cells,id',
+        ]);
+
+        $user->update(['cell_id' => $validated['cell_id']]);
+
+        return back()->with('success', 'Membro transferido com sucesso!');
+    }
+
+    public function removeFromCell(User $user)
+    {
+        // Apenas remove da célula, não deleta do sistema
+        $user->update(['cell_id' => null]);
+
+        return back()->with('success', 'Membro removido da célula com sucesso!');
+    }
+
+    public function updateObservations(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'observations' => 'nullable|string',
+        ]);
+
+        $user->update(['observations' => $validated['observations']]);
+
+        return back()->with('success', 'Observações atualizadas com sucesso!');
+    }
+
     /**
      * Validar se usuário pode criar membro nesta célula
      */

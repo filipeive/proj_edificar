@@ -185,6 +185,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/cells/{cell}/visitors', [\App\Http\Controllers\AttendanceController::class, 'storeVisitor'])->name('cells.visitors.store');
             Route::post('/cells/{cell}/discipleships', [\App\Http\Controllers\AttendanceController::class, 'storeDiscipleship'])->name('cells.discipleships.store');
             Route::post('/cells/{cell}/conversions', [\App\Http\Controllers\AttendanceController::class, 'storeConversion'])->name('cells.conversions.store');
+            Route::post('/cells/{cell}/reassign-supervision', [CellController::class, 'reassignSupervision'])->name('cells.reassign-supervision');
             Route::delete('cells/bulk-destroy', [CellController::class, 'bulkDestroy'])->name('cells.bulk-destroy');
             Route::resource('cells', CellController::class);
 
@@ -213,6 +214,8 @@ Route::middleware('auth')->group(function () {
             // Gestão de Utilizadores
             Route::delete('/users/bulk-destroy', [UserController::class, 'bulkDestroy'])->name('users.bulk-destroy');
             Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
+            Route::post('/users/{user}/reassign-cell', [UserController::class, 'reassignCell'])->name('users.reassign-cell');
+            Route::post('/users/{user}/remove-from-cell', [UserController::class, 'removeFromCell'])->name('users.remove-from-cell');
             Route::resource('users', UserController::class);
 
         });

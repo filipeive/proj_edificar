@@ -145,9 +145,25 @@ class CellController
 
     public function show(Cell $cell): View
     {
+        $user = auth()->user();
+        $availableCellsQuery = Cell::orderBy('name');
+
+        if ($user->isPastorZona()) {
+            $availableCellsQuery->whereHas('supervision', function ($q) use ($user) {
+                $q->where('zone_id', $user->getZoneId());
+            });
+        } elseif ($user->isSupervisor()) {
+            $availableCellsQuery->whereIn('supervision_id', $user->getManagedSupervisionIds());
+        }
+
+        $availableCells = $availableCellsQuery->where('id', '!=', $cell->id)->get();
+
         return view(
             'admin.cells.show',
-            ['cell' => $cell->load('supervision', 'leader', 'members')]
+            [
+                'cell' => $cell->load('supervision', 'leader', 'members'),
+                'availableCells' => $availableCells
+            ]
         );
     }
 
@@ -237,5 +253,15 @@ class CellController
         $pdf = Pdf::loadView('admin.cells.pdf', compact('cell'));
 
         return $pdf->download("ficha_celula_{$cell->name}.pdf");
+    }
+    public function reassignSupervision(Request $request, Cell $cell)
+    {
+        $validated = $request->validate([
+            'supervision_id' => 'required|exists:supervisions,id',
+        ]);
+
+        $cell->update(['supervision_id' => $validated['supervision_id']]);
+
+        return back()->with('success', 'Célula transferida de supervisão com sucesso!');
     }
 }

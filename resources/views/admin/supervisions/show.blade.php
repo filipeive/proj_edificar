@@ -20,7 +20,14 @@
 @endsection
 
 @section('content')
-    <div class="space-y-8">
+    <div class="space-y-8" x-data="{
+        showTransferModal: false,
+        selectedCell: {},
+        transfer(cell) {
+            this.selectedCell = cell;
+            this.showTransferModal = true;
+        }
+    }">
         <!-- Header & Stats Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <!-- Info Supervisão -->
@@ -117,9 +124,17 @@
                                             {{ number_format($cell->getTotalContributedThisMonth(), 0, ',', '.') }} MT
                                         </td>
                                         <td class="px-10 py-6 text-right">
-                                            <a href="{{ route('cells.show', $cell) }}" class="text-gray-300 hover:text-blue-600 transition-colors">
-                                                <i class="bi bi-chevron-right text-lg"></i>
-                                            </a>
+                                            <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                                <button @click="transfer({ id: {{ $cell->id }}, name: '{{ $cell->name }}' })"
+                                                    class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-center transition-all"
+                                                    title="Transferir Supervisão">
+                                                    <i class="bi bi-arrow-left-right"></i>
+                                                </button>
+                                                <a href="{{ route('cells.show', $cell) }}"
+                                                    class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-center transition-all">
+                                                    <i class="bi bi-chevron-right"></i>
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty
@@ -167,6 +182,40 @@
                     </div>
                     <i class="bi bi-briefcase-fill absolute -right-4 -bottom-4 text-9xl text-white opacity-5"></i>
                 </div>
+            </div>
+        </div>
+
+        <!-- Transfer Cell Modal -->
+        <div x-show="showTransferModal" 
+            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            style="display: none;">
+            <div @click.away="showTransferModal = false" class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden animate-In">
+                <div class="p-8 border-b border-gray-100">
+                    <h3 class="text-xl font-black text-gray-900 leading-tight">Transferir Célula</h3>
+                    <p class="text-sm text-gray-500 mt-1" x-text="'Mover ' + selectedCell.name + ' para outra supervisão'"></p>
+                </div>
+                <form :action="'{{ url('/admin/cells') }}/' + selectedCell.id + '/reassign-supervision'" method="POST" class="p-8 space-y-6">
+                    @csrf
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Selecione a Supervisão de Destino</label>
+                        <select name="supervision_id" required class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all">
+                            <option value="">Escolha uma supervisão...</option>
+                            @foreach($availableSupervisions as $availSup)
+                                <option value="{{ $availSup->id }}">{{ $availSup->name }} ({{ $availSup->zone->name }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" @click="showTransferModal = false" class="flex-1 px-6 py-4 rounded-2xl bg-gray-50 text-gray-500 font-black text-xs uppercase tracking-widest hover:bg-gray-100 transition-all">Cancelar</button>
+                        <button type="submit" class="flex-1 px-6 py-4 rounded-2xl bg-blue-600 text-white font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">Confirmar</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

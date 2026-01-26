@@ -75,9 +75,21 @@ class SupervisionController
 
     public function show(Supervision $supervision): View
     {
+        $user = auth()->user();
+        $query = Supervision::orderBy('name');
+
+        if ($user->isPastorZona()) {
+            $query->where('zone_id', $user->getZoneId());
+        }
+
+        $availableSupervisions = $query->where('id', '!=', $supervision->id)->get();
+
         return view(
             'admin.supervisions.show',
-            ['supervision' => $supervision->load('zone', 'cells')]
+            [
+                'supervision' => $supervision->load('zone', 'cells'),
+                'availableSupervisions' => $availableSupervisions
+            ]
         );
     }
 

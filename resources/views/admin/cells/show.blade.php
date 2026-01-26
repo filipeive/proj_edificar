@@ -25,7 +25,20 @@
 @endsection
 
 @section('content')
-    <div class="space-y-8" x-data="{ activeTab: localStorage.getItem('cell_active_tab') || 'members' }" x-init="$watch('activeTab', value => localStorage.setItem('cell_active_tab', value))">
+    <div class="space-y-8" x-data="{ 
+            activeTab: localStorage.getItem('cell_active_tab') || 'members',
+            showTransferModal: false,
+            showObsModal: false,
+            selectedMember: {},
+            transfer(member) {
+                this.selectedMember = member;
+                this.showTransferModal = true;
+            },
+            openObs(member) {
+                this.selectedMember = member;
+                this.showObsModal = true;
+            }
+        }" x-init="$watch('activeTab', value => localStorage.setItem('cell_active_tab', value))">
         <!-- Header & Stats Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <!-- Info Célula -->
@@ -153,10 +166,30 @@
                                             </span>
                                         </td>
                                         <td class="px-10 py-6 text-right">
-                                            <a href="{{ route('users.show', $member) }}"
-                                                class="text-gray-300 hover:text-blue-600 transition-colors">
-                                                <i class="bi bi-chevron-right text-lg"></i>
-                                            </a>
+                                            <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                                <button @click="openObs({ id: {{ $member->id }}, name: '{{ $member->name }}', obs: '{{ addslashes($member->observations) }}' })"
+                                                    class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-orange-50 hover:text-orange-600 flex items-center justify-center transition-all"
+                                                    title="Observações">
+                                                    <i class="bi bi-chat-dots{{ $member->observations ? '-fill' : '' }}"></i>
+                                                </button>
+                                                <button @click="transfer({ id: {{ $member->id }}, name: '{{ $member->name }}' })"
+                                                    class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-center transition-all"
+                                                    title="Transferir Célula">
+                                                    <i class="bi bi-arrow-left-right"></i>
+                                                </button>
+                                                <form action="{{ route('users.remove-from-cell', $member) }}" method="POST" class="inline" onsubmit="return confirm('Deseja remover este membro desta célula? O membro continuará no sistema, mas sem vínculo a esta célula.')">
+                                                    @csrf
+                                                    <button type="submit"
+                                                        class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 flex items-center justify-center transition-all"
+                                                        title="Remover da Célula">
+                                                        <i class="bi bi-person-x"></i>
+                                                    </button>
+                                                </form>
+                                                <a href="{{ route('users.show', $member) }}"
+                                                    class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-center transition-all">
+                                                    <i class="bi bi-chevron-right"></i>
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty
@@ -318,6 +351,69 @@
                     </div>
                     <i class="bi bi-lightning-charge-fill absolute -right-4 -bottom-4 text-9xl text-white opacity-5"></i>
                 </div>
+            </div>
+        </div>
+
+        <!-- Transfer Member Modal -->
+        <div x-show="showTransferModal" 
+            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            style="display: none;">
+            <div @click.away="showTransferModal = false" class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden animate-In">
+                <div class="p-8 border-b border-gray-100">
+                    <h3 class="text-xl font-black text-gray-900 leading-tight">Transferir Membro</h3>
+                    <p class="text-sm text-gray-500 mt-1" x-text="'Mover ' + selectedMember.name + ' para outra célula'"></p>
+                </div>
+                <form :action="'{{ url('/admin/users') }}/' + selectedMember.id + '/reassign-cell'" method="POST" class="p-8 space-y-6">
+                    @csrf
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Selecione a Célula de Destino</label>
+                        <select name="cell_id" required class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all">
+                            <option value="">Escolha uma célula...</option>
+                            @foreach($availableCells as $availCell)
+                                <option value="{{ $availCell->id }}">{{ $availCell->name }} ({{ $availCell->supervision->name }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" @click="showTransferModal = false" class="flex-1 px-6 py-4 rounded-2xl bg-gray-50 text-gray-500 font-black text-xs uppercase tracking-widest hover:bg-gray-100 transition-all">Cancelar</button>
+                        <button type="submit" class="flex-1 px-6 py-4 rounded-2xl bg-blue-600 text-white font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">Confirmar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Observations Modal -->
+        <div x-show="showObsModal" 
+            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            style="display: none;">
+            <div @click.away="showObsModal = false" class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-hidden animate-In">
+                <div class="p-8 border-b border-gray-100">
+                    <h3 class="text-xl font-black text-gray-900 leading-tight">Observações do Membro</h3>
+                    <p class="text-sm text-gray-500 mt-1" x-text="selectedMember.name"></p>
+                </div>
+                <form :action="'{{ url('/admin/users') }}/' + selectedMember.id + '/update-observations'" method="POST" class="p-8 space-y-6">
+                    @csrf
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Notas e Status (ex: Desistente, Afastado)</label>
+                        <textarea name="observations" x-model="selectedMember.obs" rows="5" class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all placeholder:text-gray-300" placeholder="Digite as observações aqui..."></textarea>
+                    </div>
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" @click="showObsModal = false" class="flex-1 px-6 py-4 rounded-2xl bg-gray-50 text-gray-500 font-black text-xs uppercase tracking-widest hover:bg-gray-100 transition-all">Cancelar</button>
+                        <button type="submit" class="flex-1 px-6 py-4 rounded-2xl bg-green-600 text-white font-black text-xs uppercase tracking-widest hover:bg-green-700 transition-all shadow-lg shadow-green-200">Salvar Notas</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
