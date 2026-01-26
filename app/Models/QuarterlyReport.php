@@ -13,6 +13,7 @@ class QuarterlyReport extends Model
         'zone_id',
         'supervision_id',
         'supervisor_id',
+        'zone_pastor_id',
         'year',
         'quarter',
         'leaders_count',
@@ -63,6 +64,11 @@ class QuarterlyReport extends Model
     public function supervisor()
     {
         return $this->belongsTo(User::class, 'supervisor_id');
+    }
+
+    public function zonePastor()
+    {
+        return $this->belongsTo(User::class, 'zone_pastor_id');
     }
 
     public function events()
