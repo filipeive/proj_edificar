@@ -13,14 +13,13 @@
 
 @section('content')
     <div class="w-full space-y-8" x-data="{ 
-                                    view: window.innerWidth < 768 ? 'grid' : 'list',
-                                    updateView() {
-                                        if (window.innerWidth < 768 && this.view === 'list') {
-                                            this.view = 'grid';
-                                        }
-                                    }
-                                }"
-        x-init="$watch('view', value => localStorage.setItem('quarterly_reports_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('quarterly_reports_view') || 'list')"
+                view: localStorage.getItem('quarterly_reports_view') || (window.innerWidth < 768 ? 'grid' : 'list'),
+                updateView() {
+                    if (window.innerWidth < 768 && this.view === 'list') {
+                        this.view = 'grid';
+                    }
+                }
+            }" x-init="$watch('view', value => localStorage.setItem('quarterly_reports_view', value))"
         @resize.window.debounce.500ms="updateView()">
         <!-- Analytics Dashboard (Hidden on Mobile) -->
         <div class="hidden md:grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -231,7 +230,7 @@
     </div>
 
     <!-- LIST VIEW -->
-    <div x-show="view === 'list'" x-transition:enter="transition ease-out duration-300"
+    <div x-show="view === 'list'" x-cloak x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
         class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
         <div class="overflow-x-auto">
@@ -309,7 +308,7 @@
                             <td class="px-10 py-6 text-center">
                                 <span
                                     class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm
-                                                                                            {{ $report->status == 'submitted' ? 'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 border-green-100 dark:border-green-800' : 'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 border-yellow-100 dark:border-yellow-800' }}">
+                                                                                                    {{ $report->status == 'submitted' ? 'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 border-green-100 dark:border-green-800' : 'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 border-yellow-100 dark:border-yellow-800' }}">
                                     {{ $report->status == 'submitted' ? 'Submetido' : 'Rascunho' }}
                                 </span>
                             </td>
@@ -358,7 +357,7 @@
     </div>
 
     <!-- GRID VIEW -->
-    <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300"
+    <div x-show="view === 'grid'" x-cloak x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
         class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
         @forelse($reports as $report)
@@ -374,7 +373,7 @@
                     </div>
                     <span
                         class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm
-                                                                                                    {{ $report->status == 'submitted' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-yellow-50 text-yellow-600 border-yellow-100' }}">
+                                                                                                            {{ $report->status == 'submitted' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-yellow-50 text-yellow-600 border-yellow-100' }}">
                         {{ $report->status == 'submitted' ? 'Submetido' : 'Rascunho' }}
                     </span>
                 </div>
