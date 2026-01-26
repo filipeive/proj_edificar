@@ -310,8 +310,8 @@
                                                             required @checked($report->$field == $i)>
                                                         <div
                                                             class="w-full py-3 text-center rounded-xl bg-white border border-gray-100 text-sm font-black transition-all cursor-pointer
-                                                                                            peer-checked:bg-{{ $section['color'] }}-600 peer-checked:text-white peer-checked:shadow-lg peer-checked:shadow-{{ $section['color'] }}-200
-                                                                                            hover:border-{{ $section['color'] }}-500 text-gray-400">
+                                                                                                            peer-checked:bg-{{ $section['color'] }}-600 peer-checked:text-white peer-checked:shadow-lg peer-checked:shadow-{{ $section['color'] }}-200
+                                                                                                            hover:border-{{ $section['color'] }}-500 text-gray-400">
                                                             {{ $i }}
                                                         </div>
                                                     </label>
@@ -385,8 +385,8 @@
                 step: 1,
                 zoneId: '{{ $report->zone_id }}',
                 supervisionId: '{{ $report->supervision_id }}',
-                zones: @json($zones),
-                supervisions: @json($supervisions),
+                zones: {{ Js::from($zones) }},
+                supervisions: {{ Js::from($supervisions) }},
                 filteredSupervisions: [],
 
                 init() {
@@ -398,7 +398,7 @@
                         this.filteredSupervisions = [];
                         return;
                     }
-                    this.filteredSupervisions = this.supervisions.filter(s => s.zone_id == this.zoneId);
+                    this.filteredSupervisions = this.supervisions.filter(s => Number(s.zone_id) === Number(this.zoneId));
                 },
 
                 nextStep() {

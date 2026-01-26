@@ -13,68 +13,97 @@
 @section('content')
     <div class="space-y-8" 
         x-data="{ 
-            view: window.innerWidth < 768 ? 'grid' : 'grid',
+            view: window.innerWidth < 768 ? 'grid' : (localStorage.getItem('cells_view') || 'grid'),
+            selected: [],
             updateView() {
                 if (window.innerWidth < 768 && this.view === 'list') {
                     this.view = 'grid';
                 }
+            },
+            toggleAll() {
+                const allIds = @json($cells->pluck('id'));
+                if (this.selected.length === allIds.length) {
+                    this.selected = [];
+                } else {
+                    this.selected = allIds;
+                }
+            },
+            deleteSelected() {
+                document.getElementById('bulk-delete-form').submit();
             }
         }"
-        x-init="$watch('view', value => localStorage.setItem('cells_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('cells_view') || 'grid')"
+        x-init="$watch('view', value => localStorage.setItem('cells_view', value))"
         @resize.window.debounce.500ms="updateView()">
-        <!-- Header -->
-        <div
-            class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white p-4 md:p-8 rounded-2xl md:rounded-[2.5rem] shadow-sm border border-gray-100">
-            <div class="space-y-1">
-                <h1 class="text-3xl font-black text-gray-900 tracking-tight">Células</h1>
-                <p class="text-gray-500 font-medium">Gerenciamento dinâmico das comunidades e liderança da igreja.</p>
-            </div>
 
-            <div class="flex flex-wrap items-center gap-4 w-full md:w-auto">
-                <!-- View Switcher -->
-                <div class="hidden md:flex bg-gray-100/50 p-1.5 rounded-2xl items-center gap-1">
-                    <button @click="view = 'grid'"
-                        :class="view === 'grid' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
-                        class="px-4 py-2 rounded-xl transition-all duration-300 flex items-center gap-2">
-                        <i class="bi bi-grid-fill"></i>
-                        <span class="text-[10px] font-black uppercase tracking-widest leading-none">Cards</span>
-                    </button>
-                    <button @click="view = 'list'"
-                        :class="view === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
-                        class="px-4 py-2 rounded-xl transition-all duration-300 flex items-center gap-2">
-                        <i class="bi bi-list-ul"></i>
-                        <span class="text-[10px] font-black uppercase tracking-widest leading-none">Listagem</span>
-                    </button>
+        <!-- Bulk Action Bar -->
+        <div x-show="selected.length > 0" x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 -translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0"
+            x-transition:leave-end="opacity-0 -translate-y-4"
+            class="fixed top-24 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
+            <div class="bg-gray-900 text-white rounded-2xl shadow-2xl p-4 flex items-center gap-6 pointer-events-auto border border-gray-700/50 backdrop-blur-md bg-opacity-90">
+                <div class="flex items-center gap-3 pl-2">
+                    <span class="bg-blue-600 text-xs font-black px-2.5 py-1 rounded-lg" x-text="selected.length"></span>
+                    <span class="text-sm font-medium">selecionados</span>
                 </div>
-
-                <div class="hidden md:flex gap-3">
-                    <a href="{{ route('members.create') }}"
-                        class="group flex items-center bg-gray-50 text-gray-600 px-6 py-4 rounded-2xl hover:bg-gray-100 transition-all font-black text-xs uppercase tracking-widest">
-                        <i class="bi bi-person-plus text-lg mr-2 group-hover:scale-110 transition-transform"></i>
-                        Novo Membro
-                    </a>
-                    <a href="{{ route('cells.create') }}"
-                        class="group flex items-center bg-blue-600 text-white px-6 py-4 rounded-2xl hover:bg-blue-700 transition-all duration-300 font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-200">
-                        <i class="bi bi-plus-circle text-lg mr-2 group-hover:scale-110 transition-transform"></i>
-                        Nova Célula
-                    </a>
+                <div class="h-8 w-px bg-gray-700"></div>
+                <div class="flex items-center gap-2">
+                    <button @click="selected = []" class="px-4 py-2 text-xs font-bold uppercase tracking-wider text-gray-400 hover:text-white transition-colors">
+                        Cancelar
+                    </button>
+                    <button @click="if(confirm('Deseja excluir as ' + selected.length + ' células selecionadas?')) deleteSelected()"
+                        class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-red-600/20 flex items-center gap-2">
+                        <i class="bi bi-trash-fill"></i> Excluir
+                    </button>
                 </div>
             </div>
         </div>
-
-        <!-- Search & Filter Panel -->
-        <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100">
-            <form action="{{ route('cells.index') }}" method="GET" class="flex flex-col md:flex-row gap-4">
-                <div class="flex-1 relative">
-                    <i class="bi bi-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        <!-- Header -->
+        <div class="bg-white p-6 md:p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col lg:flex-row justify-between items-center gap-6 transition-all">
+            <div class="flex-1 w-full lg:max-w-md relative group">
+                <form action="{{ route('cells.index') }}" method="GET" class="contents">
+                    <i class="bi bi-search absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors"></i>
                     <input type="text" name="search" value="{{ request('search') }}"
-                        placeholder="Nome da célula, líder ou zona..."
-                        class="w-full pl-14 pr-6 py-4 bg-gray-50/50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700 placeholder-gray-400">
+                        placeholder="Pesquisar célula, líder ou zona..."
+                        class="w-full pl-14 pr-6 py-4 bg-gray-50/50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all"
+                        @input.debounce.500ms="$el.form.submit()">
+                </form>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-center md:justify-end gap-4 w-full lg:w-auto">
+                {{-- View Switcher --}}
+                <div class="flex bg-gray-100/50 p-1.5 rounded-2xl border border-gray-100">
+                    <button @click="view = 'grid'" 
+                        :class="view === 'grid' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
+                        class="px-4 py-2 rounded-xl transition-all duration-300 flex items-center gap-2">
+                        <i class="bi bi-grid-fill text-sm"></i>
+                        <span class="text-[10px] font-black uppercase tracking-widest leading-none">Cards</span>
+                    </button>
+                    <button @click="view = 'list'" 
+                        :class="view === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
+                        class="px-4 py-2 rounded-xl transition-all duration-300 flex items-center gap-2">
+                        <i class="bi bi-list-ul text-sm"></i>
+                        <span class="text-[10px] font-black uppercase tracking-widest leading-none">Lista</span>
+                    </button>
                 </div>
 
+                <a href="{{ route('cells.create') }}" class="group flex items-center bg-blue-600 text-white px-8 py-4 rounded-2xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-200">
+                    <i class="bi bi-plus-circle text-lg mr-2 group-hover:scale-110 transition-transform"></i>
+                    Nova Célula
+                </a>
+            </div>
+        </div>
+
+        <!-- Filters Panel -->
+        <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100">
+            <form action="{{ route('cells.index') }}" method="GET" class="flex flex-col md:flex-row gap-4">
+                @if(request('search'))
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+                @endif
+                
                 @if(count($zones) > 1)
                     <div class="w-full md:w-64">
-                        <select name="zone"
+                        <select name="zone" onchange="this.form.submit()"
                             class="w-full px-6 py-4 bg-gray-50/50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700">
                             <option value="">Todas as Zonas</option>
                             @foreach($zones as $zone)
@@ -87,7 +116,7 @@
                 @endif
 
                 <div class="w-full md:w-64">
-                    <select name="supervision"
+                    <select name="supervision" onchange="this.form.submit()"
                         class="w-full px-6 py-4 bg-gray-50/50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700">
                         <option value="">Todas as Supervisões</option>
                         @foreach($supervisions as $supervision)
@@ -98,27 +127,37 @@
                     </select>
                 </div>
 
-                <button type="submit"
-                    class="bg-gray-900 text-white px-10 py-4 rounded-2xl hover:bg-black transition-all font-black text-xs uppercase tracking-widest">
-                    Filtrar
-                </button>
-
                 @if(request()->hasAny(['search', 'zone', 'supervision']))
                     <a href="{{ route('cells.index') }}"
-                        class="flex items-center justify-center px-5 py-4 text-red-500 bg-red-50 hover:bg-red-100 rounded-2xl transition-all">
-                        <i class="bi bi-x-lg text-lg"></i>
+                        class="flex items-center gap-2 px-6 py-4 text-red-600 bg-red-50 hover:bg-red-100 rounded-2xl transition-all font-black text-[10px] uppercase tracking-widest ml-auto">
+                        <i class="bi bi-x-circle-fill"></i> Limpar Filtros
                     </a>
                 @endif
             </form>
         </div>
+
+        <form id="bulk-delete-form" action="{{ route('cells.bulk-destroy') }}" method="POST" style="display: none;">
+            @csrf
+            @method('DELETE')
+            <template x-for="id in selected">
+                <input type="hidden" name="ids[]" :value="id">
+            </template>
+        </form>
 
         <!-- Grid View -->
         <template x-if="view === 'grid'">
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 @forelse($cells as $cell)
                     <div
-                        class="group bg-white rounded-[2rem] p-7 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-100 relative">
-                        <div class="flex items-start justify-between mb-8">
+                        class="group bg-white rounded-[2rem] p-7 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-100 relative"
+                        :class="{'ring-2 ring-blue-500 bg-blue-50/10': selected.includes({{ $cell->id }})}">
+                        
+                        <div class="absolute top-4 left-4 z-20">
+                            <input type="checkbox" value="{{ $cell->id }}" x-model="selected"
+                                class="w-5 h-5 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer shadow-sm">
+                        </div>
+
+                        <div class="flex items-start justify-between mb-8 ml-8">
                             <div class="flex items-center gap-5">
                                 <div
                                     class="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-3xl font-black shadow-sm group-hover:scale-110 transition-transform duration-300">
@@ -130,10 +169,6 @@
                                         class="flex items-center text-[10px] font-black text-gray-400 uppercase tracking-widest gap-2">
                                         <span
                                             class="bg-gray-50 px-2 py-1 rounded-lg text-blue-600">{{ $cell->supervision->name ?? 'Independente' }}</span>
-                                        @if($cell->supervision && $cell->supervision->zone)
-                                            <span class="opacity-25 opacity-30 px-2">|</span>
-                                            <span>{{ $cell->supervision->zone->name }}</span>
-                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -142,15 +177,6 @@
                                     class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-blue-50 text-gray-400 hover:text-blue-600 flex items-center justify-center transition-all shadow-sm">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
-                                <form action="{{ route('cells.destroy', $cell) }}" method="POST"
-                                    id="delete-form-{{ $cell->id }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="button" onclick="confirmDelete('{{ route('cells.destroy', $cell) }}', 'delete-form-{{ $cell->id }}')"
-                                        class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-500 flex items-center justify-center transition-all shadow-sm">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
                             </div>
                         </div>
 
@@ -219,24 +245,33 @@
                 <table class="w-full text-left">
                     <thead>
                         <tr class="bg-gray-50/50">
-                            <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                            <th class="px-6 py-6 w-10">
+                                <input type="checkbox" @click="toggleAll()"
+                                    :checked="selected.length === {{ $cells->count() }} && selected.length > 0"
+                                    class="w-5 h-5 rounded-lg border-gray-300 text-blue-600 cursor-pointer shadow-sm">
+                            </th>
+                            <th class="px-6 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">
                                 Identificação da Célula</th>
-                            <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Líder
+                            <th class="px-6 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Líder
                                 Responsável</th>
-                            <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Estrutura
+                            <th class="px-6 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Estrutura
                             </th>
                             <th
-                                class="px-10 py-6 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                class="px-6 py-6 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
                                 Membros</th>
                             <th
-                                class="px-10 py-6 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                class="px-6 py-6 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">
                                 Gestão</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50">
                         @foreach($cells as $cell)
-                            <tr class="hover:bg-gray-50/50 transition-colors group">
-                                <td class="px-10 py-7">
+                            <tr class="hover:bg-gray-50/50 transition-colors group" :class="{'bg-blue-50/30': selected.includes({{ $cell->id }})}">
+                                <td class="px-6 py-7">
+                                    <input type="checkbox" value="{{ $cell->id }}" x-model="selected"
+                                        class="w-5 h-5 rounded-lg border-gray-300 text-blue-600 cursor-pointer shadow-sm">
+                                </td>
+                                <td class="px-6 py-7">
                                     <div class="flex items-center gap-4">
                                         <div
                                             class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm font-black">
@@ -245,7 +280,7 @@
                                         <p class="font-black text-gray-900 uppercase tracking-tight">{{ $cell->name }}</p>
                                     </div>
                                 </td>
-                                <td class="px-10 py-7">
+                                <td class="px-6 py-7">
                                     <div class="flex items-center gap-3">
                                         <img src="https://ui-avatars.com/api/?name={{ urlencode($cell->leader->name ?? 'V') }}&background=F3F4F6&color=6B7280&bold=true"
                                             class="w-8 h-8 rounded-full shadow-sm">
@@ -253,7 +288,7 @@
                                             {{ $cell->leader->name ?? 'Não Atribuído' }}</p>
                                     </div>
                                 </td>
-                                <td class="px-10 py-7">
+                                <td class="px-6 py-7">
                                     <div class="space-y-1">
                                         <p class="text-[10px] font-black text-gray-900 uppercase tracking-tight leading-none">
                                             {{ $cell->supervision->name ?? 'Sem Supervisão' }}</p>
@@ -261,9 +296,9 @@
                                             class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{{ $cell->supervision->zone->name ?? 'Zonal Life' }}</span>
                                     </div>
                                 </td>
-                                <td class="px-10 py-7 text-center font-black text-blue-600 text-lg tracking-tighter">
+                                <td class="px-6 py-7 text-center font-black text-blue-600 text-lg tracking-tighter">
                                     {{ $cell->members->count() }}</td>
-                                <td class="px-10 py-7 text-right">
+                                <td class="px-6 py-7 text-right">
                                     <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
                                         <a href="{{ route('cells.show', $cell) }}"
                                             class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all">

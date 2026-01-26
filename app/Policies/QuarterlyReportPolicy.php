@@ -13,6 +13,11 @@ class QuarterlyReportPolicy
         return in_array($user->role, ['admin', 'pastor', 'pastor_zona', 'supervisor']);
     }
 
+    public function deleteAny(User $user): bool
+    {
+        return $user->role === 'admin';
+    }
+
     public function view(User $user, QuarterlyReport $report): bool
     {
         if (in_array($user->role, ['admin', 'pastor'])) {

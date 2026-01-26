@@ -8,10 +8,36 @@ use Illuminate\View\View;
 
 class ZoneController
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $zones = Zone::with('supervisions', 'pastor')->get();
+        $query = Zone::with('supervisions', 'pastor');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('name', 'LIKE', "%$search%")
+                ->orWhereHas('pastor', fn($q) => $q->where('name', 'LIKE', "%$search%"));
+        }
+
+        $zones = $query->get();
         return view('admin.zones.index', ['zones' => $zones]);
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return back()->with('error', 'Nenhuma zona selecionada.');
+        }
+
+        // Check for supervisions before deleting
+        $zonesWithSupervisions = Zone::whereIn('id', $ids)->has('supervisions')->count();
+        if ($zonesWithSupervisions > 0) {
+            return back()->with('error', 'Algumas zonas selecionadas possuem supervisões e não podem ser excluídas.');
+        }
+
+        Zone::whereIn('id', $ids)->delete();
+
+        return back()->with('success', count($ids) . ' zonas excluídas com sucesso.');
     }
 
     public function create(): View

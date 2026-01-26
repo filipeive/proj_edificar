@@ -241,10 +241,13 @@ class QuarterlyReportController extends Controller
         $zones = collect();
         $supervisions = collect();
 
-        if ($user->role === 'admin' || $user->role === 'pastor') {
+        if ($user->role === 'admin' || $user->role === 'pastor' || $user->role === 'secretaria') {
             $zones = Zone::with('supervisions')->get();
+            $supervisions = Supervision::all();
         } elseif ($user->role === 'pastor_zona') {
-            $zones = Zone::where('pastor_id', $user->id)->with('supervisions')->get();
+            $zoneIds = $user->getManagedZoneIds();
+            $zones = Zone::whereIn('id', $zoneIds)->with('supervisions')->get();
+            $supervisions = Supervision::whereIn('zone_id', $zoneIds)->get();
         } elseif ($user->role === 'supervisor') {
             $zoneId = $user->getZoneId();
             $zones = Zone::where('id', $zoneId)->get();

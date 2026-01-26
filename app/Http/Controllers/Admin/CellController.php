@@ -205,6 +205,31 @@ class CellController
         return redirect()->route('cells.index')->with('success', 'Célula excluída com sucesso!');
     }
 
+    public function bulkDestroy(Request $request)
+    {
+        $ids = $request->input('ids', []);
+
+        $cells = Cell::whereIn('id', $ids)->get();
+        $deletedCount = 0;
+        $skippedCount = 0;
+
+        foreach ($cells as $cell) {
+            if ($cell->members()->exists()) {
+                $skippedCount++;
+                continue;
+            }
+            $cell->delete();
+            $deletedCount++;
+        }
+
+        $message = "{$deletedCount} células excluídas.";
+        if ($skippedCount > 0) {
+            $message .= " {$skippedCount} foram puladas por possuírem membros.";
+        }
+
+        return redirect()->route('cells.index')->with($skippedCount > 0 ? 'warning' : 'success', $message);
+    }
+
     public function downloadPdf(Cell $cell)
     {
         $cell->load(['supervision.zone', 'leader', 'members']);

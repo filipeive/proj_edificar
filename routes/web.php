@@ -175,6 +175,7 @@ Route::middleware('auth')->group(function () {
         // Intermediate Restricted (Admin, Pastor Zona, Supervisor, Secretaria, Lider Celula)
         Route::middleware('role:admin,pastor_zona,supervisor,secretaria,pastor,lider_celula')->group(function () {
             // Gestão de Supervisões
+            Route::delete('supervisions/bulk-destroy', [SupervisionController::class, 'bulkDestroy'])->name('supervisions.bulk-destroy');
             Route::resource('supervisions', SupervisionController::class);
 
             // Gestão de Células
@@ -184,6 +185,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/cells/{cell}/visitors', [\App\Http\Controllers\AttendanceController::class, 'storeVisitor'])->name('cells.visitors.store');
             Route::post('/cells/{cell}/discipleships', [\App\Http\Controllers\AttendanceController::class, 'storeDiscipleship'])->name('cells.discipleships.store');
             Route::post('/cells/{cell}/conversions', [\App\Http\Controllers\AttendanceController::class, 'storeConversion'])->name('cells.conversions.store');
+            Route::delete('cells/bulk-destroy', [CellController::class, 'bulkDestroy'])->name('cells.bulk-destroy');
             Route::resource('cells', CellController::class);
 
             // Cultos (Relatórios de Celebração)
@@ -206,6 +208,7 @@ Route::middleware('auth')->group(function () {
         // Highly Restricted (Admin & Secretaria Only)
         Route::middleware('role:admin,secretaria')->group(function () {
             // Gestão de Zonas
+            Route::delete('zones/bulk-destroy', [ZoneController::class, 'bulkDestroy'])->name('zones.bulk-destroy');
             Route::resource('zones', ZoneController::class);
             // Gestão de Utilizadores
             Route::delete('/users/bulk-destroy', [UserController::class, 'bulkDestroy'])->name('users.bulk-destroy');
