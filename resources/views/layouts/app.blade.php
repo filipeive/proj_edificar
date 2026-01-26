@@ -545,8 +545,8 @@
                             </div>
                         </div>
 
-                        <!-- Mobile Page Actions (Yield area for Add buttons on mobile) -->
-                        <div class="md:hidden flex items-center ml-2 gap-2">
+                        <!-- Mobile & Desktop Page Actions -->
+                        <div class="flex items-center ml-2 gap-2">
                             @yield('header-actions')
                         </div>
                     </div>

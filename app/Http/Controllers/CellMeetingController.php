@@ -12,67 +12,28 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\CellMeetingsExport;
+
 class CellMeetingController extends Controller
 {
-    public function downloadPdf(CellMeeting $cellMeeting)
-    {
-        Gate::authorize('view', $cellMeeting);
-        $cellMeeting->load(['cell.supervision.zone', 'leader']);
-
-        $pdf = Pdf::loadView('cell_meetings.pdf', compact('cellMeeting'));
-        $date = Carbon::parse($cellMeeting->meeting_date);
-        return $pdf->download('Relatorio_Celula_' . $date->format('d_m_Y') . '.pdf');
-    }
-
-    public function sendEmail(Request $request, CellMeeting $cellMeeting)
-    {
-        Gate::authorize('view', $cellMeeting);
-
-        $request->validate([
-            'email' => 'required|email'
-        ]);
-
-        $cellMeeting->load(['cell.supervision.zone', 'leader']);
-        $pdf = Pdf::loadView('cell_meetings.pdf', compact('cellMeeting'));
-        $pdfContent = $pdf->output();
-
-        Mail::send([], [], function ($message) use ($request, $cellMeeting, $pdfContent) {
-            $date = Carbon::parse($cellMeeting->meeting_date);
-            $type = 'Relatório de Célula';
-            if ($cellMeeting->meeting_type === 'leadership')
-                $type = 'Acta de Reunião de Liderança';
-            if ($cellMeeting->meeting_type === 'supervision')
-                $type = 'Acta de Reunião de Supervisão';
-            if ($cellMeeting->meeting_type === 'zone')
-                $type = 'Acta de Reunião de Zona';
-
-            $message->to($request->email)
-                ->subject($type . ' - ' . $date->format('d/m/Y'))
-                ->html('Olá,<br><br>Segue em anexo o/a ' . strtolower($type) . ' realizado em ' . $date->format('d/m/Y') . '.<br><br>Atenciosamente,<br>Portal Life Church')
-                ->attachData($pdfContent, str_replace(' ', '_', $type) . '_' . $date->format('d_m_Y') . '.pdf', [
-                    'mime' => 'application/pdf',
-                ]);
-        });
-
-        return back()->with('success', 'Relatório enviado com sucesso para ' . $request->email);
-    }
-    public function index()
+    public function index(Request $request)
     {
         Gate::authorize('viewAny', CellMeeting::class);
 
         $user = auth()->user();
         $query = CellMeeting::with(['cell', 'leader']);
 
+        // Base Hierarchical Filter
         if ($user->role === 'pastor_zona') {
             $zoneId = $user->getZoneId();
             $query->whereHas('cell.supervision', function ($q) use ($zoneId) {
                 $q->where('zone_id', $zoneId);
             });
         } elseif ($user->role === 'supervisor') {
-            $query->whereHas('cell', function ($q) use ($user) {
-                $q->whereHas('supervision', function ($sq) use ($user) {
-                    $sq->where('supervisor_id', $user->id);
-                });
+            $supervisionIds = $user->getManagedSupervisionIds();
+            $query->whereHas('cell', function ($q) use ($supervisionIds) {
+                $q->whereIn('supervision_id', $supervisionIds);
             });
         } elseif ($user->role === 'lider_celula') {
             $query->whereHas('cell', function ($q) use ($user) {
@@ -80,9 +41,127 @@ class CellMeetingController extends Controller
             });
         }
 
-        $meetings = $query->orderBy('meeting_date', 'desc')->paginate(15);
+        // Additional Filters
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('theme', 'LIKE', "%{$search}%")
+                    ->orWhere('biblical_text', 'LIKE', "%{$search}%")
+                    ->orWhereHas('cell', function ($cq) use ($search) {
+                        $cq->where('name', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('leader', function ($lq) use ($search) {
+                        $lq->where('name', 'LIKE', "%{$search}%");
+                    });
+            });
+        }
 
-        return view('cell_meetings.index', compact('meetings'));
+        if ($request->filled('cell_id')) {
+            $query->where('cell_id', $request->cell_id);
+        }
+
+        if ($request->filled('meeting_type')) {
+            $query->where('meeting_type', $request->meeting_type);
+        }
+
+        if ($request->filled('date_start')) {
+            $query->whereDate('meeting_date', '>=', $request->date_start);
+        }
+
+        if ($request->filled('date_end')) {
+            $query->whereDate('meeting_date', '<=', $request->date_end);
+        }
+
+        $meetings = $query->orderBy('meeting_date', 'desc')->paginate(15)->withQueryString();
+
+        // Data for filters
+        $cells = collect();
+        if ($user->isAdmin() || $user->role === 'pastor') {
+            $cells = Cell::orderBy('name')->get();
+        } elseif ($user->role === 'pastor_zona') {
+            $cells = Cell::whereHas('supervision', function ($q) use ($user) {
+                $q->where('zone_id', $user->getZoneId());
+            })->orderBy('name')->get();
+        } elseif ($user->role === 'supervisor') {
+            $cells = Cell::whereIn('supervision_id', $user->getManagedSupervisionIds())->orderBy('name')->get();
+        }
+
+        $statsQuery = clone $query;
+        $stats = [
+            'total_meetings' => $statsQuery->count(),
+            'total_attendance' => (int) $statsQuery->sum(\DB::raw('adults_count + children_count + visitors_count')),
+            'avg_attendance' => $statsQuery->count() > 0
+                ? round($statsQuery->sum(\DB::raw('adults_count + children_count + visitors_count')) / $statsQuery->count(), 1)
+                : 0,
+            'total_decisions' => $statsQuery->whereNotNull('decisions')->where('decisions', '!=', '')->count(),
+        ];
+
+        return view('cell_meetings.index', compact('meetings', 'cells', 'stats'));
+    }
+
+    public function export(Request $request)
+    {
+        Gate::authorize('viewAny', CellMeeting::class);
+
+        $user = auth()->user();
+        $query = CellMeeting::with(['cell', 'leader']);
+
+        // Apply same filters as index
+        if ($user->role === 'pastor_zona') {
+            $zoneId = $user->getZoneId();
+            $query->whereHas('cell.supervision', function ($q) use ($zoneId) {
+                $q->where('zone_id', $zoneId);
+            });
+        } elseif ($user->role === 'supervisor') {
+            $supervisionIds = $user->getManagedSupervisionIds();
+            $query->whereHas('cell', function ($q) use ($supervisionIds) {
+                $q->whereIn('supervision_id', $supervisionIds);
+            });
+        } elseif ($user->role === 'lider_celula') {
+            $query->whereHas('cell', function ($q) use ($user) {
+                $q->where('leader_id', $user->id);
+            });
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('theme', 'LIKE', "%{$search}%")
+                    ->orWhere('biblical_text', 'LIKE', "%{$search}%")
+                    ->orWhereHas('cell', function ($cq) use ($search) {
+                        $cq->where('name', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('leader', function ($lq) use ($search) {
+                        $lq->where('name', 'LIKE', "%{$search}%");
+                    });
+            });
+        }
+
+        if ($request->filled('cell_id')) {
+            $query->where('cell_id', $request->cell_id);
+        }
+
+        if ($request->filled('meeting_type')) {
+            $query->where('meeting_type', $request->meeting_type);
+        }
+
+        $meetings = $query->orderBy('meeting_date', 'desc')->get();
+
+        return Excel::download(new CellMeetingsExport($meetings), 'Encontros_Celula.xlsx');
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        Gate::authorize('deleteAny', CellMeeting::class);
+
+        $validated = $request->validate([
+            'selected_ids' => 'required|array',
+            'selected_ids.*' => 'exists:cell_meetings,id'
+        ]);
+
+        $count = CellMeeting::whereIn('id', $validated['selected_ids'])->delete();
+
+        return redirect()->route('cell-meetings.index')->with('success', "{$count} encontro(s) excluído(s) com sucesso!");
     }
 
     public function create()
@@ -92,7 +171,7 @@ class CellMeetingController extends Controller
         $user = auth()->user();
         $cells = collect();
 
-        if ($user->role === 'admin' || $user->role === 'pastor') {
+        if ($user->isAdmin() || $user->role === 'pastor') {
             $cells = Cell::all();
         } elseif ($user->role === 'pastor_zona') {
             $zoneId = $user->getZoneId();
@@ -100,9 +179,7 @@ class CellMeetingController extends Controller
                 $q->where('zone_id', $zoneId);
             })->get();
         } elseif ($user->role === 'supervisor') {
-            $cells = Cell::whereHas('supervision', function ($q) use ($user) {
-                $q->where('supervisor_id', $user->id);
-            })->get();
+            $cells = Cell::whereIn('supervision_id', $user->getManagedSupervisionIds())->get();
         } elseif ($user->role === 'lider_celula') {
             $cells = Cell::where('leader_id', $user->id)->get();
         } else {
@@ -123,10 +200,14 @@ class CellMeetingController extends Controller
                     });
             });
         } elseif ($user->isSupervisor()) {
-            $leadersQuery->where(function ($q) use ($user) {
+            $supervisionIds = $user->getManagedSupervisionIds();
+            $leadersQuery->where(function ($q) use ($user, $supervisionIds) {
                 $q->where('id', $user->id)
-                    ->orWhereHas('cell.supervision', function ($sq) use ($user) {
-                        $sq->where('supervisor_id', $user->id);
+                    ->orWhereHas('cell', function ($cq) use ($supervisionIds) {
+                        $cq->whereIn('supervision_id', $supervisionIds);
+                    })
+                    ->orWhereHas('supervisedSupervisions', function ($sq) use ($supervisionIds) {
+                        $sq->whereIn('id', $supervisionIds);
                     });
             });
         } elseif ($user->isLider()) {
@@ -218,9 +299,71 @@ class CellMeetingController extends Controller
     {
         Gate::authorize('view', $cellMeeting);
 
-        $cellMeeting->load(['cell.supervision.zone', 'leader']);
+        $date = $cellMeeting->meeting_date?->format('Y-m-d');
+        $cellMeeting->load([
+            'cell.supervision.zone',
+            'leader',
+            'attendances' => function ($query) use ($date) {
+                $query->where('date', $date)->with('member');
+            },
+            'visitors' => function ($query) use ($date) {
+                $query->where('visit_date', $date);
+            }
+        ]);
 
         return view('cell_meetings.show', compact('cellMeeting'));
+    }
+
+    public function downloadPdf(CellMeeting $cellMeeting)
+    {
+        Gate::authorize('view', $cellMeeting);
+
+        $date = $cellMeeting->meeting_date?->format('Y-m-d');
+        $cellMeeting->load([
+            'cell.supervision.zone',
+            'leader',
+            'attendances' => function ($query) use ($date) {
+                $query->where('date', $date)->with('member');
+            },
+            'visitors' => function ($query) use ($date) {
+                $query->where('visit_date', $date);
+            }
+        ]);
+
+        $pdf = Pdf::loadView('cell_meetings.pdf', compact('cellMeeting'));
+        return $pdf->download("Encontro_{$cellMeeting->cell->name}_{$cellMeeting->meeting_date?->format('d-m-Y')}.pdf");
+    }
+
+    public function sendEmail(Request $request, CellMeeting $cellMeeting)
+    {
+        Gate::authorize('view', $cellMeeting);
+
+        $validated = $request->validate([
+            'email' => 'required|email'
+        ]);
+
+        $date = $cellMeeting->meeting_date?->format('Y-m-d');
+        $cellMeeting->load([
+            'cell.supervision.zone',
+            'leader',
+            'attendances' => function ($query) use ($date) {
+                $query->where('date', $date)->with('member');
+            },
+            'visitors' => function ($query) use ($date) {
+                $query->where('visit_date', $date);
+            }
+        ]);
+
+        try {
+            Mail::send('emails.cell_meeting_report', ['cellMeeting' => $cellMeeting], function ($message) use ($validated, $cellMeeting) {
+                $message->to($validated['email'])
+                    ->subject("Relatório de Encontro: {$cellMeeting->cell->name} - " . ($cellMeeting->meeting_date?->format('d/m/Y') ?? 'N/D'));
+            });
+
+            return back()->with('success', 'Relatório enviado com sucesso!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Erro ao enviar email: ' . $e->getMessage());
+        }
     }
 
     public function edit(CellMeeting $cellMeeting)
@@ -230,7 +373,7 @@ class CellMeetingController extends Controller
         $user = auth()->user();
         $cells = collect();
 
-        if ($user->role === 'admin' || $user->role === 'pastor') {
+        if ($user->isAdmin() || $user->role === 'pastor') {
             $cells = Cell::all();
         } elseif ($user->role === 'pastor_zona') {
             $zoneId = $user->getZoneId();
@@ -238,9 +381,8 @@ class CellMeetingController extends Controller
                 $q->where('zone_id', $zoneId);
             })->get();
         } elseif ($user->role === 'supervisor') {
-            $cells = Cell::whereHas('supervision', function ($q) use ($user) {
-                $q->where('supervisor_id', $user->id);
-            })->get();
+            $supervisionIds = $user->getManagedSupervisionIds();
+            $cells = Cell::whereIn('supervision_id', $supervisionIds)->get();
         } elseif ($user->role === 'lider_celula') {
             $cells = Cell::where('leader_id', $user->id)->get();
         }
@@ -259,10 +401,14 @@ class CellMeetingController extends Controller
                     });
             });
         } elseif ($user->isSupervisor()) {
-            $leadersQuery->where(function ($q) use ($user) {
+            $supervisionIds = $user->getManagedSupervisionIds();
+            $leadersQuery->where(function ($q) use ($user, $supervisionIds) {
                 $q->where('id', $user->id)
-                    ->orWhereHas('cell.supervision', function ($sq) use ($user) {
-                        $sq->where('supervisor_id', $user->id);
+                    ->orWhereHas('cell', function ($cq) use ($supervisionIds) {
+                        $cq->whereIn('supervision_id', $supervisionIds);
+                    })
+                    ->orWhereHas('supervisedSupervisions', function ($sq) use ($supervisionIds) {
+                        $sq->whereIn('id', $supervisionIds);
                     });
             });
         } elseif ($user->isLider()) {
@@ -272,7 +418,18 @@ class CellMeetingController extends Controller
 
         $leaders = $leadersQuery->orderBy('name')->get();
 
-        return view('cell_meetings.edit', compact('cellMeeting', 'cells', 'leaders'));
+        $members = User::where('cell_id', $cellMeeting->cell_id)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        $attendances = \App\Models\Attendance::where('cell_id', $cellMeeting->cell_id)
+            ->where('date', $cellMeeting->meeting_date->format('Y-m-d'))
+            ->where('type', 'cell')
+            ->get()
+            ->keyBy('user_id');
+
+        return view('cell_meetings.edit', compact('cellMeeting', 'cells', 'leaders', 'members', 'attendances'));
     }
 
     public function update(Request $request, CellMeeting $cellMeeting)
@@ -294,6 +451,10 @@ class CellMeetingController extends Controller
             'visitors_count' => 'required|integer|min:0',
             'decisions' => 'nullable|string',
             'observations' => 'nullable|string',
+            'present_members' => 'nullable|array',
+            'present_members.*' => 'exists:users,id',
+            'reasons' => 'nullable|array',
+            'reasons.*' => 'nullable|string|max:255',
         ]);
 
         // Check for duplicate meeting on same date for same cell (excluding current)
@@ -310,6 +471,27 @@ class CellMeetingController extends Controller
 
         if ($request->has('participants')) {
             $cellMeeting->participants()->sync($request->participants);
+        }
+
+        // Record attendance for ALL members of the cell
+        $allCellMembers = User::where('cell_id', $cellMeeting->cell_id)->where('is_active', true)->pluck('id');
+        $presentIds = $request->input('present_members', []);
+        $reasons = $request->input('reasons', []);
+
+        foreach ($allCellMembers as $userId) {
+            $isPresent = in_array($userId, $presentIds);
+            \App\Models\Attendance::updateOrCreate(
+                [
+                    'user_id' => $userId,
+                    'cell_id' => $cellMeeting->cell_id,
+                    'date' => \Carbon\Carbon::parse($cellMeeting->meeting_date)->format('Y-m-d'),
+                    'type' => 'cell',
+                ],
+                [
+                    'status' => $isPresent,
+                    'reason' => $isPresent ? null : ($reasons[$userId] ?? null),
+                ]
+            );
         }
 
         return redirect()->route('cell-meetings.index')->with('success', 'Encontro de célula atualizado com sucesso!');

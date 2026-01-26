@@ -42,4 +42,15 @@ class CellMeeting extends Model
     {
         return $this->belongsToMany(User::class, 'cell_meeting_participants');
     }
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class, 'cell_id', 'cell_id')
+            ->where('type', 'cell');
+    }
+
+    public function visitors()
+    {
+        return $this->hasMany(Visitor::class, 'cell_id', 'cell_id');
+    }
 }

@@ -344,6 +344,8 @@ Route::middleware('auth')->group(function () {
 
 
     // ===== ENCONTROS DE CÉLULA (CELL MEETINGS) ROUTES =====
+    Route::get('cell-meetings/export', [\App\Http\Controllers\CellMeetingController::class, 'export'])->name('cell-meetings.export');
+    Route::delete('cell-meetings/bulk-destroy', [\App\Http\Controllers\CellMeetingController::class, 'bulkDestroy'])->name('cell-meetings.bulk-destroy');
     Route::get('cell-meetings/{cell_meeting}/pdf', [\App\Http\Controllers\CellMeetingController::class, 'downloadPdf'])->name('cell-meetings.pdf');
     Route::post('cell-meetings/{cell_meeting}/email', [\App\Http\Controllers\CellMeetingController::class, 'sendEmail'])->name('cell-meetings.email');
     Route::resource('cell-meetings', \App\Http\Controllers\CellMeetingController::class);

@@ -52,4 +52,9 @@ class CellMeetingPolicy
     {
         return $user->role === 'admin' || ($cellMeeting->leader_id === $user->id && $cellMeeting->created_at->diffInHours(now()) < 24);
     }
+
+    public function deleteAny(User $user): bool
+    {
+        return in_array($user->role, ['admin', 'pastor', 'pastor_zona', 'supervisor', 'lider_celula']);
+    }
 }

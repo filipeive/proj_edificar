@@ -96,33 +96,47 @@
                     </div>
                 </div>
 
-                <!-- Participants Section (Visible only for non-normal meetings) -->
-                <div x-show="meetingType !== 'normal'" x-transition.fade class="space-y-6">
-                    <div class="p-8 bg-orange-50/50 rounded-[2.5rem] border border-orange-100">
-                        <h5 class="text-xs font-black uppercase tracking-widest text-orange-600 mb-6 flex items-center">
-                            <i class="bi bi-person-badge-fill mr-2"></i> Registro de Participantes (Oficiais)
-                        </h5>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-h-64 overflow-y-auto p-2">
-                            @php $meetingParticipants = $cellMeeting->participants->pluck('id')->toArray(); @endphp
-                            @foreach($leaders as $official)
-                                <label class="flex items-center p-4 bg-white rounded-2xl border border-orange-100 hover:border-orange-300 transition-all cursor-pointer group shadow-sm">
-                                    <input type="checkbox" name="participants[]" value="{{ $official->id }}"
-                                        @checked(in_array($official->id, old('participants', $meetingParticipants)))
-                                        class="w-5 h-5 text-orange-600 border-gray-200 rounded-lg focus:ring-orange-500">
-                                    <div class="ml-3">
-                                        <p class="text-xs font-black text-gray-800 group-hover:text-orange-700">{{ $official->name }}</p>
-                                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{{ $official->role }}</p>
+                <!-- Attendance Section (For Normal Meetings) -->
+                <div x-show="meetingType === 'normal'" x-transition.fade class="space-y-8">
+                    @if($members->count() > 0)
+                        <div class="bg-blue-50/50 p-8 rounded-[2.5rem] border border-blue-100">
+                            <h5 class="text-xs font-black uppercase tracking-widest text-blue-600 mb-6 flex items-center">
+                                <i class="bi bi-check2-square mr-2"></i> Chamada da Célula
+                            </h5>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                @foreach($members as $member)
+                                    @php
+                                        $attendance = $attendances->get($member->id);
+                                        $isPresent = $attendance ? $attendance->status : true;
+                                        $reason = $attendance ? $attendance->reason : '';
+                                    @endphp
+                                    <div class="bg-white rounded-2xl border border-blue-100 p-6 shadow-sm hover:border-blue-300 transition-all" x-data="{ isPresent: {{ $isPresent ? 'true' : 'false' }} }">
+                                        <div class="flex items-center justify-between gap-4">
+                                            <label class="flex items-center cursor-pointer group flex-1">
+                                                <input type="checkbox" name="present_members[]" value="{{ $member->id }}" x-model="isPresent"
+                                                    class="w-6 h-6 text-blue-600 border-gray-200 rounded-lg focus:ring-blue-500">
+                                                <span class="ml-4 font-bold text-gray-700 group-hover:text-blue-700">{{ $member->name }}</span>
+                                            </label>
+                                            <div class="flex items-center gap-2">
+                                                <span x-show="isPresent" class="text-[10px] font-black text-green-500 uppercase tracking-widest bg-green-50 px-3 py-1 rounded-full border border-green-100">Presente</span>
+                                                <span x-show="!isPresent" class="text-[10px] font-black text-red-400 uppercase tracking-widest bg-red-50 px-3 py-1 rounded-full border border-red-100">Ausente</span>
+                                            </div>
+                                        </div>
+                                        <div x-show="!isPresent" x-transition class="mt-4 pt-4 border-t border-gray-50">
+                                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Justificação da Ausência</label>
+                                            <input type="text" name="reasons[{{ $member->id }}]" value="{{ $reason }}" placeholder="Ex: Doença, Trabalho..."
+                                                class="w-full text-xs font-bold bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-blue-100 rounded-xl py-2 px-3 transition-all">
+                                        </div>
                                     </div>
-                                </label>
-                            @endforeach
+                                @endforeach
+                            </div>
                         </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Ata do Encontro (Resumo Formal)</label>
-                        <textarea name="minutes" rows="10" placeholder="Descreva os pontos abordados, decisões tomadas e orientações dadas..."
-                            class="w-full rounded-[2rem] border-gray-100 bg-gray-50/50 focus:ring-orange-500 focus:border-orange-500 font-medium p-6">{{ old('minutes', $cellMeeting->minutes) }}</textarea>
-                    </div>
+                    @else
+                        <div class="p-8 bg-gray-50 rounded-[2.5rem] border border-dashed border-gray-200 text-center">
+                            <i class="bi bi-info-circle text-2xl text-gray-400 mb-2 block"></i>
+                            <p class="text-gray-500 font-medium">Selecione uma célula para carregar a lista de membros.</p>
+                        </div>
+                    @endif
                 </div>
 
                 <div class="bg-gray-50/50 p-8 rounded-[2.5rem] border border-gray-100">
