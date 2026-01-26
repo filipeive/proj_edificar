@@ -216,6 +216,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
             Route::post('/users/{user}/reassign-cell', [UserController::class, 'reassignCell'])->name('users.reassign-cell');
             Route::post('/users/{user}/remove-from-cell', [UserController::class, 'removeFromCell'])->name('users.remove-from-cell');
+            Route::post('/users/{user}/update-observations', [UserController::class, 'updateObservations'])->name('users.update-observations');
             Route::resource('users', UserController::class);
 
         });
