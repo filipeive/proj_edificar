@@ -192,14 +192,20 @@ class ContributionController
             $currentPackage = $activeCommitment->package;
             $currentPackage->committed_amount = $activeCommitment->committed_amount ?? $currentPackage->min_amount;
         } else {
-            $currentPackage = (object) ['name' => 'Nenhum', 'min_amount' => 0, 'max_amount' => 0, 'committed_amount' => 0];
+            $currentPackage = (object) [
+                'id' => null,
+                'name' => 'Nenhum',
+                'min_amount' => 0,
+                'max_amount' => 0,
+                'committed_amount' => 0,
+            ];
         }
 
         if ($user->role === 'responsavel_pacote') {
             $packages = $user->managedPackages()->where('is_active', true)->orderBy('order')->get();
 
             // Se o usuário tiver um pacote atual que não está na lista gerenciada, adicioná-lo para que ele possa selecioná-lo
-            if (isset($currentPackage) && $currentPackage->id && !$packages->contains('id', $currentPackage->id)) {
+            if (!empty($currentPackage->id) && !$packages->contains('id', $currentPackage->id)) {
                 $packages->push($currentPackage);
             }
         } else {

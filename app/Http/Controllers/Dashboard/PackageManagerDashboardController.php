@@ -7,7 +7,6 @@ use App\Models\CommitmentPackage;
 use App\Models\Contribution;
 use App\Models\UserCommitment;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class PackageManagerDashboardController extends Controller
 {
@@ -49,17 +48,24 @@ class PackageManagerDashboardController extends Controller
                 ->count(),
         ];
 
-        // Revenue Trend (Last 6 months)
-        $revenueTrend = Contribution::whereIn('package_id', $packageIds)
+        // Revenue Trend (Last 6 months) - DB agnostic aggregation
+        $revenueTrendRows = Contribution::whereIn('package_id', $packageIds)
             ->where('status', 'verificada')
             ->where('contribution_date', '>=', now()->subMonths(6))
-            ->select(
-                DB::raw("DATE_FORMAT(contribution_date, '%m/%Y') as month"),
-                DB::raw('SUM(amount) as total')
-            )
-            ->groupBy('month')
             ->orderBy('contribution_date', 'asc')
-            ->get();
+            ->get(['contribution_date', 'amount']);
+
+        $revenueTrend = $revenueTrendRows
+            ->groupBy(function ($item) {
+                return $item->contribution_date->format('m/Y');
+            })
+            ->map(function ($items, $month) {
+                return [
+                    'month' => $month,
+                    'total' => $items->sum('amount'),
+                ];
+            })
+            ->values();
 
         // Recent Activity
         $recentContributions = Contribution::with(['user', 'package'])
