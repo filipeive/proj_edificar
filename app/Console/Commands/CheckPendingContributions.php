@@ -54,9 +54,11 @@ class CheckPendingContributions extends Command
         $notifiedCount = 0;
         foreach ($admins as $admin) {
             try {
-                $admin->notify(
-                    new PendingContributionsNotification($pendingCount)
-                );
+                if ($admin->wantsNotification('pending_contributions')) {
+                    $admin->notify(
+                        new PendingContributionsNotification($pendingCount, null, null)
+                    );
+                }
                 
                 $this->line("📧 Notificação enviada para {$admin->name}");
                 $notifiedCount++;

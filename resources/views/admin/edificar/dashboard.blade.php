@@ -7,7 +7,7 @@
 @section('content')
     <div class="space-y-6 md:space-y-8">
         <!-- Quick Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div
                 class="bg-white p-5 md:p-6 rounded-3xl md:rounded-[2.5rem] shadow-sm border border-gray-100 flex items-center space-x-4">
                 <div
@@ -43,6 +43,18 @@
                 <div>
                     <p class="text-[10px] md:text-xs font-black uppercase tracking-widest text-blue-100">Compromissos</p>
                     <h3 class="text-xl md:text-2xl font-black">{{ $pacotes->sum('membros') }} Membros Ativos</h3>
+                </div>
+            </div>
+
+            <div
+                class="bg-white p-5 md:p-6 rounded-3xl md:rounded-[2.5rem] shadow-sm border border-gray-100 flex items-center space-x-4">
+                <div
+                    class="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-yellow-50 flex items-center justify-center text-yellow-600">
+                    <i class="bi bi-patch-check text-2xl md:text-3xl"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] md:text-xs font-black uppercase tracking-widest text-gray-400">Pendentes</p>
+                    <h3 class="text-xl md:text-2xl font-black text-gray-800">{{ $pendingContributions }}</h3>
                 </div>
             </div>
         </div>

@@ -102,7 +102,9 @@ class UserController
         $user = User::create($validated);
 
         // Notificar novo usuário
-        $user->notify(new MemberCreatedNotification($user, $plainPassword));
+        if ($user->wantsNotification('member_created')) {
+            $user->notify(new MemberCreatedNotification($user, $plainPassword));
+        }
 
         return redirect()->route('users.index')
             ->with('success', 'Utilizador criado com sucesso!');
@@ -142,7 +144,9 @@ class UserController
 
         // Notificar se mudou o role
         if ($oldRole !== $validated['role']) {
-            $user->notify(new UserPromotedNotification($user, $oldRole, $validated['role']));
+            if ($user->wantsNotification('user_promoted')) {
+                $user->notify(new UserPromotedNotification($user, $oldRole, $validated['role']));
+            }
         }
 
         return redirect()->route('users.index')
@@ -322,10 +326,14 @@ class UserController
         }
 
         // Notificações
-        $newUser->notify(new MemberCreatedNotification($newUser, $plainPassword));
+        if ($newUser->wantsNotification('member_created')) {
+            $newUser->notify(new MemberCreatedNotification($newUser, $plainPassword));
+        }
 
         if ($cell->leader_id && $cell->leader_id !== $user->id) {
-            $cell->leader->notify(new MemberAddedToCellNotification($newUser));
+            if ($cell->leader->wantsNotification('member_added_to_cell')) {
+                $cell->leader->notify(new MemberAddedToCellNotification($newUser));
+            }
         }
 
         return redirect()->route('members.index')

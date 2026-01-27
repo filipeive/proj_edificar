@@ -14,8 +14,11 @@ use Illuminate\Support\Facades\Notification;
 
 // Modelos de Notificação
 use App\Notifications\ContributionCreatedNotification;
+use App\Notifications\ContributionPendingValidationNotification;
 use App\Notifications\ContributionVerifiedNotification;
+use App\Notifications\ContributionVerifiedForManagerNotification;
 use App\Notifications\ContributionRejectedNotification;
+use App\Notifications\ContributionRejectedForManagerNotification;
 
 class ContributionController
 {
@@ -323,27 +326,48 @@ class ContributionController
         if ($cell->leader_id) {
             $leader = User::find($cell->leader_id);
             // Evitar notificar o líder se ele mesmo fez a contribuição para outro membro
-            if ($leader && $leader->id !== $user->id) {
+            if ($leader && $leader->id !== $user->id && $leader->wantsNotification('contribution_created')) {
                 $leader->notify(new ContributionCreatedNotification($contribution));
             }
         }
 
-        // 2. Notificar o Admin (sempre, para verificação final)
-        $admin = User::where('role', 'admin')->first();
-        if ($admin) {
-            $admin->notify(new ContributionCreatedNotification($contribution));
+        // 2. Notificar Admins e Comissão da Obra (batch por pacote)
+        $admins = User::where('role', 'admin')->get();
+        foreach ($admins as $admin) {
+            $this->notifyPendingBatch($admin, $contribution);
+        }
+
+        $commissionMembers = User::where('role', 'comissao_obra')->get();
+        foreach ($commissionMembers as $member) {
+            $this->notifyPendingBatch($member, $contribution);
         }
 
         // 3. Notificar o usuário final (se ele mesmo não registrou)
-        if ($targetUser->id !== $user->id) {
+        if ($targetUser->id !== $user->id && $targetUser->wantsNotification('contribution_created')) {
             $targetUser->notify(new ContributionCreatedNotification($contribution));
         }
 
-        // 4. Notificar a Comissão da Obra (se registrado por um Responsável de Pacote)
-        if ($user->role === 'responsavel_pacote') {
-            $commissionMembers = User::where('role', 'comissao_obra')->get();
-            foreach ($commissionMembers as $member) {
-                $member->notify(new ContributionCreatedNotification($contribution));
+        // 3b. Notificar quem registou (quando diferente do membro)
+        if ($user->id !== $targetUser->id && $user->wantsNotification('contribution_created')) {
+            $user->notify(new ContributionCreatedNotification($contribution));
+        }
+
+        // 4. Notificar pastor da zona (pendente para validar)
+        if ($contribution->zone_id) {
+            $zonePastorIds = \App\Models\Zone::where('id', $contribution->zone_id)->pluck('pastor_id');
+            $zonePastors = User::whereIn('id', $zonePastorIds)->get();
+            foreach ($zonePastors as $pastor) {
+                if ($pastor->wantsNotification('contribution_pending_validation')) {
+                    $pastor->notify(new ContributionPendingValidationNotification($contribution));
+                }
+            }
+        }
+
+        // 5. Notificar supervisor da supervisão
+        if ($cell->supervision && $cell->supervision->supervisor_id) {
+            $supervisor = User::find($cell->supervision->supervisor_id);
+            if ($supervisor && $supervisor->id !== $user->id && $supervisor->wantsNotification('contribution_created')) {
+                $supervisor->notify(new ContributionCreatedNotification($contribution));
             }
         }
         // ----------------------------------------------------
@@ -397,8 +421,16 @@ class ContributionController
 
         // ----------------------------------------------------
         // DISPARO DE NOTIFICAÇÃO: Contribuição Verificada (Para o Doador)
-        $contribution->user->notify(new ContributionVerifiedNotification($contribution));
+        if ($contribution->user->wantsNotification('contribution_verified')) {
+            $contribution->user->notify(new ContributionVerifiedNotification($contribution));
+        }
         // ----------------------------------------------------
+        if ($contribution->package && $contribution->package->responsible_id) {
+            $responsavel = User::find($contribution->package->responsible_id);
+            if ($responsavel && $responsavel->id !== auth()->id() && $responsavel->wantsNotification('contribution_verified_manager')) {
+                $responsavel->notify(new ContributionVerifiedForManagerNotification($contribution));
+            }
+        }
 
         return back()->with('success', 'Contribuição verificada com sucesso!');
     }
@@ -425,8 +457,16 @@ class ContributionController
 
         // ----------------------------------------------------
         // DISPARO DE NOTIFICAÇÃO: Contribuição Rejeitada (Para o Doador)
-        $contribution->user->notify(new ContributionRejectedNotification($contribution, $reason));
+        if ($contribution->user->wantsNotification('contribution_rejected')) {
+            $contribution->user->notify(new ContributionRejectedNotification($contribution, $reason));
+        }
         // ----------------------------------------------------
+        if ($contribution->package && $contribution->package->responsible_id) {
+            $responsavel = User::find($contribution->package->responsible_id);
+            if ($responsavel && $responsavel->id !== auth()->id() && $responsavel->wantsNotification('contribution_rejected_manager')) {
+                $responsavel->notify(new ContributionRejectedForManagerNotification($contribution, $reason));
+            }
+        }
 
         return back()->with('success', 'Contribuição rejeitada!');
     }
@@ -467,9 +507,9 @@ class ContributionController
     {
         $contribution->load(['user.cell.supervision.zone', 'registeredBy', 'verifiedBy']);
 
-        // Apenas admins podem ver esta view de administração
+        // Apenas admin, comissão de obra e pastor_zona podem ver esta view de administração
         $user = auth()->user();
-        if ($user->role !== 'admin') {
+        if (!in_array($user->role, ['admin', 'comissao_obra', 'pastor_zona'], true)) {
             abort(403, 'Acesso negado.');
         }
 
@@ -506,8 +546,9 @@ class ContributionController
         $message = "PROJETO EDIFICAR: Olá, o responsável do pacote {$package->name} acabou de registar contribuições. Por favor, aceda ao sistema para validar {$pendingCount} registos pendentes.";
 
         foreach ($commissionMembers as $member) {
-            // Notificação Interna
-            $member->notify(new \App\Notifications\PendingContributionsNotification($pendingCount, $package->name));
+            if ($member->wantsNotification('pending_contributions')) {
+                $member->notify(new \App\Notifications\PendingContributionsNotification($pendingCount, $package->name, $package->id));
+            }
 
             // SMS
             if ($member->phone) {
@@ -516,6 +557,42 @@ class ContributionController
         }
 
         return back()->with('success', 'A Comissão da Obra foi notificada com sucesso!');
+    }
+
+    private function notifyPendingBatch(User $recipient, Contribution $contribution): void
+    {
+        if (!$recipient->wantsNotification('pending_contributions')) {
+            return;
+        }
+
+        $packageId = $contribution->package_id;
+        $packageName = $contribution->package?->name;
+
+        $pendingQuery = Contribution::where('status', 'pendente');
+        if ($packageId) {
+            $pendingQuery->where('package_id', $packageId);
+        } else {
+            $pendingQuery->whereNull('package_id');
+        }
+
+        $pendingCount = $pendingQuery->count();
+        $notification = new \App\Notifications\PendingContributionsNotification($pendingCount, $packageName, $packageId);
+
+        $existing = $recipient->unreadNotifications()
+            ->where('type', \App\Notifications\PendingContributionsNotification::class)
+            ->when($packageId, function ($q) use ($packageId) {
+                $q->where('data->package_id', $packageId);
+            }, function ($q) {
+                $q->whereNull('data->package_id');
+            })
+            ->first();
+
+        if ($existing) {
+            $existing->update(['data' => $notification->toDatabase($recipient)]);
+            return;
+        }
+
+        $recipient->notify($notification);
     }
 
     private function validateContributionPermission($user, $targetUser)

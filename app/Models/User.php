@@ -20,6 +20,7 @@ class User extends Authenticatable
         'cell_id',
         'is_active',
         'observations',
+        'notification_preferences',
     ];
 
     protected $hidden = [
@@ -33,12 +34,42 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
+            'notification_preferences' => 'array',
         ];
     }
 
     public function setPhoneAttribute($value): void
     {
         $this->attributes['phone'] = $this->normalizeMozPhone($value);
+    }
+
+    public static function notificationPreferenceDefaults(): array
+    {
+        return [
+            'contribution_created' => true,
+            'contribution_pending_validation' => true,
+            'pending_contributions' => true,
+            'contribution_verified' => true,
+            'contribution_rejected' => true,
+            'contribution_verified_manager' => true,
+            'contribution_rejected_manager' => true,
+            'commitment_chosen' => true,
+            'commitment_expiring' => true,
+            'member_created' => true,
+            'member_added_to_cell' => true,
+            'user_promoted' => true,
+        ];
+    }
+
+    public function wantsNotification(string $type): bool
+    {
+        $prefs = $this->notification_preferences ?? [];
+        if (array_key_exists($type, $prefs)) {
+            return (bool) $prefs[$type];
+        }
+
+        $defaults = self::notificationPreferenceDefaults();
+        return $defaults[$type] ?? true;
     }
 
     // Relacionamentos

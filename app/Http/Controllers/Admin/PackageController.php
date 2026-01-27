@@ -322,7 +322,9 @@ class PackageController
             'cell_id' => $newUser->cell_id,
         ]);
 
-        $newUser->notify(new MemberCreatedNotification($newUser, $plainPassword));
+        if ($newUser->wantsNotification('member_created')) {
+            $newUser->notify(new MemberCreatedNotification($newUser, $plainPassword));
+        }
 
         return back()
             ->with('success', 'Membro criado e adicionado ao pacote com sucesso!')

@@ -10,13 +10,11 @@
             <a href="{{ route('contributions.create') }}?package_id={{ $packages->first()->id }}" 
                class="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-all font-bold text-sm flex items-center gap-2 shadow-lg shadow-blue-100">
                 <i class="bi bi-plus-circle"></i>
-                <span>Registar Contribuição</span>
             </a>
         @endif
         <a href="{{ route('contributions.index') }}" 
            class="bg-white text-gray-700 border border-gray-100 px-6 py-3 rounded-xl hover:bg-gray-50 transition-all font-bold text-sm flex items-center gap-2 shadow-sm">
             <i class="bi bi-clock-history"></i>
-            <span>Histórico Completo</span>
         </a>
     </div>
 @endsection
@@ -94,13 +92,14 @@
                 <span class="text-[9px] md:text-[10px] font-black text-gray-900 uppercase tracking-widest">Histórico</span>
             </a>
 
-            <a href="{{ route('members.index') }}" class="bg-white p-5 md:p-6 rounded-3xl md:rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-2 md:gap-3 hover:shadow-lg transition-all group">
+              
+            <a href="{{ route('packages.index') }}" class="bg-white p-5 md:p-6 rounded-3xl md:rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-2 md:gap-3 hover:shadow-lg transition-all group">
                 <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-all">
                     <i class="bi bi-people text-xl md:text-2xl"></i>
                 </div>
-                <span class="text-[9px] md:text-[10px] font-black text-gray-900 uppercase tracking-widest">Membros</span>
+                <span class="text-[9px] md:text-[10px] font-black text-gray-900 uppercase tracking-widest">Gerenciar</span>
             </a>
-
+            
             @if($packages->isNotEmpty())
             <a href="{{ route('packages.export', $packages->first()) }}" class="bg-white p-5 md:p-6 rounded-3xl md:rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-2 md:gap-3 hover:shadow-lg transition-all group">
                 <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-all">

@@ -42,9 +42,11 @@ class CheckExpiringCommitments extends Command
             $daysRemaining = $commitment->daysUntilExpiration();
             
             if ($daysRemaining && $daysRemaining <= 7) {
-                $commitment->user->notify(
-                    new CommitmentExpiringNotification($commitment, $daysRemaining)
-                );
+                if ($commitment->user->wantsNotification('commitment_expiring')) {
+                    $commitment->user->notify(
+                        new CommitmentExpiringNotification($commitment, $daysRemaining)
+                    );
+                }
                 
                 $this->line("📧 Notificação enviada para {$commitment->user->name} ({$daysRemaining} dias)");
                 $count++;

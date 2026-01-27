@@ -102,15 +102,19 @@
                                         @php
                                             $type = $notification->data['type'] ?? 'general';
                                             $config = match ($type) {
-                                                'contribution_verified' => ['icon' => 'bi-check-circle-fill', 'color' => 'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400'],
-                                                'contribution_rejected' => ['icon' => 'bi-x-circle-fill', 'color' => 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400'],
-                                                'contribution_created' => ['icon' => 'bi-cash-coin', 'color' => 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'],
-                                                'member_created' => ['icon' => 'bi-person-plus-fill', 'color' => 'bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400'],
-                                                'commitment_chosen' => ['icon' => 'bi-handshake-fill', 'color' => 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'],
-                                                'commitment_expiring' => ['icon' => 'bi-clock-fill', 'color' => 'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400'],
-                                                'pending_contributions' => ['icon' => 'bi-exclamation-triangle-fill', 'color' => 'bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400'],
-                                                'user_promoted' => ['icon' => 'bi-star-fill', 'color' => 'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-400'],
-                                                default => ['icon' => 'bi-bell-fill', 'color' => 'bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400'],
+                                                'contribution_verified' => ['icon' => 'bi-check-circle-fill', 'color' => 'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400', 'label' => 'Confirmada', 'badge' => 'bg-green-50 text-green-700 dark:bg-green-900/40 dark:text-green-300'],
+                                                'contribution_rejected' => ['icon' => 'bi-x-circle-fill', 'color' => 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400', 'label' => 'Rejeitada', 'badge' => 'bg-red-50 text-red-700 dark:bg-red-900/40 dark:text-red-300'],
+                                                'contribution_created' => ['icon' => 'bi-cash-coin', 'color' => 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400', 'label' => 'Registo', 'badge' => 'bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'],
+                                                'contribution_pending_validation' => ['icon' => 'bi-exclamation-triangle-fill', 'color' => 'bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400', 'label' => 'Validação', 'badge' => 'bg-orange-50 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300'],
+                                                'contribution_verified_manager' => ['icon' => 'bi-check-circle-fill', 'color' => 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400', 'label' => 'Pacote', 'badge' => 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'],
+                                                'contribution_rejected_manager' => ['icon' => 'bi-x-circle-fill', 'color' => 'bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400', 'label' => 'Pacote', 'badge' => 'bg-rose-50 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300'],
+                                                'member_created' => ['icon' => 'bi-person-plus-fill', 'color' => 'bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400', 'label' => 'Conta', 'badge' => 'bg-purple-50 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300'],
+                                                'member_added_to_cell' => ['icon' => 'bi-people-fill', 'color' => 'bg-sky-50 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400', 'label' => 'Célula', 'badge' => 'bg-sky-50 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300'],
+                                                'commitment_chosen' => ['icon' => 'bi-handshake-fill', 'color' => 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400', 'label' => 'Compromisso', 'badge' => 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300'],
+                                                'commitment_expiring' => ['icon' => 'bi-clock-fill', 'color' => 'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400', 'label' => 'Prazo', 'badge' => 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300'],
+                                                'pending_contributions' => ['icon' => 'bi-exclamation-triangle-fill', 'color' => 'bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400', 'label' => 'Comissão', 'badge' => 'bg-orange-50 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300'],
+                                                'user_promoted' => ['icon' => 'bi-star-fill', 'color' => 'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-400', 'label' => 'Cargo', 'badge' => 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300'],
+                                                default => ['icon' => 'bi-bell-fill', 'color' => 'bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400', 'label' => 'Sistema', 'badge' => 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'],
                                             };
                                         @endphp
                                         <div
@@ -125,6 +129,9 @@
                                             <h4 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-tight">
                                                 {{ $notification->data['title'] ?? 'Notificação' }}
                                             </h4>
+                                            <span class="px-2 py-1 rounded-full text-[9px] font-black uppercase tracking-widest {{ $config['badge'] }}">
+                                                {{ $config['label'] }}
+                                            </span>
                                             @if(!$notification->read_at)
                                                 <span class="w-2 h-2 bg-blue-600 dark:bg-blue-400 rounded-full animate-pulse"></span>
                                             @endif

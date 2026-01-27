@@ -93,11 +93,15 @@ class CommitmentController
         ]);
 
         // Notificar o próprio utilizador como confirmação
-        $user->notify(new CommitmentChosenNotification($userCommitment));
+        if ($user->wantsNotification('commitment_chosen')) {
+            $user->notify(new CommitmentChosenNotification($userCommitment));
+        }
 
         // Notificar todos os admins (pode ajustar para notificar supervisores/pastores conforme necessidade)
         User::where('role', 'admin')->get()->each(function (User $admin) use ($userCommitment) {
-            $admin->notify(new CommitmentChosenNotification($userCommitment));
+            if ($admin->wantsNotification('commitment_chosen')) {
+                $admin->notify(new CommitmentChosenNotification($userCommitment));
+            }
         });
 
         return redirect()->route('commitments.index')

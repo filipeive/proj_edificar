@@ -9,11 +9,13 @@ class PendingContributionsNotification extends Notification
     use Queueable;
     private $count;
     private $packageName;
+    private $packageId;
 
-    public function __construct($count = 0, $packageName = null)
+    public function __construct($count = 0, $packageName = null, $packageId = null)
     {
         $this->count = $count;
         $this->packageName = $packageName;
+        $this->packageId = $packageId;
     }
 
     public function via(object $notifiable): array
@@ -27,9 +29,10 @@ class PendingContributionsNotification extends Notification
         return [
             'title' => 'Novas Contribuições para Validar',
             'message' => 'Existem ' . $this->count . ' contribuição' . ($this->count > 1 ? 'ões' : '') . $packageInfo . ' aguardando validação.',
-            'link' => route('contributions.index', ['status' => 'pendente']),
+            'link' => route('contributions.pending'),
             'type' => 'pending_contributions',
             'count' => $this->count,
+            'package_id' => $this->packageId,
         ];
     }
 }

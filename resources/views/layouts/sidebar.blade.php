@@ -1,6 +1,17 @@
 @php
     // O View Composer já passa $user e $role
     $authUser = auth()->user();
+    $pendingContributionsCount = null;
+    if ($authUser && ($authUser->isAdmin() || $authUser->isComissaoObra() || $authUser->isPastorZona())) {
+        $pendingQuery = \App\Models\Contribution::where('status', 'pendente');
+        if ($authUser->isPastorZona()) {
+            $zoneId = $authUser->getZoneId();
+            if ($zoneId) {
+                $pendingQuery->where('zone_id', $zoneId);
+            }
+        }
+        $pendingContributionsCount = $pendingQuery->count();
+    }
 @endphp
 <aside id="sidebar"
     class="sidebar-expanded bg-black text-white flex flex-col overflow-y-auto shadow-2xl transition-all duration-300 ease-in-out border-r border-white/5">
@@ -251,6 +262,16 @@
                                     @elseif ($authUser->isResponsavelPacote()) Dos Meus Pacotes
                                     @elseif ($authUser->isPastorZona()) Da Zona
                                     @elseif ($authUser->isSupervisor()) Da Supervisão @elseif($authUser->isLider()) Da Célula @else Geral @endif
+                                </a>
+                            @endif
+                            @if ($authUser && ($authUser->isAdmin() || $authUser->isComissaoObra() || $authUser->isPastorZona()))
+                                <a href="{{ route('contributions.pending') }}" class="flex items-center justify-between py-2 text-sm transition-all duration-200 {{ request()->routeIs('contributions.pending') ? 'text-yellow-400 font-bold' : 'text-slate-500 hover:text-slate-300' }}">
+                                    <span>Pendentes</span>
+                                    @if($pendingContributionsCount !== null && $pendingContributionsCount > 0)
+                                        <span class="ml-3 text-[10px] font-black px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">
+                                            {{ $pendingContributionsCount > 99 ? '99+' : $pendingContributionsCount }}
+                                        </span>
+                                    @endif
                                 </a>
                             @endif
                             @if ($authUser && ($authUser->isAdmin() || $authUser->isSecretaria() || $authUser->isTesouraria()))    

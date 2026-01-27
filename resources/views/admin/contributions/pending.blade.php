@@ -2,154 +2,123 @@
 
 @section('title', 'Contribuições Pendentes - Portal Life Church')
 @section('page-title', 'Contribuições Pendentes')
-@section('page-subtitle', 'Verifique e valide as contribuições')
+@section('page-subtitle', 'Validar registos pendentes')
+
+@section('header-actions')
+    <div class="flex items-center gap-2 md:hidden">
+        <a href="{{ route('contributions.index', ['status' => 'pendente']) }}"
+            class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50"
+            title="Atualizar">
+            <i class="bi bi-arrow-clockwise"></i>
+        </a>
+    </div>
+@endsection
 
 @section('content')
-    <div class="grid grid-max-w-5xl mx-auto bg-white rounded-lg shadow overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-            <p class="text-sm text-gray-600 flex items-center space-x-2">
-                <!-- Icona de total -->
-                <svg class="w-5 h-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 8c-1.657 0-3 1.343-3 3v6h6v-6c0-1.657-1.343-3-3-3zM12 4v1m0 14v1m8-9h-1M4 12H3m15.364-6.364-.707.707M6.343 17.657l-.707.707m12.728 0-.707-.707M6.343 6.343l-.707-.707" />
-                </svg>
-                <span>Total: <strong>{{ $contributions->total() }}</strong> contribuições</span>
-            </p>
+    <div class="space-y-6">
+        <div class="bg-white rounded-[1.5rem] sm:rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-6 py-5 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-black text-gray-400 uppercase tracking-widest">Pendentes</p>
+                        <p class="text-lg font-black text-gray-900">{{ $contributions->total() }} contribuições</p>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center gap-2">
+                    <a href="{{ route('contributions.index', ['status' => 'pendente']) }}"
+                        class="bg-orange-600 text-white px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-700 transition-all shadow-lg shadow-orange-100">
+                        <i class="bi bi-arrow-clockwise mr-2"></i>Atualizar
+                    </a>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full table-compact">
+                    <thead>
+                        <tr class="bg-gray-50/50">
+                            <th class="px-6 py-3 text-left text-[10px] font-black uppercase tracking-widest text-gray-400">Membro</th>
+                            <th class="hidden md:table-cell px-6 py-3 text-left text-[10px] font-black uppercase tracking-widest text-gray-400">Célula</th>
+                            <th class="px-6 py-3 text-left text-[10px] font-black uppercase tracking-widest text-gray-400">Valor</th>
+                            <th class="hidden md:table-cell px-6 py-3 text-left text-[10px] font-black uppercase tracking-widest text-gray-400">Data</th>
+                            <th class="px-6 py-3 text-right text-[10px] font-black uppercase tracking-widest text-gray-400">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($contributions as $contribution)
+                            <tr class="border-t border-gray-100 hover:bg-gray-50/60">
+                                <td class="px-6 py-4">
+                                    <div class="flex flex-col">
+                                        <span class="text-sm font-black text-gray-900 line-clamp-1">{{ $contribution->user->name }}</span>
+                                        <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Pendente</span>
+                                    </div>
+                                </td>
+                                <td class="hidden md:table-cell px-6 py-4 text-xs font-bold text-gray-600">
+                                    {{ $contribution->cell->name }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-sm font-black text-gray-900">{{ number_format($contribution->amount, 2, ',', '.') }} MT</span>
+                                </td>
+                                <td class="hidden md:table-cell px-6 py-4 text-xs font-bold text-gray-500">
+                                    {{ $contribution->contribution_date->format('d/m/Y') }}
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <div class="flex items-center justify-end gap-1">
+                                        <a href="{{ route('admin.contributions.show', $contribution) }}"
+                                            class="action-icon bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white shadow-sm"
+                                            title="Ver detalhes">
+                                            <i class="bi bi-eye-fill"></i>
+                                        </a>
+                                        @if($contribution->proof_path)
+                                            <a href="{{ route('contributions.receipt', $contribution) }}" target="_blank"
+                                                class="action-icon bg-gray-50 text-gray-600 hover:bg-gray-800 hover:text-white shadow-sm"
+                                                title="Comprovativo">
+                                                <i class="bi bi-file-earmark-text-fill"></i>
+                                            </a>
+                                        @endif
+                                        <form action="{{ route('contributions.verify', $contribution) }}" method="POST"
+                                            id="verify-form-{{ $contribution->id }}">
+                                            @csrf
+                                            <button type="button"
+                                                class="action-icon bg-green-50 text-green-600 hover:bg-green-600 hover:text-white shadow-sm"
+                                                title="Verificar"
+                                                onclick="confirmAction('Deseja verificar esta contribuição?', 'Verificar').then(result => { if(result.isConfirmed) document.getElementById('verify-form-{{ $contribution->id }}').submit(); })">
+                                                <i class="bi bi-check-lg"></i>
+                                            </button>
+                                        </form>
+                                        <button type="button"
+                                            class="action-icon bg-red-50 text-red-600 hover:bg-red-600 hover:text-white shadow-sm"
+                                            title="Rejeitar"
+                                            onclick="showRejectForm({{ $contribution->id }})">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="px-6 py-8 text-center text-xs font-bold uppercase tracking-widest text-gray-400">
+                                    Nenhuma contribuição pendente
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        <table class="w-full">
-            <thead class="bg-gray-50 border-b border-gray-200">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        <div class="inline-flex items-center space-x-2">
-                            <!-- user icon -->
-                            <svg class="w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M5.121 17.804A9 9 0 1118.88 6.196 9 9 0 015.12 17.804zM15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            <span>Membro</span>
-                        </div>
-                    </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        <div class="inline-flex items-center space-x-2">
-                            <!-- cells icon -->
-                            <svg class="w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17 20h5v-2a4 4 0 00-4-4h-1M9 20H4v-2a4 4 0 014-4h1m0-4a4 4 0 110-8 4 4 0 010 8z" />
-                            </svg>
-                            <span>Célula</span>
-                        </div>
-                    </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        <div class="inline-flex items-center space-x-2">
-                            <!-- currency icon -->
-                            <svg class="w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-12v12" />
-                            </svg>
-                            <span>Valor</span>
-                        </div>
-                    </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        <div class="inline-flex items-center space-x-2">
-                            <!-- calendar icon -->
-                            <svg class="w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 7V3m8 4V3M3 11h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <span>Data</span>
-                        </div>
-                    </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        <div class="inline-flex items-center space-x-2">
-                            <!-- actions icon -->
-                            <svg class="w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4 6h16M4 12h16M4 18h16" />
-                            </svg>
-                            <span>Ações</span>
-                        </div>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($contributions as $contribution)
-                    <tr class="border-b border-gray-200 hover:bg-gray-50">
-                        <td class="px-6 py-4 font-medium text-gray-800">{{ $contribution->user->name }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-600">{{ $contribution->cell->name }}</td>
-                        <td class="px-6 py-4 font-medium text-gray-800">{{ number_format($contribution->amount, 2, ',', '.') }}
-                            MT</td>
-                        <td class="px-6 py-4 text-sm text-gray-600">{{ $contribution->contribution_date->format('d/m/Y') }}</td>
-                        <td class="px-6 py-4 text-sm space-x-2">
-                            {{-- ver detalhes da contribuição --}}
-                            <a href="{{ route('admin.contributions.show', $contribution) }}"
-                                class="inline-flex items-center text-blue-600 hover:text-blue-800 space-x-2">
-                                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <span>Ver Detalhes</span>
-                            </a>
-                            {{-- ver comprovativo --}}
-                            @if($contribution->proof_path)
-                                <a href="{{ route('contributions.receipt', $contribution) }}" target="_blank"
-                                    class="inline-flex items-center text-blue-600 hover:text-blue-800 space-x-2">
-                                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                    </svg>
-                                    <span>Ver Comprovativo</span>
-                                </a>
-                            @endif
-                            <form action="{{ route('contributions.verify', $contribution) }}" method="POST"
-                                id="verify-form-{{ $contribution->id }}" class="inline">
-                                @csrf
-                                <button type="button"
-                                    class="inline-flex items-center text-green-600 hover:text-green-800 space-x-2"
-                                    onclick="confirmAction('Deseja verificar esta contribuição?', 'Verificar').then(result => { if(result.isConfirmed) document.getElementById('verify-form-{{ $contribution->id }}').submit(); })">
-                                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    <span>Verificar</span>
-                                </button>
-                            </form>
-                            <button type="button" class="inline-flex items-center text-red-600 hover:text-red-800 space-x-2"
-                                onclick="showRejectForm({{ $contribution->id }})">
-                                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                                <span>Rejeitar</span>
-                            </button>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">Nenhuma contribuição pendente</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Paginação -->
-    <div class="mt-6">
-        {{ $contributions->links() }}
+        @if($contributions->hasPages())
+            <div>
+                {{ $contributions->links() }}
+            </div>
+        @endif
     </div>
 
     <!-- Modal Rejeitar -->
-    <div id="rejectModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+    <div id="rejectModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
+        <div class="bg-white rounded-[2rem] p-6 max-w-md w-full mx-4 shadow-2xl border border-gray-100">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-bold text-gray-800 flex items-center space-x-2">
                     <!-- reject icon -->
@@ -177,7 +146,7 @@
                 </div>
                 <div class="flex space-x-4">
                     <button type="submit"
-                        class="flex-1 inline-flex items-center justify-center bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 space-x-2">
+                        class="flex-1 inline-flex items-center justify-center bg-red-600 text-white px-4 py-2 rounded-xl hover:bg-red-700 space-x-2">
                         <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -186,7 +155,7 @@
                         <span>Rejeitar</span>
                     </button>
                     <button type="button" onclick="closeRejectForm()"
-                        class="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300">
+                        class="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-xl hover:bg-gray-200">
                         Cancelar
                     </button>
                 </div>

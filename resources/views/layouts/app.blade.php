@@ -1077,13 +1077,38 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.length > 0) {
+                        const typeMap = {
+                            contribution_verified: { icon: 'bi-check-circle-fill', bg: 'bg-green-50', text: 'text-green-600', label: 'Confirmada', badge: 'bg-green-50 text-green-700' },
+                            contribution_rejected: { icon: 'bi-x-circle-fill', bg: 'bg-red-50', text: 'text-red-600', label: 'Rejeitada', badge: 'bg-red-50 text-red-700' },
+                            contribution_created: { icon: 'bi-cash-coin', bg: 'bg-blue-50', text: 'text-blue-600', label: 'Registo', badge: 'bg-blue-50 text-blue-700' },
+                            contribution_pending_validation: { icon: 'bi-exclamation-triangle-fill', bg: 'bg-orange-50', text: 'text-orange-600', label: 'Validação', badge: 'bg-orange-50 text-orange-700' },
+                            contribution_verified_manager: { icon: 'bi-check-circle-fill', bg: 'bg-emerald-50', text: 'text-emerald-600', label: 'Pacote', badge: 'bg-emerald-50 text-emerald-700' },
+                            contribution_rejected_manager: { icon: 'bi-x-circle-fill', bg: 'bg-rose-50', text: 'text-rose-600', label: 'Pacote', badge: 'bg-rose-50 text-rose-700' },
+                            pending_contributions: { icon: 'bi-exclamation-triangle-fill', bg: 'bg-orange-50', text: 'text-orange-600', label: 'Comissão', badge: 'bg-orange-50 text-orange-700' },
+                            member_created: { icon: 'bi-person-plus-fill', bg: 'bg-purple-50', text: 'text-purple-600', label: 'Conta', badge: 'bg-purple-50 text-purple-700' },
+                            member_added_to_cell: { icon: 'bi-people-fill', bg: 'bg-sky-50', text: 'text-sky-600', label: 'Célula', badge: 'bg-sky-50 text-sky-700' },
+                            commitment_chosen: { icon: 'bi-handshake-fill', bg: 'bg-indigo-50', text: 'text-indigo-600', label: 'Compromisso', badge: 'bg-indigo-50 text-indigo-700' },
+                            commitment_expiring: { icon: 'bi-clock-fill', bg: 'bg-yellow-50', text: 'text-yellow-600', label: 'Prazo', badge: 'bg-yellow-50 text-yellow-700' },
+                            user_promoted: { icon: 'bi-star-fill', bg: 'bg-yellow-50', text: 'text-yellow-600', label: 'Cargo', badge: 'bg-yellow-50 text-yellow-700' },
+                        };
+
                         let html = '<ul class="space-y-2">';
                         data.forEach(n => {
+                            const type = n.type || 'general';
+                            const cfg = typeMap[type] || { icon: 'bi-bell-fill', bg: 'bg-gray-50', text: 'text-gray-500', label: 'Sistema', badge: 'bg-gray-100 text-gray-600' };
+
                             html += `
                                 <a href="${n.link}" class="flex items-start p-3 hover:bg-gray-50 rounded-lg cursor-pointer block transition">
-                                    <i class="bi bi-bell-fill text-blue-500 mr-3 mt-1 flex-shrink-0"></i>
+                                    <div class="w-9 h-9 rounded-xl ${cfg.bg} ${cfg.text} flex items-center justify-center mr-3 mt-1 flex-shrink-0">
+                                        <i class="bi ${cfg.icon}"></i>
+                                    </div>
                                     <div class="flex-1 min-w-0">
-                                        <p class="font-medium text-gray-800 text-sm">${n.title}</p>
+                                        <div class="flex items-center gap-2">
+                                            <p class="font-medium text-gray-800 text-sm">${n.title}</p>
+                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest ${cfg.badge}">
+                                                ${cfg.label}
+                                            </span>
+                                        </div>
                                         <p class="text-xs text-gray-600 mt-1 line-clamp-2">${n.message}</p>
                                         <p class="text-xs text-gray-400 mt-1">${n.time_ago}</p>
                                     </div>

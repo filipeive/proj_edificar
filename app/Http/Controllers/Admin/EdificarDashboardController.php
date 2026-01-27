@@ -106,6 +106,9 @@ class EdificarDashboardController extends Controller
         }
         $zoneStats = collect($zoneStats);
 
+        $pendingContributions = Contribution::where('status', 'pendente')
+            ->whereNotNull('package_id')
+            ->count();
 
         return view('admin.edificar.dashboard', compact(
             'totalArrecadado',
@@ -113,7 +116,8 @@ class EdificarDashboardController extends Controller
             'evolucaoMensal',
             'pacotes',
             'topCells',
-            'zoneStats'
+            'zoneStats',
+            'pendingContributions'
         ));
     }
 }

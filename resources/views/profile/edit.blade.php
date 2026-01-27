@@ -54,6 +54,12 @@
                     </h2>
                 </div>
                 <div class="p-10">
+                    @php
+                        $notificationPrefs = array_merge(
+                            \App\Models\User::notificationPreferenceDefaults(),
+                            $user->notification_preferences ?? []
+                        );
+                    @endphp
                     <form action="{{ route('profile.update') }}" method="POST" id="profileUpdateForm" class="space-y-6">
                         @csrf
                         @method('PATCH')
@@ -90,6 +96,40 @@
                             <i class="bi bi-save2-fill text-lg"></i>
                             Atualizar Meus Dados
                         </button>
+
+                        <div class="pt-6 border-t border-gray-100">
+                            <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                <i class="bi bi-bell-fill text-orange-500"></i> Preferências de Notificação
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                @php
+                                    $prefLabels = [
+                                        'contribution_created' => 'Contribuição criada',
+                                        'contribution_pending_validation' => 'Pendente para validar',
+                                        'pending_contributions' => 'Resumo pendentes (batch)',
+                                        'contribution_verified' => 'Contribuição verificada',
+                                        'contribution_rejected' => 'Contribuição rejeitada',
+                                        'contribution_verified_manager' => 'Verificada (pacote)',
+                                        'contribution_rejected_manager' => 'Rejeitada (pacote)',
+                                        'commitment_chosen' => 'Compromisso escolhido',
+                                        'commitment_expiring' => 'Compromisso a expirar',
+                                        'member_created' => 'Conta criada',
+                                        'member_added_to_cell' => 'Membro adicionado à célula',
+                                        'user_promoted' => 'Promoção de cargo',
+                                    ];
+                                @endphp
+
+                                @foreach($prefLabels as $key => $label)
+                                    <label class="flex items-center justify-between gap-3 bg-gray-50 border border-gray-100 rounded-2xl px-4 py-3">
+                                        <span class="text-xs font-bold text-gray-600 uppercase tracking-widest">{{ $label }}</span>
+                                        <input type="hidden" name="notification_preferences[{{ $key }}]" value="0">
+                                        <input type="checkbox" name="notification_preferences[{{ $key }}]" value="1"
+                                            class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                            {{ old("notification_preferences.$key", $notificationPrefs[$key] ?? true) ? 'checked' : '' }}>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>
