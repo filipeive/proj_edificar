@@ -14,10 +14,12 @@
         x-init="$watch('view', value => localStorage.setItem('packages_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('packages_view') || 'list')"
         @resize.window.debounce.500ms="updateView()">
         @section('header-actions')
-            <a href="{{ route('packages.create') }}"
-                class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
-                <i class="bi bi-plus-circle text-2xl"></i>
-            </a>
+            <div class="md:hidden">
+                <a href="{{ route('packages.create') }}"
+                    class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
+                    <i class="bi bi-plus-circle text-2xl"></i>
+                </a>
+            </div>
         @endsection
         <div class="space-y-8">
             <!-- Header & Top Actions -->
@@ -64,7 +66,7 @@
                 x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
                 class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
                 <div class="overflow-x-auto">
-                    <table class="w-full">
+                    <table class="w-full table-compact">
                         <thead>
                             <tr class="bg-gray-50/50">
                                 <th
@@ -149,16 +151,16 @@
                                     <td class="px-10 py-6 text-right">
                                         <div
                                             class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                                            <a href="{{ route('packages.show', $package) }}"
-                                                class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                            <a href="{{ route('packages.show', $package) }}" title="Ver detalhes"
+                                                class="action-icon bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white shadow-sm">
                                                 <i class="bi bi-eye-fill"></i>
                                             </a>
-                                            <a href="{{ route('packages.edit', $package) }}"
-                                                class="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                            <a href="{{ route('packages.edit', $package) }}" title="Editar"
+                                                class="action-icon bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white shadow-sm">
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
                                             <a href="{{ route('contributions.create') }}?package_id={{ $package->id }}"
-                                                class="w-10 h-10 rounded-xl bg-green-50 text-green-600 hover:bg-green-600 hover:text-white flex items-center justify-center transition-all shadow-sm"
+                                                class="action-icon bg-green-50 text-green-600 hover:bg-green-600 hover:text-white shadow-sm"
                                                 title="Nova Contribuição">
                                                 <i class="bi bi-plus-lg"></i>
                                             </a>
@@ -167,7 +169,8 @@
                                                 @method('DELETE')
                                                 <button type="button"
                                                     onclick="confirmDelete('Tem certeza que deseja excluir o pacote {{ $package->name }}?').then(result => { if(result.isConfirmed) this.closest('form').submit(); })"
-                                                    class="w-10 h-10 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all shadow-sm font-black">
+                                                    class="action-icon bg-red-50 text-red-600 hover:bg-red-600 hover:text-white shadow-sm font-black"
+                                                    title="Excluir">
                                                     <i class="bi bi-trash-fill"></i>
                                                 </button>
                                             </form>
@@ -183,10 +186,10 @@
             <!-- Grid View -->
             <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300"
                 x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                class="grid grid-compact">
                 @foreach($packages as $package)
                     <div
-                        class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 relative">
+                        class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 relative compact-card">
                         <div class="absolute top-6 right-6">
                             <span
                                 class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border 
@@ -202,7 +205,7 @@
 
                         <div class="mb-4">
                             <h4
-                                class="text-lg font-black text-gray-900 leading-tight mb-1 group-hover:text-blue-600 transition-colors uppercase tracking-widest">
+                                class="text-base font-black text-gray-900 leading-tight mb-1 group-hover:text-blue-600 transition-colors uppercase tracking-widest line-clamp-1">
                                 {{ $package->name }}</h4>
                             <div class="flex items-center gap-2 text-green-600 font-black text-xs">
                                 <span>{{ number_format($package->min_amount, 0, ',', '.') }} MT</span>
@@ -225,11 +228,11 @@
                             <div class="flex flex-col border-t border-gray-100 pt-2">
                                 <span class="text-[9px] font-black uppercase text-gray-400">Responsável</span>
                                 <span
-                                    class="text-xs font-bold text-gray-700 truncate">{{ $package->getResponsavelName() }}</span>
+                                    class="text-xs font-bold text-gray-700 line-clamp-1">{{ $package->getResponsavelName() }}</span>
                             </div>
                             @if($package->whatsapp_link)
                                 <a href="{{ $package->whatsapp_link }}" target="_blank"
-                                    class="flex items-center gap-2 text-[10px] text-green-600 font-black uppercase mt-2 hover:text-green-700">
+                                    class="hidden sm:flex items-center gap-2 text-[10px] text-green-600 font-black uppercase mt-2 hover:text-green-700">
                                     <i class="bi bi-whatsapp"></i> Grupo WhatsApp
                                 </a>
                             @endif
@@ -249,5 +252,11 @@
                 @endforeach
             </div>
         </div>
+
+        @if($packages->hasPages())
+            <div class="mt-8">
+                {{ $packages->links() }}
+            </div>
+        @endif
     </div>
 @endsection

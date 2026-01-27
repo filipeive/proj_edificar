@@ -5,22 +5,22 @@
 @section('page-subtitle', 'Informações completas sobre o culto ou evento')
 
 @section('header-actions')
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 md:hidden">
         <button onclick="toggleEmailModal()"
-            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
-            title="Partilhar Email">
-            <i class="bi bi-envelope text-2xl"></i>
+            class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+            title="Partilhar email">
+            <i class="bi bi-envelope"></i>
         </button>
         <a href="{{ route('events.pdf', $event) }}"
-            class="text-gray-600 hover:text-orange-600 p-2.5 hover:bg-orange-50 rounded-xl transition-all duration-300 border border-transparent hover:border-orange-100"
+            class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50"
             title="Exportar PDF">
-            <i class="bi bi-file-earmark-pdf text-2xl"></i>
+            <i class="bi bi-file-earmark-pdf"></i>
         </a>
         @can('update', $event)
             <a href="{{ route('events.edit', $event) }}"
-                class="text-gray-600 hover:text-yellow-600 p-2.5 hover:bg-yellow-50 rounded-xl transition-all duration-300 border border-transparent hover:border-yellow-100"
+                class="action-icon text-gray-600 hover:text-yellow-600 hover:bg-yellow-50"
                 title="Editar">
-                <i class="bi bi-pencil-square text-2xl"></i>
+                <i class="bi bi-pencil-square"></i>
             </a>
         @endcan
     </div>

@@ -32,7 +32,7 @@ class SupervisionController
             });
         }
 
-        $supervisions = $query->get();
+        $supervisions = $query->paginate(24)->withQueryString();
         return view('admin.supervisions.index', ['supervisions' => $supervisions]);
     }
 
@@ -87,7 +87,11 @@ class SupervisionController
         return view(
             'admin.supervisions.show',
             [
-                'supervision' => $supervision->load('zone', 'cells'),
+                'supervision' => $supervision->load('zone'),
+                'cells' => $supervision->cells()
+                    ->with('leader')
+                    ->paginate(20)
+                    ->withQueryString(),
                 'availableSupervisions' => $availableSupervisions
             ]
         );

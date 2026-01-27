@@ -161,7 +161,15 @@ class CellController
         return view(
             'admin.cells.show',
             [
-                'cell' => $cell->load('supervision', 'leader', 'members'),
+                'cell' => $cell->load('supervision', 'leader'),
+                'members' => $cell->members()
+                    ->where('is_active', true)
+                    ->paginate(20)
+                    ->withQueryString(),
+                'meetings' => $cell->meetings()
+                    ->orderBy('meeting_date', 'desc')
+                    ->paginate(10)
+                    ->withQueryString(),
                 'availableCells' => $availableCells
             ]
         );

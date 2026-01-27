@@ -3,23 +3,23 @@
 @section('title', 'Detalhes do Pacote - ' . $package->name)
 
 @section('header-actions')
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 md:hidden">
         @if($package->whatsapp_link)
             <a href="{{ $package->whatsapp_link }}" target="_blank"
-                class="text-gray-600 hover:text-green-600 p-2.5 hover:bg-green-50 rounded-xl transition-all duration-300 border border-transparent hover:border-green-100"
+                class="action-icon text-gray-600 hover:text-green-600 hover:bg-green-50"
                 title="Grupo WhatsApp">
-                <i class="bi bi-whatsapp text-2xl"></i>
+                <i class="bi bi-whatsapp"></i>
             </a>
         @endif
         <a href="{{ route('packages.export', $package) }}"
-            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+            class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
             title="Exportar">
-            <i class="bi bi-file-earmark-excel text-2xl"></i>
+            <i class="bi bi-file-earmark-excel"></i>
         </a>
         <a href="{{ route('packages.edit', $package) }}"
-            class="text-gray-600 hover:text-orange-600 p-2.5 hover:bg-orange-50 rounded-xl transition-all duration-300 border border-transparent hover:border-orange-100"
+            class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50"
             title="Editar">
-            <i class="bi bi-pencil-square text-2xl"></i>
+            <i class="bi bi-pencil-square"></i>
         </a>
     </div>
 @endsection
@@ -31,7 +31,7 @@
                             selected: [], 
                             selectAll: false,
                             updateSelection() {
-                                this.selected = this.selectAll ? {{ $package->userCommitments->pluck('user_id') }} : [];
+                                this.selected = this.selectAll ? {{ $commitmentUserIds }} : [];
                             }
                         }">
         <!-- Header -->
@@ -126,7 +126,7 @@
                         </form>
 
                         <button
-                            onclick="copyToClipboard('{{ $package->userCommitments->pluck('user.phone')->filter()->implode(', ') }}', 'Contactos copiados!', this)"
+                            onclick="copyToClipboard('{{ $commitmentPhones }}', 'Contactos copiados!', this)"
                             class="w-full bg-blue-500/10 text-white border border-white/20 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-500/30 transition-all flex items-center justify-center gap-2">
                             <i class="bi bi-person-lines-fill"></i> Copiar Contactos
                         </button>
@@ -241,6 +241,13 @@
                                 class="w-full pl-12 pr-4 py-3 bg-white border border-gray-100 rounded-2xl text-sm font-bold text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-500 transition-all">
                         </div>
 
+                        @if(auth()->user()->isAdmin() || auth()->user()->isComissaoObra() || auth()->user()->isResponsavelPacote())
+                            <button type="button" @click="$dispatch('open-quick-member-modal')"
+                                class="bg-blue-600 text-white px-4 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
+                                <i class="bi bi-person-plus-fill mr-2"></i>Novo Membro Rápido
+                            </button>
+                        @endif
+
                         <!-- Bulk Actions Toolbar -->
                         <div x-show="selected.length > 0" x-transition
                             class="flex items-center gap-2 bg-blue-50 px-3 py-1 rounded-xl border border-blue-100">
@@ -275,7 +282,7 @@
                 <div x-show="view === 'list'" x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
                     class="overflow-x-auto">
-                    <table class="w-full">
+                    <table class="w-full table-compact">
                         <thead>
                             <tr class="bg-gray-50/50">
                                 <th class="px-4 md:px-8 py-4 w-10">
@@ -303,7 +310,7 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-50">
-                            @forelse($package->userCommitments as $commitment)
+                            @forelse($commitments as $commitment)
                                 <tr class="hover:bg-gray-50/50 transition-colors"
                                     x-show="!search || '{{ strtolower($commitment->user->name) }}'.includes(search.toLowerCase()) || '{{ $commitment->user->phone }}'.includes(search)">
                                     <td class="px-8 py-6">
@@ -343,8 +350,8 @@
                                         <div class="flex items-center justify-center gap-1">
                                             <!-- Add Contribution Shortcut -->
                                             <a href="{{ route('contributions.create') }}?user_id={{ $commitment->user_id }}&package_id={{ $package->id }}"
-                                                class="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center hover:bg-orange-600 hover:text-white transition-all shadow-sm"
-                                                title="Adicionar Contribuição">
+                                                class="action-icon bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white shadow-sm"
+                                                title="Adicionar contribuição">
                                                 <i class="bi bi-plus-circle-fill"></i>
                                             </a>
 
@@ -356,8 +363,8 @@
                                                                                                                 cellId: '{{ $commitment->user->cell_id }}',
                                                                                                                 amount: '{{ $commitment->committed_amount }}'
                                                                                                             })"
-                                                class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all shadow-sm"
-                                                title="Editar Dados">
+                                                class="action-icon bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white shadow-sm"
+                                                title="Editar dados">
                                                 <i class="bi bi-pencil-fill"></i>
                                             </button>
 
@@ -367,8 +374,8 @@
                                                                                 userName: '{{ $commitment->user->name }}',
                                                                                 currentAmount: '{{ $commitment->committed_amount }}'
                                                                             })"
-                                                class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center hover:bg-purple-600 hover:text-white transition-all shadow-sm"
-                                                title="Mudar de Pacote">
+                                                class="action-icon bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white shadow-sm"
+                                                title="Mudar de pacote">
                                                 <i class="bi bi-arrow-left-right"></i>
                                             </button>
 
@@ -380,8 +387,8 @@
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit"
-                                                    class="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-600 hover:text-white transition-all shadow-sm"
-                                                    title="Remover do Pacote">
+                                                    class="action-icon bg-red-50 text-red-600 hover:bg-red-600 hover:text-white shadow-sm"
+                                                    title="Remover do pacote">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </form>
@@ -393,10 +400,20 @@
                                                     $whatsappBody = str_replace('[NOME]', $name, $package->whatsapp_template ?? "Olá [NOME], este é um lembrete do Projetor Edificar.");
                                                     $cleanPhone = preg_replace('/[^0-9]/', '', $commitment->user->phone);
                                                 @endphp
+                                                <button type="button"
+                                                    @click="$dispatch('open-sms-member-modal', { 
+                                                        userId: {{ $commitment->user_id }}, 
+                                                        userName: @js($commitment->user->name),
+                                                        message: @js($smsBody)
+                                                    })"
+                                                    class="action-icon bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white shadow-sm"
+                                                    title="SMS individual">
+                                                    <i class="bi bi-chat-dots-fill"></i>
+                                                </button>
                                                 <a href="https://wa.me/{{ $cleanPhone }}?text={{ urlencode($whatsappBody) }}"
                                                     target="_blank"
-                                                    class="w-8 h-8 rounded-lg bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-600 hover:text-white transition-all shadow-sm"
-                                                    title="Mudar WhatsApp Individual">
+                                                    class="action-icon bg-green-50 text-green-600 hover:bg-green-600 hover:text-white shadow-sm"
+                                                    title="WhatsApp individual">
                                                     <i class="bi bi-whatsapp"></i>
                                                 </a>
                                             @endif
@@ -446,10 +463,10 @@
                 <!-- Grid View for Members -->
                 <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-                    class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50/30">
-                    @forelse($package->userCommitments as $commitment)
+                    class="p-6 grid grid-compact bg-gray-50/30">
+                    @forelse($commitments as $commitment)
                         <div x-show="!search || '{{ strtolower($commitment->user->name) }}'.includes(search.toLowerCase()) || '{{ $commitment->user->phone }}'.includes(search)"
-                            class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-md transition-all relative">
+                            class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-md transition-all relative compact-card">
                             <div class="absolute top-6 left-6 z-10">
                                 <input type="checkbox" value="{{ $commitment->user_id }}" x-model="selected"
                                     class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 w-5 h-5">
@@ -468,7 +485,7 @@
                                     {{ strtoupper(substr($commitment->user->name, 0, 1)) }}
                                 </div>
                                 <div class="flex flex-col">
-                                    <h4 class="text-sm font-black text-gray-900">{{ $commitment->user->name }}</h4>
+                                    <h4 class="text-sm font-black text-gray-900 line-clamp-1">{{ $commitment->user->name }}</h4>
                                     <span
                                         class="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">{{ $commitment->user->phone }}</span>
                                 </div>
@@ -553,9 +570,20 @@
                                     @if($commitment->user->phone)
                                         @php
                                             $name = $commitment->user->name;
+                                            $smsBody = str_replace('[NOME]', $name, $package->sms_template ?? "Olá [NOME], lembrete de contribuição para o Projetor Edificar.");
                                             $cleanPhone = preg_replace('/[^0-9]/', '', $commitment->user->phone);
                                             $whatsappBody = str_replace('[NOME]', $name, $package->whatsapp_template ?? "Olá [NOME], este é um lembrete do Projetor Edificar.");
                                         @endphp
+                                        <button type="button"
+                                            @click="$dispatch('open-sms-member-modal', { 
+                                                userId: {{ $commitment->user_id }}, 
+                                                userName: @js($commitment->user->name),
+                                                message: @js($smsBody)
+                                            })"
+                                            class="flex-1 h-10 bg-blue-50 text-blue-600 flex items-center justify-center rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                                            title="SMS">
+                                            <i class="bi bi-chat-dots-fill"></i>
+                                        </button>
                                         <a href="https://wa.me/{{ $cleanPhone }}?text={{ urlencode($whatsappBody) }}"
                                             target="_blank"
                                             class="flex-1 h-10 bg-green-50 text-green-600 flex items-center justify-center rounded-xl hover:bg-green-600 hover:text-white transition-all shadow-sm"
@@ -572,6 +600,12 @@
                         </div>
                     @endforelse
                 </div>
+
+                @if($commitments->hasPages())
+                    <div class="mt-6">
+                        {{ $commitments->links() }}
+                    </div>
+                @endif
             </div>
         </div>
     </div>
@@ -723,6 +757,137 @@
                         <button type="submit"
                             class="flex-1 bg-purple-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-purple-700 transition-all shadow-lg shadow-purple-100">
                             Confirmar Mudança
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- SMS Individual Modal -->
+    <div x-data="{ 
+            show: false, 
+            userId: '', 
+            userName: '', 
+            message: '' 
+        }" @open-sms-member-modal.window="
+            show = true; 
+            userId = $event.detail.userId; 
+            userName = $event.detail.userName; 
+            message = $event.detail.message || '';
+        " x-show="show" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div @click="show = false" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"></div>
+
+            <div
+                class="bg-white rounded-[2.5rem] overflow-hidden shadow-2xl transform transition-all sm:max-w-lg sm:w-full z-10 border border-gray-100">
+                <div class="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                    <div>
+                        <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">SMS Individual</h3>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1" x-text="userName"></p>
+                    </div>
+                    <button @click="show = false" class="text-gray-400 hover:text-gray-600 transition-colors">
+                        <i class="bi bi-x-lg text-lg"></i>
+                    </button>
+                </div>
+
+                <form :action="`{{ url('admin/packages/' . $package->id . '/members') }}/${userId}/send-sms`"
+                    method="POST" class="p-8 space-y-6">
+                    @csrf
+                    <div>
+                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">
+                            Mensagem
+                        </label>
+                        <textarea name="message" rows="4" x-model="message" required
+                            class="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-medium text-gray-900 focus:ring-2 focus:ring-blue-500"
+                            placeholder="Escreva a mensagem..."></textarea>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-2">Use [NOME] para personalizar</p>
+                    </div>
+
+                    <div class="flex gap-3 pt-2">
+                        <button type="button" @click="show = false"
+                            class="flex-1 bg-gray-100 text-gray-600 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-gray-200 transition-all">
+                            Cancelar
+                        </button>
+                        <button type="submit"
+                            class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
+                            Enviar SMS
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Member Modal -->
+    <div x-data="{ show: false }" @open-quick-member-modal.window="show = true"
+        x-show="show" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div @click="show = false" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"></div>
+
+            <div
+                class="bg-white rounded-[2.5rem] overflow-hidden shadow-2xl transform transition-all sm:max-w-lg sm:w-full z-10 border border-gray-100">
+                <div class="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                    <div>
+                        <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Novo Membro Rápido</h3>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Credenciais geradas automaticamente</p>
+                    </div>
+                    <button @click="show = false" class="text-gray-400 hover:text-gray-600 transition-colors">
+                        <i class="bi bi-x-lg text-lg"></i>
+                    </button>
+                </div>
+
+                <form action="{{ route('packages.quick-member', $package) }}" method="POST" class="p-8 space-y-6">
+                    @csrf
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">
+                                Nome Completo
+                            </label>
+                            <input type="text" name="name" required
+                                class="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500"
+                                placeholder="João da Silva">
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">
+                                Telefone (Opcional)
+                            </label>
+                            <input type="text" name="phone"
+                                class="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500"
+                                placeholder="823562000">
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">
+                                Célula
+                            </label>
+                            <select name="cell_id" required
+                                class="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500">
+                                <option value="">Selecionar célula...</option>
+                                @foreach($availableCells as $cell)
+                                    <option value="{{ $cell->id }}">{{ $cell->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">
+                                Valor do Compromisso (MT)
+                            </label>
+                            <input type="number" name="committed_amount" step="0.01" value="{{ $package->min_amount }}"
+                                class="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 pt-2">
+                        <button type="button" @click="show = false"
+                            class="flex-1 bg-gray-100 text-gray-600 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-gray-200 transition-all">
+                            Cancelar
+                        </button>
+                        <button type="submit"
+                            class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
+                            Criar e Adicionar
                         </button>
                     </div>
                 </form>

@@ -131,9 +131,9 @@
                     <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-8">Meus Pacotes Geridos</h3>
                     <div class="space-y-4">
                         @foreach($packages as $package)
-                            <div class="group p-4 rounded-2xl bg-gray-50 border border-gray-100 hover:bg-white hover:shadow-lg transition-all">
+                            <div class="group p-4 rounded-2xl bg-gray-50 border border-gray-100 hover:bg-white hover:shadow-lg transition-all compact-card">
                                 <div class="flex justify-between items-start mb-2">
-                                    <h4 class="font-bold text-gray-900">{{ $package->name }}</h4>
+                                    <h4 class="font-bold text-gray-900 line-clamp-1">{{ $package->name }}</h4>
                                     <span class="px-2 py-0.5 rounded-lg bg-blue-100 text-blue-700 text-[10px] font-black uppercase tracking-widest">{{ $package->getActiveMembersCount() }} Membros</span>
                                 </div>
                                 <div class="flex items-center gap-2 text-[10px] text-gray-400 font-bold uppercase tracking-widest">
@@ -141,7 +141,8 @@
                                 </div>
                                 <div class="mt-4 pt-4 border-t border-gray-100 flex gap-2">
                                     <a href="{{ route('packages.show', $package) }}" class="flex-1 py-2 bg-white rounded-xl text-center text-[10px] font-black uppercase tracking-widest border border-gray-100 hover:bg-blue-600 hover:text-white transition-all shadow-sm">Detalhes</a>
-                                    <a href="{{ route('packages.export', $package) }}" class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-gray-400 border border-gray-100 hover:text-green-600 transition-all shadow-sm"><i class="bi bi-file-earmark-excel"></i></a>
+                                    <a href="{{ route('packages.export', $package) }}" title="Exportar"
+                                        class="action-icon bg-white text-gray-400 border border-gray-100 hover:text-green-600 shadow-sm"><i class="bi bi-file-earmark-excel"></i></a>
                                 </div>
                             </div>
                         @endforeach
@@ -157,7 +158,7 @@
                 <a href="{{ route('contributions.index') }}" class="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">Ver Todas</a>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-left">
+                <table class="w-full text-left table-compact">
                     <thead>
                         <tr class="bg-gray-50/50">
                             <th class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Data</th>
@@ -176,10 +177,10 @@
                                 </td>
                                 <td class="px-8 py-5">
                                     <p class="text-sm font-black text-gray-900 leading-none">{{ $contribution->user->name ?? 'Doador Externo' }}</p>
-                                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-1">{{ $contribution->member_name }}</p>
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-1 line-clamp-1">{{ $contribution->member_name }}</p>
                                 </td>
                                 <td class="px-8 py-5">
-                                    <span class="text-xs font-bold text-gray-600">{{ $contribution->package->name }}</span>
+                                    <span class="text-xs font-bold text-gray-600 line-clamp-1">{{ $contribution->package->name }}</span>
                                 </td>
                                 <td class="px-8 py-5">
                                     <span class="text-sm font-black text-blue-600">{{ number_format($contribution->amount, 2, ',', '.') }} MT</span>

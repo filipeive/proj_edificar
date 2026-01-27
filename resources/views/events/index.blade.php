@@ -5,14 +5,16 @@
 @section('page-subtitle', 'Gestão de cultos, batismos e eventos especiais')
 
 @section('header-actions')
-    <a href="{{ route('event-types.index') }}"
-        class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100">
-        <i class="bi bi-gear-fill text-2xl"></i>
-    </a>
-    <a href="{{ route('events.create') }}"
-        class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100">
-        <i class="bi bi-calendar-plus text-2xl"></i>
-    </a>
+    <div class="flex items-center gap-2 md:hidden">
+        <a href="{{ route('event-types.index') }}"
+            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100">
+            <i class="bi bi-gear-fill text-2xl"></i>
+        </a>
+        <a href="{{ route('events.create') }}"
+            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100">
+            <i class="bi bi-calendar-plus text-2xl"></i>
+        </a>
+    </div>
 @endsection
 
 
@@ -166,7 +168,7 @@
         <div id="view-list" x-show="view === 'list'" class="transition-opacity duration-300">
             <div class="bg-white dark:bg-gray-800 rounded-[2rem] shadow-xl shadow-gray-100/50 dark:shadow-none border border-gray-100 dark:border-gray-700 overflow-hidden">
                 <!-- Form Removed (Using Alpine Template in Bar) -->
-                <table class="w-full transition-colors">
+                <table class="w-full transition-colors table-compact">
                     <thead>
                         <tr class="bg-gray-50/50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
                                 @if(auth()->user()->role === 'admin')
@@ -249,18 +251,18 @@
                                                 <div
                                                     class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                                     <a href="{{ route('events.show', $event) }}"
-                                                        class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
-                                                        title="Ver Detalhes">
+                                                        class="action-icon text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30"
+                                                        title="Ver detalhes">
                                                         <i class="bi bi-eye-fill"></i>
                                                     </a>
                                                     <a href="{{ route('events.pdf', $event) }}" target="_blank"
-                                                        class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+                                                        class="action-icon text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
                                                         title="PDF">
                                                         <i class="bi bi-file-earmark-pdf-fill"></i>
                                                     </a>
                                                     @can('update', $event)
                                                         <a href="{{ route('events.edit', $event) }}"
-                                                            class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
+                                                            class="action-icon text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30"
                                                             title="Editar">
                                                             <i class="bi bi-pencil-fill"></i>
                                                         </a>
@@ -272,7 +274,7 @@
                                                             @method('DELETE')
                                                             <button type="button"
                                                                 onclick="confirmDelete('delete-event-{{ $event->id }}', 'Deseja excluir este evento?')"
-                                                                class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+                                                                class="action-icon text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
                                                                 title="Excluir">
                                                                 <i class="bi bi-trash-fill"></i>
                                                             </button>
@@ -299,9 +301,9 @@
 
         <!-- Grid View -->
         <div id="view-grid" x-show="view === 'grid'" class="transition-opacity duration-300">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div class="grid grid-compact">
                 @forelse($events as $event)
-                            <div class="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-2xl md:rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col group hover:shadow-xl transition-all duration-300 relative"
+                            <div class="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-2xl md:rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col group hover:shadow-xl transition-all duration-300 relative compact-card"
                                  :class="{'ring-2 ring-blue-500 bg-blue-50/10 dark:bg-blue-900/10': selected.includes({{ $event->id }})}">
                                 <div class="absolute top-6 left-6 z-10 transition-opacity" :class="{'opacity-0 group-hover:opacity-100': !selected.includes({{ $event->id }})}">
                                      @if(auth()->user()->role === 'admin')
@@ -325,13 +327,13 @@
                             </div>
 
                             <div class="mb-4">
-                                <h4
-                                    class="text-lg font-black text-gray-900 dark:text-white leading-tight mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors uppercase tracking-tighter">
-                                    {{ $event->name }}
-                                </h4>
-                                <span
-                                    class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">{{ $event->eventType->name }}</span>
-                            </div>
+                            <h4
+                                class="text-base font-black text-gray-900 dark:text-white leading-tight mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors uppercase tracking-tighter line-clamp-1">
+                                {{ $event->name }}
+                            </h4>
+                            <span
+                                class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">{{ $event->eventType->name }}</span>
+                        </div>
 
                             <div class="space-y-3 mb-6 flex-1">
                                 <div class="flex items-center gap-3 text-gray-500 dark:text-gray-400">
@@ -342,7 +344,7 @@
                                         <span
                                             class="text-xs font-black uppercase text-gray-900 dark:text-white">{{ $event->date->format('d/m/Y') }}</span>
                                         <span
-                                            class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase">{{ $event->date->translatedFormat('l') }}</span>
+                                            class="hidden sm:block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase">{{ $event->date->translatedFormat('l') }}</span>
                                         @if($event->end_date)
                                             <span class="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase mt-1">
                                                 Até {{ $event->end_date->format('d/m/Y') }}

@@ -4,7 +4,10 @@ DEFAULT_SEEDERS="MaritalCourse2025DetailedSeeder,EdificarPackagesSeeder,Group2Pa
 
 read -r -p "Modo dry-run (não executa SSH)? [s/N]: " DRY_RUN; \
 read -r -p "Seeders (separados por vírgula, Enter para padrão): " SEEDERS_INPUT; \
+read -r -p "Executar migrations? [S/n]: " DO_MIGRATE; \
+read -r -p "Limpar caches? [S/n]: " DO_CLEAR; \
 read -r -p "Timeout SSH em segundos (Enter para 10): " SSH_TIMEOUT; \
+read -r -p "Salvar log local do deploy? [s/N]: " SAVE_LOG; \
 
 if [ -z "$SEEDERS_INPUT" ]; then SEEDERS_INPUT="$DEFAULT_SEEDERS"; fi; \
 if [ -z "$SSH_TIMEOUT" ]; then SSH_TIMEOUT=10; fi; \
@@ -18,7 +21,16 @@ for s in "${SEEDERS[@]}"; do \
   fi; \
 done; \
 
-REMOTE_CMD="cd /var/www/html/edificar && git pull && php artisan migrate --force && $SEED_CMD php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear"; \
+REMOTE_CMD="cd /var/www/html/edificar && git pull"; \
+if [ -z "$DO_MIGRATE" ] || [ "$DO_MIGRATE" = "S" ] || [ "$DO_MIGRATE" = "s" ]; then \
+  REMOTE_CMD="$REMOTE_CMD && php artisan migrate --force"; \
+fi; \
+if [ -n "$SEED_CMD" ]; then \
+  REMOTE_CMD="$REMOTE_CMD && $SEED_CMD true"; \
+fi; \
+if [ -z "$DO_CLEAR" ] || [ "$DO_CLEAR" = "S" ] || [ "$DO_CLEAR" = "s" ]; then \
+  REMOTE_CMD="$REMOTE_CMD && php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear"; \
+fi; \
 
 git add . && \
 if git diff --cached --quiet; then \
@@ -43,7 +55,12 @@ if [ -z "$DO_DEPLOY" ] || [ "$DO_DEPLOY" = "S" ] || [ "$DO_DEPLOY" = "s" ]; then
   if [ "$DRY_RUN" = "s" ] || [ "$DRY_RUN" = "S" ]; then \
     echo "Dry-run: $REMOTE_CMD"; \
   else \
-    ssh -o ConnectTimeout="$SSH_TIMEOUT" -i ~/.ssh/oracle-2025 ubuntu@146.235.224.99 "$REMOTE_CMD"; \
+    if [ "$SAVE_LOG" = "s" ] || [ "$SAVE_LOG" = "S" ]; then \
+      LOG_FILE="deploy-$(date +%F-%H%M%S).log"; \
+      ssh -o ConnectTimeout="$SSH_TIMEOUT" -i ~/.ssh/oracle-2025 ubuntu@146.235.224.99 "$REMOTE_CMD" | tee "$LOG_FILE"; \
+    else \
+      ssh -o ConnectTimeout="$SSH_TIMEOUT" -i ~/.ssh/oracle-2025 ubuntu@146.235.224.99 "$REMOTE_CMD"; \
+    fi; \
   fi; \
 else \
   echo "Deploy remoto cancelado."; \

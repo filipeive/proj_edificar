@@ -3,24 +3,24 @@
 @section('title', 'Detalhes da Celebração - Portal Life Church')
 
 @section('header-actions')
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 md:hidden">
         <a href="{{ route('services.download-pdf', $service) }}"
-            class="text-gray-600 hover:text-orange-600 p-2.5 hover:bg-orange-50 rounded-xl transition-all duration-300 border border-transparent hover:border-orange-100"
+            class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50"
             title="Exportar PDF">
-            <i class="bi bi-file-earmark-pdf text-2xl"></i>
+            <i class="bi bi-file-earmark-pdf"></i>
         </a>
         @can('update', $service)
             <a href="{{ route('services.edit', $service) }}"
-                class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+                class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
                 title="Editar">
-                <i class="bi bi-pencil-square text-2xl"></i>
+                <i class="bi bi-pencil-square"></i>
             </a>
         @endcan
         @can('delete', $service)
             <button type="button" onclick="confirmDelete('delete-form', 'Deseja excluir este culto?')"
-                class="text-gray-600 hover:text-red-600 p-2.5 hover:bg-red-50 rounded-xl transition-all duration-300 border border-transparent hover:border-red-100"
+                class="action-icon text-gray-600 hover:text-red-600 hover:bg-red-50"
                 title="Excluir">
-                <i class="bi bi-trash text-2xl"></i>
+                <i class="bi bi-trash"></i>
             </button>
         @endcan
     </div>

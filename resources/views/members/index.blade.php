@@ -17,10 +17,12 @@
 
 @section('header-actions')
     @if($userRole !== 'secretaria')
-        <a href="{{ route('members.create') }}" 
-            class="bg-blue-600 text-white p-2 rounded-xl hover:bg-blue-700 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20 active:scale-95">
-            <i class="bi bi-person-plus-fill text-2xl"></i>
-        </a>
+        <div class="md:hidden">
+            <a href="{{ route('members.create') }}" 
+                class="bg-blue-600 text-white p-2 rounded-xl hover:bg-blue-700 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20 active:scale-95">
+                <i class="bi bi-person-plus-fill text-2xl"></i>
+            </a>
+        </div>
     @endif
 @endsection
 
@@ -188,7 +190,7 @@
         <div x-show="view === 'list'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
             class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full">
+                <table class="w-full table-compact">
                     <thead>
                         <tr class="bg-gray-50/50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
                              <!-- Checkbox Select All -->
@@ -281,12 +283,14 @@
                                 </td>
                                 <td class="px-8 py-5 text-right pr-10">
                                     <div class="flex items-center justify-end gap-2 text-right">
-                                        <a href="{{ route('members.show', $member) }}" class="w-8 h-8 rounded-xl bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 text-gray-400 dark:text-gray-300 hover:bg-blue-600 hover:text-white hover:border-blue-600 flex items-center justify-center transition-all shadow-sm">
+                                        <a href="{{ route('members.show', $member) }}" title="Detalhes"
+                                            class="action-icon bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 text-gray-400 dark:text-gray-300 hover:bg-blue-600 hover:text-white hover:border-blue-600 shadow-sm">
                                             <i class="bi bi-eye-fill"></i>
                                         </a>
                                         @if($userRole !== 'secretaria')
-                                            <a href="{{ route('members.edit', $member) }}" class="w-8 h-8 rounded-xl bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 text-gray-400 dark:text-gray-300 hover:bg-orange-500 hover:text-white hover:border-orange-500 flex items-center justify-center transition-all shadow-sm">
-                                                <i class="bi bi-pencil-fill text-[10px]"></i>
+                                            <a href="{{ route('members.edit', $member) }}" title="Editar"
+                                                class="action-icon bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 text-gray-400 dark:text-gray-300 hover:bg-orange-500 hover:text-white hover:border-orange-500 shadow-sm">
+                                                <i class="bi bi-pencil-fill"></i>
                                             </a>
                                         @endif
                                     </div>
@@ -314,9 +318,9 @@
 
         <!-- Grid View -->
         <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-            class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+            class="grid grid-compact">
             @forelse($members as $member)
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col group hover:shadow-2xl hover:shadow-blue-900/10 dark:hover:shadow-black/30 transition-all duration-300 relative overflow-hidden"
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col group hover:shadow-2xl hover:shadow-blue-900/10 dark:hover:shadow-black/30 transition-all duration-300 relative overflow-hidden compact-card"
                      :class="{'ring-2 ring-blue-500 bg-blue-50/10 dark:bg-blue-900/10': selected.includes({{ $member->id }})}">
                     
                     <!-- Selection Checkbox (Absolute) -->
@@ -334,12 +338,12 @@
                         @endif
                     </div>
 
-                    <div class="flex items-start gap-4 mb-6 pl-8"> <!-- Added padding for checkbox -->
+                    <div class="flex items-start gap-4 mb-4 pl-8"> <!-- Added padding for checkbox -->
                         <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-black text-2xl shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform duration-500">
                             {{ strtoupper(substr($member->name, 0, 1)) }}
                         </div>
                         <div class="flex-1 min-w-0 pt-1">
-                            <h4 class="text-lg font-black text-gray-900 dark:text-white leading-tight mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">{{ $member->name }}</h4>
+                            <h4 class="text-base font-black text-gray-900 dark:text-white leading-tight mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">{{ $member->name }}</h4>
                             <div class="flex items-center gap-2">
                                 @if($member->role === 'lider_celula')
                                     <span class="text-[10px] font-black uppercase tracking-wider text-purple-600 dark:text-purple-400">Líder</span>

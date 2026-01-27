@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\NormalizesMozPhone;
 use Illuminate\Database\Eloquent\Model;
 
 class CellVisitor extends Model
 {
+    use NormalizesMozPhone;
     protected $fillable = [
         'cell_id',
         'name',
@@ -20,6 +22,11 @@ class CellVisitor extends Model
         'visit_date' => 'date',
         'became_participant' => 'boolean',
     ];
+
+    public function setPhoneAttribute($value): void
+    {
+        $this->attributes['phone'] = $this->normalizeMozPhone($value);
+    }
 
     public function cell()
     {

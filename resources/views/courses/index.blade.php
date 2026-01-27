@@ -6,10 +6,12 @@
 
 @section('header-actions')
     @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
-        <a href="{{ route('courses.create') }}"
-            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-orange-600/20">
-            <i class="bi bi-journal-plus text-2xl"></i>
-        </a>
+        <div class="md:hidden">
+            <a href="{{ route('courses.create') }}"
+                class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-orange-600/20">
+                <i class="bi bi-journal-plus text-2xl"></i>
+            </a>
+        </div>
     @endif
 @endsection
 
@@ -180,7 +182,7 @@
                     <div x-show="view === 'list'" x-transition:enter="transition ease-out duration-300"
                         x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
                         <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
+                            <table class="w-full text-left border-collapse table-compact">
                                 <thead>
                                     <tr class="bg-gray-50/50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
                                         @if(auth()->user()->role === 'admin')
@@ -249,12 +251,12 @@
                                             <td class="px-8 py-6 text-right">
                                                 <div
                                                     class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <a href="{{ route('courses.show', $course) }}"
-                                                        class="w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 hover:bg-orange-500 hover:text-white dark:hover:bg-orange-500 dark:hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                                    <a href="{{ route('courses.show', $course) }}" title="Detalhes"
+                                                        class="action-icon bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 hover:bg-orange-500 hover:text-white dark:hover:bg-orange-500 dark:hover:text-white shadow-sm">
                                                         <i class="bi bi-eye-fill"></i>
                                                     </a>
-                                                    <a href="{{ route('courses.edit', $course) }}"
-                                                        class="w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                                    <a href="{{ route('courses.edit', $course) }}" title="Editar"
+                                                        class="action-icon bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white shadow-sm">
                                                         <i class="bi bi-pencil-fill"></i>
                                                     </a>
                                                     @if(auth()->user()->role === 'admin')
@@ -265,7 +267,8 @@
                                                             @method('DELETE')
                                                             <button type="button"
                                                                 onclick="confirmDelete('list-delete-course-{{ $course->id }}')"
-                                                                class="w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 hover:bg-red-600 hover:text-white dark:hover:bg-red-600 dark:hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                                                class="action-icon bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 hover:bg-red-600 hover:text-white dark:hover:bg-red-600 dark:hover:text-white shadow-sm"
+                                                                title="Excluir">
                                                                 <i class="bi bi-trash-fill"></i>
                                                             </button>
                                                         </form>
@@ -282,9 +285,9 @@
                     <!-- Grid View for Admin -->
                     <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300"
                         x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-                        class="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 bg-gray-50/30 dark:bg-gray-900/10">
+                        class="p-6 grid grid-compact bg-gray-50/30 dark:bg-gray-900/10">
                         @foreach($allCourses as $course)
-                            <div class="bg-white dark:bg-gray-800 p-6 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col group hover:shadow-md hover:shadow-gray-300/50 dark:hover:shadow-gray-950/50 transition-all relative h-full"
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col group hover:shadow-md hover:shadow-gray-300/50 dark:hover:shadow-gray-950/50 transition-all relative h-full compact-card"
                                 :class="{'ring-2 ring-orange-500 bg-orange-50/10 dark:bg-orange-900/10': selected.includes({{ $course->id }})}">
                                 <div class="absolute top-6 right-6 flex gap-2">
                                     @if($course->registration_open)
@@ -300,13 +303,13 @@
                                     @endif
                                 </div>
 
-                                <div class="flex items-center gap-4 mb-6">
+                                <div class="flex items-center gap-4 mb-4">
                                     <div
                                         class="w-14 h-14 rounded-2xl bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 flex items-center justify-center font-black text-2xl group-hover:bg-orange-600 group-hover:text-white transition-all duration-500">
                                         {{ strtoupper(substr($course->name, 0, 1)) }}
                                     </div>
-                                    <div class="flex flex-col">
-                                        <h5 class="font-black text-gray-900 dark:text-white leading-tight mb-1">{{ $course->name }}</h5>
+                                    <div class="flex flex-col min-w-0">
+                                        <h5 class="font-black text-gray-900 dark:text-white leading-tight mb-1 line-clamp-1">{{ $course->name }}</h5>
                                         <span
                                             class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-tighter">{{ $course->category ?? 'ACADEMIA' }}</span>
                                     </div>

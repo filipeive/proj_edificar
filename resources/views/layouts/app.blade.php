@@ -501,6 +501,111 @@
         [x-cloak] {
             display: none !important;
         }
+
+        @media (max-width: 767px) {
+            .header-actions a,
+            .header-actions button {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0.5rem;
+                border-radius: 0.5rem;
+                color: #4b5563;
+                background: transparent;
+                border: 0;
+                box-shadow: none;
+                transition: color 0.2s ease, background-color 0.2s ease;
+            }
+
+            .header-actions a:hover,
+            .header-actions button:hover {
+                color: #1f2937;
+                background-color: #f3f4f6;
+            }
+        }
+
+        .grid-compact {
+            display: grid;
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+
+        @media (min-width: 640px) {
+            .grid-compact {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (min-width: 768px) {
+            .grid-compact {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 1rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .grid-compact {
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+            }
+        }
+
+        .compact-card {
+            padding: 0.875rem !important;
+            border-radius: 1.25rem !important;
+        }
+
+        @media (min-width: 768px) {
+            .compact-card {
+                padding: 1rem !important;
+                border-radius: 1.5rem !important;
+            }
+        }
+
+        .compact-card .card-body {
+            padding: 0.875rem !important;
+        }
+
+        .compact-card .card-footer {
+            padding: 0.75rem 0.875rem !important;
+        }
+
+        .line-clamp-1,
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .line-clamp-1 {
+            -webkit-line-clamp: 1;
+        }
+
+        .line-clamp-2 {
+            -webkit-line-clamp: 2;
+        }
+
+        .table-compact th,
+        .table-compact td {
+            padding-top: 0.75rem !important;
+            padding-bottom: 0.75rem !important;
+        }
+
+        .table-compact th {
+            font-size: 0.625rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #9ca3af;
+        }
+
+        .action-icon {
+            width: 2.25rem;
+            height: 2.25rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.75rem;
+            transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+        }
     </style>
 </head>
 
@@ -546,7 +651,7 @@
                         </div>
 
                         <!-- Mobile & Desktop Page Actions -->
-                        <div class="flex items-center ml-2 gap-2">
+                        <div class="flex items-center ml-2 gap-2 header-actions">
                             @yield('header-actions')
                         </div>
                     </div>

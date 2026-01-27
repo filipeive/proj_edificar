@@ -4,10 +4,12 @@
 
 @section('content')
 @section('header-actions')
-    <a href="{{ route('cells.create') }}"
-        class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
-        <i class="bi bi-plus-circle-fill text-2xl"></i>
-    </a>
+    <div class="md:hidden">
+        <a href="{{ route('cells.create') }}"
+            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
+            <i class="bi bi-plus-circle-fill text-2xl"></i>
+        </a>
+    </div>
 @endsection
 
 @section('content')
@@ -146,10 +148,10 @@
 
         <!-- Grid View -->
         <template x-if="view === 'grid'">
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div class="grid grid-compact">
                 @forelse($cells as $cell)
                     <div
-                        class="group bg-white rounded-[2rem] p-7 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-100 relative"
+                        class="group bg-white rounded-[2rem] p-7 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-100 relative compact-card"
                         :class="{'ring-2 ring-blue-500 bg-blue-50/10': selected.includes({{ $cell->id }})}">
                         
                         <div class="absolute top-4 left-4 z-20">
@@ -242,7 +244,7 @@
         <!-- List View -->
         <template x-if="view === 'list'">
             <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden overflow-x-auto">
-                <table class="w-full text-left">
+                <table class="w-full text-left table-compact">
                     <thead>
                         <tr class="bg-gray-50/50">
                             <th class="px-6 py-6 w-10">
@@ -300,12 +302,12 @@
                                     {{ $cell->members->count() }}</td>
                                 <td class="px-6 py-7 text-right">
                                     <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
-                                        <a href="{{ route('cells.show', $cell) }}"
-                                            class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all">
+                                        <a href="{{ route('cells.show', $cell) }}" title="Detalhes"
+                                            class="action-icon bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white">
                                             <i class="bi bi-speedometer2"></i>
                                         </a>
-                                        <a href="{{ route('cells.edit', $cell) }}"
-                                            class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 flex items-center justify-center hover:bg-yellow-500 hover:text-white transition-all">
+                                        <a href="{{ route('cells.edit', $cell) }}" title="Editar"
+                                            class="action-icon bg-gray-50 text-gray-400 hover:bg-yellow-500 hover:text-white">
                                             <i class="bi bi-pencil"></i>
                                         </a>
                                     </div>

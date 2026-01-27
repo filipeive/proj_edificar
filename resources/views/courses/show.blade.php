@@ -5,12 +5,12 @@
 @section('page-subtitle', 'Informações e lista de alunos matriculados')
 
 @section('header-actions')
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 md:hidden">
         @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
             <a href="{{ route('courses.edit', $course) }}"
-                class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+                class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
                 title="Editar">
-                <i class="bi bi-pencil-square text-2xl"></i>
+                <i class="bi bi-pencil-square"></i>
             </a>
         @endif
         
@@ -22,9 +22,9 @@
             <form action="{{ route('courses.enroll', $course) }}" method="POST" class="inline">
                 @csrf
                 <button type="submit"
-                    class="text-gray-600 hover:text-orange-600 p-2.5 hover:bg-orange-50 rounded-xl transition-all duration-300 border border-transparent hover:border-orange-100"
+                    class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50"
                     title="Matricular-me">
-                    <i class="bi bi-person-plus text-2xl"></i>
+                    <i class="bi bi-person-plus"></i>
                 </button>
             </form>
         @endif

@@ -5,16 +5,16 @@
 @section('page-subtitle', "Gestão da supervisão e suas células")
 
 @section('header-actions')
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 md:hidden">
         <a href="{{ route('cells.create') }}?supervision_id={{ $supervision->id }}"
-            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
-            title="Criar Célula">
-            <i class="bi bi-plus-circle text-2xl"></i>
+            class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+            title="Criar célula">
+            <i class="bi bi-plus-circle"></i>
         </a>
         <a href="{{ route('supervisions.edit', $supervision) }}"
-            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
-            title="Editar Estrutura">
-            <i class="bi bi-pencil-square text-2xl"></i>
+            class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+            title="Editar estrutura">
+            <i class="bi bi-pencil-square"></i>
         </a>
     </div>
 @endsection
@@ -84,7 +84,7 @@
                         </a>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full">
+                        <table class="w-full table-compact">
                             <thead>
                                 <tr class="bg-gray-50/50">
                                     <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Unidade</th>
@@ -95,20 +95,20 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-50">
-                                @forelse($supervision->cells as $cell)
+                                @forelse($cells as $cell)
                                     <tr class="hover:bg-gray-50/50 transition-colors group">
                                         <td class="px-10 py-6">
                                             <div class="flex items-center gap-4">
                                                 <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
                                                     {{ substr($cell->name, 0, 1) }}
                                                 </div>
-                                                <p class="text-sm font-bold text-gray-900 leading-tight group-hover:text-blue-600 transition-colors">{{ $cell->name }}</p>
+                                                <p class="text-sm font-bold text-gray-900 leading-tight group-hover:text-blue-600 transition-colors line-clamp-1">{{ $cell->name }}</p>
                                             </div>
                                         </td>
                                         <td class="px-10 py-6">
                                             @if($cell->leader)
                                                 <div class="flex flex-col">
-                                                    <span class="text-sm font-bold text-gray-800">{{ $cell->leader->name }}</span>
+                                                    <span class="text-sm font-bold text-gray-800 line-clamp-1">{{ $cell->leader->name }}</span>
                                                     <span class="text-[10px] text-gray-400 font-medium font-mono uppercase">Líder Principal</span>
                                                 </div>
                                             @else
@@ -126,12 +126,12 @@
                                         <td class="px-10 py-6 text-right">
                                             <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
                                                 <button @click="transfer({ id: {{ $cell->id }}, name: '{{ $cell->name }}' })"
-                                                    class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-center transition-all"
-                                                    title="Transferir Supervisão">
+                                                    class="action-icon bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600"
+                                                    title="Transferir supervisão">
                                                     <i class="bi bi-arrow-left-right"></i>
                                                 </button>
                                                 <a href="{{ route('cells.show', $cell) }}"
-                                                    class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-center transition-all">
+                                                    class="action-icon bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600" title="Detalhes">
                                                     <i class="bi bi-chevron-right"></i>
                                                 </a>
                                             </div>
@@ -147,6 +147,11 @@
                             </tbody>
                         </table>
                     </div>
+                    @if($cells->hasPages())
+                        <div class="mt-6">
+                            {{ $cells->links() }}
+                        </div>
+                    @endif
                 </div>
             </div>
 

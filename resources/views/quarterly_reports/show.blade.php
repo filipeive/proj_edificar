@@ -3,12 +3,12 @@
 @section('title', 'Detalhes do Relatório - Portal Life Church')
 
 @section('header-actions')
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 md:hidden">
         @can('update', $quarterlyReport)
             <a href="{{ route('quarterly-reports.edit', $quarterlyReport) }}"
-                class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
-                title="Editar Dados">
-                <i class="bi bi-pencil-square text-2xl"></i>
+                class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                title="Editar dados">
+                <i class="bi bi-pencil-square"></i>
             </a>
         @endcan
     </div>

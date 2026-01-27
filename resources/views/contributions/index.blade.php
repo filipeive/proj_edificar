@@ -5,10 +5,12 @@
 @section('content')
 @section('header-actions')
     @if (in_array(auth()->user()->role, ['membro', 'lider_celula', 'supervisor', 'pastor_zona', 'admin']))
-        <a href="{{ route('contributions.create') }}"
-            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
-            <i class="bi bi-plus-circle-fill text-2xl"></i>
-        </a>
+        <div class="md:hidden">
+            <a href="{{ route('contributions.create') }}"
+                class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
+                <i class="bi bi-plus-circle-fill text-2xl"></i>
+            </a>
+        </div>
     @endif
 @endsection
 
@@ -115,7 +117,7 @@
             </div>
 
             <div class="overflow-x-auto">
-                <table class="w-full">
+                <table class="w-full table-compact">
                     <thead>
                         <tr class="bg-gray-50/50">
                             <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Informação Temporal</th>
@@ -170,8 +172,8 @@
 
                                 <td class="px-10 py-6 text-center">
                                     @if ($contribution->proof_path)
-                                        <a href="{{ route('contributions.receipt', $contribution) }}" target="_blank"
-                                            class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all mx-auto shadow-sm">
+                                        <a href="{{ route('contributions.receipt', $contribution) }}" target="_blank" title="Comprovativo"
+                                            class="action-icon bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white mx-auto shadow-sm">
                                             <i class="bi bi-file-earmark-pdf-fill"></i>
                                         </a>
                                     @else
@@ -181,25 +183,25 @@
 
                                 <td class="px-10 py-6 text-right">
                                     <div class="flex items-center justify-end gap-2 text-sm">
-                                        <a href="{{ route('contributions.show', $contribution) }}"
-                                            class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all">
+                                        <a href="{{ route('contributions.show', $contribution) }}" title="Detalhes"
+                                            class="action-icon bg-gray-50 text-gray-400 hover:bg-blue-600 hover:text-white">
                                             <i class="bi bi-eye-fill"></i>
                                         </a>
                                         @if ($contribution->status === 'pendente')
                                             @if(auth()->user()->isComissaoObra() || auth()->user()->isAdmin())
                                                 <form action="{{ route('contributions.verify', $contribution) }}" method="POST" onsubmit="return confirm('Confirmar verificação desta contribuição?');">
                                                     @csrf
-                                                    <button type="submit" class="w-10 h-10 rounded-xl bg-green-50 text-green-600 hover:bg-green-600 hover:text-white flex items-center justify-center transition-all">
+                                                    <button type="submit" class="action-icon bg-green-50 text-green-600 hover:bg-green-600 hover:text-white" title="Verificar">
                                                         <i class="bi bi-check-lg"></i>
                                                     </button>
                                                 </form>
                                                 <button onclick="document.getElementById('reject-form-{{ $contribution->id }}').classList.toggle('hidden')" 
-                                                    class="w-10 h-10 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all">
+                                                    class="action-icon bg-red-50 text-red-600 hover:bg-red-600 hover:text-white" title="Rejeitar">
                                                     <i class="bi bi-x-lg"></i>
                                                 </button>
                                             @elseif(auth()->id() === $contribution->user_id)
                                                 <a href="{{ route('contributions.edit', $contribution) }}"
-                                                    class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-orange-500 hover:text-white flex items-center justify-center transition-all">
+                                                    class="action-icon bg-gray-50 text-gray-400 hover:bg-orange-500 hover:text-white" title="Editar">
                                                     <i class="bi bi-pencil-square"></i>
                                                 </a>
                                             @endif
@@ -238,9 +240,9 @@
         <!-- Grid View -->
         <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            class="grid grid-compact">
             @foreach($contributions as $contribution)
-                <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 relative">
+                <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 relative compact-card">
                     <div class="absolute top-6 right-6">
                         @if ($contribution->status === 'verificada')
                             <span class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-green-100">Validado</span>
@@ -256,7 +258,7 @@
                     </div>
 
                     <div class="mb-4">
-                        <h4 class="text-xl font-black text-green-600 tracking-tighter mb-1">
+                        <h4 class="text-lg font-black text-green-600 tracking-tighter mb-1">
                             {{ number_format($contribution->amount, 0, ',', '.') }} MT
                         </h4>
                         <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $contribution->contribution_date->format('d/m/Y') }}</p>
@@ -266,7 +268,7 @@
                         @if (isset($showUserColumn) && $showUserColumn)
                             <div class="flex flex-col border-b border-gray-100 pb-2">
                                 <span class="text-[9px] font-black uppercase text-gray-400">Membro</span>
-                                <span class="text-xs font-bold text-gray-700 truncate">{{ $contribution->user->name }}</span>
+                                <span class="text-xs font-bold text-gray-700 line-clamp-1">{{ $contribution->user->name }}</span>
                             </div>
                         @endif
                         <div class="flex items-center justify-between">

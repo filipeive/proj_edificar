@@ -5,10 +5,12 @@
 @section('page-subtitle', 'Gerenciar categorias de eventos e cerimônias')
 
 @section('header-actions')
-    <a href="{{ route('event-types.create') }}"
-        class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100">
-        <i class="bi bi-plus-circle text-2xl"></i>
-    </a>
+    <div class="md:hidden">
+        <a href="{{ route('event-types.create') }}"
+            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100">
+            <i class="bi bi-plus-circle text-2xl"></i>
+        </a>
+    </div>
 @endsection
 
 @section('content')
@@ -42,7 +44,7 @@
 
         <!-- List View -->
         <div x-show="view === 'list'" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <table class="w-full text-left border-collapse">
+            <table class="w-full text-left border-collapse table-compact">
                 <thead>
                     <tr class="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-500 font-semibold">
                         <th class="px-6 py-4">Nome</th>
@@ -65,15 +67,15 @@
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex justify-end gap-2">
-                                    <a href="{{ route('event-types.edit', $type) }}"
-                                        class="text-blue-600 hover:bg-blue-50 p-2 rounded-lg transition">
+                                    <a href="{{ route('event-types.edit', $type) }}" title="Editar"
+                                        class="action-icon text-blue-600 hover:bg-blue-50">
                                         <i class="bi bi-pencil"></i>
                                     </a>
                                     <form action="{{ route('event-types.destroy', $type) }}" method="POST" class="inline"
                                         onsubmit="return confirm('Tem certeza que deseja excluir este tipo?');">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:bg-red-50 p-2 rounded-lg transition">
+                                        <button type="submit" class="action-icon text-red-600 hover:bg-red-50" title="Excluir">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </form>
@@ -100,10 +102,10 @@
         </div>
 
         <!-- Grid View -->
-        <div x-show="view === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div x-show="view === 'grid'" class="grid grid-compact">
             @forelse($eventTypes as $type)
                 <div
-                    class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 flex flex-col">
+                    class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 flex flex-col compact-card">
                     <div class="flex justify-between items-start mb-4">
                         <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
                             <i class="bi bi-tag-fill text-2xl"></i>
@@ -115,8 +117,8 @@
                         @endif
                     </div>
 
-                    <h3 class="text-lg font-black text-gray-900 mb-2">{{ $type->name }}</h3>
-                    <p class="text-sm text-gray-600 mb-4 flex-1">{{ $type->description ?? 'Sem descrição' }}</p>
+                    <h3 class="text-base font-black text-gray-900 mb-2 line-clamp-1">{{ $type->name }}</h3>
+                    <p class="text-xs text-gray-600 mb-4 flex-1 line-clamp-2">{{ $type->description ?? 'Sem descrição' }}</p>
 
                     <div class="flex gap-2 pt-4 border-t border-gray-100">
                         <a href="{{ route('event-types.edit', $type) }}"

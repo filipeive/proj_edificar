@@ -26,7 +26,7 @@ class RegisteredUserController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'phone' => ['nullable', 'string'],
+            'phone' => ['nullable', 'regex:/^(\\+?258)?\\d{9}$/'],
             'cell_id' => ['required', 'exists:cells,id'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);

@@ -84,10 +84,12 @@
         </div>
 
         @section('header-actions')
-            <a href="{{ route('visitors.create') }}"
-                class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
-                <i class="bi bi-person-plus-fill text-2xl"></i>
-            </a>
+            <div class="md:hidden">
+                <a href="{{ route('visitors.create') }}"
+                    class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
+                    <i class="bi bi-person-plus-fill text-2xl"></i>
+                </a>
+            </div>
         @endsection
 
         <!-- Estatísticas -->
@@ -242,9 +244,9 @@
             <!-- Grid View -->
             <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300"
                 x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                class="grid grid-compact">
                 @forelse($visitors as $visitor)
-                    <div class="bg-white dark:bg-gray-800 p-4 md:p-8 rounded-2xl md:rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col group hover:shadow-xl transition-all duration-300 relative"
+                    <div class="bg-white dark:bg-gray-800 p-4 md:p-8 rounded-2xl md:rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col group hover:shadow-xl transition-all duration-300 relative compact-card"
                         :class="{'ring-2 ring-blue-500 bg-blue-50/10 dark:bg-blue-900/10': selected.includes({{ $visitor->id }})}">
 
                         <div class="absolute top-4 left-4 z-10">
@@ -263,9 +265,9 @@
                             {{ strtoupper(substr($visitor->name, 0, 1)) }}
                         </div>
 
-                        <div class="mb-6">
+                        <div class="mb-4">
                             <h4
-                                class="text-xl font-black text-gray-900 dark:text-white leading-tight mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                class="text-base font-black text-gray-900 dark:text-white leading-tight mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
                                 {{ $visitor->name }}
                             </h4>
                             <p class="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">
@@ -343,7 +345,7 @@
                 x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
                 class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
                 <div class="overflow-x-auto">
-                    <table class="w-full">
+                    <table class="w-full table-compact">
                         <thead>
                             <tr
                                 class="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 border-b border-gray-100 dark:border-gray-700">
@@ -428,12 +430,12 @@
                                     <td class="px-6 py-4">
                                         <div class="flex items-center justify-center gap-2">
                                             <a href="{{ route('visitors.show', $visitor) }}"
-                                                class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 p-2 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all"
+                                                class="action-icon text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-gray-700"
                                                 title="Ver detalhes">
                                                 <i class="bi bi-eye-fill"></i>
                                             </a>
                                             <a href="{{ route('visitors.edit', $visitor) }}"
-                                                class="text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 p-2 hover:bg-orange-50 dark:hover:bg-gray-700 rounded-lg transition-all"
+                                                class="action-icon text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 hover:bg-orange-50 dark:hover:bg-gray-700"
                                                 title="Editar">
                                                 <i class="bi bi-pencil-fill"></i>
                                             </a>
@@ -444,7 +446,7 @@
                                                     @method('DELETE')
                                                     <button type="button"
                                                         onclick="confirmDelete('list-delete-visitor-{{ $visitor->id }}')"
-                                                        class="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-2 hover:bg-red-50 dark:hover:bg-gray-700 rounded-lg transition-all"
+                                                        class="action-icon text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-gray-700"
                                                         title="Eliminar">
                                                         <i class="bi bi-trash-fill"></i>
                                                     </button>

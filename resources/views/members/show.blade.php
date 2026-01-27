@@ -5,18 +5,18 @@
 @section('page-subtitle', 'Informações completas do membro')
 
 @section('header-actions')
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 md:hidden">
         @if($userRole !== 'secretaria')
             <a href="{{ route('members.edit', $member) }}"
-                class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
-                title="Editar Perfil">
-                <i class="bi bi-pencil-square text-2xl"></i>
+                class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                title="Editar perfil">
+                <i class="bi bi-pencil-square"></i>
             </a>
         @endif
         <a href="{{ route('contributions.create', ['user_id' => $member->id]) }}"
-            class="text-gray-600 hover:text-green-600 p-2.5 hover:bg-green-50 rounded-xl transition-all duration-300 border border-transparent hover:border-green-100"
-            title="Nova Oferta">
-            <i class="bi bi-plus-circle text-2xl"></i>
+            class="action-icon text-gray-600 hover:text-green-600 hover:bg-green-50"
+            title="Nova oferta">
+            <i class="bi bi-plus-circle"></i>
         </a>
     </div>
 @endsection

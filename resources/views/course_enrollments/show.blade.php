@@ -5,24 +5,24 @@
 @section('page-subtitle', $enrollment->course->name)
 
 @section('header-actions')
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 md:hidden">
         @if($enrollment->course_class_id)
             <a href="{{ route('course-classes.show', $enrollment->course_class_id) }}" 
-                class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+                class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
                 title="Voltar para a turma">
-                <i class="bi bi-arrow-left text-2xl"></i>
+                <i class="bi bi-arrow-left"></i>
             </a>
         @else
             <a href="{{ route('courses.index') }}" 
-                class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+                class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
                 title="Voltar para cursos">
-                <i class="bi bi-arrow-left text-2xl"></i>
+                <i class="bi bi-arrow-left"></i>
             </a>
         @endif
         <a href="{{ route('course-enrollments.edit', $enrollment) }}"
-            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
-            title="Editar Dados">
-            <i class="bi bi-pencil-square text-2xl"></i>
+            class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+            title="Editar dados">
+            <i class="bi bi-pencil-square"></i>
         </a>
     </div>
 @endsection

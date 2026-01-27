@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use App\Models\Concerns\NormalizesMozPhone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -8,7 +9,7 @@ use Laravel\Breeze\Features;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, NormalizesMozPhone;
 
     protected $fillable = [
         'name',
@@ -33,6 +34,11 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_active' => 'boolean',
         ];
+    }
+
+    public function setPhoneAttribute($value): void
+    {
+        $this->attributes['phone'] = $this->normalizeMozPhone($value);
     }
 
     // Relacionamentos

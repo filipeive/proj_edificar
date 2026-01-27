@@ -5,7 +5,7 @@
 @section('page-subtitle', 'Gestão de casamentos e eventos matrimoniais')
 
 @section('header-actions')
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 md:hidden">
         <a href="{{ route('weddings.pdf', ['year' => now()->year]) }}" target="_blank"
             class="bg-white text-gray-400 p-2 rounded-lg hover:text-orange-600 hover:border-orange-200 transition-all border border-gray-200 shadow-sm flex items-center justify-center">
             <i class="bi bi-file-earmark-pdf-fill text-2xl"></i>
@@ -172,7 +172,7 @@
         <div id="view-list" x-show="view === 'list'" class="transition-opacity duration-300">
             <div class="bg-white rounded-[2rem] shadow-xl shadow-gray-100/50 border border-gray-100 overflow-hidden">
                 <!-- Form Removed -->
-                <table class="w-full">
+                <table class="w-full table-compact">
                     <thead>
                         <tr class="bg-gray-50/50 border-b border-gray-100">
                             @if(auth()->user()->role === 'admin')
@@ -274,13 +274,13 @@
                                     <div
                                         class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                         <a href="{{ route('weddings.edit', $wedding) }}"
-                                            class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                                            class="action-icon text-gray-400 hover:text-blue-600 hover:bg-blue-50"
                                             title="Editar">
                                             <i class="bi bi-pencil-fill"></i>
                                         </a>
                                         <a href="{{ route('weddings.show', $wedding) }}"
-                                            class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-orange-600 hover:bg-orange-50 transition-colors"
-                                            title="Ver Detalhes">
+                                            class="action-icon text-gray-400 hover:text-orange-600 hover:bg-orange-50"
+                                            title="Ver detalhes">
                                             <i class="bi bi-eye-fill"></i>
                                         </a>
                                         </a>
@@ -292,7 +292,7 @@
 
                                                 <button type="button"
                                                     onclick="confirmDelete('list-delete-wedding-{{ $wedding->id }}')"
-                                                    class="w-10 h-10 bg-gray-50 text-gray-400 flex items-center justify-center rounded-xl hover:bg-red-500 hover:text-white transition-all">
+                                                    class="action-icon bg-gray-50 text-gray-400 hover:bg-red-500 hover:text-white" title="Excluir">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </form>
@@ -322,9 +322,9 @@
             <div class="flex flex-col xl:flex-row gap-8">
                 <!-- Main Grid Area -->
                 <div class="flex-1">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="grid grid-compact">
                         @forelse($weddings->take(6) as $wedding)
-                            <div class="bg-white p-6 md:p-8 rounded-2xl md:rounded-[2rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 relative"
+                            <div class="bg-white p-6 md:p-8 rounded-2xl md:rounded-[2rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 relative compact-card"
                                 :class="{'ring-2 ring-orange-500 bg-orange-50/10': selected.includes({{ $wedding->id }})}">
                                 <div class="absolute top-6 right-6 flex flex-col items-end gap-2">
                                     @php

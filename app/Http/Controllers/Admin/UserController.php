@@ -91,7 +91,7 @@ class UserController
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6|confirmed',
-            'phone' => 'nullable|string',
+            'phone' => 'nullable|regex:/^(\\+?258)?\\d{9}$/',
             'role' => 'required|in:membro,lider_celula,supervisor,pastor_zona,secretaria,admin,comissao_obra,responsavel_pacote,tesouraria,pastor_senior',
             'cell_id' => 'nullable|exists:cells,id',
             'is_active' => 'boolean',
@@ -131,7 +131,7 @@ class UserController
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => "required|email|unique:users,email,{$user->id}",
-            'phone' => 'nullable|string',
+            'phone' => 'nullable|regex:/^(\\+?258)?\\d{9}$/',
             'role' => 'required|in:membro,lider_celula,supervisor,pastor_zona,secretaria,admin,comissao_obra,responsavel_pacote,tesouraria,pastor_senior',
             'cell_id' => 'nullable|exists:cells,id',
             'is_active' => 'boolean',
@@ -284,7 +284,7 @@ class UserController
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
-            'phone' => 'nullable|string',
+            'phone' => 'nullable|regex:/^(\\+?258)?\\d{9}$/',
             'cell_id' => 'required|exists:cells,id',
             'role' => 'required|in:membro,lider_celula',
             'package_id' => 'nullable|exists:commitment_packages,id',
@@ -399,7 +399,7 @@ class UserController
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => "required|email|unique:users,email,{$member->id}",
-            'phone' => 'nullable|string',
+            'phone' => 'nullable|regex:/^(\\+?258)?\\d{9}$/',
             'cell_id' => 'required|exists:cells,id',
             'role' => 'required|in:membro,lider_celula',
             'is_active' => 'boolean',

@@ -1,9 +1,15 @@
 <?php
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Cell;
 use App\Models\CommitmentPackage;
+use App\Models\User;
+use App\Models\UserCommitment;
+use App\Notifications\MemberCreatedNotification;
 use App\Services\Sms\SmsService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class PackageController
@@ -12,9 +18,14 @@ class PackageController
     {
         $user = auth()->user();
         if ($user->isResponsavelPacote()) {
-            $packages = CommitmentPackage::where('responsible_id', $user->id)->get();
+            $packages = CommitmentPackage::where('responsible_id', $user->id)
+                ->orderBy('order')
+                ->paginate(24)
+                ->withQueryString();
         } else {
-            $packages = CommitmentPackage::orderBy('order')->get();
+            $packages = CommitmentPackage::orderBy('order')
+                ->paginate(24)
+                ->withQueryString();
         }
         return view('admin.packages.index', ['packages' => $packages]);
     }
@@ -58,7 +69,19 @@ class PackageController
             'admin.packages.show',
             [
                 'package' => $package->load('userCommitments.user.cell.supervision.zone'),
-                'allPackages' => CommitmentPackage::orderBy('order')->get()
+                'commitments' => $package->userCommitments()
+                    ->with('user.cell.supervision.zone')
+                    ->paginate(24)
+                    ->withQueryString(),
+                'commitmentUserIds' => $package->userCommitments()->pluck('user_id'),
+                'commitmentPhones' => $package->userCommitments()
+                    ->with('user')
+                    ->get()
+                    ->pluck('user.phone')
+                    ->filter()
+                    ->implode(', '),
+                'allPackages' => CommitmentPackage::orderBy('order')->get(),
+                'availableCells' => Cell::orderBy('name')->get(),
             ]
         );
     }
@@ -159,7 +182,7 @@ class PackageController
 
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'nullable|regex:/^(\\+?258)?\\d{9}$/',
             'cell_id' => 'nullable|exists:cells,id',
             'committed_amount' => 'required|numeric|min:0',
         ]);
@@ -205,7 +228,7 @@ class PackageController
             return back()->with('error', 'Nenhuns membros com telefone encontrados neste pacote.');
         }
 
-        $template = $package->whatsapp_template ?? "Olá [NOME], lembrete de contribuição para o Projetor Edificar.";
+        $template = $package->sms_template ?? "Olá [NOME], lembrete de contribuição para o Projetor Edificar.";
 
         $successCount = 0;
         foreach ($membros as $membro) {
@@ -218,6 +241,109 @@ class PackageController
         }
 
         return back()->with('success', "SMS enviado com sucesso para $successCount membros!");
+    }
+
+    public function sendMemberSms(Request $request, CommitmentPackage $package, User $user, SmsService $smsService)
+    {
+        $authUser = auth()->user();
+        $isAuthorized = $authUser->isAdmin() ||
+            $authUser->isSecretaria() ||
+            $authUser->isComissaoObra() ||
+            ($authUser->isResponsavelPacote() && $package->responsible_id === $authUser->id);
+
+        if (!$isAuthorized) {
+            return back()->with('error', 'Não tem permissão para enviar SMS deste pacote.');
+        }
+
+        $commitment = UserCommitment::where('user_id', $user->id)
+            ->where('package_id', $package->id)
+            ->where(function ($q) {
+                $q->whereNull('end_date')->orWhere('end_date', '>', now());
+            })
+            ->first();
+
+        if (!$commitment) {
+            return back()->with('error', 'Membro não pertence a este pacote.');
+        }
+
+        $validated = $request->validate([
+            'message' => 'required|string|max:500',
+        ]);
+
+        if (!$user->phone) {
+            return back()->with('error', 'Este membro não possui telefone registado.');
+        }
+
+        $message = str_replace('[NOME]', $user->name, $validated['message']);
+
+        if ($smsService->send($user->phone, $message)) {
+            return back()->with('success', "SMS enviado para {$user->name}!");
+        }
+
+        return back()->with('error', 'Falha ao enviar SMS. Verifique o provedor/configuração.');
+    }
+
+    public function storeQuickMember(Request $request, CommitmentPackage $package)
+    {
+        $authUser = auth()->user();
+        $isAuthorized = $authUser->isAdmin() ||
+            $authUser->isComissaoObra() ||
+            ($authUser->isResponsavelPacote() && $package->responsible_id === $authUser->id);
+
+        if (!$isAuthorized) {
+            return back()->with('error', 'Não tem permissão para criar membros neste pacote.');
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'nullable|regex:/^(\\+?258)?\\d{9}$/',
+            'cell_id' => 'required|exists:cells,id',
+            'committed_amount' => 'nullable|numeric|min:0',
+        ]);
+
+        $email = $this->generateAutoEmail($validated['name']);
+        $plainPassword = Str::random(8);
+
+        $newUser = User::create([
+            'name' => $validated['name'],
+            'email' => $email,
+            'phone' => $validated['phone'] ?? null,
+            'password' => Hash::make($plainPassword),
+            'cell_id' => $validated['cell_id'],
+            'role' => 'membro',
+            'is_active' => true,
+        ]);
+
+        UserCommitment::create([
+            'user_id' => $newUser->id,
+            'package_id' => $package->id,
+            'committed_amount' => $validated['committed_amount'] ?? $package->min_amount,
+            'start_date' => now(),
+            'cell_id' => $newUser->cell_id,
+        ]);
+
+        $newUser->notify(new MemberCreatedNotification($newUser, $plainPassword));
+
+        return back()
+            ->with('success', 'Membro criado e adicionado ao pacote com sucesso!')
+            ->with('info', "Credenciais geradas — Email: {$email} | Senha: {$plainPassword}");
+    }
+
+    private function generateAutoEmail(string $name): string
+    {
+        $base = Str::slug($name, '.');
+        $base = $base !== '' ? $base : 'membro';
+        $host = parse_url(config('app.url'), PHP_URL_HOST) ?: 'edificar.local';
+
+        $email = "{$base}@{$host}";
+        $suffix = 1;
+
+        while (User::where('email', $email)->exists()) {
+            $email = "{$base}{$suffix}@{$host}";
+            $suffix++;
+        }
+
+        return $email;
     }
 
     public function removeMember(CommitmentPackage $package, \App\Models\User $user)

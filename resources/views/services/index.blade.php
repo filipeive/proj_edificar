@@ -3,7 +3,7 @@
 @section('title', 'Gestão de Cultos - Portal Life Church')
 
 @section('header-actions')
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 md:hidden">
         <a href="{{ route('services.report') }}"
             class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center border border-blue-100 shadow-sm">
             <i class="bi bi-graph-up text-2xl"></i>
@@ -201,9 +201,9 @@
         </div>
 
         <!-- Services Grid View -->
-        <div x-show="view === 'grid'" x-cloak x-transition.fade.duration.300ms class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+        <div x-show="view === 'grid'" x-cloak x-transition.fade.duration.300ms class="grid grid-compact">
             @foreach($services as $service)
-                <div class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 dark:hover:shadow-gray-900/50 transition-all group flex flex-col relative border-t-4 {{ $service->service_type === 'teaching' ? 'border-t-orange-500' : 'border-t-blue-500' }}"
+                <div class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 dark:hover:shadow-gray-900/50 transition-all group flex flex-col relative border-t-4 compact-card {{ $service->service_type === 'teaching' ? 'border-t-orange-500' : 'border-t-blue-500' }}"
                      :class="{'ring-2 ring-blue-500 bg-blue-50/10 dark:bg-blue-900/10': selected.includes({{ $service->id }})}">
                     <!-- Checkbox for Bulk Actions (Grid) -->
                     @if(auth()->user()->role === 'admin')
@@ -213,7 +213,7 @@
                         </div>
                     @endif
 
-                    <div class="p-8 space-y-6 flex-1">
+                    <div class="p-8 space-y-6 flex-1 card-body">
                         <!-- Card Header -->
                         <div class="flex justify-between items-start {{ auth()->user()->role === 'admin' ? 'pl-8' : '' }}">
                             <div class="space-y-1">
@@ -227,9 +227,9 @@
                                         @default Especial
                                     @endswitch
                                 </div>
-                                <h3 class="text-xl font-black text-gray-900 dark:text-white">{{ $service->date->format('d/m/Y') }}</h3>
+                                <h3 class="text-lg font-black text-gray-900 dark:text-white">{{ $service->date->format('d/m/Y') }}</h3>
                                 <p class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-tighter">
-                                    Pregador: <span class="text-xs font-black {{ ($service->preacher_id === null && $service->preacher_name) ? 'text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 px-2 py-0.5 rounded-lg' : 'text-gray-600 dark:text-gray-300' }}">
+                                    Pregador: <span class="text-xs font-black line-clamp-1 {{ ($service->preacher_id === null && $service->preacher_name) ? 'text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 px-2 py-0.5 rounded-lg' : 'text-gray-600 dark:text-gray-300' }}">
                                         @if($service->preacher)
                                             {{ $service->preacher->name }}
                                         @else
@@ -249,8 +249,8 @@
 
                         <!-- Theme -->
                         @if($service->theme)
-                            <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-2xl border border-gray-100 dark:border-gray-700 min-h-[80px] flex items-center justify-center text-center">
-                                <span class="text-sm font-black text-gray-700 dark:text-gray-300 italic">"{{ $service->theme }}"</span>
+                            <div class="hidden sm:flex p-3 bg-gray-50 dark:bg-gray-700/50 rounded-2xl border border-gray-100 dark:border-gray-700 min-h-[64px] items-center justify-center text-center">
+                                <span class="text-xs font-black text-gray-700 dark:text-gray-300 italic line-clamp-2">"{{ $service->theme }}"</span>
                             </div>
                         @endif
 
@@ -268,7 +268,7 @@
                     </div>
 
                     <!-- Card Actions -->
-                    <div class="px-8 py-6 bg-gray-50/50 dark:bg-gray-700/50 border-t border-gray-50 dark:border-gray-700 flex items-center justify-between">
+                    <div class="px-8 py-6 bg-gray-50/50 dark:bg-gray-700/50 border-t border-gray-50 dark:border-gray-700 flex items-center justify-between card-footer">
                         <div class="flex gap-2">
                             <a href="{{ route('services.show', $service) }}" class="p-2 {{ $service->service_type === 'teaching' ? 'text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/30' : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30' }} rounded-lg transition-colors">
                                 <i class="bi bi-info-circle text-lg"></i>
@@ -297,7 +297,7 @@
         <!-- Services List View -->
         <div x-show="view === 'list'" x-cloak x-transition.fade.duration.300ms class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
+                <table class="w-full text-left border-collapse table-compact">
                     <thead>
                         <tr class="bg-gray-50/50 dark:bg-gray-700/50">
                             @if(auth()->user()->role === 'admin')
@@ -352,24 +352,27 @@
                                 <td class="px-8 py-6">
                                     <div class="flex justify-end gap-2 transition-all">
                                         <!-- detalhes do culto -->
-                                        <a href="{{ route('services.show', $service) }}" class="p-2 {{ $service->service_type === 'teaching' ? 'text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/30' : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30' }} rounded-lg transition-colors">
-                                            <i class="bi bi-info-circle text-lg"></i>
+                                        <a href="{{ route('services.show', $service) }}" title="Detalhes"
+                                            class="action-icon {{ $service->service_type === 'teaching' ? 'text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/30' : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30' }}">
+                                            <i class="bi bi-info-circle"></i>
                                         </a>
                                         <!-- download pdf -->
-                                        <a href="{{ route('services.download-pdf', $service) }}" class="p-2 text-red-500 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30 rounded-lg transition-colors">
-                                            <i class="bi bi-file-earmark-pdf text-lg"></i>
+                                        <a href="{{ route('services.download-pdf', $service) }}" title="Baixar PDF"
+                                            class="action-icon text-red-500 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30">
+                                            <i class="bi bi-file-earmark-pdf"></i>
                                         </a>
                                         <!-- editar -->
-                                        <a href="{{ route('services.edit', $service) }}" class="p-2 {{ $service->service_type === 'teaching' ? 'text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/30' : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30' }} rounded-lg transition-colors">
-                                            <i class="bi bi-pencil-square text-lg"></i>
+                                        <a href="{{ route('services.edit', $service) }}" title="Editar"
+                                            class="action-icon {{ $service->service_type === 'teaching' ? 'text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/30' : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30' }}">
+                                            <i class="bi bi-pencil-square"></i>
                                         </a>
                                         <form action="{{ route('services.destroy', $service) }}" method="POST"
                                             id="delete-form-list-{{ $service->id }}">
                                             @csrf
                                             @method('DELETE')
                                             <button type="button" onclick="confirmDelete('delete-form-list-{{ $service->id }}', 'Deseja excluir este culto?')" 
-                                                class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors">
-                                                <i class="bi bi-trash text-lg"></i>
+                                                class="action-icon text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30" title="Excluir">
+                                                <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
                                     </div>

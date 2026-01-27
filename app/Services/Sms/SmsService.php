@@ -20,6 +20,8 @@ class SmsService
         switch ($driver) {
             case 'log':
                 return new LogSmsProvider();
+            case 'mocean':
+                return new MoceanSmsProvider();
             // case 'generic_http':
             //     return new GenericHttpSmsProvider();
             default:
@@ -59,6 +61,12 @@ class SmsService
      */
     protected function formatPhone(string $phone): string
     {
-        return preg_replace('/[^0-9]/', '', $phone);
+        $digits = preg_replace('/[^0-9]/', '', $phone);
+
+        if ($digits !== '' && strpos($digits, '258') !== 0) {
+            $digits = '258' . $digits;
+        }
+
+        return $digits;
     }
 }

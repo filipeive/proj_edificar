@@ -5,26 +5,26 @@
 @section('page-subtitle', 'Informações e acompanhamento do visitante')
 
 @section('header-actions')
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 md:hidden">
         <a href="{{ route('visitors.index') }}"
-            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
-            title="Voltar à Lista">
-            <i class="bi bi-arrow-left text-2xl"></i>
+            class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+            title="Voltar à lista">
+            <i class="bi bi-arrow-left"></i>
         </a>
         @if($visitor->isPending())
             <form method="POST" action="{{ route('visitors.mark-contacted', $visitor) }}" class="inline">
                 @csrf
                 <button type="submit"
-                    class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
-                    title="Marcar Contatado">
-                    <i class="bi bi-telephone-plus text-2xl"></i>
+                    class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                    title="Marcar contatado">
+                    <i class="bi bi-telephone-plus"></i>
                 </button>
             </form>
         @endif
         <a href="{{ route('visitors.edit', $visitor) }}"
-            class="text-gray-600 hover:text-orange-600 p-2.5 hover:bg-orange-50 rounded-xl transition-all duration-300 border border-transparent hover:border-orange-100"
+            class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50"
             title="Editar">
-            <i class="bi bi-pencil-square text-2xl"></i>
+            <i class="bi bi-pencil-square"></i>
         </a>
     </div>
 @endsection

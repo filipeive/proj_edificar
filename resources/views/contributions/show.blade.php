@@ -4,32 +4,32 @@
 @section('page-title', 'Detalhes da Contribuição')
 
 @section('header-actions')
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 md:hidden">
         <a href="{{ route('contributions.index') }}"
-            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
-            title="Voltar à Lista">
-            <i class="bi bi-arrow-left text-2xl"></i>
+            class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+            title="Voltar à lista">
+            <i class="bi bi-arrow-left"></i>
         </a>
         @if($contribution->status === 'pendente' && auth()->id() === $contribution->user_id)
             <a href="{{ route('contributions.edit', $contribution) }}"
-                class="text-gray-600 hover:text-orange-600 p-2.5 hover:bg-orange-50 rounded-xl transition-all duration-300 border border-transparent hover:border-orange-100"
-                title="Corrigir Registro">
-                <i class="bi bi-pencil-square text-2xl"></i>
+                class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50"
+                title="Corrigir registro">
+                <i class="bi bi-pencil-square"></i>
             </a>
         @endif
         @if($canManage && $contribution->status === 'pendente')
             <form action="{{ route('contributions.verify', $contribution) }}" method="POST" class="inline">
                 @csrf
                 <button type="submit"
-                    class="text-gray-600 hover:text-green-600 p-2.5 hover:bg-green-50 rounded-xl transition-all duration-300 border border-transparent hover:border-green-100"
-                    title="Validar Oferta">
-                    <i class="bi bi-patch-check text-2xl"></i>
+                    class="action-icon text-gray-600 hover:text-green-600 hover:bg-green-50"
+                    title="Validar oferta">
+                    <i class="bi bi-patch-check"></i>
                 </button>
             </form>
             <button onclick="document.getElementById('rejectModal').classList.remove('hidden')"
-                class="text-gray-600 hover:text-red-600 p-2.5 hover:bg-red-50 rounded-xl transition-all duration-300 border border-transparent hover:border-red-100"
+                class="action-icon text-gray-600 hover:text-red-600 hover:bg-red-50"
                 title="Rejeitar">
-                <i class="bi bi-x-circle text-2xl"></i>
+                <i class="bi bi-x-circle"></i>
             </button>
         @endif
     </div>

@@ -4,8 +4,14 @@
 @section('page-title', 'Criar Supervisão')
 
 @section('content')
-    <div class="max-w-2xl mx-auto">
+    <div class="w-full">
         <div class="bg-white rounded-lg shadow p-8">
+             <!-- voltar -->
+             <div class="mb-6 btn btn-danger">
+            <a href="{{ route('supervisions.index') }}">
+                <i class="bi bi-arrow-left-short"></i> Voltar
+            </a>
+            </div> 
             <form action="{{ route('supervisions.store') }}" method="POST">
                 @csrf
 

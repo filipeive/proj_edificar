@@ -5,34 +5,29 @@
 @section('page-subtitle', 'Informações completas sobre o agendamento matrimonial')
 
 @section('header-actions')
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 md:hidden">
         <a href="{{ route('weddings.pdf', ['id' => $wedding->id]) }}"
-            class="text-gray-600 hover:text-orange-600 p-2.5 hover:bg-orange-50 rounded-xl transition-all duration-300 border border-transparent hover:border-orange-100"
+            class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50"
             title="Exportar PDF">
-            <i class="bi bi-file-earmark-pdf text-2xl"></i>
+            <i class="bi bi-file-earmark-pdf"></i>
         </a>
         @if(in_array(auth()->user()->role, ['admin', 'secretaria']))
             <a href="{{ route('weddings.edit', $wedding) }}"
-                class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
+                class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
                 title="Editar">
-                <i class="bi bi-pencil-square text-2xl"></i>
+                <i class="bi bi-pencil-square"></i>
             </a>
         @endif
         <a href="{{ route('weddings.index') }}"
-            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
-            title="Voltar à Lista">
-            <i class="bi bi-arrow-left text-2xl"></i>
-        </a>
-        <a href="{{ route('weddings.pdf', ['id' => $wedding->id]) }}"
-            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
-            title="Exportar PDF">
-            <i class="bi bi-file-earmark-pdf text-2xl"></i>
+            class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+            title="Voltar à lista">
+            <i class="bi bi-arrow-left"></i>
         </a>
         @if(in_array(auth()->user()->role, ['admin', 'secretaria']))
             <a href="{{ route('weddings.edit', $wedding) }}"
-                class="text-gray-600 hover:text-orange-600 p-2.5 hover:bg-orange-50 rounded-xl transition-all duration-300 border border-transparent hover:border-orange-100"
-                title="Editar Casamento">
-                <i class="bi bi-pencil-square text-2xl"></i>
+                class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50"
+                title="Editar casamento">
+                <i class="bi bi-pencil-square"></i>
             </a>
         @endif
     </div>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Concerns\NormalizesMozPhone;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\Artisan;
 
 class SetupController extends Controller
 {
+    use NormalizesMozPhone;
     /**
      * Check if setup is already completed
      */
@@ -31,14 +33,14 @@ class SetupController extends Controller
             'church_name' => 'required|string|max:255',
             'church_description' => 'nullable|string',
             'church_email' => 'required|email',
-            'church_phone' => 'nullable|string',
+            'church_phone' => 'nullable|regex:/^(\\+?258)?\\d{9}$/',
             'church_address' => 'nullable|string',
         ]);
 
         Setting::set('church.name', $validated['church_name'], 'string', 'general');
         Setting::set('church.description', $validated['church_description'] ?? '', 'string', 'general');
         Setting::set('church.email', $validated['church_email'], 'string', 'general');
-        Setting::set('church.phone', $validated['church_phone'] ?? '', 'string', 'general');
+        Setting::set('church.phone', $this->normalizeMozPhone($validated['church_phone'] ?? '') ?? '', 'string', 'general');
         Setting::set('church.address', $validated['church_address'] ?? '', 'string', 'general');
 
         return response()->json(['success' => true, 'next_step' => 2]);

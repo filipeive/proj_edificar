@@ -6,10 +6,12 @@
 
 @section('content')
 @section('header-actions')
-    <a href="{{ route('zones.create') }}"
-        class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
-        <i class="bi bi-plus-circle-fill text-2xl"></i>
-    </a>
+    <div class="md:hidden">
+        <a href="{{ route('zones.create') }}"
+            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
+            <i class="bi bi-plus-circle-fill text-2xl"></i>
+        </a>
+    </div>
 @endsection
 
 @section('content')
@@ -108,10 +110,10 @@
 
         <!-- Grid View -->
         <template x-if="view === 'grid'">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div class="grid grid-compact">
                 @forelse($zones as $zone)
                     <div
-                        class="group bg-white rounded-[2rem] p-7 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-100 relative overflow-hidden">
+                        class="group bg-white rounded-[2rem] p-7 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-100 relative overflow-hidden compact-card">
                         <div
                             class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full -mr-16 -mt-16 opacity-50 group-hover:scale-110 transition-transform duration-500">
                         </div>
@@ -215,7 +217,7 @@
         <!-- List View -->
         <template x-if="view === 'list'">
             <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden overflow-x-auto">
-                <table class="w-full text-left font-sans">
+                <table class="w-full text-left font-sans table-compact">
                     <thead>
                         <tr class="bg-gray-50/50">
                             <th class="px-6 py-5 text-center w-10">
@@ -271,12 +273,12 @@
                                 </td>
                                 <td class="px-10 py-6 text-right">
                                     <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
-                                        <a href="{{ route('zones.show', $zone) }}"
-                                            class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all">
+                                        <a href="{{ route('zones.show', $zone) }}" title="Detalhes"
+                                            class="action-icon bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        <a href="{{ route('zones.edit', $zone) }}"
-                                            class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 flex items-center justify-center hover:bg-yellow-500 hover:text-white transition-all">
+                                        <a href="{{ route('zones.edit', $zone) }}" title="Editar"
+                                            class="action-icon bg-gray-50 text-gray-400 hover:bg-yellow-500 hover:text-white">
                                             <i class="bi bi-pencil"></i>
                                         </a>
                                         @if($zone->supervisions->count() === 0)
@@ -286,7 +288,7 @@
                                                 @method('DELETE')
                                                 <button type="button"
                                                     @click="confirmDelete('list-delete-form-{{ $zone->id }}', 'Deseja excluir esta zona?')"
-                                                    class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all">
+                                                    class="action-icon bg-gray-50 text-gray-400 hover:bg-red-500 hover:text-white" title="Excluir">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </form>
@@ -299,5 +301,11 @@
                 </table>
             </div>
         </template>
+
+        @if($zones->hasPages())
+            <div class="mt-8">
+                {{ $zones->links() }}
+            </div>
+        @endif
     </div>
 @endsection

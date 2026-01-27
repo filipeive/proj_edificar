@@ -90,7 +90,7 @@
         </div>
 
         @section('header-actions')
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 md:hidden">
                 <a href="{{ route('course-classes.export-all') }}"
                     class="bg-indigo-50 text-indigo-600 border border-indigo-100 p-2 rounded-lg hover:bg-indigo-100 transition-all flex items-center justify-center shadow-sm">
                     <i class="bi bi-file-earmark-spreadsheet text-2xl"></i>
@@ -175,7 +175,7 @@
         <div x-show="view === 'list'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
             class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-colors">
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                    <table class="w-full text-left border-collapse table-compact">
                         <thead>
                             <tr class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
                                 <th class="px-6 py-4 w-10">
@@ -252,14 +252,14 @@
                                     </td>
                                     <td class="px-6 py-4 text-right space-x-2">
                                         <a href="{{ route('course-classes.show', $class) }}"
-                                            class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-200 border border-transparent hover:border-blue-200 p-1 rounded transition-all"
-                                            title="Ver Detalhes">
-                                            <i class="bi bi-eye-fill text-lg"></i>
+                                            class="action-icon text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-blue-50 dark:hover:bg-blue-900/30"
+                                            title="Ver detalhes">
+                                            <i class="bi bi-eye-fill"></i>
                                         </a>
                                         <a href="{{ route('course-classes.edit', $class) }}"
-                                            class="text-amber-600 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-200 border border-transparent hover:border-amber-200 p-1 rounded transition-all"
+                                            class="action-icon text-amber-600 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-200 hover:bg-amber-50 dark:hover:bg-amber-900/30"
                                             title="Editar">
-                                            <i class="bi bi-pencil-square text-lg"></i>
+                                            <i class="bi bi-pencil-square"></i>
                                         </a>
                                         <form action="{{ route('course-classes.destroy', $class) }}" method="POST"
                                             id="delete-form-{{ $class->id }}" class="inline-block">
@@ -267,8 +267,9 @@
                                             @method('DELETE')
                                             <button type="button"
                                                 onclick="confirmDelete('delete-form-{{ $class->id }}', 'Deseja excluir permanentemente esta turma?')"
-                                                class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-200 border border-transparent hover:border-red-200 p-1 rounded transition-all">
-                                                <i class="bi bi-trash-fill text-lg"></i>
+                                                class="action-icon text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-200 hover:bg-red-50 dark:hover:bg-red-900/30"
+                                                title="Excluir">
+                                                <i class="bi bi-trash-fill"></i>
                                             </button>
                                         </form>
                                     </td>
@@ -293,9 +294,9 @@
 
         <!-- Grid View -->
         <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            class="grid grid-compact">
             @forelse($classes as $class)
-                <div class="bg-white dark:bg-gray-800 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col group hover:shadow-2xl hover:shadow-blue-900/10 dark:hover:shadow-blue-900/20 transition-all duration-300 relative overflow-hidden"
+                <div class="bg-white dark:bg-gray-800 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col group hover:shadow-2xl hover:shadow-blue-900/10 dark:hover:shadow-blue-900/20 transition-all duration-300 relative overflow-hidden compact-card"
                      :class="{'ring-2 ring-indigo-500 bg-indigo-50/10 dark:bg-indigo-900/10': selected.includes({{ $class->id }})}">
                     <!-- Status Badge -->
                     <div class="absolute top-6 right-6 z-10">
@@ -335,7 +336,7 @@
                         </div>
 
                         <div class="mb-2 min-h-[4rem]">
-                             <h4 class="text-xl font-black text-gray-900 dark:text-white leading-tight mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">{{ $class->name }}</h4>
+                             <h4 class="text-base font-black text-gray-900 dark:text-white leading-tight mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">{{ $class->name }}</h4>
                              <span class="inline-block px-2 py-1 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 text-[10px] font-bold uppercase tracking-wider rounded-lg border border-gray-100 dark:border-gray-600">
                                 {{ $class->course->name ?? 'Curso não definido' }}
                              </span>

@@ -5,7 +5,7 @@
 @section('page-subtitle', 'Gestão de Reuniões e Atas')
 
 @section('header-actions')
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-3 md:hidden">
         <a href="{{ route('cell-meetings.export', request()->all()) }}"
             class="flex items-center gap-2 px-4 md:px-6 py-2.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-black text-[10px] uppercase tracking-widest rounded-xl border border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all shadow-sm"
             title="Exportar para Excel">
@@ -176,7 +176,7 @@
             x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
             class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full">
+                <table class="w-full table-compact">
                     <thead>
                         <tr class="bg-gray-50/50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
                             <th class="px-8 py-6 text-left">
@@ -257,19 +257,19 @@
                                 </td>
                                 <td class="px-10 py-6 text-right">
                                     <div class="flex items-center justify-end gap-2">
-                                        <a href="{{ route('cell-meetings.show', $meeting) }}"
-                                            class="w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white dark:hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                        <a href="{{ route('cell-meetings.show', $meeting) }}" title="Detalhes"
+                                            class="action-icon bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white dark:hover:text-white shadow-sm">
                                             <i class="bi bi-eye-fill"></i>
                                         </a>
                                         @can('update', $meeting)
                                             <a href="{{ route('cell-meetings.edit', $meeting) }}"
-                                                class="w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 hover:bg-orange-500 dark:hover:bg-orange-500 hover:text-white dark:hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                                class="action-icon bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 hover:bg-orange-500 dark:hover:bg-orange-500 hover:text-white dark:hover:text-white shadow-sm" title="Editar">
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
                                         @endcan
                                         @can('delete', $meeting)
                                             <button type="button" @click="confirmDelete('{{ route('cell-meetings.destroy', $meeting) }}', 'delete-meeting-{{ $meeting->id }}')"
-                                                class="w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 hover:bg-red-600 dark:hover:bg-red-600 hover:text-white dark:hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                                class="action-icon bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 hover:bg-red-600 dark:hover:bg-red-600 hover:text-white dark:hover:text-white shadow-sm" title="Excluir">
                                                 <i class="bi bi-trash-fill"></i>
                                             </button>
                                             <form action="{{ route('cell-meetings.destroy', $meeting) }}" method="POST" id="delete-meeting-{{ $meeting->id }}" class="hidden">
@@ -302,9 +302,9 @@
         <!-- Grid View -->
         <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            class="grid grid-compact">
             @foreach($meetings as $meeting)
-                <div class="bg-white dark:bg-gray-800 p-8 rounded-[3rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col group hover:shadow-2xl hover:shadow-blue-600/5 transition-all duration-500 relative overflow-hidden active:scale-95">
+                <div class="bg-white dark:bg-gray-800 p-8 rounded-[3rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col group hover:shadow-2xl hover:shadow-blue-600/5 transition-all duration-500 relative overflow-hidden active:scale-95 compact-card">
                     <div class="absolute top-8 right-8 flex flex-col items-end gap-3 z-10">
                         <label class="flex items-center cursor-pointer mb-2">
                             <input type="checkbox" value="{{ $meeting->id }}" x-model="selectedIds"
@@ -333,11 +333,11 @@
                         <i class="bi bi-calendar-week"></i>
                     </div>
 
-                    <div class="mb-6 space-y-1">
-                        <h4 class="text-2xl font-black text-gray-900 dark:text-white leading-none tracking-tighter group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    <div class="mb-4 space-y-1">
+                        <h4 class="text-lg font-black text-gray-900 dark:text-white leading-none tracking-tighter group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
                             {{ $meeting->meeting_date->format('d/m/Y') }}
                         </h4>
-                        <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">{{ $meeting->cell->name }}</p>
+                        <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] line-clamp-1">{{ $meeting->cell->name }}</p>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4 mb-8">

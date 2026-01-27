@@ -227,6 +227,8 @@ Route::middleware('auth')->group(function () {
         Route::post('packages/{package}/assign', [PackageController::class, 'assignMember'])->name('packages.assign');
         Route::post('packages/{package}/update-member', [PackageController::class, 'updateMember'])->name('packages.update-member');
         Route::post('packages/{package}/bulk-sms', [PackageController::class, 'sendBulkSms'])->name('packages.send-bulk-sms');
+        Route::post('packages/{package}/quick-member', [PackageController::class, 'storeQuickMember'])->name('packages.quick-member');
+        Route::post('packages/{package}/members/{user}/send-sms', [PackageController::class, 'sendMemberSms'])->name('packages.members.send-sms');
         Route::get('packages/{package}/export', [PackageController::class, 'export'])->name('packages.export');
 
         // Members Management

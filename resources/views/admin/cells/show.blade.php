@@ -5,21 +5,21 @@
 @section('page-subtitle', 'Gestão da célula e membros')
 
 @section('header-actions')
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 md:hidden">
         <a href="{{ route('cells.pdf', $cell) }}"
-            class="text-gray-600 hover:text-orange-600 p-2.5 hover:bg-orange-50 rounded-xl transition-all duration-300 border border-transparent hover:border-orange-100"
-            title="Exportar Ficha">
-            <i class="bi bi-file-earmark-pdf text-2xl"></i>
+            class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50"
+            title="Exportar ficha">
+            <i class="bi bi-file-earmark-pdf"></i>
         </a>
         <a href="{{ route('cells.attendance', $cell) }}"
-            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
-            title="Ficha de Presença">
-            <i class="bi bi-calendar-check text-2xl"></i>
+            class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+            title="Ficha de presença">
+            <i class="bi bi-calendar-check"></i>
         </a>
         <a href="{{ route('cells.edit', $cell) }}"
-            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
-            title="Editar Célula">
-            <i class="bi bi-pencil-square text-2xl"></i>
+            class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+            title="Editar célula">
+            <i class="bi bi-pencil-square"></i>
         </a>
     </div>
 @endsection
@@ -128,7 +128,7 @@
                         </div>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full">
+                        <table class="w-full table-compact">
                             <thead>
                                 <tr class="bg-gray-50/50">
                                     <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Membro</th>
@@ -138,16 +138,16 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-50">
-                                @forelse($cell->members()->where('is_active', true)->get() as $member)
+                                @forelse($members as $member)
                                     <tr class="hover:bg-gray-50/50 transition-colors group">
                                         <td class="px-10 py-6">
                                             <div class="flex items-center gap-4">
                                                 <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 font-bold group-hover:bg-blue-50 group-hover:text-blue-600 transition-all">
                                                     {{ substr($member->name, 0, 1) }}
                                                 </div>
-                                                <div>
-                                                    <p class="text-sm font-bold text-gray-900 leading-tight group-hover:text-blue-600 transition-colors">{{ $member->name }}</p>
-                                                    <p class="text-[10px] font-medium text-gray-400">{{ $member->email }}</p>
+                                                <div class="min-w-0">
+                                                    <p class="text-sm font-bold text-gray-900 leading-tight group-hover:text-blue-600 transition-colors line-clamp-1">{{ $member->name }}</p>
+                                                    <p class="text-[10px] font-medium text-gray-400 line-clamp-1">{{ $member->email }}</p>
                                                 </div>
                                             </div>
                                         </td>
@@ -168,12 +168,12 @@
                                         <td class="px-10 py-6 text-right">
                                             <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
                                                 <button @click="openObs({ id: {{ $member->id }}, name: '{{ $member->name }}', obs: '{{ addslashes($member->observations) }}' })"
-                                                    class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-orange-50 hover:text-orange-600 flex items-center justify-center transition-all"
+                                                    class="action-icon bg-gray-50 text-gray-400 hover:bg-orange-50 hover:text-orange-600"
                                                     title="Observações">
                                                     <i class="bi bi-chat-dots{{ $member->observations ? '-fill' : '' }}"></i>
                                                 </button>
                                                 <button @click="transfer({ id: {{ $member->id }}, name: '{{ $member->name }}' })"
-                                                    class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-center transition-all"
+                                                    class="action-icon bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600"
                                                     title="Transferir Célula">
                                                     <i class="bi bi-arrow-left-right"></i>
                                                 </button>
@@ -202,6 +202,11 @@
                             </tbody>
                         </table>
                     </div>
+                    @if($members->hasPages())
+                        <div class="mt-6">
+                            {{ $members->links() }}
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Tab: Meetings -->
@@ -219,7 +224,7 @@
                         </div>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-sm">
+                        <table class="w-full text-sm table-compact">
                             <thead>
                                 <tr class="bg-gray-50/50">
                                     <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Data</th>
@@ -230,7 +235,7 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-50">
-                                @forelse($cell->meetings()->orderBy('meeting_date', 'desc')->get() as $meeting)
+                                @forelse($meetings as $meeting)
                                     <tr class="hover:bg-gray-50/50 transition-colors group">
                                         <td class="px-10 py-6 font-bold text-gray-900">
                                             {{ $meeting->meeting_date->format('d/m/Y') }}
@@ -260,10 +265,12 @@
                                         </td>
                                         <td class="px-10 py-6 text-right">
                                             <div class="flex justify-end gap-2">
-                                                <a href="{{ route('cell-meetings.pdf', $meeting) }}" class="p-2 text-gray-300 hover:text-orange-600 transition-colors">
+                                                <a href="{{ route('cell-meetings.pdf', $meeting) }}" title="PDF"
+                                                    class="action-icon text-gray-300 hover:text-orange-600 hover:bg-orange-50">
                                                     <i class="bi bi-file-earmark-pdf"></i>
                                                 </a>
-                                                <a href="{{ route('cell-meetings.show', $meeting) }}" class="p-2 text-gray-300 hover:text-blue-600 transition-colors">
+                                                <a href="{{ route('cell-meetings.show', $meeting) }}" title="Detalhes"
+                                                    class="action-icon text-gray-300 hover:text-blue-600 hover:bg-blue-50">
                                                     <i class="bi bi-chevron-right"></i>
                                                 </a>
                                             </div>
@@ -279,6 +286,11 @@
                             </tbody>
                         </table>
                     </div>
+                    @if($meetings->hasPages())
+                        <div class="mt-6">
+                            {{ $meetings->links() }}
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Tab: Stats -->

@@ -5,39 +5,31 @@
 @section('page-subtitle', 'Informações completas sobre a reunião')
 
 @section('header-actions')
-    <div class="flex items-center gap-3">
-        <a href="{{ route('cell-meetings.index') }}"
-            class="hidden md:flex items-center gap-2 px-6 py-2.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-black text-[10px] uppercase tracking-widest rounded-xl border border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all shadow-sm">
-            <i class="bi bi-arrow-left"></i>
-            Voltar
-        </a>
-
-        <div class="h-8 w-px bg-gray-100 dark:bg-gray-700 mx-1 hidden md:block"></div>
-
+    <div class="flex items-center gap-3 md:hidden">
         <button onclick="toggleEmailModal()"
-            class="text-gray-600 dark:text-gray-400 hover:text-blue-600 p-2.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
-            title="Enviar por Email">
-            <i class="bi bi-envelope text-2xl"></i>
+            class="action-icon text-gray-600 dark:text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+            title="Enviar por email">
+            <i class="bi bi-envelope"></i>
         </button>
         <a href="{{ route('cell-meetings.pdf', $cellMeeting) }}"
-            class="text-gray-600 dark:text-gray-400 hover:text-orange-600 p-2.5 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-xl transition-all duration-300 border border-transparent hover:border-orange-100"
+            class="action-icon text-gray-600 dark:text-gray-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20"
             title="Exportar PDF">
-            <i class="bi bi-file-earmark-pdf text-2xl"></i>
+            <i class="bi bi-file-earmark-pdf"></i>
         </a>
 
         @can('update', $cellMeeting)
             <a href="{{ route('cell-meetings.edit', $cellMeeting) }}"
-                class="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white font-black text-[10px] uppercase tracking-widest rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20">
+                class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                title="Editar">
                 <i class="bi bi-pencil-square"></i>
-                <span class="hidden md:inline">Editar Encontro</span>
             </a>
         @endcan
 
         @can('delete', $cellMeeting)
             <button type="button" onclick="confirmDelete('delete-form-{{ $cellMeeting->id }}')"
-                class="flex items-center gap-2 px-6 py-2.5 bg-red-600 text-white font-black text-[10px] uppercase tracking-widest rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-600/20">
+                class="action-icon text-gray-600 hover:text-red-600 hover:bg-red-50"
+                title="Excluir">
                 <i class="bi bi-trash-fill"></i>
-                <span class="hidden md:inline">Excluir</span>
             </button>
             <form id="delete-form-{{ $cellMeeting->id }}" action="{{ route('cell-meetings.destroy', $cellMeeting) }}" method="POST" class="hidden">
                 @csrf

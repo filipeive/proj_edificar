@@ -5,10 +5,12 @@
 @section('page-subtitle', 'Gestão de membros e líderes da igreja')
 
 @section('header-actions')
-    <a href="{{ route('users.create') }}"
-        class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100">
-        <i class="bi bi-person-plus-fill text-2xl"></i>
-    </a>
+    <div class="md:hidden">
+        <a href="{{ route('users.create') }}"
+            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100">
+            <i class="bi bi-person-plus-fill text-2xl"></i>
+        </a>
+    </div>
 @endsection
 
 @section('content')
@@ -178,7 +180,7 @@
         <div x-show="view === 'list'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
             class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full">
+                <table class="w-full table-compact">
                     <thead>
                         <tr class="bg-gray-50/50">
                             <th class="px-6 py-6 text-center">
@@ -259,24 +261,26 @@
                                 </td>
                                 <td class="px-10 py-6 text-right">
                                     <div class="flex items-center justify-end gap-2 text-right">
-                                        <a href="{{ route('users.show', $user) }}" class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                        <a href="{{ route('users.show', $user) }}" title="Detalhes"
+                                            class="action-icon bg-gray-50 text-gray-400 hover:bg-blue-600 hover:text-white shadow-sm">
                                             <i class="bi bi-eye-fill"></i>
                                         </a>
-                                        <a href="{{ route('users.edit', $user) }}" class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-orange-500 hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                        <a href="{{ route('users.edit', $user) }}" title="Editar"
+                                            class="action-icon bg-gray-50 text-gray-400 hover:bg-orange-500 hover:text-white shadow-sm">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
                                         @if($user->role !== 'admin')
                                             <form action="{{ route('users.reset-password', $user) }}" method="POST" id="reset-password-{{ $user->id }}" class="inline">
                                                 @csrf
                                                 <button type="button" onclick="confirmAction('Redefinir Senha', 'Redefinir senha de {{ $user->name }} para mudar123?', 'question', 'Sim, redefinir', 'reset-password-{{ $user->id }}')" 
-                                                    class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-purple-600 hover:text-white flex items-center justify-center transition-all shadow-sm" title="Redefinir Senha">
+                                                    class="action-icon bg-gray-50 text-gray-400 hover:bg-purple-600 hover:text-white shadow-sm" title="Redefinir senha">
                                                     <i class="bi bi-key-fill"></i>
                                                 </button>
                                             </form>
                                             <form action="{{ route('users.destroy', $user) }}" method="POST" id="delete-user-{{ $user->id }}" class="inline">
                                                 @csrf @method('DELETE')
                                                 <button type="button" onclick="confirmDelete('delete-user-{{ $user->id }}', 'Deletar {{ $user->name }}?')" 
-                                                    class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                                    class="action-icon bg-gray-50 text-gray-400 hover:bg-red-600 hover:text-white shadow-sm" title="Excluir">
                                                     <i class="bi bi-trash-fill"></i>
                                                 </button>
                                             </form>
@@ -307,10 +311,10 @@
 
         <!-- Grid View -->
         <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-            class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+            class="grid grid-compact">
             @forelse($users as $user)
-                <div class="bg-white p-5 md:p-8 rounded-[2rem] md:rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300">
-                    <div class="flex justify-between items-start mb-6">
+                <div class="bg-white p-5 md:p-8 rounded-[2rem] md:rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 compact-card">
+                    <div class="flex justify-between items-start mb-4">
                         <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 text-white flex items-center justify-center font-black text-2xl group-hover:scale-110 transition-all duration-500 shadow-lg shadow-blue-100">
                             {{ strtoupper(substr($user->name, 0, 1)) }}
                         </div>
@@ -342,8 +346,8 @@
                         </div>
                     </div>
 
-                    <div class="mb-6">
-                        <h4 class="text-xl font-black text-gray-900 leading-tight mb-1 group-hover:text-blue-600 transition-colors">{{ $user->name }}</h4>
+                    <div class="mb-4">
+                        <h4 class="text-base font-black text-gray-900 leading-tight mb-1 group-hover:text-blue-600 transition-colors line-clamp-1">{{ $user->name }}</h4>
                         <p class="text-[10px] text-gray-400 font-mono uppercase tracking-tighter">ID: #{{ str_pad($user->id, 5, '0', STR_PAD_LEFT) }}</p>
                     </div>
 

@@ -2,11 +2,11 @@
 @section('title', "Zona $zone->name - Portal Life Church")
 
 @section('header-actions')
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 md:hidden">
         <a href="{{ route('zones.edit', $zone) }}"
-            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
-            title="Configurar Zona">
-            <i class="bi bi-pencil-square text-2xl"></i>
+            class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+            title="Configurar zona">
+            <i class="bi bi-pencil-square"></i>
         </a>
     </div>
 @endsection
@@ -40,7 +40,7 @@
             <!-- Total Células -->
             <div
                 class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col justify-center text-center">
-                <p class="text-5xl font-black text-blue-600 tracking-tighter">{{ $cells->count() }}</p>
+                <p class="text-5xl font-black text-blue-600 tracking-tighter">{{ $cells->total() }}</p>
                 <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mt-2">Unidades de Células</p>
             </div>
 
@@ -48,7 +48,7 @@
             <div
                 class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col justify-center text-center relative overflow-hidden">
                 <div class="relative z-10">
-                    <p class="text-5xl font-black text-green-600 tracking-tighter">{{ $members->count() }}</p>
+                <p class="text-5xl font-black text-green-600 tracking-tighter">{{ $members->total() }}</p>
                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mt-2">Membros Totais</p>
                 </div>
                 <div class="absolute -right-4 -bottom-4 text-8xl text-green-50 opacity-50"><i class="bi bi-people-fill"></i>
@@ -117,7 +117,7 @@
                 <div x-show="activeTab === 'cells'" x-transition.fade
                     class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
                     <div class="overflow-x-auto">
-                        <table class="w-full">
+                        <table class="w-full table-compact">
                             <thead>
                                 <tr class="bg-gray-50/50">
                                     <th
@@ -137,14 +137,14 @@
                             <tbody class="divide-y divide-gray-50">
                                 @foreach($cells as $cell)
                                     <tr class="hover:bg-gray-50/50 transition-colors group">
-                                        <td class="px-10 py-6 font-bold text-gray-900">{{ $cell->name }}</td>
-                                        <td class="px-10 py-6 text-sm text-gray-500 font-medium">{{ $cell->supervision->name }}
+                                        <td class="px-10 py-6 font-bold text-gray-900 line-clamp-1">{{ $cell->name }}</td>
+                                        <td class="px-10 py-6 text-sm text-gray-500 font-medium line-clamp-1">{{ $cell->supervision->name }}
                                         </td>
-                                        <td class="px-10 py-6 text-sm font-bold text-gray-700">{{ $cell->leader->name ?? '-' }}
+                                        <td class="px-10 py-6 text-sm font-bold text-gray-700 line-clamp-1">{{ $cell->leader->name ?? '-' }}
                                         </td>
                                         <td class="px-10 py-6 text-right">
-                                            <a href="{{ route('cells.show', $cell) }}"
-                                                class="text-gray-300 hover:text-blue-600 transition-colors">
+                                            <a href="{{ route('cells.show', $cell) }}" title="Detalhes"
+                                                class="action-icon text-gray-300 hover:text-blue-600 hover:bg-blue-50">
                                                 <i class="bi bi-chevron-right text-lg"></i>
                                             </a>
                                         </td>
@@ -153,13 +153,18 @@
                             </tbody>
                         </table>
                     </div>
+                    @if($cells->hasPages())
+                        <div class="mt-6">
+                            {{ $cells->links() }}
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Tab Content: Membros -->
                 <div x-show="activeTab === 'members'" x-transition.fade
                     class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
                     <div class="overflow-x-auto">
-                        <table class="w-full">
+                        <table class="w-full table-compact">
                             <thead>
                                 <tr class="bg-gray-50/50">
                                     <th
@@ -174,7 +179,7 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-50">
-                                @foreach($members->take(50) as $member)
+                                @foreach($members as $member)
                                     <tr class="hover:bg-gray-50/50 transition-colors group">
                                         <td class="px-10 py-6">
                                             <div class="flex items-center gap-4">
@@ -182,10 +187,10 @@
                                                     class="w-10 h-10 rounded-xl bg-gray-100 text-gray-400 flex items-center justify-center font-bold">
                                                     {{ substr($member->name, 0, 1) }}
                                                 </div>
-                                                <div>
-                                                    <p class="text-sm font-bold text-gray-900 leading-tight">{{ $member->name }}
+                                                <div class="min-w-0">
+                                                    <p class="text-sm font-bold text-gray-900 leading-tight line-clamp-1">{{ $member->name }}
                                                     </p>
-                                                    <p class="text-[10px] text-gray-400 font-medium">{{ $member->email }}</p>
+                                                    <p class="text-[10px] text-gray-400 font-medium line-clamp-1">{{ $member->email }}</p>
                                                 </div>
                                             </div>
                                         </td>
@@ -196,8 +201,8 @@
                                             </span>
                                         </td>
                                         <td class="px-10 py-6 text-right">
-                                            <a href="{{ route('users.show', $member) }}"
-                                                class="text-gray-300 hover:text-blue-600 transition-colors">
+                                            <a href="{{ route('users.show', $member) }}" title="Detalhes"
+                                                class="action-icon text-gray-300 hover:text-blue-600 hover:bg-blue-50">
                                                 <i class="bi bi-chevron-right text-lg"></i>
                                             </a>
                                         </td>
@@ -206,6 +211,11 @@
                             </tbody>
                         </table>
                     </div>
+                    @if($members->hasPages())
+                        <div class="mt-6">
+                            {{ $members->links() }}
+                        </div>
+                    @endif
                 </div>
             </div>
 

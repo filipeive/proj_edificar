@@ -18,7 +18,7 @@ class ZoneController
                 ->orWhereHas('pastor', fn($q) => $q->where('name', 'LIKE', "%$search%"));
         }
 
-        $zones = $query->get();
+        $zones = $query->paginate(24)->withQueryString();
         return view('admin.zones.index', ['zones' => $zones]);
     }
 
@@ -65,8 +65,8 @@ class ZoneController
     {
         $zone->load(['supervisions.cells.leader', 'pastor']);
 
-        $cells = $zone->cells()->with(['leader', 'supervision'])->get();
-        $members = $zone->members()->get();
+        $cells = $zone->cells()->with(['leader', 'supervision'])->paginate(24)->withQueryString();
+        $members = $zone->members()->paginate(24)->withQueryString();
 
         return view('admin.zones.show', [
             'zone' => $zone,

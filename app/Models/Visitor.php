@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\NormalizesMozPhone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Visitor extends Model
 {
-    use HasFactory;
+    use HasFactory, NormalizesMozPhone;
 
     protected $fillable = [
         'name',
@@ -35,6 +36,11 @@ class Visitor extends Model
         'contacted_at' => 'datetime',
         'invited_by_someone' => 'boolean',
     ];
+
+    public function setPhoneAttribute($value): void
+    {
+        $this->attributes['phone'] = $this->normalizeMozPhone($value);
+    }
 
     /**
      * Relacionamentos

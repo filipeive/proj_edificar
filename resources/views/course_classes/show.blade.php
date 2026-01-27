@@ -5,27 +5,27 @@
 @section('page-subtitle', $courseClass->course->name)
 
 @section('header-actions')
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 md:hidden">
         <a href="{{ route('course-classes.index', ['course_id' => $courseClass->course_id]) }}"
-            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
-            title="Voltar à Lista">
-            <i class="bi bi-arrow-left text-2xl"></i>
+            class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+            title="Voltar à lista">
+            <i class="bi bi-arrow-left"></i>
         </a>
         <a href="{{ route('course-classes.report', $courseClass) }}"
-            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100"
-            title="Relatório Final">
-            <i class="bi bi-bar-chart-fill text-2xl"></i>
+            class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+            title="Relatório final">
+            <i class="bi bi-bar-chart-fill"></i>
         </a>
         <a href="{{ route('course-classes.export-pdf', $courseClass) }}"
-            class="text-gray-600 hover:text-red-600 p-2.5 hover:bg-red-50 rounded-xl transition-all duration-300 border border-transparent hover:border-red-100"
+            class="action-icon text-gray-600 hover:text-red-600 hover:bg-red-50"
             title="Relatório PDF">
-            <i class="bi bi-file-earmark-pdf text-2xl"></i>
+            <i class="bi bi-file-earmark-pdf"></i>
         </a>
         @if(auth()->user()->isAdmin() || auth()->user()->isPastorSenior())
             <a href="{{ route('course-classes.edit', $courseClass) }}"
-                class="text-gray-600 hover:text-orange-600 p-2.5 hover:bg-orange-50 rounded-xl transition-all duration-300 border border-transparent hover:border-orange-100"
-                title="Editar Turma">
-                <i class="bi bi-pencil-square text-2xl"></i>
+                class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50"
+                title="Editar turma">
+                <i class="bi bi-pencil-square"></i>
             </a>
         @endif
     </div>

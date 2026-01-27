@@ -5,10 +5,12 @@
 @section('page-subtitle', 'Análise de crescimento e estatísticas ministeriais')
 
 @section('header-actions')
-    <a href="{{ route('quarterly-reports.create') }}"
-        class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100">
-        <i class="bi bi-plus-circle text-2xl"></i>
-    </a>
+    <div class="md:hidden">
+        <a href="{{ route('quarterly-reports.create') }}"
+            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100">
+            <i class="bi bi-plus-circle text-2xl"></i>
+        </a>
+    </div>
 @endsection
 
 @section('content')
@@ -278,7 +280,7 @@
             x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
             class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full">
+                <table class="w-full table-compact">
                     <thead>
                         <tr class="bg-gray-50/50 dark:bg-gray-700/50">
                             <th class="px-6 py-5 text-center w-10">
@@ -368,13 +370,13 @@
                                 <td class="px-10 py-6 text-right">
                                     <div
                                         class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                                        <a href="{{ route('quarterly-reports.show', $report) }}"
-                                            class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                        <a href="{{ route('quarterly-reports.show', $report) }}" title="Detalhes"
+                                            class="action-icon bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white shadow-sm">
                                             <i class="bi bi-eye-fill"></i>
                                         </a>
                                         @can('update', $report)
                                             <a href="{{ route('quarterly-reports.edit', $report) }}"
-                                                class="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 hover:bg-orange-600 hover:text-white dark:hover:bg-orange-600 dark:hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                                class="action-icon bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 hover:bg-orange-600 hover:text-white dark:hover:bg-orange-600 dark:hover:text-white shadow-sm" title="Editar">
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
                                         @endcan
@@ -385,7 +387,7 @@
                                                 @method('DELETE')
                                                 <button type="button"
                                                     onclick="confirmDelete('delete-report-{{ $report->id }}', 'Deseja excluir este relatório?')"
-                                                    class="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white dark:hover:bg-red-600 dark:hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                                    class="action-icon bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white dark:hover:bg-red-600 dark:hover:text-white shadow-sm" title="Excluir">
                                                     <i class="bi bi-trash-fill"></i>
                                                 </button>
                                             </form>
@@ -413,10 +415,10 @@
         <!-- GRID VIEW -->
         <div x-show="view === 'grid'" x-cloak x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-            class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            class="grid grid-compact">
             @forelse($reports as $report)
                 <div
-                    class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-2 transition-all group overflow-hidden flex flex-col">
+                    class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-2 transition-all group overflow-hidden flex flex-col compact-card">
                     <!-- Card Header -->
                     <div class="p-8 pb-0 flex justify-between items-start relative">
                         <div class="absolute top-8 right-8">
@@ -427,7 +429,7 @@
                             <span
                                 class="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] mb-1">{{ $report->quarter }}º
                                 Trimestre</span>
-                            <h3 class="text-2xl font-black text-gray-900 leading-tight dark:text-white">{{ $report->year }}</h3>
+                            <h3 class="text-lg font-black text-gray-900 leading-tight dark:text-white">{{ $report->year }}</h3>
                         </div>
                         <span
                             class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm mr-10
