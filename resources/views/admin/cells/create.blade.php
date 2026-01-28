@@ -12,7 +12,7 @@
             <div class="mb-6">
                 <label for="supervision_id" class="block text-sm font-medium text-gray-700 mb-2">Supervisão</label>
                 <select name="supervision_id" id="supervision_id" 
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 @error('supervision_id') border-red-500 @enderror"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 searchable-select @error('supervision_id') border-red-500 @enderror"
                     required>
                     <option value="">-- Selecione uma supervisão --</option>
                     @foreach($supervisions as $supervision)
@@ -39,7 +39,7 @@
             <div class="mb-6">
                 <label for="leader_id" class="block text-sm font-medium text-gray-700 mb-2">Líder da Célula</label>
                 <select name="leader_id" id="leader_id" 
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 @error('leader_id') border-red-500 @enderror"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 searchable-select @error('leader_id') border-red-500 @enderror"
                     required>
                     <option value="">-- Selecione um líder --</option>
                     @foreach($leaders as $leader)

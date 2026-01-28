@@ -132,6 +132,12 @@
                         <i class="bi bi-plus-lg mr-2"></i> Novo Evento
                     </a>
                 @endcan
+                @if(auth()->user()->role === 'admin')
+                 <a href="{{ route('event-types.index') }}"
+            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 hidden md:inline">
+            <i class="bi bi-gear-fill text-2xl"></i>
+        </a>
+        @endif
             </div>
         </div>
 

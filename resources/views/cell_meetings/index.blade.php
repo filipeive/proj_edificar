@@ -57,51 +57,9 @@
         }"
         x-init="$watch('view', value => localStorage.setItem('cell_meetings_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('cell_meetings_view') || 'list')"
         @resize.window.debounce.500ms="updateView()">
-
-        <!-- Filter Bar -->
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
-            <form action="{{ route('cell-meetings.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                <div class="relative group lg:col-span-2 text-black dark:text-white">
-                    <i class="bi bi-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors"></i>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Pesquisar tema, líder ou célula..."
-                        class="w-full pl-14 pr-6 py-4 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white">
-                </div>
-
-                <div class="text-black dark:text-white">
-                    <select name="cell_id" class="w-full py-4 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white">
-                        <option value="">Todas as Células</option>
-                        @foreach($cells as $cell)
-                            <option value="{{ $cell->id }}" {{ request('cell_id') == $cell->id ? 'selected' : '' }}>{{ $cell->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="text-black dark:text-white">
-                    <select name="meeting_type" class="w-full py-4 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white">
-                        <option value="">Todos os Tipos</option>
-                        <option value="normal" {{ request('meeting_type') == 'normal' ? 'selected' : '' }}>Reunião de Célula</option>
-                        <option value="leadership" {{ request('meeting_type') == 'leadership' ? 'selected' : '' }}>Liderança</option>
-                        <option value="supervision" {{ request('meeting_type') == 'supervision' ? 'selected' : '' }}>Supervisão</option>
-                        <option value="zone" {{ request('meeting_type') == 'zone' ? 'selected' : '' }}>Zona</option>
-                    </select>
-                </div>
-
-                <div class="flex gap-2 text-black dark:text-white">
-                    <button type="submit" class="flex-1 bg-gray-900 dark:bg-black text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 transition-all flex items-center justify-center gap-2">
-                        <i class="bi bi-filter"></i> Filtrar
-                    </button>
-                    @if(request()->anyFilled(['search', 'cell_id', 'meeting_type', 'date_start', 'date_end']))
-                        <a href="{{ route('cell-meetings.index') }}" class="w-14 bg-gray-100 dark:bg-gray-700 text-gray-500 rounded-2xl hover:bg-red-50 hover:text-red-600 transition-all flex items-center justify-center">
-                            <i class="bi bi-x-lg"></i>
-                        </a>
-                    @endif
-                </div>
-            </form>
-        </div>
-        
-        <!-- Stats Overview -->
+         <!-- Stats Overview -->
         @if(isset($stats))
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 hidden md:flex">
             <div class="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-lg group">
                 <div class="flex items-center gap-5">
                     <div class="w-14 h-14 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center text-2xl group-hover:bg-blue-600 group-hover:text-white transition-all">
@@ -151,8 +109,56 @@
             </div>
         </div>
         @endif
-        <div class="flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="flex items-center gap-4">
+        <!-- Filter Bar -->
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
+            <form action="{{ route('cell-meetings.index') }}" method="GET" class="flex flex-col xl:flex-row xl:items-end gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 flex-1">
+                    <div class="text-black dark:text-white">
+                        <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Pesquisar</label>
+                        <div class="relative group">
+                            <i class="bi bi-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors"></i>
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Tema, líder ou célula..."
+                                class="w-full pl-14 pr-6 py-4 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white">
+                        </div>
+                    </div>
+
+                    <div class="text-black dark:text-white">
+                        <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Célula</label>
+                        <select name="cell_id" class="searchable-select w-full py-4 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white" data-label="Célula">
+                            <option value="">Todas as Células</option>
+                            @foreach($cells as $cell)
+                                <option value="{{ $cell->id }}" {{ request('cell_id') == $cell->id ? 'selected' : '' }}>{{ $cell->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="text-black dark:text-white">
+                        <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Tipo</label>
+                        <select name="meeting_type" class="w-full py-4 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white">
+                            <option value="">Todos os Tipos</option>
+                            <option value="normal" {{ request('meeting_type') == 'normal' ? 'selected' : '' }}>Reunião de Célula</option>
+                            <option value="leadership" {{ request('meeting_type') == 'leadership' ? 'selected' : '' }}>Liderança</option>
+                            <option value="supervision" {{ request('meeting_type') == 'supervision' ? 'selected' : '' }}>Supervisão</option>
+                            <option value="zone" {{ request('meeting_type') == 'zone' ? 'selected' : '' }}>Zona</option>
+                        </select>
+                    </div>
+
+                    <div class="flex gap-2 text-black dark:text-white items-end">
+                        <button type="submit" class="flex-1 bg-gray-900 dark:bg-black text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 transition-all flex items-center justify-center gap-2 py-4">
+                            <i class="bi bi-filter"></i> Filtrar
+                        </button>
+                        @if(request()->anyFilled(['search', 'cell_id', 'meeting_type', 'date_start', 'date_end']))
+                            <a href="{{ route('cell-meetings.index') }}" class="w-14 h-14 bg-gray-100 dark:bg-gray-700 text-gray-500 rounded-2xl hover:bg-red-50 hover:text-red-600 transition-all flex items-center justify-center">
+                                <i class="bi bi-x-lg"></i>
+                            </a>
+                        @endif
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div class="flex flex-wrap items-center gap-3">
                 <div class="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-xl items-center shadow-inner">
                     <button @click="view = 'list'"
                         :class="view === 'list' ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-md' : 'text-gray-400 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'"
@@ -168,6 +174,24 @@
                 <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 dark:bg-gray-900 px-4 py-2 rounded-full border border-gray-100 dark:border-gray-700">
                     {{ $meetings->total() }} Registros
                 </span>
+            </div>
+
+            <div class="hidden md:flex items-center gap-3">
+                <a href="{{ route('cell-meetings.export', request()->all()) }}"
+                    class="flex items-center gap-2 px-4 md:px-6 py-2.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-black text-[10px] uppercase tracking-widest rounded-xl border border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all shadow-sm"
+                    title="Exportar para Excel">
+                    <i class="bi bi-file-earmark-excel-fill text-xl md:text-2xl"></i>
+                    <span class="hidden md:inline">Exportar</span>
+                </a>
+
+                @if(auth()->user()->isAdmin() || auth()->user()->can('create', App\Models\CellMeeting::class))
+                    <a href="{{ route('cell-meetings.create') }}"
+                        class="flex items-center gap-2 px-4 md:px-6 py-2.5 bg-blue-600 text-white font-black text-[10px] uppercase tracking-widest rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20"
+                        title="Novo Encontro">
+                        <i class="bi bi-plus-lg text-xl md:text-2xl"></i>
+                        <span class="hidden md:inline">Novo Encontro</span>
+                    </a>
+                @endif
             </div>
         </div>
 

@@ -18,6 +18,12 @@ class MoceanSmsProvider implements SmsProviderInterface
             return false;
         }
 
+        Log::info('Mocean SMS request', [
+            'to' => $phone,
+            'from' => $senderId,
+            'url' => $apiUrl,
+        ]);
+
         $response = Http::asForm()
             ->withToken($apiKey)
             ->post($apiUrl, [
@@ -35,6 +41,10 @@ class MoceanSmsProvider implements SmsProviderInterface
         }
 
         $payload = $response->json();
+        Log::info('Mocean SMS response', [
+            'status' => $response->status(),
+            'body' => $payload ?? $response->body(),
+        ]);
         if (is_array($payload) && isset($payload['messages'][0]['status'])) {
             return (string) $payload['messages'][0]['status'] === '0';
         }

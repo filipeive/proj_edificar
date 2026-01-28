@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\UserCommitment;
 use App\Notifications\MemberCreatedNotification;
 use App\Services\Sms\SmsService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -217,6 +218,59 @@ class PackageController
     {
         $filename = 'membros_' . \Illuminate\Support\Str::slug($package->name) . '_' . now()->format('Y_m_d') . '.xlsx';
         return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\PackageMembersExport($package), $filename);
+    }
+
+    public function exportPdf(CommitmentPackage $package)
+    {
+        $now = now();
+        if ($now->day <= 5) {
+            $startDate = $now->copy()->subMonth()->startOfMonth()->addDays(19);
+            $endDate = $now->copy()->startOfMonth()->addDays(4);
+        } else {
+            $startDate = $now->copy()->startOfMonth()->addDays(19);
+            $endDate = $now->copy()->addMonth()->startOfMonth()->addDays(4);
+        }
+
+        $rows = $package->userCommitments()
+            ->with(['user.cell.supervision.zone', 'user.cell.supervision.zone.pastor'])
+            ->get()
+            ->map(function ($commitment) use ($startDate, $endDate, $package) {
+                $user = $commitment->user;
+                $cell = $user->cell;
+                $supervision = $cell?->supervision;
+                $zone = $supervision?->zone;
+
+                $contribution = \App\Models\Contribution::verified()
+                    ->where('user_id', $user->id)
+                    ->where('package_id', $package->id)
+                    ->whereBetween('contribution_date', [$startDate, $endDate])
+                    ->orderBy('contribution_date', 'desc')
+                    ->first();
+
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'phone' => $user->phone ?? 'N/A',
+                    'cell' => $cell->name ?? 'N/A',
+                    'supervision' => $supervision->name ?? 'N/A',
+                    'zone' => $zone->name ?? 'N/A',
+                    'pastor' => $zone?->pastor?->name ?? 'N/A',
+                    'committed' => number_format((float) $commitment->committed_amount, 2, ',', '.') . ' MT',
+                    'contributed' => $contribution ? 'SIM' : 'NÃO',
+                    'paid' => $contribution ? number_format((float) $contribution->amount, 2, ',', '.') . ' MT' : '0,00 MT',
+                    'paid_date' => $contribution ? $contribution->contribution_date->format('d/m/Y') : '-',
+                ];
+            });
+
+        $pdf = Pdf::loadView('admin.packages.export-pdf', [
+            'package' => $package,
+            'rows' => $rows,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+        ])->setPaper('a4', 'landscape');
+
+        $filename = 'membros_' . \Illuminate\Support\Str::slug($package->name) . '_' . now()->format('Y_m_d') . '.pdf';
+        return $pdf->download($filename);
     }
 
     public function sendBulkSms(Request $request, CommitmentPackage $package, SmsService $smsService)

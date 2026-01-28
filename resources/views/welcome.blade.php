@@ -5,16 +5,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Life Church - Edificando Vidas, Transformando Destinos</title>
+    <meta name="description"
+        content="Portal Life Church: gestão de cultos, células, contribuições e relatórios para fortalecer a missão da igreja.">
+    <meta name="theme-color" content="#f97316">
+    <meta name="application-name" content="Portal Life Church">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Life Church">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="color-scheme" content="light">
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('favicon.png') }}">
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"
         rel="stylesheet">
     <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: 'Outfit', sans-serif;
             overflow-x: hidden;
@@ -28,11 +44,17 @@
         }
 
         .hero-section {
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(249, 115, 22, 0.3) 100%),
-                url('https://images.unsplash.com/photo-1438232992991-995b7058bbb3?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.72) 0%, rgba(249, 115, 22, 0.28) 100%),
+                url('{{ asset('images/hero-2.jpg') }}');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                background-attachment: scroll;
+            }
         }
 
         .orange-gradient {
@@ -248,8 +270,69 @@
         .text-shadow-glow {
             text-shadow: 0 0 40px rgba(249, 115, 22, 0.5);
         }
+
+        .mobile-scroll-row {
+            display: grid;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-scroll-row {
+                display: flex;
+                overflow-x: auto;
+                scroll-snap-type: x mandatory;
+                gap: 1rem;
+                padding-bottom: 1rem;
+            }
+
+            .mobile-scroll-row>* {
+                min-width: 84%;
+                scroll-snap-align: center;
+            }
+
+            .mobile-scroll-row::-webkit-scrollbar {
+                display: none;
+            }
+        }
+
+        .hero-slide {
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .hero-slide.is-active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .hero-slide.is-hidden {
+            opacity: 0;
+            transform: translateY(8px);
+            pointer-events: none;
+            position: absolute;
+            inset: 0;
+        }
+
+        .map-quelimane {
+            transform: scale(4.0) translate(0%, 20%);
+            transform-origin: center;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
     </style>
 </head>
+
+@php
+    $churchName = \App\Models\Setting::get('church.name', 'Life Church');
+    $logoPrimary = \App\Models\Setting::get('branding.logo_primary', asset('images/logo-white-orange.png'));
+@endphp
 
 <body class="bg-white text-gray-900">
     <!-- Navigation -->
@@ -259,11 +342,10 @@
                 <div class="flex items-center space-x-3 group cursor-pointer">
                     <div
                         class="p-2 orange-gradient rounded-2xl shadow-lg transition-transform duration-300 group-hover:scale-110 pulse-glow">
-                        <img src="{{ asset('images/logo-white-orange.png') }}" alt="Life Church" class="h-8 w-auto">
+                        <img src="{{ $logoPrimary }}" alt="{{ $churchName }}" class="h-8 w-auto">
                     </div>
                     <div class="flex flex-col">
-                        <span class="text-xl font-black tracking-tighter text-gray-900 uppercase leading-none">Life
-                            Church</span>
+                        <span class="text-xl font-black tracking-tighter text-gray-900 uppercase leading-none">{{ $churchName }}</span>
                         <span class="text-[9px] text-orange-600 font-black uppercase tracking-[0.3em]">Portal de
                             Gestão</span>
                     </div>
@@ -366,47 +448,245 @@
         <div class="absolute bottom-40 left-1/3 w-24 h-24 orange-gradient rounded-full opacity-20 blur-xl float-animation"
             style="animation-delay: 2s;"></div>
 
-        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 py-32">
-            <div class="text-center max-w-5xl mx-auto">
-                <div
-                    class="inline-flex items-center px-6 py-3 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-orange-400 text-[10px] font-black uppercase tracking-[0.3em] mb-8 hover:bg-white/20 transition-all duration-300 cursor-default">
-                    <span class="flex h-2 w-2 rounded-full bg-orange-500 mr-3">
-                        <span
-                            class="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-orange-400 opacity-75"></span>
-                    </span>
-                    Edificando Vidas, Transformando Destinos
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 py-28 lg:py-32">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                <div class="text-center lg:text-left">
+                    <div
+                        class="inline-flex items-center px-6 py-3 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-orange-400 text-[10px] font-black uppercase tracking-[0.3em] mb-8 hover:bg-white/20 transition-all duration-300 cursor-default">
+                        <span class="flex h-2 w-2 rounded-full bg-orange-500 mr-3">
+                            <span
+                                class="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-orange-400 opacity-75"></span>
+                        </span>
+                        Edificando Vidas, Transformando Destinos
+                    </div>
+
+                    <h1
+                        class="text-[clamp(2.75rem,6vw,5.5rem)] font-black text-white mb-6 tracking-tighter leading-[0.95]">
+                        Transformando <span class="orange-gradient-text">Comunidades</span>,<br class="hidden sm:block">
+                        Mudando <span class="orange-gradient-text">Nações</span>
+                    </h1>
+                    <p class="text-xl md:text-2xl text-white mb-6 font-black uppercase tracking-widest">
+                        Uma Vida de Cada Vez
+                    </p>
+                    <p class="text-lg text-gray-300 mb-10 leading-relaxed max-w-2xl lg:mx-0 mx-auto font-light">
+                        Somos uma igreja familiar baseada em células, amando a Jesus, servindo e discipulando pessoas.
+                    </p>
+
+                    <div
+                        class="flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-4">
+                        <a href="{{ route('register') }}"
+                            class="w-full sm:w-auto bg-white text-gray-900 px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-orange-600 hover:text-white transition-all duration-500 shadow-2xl group text-center">
+                            Começar Agora
+                            <i
+                                class="bi bi-arrow-right ml-2 group-hover:translate-x-2 transition-transform inline-block"></i>
+                        </a>
+                        <a href="#features"
+                            class="w-full sm:w-auto bg-white/5 backdrop-blur-xl text-white border-2 border-white/20 px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-white/10 hover:border-white/40 transition-all duration-500 text-center">
+                            Explorar Recursos
+                        </a>
+                    </div>
                 </div>
 
-                <h1 class="text-6xl md:text-8xl font-black text-white mb-8 tracking-tighter leading-none">
-                    Transformando <span class="orange-gradient-text">Comunidades</span>,<br>
-                    Mudando <span class="orange-gradient-text">Nações</span>
-                </h1>
-                <p class="text-2xl md:text-3xl text-white mb-8 font-black uppercase tracking-widest">
-                    Uma Vida de Cada Vez
-                </p>
-                <p class="text-xl text-gray-300 mb-12 leading-relaxed max-w-3xl mx-auto font-light">
-                    Somos uma igreja familiar baseada em células, amando a Jesus, servindo e discipulando pessoas.
-                </p>
+                <div class="relative">
+                    <div
+                        class="bg-white/10 backdrop-blur-2xl border border-white/20 rounded-[2.5rem] p-6 md:p-8 shadow-2xl">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-orange-400 text-lg">
+                                    <i class="bi bi-collection-fill"></i>
+                                </div>
+                                <div>
+                                    <p class="text-white font-black text-sm uppercase tracking-widest">Painel em
+                                        Destaque</p>
+                                    <p class="text-[10px] text-orange-300 uppercase tracking-[0.2em]">Quelimane • Life
+                                        Church</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button type="button"
+                                    class="hero-slide-dot w-2.5 h-2.5 rounded-full bg-white/40"></button>
+                                <button type="button"
+                                    class="hero-slide-dot w-2.5 h-2.5 rounded-full bg-white/20"></button>
+                                <button type="button"
+                                    class="hero-slide-dot w-2.5 h-2.5 rounded-full bg-white/20"></button>
+                                <button type="button"
+                                    class="hero-slide-dot w-2.5 h-2.5 rounded-full bg-white/20"></button>
+                                <button type="button"
+                                    class="hero-slide-dot w-2.5 h-2.5 rounded-full bg-white/20"></button>
+                            </div>
+                        </div>
 
-                <!-- Floating Decorative Elements -->
-                <div
-                    class="absolute top-1/2 left-10 w-24 h-24 border border-white/10 rounded-full animate-spin-slow hidden md:block">
-                </div>
-                <div
-                    class="absolute bottom-20 right-10 w-32 h-32 border border-white/5 rounded-full animate-bounce-slow hidden md:block">
-                </div>
-            </div>
+                        <div class="hero-slides relative min-h-[20rem]">
+                            <div class="hero-slide is-active">
+                                <div
+                                    class="bg-white rounded-2xl p-4 border border-white/10 text-gray-900 overflow-hidden">
+                                    <img src="{{ asset('images/map-mozambique.png') }}"
+                                        alt="Mapa Life Church Moçambique"
+                                        class="w-full h-44 md:h-48 object-contain map-quelimane">
+                                </div>
+                                <div class="mt-5 grid grid-cols-3 gap-3 text-center">
+                                    <div class="bg-white/10 rounded-2xl py-4 border border-white/10">
+                                        <p class="text-[9px] text-orange-200 uppercase tracking-widest">Células</p>
+                                        <p class="text-white font-black text-xl">
+                                            {{ number_format($cellCount, 0, ',', '.') }}
+                                        </p>
+                                    </div>
+                                    <div class="bg-white/10 rounded-2xl py-4 border border-white/10">
+                                        <p class="text-[9px] text-blue-200 uppercase tracking-widest">Zonas</p>
+                                        <p class="text-white font-black text-xl">
+                                            {{ number_format($zoneCount, 0, ',', '.') }}
+                                        </p>
+                                    </div>
+                                    <div class="bg-white/10 rounded-2xl py-4 border border-white/10">
+                                        <p class="text-[9px] text-emerald-200 uppercase tracking-widest">Membros</p>
+                                        <p class="text-white font-black text-xl">
+                                            {{ number_format($memberCount ?? 0, 0, ',', '.') }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
 
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
-                <a href="{{ route('register') }}"
-                    class="w-full sm:w-auto bg-white text-gray-900 px-12 py-5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-orange-600 hover:text-white transition-all duration-500 shadow-2xl group text-center">
-                    Começar Agora
-                    <i class="bi bi-arrow-right ml-2 group-hover:translate-x-2 transition-transform inline-block"></i>
-                </a>
-                <a href="#features"
-                    class="w-full sm:w-auto bg-white/5 backdrop-blur-xl text-white border-2 border-white/20 px-12 py-5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-white/10 hover:border-white/40 transition-all duration-500 text-center">
-                    Explorar Recursos
-                </a>
+                            <div class="hero-slide is-hidden">
+                                <div class="bg-white rounded-2xl p-5 border border-white/10 text-gray-900">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <h4 class="text-sm font-black uppercase tracking-widest text-gray-500">Horários
+                                            de Culto</h4>
+                                        <span
+                                            class="text-[10px] font-black uppercase tracking-widest text-orange-600 bg-orange-50 px-3 py-1 rounded-full">Quelimane</span>
+                                    </div>
+                                    <div class="space-y-3">
+                                        <div class="flex items-center justify-between text-sm font-bold">
+                                            <span>Domingo • 08:00</span>
+                                            <span class="text-orange-600">Celebração</span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-sm font-bold">
+                                            <span>Domingo • 10:00</span>
+                                            <span class="text-orange-600">Celebração</span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-sm font-bold">
+                                            <span>Domingo • 15:00</span>
+                                            <span class="text-yellow-600">Adolescentes</span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-sm font-bold">
+                                            <span>Domingo • 17:00</span>
+                                            <span class="text-green-600">Jovens</span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-sm font-bold">
+                                            <span>Quarta • 17:30</span>
+                                            <span class="text-purple-600">Palavra</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-5 grid grid-cols-2 gap-3 text-center">
+                                    <div class="bg-white/10 rounded-2xl py-4 border border-white/10">
+                                        <p class="text-[9px] text-orange-200 uppercase tracking-widest">Impacto</p>
+                                        <p class="text-white font-black text-lg">Semanas cheias</p>
+                                    </div>
+                                    <div class="bg-white/10 rounded-2xl py-4 border border-white/10">
+                                        <p class="text-[9px] text-blue-200 uppercase tracking-widest">Equipe</p>
+                                        <p class="text-white font-black text-lg">Servindo juntos</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="hero-slide is-hidden">
+                                <div class="bg-white rounded-2xl p-5 border border-white/10 text-gray-900">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <h4 class="text-sm font-black uppercase tracking-widest text-gray-500">Cursos em
+                                            Destaque</h4>
+                                        <span
+                                            class="text-[10px] font-black uppercase tracking-widest text-green-600 bg-green-50 px-3 py-1 rounded-full">Inscrições</span>
+                                    </div>
+                                    <div class="space-y-3">
+                                        @forelse($activeCourses->take(3) as $course)
+                                            <div class="flex items-center justify-between text-sm font-bold">
+                                                <span class="line-clamp-1">{{ $course->name }}</span>
+                                                <span class="text-green-600">Aberto</span>
+                                            </div>
+                                        @empty
+                                            <div class="text-sm text-gray-500">Inscrições em breve.</div>
+                                        @endforelse
+                                    </div>
+                                </div>
+                                <div class="mt-5 grid grid-cols-2 gap-3 text-center">
+                                    <div class="bg-white/10 rounded-2xl py-4 border border-white/10">
+                                        <p class="text-[9px] text-green-200 uppercase tracking-widest">Formação</p>
+                                        <p class="text-white font-black text-lg">Crescimento</p>
+                                    </div>
+                                    <div class="bg-white/10 rounded-2xl py-4 border border-white/10">
+                                        <p class="text-[9px] text-blue-200 uppercase tracking-widest">Liderança</p>
+                                        <p class="text-white font-black text-lg">Equipar</p>
+                                    </div>
+                                </div>
+                                @if($activeCourses->count())
+                                    <a href="{{ route('public.courses.register', $activeCourses->first()->slug) }}"
+                                        class="mt-4 inline-flex items-center justify-center w-full bg-green-600 text-white py-3 rounded-2xl text-[10px] uppercase tracking-widest font-black hover:bg-green-700 transition">
+                                        Inscrever-se
+                                    </a>
+                                @else
+                                    <a href="#courses"
+                                        class="mt-4 inline-flex items-center justify-center w-full bg-white/10 text-white py-3 rounded-2xl text-[10px] uppercase tracking-widest font-black hover:bg-white/20 transition">
+                                        Ver Cursos
+                                    </a>
+                                @endif
+                            </div>
+
+                            <div class="hero-slide is-hidden">
+                                <div class="bg-white rounded-2xl p-4 border border-white/10 text-gray-900">
+                                    <img src="{{ asset('images/map-family.png') }}" alt="Mapa Life Church Family"
+                                        class="w-full h-44 md:h-48 object-contain">
+                                </div>
+                                <div class="mt-5 grid grid-cols-2 gap-3 text-center">
+                                    <div class="bg-white/10 rounded-2xl py-4 border border-white/10">
+                                        <p class="text-[9px] text-orange-200 uppercase tracking-widest">Nacional</p>
+                                        <p class="text-white font-black text-lg">Moçambique</p>
+                                    </div>
+                                    <div class="bg-white/10 rounded-2xl py-4 border border-white/10">
+                                        <p class="text-[9px] text-blue-200 uppercase tracking-widest">Internacional</p>
+                                        <p class="text-white font-black text-lg">Life Church Family</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="hero-slide is-hidden">
+                                <div class="bg-white rounded-2xl p-5 border border-white/10 text-gray-900">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <h4 class="text-sm font-black uppercase tracking-widest text-gray-500">Eventos
+                                            Públicos</h4>
+                                        <span
+                                            class="text-[10px] font-black uppercase tracking-widest text-orange-600 bg-orange-50 px-3 py-1 rounded-full">Aberto</span>
+                                    </div>
+                                    <div class="space-y-3">
+                                        @forelse($publicEvents as $event)
+                                            <div class="flex items-center justify-between text-sm font-bold">
+                                                <span class="line-clamp-1">{{ $event->name }}</span>
+                                                <span class="text-orange-600">{{ $event->eventType->name }}</span>
+                                            </div>
+                                        @empty
+                                            <div class="text-sm text-gray-500">Sem eventos públicos no momento.</div>
+                                        @endforelse
+                                    </div>
+                                </div>
+                                <div class="mt-5 grid grid-cols-2 gap-3 text-center">
+                                    <div class="bg-white/10 rounded-2xl py-4 border border-white/10">
+                                        <p class="text-[9px] text-orange-200 uppercase tracking-widest">Jejum & Oração
+                                        </p>
+                                        <p class="text-white font-black text-lg">Unidos</p>
+                                    </div>
+                                    <div class="bg-white/10 rounded-2xl py-4 border border-white/10">
+                                        <p class="text-[9px] text-blue-200 uppercase tracking-widest">Público</p>
+                                        <p class="text-white font-black text-lg">Aberto</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="absolute -bottom-8 -right-8 w-24 h-24 orange-gradient rounded-full blur-[60px] opacity-60">
+                    </div>
+                </div>
             </div>
 
             <!-- Stats Preview -->
@@ -434,13 +714,10 @@
                 </div>
             </div>
         </div>
-        </div>
 
         <div class="scroll-indicator absolute bottom-10 left-1/2 text-white/60 cursor-pointer z-10">
             <a href="#features"><i class="bi bi-chevron-down text-3xl animate-bounce"></i></a>
         </div>
-    </section>
-
     </section>
 
     <!-- Vision & Values Section -->
@@ -486,7 +763,7 @@
                 <div class="lg:w-1/2 relative">
                     <div
                         class="relative aspect-video rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl group">
-                        <iframe class="w-full h-full" src="https://www.youtube.com/embed/sHLqLp_7Uv8"
+                        <iframe class="w-full h-full" src="https://www.youtube.com/embed/sHLqLp_7Uv8" loading="lazy"
                             title="Visão Life Church" frameborder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                             allowfullscreen>
@@ -775,7 +1052,7 @@
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="mobile-scroll-row grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div class="feature-card card-float p-10 rounded-3xl group cursor-pointer">
                     <div
                         class="w-16 h-16 orange-gradient rounded-2xl flex items-center justify-center text-3xl text-white mb-8 feature-icon shadow-lg">
@@ -862,7 +1139,7 @@
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="mobile-scroll-row grid grid-cols-1 md:grid-cols-3 gap-8">
                 @forelse($events as $event)
                     <div class="event-card bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-lg">
                         <div class="p-8">
@@ -1021,8 +1298,7 @@
 
                 <div class="relative">
                     <div class="aspect-square rounded-[3rem] overflow-hidden shadow-2xl">
-                        <img src="https://images.unsplash.com/photo-1438232992991-995b7058bbb3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
-                            alt="Worship"
+                        <img src="{{ asset('images/hero-1.jpg') }}" alt="Culto Life Church"
                             class="w-full h-full object-cover hover:scale-110 transition-transform duration-700">
                     </div>
                     <div
@@ -1043,8 +1319,8 @@
     <!-- YouTube Section -->
     <section id="online" class="py-32 bg-black relative overflow-hidden">
         <div class="absolute inset-0 opacity-20">
-            <div
-                class="absolute top-0 left-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')] bg-cover bg-center">
+            <div class="absolute top-0 left-0 w-full h-full bg-center bg-no-repeat bg-contain"
+                style="background-image: url('{{ asset('images/map-family.png') }}');">
             </div>
             <div class="absolute inset-0 bg-black/50"></div>
         </div>
@@ -1101,7 +1377,7 @@
                     de nossas escolas de formação.</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="mobile-scroll-row grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @forelse($activeCourses as $course)
                     <div
                         class="bg-gray-50 p-8 rounded-[3rem] border border-gray-100 group hover:bg-white hover:shadow-2xl transition-all duration-500">
@@ -1285,7 +1561,10 @@
 
             <div
                 class="pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6 text-gray-400 text-[10px] font-bold uppercase tracking-[0.3em]">
-                <div>&copy; 2025 Portal Life Church. Todos os direitos reservados.</div>
+                <div>&copy;
+                    <script>document.write(new Date().getFullYear());</script> - Portal Life Church. Todos os direitos
+                    reservados.
+                </div>
                 <div class="flex space-x-8">
                     <a href="#" class="hover:text-orange-600 transition">Privacidade</a>
                     <a href="#" class="hover:text-orange-600 transition">Termos</a>
@@ -1349,29 +1628,83 @@
         });
 
         // Scroll to Top Button
-        const scrollToTopBtn = document.getElementById('scrollToTop');
+        window.addEventListener('load', () => {
+            const scrollToTopBtn = document.getElementById('scrollToTop');
+            if (!scrollToTopBtn) return;
 
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 500) {
-                scrollToTopBtn.classList.remove('opacity-0', 'pointer-events-none');
-                scrollToTopBtn.classList.add('opacity-100');
-            } else {
-                scrollToTopBtn.classList.add('opacity-0', 'pointer-events-none');
-                scrollToTopBtn.classList.remove('opacity-100');
-            }
-        });
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 500) {
+                    scrollToTopBtn.classList.remove('opacity-0', 'pointer-events-none');
+                    scrollToTopBtn.classList.add('opacity-100');
+                } else {
+                    scrollToTopBtn.classList.add('opacity-0', 'pointer-events-none');
+                    scrollToTopBtn.classList.remove('opacity-100');
+                }
+            });
 
-        scrollToTopBtn.addEventListener('click', () => {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
+            scrollToTopBtn.addEventListener('click', () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
             });
         });
+
+        window.addEventListener('load', () => {
+            const heroSlides = Array.from(document.querySelectorAll('.hero-slide'));
+            const heroDots = Array.from(document.querySelectorAll('.hero-slide-dot'));
+            if (!heroSlides.length) return;
+
+            let heroIndex = 0;
+            const setHeroSlide = (index) => {
+                heroSlides.forEach((slide, i) => {
+                    const isActive = i === index;
+                    slide.classList.toggle('is-active', isActive);
+                    slide.classList.toggle('is-hidden', !isActive);
+                });
+                heroDots.forEach((dot, i) => {
+                    dot.classList.toggle('bg-white/40', i === index);
+                    dot.classList.toggle('bg-white/20', i !== index);
+                });
+            };
+
+            setHeroSlide(0);
+            heroDots.forEach((dot, i) => {
+                dot.addEventListener('click', () => {
+                    heroIndex = i;
+                    setHeroSlide(heroIndex);
+                });
+            });
+
+            setInterval(() => {
+                heroIndex = (heroIndex + 1) % heroSlides.length;
+                setHeroSlide(heroIndex);
+            }, 6500);
+        });
     </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(() => { });
+        }
+    </script>
+
+    @php
+        $whatsappRaw = \App\Models\Setting::get('church.phone', '');
+        $whatsappNumber = preg_replace('/\D+/', '', $whatsappRaw);
+    @endphp
+
+    @if($whatsappNumber)
+        <a href="https://wa.me/{{ $whatsappNumber }}" target="_blank" rel="noopener"
+            class="fixed bottom-8 left-8 z-50 w-14 h-14 bg-gradient-to-br from-emerald-500 to-green-600 text-white rounded-full shadow-2xl hover:shadow-green-500/50 transition-all duration-300 hover:scale-110 group flex items-center justify-center"
+            aria-label="Falar no WhatsApp">
+            <i class="bi bi-whatsapp text-2xl group-hover:scale-110 transition-transform"></i>
+        </a>
+    @endif
 
     <!-- Scroll to Top Button -->
     <button id="scrollToTop"
-        class="fixed bottom-8 right-8 z-50 w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-full shadow-2xl hover:shadow-orange-500/50 transition-all duration-300 opacity-0 pointer-events-none hover:scale-110 group">
+        class="fixed bottom-8 right-8 z-50 w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-full shadow-2xl hover:shadow-orange-500/50 transition-all duration-300 opacity-0 pointer-events-none hover:scale-110 group"
+        aria-label="Voltar ao topo">
         <i class="bi bi-arrow-up text-xl group-hover:animate-bounce"></i>
     </button>
 </body>

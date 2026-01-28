@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('title', 'Gestão de Células - Portal Life Church')
+@section('page-title', 'Gestão de Células')
 
-@section('content')
 @section('header-actions')
     <div class="md:hidden">
         <a href="{{ route('cells.create') }}"
@@ -60,21 +60,23 @@
                 </div>
             </div>
         </div>
+
         <!-- Header -->
-        <div class="bg-white p-6 md:p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col lg:flex-row justify-between items-center gap-6 transition-all">
-            <div class="flex-1 w-full lg:max-w-md relative group">
-                <form action="{{ route('cells.index') }}" method="GET" class="contents">
-                    <i class="bi bi-search absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors"></i>
-                    <input type="text" name="search" value="{{ request('search') }}"
-                        placeholder="Pesquisar célula, líder ou zona..."
-                        class="w-full pl-14 pr-6 py-4 bg-gray-50/50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all"
-                        @input.debounce.500ms="$el.form.submit()">
-                </form>
+        <div class="bg-white p-6 md:p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 transition-all">
+            <div class="space-y-1">
+                <div class="flex items-center gap-2 text-xs font-bold text-blue-600 uppercase tracking-widest mb-1">
+                    <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                        <i class="bi bi-diagram-3-fill"></i>
+                    </div>
+                    <span>Comunhão</span>
+                </div>
+                <h1 class="text-3xl font-black text-gray-900 tracking-tight uppercase">Gestão de Células</h1>
+                <p class="text-gray-500 font-medium">Controle de liderança, membros e expansão das células</p>
             </div>
 
-            <div class="flex flex-wrap items-center justify-center md:justify-end gap-4 w-full lg:w-auto">
+            <div class="flex flex-wrap items-center gap-4">
                 {{-- View Switcher --}}
-                <div class="flex bg-gray-100/50 p-1.5 rounded-2xl border border-gray-100">
+                <div class="hidden md:flex bg-gray-100/50 p-1.5 rounded-2xl border border-gray-100">
                     <button @click="view = 'grid'" 
                         :class="view === 'grid' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
                         class="px-4 py-2 rounded-xl transition-all duration-300 flex items-center gap-2">
@@ -89,37 +91,46 @@
                     </button>
                 </div>
 
-                <a href="{{ route('cells.create') }}" class="group flex items-center bg-blue-600 text-white px-8 py-4 rounded-2xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-200">
-                    <i class="bi bi-plus-circle text-lg mr-2 group-hover:scale-110 transition-transform"></i>
-                    Nova Célula
-                </a>
+                <div class="hidden md:flex gap-3">
+                    <a href="{{ route('cells.create') }}" class="group flex items-center bg-blue-600 text-white px-8 py-4 rounded-2xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-200">
+                        <i class="bi bi-plus-circle text-lg mr-2 group-hover:scale-110 transition-transform"></i>
+                        Nova Célula
+                    </a>
+                </div>
             </div>
         </div>
 
         <!-- Filters Panel -->
-        <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100">
-            <form action="{{ route('cells.index') }}" method="GET" class="flex flex-col md:flex-row gap-4">
-                @if(request('search'))
-                    <input type="hidden" name="search" value="{{ request('search') }}">
-                @endif
-                
-                @if(count($zones) > 1)
-                    <div class="w-full md:w-64">
-                        <select name="zone" onchange="this.form.submit()"
-                            class="w-full px-6 py-4 bg-gray-50/50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700">
-                            <option value="">Todas as Zonas</option>
-                            @foreach($zones as $zone)
-                                <option value="{{ $zone->id }}" {{ request('zone') == $zone->id ? 'selected' : '' }}>
-                                    {{ $zone->name }}
-                                </option>
-                            @endforeach
-                        </select>
+        <div class="bg-gray-50/50 p-6 rounded-[2rem] border border-gray-100 shadow-sm">
+            <form action="{{ route('cells.index') }}" method="GET" class="flex flex-wrap items-end gap-4">
+                <div class="flex-1 min-w-[300px] space-y-2">
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Pesquisar</label>
+                    <div class="relative group">
+                        <i class="bi bi-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors"></i>
+                        <input type="text" name="search" value="{{ request('search') }}"
+                            placeholder="Célula, líder ou zona..."
+                            class="w-full pl-12 pr-6 py-3 bg-white border-transparent focus:ring-4 focus:ring-blue-100 rounded-xl text-sm font-bold transition-all"
+                            @input.debounce.500ms="$el.form.submit()">
                     </div>
-                @endif
+                </div>
 
-                <div class="w-full md:w-64">
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Zona</label>
+                    <select name="zone" onchange="this.form.submit()"
+                        class="px-6 py-3 bg-white border-transparent focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-xl transition-all font-bold text-gray-700 text-sm min-w-[200px]">
+                        <option value="">Todas as Zonas</option>
+                        @foreach($zones as $zone)
+                            <option value="{{ $zone->id }}" {{ request('zone') == $zone->id ? 'selected' : '' }}>
+                                {{ $zone->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Supervisão</label>
                     <select name="supervision" onchange="this.form.submit()"
-                        class="w-full px-6 py-4 bg-gray-50/50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700">
+                        class="px-6 py-3 bg-white border-transparent focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-xl transition-all font-bold text-gray-700 text-sm min-w-[220px]">
                         <option value="">Todas as Supervisões</option>
                         @foreach($supervisions as $supervision)
                             <option value="{{ $supervision->id }}" {{ request('supervision') == $supervision->id ? 'selected' : '' }}>
@@ -130,10 +141,12 @@
                 </div>
 
                 @if(request()->hasAny(['search', 'zone', 'supervision']))
-                    <a href="{{ route('cells.index') }}"
-                        class="flex items-center gap-2 px-6 py-4 text-red-600 bg-red-50 hover:bg-red-100 rounded-2xl transition-all font-black text-[10px] uppercase tracking-widest ml-auto">
-                        <i class="bi bi-x-circle-fill"></i> Limpar Filtros
-                    </a>
+                    <div class="flex gap-2">
+                        <a href="{{ route('cells.index') }}"
+                            class="flex items-center gap-2 px-6 py-3 text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-all font-black text-[10px] uppercase tracking-widest">
+                            <i class="bi bi-x-circle-fill"></i> Limpar
+                        </a>
+                    </div>
                 @endif
             </form>
         </div>

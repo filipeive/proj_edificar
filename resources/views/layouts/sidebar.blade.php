@@ -12,6 +12,7 @@
         }
         $pendingContributionsCount = $pendingQuery->count();
     }
+    $logoPrimary = \App\Models\Setting::get('branding.logo_primary', asset('images/logo.png'));
 @endphp
 <aside id="sidebar"
     class="sidebar-expanded bg-black text-white flex flex-col overflow-y-auto shadow-2xl transition-all duration-300 ease-in-out border-r border-white/5">
@@ -20,7 +21,7 @@
         class="px-6 py-8 border-b border-white/5 flex items-center justify-between bg-black/50 backdrop-blur-xl sticky top-0 z-20">
         <div class="flex items-center space-x-3 overflow-hidden">
             <div class="flex-shrink-0 p-2 bg-orange-600 rounded-xl shadow-lg shadow-orange-600/20">
-                <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-8 w-auto brightness-0 invert">
+                <img src="{{ $logoPrimary }}" alt="Logo" class="h-8 w-auto brightness-0 invert">
             </div>
             <div class="sidebar-text">
                 <h1 class="text-lg font-black tracking-tighter text-white uppercase leading-none">Life - APP</h1>
@@ -395,3 +396,37 @@
     </div>
     @endif
 </aside>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const sidebar = document.getElementById('sidebar');
+        if (!sidebar) return;
+
+        const activeItem = sidebar.querySelector(
+            '.nav-item.bg-orange-600, .nav-item.bg-blue-600, .nav-item.bg-indigo-600, .nav-item.bg-zinc-900, .nav-item.bg-zinc-900\\/50'
+        );
+        if (!activeItem) return;
+
+        const scrollContainer = activeItem.closest('.custom-scrollbar') || sidebar;
+        const stickyHeader = sidebar.querySelector('.sticky.top-0');
+        const headerOffset = stickyHeader ? stickyHeader.offsetHeight + 12 : 24;
+
+        const runScroll = () => {
+            const visibleTop = scrollContainer.scrollTop + headerOffset;
+            const visibleBottom = scrollContainer.scrollTop + scrollContainer.clientHeight - 16;
+            const itemTop = activeItem.offsetTop;
+            const itemBottom = itemTop + activeItem.offsetHeight;
+
+            const targetTop = itemTop - headerOffset;
+            const shouldScroll = itemTop < visibleTop || itemBottom > visibleBottom;
+            if (shouldScroll) {
+                scrollContainer.scrollTo({ top: Math.max(targetTop, 0), behavior: 'smooth' });
+            }
+
+            activeItem.classList.add('nav-item-highlight');
+            setTimeout(() => activeItem.classList.remove('nav-item-highlight'), 1800);
+        };
+
+        requestAnimationFrame(() => setTimeout(runScroll, 60));
+    });
+</script>

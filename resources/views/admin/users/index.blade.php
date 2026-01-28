@@ -51,9 +51,55 @@
     }"
     x-init="$watch('view', value => localStorage.setItem('users_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('users_view') || 'list')"
     @resize.window.debounce.500ms="updateView()">
+
+        <!-- Header -->
+        <div class="bg-white p-6 md:p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 transition-all">
+            <div class="space-y-1">
+                <div class="flex items-center gap-2 text-xs font-bold text-blue-600 uppercase tracking-widest mb-1">
+                    <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <span>Administração</span>
+                </div>
+                <h1 class="text-3xl font-black text-gray-900 tracking-tight uppercase">Utilizadores</h1>
+                <p class="text-gray-500 font-medium">Gestão de membros, líderes e permissões de acesso</p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-4">
+                {{-- View Switcher --}}
+                <div class="hidden md:flex bg-gray-100/50 p-1.5 rounded-2xl border border-gray-100">
+                    <button @click="view = 'list'" 
+                        :class="view === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
+                        class="px-4 py-2 rounded-xl transition-all duration-300 flex items-center gap-2">
+                        <i class="bi bi-list-ul text-sm"></i>
+                        <span class="text-[10px] font-black uppercase tracking-widest leading-none">Lista</span>
+                    </button>
+                    <button @click="view = 'grid'" 
+                        :class="view === 'grid' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
+                        class="px-4 py-2 rounded-xl transition-all duration-300 flex items-center gap-2">
+                        <i class="bi bi-grid-fill text-sm"></i>
+                        <span class="text-[10px] font-black uppercase tracking-widest leading-none">Cards</span>
+                    </button>
+                </div>
+
+                <div class="hidden md:flex gap-3">
+                    <button type="button" x-show="selectedUsers.length > 0" x-cloak @click="bulkDelete()"
+                        class="group flex items-center bg-red-600 text-white px-8 py-4 rounded-2xl hover:bg-red-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-red-200">
+                        <i class="bi bi-trash-fill text-lg mr-2 group-hover:scale-110 transition-transform"></i>
+                        Deletar (<span x-text="selectedUsers.length"></span>)
+                    </button>
+
+                    <a href="{{ route('users.create') }}" class="group flex items-center bg-blue-600 text-white px-8 py-4 rounded-2xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-200">
+                        <i class="bi bi-person-plus-fill text-lg mr-2 group-hover:scale-110 transition-transform"></i>
+                        Novo Utilizador
+                    </a>
+                </div>
+            </div>
+        </div>
+
         <!-- Global Stats Row -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="hidden md:flex bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 items-center justify-between group hover:shadow-xl transition-all">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 hidden md:flex" x-show="view === 'list'">
+            <div class="flex bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 items-center justify-between group hover:shadow-xl transition-all">
                 <div class="space-y-1">
                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Geral</p>
                     <p class="text-3xl font-black text-gray-900">{{ $totalUsers }}</p>
@@ -62,27 +108,27 @@
                     <i class="bi bi-people-fill"></i>
                 </div>
             </div>
-            <div class="hidden md:flex bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 items-center justify-between group hover:shadow-xl transition-all">
+            <div class="flex bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 items-center justify-between group hover:shadow-xl transition-all">
                 <div class="space-y-1">
-                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Membros Ativos</p>
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Membros</p>
                     <p class="text-3xl font-black text-green-600">{{ $totalMembers }}</p>
                 </div>
                 <div class="w-16 h-16 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center text-2xl group-hover:bg-green-600 group-hover:text-white transition-all">
                     <i class="bi bi-person-check-fill"></i>
                 </div>
             </div>
-            <div class="hidden md:flex bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 items-center justify-between group hover:shadow-xl transition-all">
+            <div class="flex bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 items-center justify-between group hover:shadow-xl transition-all">
                 <div class="space-y-1">
-                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Corpo de Liderança</p>
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Liderança</p>
                     <p class="text-3xl font-black text-purple-600">{{ $totalLeaders }}</p>
                 </div>
                 <div class="w-16 h-16 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-2xl group-hover:bg-purple-600 group-hover:text-white transition-all">
                     <i class="bi bi-person-badge-fill"></i>
                 </div>
             </div>
-            <div class="hidden md:flex bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 items-center justify-between group hover:shadow-xl transition-all">
+            <div class="flex bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 items-center justify-between group hover:shadow-xl transition-all">
                 <div class="space-y-1">
-                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Acessos Ativos</p>
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Ativos</p>
                     <p class="text-3xl font-black text-orange-600">{{ $totalActive }}</p>
                 </div>
                 <div class="w-16 h-16 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center text-2xl group-hover:bg-orange-600 group-hover:text-white transition-all">
@@ -92,89 +138,56 @@
         </div>
 
         <!-- Filter & Search Bar -->
-        <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
+        <div class="bg-gray-50/50 p-6 rounded-[2rem] shadow-sm border border-gray-100">
             <form action="{{ route('users.index') }}" method="GET" class="space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-6 pb-6 border-b border-gray-50">
-                    <div class="md:col-span-4 relative">
-                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Pesquisa Global</label>
-                        <input type="text" name="search" id="liveSearch" value="{{ request('search') }}" placeholder="Nome, email ou telefone..." 
-                            class="w-full pl-12 pr-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold text-sm">
-                        <i class="bi bi-search absolute left-5 top-11 text-gray-400"></i>
-                        <div id="searchSpinner" class="hidden absolute right-5 top-11">
-                            <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                    <div class="md:col-span-5 space-y-2">
+                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Pesquisar</label>
+                        <div class="relative group">
+                            <i class="bi bi-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors"></i>
+                            <input type="text" name="search" id="liveSearch" value="{{ request('search') }}" placeholder="Nome, email ou telefone..." 
+                                class="w-full pl-12 pr-6 py-3 bg-white border-transparent focus:ring-4 focus:ring-blue-100 rounded-xl font-bold text-sm transition-all">
+                            <div id="searchSpinner" class="hidden absolute right-5 top-1/2 -translate-y-1/2">
+                                <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </div>
                         </div>
                     </div>
-                    <div class="md:col-span-2">
-                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Papel Hierárquico</label>
-                        <select name="role" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold text-sm appearance-none">
-                            <option value="">Qualquer Role</option>
-                            <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                            <option value="pastor_zona" {{ request('role') == 'pastor_zona' ? 'selected' : '' }}>Pastor</option>
+                    <div class="md:col-span-3 space-y-2">
+                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nível</label>
+                        <select name="role" class="w-full px-6 py-3 bg-white border-transparent focus:ring-4 focus:ring-blue-100 rounded-xl font-bold text-sm appearance-none transition-all">
+                            <option value="">Todos os Papéis</option>
+                            <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Administrador</option>
+                            <option value="pastor_zona" {{ request('role') == 'pastor_zona' ? 'selected' : '' }}>Pastor de Zona</option>
                             <option value="supervisor" {{ request('role') == 'supervisor' ? 'selected' : '' }}>Supervisor</option>
-                            <option value="lider_celula" {{ request('role') == 'lider_celula' ? 'selected' : '' }}>Líder</option>
+                            <option value="lider_celula" {{ request('role') == 'lider_celula' ? 'selected' : '' }}>Líder de Célula</option>
                             <option value="membro" {{ request('role') == 'membro' ? 'selected' : '' }}>Membro</option>
                         </select>
                     </div>
-                    <div class="md:col-span-2">
-                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Status da Conta</label>
-                        <select name="status" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold text-sm appearance-none">
+                    <div class="md:col-span-2 space-y-2">
+                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Status</label>
+                        <select name="status" class="w-full px-6 py-3 bg-white border-transparent focus:ring-4 focus:ring-blue-100 rounded-xl font-bold text-sm appearance-none transition-all">
                             <option value="">Qualquer Status</option>
                             <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Ativos</option>
                             <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inativos</option>
                         </select>
                     </div>
-                    <div class="md:col-span-4 flex items-end gap-3">
-                        <!-- View Toggle -->
-                        <div class="hidden md:flex bg-gray-50 p-1 rounded-2xl border border-gray-100 h-14">
-                            <button type="button" @click="view = 'list'" 
-                                :class="view === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
-                                class="px-4 rounded-xl transition-all duration-300">
-                                <i class="bi bi-list-ul"></i>
-                            </button>
-                            <button type="button" @click="view = 'grid'" 
-                                :class="view === 'grid' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
-                                class="px-4 rounded-xl transition-all duration-300">
-                                <i class="bi bi-grid-fill"></i>
-                            </button>
-                        </div>
-
-                        <button type="submit" id="filterBtn" class="flex-1 h-14 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-100 flex items-center justify-center gap-2 hover:bg-blue-700 transition-all">
-                            <i class="bi bi-funnel-fill"></i> Filtrar
+                    <div class="md:col-span-2 flex gap-2">
+                        <button type="submit" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all">
+                            Filtrar
                         </button>
-                        
-                        <!-- Bulk Delete Button -->
-                        <button type="button" x-show="selectedUsers.length > 0" x-cloak @click="bulkDelete()"
-                            class="flex-1 h-14 bg-red-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-red-100 flex items-center justify-center gap-2 hover:bg-red-700 transition-all">
-                            <i class="bi bi-trash-fill"></i> Deletar (<span x-text="selectedUsers.length"></span>)
-                        </button>
-                        
-                        <a href="{{ route('users.create') }}" class="hidden md:flex w-14 h-14 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center hover:bg-green-600 hover:text-white transition-all shadow-sm">
-                            <i class="bi bi-plus-lg text-2xl"></i>
-                        </a>
+                        @if(request()->hasAny(['search', 'role', 'status']))
+                            <a href="{{ route('users.index') }}" class="px-4 py-3 bg-red-50 text-red-600 rounded-xl flex items-center justify-center hover:bg-red-100 transition-all">
+                                <i class="bi bi-x-lg"></i>
+                            </a>
+                        @endif
                     </div>
                 </div>
-
-                @if(request()->hasAny(['search', 'role', 'status', 'cell_id']))
-                    <div class="flex items-center gap-3">
-                        <span class="text-[10px] font-black text-gray-300 uppercase tracking-widest">Filtros Ativos:</span>
-                        <div class="flex flex-wrap gap-2">
-                            @if(request('search'))
-                                <span class="px-4 py-1.5 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-100">"{{ request('search') }}"</span>
-                            @endif
-                            @if(request('role'))
-                                <span class="px-4 py-1.5 bg-purple-50 text-purple-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-purple-100">{{ request('role') }}</span>
-                            @endif
-                            @if(request('status'))
-                                <span class="px-4 py-1.5 bg-green-50 text-green-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-green-100">{{ request('status') }}</span>
-                            @endif
-                        </div>
-                    </div>
-                @endif
             </form>
         </div>
+
 
         <!-- List View -->
         <div x-show="view === 'list'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"

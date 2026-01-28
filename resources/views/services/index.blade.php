@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('title', 'Gestão de Cultos - Portal Life Church')
+@section('page-title','Gestão de Cultos')
+@section('page-description', 'Gestão de Cultos')
 
 @section('header-actions')
     <div class="flex items-center gap-2 md:hidden">

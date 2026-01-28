@@ -170,6 +170,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/update', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('update');
             Route::post('/upload-logo', [\App\Http\Controllers\Admin\SettingController::class, 'uploadLogo'])->name('upload-logo');
             Route::post('/reset', [\App\Http\Controllers\Admin\SettingController::class, 'resetToDefaults'])->name('reset');
+            Route::get('/backup', [\App\Http\Controllers\Admin\SettingController::class, 'backup'])->name('backup');
         });
 
         // Intermediate Restricted (Admin, Pastor Zona, Supervisor, Secretaria, Lider Celula)
@@ -230,6 +231,7 @@ Route::middleware('auth')->group(function () {
         Route::post('packages/{package}/quick-member', [PackageController::class, 'storeQuickMember'])->name('packages.quick-member');
         Route::post('packages/{package}/members/{user}/send-sms', [PackageController::class, 'sendMemberSms'])->name('packages.members.send-sms');
         Route::get('packages/{package}/export', [PackageController::class, 'export'])->name('packages.export');
+        Route::get('packages/{package}/export-pdf', [PackageController::class, 'exportPdf'])->name('packages.export-pdf');
 
         // Members Management
         Route::delete('packages/{package}/members/{user}', [PackageController::class, 'removeMember'])->name('packages.members.remove');

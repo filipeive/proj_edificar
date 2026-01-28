@@ -375,86 +375,7 @@
             overflow: hidden;
         }
 
-        /* Toast Container - Fixed Position */
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-width: 420px;
-            width: calc(100% - 40px);
-        }
-
-        @media (max-width: 640px) {
-            .toast-container {
-                top: 10px;
-                right: 10px;
-                width: calc(100% - 20px);
-            }
-        }
-
-        /* Enhanced Toast Styles */
-        .toast {
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            transform-origin: right center;
-        }
-
-        @keyframes slideInFromRight {
-            from {
-                opacity: 0;
-                transform: translateX(400px) scale(0.9);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0) scale(1);
-            }
-        }
-
-        @keyframes slideOutToRight {
-            from {
-                opacity: 1;
-                transform: translateX(0) scale(1);
-            }
-
-            to {
-                opacity: 0;
-                transform: translateX(400px) scale(0.9);
-            }
-        }
-
-        .toast-enter {
-            animation: slideInFromRight 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-
-        .toast-exit {
-            animation: slideOutToRight 0.3s cubic-bezier(0.6, -0.28, 0.735, 0.045);
-        }
-
-        /* Progress Bar */
-        .toast-progress {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            height: 4px;
-            background: currentColor;
-            opacity: 0.3;
-            animation: progressBar 5s linear;
-        }
-
-        @keyframes progressBar {
-            from {
-                width: 100%;
-            }
-
-            to {
-                width: 0%;
-            }
-        }
+        /* SweetAlert notifications are now used globally - toast CSS removed */
 
         /* Custom Scrollbar for Sidebar */
         .custom-scrollbar::-webkit-scrollbar {
@@ -503,6 +424,7 @@
         }
 
         @media (max-width: 767px) {
+
             .header-actions a,
             .header-actions button {
                 display: inline-flex;
@@ -569,6 +491,36 @@
             padding: 0.75rem 0.875rem !important;
         }
 
+        .nav-item-highlight {
+            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.25), 0 10px 24px rgba(249, 115, 22, 0.18);
+            transition: box-shadow 0.6s ease;
+        }
+
+        .phone-prefix-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .phone-prefix-label {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            font-weight: 800;
+            color: #6b7280;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 999px;
+            padding: 2px 8px;
+            letter-spacing: 0.08em;
+        }
+
+        .phone-prefix-input {
+            padding-left: 84px !important;
+        }
+
         .line-clamp-1,
         .line-clamp-2 {
             display: -webkit-box;
@@ -605,6 +557,23 @@
             justify-content: center;
             border-radius: 0.75rem;
             transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .searchable-select-input {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            background: #f9fafb;
+        }
+
+        .searchable-select-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
         }
     </style>
 </head>
@@ -787,92 +756,19 @@
         </div>
     </div>
 
-    <!-- Toast Container (Floating) -->
-    <div class="toast-container" id="toastContainer">
-        @if ($message = Session::get('success'))
-            <div id="successToast"
-                class="toast relative p-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl flex items-center justify-between shadow-2xl"
-                role="alert">
-                <div class="flex items-center">
-                    <div class="bg-white/20 backdrop-blur-sm p-2 rounded-lg mr-3">
-                        <i class="bi bi-check-circle-fill text-2xl"></i>
-                    </div>
-                    <div>
-                        <p class="font-bold text-sm">Sucesso!</p>
-                        <span class="text-sm opacity-90">{{ $message }}</span>
-                    </div>
-                </div>
-                <button onclick="closeToast('successToast')"
-                    class="text-white/80 hover:text-white p-2 ml-4 hover:bg-white/10 rounded-lg transition">
-                    <i class="bi bi-x-lg text-lg"></i>
-                </button>
-                <div class="toast-progress"></div>
-            </div>
-        @endif
-
-        @if ($message = Session::get('error'))
-            <div id="errorToast"
-                class="toast relative p-4 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl flex items-center justify-between shadow-2xl"
-                role="alert">
-                <div class="flex items-center">
-                    <div class="bg-white/20 backdrop-blur-sm p-2 rounded-lg mr-3">
-                        <i class="bi bi-exclamation-circle-fill text-2xl"></i>
-                    </div>
-                    <div>
-                        <p class="font-bold text-sm">Erro!</p>
-                        <span class="text-sm opacity-90">{{ $message }}</span>
-                    </div>
-                </div>
-                <button onclick="closeToast('errorToast')"
-                    class="text-white/80 hover:text-white p-2 ml-4 hover:bg-white/10 rounded-lg transition">
-                    <i class="bi bi-x-lg text-lg"></i>
-                </button>
-                <div class="toast-progress"></div>
-            </div>
-        @endif
-
-        @if ($message = Session::get('warning'))
-            <div id="warningToast"
-                class="toast relative p-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-xl flex items-center justify-between shadow-2xl"
-                role="alert">
-                <div class="flex items-center">
-                    <div class="bg-white/20 backdrop-blur-sm p-2 rounded-lg mr-3">
-                        <i class="bi bi-exclamation-triangle-fill text-2xl"></i>
-                    </div>
-                    <div>
-                        <p class="font-bold text-sm">Atenção!</p>
-                        <span class="text-sm opacity-90">{{ $message }}</span>
-                    </div>
-                </div>
-                <button onclick="closeToast('warningToast')"
-                    class="text-white/80 hover:text-white p-2 ml-4 hover:bg-white/10 rounded-lg transition">
-                    <i class="bi bi-x-lg text-lg"></i>
-                </button>
-                <div class="toast-progress"></div>
-            </div>
-        @endif
-
-        @if ($message = Session::get('info'))
-            <div id="infoToast"
-                class="toast relative p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl flex items-center justify-between shadow-2xl"
-                role="alert">
-                <div class="flex items-center">
-                    <div class="bg-white/20 backdrop-blur-sm p-2 rounded-lg mr-3">
-                        <i class="bi bi-info-circle-fill text-2xl"></i>
-                    </div>
-                    <div>
-                        <p class="font-bold text-sm">Informação</p>
-                        <span class="text-sm opacity-90">{{ $message }}</span>
-                    </div>
-                </div>
-                <button onclick="closeToast('infoToast')"
-                    class="text-white/80 hover:text-white p-2 ml-4 hover:bg-white/10 rounded-lg transition">
-                    <i class="bi bi-x-lg text-lg"></i>
-                </button>
-                <div class="toast-progress"></div>
-            </div>
-        @endif
-    </div>
+    <!-- SweetAlert Session Messages -->
+    @if ($message = Session::get('success'))
+        <script>document.addEventListener('DOMContentLoaded', () => window.showSuccess(@json($message)));</script>
+    @endif
+    @if ($message = Session::get('error'))
+        <script>document.addEventListener('DOMContentLoaded', () => window.showError(@json($message)));</script>
+    @endif
+    @if ($message = Session::get('warning'))
+        <script>document.addEventListener('DOMContentLoaded', () => window.showWarning(@json($message)));</script>
+    @endif
+    @if ($message = Session::get('info'))
+        <script>document.addEventListener('DOMContentLoaded', () => window.showInfo(@json($message)));</script>
+    @endif
 
     <script>
         // DOM Elements
@@ -1046,6 +942,219 @@
         const debouncedDesktopSearch = debounce((q) => handleSearch(q, false), 300);
         const debouncedMobileSearch = debounce((q) => handleSearch(q, true), 300);
 
+        function initSearchableSelects() {
+            const selects = document.querySelectorAll('select:not([data-searchable=\"false\"]):not([data-searchable-ready])');
+            selects.forEach((select) => {
+                if (select.multiple || select.size > 1) return;
+                const options = Array.from(select.options);
+                if (options.length <= 6) return;
+                select.setAttribute('data-searchable-ready', 'true');
+                const wrapper = document.createElement('div');
+                wrapper.className = 'relative';
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'searchable-select-input';
+                input.placeholder = select.dataset.searchPlaceholder || 'Escreva o nome ou pesquise...';
+                input.setAttribute('autocomplete', 'off');
+
+                const listId = `searchable-${Math.random().toString(36).slice(2)}`;
+                input.setAttribute('list', listId);
+
+                const dataList = document.createElement('datalist');
+                dataList.id = listId;
+
+                options.forEach((opt, index) => {
+                    if (index === 0) return;
+                    const optionEl = document.createElement('option');
+                    optionEl.value = opt.text;
+                    optionEl.dataset.value = opt.value;
+                    dataList.appendChild(optionEl);
+                });
+
+                // Initialize input text with current selection
+                const selectedOption = select.options[select.selectedIndex];
+                if (selectedOption && selectedOption.value) {
+                    input.value = selectedOption.text;
+                }
+
+                input.addEventListener('input', () => {
+                    const match = Array.from(dataList.options).find(opt => opt.value === input.value);
+                    if (match) {
+                        select.value = match.dataset.value;
+                        select.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                });
+
+                const shouldOpenOnFocus = select.dataset.searchOpen !== 'false';
+                if (shouldOpenOnFocus) {
+                    input.addEventListener('focus', () => {
+                        const currentValue = input.value;
+                        input.value = currentValue ? `${currentValue} ` : ' ';
+                        input.dispatchEvent(new Event('input', { bubbles: true }));
+                        setTimeout(() => {
+                            input.value = currentValue;
+                            input.setSelectionRange(currentValue.length, currentValue.length);
+                        }, 0);
+                    });
+                }
+
+                input.addEventListener('blur', () => {
+                    const match = Array.from(dataList.options).find(opt => opt.value === input.value);
+                    if (!match) {
+                        input.value = '';
+                        select.value = '';
+                    }
+                });
+
+                const labelText = getSelectLabelText(select);
+                if (labelText && !hasSelectLabel(select)) {
+                    const label = document.createElement('label');
+                    label.className = 'block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2';
+                    if (!select.id) {
+                        select.id = `select-${Math.random().toString(36).slice(2)}`;
+                    }
+                    label.setAttribute('for', select.id);
+                    label.textContent = labelText;
+                    wrapper.appendChild(label);
+                }
+
+                select.style.display = 'none';
+                select.parentNode.insertBefore(wrapper, select);
+                wrapper.appendChild(input);
+                wrapper.appendChild(dataList);
+                wrapper.appendChild(select);
+            });
+        }
+
+        function hasSelectLabel(select) {
+            if (select.closest('label')) return true;
+            if (select.id && document.querySelector(`label[for="${select.id}"]`)) return true;
+            if (select.previousElementSibling && select.previousElementSibling.tagName === 'LABEL') return true;
+            let node = select.parentElement;
+            let depth = 0;
+            while (node && depth < 3) {
+                if (node.querySelector && node.querySelector('label')) return true;
+                node = node.parentElement;
+                depth += 1;
+            }
+            return false;
+        }
+
+        function getSelectLabelText(select) {
+            if (select.dataset.label) return select.dataset.label;
+            if (select.getAttribute('aria-label')) return select.getAttribute('aria-label');
+            if (select.name) {
+                const raw = select.name
+                    .replace(/\[\]$/g, '')
+                    .replace(/\[\d+\]/g, '')
+                    .replace(/_?id$/i, '')
+                    .replace(/[_\-]+/g, ' ')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+
+                const key = raw.toLowerCase();
+                const map = {
+                    'preacher': 'Pregador',
+                    'zone': 'Zona',
+                    'supervision': 'Supervisão',
+                    'leader': 'Líder',
+                    'cell': 'Célula',
+                    'package': 'Pacote',
+                    'role': 'Função',
+                    'status': 'Estado',
+                    'category': 'Categoria',
+                    'month': 'Mês',
+                    'year': 'Ano',
+                    'type': 'Tipo',
+                    'service type': 'Tipo de Culto',
+                    'meeting type': 'Tipo de Encontro',
+                    'event type': 'Tipo de Evento',
+                    'course': 'Curso',
+                    'course class': 'Turma',
+                    'teacher male': 'Professor (Masculino)',
+                    'teacher female': 'Professora (Feminino)',
+                    'assistant male': 'Assistente (Masculino)',
+                    'assistant female': 'Assistente (Feminino)',
+                    'responsible': 'Responsável',
+                    'pastor': 'Pastor',
+                    'gender': 'Gênero',
+                    'currency': 'Moeda',
+                    'timezone': 'Fuso Horário',
+                    'date format': 'Formato de Data',
+                };
+                if (map[key]) return map[key];
+
+                return raw.replace(/\b\w/g, (c) => c.toUpperCase());
+            }
+            return null;
+        }
+
+        function addMissingSelectLabels() {
+            const selects = document.querySelectorAll('select');
+            selects.forEach((select) => {
+                if (select.classList.contains('searchable-select')) return;
+                if (hasSelectLabel(select)) return;
+                const labelText = getSelectLabelText(select);
+                if (!labelText) return;
+                if (!select.id) {
+                    select.id = `select-${Math.random().toString(36).slice(2)}`;
+                }
+                const label = document.createElement('label');
+                label.className = 'block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2';
+                label.setAttribute('for', select.id);
+                label.textContent = labelText;
+                select.parentNode.insertBefore(label, select);
+            });
+        }
+
+        function initPhonePrefixInputs() {
+            const selector = 'input[type="tel"], input[name*="phone"], input[name*="whatsapp"]';
+            document.querySelectorAll(selector).forEach((input) => {
+                if (input.dataset.phonePrefix === 'false') return;
+                if (input.closest('.phone-prefix-wrapper')) return;
+                if (input.dataset.phonePrefixReady === 'true') return;
+                input.dataset.phonePrefixReady = 'true';
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'phone-prefix-wrapper';
+                input.parentNode.insertBefore(wrapper, input);
+                wrapper.appendChild(input);
+
+                const label = document.createElement('span');
+                label.className = 'phone-prefix-label';
+                label.textContent = '+258';
+                wrapper.appendChild(label);
+
+                input.classList.add('phone-prefix-input');
+                if (!input.placeholder) {
+                    input.placeholder = '823562000';
+                }
+
+                input.addEventListener('focus', () => {
+                    input.value = input.value.replace(/\s+/g, '');
+                    if (!input.value) {
+                        input.value = '+258';
+                    }
+                });
+
+                input.addEventListener('blur', () => {
+                    if (input.value === '+258') {
+                        input.value = '';
+                        return;
+                    }
+                    const digits = input.value.replace(/\D/g, '');
+                    if (digits.length === 9 && !input.value.startsWith('+258')) {
+                        input.value = `+258${digits}`;
+                    }
+                    const normalized = input.value.replace(/\D/g, '');
+                    if (normalized.startsWith('258') && normalized.length === 12) {
+                        const local = normalized.slice(3);
+                        input.value = `+258 ${local.slice(0, 2)} ${local.slice(2, 5)} ${local.slice(5, 9)}`;
+                    }
+                });
+            });
+        }
+
         // ===== NOTIFICATIONS FUNCTIONS =====
         function toggleNotifications() {
             notificationsPanel.classList.toggle('hidden');
@@ -1150,7 +1259,9 @@
             })
                 .then(response => response.json())
                 .then(data => {
-                    const badge = document.querySelector('.bi-bell').nextElementSibling;
+                    const bell = document.querySelector('.bi-bell');
+                    if (!bell || !bell.nextElementSibling) return;
+                    const badge = bell.nextElementSibling;
                     if (badge) {
                         badge.style.display = data.count > 0 ? 'block' : 'none';
                     }
@@ -1188,6 +1299,9 @@
             // Update notification badge periodically
             updateNotificationBadge();
             setInterval(updateNotificationBadge, 30000);
+            initSearchableSelects();
+            addMissingSelectLabels();
+            initPhonePrefixInputs();
 
             // Close dropdowns on outside click
             document.addEventListener('click', function (event) {
@@ -1305,6 +1419,26 @@
                 icon: 'error',
                 title: title,
                 text: message
+            });
+        };
+
+        window.showWarning = function (message, title = 'Atenção!') {
+            Swal.fire({
+                icon: 'warning',
+                title: title,
+                text: message,
+                timer: 4000,
+                showConfirmButton: false
+            });
+        };
+
+        window.showInfo = function (message, title = 'Informação') {
+            Swal.fire({
+                icon: 'info',
+                title: title,
+                text: message,
+                timer: 4000,
+                showConfirmButton: false
             });
         };
     </script>

@@ -8,10 +8,11 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class PackageMembersExport implements FromCollection, WithHeadings, WithTitle, WithStyles, ShouldAutoSize
+class PackageMembersExport implements FromCollection, WithHeadings, WithTitle, WithStyles, WithColumnWidths, ShouldAutoSize
 {
     protected $package;
     protected $startDate;
@@ -47,14 +48,23 @@ class PackageMembersExport implements FromCollection, WithHeadings, WithTitle, W
                     ->whereBetween('contribution_date', [$this->startDate, $this->endDate])
                     ->first();
 
+                $cell = $user->cell;
+                $supervision = $cell?->supervision;
+                $zone = $supervision?->zone;
+                $pastorZona = $zone?->pastor;
+
                 return [
+                    'ID' => $user->id,
                     'Membro' => $user->name,
                     'Telefone' => $user->phone ?? 'N/A',
-                    'Célula' => $user->cell->name ?? 'N/A',
-                    'Zona' => $user->cell->supervision->zone->name ?? 'N/A',
-                    'Comprometido' => number_format((float) $commitment->committed_amount, 2, ',', '.') . ' MT',
-                    'Contribuído?' => $contribution ? 'SIM' : 'NÃO',
+                    'Célula' => $cell->name ?? 'N/A',
+                    'Supervisão' => $supervision->name ?? 'N/A',
+                    'Zona' => $zone->name ?? 'N/A',
+                    'Pastor Zona' => $pastorZona?->name ?? 'N/A',
+                    'Valor Comprometido' => number_format((float) $commitment->committed_amount, 2, ',', '.') . ' MT',
+                    'Contribuiu no período?' => $contribution ? 'SIM' : 'NÃO',
                     'Valor Pago' => $contribution ? number_format((float) $contribution->amount, 2, ',', '.') . ' MT' : '0,00 MT',
+                    'Data da Contribuição' => $contribution ? $contribution->contribution_date->format('d/m/Y') : '-',
                 ];
             });
     }
@@ -62,13 +72,17 @@ class PackageMembersExport implements FromCollection, WithHeadings, WithTitle, W
     public function headings(): array
     {
         return [
+            'ID',
             'Membro',
             'Telefone',
             'Célula',
+            'Supervisão',
             'Zona',
+            'Pastor Zona',
             'Valor Comprometido',
-            'Contribuído? (' . $this->startDate->format('d/m') . ' - ' . $this->endDate->format('d/m') . ')',
-            'Valor Pago'
+            'Contribuiu? (' . $this->startDate->format('d/m') . ' - ' . $this->endDate->format('d/m') . ')',
+            'Valor Pago',
+            'Data da Contribuição'
         ];
     }
 
@@ -79,11 +93,30 @@ class PackageMembersExport implements FromCollection, WithHeadings, WithTitle, W
 
     public function styles(Worksheet $sheet)
     {
+        $sheet->getDefaultRowDimension()->setRowHeight(20);
+        $sheet->getStyle('A:K')->getAlignment()->setWrapText(true)->setVertical('center');
         return [
             1 => [
                 'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-                'fill' => ['fillType' => 'solid', 'startColor' => ['rgb' => '0082C4']]
+                'fill' => ['fillType' => 'solid', 'startColor' => ['rgb' => '0082C4']],
             ],
+        ];
+    }
+
+    public function columnWidths(): array
+    {
+        return [
+            'A' => 8,
+            'B' => 28,
+            'C' => 16,
+            'D' => 22,
+            'E' => 22,
+            'F' => 18,
+            'G' => 22,
+            'H' => 18,
+            'I' => 22,
+            'J' => 16,
+            'K' => 18,
         ];
     }
 }

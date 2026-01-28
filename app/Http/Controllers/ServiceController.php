@@ -73,7 +73,7 @@ class ServiceController extends Controller
     {
         Gate::authorize('create', Service::class);
 
-        if ($request->preacher_id === 'other') {
+        if ($request->boolean('guest_preacher') || $request->filled('preacher_name')) {
             $request->merge(['preacher_id' => null]);
         } else {
             $request->merge(['preacher_name' => null]);
@@ -242,7 +242,7 @@ class ServiceController extends Controller
     {
         Gate::authorize('update', $service);
 
-        if ($request->preacher_id === 'other') {
+        if ($request->boolean('guest_preacher') || $request->filled('preacher_name')) {
             $request->merge(['preacher_id' => null]);
         } else {
             $request->merge(['preacher_name' => null]);

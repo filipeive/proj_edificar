@@ -16,6 +16,11 @@
             title="Exportar">
             <i class="bi bi-file-earmark-excel"></i>
         </a>
+        <a href="{{ route('packages.export-pdf', $package) }}"
+            class="action-icon text-gray-600 hover:text-red-600 hover:bg-red-50"
+            title="Exportar PDF">
+            <i class="bi bi-file-earmark-pdf"></i>
+        </a>
         <a href="{{ route('packages.edit', $package) }}"
             class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50"
             title="Editar">
@@ -58,6 +63,10 @@
                 <a href="{{ route('packages.export', $package) }}"
                     class="sm:w-auto bg-blue-600 text-white px-4 md:px-8 py-3 md:py-4 rounded-xl sm:rounded-2xl hover:bg-blue-700 transition-all font-black text-[10px] sm:text-xs uppercase tracking-widest flex items-center justify-center shadow-lg shadow-blue-100">
                     <i class="bi bi-file-earmark-excel mr-2"></i> Exportar
+                </a>
+                <a href="{{ route('packages.export-pdf', $package) }}"
+                    class="sm:w-auto bg-red-600 text-white px-4 md:px-8 py-3 md:py-4 rounded-xl sm:rounded-2xl hover:bg-red-700 transition-all font-black text-[10px] sm:text-xs uppercase tracking-widest flex items-center justify-center shadow-lg shadow-red-100">
+                    <i class="bi bi-file-earmark-pdf mr-2"></i> PDF
                 </a>
                 <a href="{{ route('packages.edit', $package) }}"
                     class="sm:w-auto bg-orange-600 text-white px-4 md:px-8 py-3 md:py-4 rounded-xl sm:rounded-2xl hover:bg-orange-700 transition-all font-black text-[10px] sm:text-xs uppercase tracking-widest flex items-center justify-center shadow-lg shadow-orange-100">

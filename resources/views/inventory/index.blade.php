@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Inventário - Portal Life Church')
+@section('page-title', 'Inventário')
 
 @section('content')
     <div class="space-y-6">

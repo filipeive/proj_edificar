@@ -7,6 +7,39 @@
 @section('content')
     <div class="grid grid-max-w-3xl mx-auto">
         <div class="bg-white rounded-lg shadow-lg p-8">
+            @if ($errors->any())
+                <div class="mb-6 bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-2xl font-bold">
+                    <i class="bi bi-exclamation-triangle-fill mr-2"></i>
+                    Verifique os campos destacados e tente novamente.
+                </div>
+                @push('scripts')
+                    <script>
+                        window.showError('Verifique os campos destacados e tente novamente.');
+                    </script>
+                @endpush
+            @endif
+            @if(session('success'))
+                <div class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-800 px-6 py-4 rounded-2xl font-bold">
+                    <i class="bi bi-check-circle-fill mr-2"></i>
+                    {{ session('success') }}
+                </div>
+                @push('scripts')
+                    <script>
+                        window.showSuccess(@json(session('success')));
+                    </script>
+                @endpush
+            @endif
+            @if(session('error'))
+                <div class="mb-6 bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-2xl font-bold">
+                    <i class="bi bi-exclamation-circle-fill mr-2"></i>
+                    {{ session('error') }}
+                </div>
+                @push('scripts')
+                    <script>
+                        window.showError(@json(session('error')));
+                    </script>
+                @endpush
+            @endif
             <form action="{{ route('members.store') }}" method="POST">
                 @csrf
 
@@ -54,6 +87,12 @@
                         <label for="cell_id" class="block text-sm font-medium text-gray-700 mb-2">
                             <i class="bi bi-people-fill mr-2"></i>Célula <span class="text-red-500">*</span>
                         </label>
+                        @if($availableCells->isEmpty())
+                            <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg text-sm font-bold">
+                                <i class="bi bi-exclamation-triangle mr-2"></i>
+                                Nenhuma célula disponível para o seu perfil. Contacte o administrador.
+                            </div>
+                        @endif
                         <select name="cell_id" id="cell_id" required
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 @error('cell_id') border-red-500 @enderror">
                             <option value="">-- Selecione uma célula --</option>
@@ -121,8 +160,11 @@
                                 Telefone
                             </label>
                             <input type="tel" name="phone" id="phone"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 @error('phone') border-red-500 @enderror"
                                 value="{{ old('phone') }}" placeholder="823562000">
+                            @error('phone')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
 
@@ -204,8 +246,11 @@
                             </label>
                             <input type="password" name="password_confirmation" id="password_confirmation" required
                                 minlength="6"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 @error('password_confirmation') border-red-500 @enderror"
                                 placeholder="••••••••">
+                            @error('password_confirmation')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
 

@@ -44,7 +44,7 @@ else \
     if [ "$ADD_DATE" = "s" ] || [ "$ADD_DATE" = "S" ]; then \
       COMMIT_MSG="$(date +%F) - $COMMIT_MSG"; \
     fi; \
-    git commit -m "$COMMIT_MSG"; \
+    git commit -m "$COMMIT_MSG"; \o bot
     git push; \
   else \
     echo "Commit/push ignorado."; \
