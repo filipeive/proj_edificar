@@ -36,9 +36,20 @@ class ZoneController
         }
 
         // Check for supervisions before deleting
-        $zonesWithSupervisions = Zone::whereIn('id', $ids)->has('supervisions')->count();
-        if ($zonesWithSupervisions > 0) {
-            return back()->with('error', 'Algumas zonas selecionadas possuem supervisões e não podem ser excluídas.');
+        if (Zone::whereIn('id', $ids)->has('supervisions')->exists()) {
+            return back()->with('error', 'Algumas zonas selecionadas possuem supervisões vinculadas.');
+        }
+
+        if (Zone::whereIn('id', $ids)->has('contributions')->exists()) {
+            return back()->with('error', 'Algumas zonas selecionadas possuem contribuições financeiras vinculadas.');
+        }
+
+        if (Zone::whereIn('id', $ids)->has('quarterlyReports')->exists()) {
+            return back()->with('error', 'Algumas zonas selecionadas possuem relatórios trimestrais vinculados.');
+        }
+
+        if (Zone::whereIn('id', $ids)->has('events')->exists()) {
+            return back()->with('error', 'Algumas zonas selecionadas possuem eventos vinculados.');
         }
 
         Zone::whereIn('id', $ids)->delete();
@@ -110,7 +121,19 @@ class ZoneController
     public function destroy(Zone $zone)
     {
         if ($zone->supervisions()->exists()) {
-            return back()->with('error', 'Não pode deletar zona com supervisões!');
+            return back()->with('error', 'Não pode excluir: Esta zona possui supervisões vinculadas.');
+        }
+
+        if ($zone->contributions()->exists()) {
+            return back()->with('error', 'Não pode excluir: Existem contribuições financeiras registradas nesta zona.');
+        }
+
+        if ($zone->quarterlyReports()->exists()) {
+            return back()->with('error', 'Não pode excluir: Existem relatórios trimestrais vinculados a esta zona.');
+        }
+
+        if ($zone->events()->exists()) {
+            return back()->with('error', 'Não pode excluir: Existem eventos agendados nesta zona.');
         }
 
         $zone->delete();
