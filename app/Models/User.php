@@ -258,7 +258,11 @@ class User extends Authenticatable
     public function getManagedZoneIds()
     {
         if ($this->isPastorZona()) {
-            return Zone::where('pastor_id', $this->id)->pluck('id');
+            $zoneIds = Zone::where('pastor_id', $this->id)->pluck('id');
+            if ($zoneIds->isEmpty() && $this->cell && $this->cell->supervision && $this->cell->supervision->zone_id) {
+                $zoneIds = collect([$this->cell->supervision->zone_id]);
+            }
+            return $zoneIds;
         }
 
         if ($this->isSupervisor()) {

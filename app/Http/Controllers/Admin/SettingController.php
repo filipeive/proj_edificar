@@ -28,6 +28,9 @@ class SettingController extends Controller
         });
 
         $groups = Setting::select('group')->distinct()->pluck('group');
+        if ($groups->isEmpty()) {
+            $groups = collect(['general', 'branding', 'regional', 'email', 'system']);
+        }
 
         $backups = [];
         $backupCount = 0;
@@ -153,7 +156,13 @@ class SettingController extends Controller
                 return back()->with('error', 'Base de dados não encontrada.');
             }
             $filename = "backup_{$timestamp}.sqlite";
-            return Response::download($path, $filename);
+            $backupDir = storage_path('app/backups');
+            if (!is_dir($backupDir)) {
+                mkdir($backupDir, 0755, true);
+            }
+            $fullPath = $backupDir . DIRECTORY_SEPARATOR . $filename;
+            copy($path, $fullPath);
+            return response()->download($fullPath);
         }
 
         if ($driver !== 'mysql') {
@@ -194,7 +203,7 @@ class SettingController extends Controller
 
         file_put_contents($fullPath, $process->getOutput());
 
-        return response()->download($fullPath)->deleteFileAfterSend(true);
+        return response()->download($fullPath);
     }
 
     public function downloadBackup(string $filename)
