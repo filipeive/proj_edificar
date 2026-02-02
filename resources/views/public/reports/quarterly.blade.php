@@ -3,8 +3,8 @@
 @section('title', 'Relatório Trimestral')
 
 @section('content')
-    <div class="min-h-screen bg-gray-900 py-10 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-6xl mx-auto space-y-8"
+    <div class="min-h-screen bg-gray-900 py-10 px-4 sm:px-6 lg:px-8 relative">
+        <div class="max-w-6xl mx-auto space-y-8 relative z-10"
             x-data="{
                 step: 1,
                 zoneId: '',
@@ -62,7 +62,7 @@
                 </div>
             @endif
 
-            <div class="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 md:p-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div class="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 md:p-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10">
                 <div>
                     <div class="flex items-center gap-2 text-xs font-bold text-blue-300 uppercase tracking-widest mb-2">
                         <span>Relatórios Trimestrais</span>
@@ -89,7 +89,7 @@
                 </div>
             </div>
 
-            <form action="{{ route('public.reports.quarterly.store') }}" method="POST" id="reportForm" class="space-y-8 pb-12">
+            <form action="{{ route('public.reports.quarterly.store') }}" method="POST" id="reportForm" class="space-y-8 pb-12 relative z-10">
                 @csrf
 
                 <div x-show="step === 1" x-transition:enter="transition ease-out duration-300"
