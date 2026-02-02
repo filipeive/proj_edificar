@@ -1,6 +1,9 @@
 @extends('layouts.app')
 
-@section('title', $pageTitle . ' - Portal Life Church') 
+@section('title', $pageTitle . ' - Portal Life Church')
+@section('page-title', $pageTitle)
+@section('page-subtitle', 'Gerencie as contribuições e dízimos da igreja')
+
 
 @section('content')
 @section('header-actions')
@@ -78,7 +81,7 @@
 
                 <div class="space-y-1">
                     <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 px-2">Estado</label>
-                    <select name="status" class="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500 transition-all">
+                    <select name="status" class="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500 transition-all custom-select">
                         <option value="">Todos Estados</option>
                         <option value="pendente" {{ request('status') === 'pendente' ? 'selected' : '' }}>Pendente</option>
                         <option value="verificada" {{ request('status') === 'verificada' ? 'selected' : '' }}>Verificada</option>
@@ -88,7 +91,7 @@
 
                 <div class="space-y-1">
                     <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 px-2">Pacote</label>
-                    <select name="package_id" class="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500 transition-all">
+                    <select name="package_id" class="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500 transition-all custom-select">
                         <option value="">Todos Pacotes</option>
                         @foreach($packages as $package)
                             <option value="{{ $package->id }}" {{ request('package_id') == $package->id ? 'selected' : '' }}>{{ $package->name }}</option>
@@ -240,7 +243,7 @@
         <!-- Grid View -->
         <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-            class="grid grid-compact">
+            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             @foreach($contributions as $contribution)
                 <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 relative compact-card">
                     <div class="absolute top-6 right-6">

@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('title', 'Nova Despesa')
+@section('page-title', 'Nova Despesa')
+@section('page-subtitle', 'Registar saída de caixa do sistema')
 
 @section('content')
     <div class="max-w-3xl mx-auto space-y-6">
@@ -44,7 +46,7 @@
                 <div class="space-y-2">
                     <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Categoria</label>
                     <select name="category" required
-                        class="w-full px-5 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-red-500 focus:ring-4 focus:ring-red-500/10 rounded-2xl transition-all font-bold text-gray-900 appearance-none">
+                        class="w-full px-5 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-red-500 focus:ring-4 focus:ring-red-500/10 rounded-2xl transition-all font-bold text-gray-900 appearance-none custom-select">
                         <option value="Operacional">Custos Operacionais</option>
                         <option value="Material">Material de Consumo</option>
                         <option value="Manutenção">Manutenção e Reparos</option>
@@ -57,7 +59,7 @@
                 <div class="space-y-2">
                     <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Âmbito</label>
                     <select name="scope" required
-                        class="w-full px-5 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-red-500 focus:ring-4 focus:ring-red-500/10 rounded-2xl transition-all font-bold text-gray-900 appearance-none">
+                        class="w-full px-5 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-red-500 focus:ring-4 focus:ring-red-500/10 rounded-2xl transition-all font-bold text-gray-900 appearance-none custom-select">
                         <option value="eclesiastico">Eclesiástico (Igreja)</option>
                         <option value="edificar">Projeto Edificar</option>
                     </select>

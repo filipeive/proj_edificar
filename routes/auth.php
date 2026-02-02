@@ -56,4 +56,9 @@ Route::middleware('auth')->group(function () {
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
+
+    // GET logout fallback to prevent 404 and redirect to root
+    Route::get('logout', function () {
+        return redirect('/');
+    });
 });

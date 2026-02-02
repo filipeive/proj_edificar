@@ -1,10 +1,11 @@
 @extends('layouts.app')
 @section('title', "Zona $zone->name - Portal Life Church")
+@section('page-title', 'Detalhes da Zona')
+@section('page-subtitle', 'Visão consolidada da área pastoral ' . $zone->name)
 
 @section('header-actions')
     <div class="flex items-center gap-2 md:hidden">
-        <a href="{{ route('zones.edit', $zone) }}"
-            class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+        <a href="{{ route('zones.edit', $zone) }}" class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
             title="Configurar zona">
             <i class="bi bi-pencil-square"></i>
         </a>
@@ -12,7 +13,15 @@
 @endsection
 
 @section('content')
-    <div class="space-y-8" x-data="{ activeTab: 'supervisions' }">
+    <div class="space-y-8" x-data="{ 
+                activeTab: 'supervisions',
+                showTransferModal: false,
+                selectedSupervision: {},
+                transfer(supervision) {
+                    this.selectedSupervision = supervision;
+                    this.showTransferModal = true;
+                }
+            }">
         <!-- Header & Stats Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <!-- Info Zona -->
@@ -48,7 +57,7 @@
             <div
                 class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col justify-center text-center relative overflow-hidden">
                 <div class="relative z-10">
-                <p class="text-5xl font-black text-green-600 tracking-tighter">{{ $members->total() }}</p>
+                    <p class="text-5xl font-black text-green-600 tracking-tighter">{{ $members->total() }}</p>
                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mt-2">Membros Totais</p>
                 </div>
                 <div class="absolute -right-4 -bottom-4 text-8xl text-green-50 opacity-50"><i class="bi bi-people-fill"></i>
@@ -87,10 +96,17 @@
                                     class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-black text-2xl">
                                     {{ substr($supervision->name, 0, 1) }}
                                 </div>
-                                <a href="{{ route('supervisions.show', $supervision) }}"
-                                    class="text-gray-300 hover:text-blue-600 transition-colors">
-                                    <i class="bi bi-arrow-up-right-circle text-2xl"></i>
-                                </a>
+                                <div class="flex gap-2">
+                                    <button @click="transfer({{ Js::from($supervision) }})"
+                                        class="text-gray-300 hover:text-amber-500 transition-colors"
+                                        title="Transferir para outra zona">
+                                        <i class="bi bi-arrow-left-right text-xl"></i>
+                                    </button>
+                                    <a href="{{ route('supervisions.show', $supervision) }}"
+                                        class="text-gray-300 hover:text-blue-600 transition-colors">
+                                        <i class="bi bi-arrow-up-right-circle text-2xl"></i>
+                                    </a>
+                                </div>
                             </div>
                             <h3 class="text-xl font-bold text-gray-900 mb-2">{{ $supervision->name }}</h3>
                             <div class="flex gap-4">
@@ -138,9 +154,11 @@
                                 @foreach($cells as $cell)
                                     <tr class="hover:bg-gray-50/50 transition-colors group">
                                         <td class="px-10 py-6 font-bold text-gray-900 line-clamp-1">{{ $cell->name }}</td>
-                                        <td class="px-10 py-6 text-sm text-gray-500 font-medium line-clamp-1">{{ $cell->supervision->name }}
+                                        <td class="px-10 py-6 text-sm text-gray-500 font-medium line-clamp-1">
+                                            {{ $cell->supervision->name }}
                                         </td>
-                                        <td class="px-10 py-6 text-sm font-bold text-gray-700 line-clamp-1">{{ $cell->leader->name ?? '-' }}
+                                        <td class="px-10 py-6 text-sm font-bold text-gray-700 line-clamp-1">
+                                            {{ $cell->leader->name ?? '-' }}
                                         </td>
                                         <td class="px-10 py-6 text-right">
                                             <a href="{{ route('cells.show', $cell) }}" title="Detalhes"
@@ -161,50 +179,103 @@
                 </div>
 
                 <!-- Tab Content: Membros -->
-                <div x-show="activeTab === 'members'" x-transition.fade
+                <div x-show="activeTab === 'members'" x-data="{ 
+                        memberSearch: '',
+                        showTransferMemberModal: false,
+                        showObservationsModal: false,
+                        selectedMember: {},
+                        memberObservations: '',
+
+                        openTransferMember(member) {
+                            this.selectedMember = member;
+                            this.showTransferMemberModal = true;
+                        },
+                        openObservations(member) {
+                            this.selectedMember = member;
+                            this.memberObservations = member.observations || '';
+                            this.showObservationsModal = true;
+                        }
+                    }" x-transition.fade
                     class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+
+                    <div class="p-8 border-b border-gray-50 bg-gray-50/30">
+                        <div class="relative">
+                            <i class="bi bi-search absolute left-6 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" x-model="memberSearch" placeholder="Pesquisar membros por nome ou email..."
+                                class="w-full pl-14 pr-6 py-4 bg-white border-transparent focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all shadow-sm">
+                        </div>
+                    </div>
+
                     <div class="overflow-x-auto">
                         <table class="w-full table-compact">
                             <thead>
                                 <tr class="bg-gray-50/50">
                                     <th
-                                        class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                        class="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
                                         Membro</th>
                                     <th
-                                        class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                        class="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
                                         Célula</th>
                                     <th
-                                        class="px-10 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                    </th>
+                                        class="px-8 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                        Status</th>
+                                    <th
+                                        class="px-8 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                        Ações</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-50">
                                 @foreach($members as $member)
-                                    <tr class="hover:bg-gray-50/50 transition-colors group">
-                                        <td class="px-10 py-6">
+                                    <tr class="hover:bg-gray-50/50 transition-colors group"
+                                        x-show="memberSearch === '' || '{{ strtolower($member->name) }}'.includes(memberSearch.toLowerCase()) || '{{ strtolower($member->email) }}'.includes(memberSearch.toLowerCase())">
+                                        <td class="px-8 py-6">
                                             <div class="flex items-center gap-4">
                                                 <div
                                                     class="w-10 h-10 rounded-xl bg-gray-100 text-gray-400 flex items-center justify-center font-bold">
                                                     {{ substr($member->name, 0, 1) }}
                                                 </div>
                                                 <div class="min-w-0">
-                                                    <p class="text-sm font-bold text-gray-900 leading-tight line-clamp-1">{{ $member->name }}
+                                                    <p class="text-sm font-bold text-gray-900 leading-tight line-clamp-1">
+                                                        {{ $member->name }}
                                                     </p>
-                                                    <p class="text-[10px] text-gray-400 font-medium line-clamp-1">{{ $member->email }}</p>
+                                                    <p class="text-[10px] text-gray-400 font-medium line-clamp-1">
+                                                        {{ $member->email }}
+                                                    </p>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="px-10 py-6">
+                                        <td class="px-8 py-6">
                                             <span
                                                 class="px-3 py-1 bg-gray-100 rounded-full text-[10px] font-black text-gray-500 uppercase">
                                                 {{ $member->cell->name ?? '-' }}
                                             </span>
                                         </td>
-                                        <td class="px-10 py-6 text-right">
-                                            <a href="{{ route('users.show', $member) }}" title="Detalhes"
-                                                class="action-icon text-gray-300 hover:text-blue-600 hover:bg-blue-50">
-                                                <i class="bi bi-chevron-right text-lg"></i>
-                                            </a>
+                                        <td class="px-8 py-6 text-center">
+                                            <form action="{{ route('users.toggle-status', $member) }}" method="POST">
+                                                @csrf
+                                                <button type="submit"
+                                                    class="px-3 py-1 rounded-full text-[10px] font-black uppercase transition-all {{ $member->is_active ? 'bg-green-50 text-green-600 hover:bg-green-100' : 'bg-red-50 text-red-600 hover:bg-red-100' }}">
+                                                    {{ $member->is_active ? 'Ativo' : 'Inativo' }}
+                                                </button>
+                                            </form>
+                                        </td>
+                                        <td class="px-8 py-6 text-right">
+                                            <div class="flex items-center justify-end gap-2">
+                                                <button @click="openObservations({{ Js::from($member) }})"
+                                                    class="action-icon text-gray-300 hover:text-orange-500 hover:bg-orange-50"
+                                                    title="Observações">
+                                                    <i class="bi bi-chat-dots text-lg"></i>
+                                                </button>
+                                                <button @click="openTransferMember({{ Js::from($member) }})"
+                                                    class="action-icon text-gray-300 hover:text-amber-500 hover:bg-amber-50"
+                                                    title="Transferir Célula">
+                                                    <i class="bi bi-arrow-left-right text-lg"></i>
+                                                </button>
+                                                <a href="{{ route('users.show', $member) }}" title="Perfil Completo"
+                                                    class="action-icon text-gray-300 hover:text-blue-600 hover:bg-blue-50">
+                                                    <i class="bi bi-person-fill text-lg"></i>
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -212,10 +283,84 @@
                         </table>
                     </div>
                     @if($members->hasPages())
-                        <div class="mt-6">
+                        <div class="p-8 border-t border-gray-50">
                             {{ $members->links() }}
                         </div>
                     @endif
+
+                    <!-- Transfer Member Modal -->
+                    <div x-show="showTransferMemberModal"
+                        class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm"
+                        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+                        x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+                        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" style="display: none;"
+                        x-cloak>
+                        <div @click.away="showTransferMemberModal = false"
+                            class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden">
+                            <div class="p-8 border-b border-gray-100">
+                                <h3 class="text-xl font-black text-gray-900 leading-tight">Transferir Membro</h3>
+                                <p class="text-sm text-gray-500 mt-1"
+                                    x-text="'Mover ' + selectedMember.name + ' para outra célula'"></p>
+                            </div>
+                            <form :action="'{{ url('/admin/users') }}/' + selectedMember.id + '/reassign-cell'"
+                                method="POST" class="p-8 space-y-6">
+                                @csrf
+                                <div class="space-y-2">
+                                    <label
+                                        class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Selecione
+                                        a Célula de Destino</label>
+                                    <select name="cell_id" required
+                                        class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all custom-select">
+                                        <option value="">Escolha uma célula...</option>
+                                        @foreach($cells as $availCell)
+                                            <option value="{{ $availCell->id }}">{{ $availCell->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="flex gap-3 pt-4">
+                                    <button type="button" @click="showTransferMemberModal = false"
+                                        class="flex-1 px-6 py-4 rounded-2xl bg-gray-50 text-gray-500 font-black text-xs uppercase tracking-widest hover:bg-gray-100 transition-all">Cancelar</button>
+                                    <button type="submit"
+                                        class="flex-1 px-6 py-4 rounded-2xl bg-blue-600 text-white font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">Confirmar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Member Observations Modal -->
+                    <div x-show="showObservationsModal"
+                        class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm"
+                        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+                        x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+                        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" style="display: none;"
+                        x-cloak>
+                        <div @click.away="showObservationsModal = false"
+                            class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden">
+                            <div class="p-8 border-b border-gray-100">
+                                <h3 class="text-xl font-black text-gray-900 leading-tight">Observações</h3>
+                                <p class="text-sm text-gray-500 mt-1" x-text="'Notas sobre ' + selectedMember.name"></p>
+                            </div>
+                            <form :action="'{{ url('/admin/users') }}/' + selectedMember.id + '/observations'" method="POST"
+                                class="p-8 space-y-6">
+                                @csrf
+                                <div class="space-y-2">
+                                    <label
+                                        class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Conteúdo
+                                        das Notas</label>
+                                    <textarea name="observations" x-model="memberObservations" rows="5"
+                                        class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all resize-none"
+                                        placeholder="Escreva observações importantes aqui..."></textarea>
+                                </div>
+                                <div class="flex gap-3 pt-4">
+                                    <button type="button" @click="showObservationsModal = false"
+                                        class="flex-1 px-6 py-4 rounded-2xl bg-gray-50 text-gray-500 font-black text-xs uppercase tracking-widest hover:bg-gray-100 transition-all">Cancelar</button>
+                                    <button type="submit"
+                                        class="flex-1 px-6 py-4 rounded-2xl bg-orange-600 text-white font-black text-xs uppercase tracking-widest hover:bg-orange-700 transition-all shadow-lg shadow-orange-200">Salvar
+                                        Notas</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -256,13 +401,50 @@
                         <h4 class="text-sm font-black text-red-900 uppercase mb-2">Zona de Perigo</h4>
                         <form action="{{ route('zones.destroy', $zone) }}" method="POST" id="delete-form">
                             @csrf @method('DELETE')
-                            <button type="button" onclick="confirmDelete('{{ route('zones.destroy', $zone) }}', 'delete-form')"
+                            <button type="button" onclick="confirmDelete('delete-form', 'Deseja excluir esta zona?')"
                                 class="w-full py-3 bg-white text-red-600 rounded-xl font-bold border border-red-100 hover:bg-red-600 hover:text-white transition-all text-xs uppercase">
                                 Excluir Zona
                             </button>
                         </form>
                     </div>
                 @endif
+            </div>
+        </div>
+
+        <!-- Transfer Supervision Modal -->
+        <div x-show="showTransferModal"
+            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm"
+            x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" style="display: none;" x-cloak>
+            <div @click.away="showTransferModal = false"
+                class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden animate-In">
+                <div class="p-8 border-b border-gray-100">
+                    <h3 class="text-xl font-black text-gray-900 leading-tight">Transferir Supervisão</h3>
+                    <p class="text-sm text-gray-500 mt-1" x-text="'Mover ' + selectedSupervision.name + ' para outra zona'">
+                    </p>
+                </div>
+                <form :action="'{{ url('/admin/supervisions') }}/' + selectedSupervision.id + '/reassign-zone'"
+                    method="POST" class="p-8 space-y-6">
+                    @csrf
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Selecione a Zona
+                            de Destino</label>
+                        <select name="zone_id" required
+                            class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all custom-select">
+                            <option value="">Escolha uma zona...</option>
+                            @foreach($availableZones as $availZone)
+                                <option value="{{ $availZone->id }}">{{ $availZone->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" @click="showTransferModal = false"
+                            class="flex-1 px-6 py-4 rounded-2xl bg-gray-50 text-gray-500 font-black text-xs uppercase tracking-widest hover:bg-gray-100 transition-all">Cancelar</button>
+                        <button type="submit"
+                            class="flex-1 px-6 py-4 rounded-2xl bg-blue-600 text-white font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">Confirmar</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

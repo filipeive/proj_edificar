@@ -165,6 +165,23 @@ class UserController
     }
 
     /**
+     * Alternar status de ativação do utilizador
+     */
+    public function toggleStatus(User $user)
+    {
+        if ($user->role === 'admin' && $user->id === auth()->id()) {
+            return back()->with('error', 'Você não pode desativar sua própria conta de admin!');
+        }
+
+        $user->update([
+            'is_active' => !$user->is_active
+        ]);
+
+        $status = $user->is_active ? 'ativado' : 'desativado';
+        return back()->with('success', "Utilizador {$status} com sucesso!");
+    }
+
+    /**
      * Redefinir senha do utilizador (Admin)
      */
     public function resetPassword(User $user)

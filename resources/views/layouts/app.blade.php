@@ -29,6 +29,10 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <!-- Tom Select for better searchable dropdowns -->
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+
     <style>
         /* Theme Variables */
         :root {
@@ -448,8 +452,15 @@
 
         .grid-compact {
             display: grid;
+            width: 100%;
             grid-template-columns: repeat(1, minmax(0, 1fr));
             gap: 0.75rem;
+            justify-content: stretch;
+            align-content: stretch;
+        }
+
+        .grid-compact>* {
+            min-width: 0;
         }
 
         @media (min-width: 640px) {
@@ -467,7 +478,19 @@
 
         @media (min-width: 1024px) {
             .grid-compact {
-                grid-template-columns: repeat(5, minmax(0, 1fr));
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+
+        @media (min-width: 1280px) {
+            .grid-compact {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+
+        @media (min-width: 1536px) {
+            .grid-compact {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
             }
         }
 
@@ -559,21 +582,135 @@
             transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .searchable-select-input {
+        /* Tom Select Custom Styling */
+        .ts-wrapper {
             width: 100%;
-            padding: 0.5rem 1rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.75rem;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #374151;
-            background: #f9fafb;
         }
 
-        .searchable-select-input:focus {
-            outline: none;
+        .ts-wrapper .ts-control {
+            padding: 0.75rem 1rem;
+            border: 1px solid transparent;
+            border-radius: 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #374151;
+            background: #f9fafb;
+            min-height: 48px;
+            box-shadow: none;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .ts-wrapper .ts-control:hover {
+            background: #f3f4f6;
+        }
+
+        .ts-wrapper.focus .ts-control {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+            background: white;
+            color: #111827;
+        }
+
+        .ts-wrapper .ts-control input {
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: #111827;
+        }
+
+        .ts-wrapper .ts-control .item {
+            font-weight: 700;
+        }
+
+        .ts-wrapper .ts-dropdown {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            margin-top: 4px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            background: white;
+            overflow: hidden;
+        }
+
+        .ts-wrapper .ts-dropdown .option {
+            padding: 0.75rem 1rem;
+            font-weight: 500;
+            color: #374151;
+            transition: all 0.15s ease;
+        }
+
+        .ts-wrapper .ts-dropdown .option:hover,
+        .ts-wrapper .ts-dropdown .option.active {
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .ts-wrapper .ts-dropdown .option.selected {
+            background: #eff6ff;
+            color: #2563eb;
+            font-weight: 700;
+        }
+
+        .ts-wrapper .ts-dropdown .highlight {
+            background: transparent;
+            color: inherit;
+            font-weight: 900;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .ts-wrapper .ts-dropdown .no-results {
+            padding: 1rem;
+            text-align: center;
+            color: #9ca3af;
+            font-style: italic;
+        }
+
+        /* Dark theme support */
+        [data-theme="dark"] .ts-wrapper .ts-control {
+            background: #1e293b;
+            border-color: #334155;
+            color: #f1f5f9;
+        }
+
+        [data-theme="dark"] .ts-wrapper.focus .ts-control {
             border-color: #3b82f6;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+            background: #0f172a;
+        }
+
+        [data-theme="dark"] .ts-wrapper .ts-dropdown {
+            background: #1e293b;
+            border-color: #334155;
+        }
+
+        [data-theme="dark"] .ts-wrapper .ts-dropdown .option {
+            color: #e2e8f0;
+        }
+
+        [data-theme="dark"] .ts-wrapper .ts-dropdown .option:hover,
+        [data-theme="dark"] .ts-wrapper .ts-dropdown .option.active {
+            background: #334155;
+            color: #60a5fa;
+        }
+
+        [data-theme="dark"] .ts-wrapper .ts-dropdown .option.selected {
+            background: #1e3a5f;
+            color: #93c5fd;
+        }
+
+        .custom-select {
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 1rem center;
+            background-repeat: no-repeat;
+            background-size: 1.25em 1.25em;
+            padding-right: 3rem !important;
+        }
+
+        [data-theme="dark"] .custom-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
         }
     </style>
 </head>
@@ -943,86 +1080,46 @@
         const debouncedMobileSearch = debounce((q) => handleSearch(q, true), 300);
 
         function initSearchableSelects() {
-            const selects = document.querySelectorAll('select:not([data-searchable=\"false\"]):not([data-searchable-ready])');
+            const selects = document.querySelectorAll('select.searchable-select, select:not([data-searchable="false"]):not([data-tomselect-ready])');
+
             selects.forEach((select) => {
-                if (select.multiple || select.size > 1) return;
-                const options = Array.from(select.options);
-                if (options.length <= 6) return;
-                select.setAttribute('data-searchable-ready', 'true');
-                const wrapper = document.createElement('div');
-                wrapper.className = 'relative';
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.className = 'searchable-select-input';
-                input.placeholder = select.dataset.searchPlaceholder || 'Escreva o nome ou pesquise...';
-                input.setAttribute('autocomplete', 'off');
+                // Skip if already initialized or not suitable
+                if (select.dataset.tomselectReady || select.multiple || select.size > 1) return;
 
-                const listId = `searchable-${Math.random().toString(36).slice(2)}`;
-                input.setAttribute('list', listId);
+                // Only auto-apply to selects with > 6 options if they don't have the class
+                if (!select.classList.contains('searchable-select') && select.options.length <= 6) return;
 
-                const dataList = document.createElement('datalist');
-                dataList.id = listId;
+                select.setAttribute('data-tomselect-ready', 'true');
 
-                options.forEach((opt, index) => {
-                    if (index === 0) return;
-                    const optionEl = document.createElement('option');
-                    optionEl.value = opt.text;
-                    optionEl.dataset.value = opt.value;
-                    dataList.appendChild(optionEl);
-                });
-
-                // Initialize input text with current selection
-                const selectedOption = select.options[select.selectedIndex];
-                if (selectedOption && selectedOption.value) {
-                    input.value = selectedOption.text;
-                }
-
-                input.addEventListener('input', () => {
-                    const match = Array.from(dataList.options).find(opt => opt.value === input.value);
-                    if (match) {
-                        select.value = match.dataset.value;
-                        select.dispatchEvent(new Event('change', { bubbles: true }));
-                    }
-                });
-
-                const shouldOpenOnFocus = select.dataset.searchOpen !== 'false';
-                if (shouldOpenOnFocus) {
-                    input.addEventListener('focus', () => {
-                        const currentValue = input.value;
-                        input.value = currentValue ? `${currentValue} ` : ' ';
-                        input.dispatchEvent(new Event('input', { bubbles: true }));
-                        setTimeout(() => {
-                            input.value = currentValue;
-                            input.setSelectionRange(currentValue.length, currentValue.length);
-                        }, 0);
+                try {
+                    new TomSelect(select, {
+                        create: false,
+                        placeholder: select.dataset.placeholder || select.dataset.searchPlaceholder || 'Pesquisar...',
+                        allowEmptyOption: true,
+                        maxOptions: 100,
+                        copyAttributesToRoot: true,
+                        render: {
+                            no_results: function (data, escape) {
+                                return '<div class="no-results">Nenhum resultado encontrado para "' + escape(data.input) + '"</div>';
+                            },
+                            option: function (data, escape) {
+                                return '<div class="option">' + data.text + '</div>';
+                            },
+                            item: function (data, escape) {
+                                return '<div class="item">' + data.text + '</div>';
+                            }
+                        },
+                        onInitialize: function () {
+                            // Ensure the control has the same height/feel as other inputs
+                            const control = this.control;
+                            if (select.classList.contains('custom-select')) {
+                                control.classList.add('custom-select-ready');
+                            }
+                        }
                     });
+                } catch (e) {
+                    console.error('TomSelect Init Error:', e, select);
                 }
-
-                input.addEventListener('blur', () => {
-                    const match = Array.from(dataList.options).find(opt => opt.value === input.value);
-                    if (!match) {
-                        input.value = '';
-                        select.value = '';
-                    }
-                });
-
-                const labelText = getSelectLabelText(select);
-                if (labelText && !hasSelectLabel(select)) {
-                    const label = document.createElement('label');
-                    label.className = 'block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2';
-                    if (!select.id) {
-                        select.id = `select-${Math.random().toString(36).slice(2)}`;
-                    }
-                    label.setAttribute('for', select.id);
-                    label.textContent = labelText;
-                    wrapper.appendChild(label);
-                }
-
-                select.style.display = 'none';
-                select.parentNode.insertBefore(wrapper, select);
-                wrapper.appendChild(input);
-                wrapper.appendChild(dataList);
-                wrapper.appendChild(select);
             });
         }
 
@@ -1092,7 +1189,6 @@
         function addMissingSelectLabels() {
             const selects = document.querySelectorAll('select');
             selects.forEach((select) => {
-                if (select.classList.contains('searchable-select')) return;
                 if (hasSelectLabel(select)) return;
                 const labelText = getSelectLabelText(select);
                 if (!labelText) return;
@@ -1299,8 +1395,8 @@
             // Update notification badge periodically
             updateNotificationBadge();
             setInterval(updateNotificationBadge, 30000);
-            initSearchableSelects();
             addMissingSelectLabels();
+            initSearchableSelects();
             initPhonePrefixInputs();
 
             // Close dropdowns on outside click

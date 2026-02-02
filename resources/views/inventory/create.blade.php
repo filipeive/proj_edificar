@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('title', 'Novo Item - Inventário')
+@section('page-title', 'Adicionar ao Inventário')
+@section('page-subtitle', 'Registar novo património ou consumível no sistema')
 
 @section('content')
     <div class="max-w-3xl mx-auto space-y-6">
@@ -43,7 +45,7 @@
                 <div class="space-y-2">
                     <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Condição</label>
                     <select name="condition"
-                        class="w-full px-5 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-900">
+                        class="w-full px-5 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-900 custom-select">
                         <option value="Novo">Novo</option>
                         <option value="Bom">Bom</option>
                         <option value="Razoável">Razoável</option>

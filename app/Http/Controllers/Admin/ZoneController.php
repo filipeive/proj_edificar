@@ -10,7 +10,13 @@ class ZoneController
 {
     public function index(Request $request): View
     {
+        $user = auth()->user();
         $query = Zone::with('supervisions', 'pastor');
+
+        // Pastor de Zona can only see zones they are responsible for
+        if ($user->role === 'pastor_zona') {
+            $query->where('pastor_id', $user->id);
+        }
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -53,6 +59,7 @@ class ZoneController
             'name' => 'required|unique:zones|string|max:255',
             'description' => 'nullable|string',
             'pastor_id' => 'nullable|exists:users,id',
+            'show_in_teaching_services' => 'nullable|boolean',
         ]);
 
         Zone::create($validated);
@@ -68,10 +75,13 @@ class ZoneController
         $cells = $zone->cells()->with(['leader', 'supervision'])->paginate(24)->withQueryString();
         $members = $zone->members()->paginate(24)->withQueryString();
 
+        $availableZones = Zone::orderBy('name')->where('id', '!=', $zone->id)->get();
+
         return view('admin.zones.show', [
             'zone' => $zone,
             'cells' => $cells,
-            'members' => $members
+            'members' => $members,
+            'availableZones' => $availableZones
         ]);
     }
 
@@ -88,6 +98,7 @@ class ZoneController
             'name' => "required|unique:zones,name,{$zone->id}|string|max:255",
             'description' => 'nullable|string',
             'pastor_id' => 'nullable|exists:users,id',
+            'show_in_teaching_services' => 'nullable|boolean',
         ]);
 
         $zone->update($validated);

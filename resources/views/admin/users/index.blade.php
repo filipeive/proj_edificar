@@ -145,7 +145,7 @@
                         <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Pesquisar</label>
                         <div class="relative group">
                             <i class="bi bi-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors"></i>
-                            <input type="text" name="search" id="liveSearch" value="{{ request('search') }}" placeholder="Nome, email ou telefone..." 
+                            <input type="text" name="search" id="liveSearch" value="{{ request('search') }}" placeholder="Pesquisar por nome, email ou telefone..." 
                                 class="w-full pl-12 pr-6 py-3 bg-white border-transparent focus:ring-4 focus:ring-blue-100 rounded-xl font-bold text-sm transition-all">
                             <div id="searchSpinner" class="hidden absolute right-5 top-1/2 -translate-y-1/2">
                                 <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -157,7 +157,7 @@
                     </div>
                     <div class="md:col-span-3 space-y-2">
                         <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nível</label>
-                        <select name="role" class="w-full px-6 py-3 bg-white border-transparent focus:ring-4 focus:ring-blue-100 rounded-xl font-bold text-sm appearance-none transition-all">
+                        <select name="role" class="w-full px-6 py-3 bg-white border-transparent focus:ring-4 focus:ring-blue-100 rounded-xl font-bold text-sm appearance-none transition-all custom-select">
                             <option value="">Todos os Papéis</option>
                             <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Administrador</option>
                             <option value="pastor_zona" {{ request('role') == 'pastor_zona' ? 'selected' : '' }}>Pastor de Zona</option>
@@ -168,7 +168,7 @@
                     </div>
                     <div class="md:col-span-2 space-y-2">
                         <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Status</label>
-                        <select name="status" class="w-full px-6 py-3 bg-white border-transparent focus:ring-4 focus:ring-blue-100 rounded-xl font-bold text-sm appearance-none transition-all">
+                        <select name="status" class="w-full px-6 py-3 bg-white border-transparent focus:ring-4 focus:ring-blue-100 rounded-xl font-bold text-sm appearance-none transition-all custom-select">
                             <option value="">Qualquer Status</option>
                             <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Ativos</option>
                             <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inativos</option>
@@ -324,7 +324,7 @@
 
         <!-- Grid View -->
         <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-            class="grid grid-compact">
+            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             @forelse($users as $user)
                 <div class="bg-white p-5 md:p-8 rounded-[2rem] md:rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 compact-card">
                     <div class="flex justify-between items-start mb-4">

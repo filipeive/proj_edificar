@@ -98,7 +98,7 @@
                                             Célula Designada
                                         </label>
                                         <select name="cell_id" id="cell_id"
-                                            class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl font-bold text-sm transition-all appearance-none cursor-pointer">
+                                            class="searchable-select w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl font-bold text-sm transition-all appearance-none cursor-pointer custom-select" data-label="Célula">
                                             <option value="">Sem célula</option>
                                             @foreach($cells as $cell)
                                                 <option value="{{ $cell->id }}" {{ old('cell_id') == $cell->id ? 'selected' : '' }}>
@@ -193,7 +193,7 @@
                                         class="block text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">Nível de
                                         Acesso</label>
                                     <select name="role" id="role" required
-                                        class="w-full px-6 py-4 bg-white/5 border-transparent focus:bg-white/10 focus:ring-4 focus:ring-blue-500/20 rounded-2xl font-bold text-sm text-white transition-all appearance-none cursor-pointer">
+                                        class="w-full px-6 py-4 bg-white/5 border-transparent focus:bg-white/10 focus:ring-4 focus:ring-blue-500/20 rounded-2xl font-bold text-sm text-white transition-all appearance-none cursor-pointer custom-select">
                                         <option value="" class="bg-gray-900">Selecione o papel</option>
                                         <option value="membro" {{ old('role') == 'membro' ? 'selected' : '' }}
                                             class="bg-gray-900">Membro</option>

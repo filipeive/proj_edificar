@@ -17,14 +17,14 @@
                 </div>
                 <div class="flex items-center space-x-4">
                     <form action="{{ route('cells.attendance', $cell) }}" method="GET" class="flex items-center space-x-2">
-                        <select name="month" class="bg-zinc-900 border-zinc-800 text-white rounded-lg text-sm focus:ring-orange-500 focus:border-orange-500">
+                        <select name="month" class="bg-zinc-900 border-zinc-800 text-white rounded-lg text-sm focus:ring-orange-500 focus:border-orange-500 custom-select">
                             @foreach(range(1, 12) as $m)
                                 <option value="{{ $m }}" {{ $month == $m ? 'selected' : '' }}>
                                     {{ Carbon\Carbon::create()->month($m)->translatedFormat('F') }}
                                 </option>
                             @endforeach
                         </select>
-                        <select name="year" class="bg-zinc-900 border-zinc-800 text-white rounded-lg text-sm focus:ring-orange-500 focus:border-orange-500">
+                        <select name="year" class="bg-zinc-900 border-zinc-800 text-white rounded-lg text-sm focus:ring-orange-500 focus:border-orange-500 custom-select">
                             @foreach(range(now()->year - 1, now()->year + 1) as $y)
                                 <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
                             @endforeach
@@ -290,7 +290,7 @@
             @csrf
             <div>
                 <label class="block text-xs font-black uppercase text-gray-400 mb-1">Membro</label>
-                <select name="user_id" required class="w-full border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500">
+                <select name="user_id" required class="w-full border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 custom-select">
                     @foreach($members as $m)
                         <option value="{{ $m->id }}">{{ $m->name }}</option>
                     @endforeach
@@ -360,19 +360,4 @@
     }
 </script>
 
-<style>
-    .custom-scrollbar::-webkit-scrollbar {
-        height: 6px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-        background: #f1f1f1;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #ddd;
-        border-radius: 10px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: #ccc;
-    }
-</style>
 @endsection

@@ -33,7 +33,7 @@
                                 <label
                                     class="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-widest">Categoria</label>
                                 <select name="category"
-                                    class="w-full rounded-xl border-gray-200 focus:ring-orange-500 focus:border-orange-500 p-4">
+                                    class="w-full rounded-xl border-gray-200 focus:ring-orange-500 focus:border-orange-500 p-4 appearance-none custom-select">
                                     <option value="Teologia" {{ old('category') == 'Teologia' ? 'selected' : '' }}>Teologia /
                                         Academia</option>
                                     <option value="Família" {{ old('category') == 'Família' ? 'selected' : '' }}>Família /
@@ -60,7 +60,7 @@
                                 <label class="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-widest">Nível /
                                     Cargo Alvo</label>
                                 <select name="target_role"
-                                    class="w-full rounded-xl border-gray-200 focus:ring-orange-500 focus:border-orange-500 p-4">
+                                    class="w-full rounded-xl border-gray-200 focus:ring-orange-500 focus:border-orange-500 p-4 appearance-none custom-select">
                                     <option value="" {{ old('target_role') == '' ? 'selected' : '' }}>Todos (Geral)</option>
                                     <option value="membro" {{ old('target_role') == 'membro' ? 'selected' : '' }}>Apenas
                                         Membros</option>

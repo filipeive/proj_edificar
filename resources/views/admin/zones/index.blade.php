@@ -6,36 +6,38 @@
 
 @section('content')
 @section('header-actions')
-    <div class="md:hidden">
-        <a href="{{ route('zones.create') }}"
-            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
-            <i class="bi bi-plus-circle-fill text-2xl"></i>
-        </a>
-    </div>
+    @if(auth()->user()->isAdmin() || auth()->user()->isSecretaria())
+        <div class="md:hidden">
+            <a href="{{ route('zones.create') }}"
+                class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
+                <i class="bi bi-plus-circle-fill text-2xl"></i>
+            </a>
+        </div>
+    @endif
 @endsection
 
 @section('content')
     <div class="space-y-8" x-data="{ 
-                        view: window.innerWidth < 768 ? 'grid' : (localStorage.getItem('zones_view') || 'grid'),
-                        selected: [],
-                        search: '{{ request('search') }}',
-                        updateView() {
-                            if (window.innerWidth < 768 && this.view === 'list') {
-                                this.view = 'grid';
+                            view: window.innerWidth < 768 ? 'grid' : (localStorage.getItem('zones_view') || 'grid'),
+                            selected: [],
+                            search: '{{ request('search') }}',
+                            updateView() {
+                                if (window.innerWidth < 768 && this.view === 'list') {
+                                    this.view = 'grid';
+                                }
+                            },
+                            toggleAll() {
+                                const allIds = {{ Js::from($zones->pluck('id')) }};
+                                if (this.selected.length === allIds.length) {
+                                    this.selected = [];
+                                } else {
+                                    this.selected = allIds;
+                                }
+                            },
+                            deleteSelected() {
+                                document.getElementById('bulk-delete-form').submit();
                             }
-                        },
-                        toggleAll() {
-                            const allIds = {{ Js::from($zones->pluck('id')) }};
-                            if (this.selected.length === allIds.length) {
-                                this.selected = [];
-                            } else {
-                                this.selected = allIds;
-                            }
-                        },
-                        deleteSelected() {
-                            document.getElementById('bulk-delete-form').submit();
-                        }
-                    }" x-init="$watch('view', value => localStorage.setItem('zones_view', value))"
+                        }" x-init="$watch('view', value => localStorage.setItem('zones_view', value))"
         @resize.window.debounce.500ms="updateView()">
 
         <!-- Bulk Action Bar -->
@@ -66,10 +68,12 @@
         </div>
 
         <!-- Toolbar -->
-        <div class="bg-white p-6 md:p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col lg:flex-row justify-between items-center gap-6 transition-all">
+        <div
+            class="bg-white p-6 md:p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col lg:flex-row justify-between items-center gap-6 transition-all">
             <div class="w-full lg:max-w-md relative group">
                 <form action="{{ route('zones.index') }}" method="GET" class="contents">
-                    <i class="bi bi-search absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors"></i>
+                    <i
+                        class="bi bi-search absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors"></i>
                     <input type="text" name="search" value="{{ request('search') }}"
                         placeholder="Pesquisar zonas ou pastores..."
                         class="w-full pl-14 pr-6 py-4 bg-gray-50/50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all">
@@ -79,13 +83,13 @@
             <div class="flex flex-wrap items-center justify-center md:justify-end gap-4 w-full lg:w-auto">
                 {{-- View Switcher --}}
                 <div class="flex bg-gray-100/50 p-1.5 rounded-2xl border border-gray-100">
-                    <button @click="view = 'grid'" 
+                    <button @click="view = 'grid'"
                         :class="view === 'grid' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
                         class="px-4 py-2 rounded-xl transition-all duration-300 flex items-center gap-2">
                         <i class="bi bi-grid-fill text-sm"></i>
                         <span class="text-[10px] font-black uppercase tracking-widest leading-none">Cards</span>
                     </button>
-                    <button @click="view = 'list'" 
+                    <button @click="view = 'list'"
                         :class="view === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
                         class="px-4 py-2 rounded-xl transition-all duration-300 flex items-center gap-2">
                         <i class="bi bi-list-ul text-sm"></i>
@@ -93,10 +97,13 @@
                     </button>
                 </div>
 
-                <a href="{{ route('zones.create') }}" class="group flex items-center bg-blue-600 text-white px-8 py-4 rounded-2xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-200">
-                    <i class="bi bi-plus-circle text-lg mr-2 group-hover:scale-110 transition-transform"></i>
-                    Nova Zona
-                </a>
+                @if(auth()->user()->isAdmin() || auth()->user()->isSecretaria())
+                    <a href="{{ route('zones.create') }}"
+                        class="group flex items-center bg-blue-600 text-white px-8 py-4 rounded-2xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-200">
+                        <i class="bi bi-plus-circle text-lg mr-2 group-hover:scale-110 transition-transform"></i>
+                        Nova Zona
+                    </a>
+                @endif
             </div>
         </div>
 
@@ -110,7 +117,7 @@
 
         <!-- Grid View -->
         <template x-if="view === 'grid'">
-            <div class="grid grid-compact">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 @forelse($zones as $zone)
                     <div
                         class="group bg-white rounded-[2rem] p-7 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-100 relative overflow-hidden compact-card">
@@ -288,7 +295,8 @@
                                                 @method('DELETE')
                                                 <button type="button"
                                                     @click="confirmDelete('list-delete-form-{{ $zone->id }}', 'Deseja excluir esta zona?')"
-                                                    class="action-icon bg-gray-50 text-gray-400 hover:bg-red-500 hover:text-white" title="Excluir">
+                                                    class="action-icon bg-gray-50 text-gray-400 hover:bg-red-500 hover:text-white"
+                                                    title="Excluir">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </form>

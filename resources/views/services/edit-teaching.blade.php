@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('title', 'Editar Culto de Ensino - Portal Life Church')
+@section('page-title', 'Editar Culto de Ensino')
+@section('page-subtitle', 'Atualizar métricas da reunião de quarta-feira')
 
 @section('content')
     <div class="space-y-8" x-data="{ 
@@ -64,7 +66,7 @@
                         <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Pregador</label>
                         <div class="space-y-4" x-effect="if (guestPreacher && $refs.preacherSelect) { $refs.preacherSelect.value = ''; }">
                             <select name="preacher_id" x-ref="preacherSelect"
-                                class="w-full px-5 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700 appearance-none">
+                                class="w-full px-5 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700 appearance-none custom-select">
                                 <option value="">Selecione o pregador</option>
                                 @foreach($preachers as $preacher)
                                     <option value="{{ $preacher->id }}" @selected(old('preacher_id', $service->preacher_id) == $preacher->id)>
@@ -277,8 +279,8 @@
                                     <div class="w-32">
                                         <select name="individual_contributions[{{ $index }}][type]"
                                             class="contribution-type w-full px-3 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-blue-500 focus:ring-0 text-xs font-bold text-gray-700">
-                                            <option value="tithe" @selected($contribution['type'] == 'tithe')>Dízimo</option>
                                             <option value="offering" @selected($contribution['type'] == 'offering')>Oferta</option>
+                                            <option value="tithe" @selected($contribution['type'] == 'tithe')>Dízimo</option>
                                         </select>
                                     </div>
                                     <div class="flex-1 relative">
@@ -376,8 +378,8 @@
                 <div class="w-32">
                     <select name="individual_contributions[INDEX][type]"
                         class="contribution-type w-full px-3 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-blue-500 focus:ring-0 text-xs font-bold text-gray-700">
-                        <option value="tithe">Dízimo</option>
                         <option value="offering">Oferta</option>
+                        <option value="tithe">Dízimo</option>
                     </select>
                 </div>
                 <div class="flex-1 relative">

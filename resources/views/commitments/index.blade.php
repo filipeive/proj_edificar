@@ -29,7 +29,7 @@
     </p>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
     @foreach($packages as $package)
     <div
         class="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition @if($currentCommitment && $currentCommitment->package_id === $package->id) ring-2 ring-blue-500 @endif">

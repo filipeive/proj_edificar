@@ -38,8 +38,8 @@
                                 {{ $currentUser->role === 'lider_celula' ? 'Célula' : ($currentUser->role === 'supervisor' ? 'Supervisão' : 'Zona') }}
                             </label>
                             <select id="user_id_select"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('user_id') border-red-500 @enderror"
-                                onchange="updateSelectedMemberInfo()">
+                                class="searchable-select w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent custom-select @error('user_id') border-red-500 @enderror"
+                                onchange="updateSelectedMemberInfo()" data-label="Membro">
                                 <option value="">-- Selecione um membro --</option>
                                 @foreach($members as $member)
                                     {{-- A opção do usuário logado deve ser incluída, mas pode ser excluída no controller se for
@@ -99,7 +99,7 @@
 
                         {{-- Seleção do Pacote (Apenas se precisar trocar o pacote na contribuição) --}}
                         <select name="package_id" id="package_id"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('package_id') border-red-500 @enderror"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent custom-select @error('package_id') border-red-500 @enderror"
                             required>
                             <option value="">-- Selecione o Pacote Referente à Contribuição --</option>
                             @foreach($packages as $package)

@@ -6,261 +6,138 @@
     <div class="flex items-center gap-2 md:hidden">
         @if($package->whatsapp_link)
             <a href="{{ $package->whatsapp_link }}" target="_blank"
-                class="action-icon text-gray-600 hover:text-green-600 hover:bg-green-50"
-                title="Grupo WhatsApp">
+                class="action-icon text-gray-600 hover:text-green-600 hover:bg-green-50" title="Grupo WhatsApp">
                 <i class="bi bi-whatsapp"></i>
             </a>
         @endif
         <a href="{{ route('packages.export', $package) }}"
-            class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
-            title="Exportar">
+            class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50" title="Exportar">
             <i class="bi bi-file-earmark-excel"></i>
         </a>
-        <a href="{{ route('packages.export-pdf', $package) }}"
-            class="action-icon text-gray-600 hover:text-red-600 hover:bg-red-50"
-            title="Exportar PDF">
-            <i class="bi bi-file-earmark-pdf"></i>
-        </a>
         <a href="{{ route('packages.edit', $package) }}"
-            class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50"
-            title="Editar">
+            class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50" title="Editar">
             <i class="bi bi-pencil-square"></i>
         </a>
     </div>
 @endsection
 
 @section('content')
-    <div class="space-y-8" x-data="{ 
-                            view: window.innerWidth < 768 ? 'grid' : 'list', 
-                            search: '',
-                            selected: [], 
-                            selectAll: false,
-                            updateSelection() {
-                                this.selected = this.selectAll ? {{ $commitmentUserIds }} : [];
-                            }
-                        }">
-        <!-- Header -->
-        <div
-            class="bg-white p-4 sm:p-6 md:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col lg:flex-row justify-between items-center gap-6">
+    <div class="space-y-6" x-data="{ 
+                                view: window.innerWidth < 768 ? 'grid' : 'list', 
+                                search: '',
+                                selected: [], 
+                                selectAll: false,
+                                updateSelection() {
+                                    this.selected = this.selectAll ? {{ $commitmentUserIds }} : [];
+                                }
+                            }">
+        <!-- New Compact Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div class="flex items-center gap-4">
                 <a href="{{ route('packages.index') }}"
-                    class="w-12 h-12 rounded-2xl bg-gray-50 text-gray-400 flex items-center justify-center hover:bg-gray-100 transition-all">
-                    <i class="bi bi-arrow-left text-2xl"></i>
+                    class="w-10 h-10 rounded-xl bg-white text-gray-400 flex items-center justify-center hover:bg-blue-50 hover:text-blue-600 transition-all shadow-sm border border-gray-100">
+                    <i class="bi bi-arrow-left text-xl"></i>
                 </a>
                 <div>
-                    <h1 class="text-3xl font-black text-gray-900 tracking-tight">{{ $package->name }}</h1>
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Gestão de Membros e
-                        Contribuições</p>
+                    <h1 class="text-2xl font-black text-gray-900 tracking-tight">{{ $package->name }}</h1>
+                    <div class="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">
+                        <span>Gestão de Membros</span>
+                        <span class="w-1 h-1 rounded-full bg-gray-300"></span>
+                        <span
+                            class="{{ $package->is_active ? 'text-green-500' : 'text-red-500' }}">{{ $package->is_active ? 'Ativo' : 'Inativo' }}</span>
+                    </div>
                 </div>
             </div>
-            <div class="grid grid-cols-2 sm:flex sm:flex-row flex-wrap items-center gap-2 sm:gap-3 w-full lg:w-auto hidden md:flex">
+
+            <div class="hidden md:flex items-center gap-2">
                 @if($package->whatsapp_link)
                     <a href="{{ $package->whatsapp_link }}" target="_blank"
-                        class="col-span-2 sm:w-auto bg-green-600 text-white px-4 md:px-8 py-3 md:py-4 rounded-xl sm:rounded-2xl hover:bg-green-700 transition-all font-black text-[10px] sm:text-xs uppercase tracking-widest flex items-center justify-center shadow-lg shadow-green-100">
-                        <i class="bi bi-whatsapp mr-2 text-base sm:text-lg"></i> <span class="hidden sm:inline">Grupo</span> WhatsApp
+                        class="px-4 py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-all text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                        <i class="bi bi-whatsapp"></i> WhatsApp
                     </a>
                 @endif
+                <div class="h-8 w-px bg-gray-200 mx-2"></div>
                 <a href="{{ route('packages.export', $package) }}"
-                    class="sm:w-auto bg-blue-600 text-white px-4 md:px-8 py-3 md:py-4 rounded-xl sm:rounded-2xl hover:bg-blue-700 transition-all font-black text-[10px] sm:text-xs uppercase tracking-widest flex items-center justify-center shadow-lg shadow-blue-100">
-                    <i class="bi bi-file-earmark-excel mr-2"></i> Exportar
+                    class="px-4 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-all text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                    <i class="bi bi-file-earmark-excel"></i> Excel
                 </a>
                 <a href="{{ route('packages.export-pdf', $package) }}"
-                    class="sm:w-auto bg-red-600 text-white px-4 md:px-8 py-3 md:py-4 rounded-xl sm:rounded-2xl hover:bg-red-700 transition-all font-black text-[10px] sm:text-xs uppercase tracking-widest flex items-center justify-center shadow-lg shadow-red-100">
-                    <i class="bi bi-file-earmark-pdf mr-2"></i> PDF
+                    class="px-4 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-all text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                    <i class="bi bi-file-earmark-pdf"></i> PDF
                 </a>
                 <a href="{{ route('packages.edit', $package) }}"
-                    class="sm:w-auto bg-orange-600 text-white px-4 md:px-8 py-3 md:py-4 rounded-xl sm:rounded-2xl hover:bg-orange-700 transition-all font-black text-[10px] sm:text-xs uppercase tracking-widest flex items-center justify-center shadow-lg shadow-orange-100">
-                    <i class="bi bi-pencil-square mr-2"></i> Editar
+                    class="px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all text-xs font-bold uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-gray-200">
+                    <i class="bi bi-pencil-square"></i> Editar
                 </a>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Stats Column -->
-            <div class="lg:col-span-1 space-y-6">
-                <div class="bg-white p-6 md:p-8 rounded-[2rem] sm:rounded-[2.5rem] shadow-sm border border-gray-100">
-                    <h3 class="text-xs sm:text-sm font-black text-gray-900 uppercase tracking-widest mb-6">Informações do Pacote</h3>
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center pb-4 border-b border-gray-50">
-                            <span class="text-xs font-bold text-gray-400 uppercase">Valor Mínimo</span>
-                            <span
-                                class="text-sm font-black text-gray-900">{{ number_format($package->min_amount, 2, ',', '.') }}
-                                MT</span>
-                        </div>
-                        <div class="flex justify-between items-center pb-4 border-b border-gray-50">
-                            <span class="text-xs font-bold text-gray-400 uppercase">Valor Máximo</span>
-                            <span class="text-sm font-black text-gray-900">
-                                @if($package->max_amount)
-                                    {{ number_format($package->max_amount, 2, ',', '.') }} MT
-                                @else
-                                    Sem Limite
-                                @endif
-                            </span>
-                        </div>
-                        <div class="flex justify-between items-center pb-4 border-b border-gray-50">
-                            <span class="text-xs font-bold text-gray-400 uppercase">Membros Ativos</span>
-                            <span class="text-sm font-black text-blue-600">{{ $package->getActiveMembersCount() }}</span>
-                        </div>
-                        <div>
-                            <span class="text-xs font-bold text-gray-400 uppercase block mb-2">Descrição</span>
-                            <p class="text-sm text-gray-600 leading-relaxed font-medium">
-                                {{ $package->description ?? 'Nenhuma descrição fornecida.' }}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SMS/WhatsApp Bulk Actions -->
-                <div class="bg-blue-600 p-6 md:p-8 rounded-[2rem] sm:rounded-[2.5rem] shadow-lg shadow-blue-100 text-white space-y-6">
-                    <div>
-                        <h3 class="text-xs sm:text-sm font-black uppercase tracking-widest mb-2">Ações de Massa</h3>
-                        <p class="text-xs text-blue-100 font-medium">Use as ferramentas abaixo para comunicar com todos os
-                            membros deste pacote de uma só vez.</p>
-                    </div>
-
-                    <div class="space-y-3">
-                        <button
-                            onclick="copyToClipboard('{{ $package->whatsapp_template ?? 'Paz do Senhor! Este é um lembrete do Projeto Edificar.' }}', 'Mensagem copiada!', this)"
-                            class="w-full bg-white text-blue-600 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-50 transition-all shadow-xl flex items-center justify-center gap-2">
-                            <i class="bi bi-clipboard-check"></i> Copiar Mensagem
-                        </button>
-
-                        <form action="{{ route('packages.send-bulk-sms', $package) }}" method="POST">
-                            @csrf
-                            <button type="button"
-                                onclick="confirmAction('Tem certeza que deseja disparar SMS para todos os membros deste pacote?', 'Disparar SMS em Massa').then(result => { if(result.isConfirmed) this.closest('form').submit(); })"
-                                class="w-full bg-blue-500 text-white border border-blue-400/30 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl flex items-center justify-center gap-2">
-                                <i class="bi bi-broadcast"></i> Disparar SMS em Massa
-                            </button>
-                        </form>
-
-                        <button
-                            onclick="copyToClipboard('{{ $commitmentPhones }}', 'Contactos copiados!', this)"
-                            class="w-full bg-blue-500/10 text-white border border-white/20 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-500/30 transition-all flex items-center justify-center gap-2">
-                            <i class="bi bi-person-lines-fill"></i> Copiar Contactos
-                        </button>
-
-                        @if (auth()->user()->managesPackage($package))
-                        <form action="{{ route('packages.notify-commission', $package) }}" method="POST">
-                            @csrf
-                            <button type="submit"
-                                class="w-full bg-orange-500 text-white py-3 sm:py-4 rounded-xl sm:rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-orange-600 transition-all shadow-xl flex items-center justify-center gap-2 mt-4">
-                                <i class="bi bi-bell-fill"></i> Notificar Comissão
-                            </button>
-                        </form>
-                        @endif
-
-                    </div>
-
-                    @if($package->whatsapp_link)
-                        <a href="{{ $package->whatsapp_link }}" target="_blank"
-                            class="w-full bg-green-500 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-green-600 transition-all shadow-xl flex items-center justify-center gap-2">
-                            <i class="bi bi-whatsapp"></i> Ir para o Grupo
-                        </a>
-                    @endif
+        <!-- Top Stats Bar (Horizontal) -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Min Amount -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Valor Mínimo</span>
+                <div class="flex items-end justify-between mt-2">
+                    <span
+                        class="text-xl font-black text-gray-900">{{ number_format($package->min_amount, 2, ',', '.') }}</span>
+                    <span class="text-[10px] font-bold text-gray-400 mb-1">MT</span>
                 </div>
             </div>
 
-            <script>
-                function copyToClipboard(text, successMessage, element = null) {
-                    if (!text) {
-                        alert('Nenhum conteúdo para copiar.');
-                        return;
-                    }
-
-                    navigator.clipboard.writeText(text).then(() => {
-                        const target = element || event.currentTarget;
-                        const originalHTML = target.innerHTML;
-                        const originalClass = target.className;
-
-                        target.innerHTML = `<i class="bi bi-check2"></i> ${successMessage || ''}`;
-                        if (target.tagName === 'BUTTON') {
-                            target.classList.add('bg-green-500', 'text-white');
-                        }
-
-                        setTimeout(() => {
-                            target.innerHTML = originalHTML;
-                            target.className = originalClass;
-                        }, 2000);
-                    }).catch(err => {
-                        console.error('Erro ao copiar: ', err);
-                        const textArea = document.createElement("textarea");
-                        textArea.value = text;
-                        document.body.appendChild(textArea);
-                        textArea.select();
-                        try {
-                            document.execCommand('copy');
-                            alert(successMessage || 'Copiado!');
-                        } catch (err) {
-                            alert('Erro ao copiar. Por favor copie manualmente.');
-                        }
-                        document.body.removeChild(textArea);
-                    });
-                }
-            </script>
-
-            <!-- Members List Column -->
-            <div class="lg:col-span-2 space-y-8">
-                <!-- Add Member Form -->
-                <div class="bg-white p-6 md:p-8 rounded-[2rem] sm:rounded-[2.5rem] shadow-sm border border-gray-100">
-                    <h3 class="text-xs sm:text-sm font-black text-gray-900 uppercase tracking-widest mb-6">Adicionar Membro ao Pacote
-                    </h3>
-                    <form action="{{ route('packages.assign', $package) }}" method="POST"
-                        class="flex flex-col md:flex-row gap-4 items-end">
-                        @csrf
-                        <div class="flex-1">
-                            <label for="user_id"
-                                class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Selecionar
-                                Membro</label>
-                            <select name="user_id" id="user_id"
-                                class="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500"
-                                required>
-                                <option value="">Escolha um membro...</option>
-                                @foreach(\App\Models\User::orderBy('name')->get() as $user)
-                                    <option value="{{ $user->id }}">{{ $user->name }} - {{ $user->phone }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="w-full md:w-32">
-                            <label for="committed_amount"
-                                class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Valor
-                                (MT)</label>
-                            <input type="number" name="committed_amount" id="committed_amount"
-                                value="{{ $package->min_amount }}" step="0.01"
-                                class="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500"
-                                required>
-                        </div>
-                        <button type="submit"
-                            class="bg-blue-600 text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 h-[46px]">
-                            <i class="bi bi-person-plus-fill"></i>
-                        </button>
-                    </form>
-                </div>
-
-                <div
-                    class="p-4 sm:p-6 md:p-8 border-b border-gray-50 flex flex-col md:flex-row justify-between items-center gap-4 bg-gray-50/10">
-                    <div class="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
-                        <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest whitespace-nowrap">Membros
-                            Comprometidos</h3>
-
-                        <!-- Search Input -->
-                        <div class="relative w-full md:w-72">
-                            <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                            <input type="text" x-model="search" placeholder="Pesquisar membro ou telefone..."
-                                class="w-full pl-12 pr-4 py-3 bg-white border border-gray-100 rounded-2xl text-sm font-bold text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-500 transition-all">
-                        </div>
-
-                        @if(auth()->user()->isAdmin() || auth()->user()->isComissaoObra() || auth()->user()->isResponsavelPacote())
-                            <button type="button" @click="$dispatch('open-quick-member-modal')"
-                                class="bg-blue-600 text-white px-4 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
-                                <i class="bi bi-person-plus-fill mr-2"></i>Novo Membro Rápido
-                            </button>
+            <!-- Max Amount -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Valor Máximo</span>
+                <div class="flex items-end justify-between mt-2">
+                    <span class="text-xl font-black text-gray-900">
+                        @if($package->max_amount)
+                            {{ number_format($package->max_amount, 2, ',', '.') }}
+                        @else
+                            ∞
                         @endif
+                    </span>
+                    <span class="text-[10px] font-bold text-gray-400 mb-1">MT</span>
+                </div>
+            </div>
 
-                        <!-- Bulk Actions Toolbar -->
+            <!-- Active Members -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Membros Ativos</span>
+                <div class="flex items-end justify-between mt-2">
+                    <span class="text-xl font-black text-blue-600">{{ $package->getActiveMembersCount() }}</span>
+                    <div class="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
+                        <i class="bi bi-people-fill text-xs"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Responsavel -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Responsável</span>
+                <div class="mt-2">
+                    <span class="text-sm font-bold text-gray-900 line-clamp-1">{{ $package->getResponsavelName() }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+            <!-- Left Column: Members List (Span 2) -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Toolbar -->
+                <div
+                    class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="relative w-full sm:w-64">
+                        <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" x-model="search" placeholder="Pesquisar membro..."
+                            class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-blue-500 rounded-xl text-sm font-bold transition-all">
+                    </div>
+
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <!-- Bulk Actions -->
                         <div x-show="selected.length > 0" x-transition
-                            class="flex items-center gap-2 bg-blue-50 px-3 py-1 rounded-xl border border-blue-100">
-                            <span class="text-[10px] font-black uppercase text-blue-600"
+                            class="flex items-center gap-2 bg-red-50 px-3 py-1.5 rounded-lg border border-red-100 mr-auto sm:mr-0">
+                            <span class="text-[10px] font-black uppercase text-red-600"
                                 x-text="selected.length + ' selecionado(s)'"></span>
                             <form action="{{ route('packages.members.bulk-remove', $package) }}" method="POST"
                                 onsubmit="return confirm('Tem certeza que deseja remover os membros selecionados?');">
@@ -273,247 +150,153 @@
                                 </button>
                             </form>
                         </div>
-                    </div>
 
-                    <div class="flex bg-gray-50 p-1 rounded-xl border border-gray-100 shrink-0">
-                        <button @click="view = 'list'"
-                            :class="view === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
-                            class="px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
-                            <i class="bi bi-list-ul"></i>
-                        </button>
-                        <button @click="view = 'grid'"
-                            :class="view === 'grid' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
-                            class="px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
-                            <i class="bi bi-grid-fill"></i>
-                        </button>
+                        <!-- View Toggles -->
+                        <div class="flex bg-gray-100 p-1 rounded-lg ml-auto">
+                            <button @click="view = 'list'"
+                                :class="view === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
+                                class="w-8 h-8 rounded-md flex items-center justify-center transition-all">
+                                <i class="bi bi-list-ul"></i>
+                            </button>
+                            <button @click="view = 'grid'"
+                                :class="view === 'grid' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
+                                class="w-8 h-8 rounded-md flex items-center justify-center transition-all">
+                                <i class="bi bi-grid-fill"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <div x-show="view === 'list'" x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-                    class="overflow-x-auto">
-                    <table class="w-full table-compact">
-                        <thead>
-                            <tr class="bg-gray-50/50">
-                                <th class="px-4 md:px-8 py-4 w-10">
-                                    <input type="checkbox" x-model="selectAll" @change="updateSelection()"
-                                        class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                                </th>
-                                <th
-                                    class="px-4 md:px-8 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                    Membro</th>
-                                <th
-                                    class="px-4 md:px-8 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                    Valor</th>
-                                <th
-                                    class="hidden lg:table-cell px-4 md:px-8 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                    Célula</th>
-                                <th
-                                    class="hidden xl:table-cell px-4 md:px-8 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                    Zona</th>
-                                <th
-                                    class="px-4 md:px-8 py-4 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                    Estado Mês</th>
-                                <th
-                                    class="px-4 md:px-8 py-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                    Admissão</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-50">
-                            @forelse($commitments as $commitment)
-                                <tr class="hover:bg-gray-50/50 transition-colors"
-                                    x-show="!search || '{{ strtolower($commitment->user->name) }}'.includes(search.toLowerCase()) || '{{ $commitment->user->phone }}'.includes(search)">
-                                    <td class="px-8 py-6">
-                                        <input type="checkbox" value="{{ $commitment->user_id }}" x-model="selected"
-                                            class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                                    </td>
-                                    <td class="px-8 py-6">
-                                        <div class="flex items-center gap-3">
-                                            <div
-                                                class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center font-black text-gray-400 text-xs">
-                                                {{ strtoupper(substr($commitment->user->name, 0, 1)) }}
+
+                <!-- List View -->
+                <div x-show="view === 'list'" x-transition
+                    class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full table-compact">
+                            <thead>
+                                <tr class="bg-gray-50/50">
+                                    <th class="px-6 py-4 w-10">
+                                        <input type="checkbox" x-model="selectAll" @change="updateSelection()"
+                                            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                    </th>
+                                    <th class="px-6 py-4 text-left">Membro</th>
+                                    <th class="px-6 py-4 text-left">Valor</th>
+                                    <th class="px-6 py-4 text-left hidden sm:table-cell">Célula</th>
+                                    <th class="px-6 py-4 text-center">Estado Mês</th>
+                                    <th class="px-6 py-4 text-right">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+                                @forelse($commitments as $commitment)
+                                    <tr class="hover:bg-gray-50/50 transition-colors"
+                                        x-show="!search || '{{ strtolower($commitment->user->name) }}'.includes(search.toLowerCase()) || '{{ $commitment->user->phone }}'.includes(search)">
+                                        <td class="px-6 py-4">
+                                            <input type="checkbox" value="{{ $commitment->user_id }}" x-model="selected"
+                                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center gap-3">
+                                                <div
+                                                    class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center font-bold text-gray-500 text-xs">
+                                                    {{ strtoupper(substr($commitment->user->name, 0, 1)) }}
+                                                </div>
+                                                <div>
+                                                    <div class="text-sm font-bold text-gray-900">{{ $commitment->user->name }}
+                                                    </div>
+                                                    <div class="text-[10px] text-gray-400 font-mono">
+                                                        {{ $commitment->user->phone }}</div>
+                                                </div>
                                             </div>
-                                            <div class="flex flex-col">
+                                        </td>
+                                        <td class="px-6 py-4 text-sm font-bold text-gray-900">
+                                            {{ number_format($commitment->committed_amount, 2, ',', '.') }} MT
+                                        </td>
+                                        <td class="px-6 py-4 text-xs font-medium text-gray-500 hidden sm:table-cell">
+                                            {{ $commitment->user->cell->name ?? '-' }}
+                                        </td>
+                                        <td class="px-6 py-4 text-center">
+                                            @php
+                                                $currentMonthContribution = $commitment->user->contributions()
+                                                    ->where('package_id', $package->id)
+                                                    ->whereMonth('contribution_date', now()->month)
+                                                    ->whereYear('contribution_date', now()->year)
+                                                    ->first();
+                                            @endphp
+                                            @if($currentMonthContribution)
+                                                                        <span
+                                                                            class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide
+                                                                                        {{ $currentMonthContribution->isVerified() ? 'bg-green-100 text-green-700' :
+                                                ($currentMonthContribution->isRejected() ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700') }}">
+                                                                            {{ $currentMonthContribution->getStatusLabel() }}
+                                                                        </span>
+                                            @else
                                                 <span
-                                                    class="text-sm font-black text-gray-900 leading-tight">{{ $commitment->user->name }}</span>
-                                                <span
-                                                    class="text-[10px] text-gray-400 font-bold uppercase">{{ $commitment->user->phone }}</span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-8 py-6">
-                                        <span
-                                            class="text-sm font-black text-gray-900">{{ number_format($commitment->committed_amount, 2, ',', '.') }}
-                                            MT</span>
-                                    </td>
-                                    <td class="hidden lg:table-cell px-4 md:px-8 py-6">
-                                        <span class="text-xs font-bold text-gray-600">
-                                            {{ $commitment->user->cell->name ?? 'N/A' }}
-                                        </span>
-                                    </td>
-                                    <td class="hidden xl:table-cell px-4 md:px-8 py-6">
-                                        <span class="text-xs font-bold text-gray-600">
-                                            {{ $commitment->user->cell->supervision->zone->name ?? 'N/A' }}
-                                        </span>
-                                    </td>
-                                    <td class="px-8 py-6 text-center">
-                                        <div class="flex items-center justify-center gap-1">
-                                            <!-- Add Contribution Shortcut -->
-                                            <a href="{{ route('contributions.create') }}?user_id={{ $commitment->user_id }}&package_id={{ $package->id }}"
-                                                class="action-icon bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white shadow-sm"
-                                                title="Adicionar contribuição">
-                                                <i class="bi bi-plus-circle-fill"></i>
-                                            </a>
-
-                                            <!-- Edit Member Info Modal Trigger -->
-                                            <button type="button" @click="$dispatch('open-edit-member-modal', { 
-                                                                                                                userId: {{ $commitment->user_id }}, 
-                                                                                                                userName: '{{ $commitment->user->name }}', 
-                                                                                                                phone: '{{ $commitment->user->phone }}', 
-                                                                                                                cellId: '{{ $commitment->user->cell_id }}',
-                                                                                                                amount: '{{ $commitment->committed_amount }}'
-                                                                                                            })"
-                                                class="action-icon bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white shadow-sm"
-                                                title="Editar dados">
-                                                <i class="bi bi-pencil-fill"></i>
-                                            </button>
-
-                                            <!-- Change Package -->
-                                            <button type="button" @click="$dispatch('open-change-package-modal', { 
-                                                                                userId: {{ $commitment->user_id }}, 
-                                                                                userName: '{{ $commitment->user->name }}',
-                                                                                currentAmount: '{{ $commitment->committed_amount }}'
-                                                                            })"
-                                                class="action-icon bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white shadow-sm"
-                                                title="Mudar de pacote">
-                                                <i class="bi bi-arrow-left-right"></i>
-                                            </button>
-
-                                            <!-- Remove Member -->
-                                            <form
-                                                action="{{ route('packages.members.remove', [$package, $commitment->user_id]) }}"
-                                                method="POST"
-                                                onsubmit="return confirm('Tem certeza que deseja remover este membro do pacote?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit"
-                                                    class="action-icon bg-red-50 text-red-600 hover:bg-red-600 hover:text-white shadow-sm"
-                                                    title="Remover do pacote">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </form>
-
-                                            @if($commitment->user->phone)
-                                                @php
-                                                    $name = $commitment->user->name;
-                                                    $smsBody = str_replace('[NOME]', $name, $package->sms_template ?? "Olá [NOME], lembrete de contribuição para o Projetor Edificar.");
-                                                    $whatsappBody = str_replace('[NOME]', $name, $package->whatsapp_template ?? "Olá [NOME], este é um lembrete do Projetor Edificar.");
-                                                    $cleanPhone = preg_replace('/[^0-9]/', '', $commitment->user->phone);
-                                                @endphp
-                                                <button type="button"
-                                                    @click="$dispatch('open-sms-member-modal', { 
-                                                        userId: {{ $commitment->user_id }}, 
-                                                        userName: @js($commitment->user->name),
-                                                        message: @js($smsBody)
-                                                    })"
-                                                    class="action-icon bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white shadow-sm"
-                                                    title="SMS individual">
-                                                    <i class="bi bi-chat-dots-fill"></i>
-                                                </button>
-                                                <a href="https://wa.me/{{ $cleanPhone }}?text={{ urlencode($whatsappBody) }}"
-                                                    target="_blank"
-                                                    class="action-icon bg-green-50 text-green-600 hover:bg-green-600 hover:text-white shadow-sm"
-                                                    title="WhatsApp individual">
-                                                    <i class="bi bi-whatsapp"></i>
-                                                </a>
+                                                    class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide bg-gray-100 text-gray-400">
+                                                    Pendente
+                                                </span>
                                             @endif
-                                        </div>
-                                    </td>
-                                    <td class="px-8 py-6 text-center">
-                                        @php
-                                            $currentMonthContribution = $commitment->user->contributions()
-                                                ->where('package_id', $package->id)
-                                                ->whereMonth('contribution_date', now()->month)
-                                                ->whereYear('contribution_date', now()->year)
-                                                ->first();
-                                        @endphp
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center justify-end gap-1">
+                                                <button type="button" @click="$dispatch('open-edit-member-modal', { 
+                                                            userId: {{ $commitment->user_id }}, 
+                                                            userName: '{{ $commitment->user->name }}', 
+                                                            phone: '{{ $commitment->user->phone }}', 
+                                                            cellId: '{{ $commitment->user->cell_id }}',
+                                                            amount: '{{ $commitment->committed_amount }}'
+                                                        })" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Editar">
+                                                            <i class="bi bi-pencil-fill"></i>
+                                                        </button>
 
-                                        @if($currentMonthContribution)
-                                            <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border 
-                                                {{ $currentMonthContribution->isVerified() ? 'bg-green-50 text-green-600 border-green-100' : 
-                                                   ($currentMonthContribution->isRejected() ? 'bg-red-50 text-red-600 border-red-100' : 'bg-yellow-50 text-yellow-600 border-yellow-100') }}">
-                                                {{ $currentMonthContribution->getStatusLabel() }}
-                                            </span>
-                                        @else
-                                            <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border bg-gray-50 text-gray-400 border-gray-100">
-                                                Não Registado
-                                            </span>
-                                        @endif
-                                    </td>
-                                    <td class="px-8 py-6 text-right">
-                                        <span
-                                            class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border 
-                                                                                                                                        {{ $commitment->isActive() ? 'bg-green-50 text-green-600 border-green-100' : 'bg-red-50 text-red-600 border-red-100' }}">
-                                            {{ $commitment->isActive() ? 'Ativo' : 'Encerrado' }}
-                                        </span>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="px-8 py-10 text-center">
-                                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Nenhum membro
-                                            encontrado neste pacote.</p>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+                                                        <button type="button" @click="$dispatch('open-change-package-modal', { 
+                                                            userId: {{ $commitment->user_id }}, 
+                                                            userName: '{{ $commitment->user->name }}',
+                                                            currentAmount: '{{ $commitment->committed_amount }}'
+                                                        })" class="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors" title="Mudar Pacote">
+                                                            <i class="bi bi-arrow-left-right"></i>
+                                                        </button>
 
-                <!-- Grid View for Members -->
-                <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-                    class="p-6 grid grid-compact bg-gray-50/30">
-                    @forelse($commitments as $commitment)
-                        <div x-show="!search || '{{ strtolower($commitment->user->name) }}'.includes(search.toLowerCase()) || '{{ $commitment->user->phone }}'.includes(search)"
-                            class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-md transition-all relative compact-card">
-                            <div class="absolute top-6 left-6 z-10">
-                                <input type="checkbox" value="{{ $commitment->user_id }}" x-model="selected"
-                                    class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 w-5 h-5">
-                            </div>
-                            <div class="absolute top-6 right-6">
-                                <span
-                                    class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border 
-                                                                                {{ $commitment->isActive() ? 'bg-green-50 text-green-600 border-green-100' : 'bg-red-50 text-red-600 border-red-100' }}">
-                                    {{ $commitment->isActive() ? 'Ativo' : 'Encerrado' }}
-                                </span>
-                            </div>
+                                                        @if($commitment->user->phone)
+                                                            @php
+                                                                $name = $commitment->user->name;
+                                                                $smsBody = str_replace('[NOME]', $name, $package->sms_template ?? "Olá [NOME], lembrete de contribuição para o Projetor Edificar.");
+                                                            @endphp
+                                                            <button type="button" @click="$dispatch('open-sms-member-modal', { 
+                                                                userId: {{ $commitment->user_id }}, 
+                                                                userName: '{{ $commitment->user->name }}',
+                                                                message: '{{ $smsBody }}'
+                                                            })" class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="Enviar SMS/WhatsApp">
+                                                                <i class="bi bi-chat-dots-fill"></i>
+                                                            </button>
+                                                        @endif
 
-                            <div class="flex items-center gap-4 mb-4">
-                                <div
-                                    class="w-12 h-12 rounded-2xl bg-gray-50 text-gray-400 flex items-center justify-center font-black text-xl group-hover:bg-blue-600 group-hover:text-white transition-all">
-                                    {{ strtoupper(substr($commitment->user->name, 0, 1)) }}
-                                </div>
-                                <div class="flex flex-col">
-                                    <h4 class="text-sm font-black text-gray-900 line-clamp-1">{{ $commitment->user->name }}</h4>
-                                    <span
-                                        class="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">{{ $commitment->user->phone }}</span>
-                                </div>
-                            </div>
+                                                        <form action="{{ route('packages.members.remove', [$package, $commitment->user_id]) }}" method="POST"
+                                                            onsubmit="return confirm('Remover membro?');" class="inline">
+                                                            @csrf @method('DELETE')
+                                                            <button type="submit" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Remover">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                @empty
+                                        <tr>
+                                            <td colspan="6" class="px-6 py-12 text-center text-gray-400 text-xs font-bold uppercase tracking-widest">
+                                                Nenhum membro encontrado
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
 
-                            <div class="bg-gray-50 p-4 rounded-2xl mb-6 space-y-2">
-                                <div class="flex justify-between items-center">
-                                    <span
-                                        class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Compromisso</span>
-                                    <span
-                                        class="text-sm font-black text-gray-900">{{ number_format($commitment->committed_amount, 2, ',', '.') }}
-                                        MT</span>
-                                </div>
-                                <div class="flex justify-between items-center text-[10px] font-bold">
-                                    <span class="text-gray-400 uppercase">Célula</span>
-                                    <span class="text-gray-900">{{ $commitment->user->cell->name ?? 'N/A' }}</span>
-                                </div>
-                                <div class="flex justify-between items-center text-[10px] font-bold pt-2 border-t border-gray-100">
-                                    <span class="text-gray-400 uppercase">Estado Mês</span>
+                    <!-- Grid View -->
+                    <div x-show="view === 'grid'" x-transition class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        @forelse($commitments as $commitment)
+                            <div x-show="!search || '{{ strtolower($commitment->user->name) }}'.includes(search.toLowerCase()) || '{{ $commitment->user->phone }}'.includes(search)"
+                                class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 relative group compact-card">
+                                <div class="absolute top-4 right-4 flex items-center gap-2">
                                     @php
                                         $currentMonthContribution = $commitment->user->contributions()
                                             ->where('package_id', $package->id)
@@ -521,387 +304,325 @@
                                             ->whereYear('contribution_date', now()->year)
                                             ->first();
                                     @endphp
-
                                     @if($currentMonthContribution)
-                                        <span class="{{ $currentMonthContribution->isVerified() ? 'text-green-600' : 
-                                               ($currentMonthContribution->isRejected() ? 'text-red-600' : 'text-yellow-600') }}">
-                                            {{ $currentMonthContribution->getStatusLabel() }}
-                                        </span>
+                                        <div class="w-2 h-2 rounded-full {{ $currentMonthContribution->isVerified() ? 'bg-green-500' : ($currentMonthContribution->isRejected() ? 'bg-red-500' : 'bg-yellow-500') }}"></div>
                                     @else
-                                        <span class="text-gray-400">Não Registado</span>
+                                        <div class="w-2 h-2 rounded-full bg-gray-300"></div>
                                     @endif
-                                </div>
-                            </div>
 
-                            <div class="flex flex-col gap-2 mt-auto">
-                                <a href="{{ route('contributions.create') }}?user_id={{ $commitment->user_id }}&package_id={{ $package->id }}"
-                                    class="w-full bg-gray-900 text-white text-center py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all flex items-center justify-center gap-2">
-                                    <i class="bi bi-plus-circle"></i> Contribuir
-                                </a>
-                                <div class="flex items-center justify-between gap-1">
-                                    <button type="button" @click="$dispatch('open-edit-member-modal', { 
-                                                                                            userId: {{ $commitment->user_id }}, 
-                                                                                            userName: '{{ $commitment->user->name }}', 
-                                                                                            phone: '{{ $commitment->user->phone }}', 
-                                                                                            cellId: '{{ $commitment->user->cell_id }}',
-                                                                                            amount: '{{ $commitment->committed_amount }}'
-                                                                                        })"
-                                        class="flex-1 h-10 bg-blue-50 text-blue-600 flex items-center justify-center rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm"
-                                        title="Editar">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-
-                                    <!-- Change Package -->
-                                    <button type="button" @click="$dispatch('open-change-package-modal', { 
-                                                                        userId: {{ $commitment->user_id }}, 
-                                                                        userName: '{{ $commitment->user->name }}',
-                                                                        currentAmount: '{{ $commitment->committed_amount }}'
-                                                                    })"
-                                        class="flex-1 h-10 bg-purple-50 text-purple-600 flex items-center justify-center rounded-xl hover:bg-purple-600 hover:text-white transition-all shadow-sm"
-                                        title="Mudar Pacote">
-                                        <i class="bi bi-arrow-left-right"></i>
-                                    </button>
-
-                                    <!-- Remove -->
-                                    <form action="{{ route('packages.members.remove', [$package, $commitment->user_id]) }}"
-                                        method="POST"
-                                        onsubmit="return confirm('Tem certeza que deseja remover este membro do pacote?');"
-                                        class="flex-1">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                            class="w-full h-10 bg-red-50 text-red-600 flex items-center justify-center rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm"
-                                            title="Remover">
-                                            <i class="bi bi-trash"></i>
+                                    <form action="{{ route('packages.members.remove', [$package, $commitment->user_id]) }}" method="POST"
+                                        onsubmit="return confirm('Remover membro?');" class="inline opacity-0 group-hover:opacity-100 transition-opacity">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="text-red-400 hover:text-red-600">
+                                            <i class="bi bi-x-circle-fill"></i>
                                         </button>
                                     </form>
+                                </div>
 
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center font-black text-gray-500 text-sm">
+                                        {{ strtoupper(substr($commitment->user->name, 0, 1)) }}
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xs font-bold text-gray-900 line-clamp-1">{{ $commitment->user->name }}</h4>
+                                        <p class="text-[10px] text-gray-400 font-mono">{{ $commitment->user->phone }}</p>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-2 mb-4">
+                                    <div class="flex justify-between items-center text-[10px]">
+                                        <span class="text-gray-400 font-bold uppercase">Compromisso</span>
+                                        <span class="font-black text-gray-900">{{ number_format($commitment->committed_amount, 2, ',', '.') }} MT</span>
+                                    </div>
+                                    <div class="flex justify-between items-center text-[10px]">
+                                        <span class="text-gray-400 font-bold uppercase">Célula</span>
+                                        <span class="font-medium text-gray-600 truncate max-w-[100px]">{{ $commitment->user->cell->name ?? '-' }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-2 mb-2">
+                                    <a href="{{ route('contributions.create') }}?user_id={{ $commitment->user_id }}&package_id={{ $package->id }}"
+                                        class="py-2.5 bg-gray-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest text-center hover:bg-gray-800 transition-all">
+                                        Contribuir
+                                    </a>
+                                    <button type="button" @click="$dispatch('open-edit-member-modal', { 
+                                        userId: {{ $commitment->user_id }}, 
+                                        userName: '{{ $commitment->user->name }}', 
+                                        phone: '{{ $commitment->user->phone }}', 
+                                        cellId: '{{ $commitment->user->cell_id }}',
+                                        amount: '{{ $commitment->committed_amount }}'
+                                    })" class="py-2.5 bg-gray-100 text-gray-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-200 transition-all">
+                                        Editar
+                                    </button>
+                                </div>
+
+                                <div class="flex items-center justify-center gap-4 pt-1 border-t border-gray-50">
+                                    <button type="button" @click="$dispatch('open-change-package-modal', { 
+                                        userId: {{ $commitment->user_id }}, 
+                                        userName: '{{ $commitment->user->name }}',
+                                        currentAmount: '{{ $commitment->committed_amount }}'
+                                    })" class="text-purple-400 hover:text-purple-600 text-[10px] font-bold uppercase" title="Mudar Pacote">
+                                        Mudar
+                                    </button>
+                                    <div class="w-px h-3 bg-gray-200"></div>
                                     @if($commitment->user->phone)
                                         @php
                                             $name = $commitment->user->name;
                                             $smsBody = str_replace('[NOME]', $name, $package->sms_template ?? "Olá [NOME], lembrete de contribuição para o Projetor Edificar.");
-                                            $cleanPhone = preg_replace('/[^0-9]/', '', $commitment->user->phone);
-                                            $whatsappBody = str_replace('[NOME]', $name, $package->whatsapp_template ?? "Olá [NOME], este é um lembrete do Projetor Edificar.");
                                         @endphp
-                                        <button type="button"
-                                            @click="$dispatch('open-sms-member-modal', { 
-                                                userId: {{ $commitment->user_id }}, 
-                                                userName: @js($commitment->user->name),
-                                                message: @js($smsBody)
-                                            })"
-                                            class="flex-1 h-10 bg-blue-50 text-blue-600 flex items-center justify-center rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm"
-                                            title="SMS">
-                                            <i class="bi bi-chat-dots-fill"></i>
+                                        <button type="button" @click="$dispatch('open-sms-member-modal', { 
+                                            userId: {{ $commitment->user_id }}, 
+                                            userName: '{{ $commitment->user->name }}',
+                                            message: '{{ $smsBody }}'
+                                        })" class="text-green-400 hover:text-green-600 text-[10px] font-bold uppercase" title="SMS">
+                                            SMS
                                         </button>
-                                        <a href="https://wa.me/{{ $cleanPhone }}?text={{ urlencode($whatsappBody) }}"
-                                            target="_blank"
-                                            class="flex-1 h-10 bg-green-50 text-green-600 flex items-center justify-center rounded-xl hover:bg-green-600 hover:text-white transition-all shadow-sm"
-                                            title="WhatsApp">
-                                            <i class="bi bi-whatsapp"></i>
-                                        </a>
                                     @endif
                                 </div>
                             </div>
+                        @empty
+                            <div class="col-span-full py-12 text-center text-gray-400 text-xs font-bold uppercase">
+                                Nenhum membro encontrado
+                            </div>
+                        @endforelse
+                    </div>
+
+                    @if($commitments->hasPages())
+                        <div class="mt-4">
+                            {{ $commitments->links() }}
                         </div>
-                    @empty
-                        <div class="col-span-full py-12 text-center text-gray-400">
-                            <p class="text-xs font-bold uppercase tracking-widest italic">Nenhum membro encontrado.</p>
-                        </div>
-                    @endforelse
+                    @endif
                 </div>
 
-                @if($commitments->hasPages())
-                    <div class="mt-6">
-                        {{ $commitments->links() }}
+                <!-- Right Column: Actions & Form (Span 1) -->
+                <div class="lg:col-span-1 space-y-6">
+
+                    <!-- Add Member Box -->
+                    <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-gray-100">
+                        <h3 class="text-xs font-black text-gray-900 uppercase tracking-widest mb-4">Adicionar Membro</h3>
+                        <form action="{{ route('packages.assign', $package) }}" method="POST" class="space-y-4">
+                            @csrf
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Membro</label>
+                                <select name="user_id" required class="w-full bg-gray-50 border-none rounded-xl py-2.5 px-3 text-sm font-bold text-gray-900 appearance-none custom-select">
+                                    <option value="">Selecionar...</option>
+                                    @foreach(\App\Models\User::orderBy('name')->get() as $user)
+                                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Valor (MT)</label>
+                                <input type="number" name="committed_amount" value="{{ $package->min_amount }}" step="0.01" required
+                                    class="w-full bg-gray-50 border-none rounded-xl py-2.5 px-3 text-sm font-bold text-gray-900">
+                            </div>
+                            <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
+                                Adicionar
+                            </button>
+                        </form>
+
+                        <!-- Quick add button -->
+                        @if(auth()->user()->isAdmin() || auth()->user()->isComissaoObra() || auth()->user()->isResponsavelPacote())
+                            <button type="button" @click="$dispatch('open-quick-member-modal')"
+                                class="w-full mt-3 py-3 bg-blue-50 text-blue-600 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-100 transition-all">
+                                Novo Membro Rápido
+                            </button>
+                        @endif
                     </div>
-                @endif
+
+                    <!-- Bulk Communication -->
+                    <div class="bg-gradient-to-br from-blue-600 to-blue-700 p-6 rounded-[2rem] shadow-lg shadow-blue-200 text-white">
+                        <h3 class="text-xs font-black uppercase tracking-widest mb-4 text-blue-100">Comunicação</h3>
+
+                        <div class="space-y-3">
+                            <button onclick="copyToClipboard('{{ $package->whatsapp_template ?? 'Paz do Senhor!' }}', 'Copiado!', this)"
+                                class="w-full py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all">
+                                <i class="bi bi-clipboard"></i> Copiar Msg
+                            </button>
+
+                            <form action="{{ route('packages.send-bulk-sms', $package) }}" method="POST">
+                                @csrf
+                                <button type="button" 
+                                    onclick="confirmAction('Enviar SMS para todos?', 'Disparar SMS').then(r => { if(r.isConfirmed) this.closest('form').submit(); })"
+                                    class="w-full py-3 bg-white text-blue-600 rounded-xl font-bold text-xs flex items-center justify-center gap-2 hover:bg-blue-50 transition-all shadow-lg">
+                                    <i class="bi bi-chat-dots-fill"></i> SMS em Massa
+                                </button>
+                            </form>
+
+                            <button onclick="copyToClipboard('{{ $commitmentPhones }}', 'Contactos copiados!', this)"
+                                class="w-full py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all">
+                                <i class="bi bi-person-lines-fill"></i> Copiar Contactos
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Description Card -->
+                    <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-gray-100">
+                         <h3 class="text-xs font-black text-gray-900 uppercase tracking-widest mb-2">Sobre</h3>
+                         <p class="text-xs text-gray-500 leading-relaxed">
+                            {{ $package->description ?? 'Sem descrição.' }}
+                         </p>
+                    </div>
+
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Edit Member Modal -->
-    <div x-data="{ 
-                                        show: false, 
-                                        userId: '', 
-                                        userName: '', 
-                                        phone: '', 
-                                        cellId: '',
-                                        amount: ''
-                                    }" @open-edit-member-modal.window="
-                                        show = true; 
-                                        userId = $event.detail.userId; 
-                                        userName = $event.detail.userName; 
-                                        phone = $event.detail.phone; 
-                                        cellId = $event.detail.cellId;
-                                        amount = $event.detail.amount;
-                                    " x-show="show" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
-        <div class="flex items-center justify-center min-h-screen px-4">
-            <div @click="show = false" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"></div>
-
-            <div
-                class="bg-white rounded-[2.5rem] overflow-hidden shadow-2xl transform transition-all sm:max-w-lg sm:w-full z-10 border border-gray-100">
-                <div class="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
-                    <div>
-                        <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Editar Dados do Membro
-                        </h3>
-                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1" x-text="userName">
-                        </p>
+        <!-- Modals (Edit, Quick Member, etc) -->
+        <!-- Edit Member Modal -->
+        <div x-data="{ show: false, userId: '', userName: '', phone: '', cellId: '', amount: '' }" 
+             @open-edit-member-modal.window="show = true; userId = $event.detail.userId; userName = $event.detail.userName; phone = $event.detail.phone; cellId = $event.detail.cellId; amount = $event.detail.amount;" 
+             x-show="show" x-cloak class="fixed inset-0 z-50 overflow-y-auto">
+            <div class="flex items-center justify-center min-h-screen px-4">
+                <div @click="show = false" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"></div>
+                <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md z-10 relative overflow-hidden">
+                    <div class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+                        <h3 class="font-bold text-gray-900">Editar Membro</h3>
+                        <button @click="show = false" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button>
                     </div>
-                    <button @click="show = false" class="text-gray-400 hover:text-gray-600 transition-colors">
-                        <i class="bi bi-x-lg text-lg"></i>
-                    </button>
-                </div>
-
-                <form action="{{ route('packages.update-member', $package) }}" method="POST" class="p-8 space-y-6">
-                    @csrf
-                    <input type="hidden" name="user_id" :value="userId">
-
-                    <div class="space-y-4">
+                    <form action="{{ route('packages.update-member', $package) }}" method="POST" class="p-6 space-y-4">
+                        @csrf
+                        <input type="hidden" name="user_id" :value="userId">
                         <div>
-                            <label
-                                class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Telefone</label>
-                            <input type="text" name="phone" x-model="phone"
-                                class="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500">
+                            <label class="text-xs font-bold text-gray-500 uppercase">Telefone</label>
+                            <input type="text" name="phone" x-model="phone" class="w-full mt-1 bg-gray-50 border-none rounded-xl text-sm font-bold text-gray-900">
                         </div>
-
                         <div>
-                            <label
-                                class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Célula</label>
-                            <select name="cell_id" x-model="cellId"
-                                class="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500">
+                            <label class="text-xs font-bold text-gray-500 uppercase">Célula</label>
+                            <select name="cell_id" x-model="cellId" class="w-full mt-1 bg-gray-50 border-none rounded-xl text-sm font-bold text-gray-900 custom-select">
                                 <option value="">Sem Célula</option>
                                 @foreach(\App\Models\Cell::orderBy('name')->get() as $cell)
                                     <option value="{{ $cell->id }}">{{ $cell->name }}</option>
                                 @endforeach
                             </select>
                         </div>
-
                         <div>
-                            <label
-                                class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Valor
-                                do Compromisso (MT)</label>
-                            <input type="number" name="committed_amount" x-model="amount" step="0.01"
-                                class="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500"
-                                required>
+                            <label class="text-xs font-bold text-gray-500 uppercase">Valor (MT)</label>
+                            <input type="number" name="committed_amount" x-model="amount" step="0.01" required
+                                 class="w-full mt-1 bg-gray-50 border-none rounded-xl text-sm font-bold text-gray-900">
                         </div>
-                    </div>
-
-                    <div class="flex gap-3 pt-4">
-                        <button type="button" @click="show = false"
-                            class="flex-1 bg-gray-100 text-gray-600 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-gray-200 transition-all">
-                            Cancelar
-                        </button>
-                        <button type="submit"
-                            class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
-                            Salvar Alterações
-                        </button>
-                    </div>
-                </form>
+                        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition">Salvar</button>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Change Package Modal -->
-    <div x-data="{ 
-                                show: false, 
-                                userId: '', 
-                                userName: '', 
-                                amount: ''
-                            }" @open-change-package-modal.window="
-                                show = true; 
-                                userId = $event.detail.userId; 
-                                userName = $event.detail.userName; 
-                                amount = $event.detail.currentAmount;
-                            " x-show="show" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
-        <div class="flex items-center justify-center min-h-screen px-4">
-            <div @click="show = false" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"></div>
-
-            <div
-                class="bg-white rounded-[2.5rem] overflow-hidden shadow-2xl transform transition-all sm:max-w-lg sm:w-full z-10 border border-gray-100">
-                <div class="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
-                    <div>
-                        <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Mudar Pacote</h3>
-                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1" x-text="userName"></p>
+        <!-- Quick Member Modal -->
+        <div x-data="{ show: false }" @open-quick-member-modal.window="show = true" x-show="show" x-cloak class="fixed inset-0 z-50 overflow-y-auto">
+            <div class="flex items-center justify-center min-h-screen px-4">
+                <div @click="show = false" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"></div>
+                <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md z-10 relative overflow-hidden">
+                    <div class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+                        <h3 class="font-bold text-gray-900">Novo Membro Rápido</h3>
+                        <button @click="show = false" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button>
                     </div>
-                    <button @click="show = false" class="text-gray-400 hover:text-gray-600 transition-colors">
-                        <i class="bi bi-x-lg text-lg"></i>
-                    </button>
-                </div>
-
-                <form :action="`{{ url('admin/packages/' . $package->id . '/members') }}/${userId}/change-package`"
-                    method="POST" class="p-8 space-y-6">
-                    @csrf
-                    <div class="space-y-4">
+                    <form action="{{ route('packages.quick-member', $package) }}" method="POST" class="p-6 space-y-4">
+                        @csrf
                         <div>
-                            <label
-                                class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Para
-                                qual pacote deseja mover?</label>
-                            <select name="new_package_id"
-                                class="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500"
-                                required>
-                                @foreach($allPackages as $p)
-                                    @if($p->id !== $package->id)
-                                        <option value="{{ $p->id }}">{{ $p->name }} (Min: {{ number_format($p->min_amount, 2) }} MT)
-                                        </option>
-                                    @endif
-                                @endforeach
-                            </select>
+                            <label class="text-xs font-bold text-gray-500 uppercase">Nome</label>
+                            <input type="text" name="name" required placeholder="João Silva" class="w-full mt-1 bg-gray-50 border-none rounded-xl text-sm font-bold text-gray-900">
                         </div>
-
                         <div>
-                            <label
-                                class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Novo
-                                Valor do Compromisso (MT)</label>
-                            <input type="number" name="committed_amount" x-model="amount" step="0.01"
-                                class="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500"
-                                required>
+                            <label class="text-xs font-bold text-gray-500 uppercase">Telefone</label>
+                            <input type="text" name="phone" placeholder="82..." class="w-full mt-1 bg-gray-50 border-none rounded-xl text-sm font-bold text-gray-900">
                         </div>
-                    </div>
-
-                    <div class="flex gap-3 pt-4">
-                        <button type="button" @click="show = false"
-                            class="flex-1 bg-gray-100 text-gray-600 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-gray-200 transition-all">
-                            Cancelar
-                        </button>
-                        <button type="submit"
-                            class="flex-1 bg-purple-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-purple-700 transition-all shadow-lg shadow-purple-100">
-                            Confirmar Mudança
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- SMS Individual Modal -->
-    <div x-data="{ 
-            show: false, 
-            userId: '', 
-            userName: '', 
-            message: '' 
-        }" @open-sms-member-modal.window="
-            show = true; 
-            userId = $event.detail.userId; 
-            userName = $event.detail.userName; 
-            message = $event.detail.message || '';
-        " x-show="show" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
-        <div class="flex items-center justify-center min-h-screen px-4">
-            <div @click="show = false" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"></div>
-
-            <div
-                class="bg-white rounded-[2.5rem] overflow-hidden shadow-2xl transform transition-all sm:max-w-lg sm:w-full z-10 border border-gray-100">
-                <div class="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
-                    <div>
-                        <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">SMS Individual</h3>
-                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1" x-text="userName"></p>
-                    </div>
-                    <button @click="show = false" class="text-gray-400 hover:text-gray-600 transition-colors">
-                        <i class="bi bi-x-lg text-lg"></i>
-                    </button>
-                </div>
-
-                <form :action="`{{ url('admin/packages/' . $package->id . '/members') }}/${userId}/send-sms`"
-                    method="POST" class="p-8 space-y-6">
-                    @csrf
-                    <div>
-                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">
-                            Mensagem
-                        </label>
-                        <textarea name="message" rows="4" x-model="message" required
-                            class="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-medium text-gray-900 focus:ring-2 focus:ring-blue-500"
-                            placeholder="Escreva a mensagem..."></textarea>
-                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-2">Use [NOME] para personalizar</p>
-                    </div>
-
-                    <div class="flex gap-3 pt-2">
-                        <button type="button" @click="show = false"
-                            class="flex-1 bg-gray-100 text-gray-600 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-gray-200 transition-all">
-                            Cancelar
-                        </button>
-                        <button type="submit"
-                            class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
-                            Enviar SMS
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Member Modal -->
-    <div x-data="{ show: false }" @open-quick-member-modal.window="show = true"
-        x-show="show" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
-        <div class="flex items-center justify-center min-h-screen px-4">
-            <div @click="show = false" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"></div>
-
-            <div
-                class="bg-white rounded-[2.5rem] overflow-hidden shadow-2xl transform transition-all sm:max-w-lg sm:w-full z-10 border border-gray-100">
-                <div class="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
-                    <div>
-                        <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Novo Membro Rápido</h3>
-                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Credenciais geradas automaticamente</p>
-                    </div>
-                    <button @click="show = false" class="text-gray-400 hover:text-gray-600 transition-colors">
-                        <i class="bi bi-x-lg text-lg"></i>
-                    </button>
-                </div>
-
-                <form action="{{ route('packages.quick-member', $package) }}" method="POST" class="p-8 space-y-6">
-                    @csrf
-                    <div class="space-y-4">
                         <div>
-                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">
-                                Nome Completo
-                            </label>
-                            <input type="text" name="name" required
-                                class="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500"
-                                placeholder="João da Silva">
-                        </div>
-
-                        <div>
-                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">
-                                Telefone (Opcional)
-                            </label>
-                            <input type="text" name="phone"
-                                class="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500"
-                                placeholder="823562000">
-                        </div>
-
-                        <div>
-                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">
-                                Célula
-                            </label>
-                            <select name="cell_id" required
-                                class="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500">
-                                <option value="">Selecionar célula...</option>
+                            <label class="text-xs font-bold text-gray-500 uppercase">Célula</label>
+                            <select name="cell_id" required class="w-full mt-1 bg-gray-50 border-none rounded-xl text-sm font-bold text-gray-900 custom-select">
+                                <option value="">Selecionar...</option>
                                 @foreach($availableCells as $cell)
                                     <option value="{{ $cell->id }}">{{ $cell->name }}</option>
                                 @endforeach
                             </select>
                         </div>
-
                         <div>
-                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">
-                                Valor do Compromisso (MT)
-                            </label>
-                            <input type="number" name="committed_amount" step="0.01" value="{{ $package->min_amount }}"
-                                class="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500">
+                            <label class="text-xs font-bold text-gray-500 uppercase">Valor (MT)</label>
+                            <input type="number" name="committed_amount" value="{{ $package->min_amount }}" step="0.01" required
+                                 class="w-full mt-1 bg-gray-50 border-none rounded-xl text-sm font-bold text-gray-900">
                         </div>
-                    </div>
-
-                    <div class="flex gap-3 pt-2">
-                        <button type="button" @click="show = false"
-                            class="flex-1 bg-gray-100 text-gray-600 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-gray-200 transition-all">
-                            Cancelar
-                        </button>
-                        <button type="submit"
-                            class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
-                            Criar e Adicionar
-                        </button>
-                    </div>
-                </form>
+                        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition">Criar</button>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
-    </div>
+
+        <!-- Change Package Modal -->
+        <div x-data="{ show: false, userId: '', userName: '', amount: '' }" 
+             @open-change-package-modal.window="show = true; userId = $event.detail.userId; userName = $event.detail.userName; amount = $event.detail.currentAmount;" 
+             x-show="show" x-cloak class="fixed inset-0 z-50 overflow-y-auto">
+            <div class="flex items-center justify-center min-h-screen px-4">
+                <div @click="show = false" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"></div>
+                <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md z-10 relative overflow-hidden">
+                    <div class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+                        <h3 class="font-bold text-gray-900">Mudar Pacote</h3>
+                        <div class="text-right">
+                            <p class="text-[10px] uppercase font-bold text-gray-400" x-text="userName"></p>
+                        </div>
+                    </div>
+                    <!-- Note: The action URL needs to be dynamic or handled via JS. Blade compiles once. 
+                         We can use a placeholder and replace it on submit or use a JS form submission. 
+                         Here I'll use a dynamic action approach compatible with Alpine. -->
+                    <form :action="`{{ url('admin/packages/' . $package->id . '/members') }}/${userId}/change-package`" method="POST" class="p-6 space-y-4">
+                        @csrf
+                        <div>
+                            <label class="text-xs font-bold text-gray-500 uppercase">Novo Pacote</label>
+                            <select name="new_package_id" required class="w-full mt-1 bg-gray-50 border-none rounded-xl text-sm font-bold text-gray-900 custom-select">
+                                @foreach($allPackages as $p)
+                                    @if($p->id !== $package->id)
+                                        <option value="{{ $p->id }}">{{ $p->name }} (Min: {{ number_format($p->min_amount, 2) }} MT)</option>
+                                    @endif
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-gray-500 uppercase">Valor (MT)</label>
+                            <input type="number" name="committed_amount" x-model="amount" step="0.01" required
+                                 class="w-full mt-1 bg-gray-50 border-none rounded-xl text-sm font-bold text-gray-900">
+                        </div>
+                        <button type="submit" class="w-full py-3 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition">Confirmar Mudança</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- SMS Modal -->
+        <div x-data="{ show: false, userId: '', userName: '', message: '' }" 
+             @open-sms-member-modal.window="show = true; userId = $event.detail.userId; userName = $event.detail.userName; message = $event.detail.message;" 
+             x-show="show" x-cloak class="fixed inset-0 z-50 overflow-y-auto">
+            <div class="flex items-center justify-center min-h-screen px-4">
+                <div @click="show = false" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"></div>
+                <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md z-10 relative overflow-hidden">
+                    <div class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+                        <h3 class="font-bold text-gray-900">Enviar SMS</h3>
+                        <div class="text-right">
+                            <p class="text-[10px] uppercase font-bold text-gray-400" x-text="userName"></p>
+                        </div>
+                    </div>
+                    <form :action="`{{ url('admin/packages/' . $package->id . '/members') }}/${userId}/send-sms`" method="POST" class="p-6 space-y-4">
+                        @csrf
+                        <div>
+                            <label class="text-xs font-bold text-gray-500 uppercase">Mensagem</label>
+                            <textarea name="message" x-model="message" rows="4" required class="w-full mt-1 bg-gray-50 border-none rounded-xl text-sm font-medium text-gray-900" placeholder="Escreva a mensagem aqui..."></textarea>
+                            <p class="text-[10px] text-gray-400 mt-1">Use [NOME] para personalizar</p>
+                        </div>
+                        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition">Enviar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function copyToClipboard(text, successMessage, element) {
+                if (!text) return alert('Nada para copiar');
+                navigator.clipboard.writeText(text).then(() => {
+                    const originalText = element.innerHTML;
+                    element.innerHTML = `<i class="bi bi-check2"></i> ${successMessage}`;
+                    element.classList.add('bg-green-500', 'text-white', 'border-transparent');
+                    setTimeout(() => {
+                        element.innerHTML = originalText;
+                        element.classList.remove('bg-green-500', 'text-white', 'border-transparent');
+                    }, 2000);
+                });
+            }
+        </script>
 @endsection

@@ -173,7 +173,7 @@
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">Moeda</label>
                         <select name="settings[regional.currency]"
-                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none custom-select">
                             <option value="MZN" {{ ($settings['regional.currency']['value'] ?? 'MZN') == 'MZN' ? 'selected' : '' }}>Metical (MZN)</option>
                             <option value="USD" {{ ($settings['regional.currency']['value'] ?? '') == 'USD' ? 'selected' : '' }}>Dólar (USD)</option>
                             <option value="EUR" {{ ($settings['regional.currency']['value'] ?? '') == 'EUR' ? 'selected' : '' }}>Euro (EUR)</option>
@@ -188,7 +188,7 @@
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">Fuso Horário</label>
                         <select name="settings[regional.timezone]"
-                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none custom-select">
                             <option value="Africa/Maputo" {{ ($settings['regional.timezone']['value'] ?? 'Africa/Maputo') == 'Africa/Maputo' ? 'selected' : '' }}>África/Maputo</option>
                             <option value="UTC" {{ ($settings['regional.timezone']['value'] ?? '') == 'UTC' ? 'selected' : '' }}>UTC</option>
                         </select>
@@ -196,7 +196,7 @@
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">Formato de Data</label>
                         <select name="settings[regional.date_format]"
-                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none custom-select">
                             <option value="d/m/Y" {{ ($settings['regional.date_format']['value'] ?? 'd/m/Y') == 'd/m/Y' ? 'selected' : '' }}>DD/MM/AAAA</option>
                             <option value="Y-m-d" {{ ($settings['regional.date_format']['value'] ?? '') == 'Y-m-d' ? 'selected' : '' }}>AAAA-MM-DD</option>
                             <option value="m/d/Y" {{ ($settings['regional.date_format']['value'] ?? '') == 'm/d/Y' ? 'selected' : '' }}>MM/DD/AAAA</option>
@@ -205,7 +205,7 @@
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">Formato de Hora</label>
                         <select name="settings[regional.time_format]"
-                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none custom-select">
                             <option value="H:i" {{ ($settings['regional.time_format']['value'] ?? 'H:i') == 'H:i' ? 'selected' : '' }}>24h (HH:MM)</option>
                             <option value="h:i A" {{ ($settings['regional.time_format']['value'] ?? '') == 'h:i A' ? 'selected' : '' }}>12h (HH:MM AM/PM)</option>
                         </select>

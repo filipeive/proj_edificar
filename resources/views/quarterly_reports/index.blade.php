@@ -15,26 +15,26 @@
 
 @section('content')
     <div class="w-full space-y-8" x-data="{ 
-                view: window.innerWidth < 768 ? 'grid' : 'list',
-                selected: [],
-                showCharts: window.innerWidth >= 768,
-                updateView() {
-                    if (window.innerWidth < 768 && this.view === 'list') {
-                        this.view = 'grid';
+                    view: window.innerWidth < 768 ? 'grid' : 'list',
+                    selected: [],
+                    showCharts: window.innerWidth >= 768,
+                    updateView() {
+                        if (window.innerWidth < 768 && this.view === 'list') {
+                            this.view = 'grid';
+                        }
+                    },
+                    toggleAll() {
+                        const allIds = {{ Js::from($reports->pluck('id')) }};
+                        if (this.selected.length === allIds.length) {
+                            this.selected = [];
+                        } else {
+                            this.selected = allIds;
+                        }
+                    },
+                    deleteSelected() {
+                        document.getElementById('bulk-delete-form').submit();
                     }
-                },
-                toggleAll() {
-                    const allIds = {{ Js::from($reports->pluck('id')) }};
-                    if (this.selected.length === allIds.length) {
-                        this.selected = [];
-                    } else {
-                        this.selected = allIds;
-                    }
-                },
-                deleteSelected() {
-                    document.getElementById('bulk-delete-form').submit();
-                }
-            }"
+                }"
         x-init="$watch('view', value => localStorage.setItem('quarterly_reports_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('quarterly_reports_view') || 'list')"
         @resize.window.debounce.500ms="updateView()">
 
@@ -194,7 +194,7 @@
                 <!-- Filters -->
                 <div class="flex flex-wrap gap-4">
                     <select name="year"
-                        class="bg-gray-50/50 dark:bg-gray-700/50 border-transparent focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl text-xs font-black uppercase tracking-widest px-6 py-4">
+                        class="bg-gray-50/50 dark:bg-gray-700/50 border-transparent focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl text-xs font-black uppercase tracking-widest px-6 py-4 custom-select">
                         <option value="">Todos os Anos</option>
                         @for($y = date('Y'); $y >= 2024; $y--)
                             <option value="{{ $y }}" @selected(request('year') == $y)>{{ $y }}</option>
@@ -202,7 +202,7 @@
                     </select>
 
                     <select name="quarter"
-                        class="bg-gray-50/50 dark:bg-gray-700/50 border-transparent focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl text-xs font-black uppercase tracking-widest px-6 py-4">
+                        class="bg-gray-50/50 dark:bg-gray-700/50 border-transparent focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl text-xs font-black uppercase tracking-widest px-6 py-4 custom-select">
                         <option value="">Todos os Trimestres</option>
                         @for($q = 1; $q <= 4; $q++)
                             <option value="{{ $q }}" @selected(request('quarter') == $q)>{{ $q }}º Trimestre</option>
@@ -363,7 +363,7 @@
                                 <td class="px-10 py-6 text-center">
                                     <span
                                         class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm
-                                                                                                                                            {{ $report->status == 'submitted' ? 'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 border-green-100 dark:border-green-800' : 'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 border-yellow-100 dark:border-yellow-800' }}">
+                                                                                                                                                    {{ $report->status == 'submitted' ? 'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 border-green-100 dark:border-green-800' : 'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 border-yellow-100 dark:border-yellow-800' }}">
                                         {{ $report->status == 'submitted' ? 'Submetido' : 'Rascunho' }}
                                     </span>
                                 </td>
@@ -376,7 +376,8 @@
                                         </a>
                                         @can('update', $report)
                                             <a href="{{ route('quarterly-reports.edit', $report) }}"
-                                                class="action-icon bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 hover:bg-orange-600 hover:text-white dark:hover:bg-orange-600 dark:hover:text-white shadow-sm" title="Editar">
+                                                class="action-icon bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 hover:bg-orange-600 hover:text-white dark:hover:bg-orange-600 dark:hover:text-white shadow-sm"
+                                                title="Editar">
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
                                         @endcan
@@ -387,7 +388,8 @@
                                                 @method('DELETE')
                                                 <button type="button"
                                                     onclick="confirmDelete('delete-report-{{ $report->id }}', 'Deseja excluir este relatório?')"
-                                                    class="action-icon bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white dark:hover:bg-red-600 dark:hover:text-white shadow-sm" title="Excluir">
+                                                    class="action-icon bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white dark:hover:bg-red-600 dark:hover:text-white shadow-sm"
+                                                    title="Excluir">
                                                     <i class="bi bi-trash-fill"></i>
                                                 </button>
                                             </form>
@@ -415,7 +417,7 @@
         <!-- GRID VIEW -->
         <div x-show="view === 'grid'" x-cloak x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-            class="grid grid-compact">
+            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             @forelse($reports as $report)
                 <div
                     class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-2 transition-all group overflow-hidden flex flex-col compact-card">
@@ -433,7 +435,7 @@
                         </div>
                         <span
                             class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm mr-10
-                                                                                                                                                    {{ $report->status == 'submitted' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-yellow-50 text-yellow-600 border-yellow-100' }}">
+                                                                                                                                                            {{ $report->status == 'submitted' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-yellow-50 text-yellow-600 border-yellow-100' }}">
                             {{ $report->status == 'submitted' ? 'Submetido' : 'Rascunho' }}
                         </span>
                     </div>

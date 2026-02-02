@@ -285,7 +285,7 @@
                     <!-- Grid View for Admin -->
                     <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300"
                         x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-                        class="p-6 grid grid-compact bg-gray-50/30 dark:bg-gray-900/10">
+                        class="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 bg-gray-50/30 dark:bg-gray-900/10">
                         @foreach($allCourses as $course)
                             <div class="bg-white dark:bg-gray-800 p-6 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col group hover:shadow-md hover:shadow-gray-300/50 dark:hover:shadow-gray-950/50 transition-all relative h-full compact-card"
                                 :class="{'ring-2 ring-orange-500 bg-orange-50/10 dark:bg-orange-900/10': selected.includes({{ $course->id }})}">

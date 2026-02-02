@@ -118,7 +118,7 @@
                         @if($userRole !== 'lider_celula' && $availableCells->count() > 1)
                             <select name="cell_id" 
                                 @change="$el.form.submit()"
-                                class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold text-xs uppercase tracking-widest text-gray-600 dark:text-gray-300 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                class="searchable-select px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold text-xs uppercase tracking-widest text-gray-600 dark:text-gray-300 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors custom-select" data-label="Célula">
                                 <option value="">Todas as Células</option>
                                 @foreach($availableCells as $cell)
                                     <option value="{{ $cell->id }}" {{ request('cell_id') == $cell->id ? 'selected' : '' }}>
@@ -318,7 +318,7 @@
 
         <!-- Grid View -->
         <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-            class="grid grid-compact">
+            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             @forelse($members as $member)
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col group hover:shadow-2xl hover:shadow-blue-900/10 dark:hover:shadow-black/30 transition-all duration-300 relative overflow-hidden compact-card"
                      :class="{'ring-2 ring-blue-500 bg-blue-50/10 dark:bg-blue-900/10': selected.includes({{ $member->id }})}">

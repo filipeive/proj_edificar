@@ -1,25 +1,43 @@
 @extends('layouts.app')
 
 @section('title', 'Nova Zona Pastoral - Portal Life Church')
-
-@section('header-actions')
-    <div class="w-full">
-        <!-- Header -->
-        <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex items-center justify-between">
-            <div>
-                <h1 class="text-3xl font-black text-gray-900 tracking-tight mb-2">Criar Nova Zona</h1>
-                <p class="text-gray-500 text-sm">Preencha os dados abaixo para registar uma nova divisão.</p>
-            </div>
-            <a href="{{ route('zones.index') }}"
-                class="w-12 h-12 rounded-2xl bg-gray-50 text-gray-400 flex items-center justify-center hover:bg-gray-100 transition-colors">
-                <i class="bi bi-x-lg"></i>
-            </a>
-        </div>
-    </div>
-@endsection
+@section('page-title', 'Criar Nova Zona')
+@section('page-subtitle', 'Registar uma nova divisão ministerial ou área pastoral')
 
 @section('content')
-    <div class="w-full">
+    <div class="w-full space-y-8">
+        <!-- Header Card -->
+        <div class="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-sm border border-gray-100 relative overflow-hidden group">
+            <div
+                class="absolute top-0 right-0 w-64 h-64 bg-blue-50/50 rounded-full -mr-32 -mt-32 transition-transform group-hover:scale-110 duration-700">
+            </div>
+
+            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                <div class="flex flex-col md:flex-row items-center gap-8 text-center md:text-left">
+                    <div
+                        class="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-blue-500 to-blue-700 text-white flex items-center justify-center text-4xl shadow-2xl shadow-blue-100">
+                        <i class="bi bi-map"></i>
+                    </div>
+                    <div>
+                        <div
+                            class="flex items-center justify-center md:justify-start gap-2 text-xs font-bold text-blue-600 uppercase tracking-widest mb-2">
+                            <a href="{{ route('zones.index') }}" class="hover:underline">Zonas</a>
+                            <i class="bi bi-chevron-right text-[10px]"></i>
+                            <span>Nova Zona</span>
+                        </div>
+                        <h1 class="text-3xl font-black text-gray-900 tracking-tight uppercase">Criar Nova Zona</h1>
+                        <p class="text-gray-500 font-medium tracking-tight">Registe uma nova divisão ministerial ou área
+                            pastoral</p>
+                    </div>
+                </div>
+
+                <a href="{{ route('zones.index') }}"
+                    class="group flex items-center bg-gray-50 text-gray-500 px-6 py-4 rounded-2xl hover:bg-gray-100 transition-all font-bold text-xs uppercase tracking-widest">
+                    <i class="bi bi-arrow-left text-lg mr-2 group-hover:-translate-x-1 transition-transform"></i>
+                    Cancelar
+                </a>
+            </div>
+        </div>
         <!-- Form -->
         <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
             <form action="{{ route('zones.store') }}" method="POST" class="p-8 md:p-12 space-y-8">
@@ -49,7 +67,7 @@
                         <div class="relative">
                             <i class="bi bi-person-badge absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
                             <select name="pastor_id" id="pastor_id"
-                                class="w-full pl-12 pr-4 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-medium text-gray-700 appearance-none @error('pastor_id') border-red-500 @enderror">
+                                class="w-full pl-12 pr-4 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-medium text-gray-700 appearance-none custom-select @error('pastor_id') border-red-500 @enderror">
                                 <option value="">A definir futuramente</option>
                                 @foreach ($pastors as $pastor)
                                     <option value="{{ $pastor->id }}" @selected(old('pastor_id') == $pastor->id)>
@@ -57,8 +75,6 @@
                                     </option>
                                 @endforeach
                             </select>
-                            <i
-                                class="bi bi-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                         </div>
                         @error('pastor_id')
                             <p class="text-red-500 text-xs mt-1 ml-1">{{ $message }}</p>

@@ -2,7 +2,7 @@
 
 @section('title', 'Gestão de Cultos - Portal Life Church')
 @section('page-title','Gestão de Cultos')
-@section('page-description', 'Gestão de Cultos')
+@section('page-subtitle', 'Histórico e registro de celebrações e reuniões de ensino')
 
 @section('header-actions')
     <div class="flex items-center gap-2 md:hidden">
@@ -177,7 +177,7 @@
                 <div class="space-y-2">
                     <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">Tipo de Culto</label>
                     <select name="service_type" 
-                        class="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 text-xs font-bold text-gray-600 dark:text-gray-200 min-w-[150px]">
+                        class="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 text-xs font-bold text-gray-600 dark:text-gray-200 min-w-[150px] custom-select">
                         <option value="">Todos</option>
                         <option value="1st" {{ request('service_type') === '1st' ? 'selected' : '' }}>1º Culto</option>
                         <option value="2nd" {{ request('service_type') === '2nd' ? 'selected' : '' }}>2º Culto</option>
@@ -203,7 +203,7 @@
         </div>
 
         <!-- Services Grid View -->
-        <div x-show="view === 'grid'" x-cloak x-transition.fade.duration.300ms class="grid grid-compact">
+        <div x-show="view === 'grid'" x-cloak x-transition.fade.duration.300ms class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             @foreach($services as $service)
                 <div class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 dark:hover:shadow-gray-900/50 transition-all group flex flex-col relative border-t-4 compact-card {{ $service->service_type === 'teaching' ? 'border-t-orange-500' : 'border-t-blue-500' }}"
                      :class="{'ring-2 ring-blue-500 bg-blue-50/10 dark:bg-blue-900/10': selected.includes({{ $service->id }})}">

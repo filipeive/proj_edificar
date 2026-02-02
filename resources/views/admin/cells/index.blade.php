@@ -2,6 +2,7 @@
 
 @section('title', 'Gestão de Células - Portal Life Church')
 @section('page-title', 'Gestão de Células')
+@section('page-subtitle', 'Controle de liderança, membros e expansão das células')
 
 @section('header-actions')
     <div class="md:hidden">
@@ -117,7 +118,7 @@
                 <div class="space-y-2">
                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Zona</label>
                     <select name="zone" onchange="this.form.submit()"
-                        class="px-6 py-3 bg-white border-transparent focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-xl transition-all font-bold text-gray-700 text-sm min-w-[200px]">
+                        class="searchable-select px-6 py-3 bg-white border-transparent focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-xl transition-all font-bold text-gray-700 text-sm min-w-[200px] custom-select" data-label="Zona">
                         <option value="">Todas as Zonas</option>
                         @foreach($zones as $zone)
                             <option value="{{ $zone->id }}" {{ request('zone') == $zone->id ? 'selected' : '' }}>
@@ -130,7 +131,7 @@
                 <div class="space-y-2">
                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Supervisão</label>
                     <select name="supervision" onchange="this.form.submit()"
-                        class="px-6 py-3 bg-white border-transparent focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-xl transition-all font-bold text-gray-700 text-sm min-w-[220px]">
+                        class="searchable-select px-6 py-3 bg-white border-transparent focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-xl transition-all font-bold text-gray-700 text-sm min-w-[220px] custom-select" data-label="Supervisão">
                         <option value="">Todas as Supervisões</option>
                         @foreach($supervisions as $supervision)
                             <option value="{{ $supervision->id }}" {{ request('supervision') == $supervision->id ? 'selected' : '' }}>
@@ -161,7 +162,7 @@
 
         <!-- Grid View -->
         <template x-if="view === 'grid'">
-            <div class="grid grid-compact">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 @forelse($cells as $cell)
                     <div
                         class="group bg-white rounded-[2rem] p-7 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-100 relative compact-card"

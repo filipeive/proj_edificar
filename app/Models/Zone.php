@@ -13,10 +13,12 @@ class Zone extends Model
         'pastor_id',
         'description', // Adicionado para consistência com o Controller
         'is_active',
+        'show_in_teaching_services',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'show_in_teaching_services' => 'boolean',
     ];
 
     // RELACIONAMENTOS
@@ -98,5 +100,13 @@ class Zone extends Model
     public function members()
     {
         return User::whereIn('cell_id', $this->cells()->pluck('cells.id'))->with('cell');
+    }
+
+    /**
+     * Scope for zones visible in teaching services
+     */
+    public function scopeForTeachingServices($query)
+    {
+        return $query->where('show_in_teaching_services', true)->where('is_active', true);
     }
 }

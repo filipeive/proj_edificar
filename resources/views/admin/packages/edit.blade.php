@@ -2,6 +2,7 @@
 
 @section('title', 'Editar Pacote - Portal Life Church')
 @section('page-title', 'Editar Pacote')
+@section('page-subtitle', 'Atualize as configurações do pacote ' . $package->name)
 
 @section('content')
     <div class="max-w-2xl mx-auto">
@@ -88,7 +89,7 @@
 
                 <div class="mb-6">
                     <label for="responsible_id" class="block text-sm font-medium text-gray-700 mb-2">Irmão Responsável pelo Pacote</label>
-                    <select name="responsible_id" id="responsible_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <select name="responsible_id" id="responsible_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 custom-select">
                         <option value="">Nenhum responsável atribuído</option>
                         @foreach($users as $u)
                             <option value="{{ $u->id }}" {{ old('responsible_id', $package->responsible_id) == $u->id ? 'selected' : '' }}>

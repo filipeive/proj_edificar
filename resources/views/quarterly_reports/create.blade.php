@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('title', 'Novo Relatório Trimestral - Portal Life Church')
+@section('page-title', 'Novo Relatório Trimestral')
+@section('page-subtitle', 'Preencha os dados do período para análise ministerial')
 
 @section('content')
     <div class="w-full space-y-8" x-data="reportForm()">
@@ -71,7 +73,7 @@
                         <div class="space-y-2">
                             <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Zona</label>
                             <select name="zone_id" required x-model="zoneId" @change="updateSupervisions()"
-                                class="w-full px-5 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700 appearance-none">
+                                class="w-full px-5 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700 appearance-none custom-select">
                                 <option value="">Selecione a Zona</option>
                                 @foreach($zones as $zone)
                                     <option value="{{ $zone->id }}">{{ $zone->name }}</option>
@@ -82,7 +84,7 @@
                             <label
                                 class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Supervisão</label>
                             <select name="supervision_id" required x-model="supervisionId"
-                                class="w-full px-5 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700 appearance-none">
+                                class="w-full px-5 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700 appearance-none custom-select">
                                 <option value="">Selecione a Supervisão</option>
                                 <template x-for="sup in filteredSupervisions" :key="sup.id">
                                     <option :value="sup.id" x-text="sup.name"></option>
@@ -98,7 +100,7 @@
                             <label
                                 class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Trimestre</label>
                             <select name="quarter" required
-                                class="w-full px-5 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700 appearance-none">
+                                class="w-full px-5 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700 appearance-none custom-select">
                                 <option value="1">1º Trimestre</option>
                                 <option value="2">2º Trimestre</option>
                                 <option value="3">3º Trimestre</option>
@@ -311,8 +313,8 @@
                                                             required @if($i == 2) checked @endif>
                                                         <div
                                                             class="w-full py-3 text-center rounded-xl bg-white border border-gray-100 text-sm font-black transition-all cursor-pointer
-                                                                                                                                                            peer-checked:bg-{{ $section['color'] }}-600 peer-checked:text-white peer-checked:shadow-lg peer-checked:shadow-{{ $section['color'] }}-200
-                                                                                                                                                            hover:border-{{ $section['color'] }}-500 text-gray-400">
+                                                                                                                                                                                            peer-checked:bg-{{ $section['color'] }}-600 peer-checked:text-white peer-checked:shadow-lg peer-checked:shadow-{{ $section['color'] }}-200
+                                                                                                                                                                                            hover:border-{{ $section['color'] }}-500 text-gray-400">
                                                             {{ $i }}
                                                         </div>
                                                     </label>

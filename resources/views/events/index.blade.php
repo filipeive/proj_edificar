@@ -307,7 +307,7 @@
 
         <!-- Grid View -->
         <div id="view-grid" x-show="view === 'grid'" class="transition-opacity duration-300">
-            <div class="grid grid-compact">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 @forelse($events as $event)
                             <div class="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-2xl md:rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col group hover:shadow-xl transition-all duration-300 relative compact-card"
                                  :class="{'ring-2 ring-blue-500 bg-blue-50/10 dark:bg-blue-900/10': selected.includes({{ $event->id }})}">

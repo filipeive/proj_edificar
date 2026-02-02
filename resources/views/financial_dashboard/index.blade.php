@@ -1,23 +1,29 @@
 @extends('layouts.app')
 
 @section('title', 'Painel Financeiro - Portal Life Church')
+@section('page-title', 'Painel Financeiro')
+@section('page-subtitle', 'Visão Geral & Métricas Consolidadas')
 
 @section('content')
     <div class="space-y-8">
         <!-- Header & Top Actions -->
-        <div class="bg-white p-6 md:p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div
+            class="bg-white p-6 md:p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
             <div class="text-center md:text-left">
                 <h1 class="text-3xl font-black text-gray-900 tracking-tight">Painel Financeiro</h1>
                 <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Visão Geral & Métricas</p>
             </div>
             <div class="flex flex-wrap justify-center gap-3">
-                <button onclick="window.print()" class="bg-gray-100 text-gray-600 px-6 py-3 rounded-2xl hover:bg-gray-200 transition-all font-black text-xs uppercase tracking-widest flex items-center shadow-sm">
+                <button onclick="window.print()"
+                    class="bg-gray-100 text-gray-600 px-6 py-3 rounded-2xl hover:bg-gray-200 transition-all font-black text-xs uppercase tracking-widest flex items-center shadow-sm">
                     <i class="bi bi-printer text-lg mr-2"></i> Report
                 </button>
-                <a href="{{ route('expenses.create') }}" class="bg-red-50 text-red-600 px-6 py-3 rounded-2xl hover:bg-red-100 transition-all font-black text-xs uppercase tracking-widest flex items-center shadow-sm border border-red-100">
+                <a href="{{ route('expenses.create') }}"
+                    class="bg-red-50 text-red-600 px-6 py-3 rounded-2xl hover:bg-red-100 transition-all font-black text-xs uppercase tracking-widest flex items-center shadow-sm border border-red-100">
                     <i class="bi bi-dash-circle mr-2"></i> Despesa
                 </a>
-                <a href="{{ route('contributions.create') }}" class="bg-green-50 text-green-600 px-6 py-3 rounded-2xl hover:bg-green-100 transition-all font-black text-xs uppercase tracking-widest flex items-center shadow-sm border border-green-100">
+                <a href="{{ route('contributions.create') }}"
+                    class="bg-green-50 text-green-600 px-6 py-3 rounded-2xl hover:bg-green-100 transition-all font-black text-xs uppercase tracking-widest flex items-center shadow-sm border border-green-100">
                     <i class="bi bi-plus-circle mr-2"></i> Entrada
                 </a>
             </div>
@@ -25,24 +31,25 @@
 
         <!-- Scope Tabs -->
         <div class="flex p-1 bg-gray-100 rounded-2xl w-fit mx-auto md:mx-0">
-            <a href="{{ route('financial.dashboard', array_merge(request()->all(), ['scope' => 'eclesiastico'])) }}" 
-               class="px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all {{ $scope == 'eclesiastico' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600' }}">
-               Eclesiástico (Igreja)
+            <a href="{{ route('financial.dashboard', array_merge(request()->all(), ['scope' => 'eclesiastico'])) }}"
+                class="px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all {{ $scope == 'eclesiastico' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600' }}">
+                Eclesiástico (Igreja)
             </a>
-            <a href="{{ route('financial.dashboard', array_merge(request()->all(), ['scope' => 'edificar'])) }}" 
-               class="px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all {{ $scope == 'edificar' ? 'bg-white text-orange-500 shadow-sm' : 'text-gray-400 hover:text-gray-600' }}">
-               Projeto Edificar
+            <a href="{{ route('financial.dashboard', array_merge(request()->all(), ['scope' => 'edificar'])) }}"
+                class="px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all {{ $scope == 'edificar' ? 'bg-white text-orange-500 shadow-sm' : 'text-gray-400 hover:text-gray-600' }}">
+                Projeto Edificar
             </a>
         </div>
 
         <!-- Filter Panel -->
         <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100">
-            <form action="{{ route('financial.dashboard') }}" method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <form action="{{ route('financial.dashboard') }}" method="GET"
+                class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                 <input type="hidden" name="scope" value="{{ $scope }}">
                 <div class="space-y-1">
                     <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Mês</label>
                     <select name="month"
-                        class="w-full px-5 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 rounded-2xl font-bold text-gray-700">
+                        class="w-full px-5 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 rounded-2xl font-bold text-gray-700 custom-select">
                         @for($m = 1; $m <= 12; $m++)
                             <option value="{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}" {{ $month == $m ? 'selected' : '' }}>
                                 {{ date('F', mktime(0, 0, 0, $m, 1)) }}
@@ -53,7 +60,7 @@
                 <div class="space-y-1">
                     <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Ano</label>
                     <select name="year"
-                        class="w-full px-5 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 rounded-2xl font-bold text-gray-700">
+                        class="w-full px-5 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 rounded-2xl font-bold text-gray-700 custom-select">
                         @for($y = date('Y'); $y >= 2020; $y--)
                             <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
                         @endfor
@@ -75,7 +82,8 @@
                     <p class="text-[10px] font-black text-green-100 uppercase tracking-widest mb-1">Entradas
                         ({{ $month }}/{{ $year }})</p>
                     <h3 class="text-3xl md:text-4xl font-black tracking-tighter">
-                        {{ number_format($grandTotal, 2, ',', '.') }}<small class="text-lg opacity-60">MT</small></h3>
+                        {{ number_format($grandTotal, 2, ',', '.') }}<small class="text-lg opacity-60">MT</small>
+                    </h3>
                 </div>
                 <i
                     class="bi bi-graph-up-arrow absolute right-6 bottom-6 text-6xl text-white opacity-10 group-hover:scale-110 transition-transform"></i>
@@ -88,7 +96,8 @@
                     <p class="text-[10px] font-black text-red-100 uppercase tracking-widest mb-1">Saídas
                         ({{ $month }}/{{ $year }})</p>
                     <h3 class="text-3xl md:text-4xl font-black tracking-tighter">
-                        {{ number_format($totalExpenses, 2, ',', '.') }}<small class="text-lg opacity-60">MT</small></h3>
+                        {{ number_format($totalExpenses, 2, ',', '.') }}<small class="text-lg opacity-60">MT</small>
+                    </h3>
                 </div>
                 <i
                     class="bi bi-graph-down-arrow absolute right-6 bottom-6 text-6xl text-white opacity-10 group-hover:scale-110 transition-transform"></i>
@@ -153,7 +162,8 @@
                                             <div class="ml-4">
                                                 <p class="text-xs font-bold text-gray-900">{{ $transaction->description }}</p>
                                                 <p class="text-[10px] text-gray-400 font-medium">
-                                                    {{ \Carbon\Carbon::parse($transaction->date)->format('d/m/Y') }}</p>
+                                                    {{ \Carbon\Carbon::parse($transaction->date)->format('d/m/Y') }}
+                                                </p>
                                             </div>
                                         </div>
                                     </td>
@@ -194,7 +204,8 @@
                                 <tr class="hover:bg-gray-50/50">
                                     <td class="px-6 py-4 text-xs font-bold text-gray-700">{{ $item['type'] }}</td>
                                     <td class="px-6 py-4 text-right text-xs font-black text-blue-600">
-                                        {{ number_format($item['total'], 2, ',', '.') }} MT</td>
+                                        {{ number_format($item['total'], 2, ',', '.') }} MT
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>

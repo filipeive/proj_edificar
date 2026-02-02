@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('title', 'Detalhes da Celebração - Portal Life Church')
+@section('page-title', 'Detalhes do Culto')
+@section('page-subtitle', 'Dados consolidados da celebração de ' . $service->date->format('d/m/Y'))
 
 @section('header-actions')
     <div class="flex items-center gap-2 md:hidden">

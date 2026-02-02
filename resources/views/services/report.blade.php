@@ -18,7 +18,7 @@
 
         <!-- Filtros e Exportações -->
         <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
-            <div class="grid grid-cols-1 xl:grid-cols-5 gap-8">
+            <div class="grid grid-cols-1 xl:grid-cols-4 gap-8">
                 <!-- Filtros de Visualização -->
                 <div class="space-y-6">
                     <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
@@ -40,7 +40,7 @@
                         <div>
                             <label class="block text-[10px] font-black text-gray-500 uppercase mb-2">Tipo de Culto</label>
                             <select name="service_type"
-                                class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+                                class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 custom-select">
                                 <option value="">Todos os Tipos</option>
                                 <option value="1st" {{ request('service_type') == '1st' ? 'selected' : '' }}>1º Culto</option>
                                 <option value="2nd" {{ request('service_type') == '2nd' ? 'selected' : '' }}>2º Culto</option>
@@ -82,7 +82,7 @@
                         <div>
                             <label class="block text-[10px] font-black text-gray-400 uppercase mb-2">Tipo de Culto</label>
                             <select name="service_type" required
-                                class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500">
+                                class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 custom-select">
                                 <option value="">Selecione...</option>
                                 <option value="all">Todos (Separados)</option>
                                 <option value="1st">Apenas 1º Culto</option>
@@ -117,7 +117,7 @@
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase mb-2">Mês</label>
                                 <select name="month"
-                                    class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500">
+                                    class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 custom-select">
                                     @for($m = 1; $m <= 12; $m++)
                                         <option value="{{ $m }}" {{ now()->month == $m ? 'selected' : '' }}>
                                             {{ \Carbon\Carbon::create(null, $m)->translatedFormat('F') }}
@@ -128,7 +128,7 @@
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase mb-2">Ano</label>
                                 <select name="year"
-                                    class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500">
+                                    class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 custom-select">
                                     @for($y = now()->year; $y >= 2023; $y--)
                                         <option value="{{ $y }}">{{ $y }}</option>
                                     @endfor
@@ -138,7 +138,7 @@
                         <div class="mt-4">
                             <label class="block text-[10px] font-black text-gray-400 uppercase mb-2">Tipo de Culto</label>
                             <select name="service_type"
-                                class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500">
+                                class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 custom-select">
                                 <option value="all">Todos (Separados)</option>
                                 <option value="normal">Cultos Normais</option>
                                 <option value="teaching">Cultos de Ensino</option>
@@ -167,7 +167,7 @@
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase mb-2">Trimestre</label>
                                 <select name="quarter"
-                                    class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500">
+                                    class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 custom-select">
                                     <option value="1">1º Trimestre</option>
                                     <option value="2">2º Trimestre</option>
                                     <option value="3">3º Trimestre</option>
@@ -177,7 +177,7 @@
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase mb-2">Ano</label>
                                 <select name="year"
-                                    class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500">
+                                    class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 custom-select">
                                     @for($y = now()->year; $y >= 2023; $y--)
                                         <option value="{{ $y }}">{{ $y }}</option>
                                     @endfor
@@ -206,7 +206,7 @@
                         <div>
                             <label class="block text-[10px] font-black text-gray-500 uppercase mb-2">Ano</label>
                             <select name="year"
-                                class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500">
+                                class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 custom-select">
                                 @for($y = now()->year; $y >= 2023; $y--)
                                     <option value="{{ $y }}">{{ $y }}</option>
                                 @endfor
@@ -215,7 +215,7 @@
                         <div>
                             <label class="block text-[10px] font-black text-gray-400 uppercase mb-2">Tipo de Culto</label>
                             <select name="service_type"
-                                class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500">
+                                class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 custom-select">
                                 <option value="all">Todos (Separados)</option>
                                 <option value="normal">Cultos Normais</option>
                                 <option value="teaching">Cultos de Ensino</option>
@@ -363,7 +363,7 @@
                         labels: ['Membros', 'Visitantes'],
                         datasets: [{
                             data: [
-                                                                                    {{ $trendServices->sum('total_members') }},
+                                                                                                    {{ $trendServices->sum('total_members') }},
                                 {{ $trendServices->sum('total_visitors') }}
                             ],
                             backgroundColor: ['#2563eb', '#eab308'],

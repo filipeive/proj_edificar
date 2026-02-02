@@ -64,7 +64,7 @@ class ServiceController extends Controller
 
         $preachers = User::whereIn('role', ['admin', 'pastor', 'pastor_zona', 'supervisor'])->get();
         $offeringTypes = OfferingType::where('is_active', true)->orderBy('order')->get();
-        $zones = \App\Models\Zone::orderBy('name')->get();
+        $zones = \App\Models\Zone::forTeachingServices()->orderBy('name')->get();
 
         return view('services.create-teaching', compact('preachers', 'offeringTypes', 'zones'));
     }
@@ -232,7 +232,7 @@ class ServiceController extends Controller
 
         $preachers = User::whereIn('role', ['admin', 'pastor', 'pastor_zona', 'supervisor'])->get();
         $offeringTypes = OfferingType::where('is_active', true)->orderBy('order')->get();
-        $zones = \App\Models\Zone::orderBy('name')->get();
+        $zones = \App\Models\Zone::forTeachingServices()->orderBy('name')->get();
         $service->load(['offerings', 'tithes', 'individualOfferings', 'zoneParticipations']);
 
         return view('services.edit-teaching', compact('service', 'preachers', 'offeringTypes', 'zones'));

@@ -47,7 +47,18 @@ class VisitorController extends Controller
         // Permissões por papel
         $user = Auth::user();
         if ($user->isPastorZona() && !$user->isAdmin()) {
-            $query->where('zone_id', $user->zone_id);
+            // Get zones where user is pastor
+            $managedZoneIds = $user->getManagedZoneIds();
+            // Get cells that belong to those zones
+            $cellIds = Cell::whereHas('supervision', function ($q) use ($managedZoneIds) {
+                $q->whereIn('zone_id', $managedZoneIds);
+            })->pluck('id');
+
+            // Filter visitors: in managed zones OR in cells of those zones
+            $query->where(function ($q) use ($managedZoneIds, $cellIds) {
+                $q->whereIn('zone_id', $managedZoneIds)
+                    ->orWhereIn('cell_id', $cellIds);
+            });
         }
 
         $visitors = $query->paginate(20);
@@ -70,9 +81,17 @@ class VisitorController extends Controller
      */
     public function create()
     {
-        $zones = Zone::orderBy('name')->get();
+        $user = Auth::user();
+        $zonesQuery = Zone::orderBy('name');
+
+        if ($user->role === 'pastor_zona' && !$user->isAdmin()) {
+            $zonesQuery->whereIn('id', $user->getManagedZoneIds());
+        }
+
+        $zones = $zonesQuery->get();
+        $cells = collect(); // Initially empty, will load via AJAX
         $services = \App\Models\Service::orderBy('date', 'desc')->take(20)->get();
-        return view('visitors.create', compact('zones', 'services'));
+        return view('visitors.create', compact('zones', 'cells', 'services'));
     }
 
     /**
@@ -92,6 +111,7 @@ class VisitorController extends Controller
             'visit_date' => 'required|date',
             'service_id' => 'nullable|exists:services,id',
             'zone_id' => 'nullable|exists:zones,id',
+            'cell_id' => 'nullable|exists:cells,id',
             'notes' => 'nullable|string',
         ]);
 
@@ -120,7 +140,20 @@ class VisitorController extends Controller
      */
     public function edit(Visitor $visitor)
     {
-        $zones = Zone::orderBy('name')->get();
+        $user = Auth::user();
+        $zonesQuery = Zone::orderBy('name');
+
+        if ($user->role === 'pastor_zona' && !$user->isAdmin()) {
+            $managedZoneIds = $user->getManagedZoneIds();
+            $zonesQuery->whereIn('id', $managedZoneIds);
+
+            // Security check for Pastor de Zona
+            if ($visitor->zone_id && !in_array($visitor->zone_id, $managedZoneIds->toArray())) {
+                abort(403, 'Você não tem permissão para editar este visitante.');
+            }
+        }
+
+        $zones = $zonesQuery->get();
         $cells = $visitor->zone ? $visitor->zone->cells : collect();
         $services = \App\Models\Service::orderBy('date', 'desc')->take(20)->get();
 
@@ -245,7 +278,18 @@ class VisitorController extends Controller
         // Permissões por papel
         $user = Auth::user();
         if ($user->isPastorZona() && !$user->isAdmin()) {
-            $query->where('zone_id', $user->zone_id);
+            // Get zones where user is pastor
+            $managedZoneIds = $user->getManagedZoneIds();
+            // Get cells that belong to those zones
+            $cellIds = Cell::whereHas('supervision', function ($q) use ($managedZoneIds) {
+                $q->whereIn('zone_id', $managedZoneIds);
+            })->pluck('id');
+
+            // Filter visitors: in managed zones OR in cells of those zones
+            $query->where(function ($q) use ($managedZoneIds, $cellIds) {
+                $q->whereIn('zone_id', $managedZoneIds)
+                    ->orWhereIn('cell_id', $cellIds);
+            });
         }
 
         $filename = 'visitantes_' . date('Y-m-d_His') . '.xlsx';
@@ -278,5 +322,23 @@ class VisitorController extends Controller
 
         return redirect()->route('visitors.index')
             ->with('success', "{$deletedCount} visitante(s) removido(s) com sucesso!");
+    }
+
+    /**
+     * Get cells filtered by zone for dynamic selects
+     */
+    public function getCellsByZone(Request $request)
+    {
+        $zoneId = $request->zone_id;
+
+        if (!$zoneId) {
+            return response()->json([]);
+        }
+
+        $cells = Cell::whereHas('supervision', function ($q) use ($zoneId) {
+            $q->where('zone_id', $zoneId);
+        })->orderBy('name')->get(['id', 'name']);
+
+        return response()->json($cells);
     }
 }

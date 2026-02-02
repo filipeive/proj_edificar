@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('title', 'Notificações - Portal Life Church')
+@section('page-title', 'Notificações')
+@section('page-subtitle', 'Alertas e atualizações do sistema')
 
 @section('content')
     <div class="space-y-8">
@@ -10,19 +12,25 @@
             <div class="flex flex-col md:flex-row items-center gap-8">
                 <div>
                     <h1 class="text-3xl font-black text-gray-900 dark:text-white tracking-tight">Notificações</h1>
-                    <p class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">Alertas e Atualizações do
+                    <p class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">Alertas e
+                        Atualizações do
                         Sistema</p>
                 </div>
 
                 <div class="hidden md:flex items-center gap-6">
                     <div class="h-12 w-px bg-gray-100 dark:bg-gray-700"></div>
                     <div class="flex flex-col">
-                        <span class="text-2xl font-black text-gray-900 dark:text-white leading-none">{{ $notifications->total() }}</span>
-                        <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">Total</span>
+                        <span
+                            class="text-2xl font-black text-gray-900 dark:text-white leading-none">{{ $notifications->total() }}</span>
+                        <span
+                            class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">Total</span>
                     </div>
                     <div class="flex flex-col">
-                        <span class="text-2xl font-black text-blue-600 dark:text-blue-400 leading-none">{{ $unreadCount }}</span>
-                        <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">Não Lidas</span>
+                        <span
+                            class="text-2xl font-black text-blue-600 dark:text-blue-400 leading-none">{{ $unreadCount }}</span>
+                        <span
+                            class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">Não
+                            Lidas</span>
                     </div>
                 </div>
             </div>
@@ -73,8 +81,10 @@
 
             <!-- Notifications List -->
             @if($notifications->isEmpty())
-                <div class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 p-20 text-center transition-colors">
-                    <div class="w-24 h-24 rounded-full bg-gray-50 dark:bg-gray-700 flex items-center justify-center mx-auto mb-6">
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 p-20 text-center transition-colors">
+                    <div
+                        class="w-24 h-24 rounded-full bg-gray-50 dark:bg-gray-700 flex items-center justify-center mx-auto mb-6">
                         <i class="bi bi-bell-slash text-4xl text-gray-200 dark:text-gray-600"></i>
                     </div>
                     <h3 class="text-xl font-black text-gray-900 dark:text-white mb-2">Sem notificações</h3>
@@ -129,7 +139,8 @@
                                             <h4 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-tight">
                                                 {{ $notification->data['title'] ?? 'Notificação' }}
                                             </h4>
-                                            <span class="px-2 py-1 rounded-full text-[9px] font-black uppercase tracking-widest {{ $config['badge'] }}">
+                                            <span
+                                                class="px-2 py-1 rounded-full text-[9px] font-black uppercase tracking-widest {{ $config['badge'] }}">
                                                 {{ $config['label'] }}
                                             </span>
                                             @if(!$notification->read_at)

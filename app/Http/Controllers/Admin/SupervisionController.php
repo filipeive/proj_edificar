@@ -83,6 +83,7 @@ class SupervisionController
         }
 
         $availableSupervisions = $query->where('id', '!=', $supervision->id)->get();
+        $availableZones = Zone::orderBy('name')->where('id', '!=', $supervision->zone_id)->get();
 
         return view(
             'admin.supervisions.show',
@@ -92,7 +93,8 @@ class SupervisionController
                     ->with('leader')
                     ->paginate(20)
                     ->withQueryString(),
-                'availableSupervisions' => $availableSupervisions
+                'availableSupervisions' => $availableSupervisions,
+                'availableZones' => $availableZones
             ]
         );
     }
@@ -155,6 +157,7 @@ class SupervisionController
         $deletedCount = 0;
         $skippedCount = 0;
 
+        /** @var Supervision $supervision */
         foreach ($supervisions as $supervision) {
             if ($supervision->cells()->exists()) {
                 $skippedCount++;
@@ -169,6 +172,17 @@ class SupervisionController
             $message .= " {$skippedCount} foram puladas por possuírem células.";
         }
 
-        return redirect()->route('supervisions.index')->with($skippedCount > 0 ? 'warning' : 'success', $message);
+        return back()->with('success', $message);
+    }
+
+    public function reassignZone(Request $request, Supervision $supervision)
+    {
+        $validated = $request->validate([
+            'zone_id' => 'required|exists:zones,id',
+        ]);
+
+        $supervision->update($validated);
+
+        return back()->with('success', 'Supervisão transferida com sucesso para a nova zona!');
     }
 }

@@ -385,7 +385,7 @@
                     @csrf
                     <div class="space-y-2">
                         <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Selecione a Célula de Destino</label>
-                        <select name="cell_id" required class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all">
+                        <select name="cell_id" required class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all appearance-none custom-select">
                             <option value="">Escolha uma célula...</option>
                             @foreach($availableCells as $availCell)
                                 <option value="{{ $availCell->id }}">{{ $availCell->name }} ({{ $availCell->supervision->name }})</option>

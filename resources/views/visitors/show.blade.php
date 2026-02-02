@@ -1,225 +1,302 @@
 @extends('layouts.app')
 
 @section('title', 'Detalhes do Visitante - Portal Life Church')
-@section('page-title', $visitor->name)
-@section('page-subtitle', 'Informações e acompanhamento do visitante')
+@section('page-title', 'Detalhes do Visitante')
+@section('page-subtitle', 'Ficha completa de ' . $visitor->name)
 
 @section('header-actions')
+    {{-- Mobile Actions --}}
     <div class="flex items-center gap-2 md:hidden">
-        <a href="{{ route('visitors.index') }}"
-            class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+        <a href="{{ route('visitors.index') }}" class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
             title="Voltar à lista">
             <i class="bi bi-arrow-left"></i>
         </a>
         @if($visitor->isPending())
             <form method="POST" action="{{ route('visitors.mark-contacted', $visitor) }}" class="inline">
                 @csrf
-                <button type="submit"
-                    class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                <button type="submit" class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
                     title="Marcar contatado">
                     <i class="bi bi-telephone-plus"></i>
                 </button>
             </form>
         @endif
         <a href="{{ route('visitors.edit', $visitor) }}"
-            class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50"
-            title="Editar">
+            class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50" title="Editar">
             <i class="bi bi-pencil-square"></i>
         </a>
     </div>
 @endsection
 
 @section('content')
-    <div class="w-full">
-        <!-- Ações Rápidas (Hidden on Mobile) -->
-        <div class="flex items-center justify-between mb-8 hidden md:flex">
-            <a href="{{ route('visitors.index') }}"
-                class="text-gray-600 hover:text-gray-900 font-bold flex items-center transition">
-                <i class="bi bi-arrow-left mr-2"></i>Voltar para Lista
-            </a>
+    <div class="container-fluid space-y-8">
+        <!-- Header Section (Desktop) -->
+        <div
+            class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 hidden md:flex">
+            <div class="space-y-1">
+                <div class="flex items-center gap-2 text-xs font-bold text-blue-600 uppercase tracking-widest mb-1">
+                    <a href="{{ route('visitors.index') }}" class="hover:underline">Visitantes</a>
+                    <i class="bi bi-chevron-right text-[10px]"></i>
+                    <span>Ficha Cadastral</span>
+                </div>
+                <h1 class="text-3xl font-black text-gray-900 tracking-tight">{{ $visitor->name }}</h1>
+                <p class="text-gray-500 font-medium flex items-center gap-2">
+                    <i class="bi bi-calendar-event"></i>
+                    Visitou em {{ $visitor->visit_date->format('d/m/Y') }}
+                    <span class="text-gray-300">|</span>
+                    {{ $visitor->visit_date->diffForHumans() }}
+                </p>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <a href="{{ route('visitors.index') }}"
+                    class="flex items-center bg-gray-50 text-gray-500 px-6 py-4 rounded-2xl hover:bg-gray-100 transition-all font-bold text-xs uppercase tracking-widest">
+                    <i class="bi bi-arrow-left text-lg mr-2"></i>
+                    Voltar
+                </a>
+                @if($visitor->isPending())
+                    <form method="POST" action="{{ route('visitors.mark-contacted', $visitor) }}">
+                        @csrf
+                        <button type="submit"
+                            class="flex items-center bg-blue-50 text-blue-600 px-6 py-4 rounded-2xl hover:bg-blue-600 hover:text-white transition-all font-black text-xs uppercase tracking-widest shadow-sm">
+                            <i class="bi bi-telephone-plus text-lg mr-2"></i>
+                            Marcar Contatado
+                        </button>
+                    </form>
+                @endif
+                <a href="{{ route('visitors.edit', $visitor) }}"
+                    class="flex items-center bg-orange-50 text-orange-600 px-6 py-4 rounded-2xl hover:bg-orange-600 hover:text-white transition-all font-black text-xs uppercase tracking-widest shadow-sm">
+                    <i class="bi bi-pencil-square text-lg mr-2"></i>
+                    Editar
+                </a>
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Informações Principais -->
-            <div class="lg:col-span-2 space-y-8">
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
+            <!-- Left Column: Primary Info -->
+            <div class="xl:col-span-8 space-y-8">
                 <!-- Dados Pessoais -->
-                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
-                    <h3 class="text-xl font-black text-gray-900 mb-6 flex items-center">
-                        <i class="bi bi-person-fill text-orange-600 mr-3"></i>
-                        Dados Pessoais
-                    </h3>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Nome Completo</p>
+                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-8 border-b border-gray-50 bg-gray-50/30 flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl">
+                            <i class="bi bi-person-badge"></i>
+                        </div>
+                        <h3 class="text-lg font-black text-gray-900">Dados Pessoais</h3>
+                    </div>
+                    <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-1">
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Nome Completo</p>
                             <p class="text-lg font-bold text-gray-900">{{ $visitor->name }}</p>
                         </div>
-
-                        <div>
-                            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Idade</p>
-                            <p class="text-lg font-bold text-gray-900">{{ $visitor->age ?? 'Não informado' }}
-                                @if($visitor->age) anos @endif
+                        <div class="space-y-1">
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Idade</p>
+                            <p class="text-lg font-bold text-gray-900">
+                                {{ $visitor->age ? $visitor->age . ' anos' : 'Não informado' }}
                             </p>
                         </div>
-
-                        <div>
-                            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Sexo</p>
+                        <div class="space-y-1">
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Sexo</p>
                             <p class="text-lg font-bold text-gray-900">
                                 {{ $visitor->gender ? ucfirst($visitor->gender) : 'Não informado' }}
                             </p>
                         </div>
-
-                        <div>
-                            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Data da Visita</p>
-                            <p class="text-lg font-bold text-gray-900">{{ $visitor->visit_date->format('d/m/Y') }}</p>
-                            <p class="text-xs text-gray-500">{{ $visitor->visit_date->diffForHumans() }}</p>
-                        </div>
-
-                        <div>
-                            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Culto que Visitou</p>
+                        <div class="space-y-1">
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Culto Visitado</p>
                             @if($visitor->service)
-                                <p class="text-lg font-bold text-gray-900">{{ $visitor->service->service_type }}</p>
-                                <p class="text-xs text-gray-500">{{ $visitor->service->date->format('d/m/Y') }}</p>
+                                <div class="flex items-center gap-2">
+                                    <span
+                                        class="px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold uppercase">{{ $visitor->service->service_type }}</span>
+                                    <span
+                                        class="text-sm font-medium text-gray-500">{{ $visitor->service->date->format('d/m/Y') }}</span>
+                                </div>
                             @else
-                                <p class="text-sm text-gray-500">Não informado</p>
+                                <p class="text-gray-500 italic">Não vinculado</p>
                             @endif
                         </div>
                     </div>
                 </div>
 
                 <!-- Contato e Localização -->
-                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
-                    <h3 class="text-xl font-black text-gray-900 mb-6 flex items-center">
-                        <i class="bi bi-geo-alt-fill text-orange-600 mr-3"></i>
-                        Contato e Localização
-                    </h3>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Telefone</p>
-                            <p class="text-lg font-bold text-gray-900">
-                                @if($visitor->phone)
-                                    <a href="tel:{{ $visitor->phone }}" class="text-blue-600 hover:text-blue-700">
-                                        <i class="bi bi-telephone mr-1"></i>{{ $visitor->phone }}
-                                    </a>
-                                @else
-                                    Não informado
-                                @endif
-                            </p>
+                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-8 border-b border-gray-50 bg-gray-50/30 flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center text-xl">
+                            <i class="bi bi-geo-alt-fill"></i>
                         </div>
-
-                        <div>
-                            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Bairro</p>
+                        <h3 class="text-lg font-black text-gray-900">Contato e Localização</h3>
+                    </div>
+                    <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-1">
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Telefone</p>
+                            @if($visitor->phone)
+                                <a href="tel:{{ $visitor->phone }}"
+                                    class="text-lg font-bold text-blue-600 hover:underline flex items-center gap-2">
+                                    <i class="bi bi-whatsapp"></i> {{ $visitor->phone }}
+                                </a>
+                            @else
+                                <p class="text-gray-500 italic">Não informado</p>
+                            @endif
+                        </div>
+                        <div class="space-y-1">
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Bairro</p>
                             <p class="text-lg font-bold text-gray-900">{{ $visitor->neighborhood ?? 'Não informado' }}</p>
                         </div>
-
-                        <div class="col-span-2">
-                            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Cidade</p>
+                        <div class="space-y-1 md:col-span-2">
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Cidade</p>
                             <p class="text-lg font-bold text-gray-900">{{ $visitor->city }}</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Convite -->
-                @if($visitor->invited_by_someone)
-                    <div class="bg-blue-50 rounded-[2.5rem] border border-blue-100 p-8">
-                        <h3 class="text-xl font-black text-blue-900 mb-4 flex items-center">
-                            <i class="bi bi-person-plus-fill mr-3"></i>
-                            Veio a Convite
-                        </h3>
-                        <p class="text-lg font-bold text-blue-900">{{ $visitor->inviter_name }}</p>
-                    </div>
-                @endif
+                <!-- Convite e Observações -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    @if($visitor->invited_by_someone)
+                        <div
+                            class="bg-blue-600 rounded-[2.5rem] p-8 text-white shadow-lg shadow-blue-200 relative overflow-hidden">
+                            <i
+                                class="bi bi-envelope-paper-heart absolute -right-4 -bottom-4 text-8xl text-white opacity-10"></i>
+                            <div class="relative z-10">
+                                <p class="text-[10px] font-black text-blue-200 uppercase tracking-widest mb-2">Veio a convite de
+                                </p>
+                                <h3 class="text-2xl font-black">{{ $visitor->inviter_name }}</h3>
+                            </div>
+                        </div>
+                    @endif
 
-                <!-- Observações -->
-                @if($visitor->notes)
-                    <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
-                        <h3 class="text-xl font-black text-gray-900 mb-4 flex items-center">
-                            <i class="bi bi-chat-left-text-fill text-orange-600 mr-3"></i>
-                            Observações
-                        </h3>
-                        <p class="text-gray-700 leading-relaxed">{{ $visitor->notes }}</p>
-                    </div>
-                @endif
+                    @if($visitor->notes)
+                        <div
+                            class="{{ $visitor->invited_by_someone ? '' : 'md:col-span-2' }} bg-yellow-50 rounded-[2.5rem] p-8 border border-yellow-100">
+                            <div class="flex items-center gap-3 mb-4">
+                                <i class="bi bi-chat-quote-fill text-yellow-600 text-xl"></i>
+                                <h3 class="text-sm font-black text-yellow-800 uppercase tracking-widest">Observações</h3>
+                            </div>
+                            <p class="text-yellow-900 font-medium italic leading-relaxed">"{{ $visitor->notes }}"</p>
+                        </div>
+                    @endif
+                </div>
             </div>
 
             <!-- Sidebar - Status e Atribuições -->
-            <div class="space-y-6">
-                <!-- Status -->
-                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-6">
-                    <h4 class="text-sm font-black text-gray-900 mb-4 uppercase tracking-wider">Status</h4>
-                    <div class="text-center">
-                        {!! $visitor->status_badge !!}
+            <div class="xl:col-span-4 space-y-8">
+                <!-- Status Card -->
+                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-8 text-center border-b border-gray-50">
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Status Atual</p>
+                        <div class="inline-block transform scale-125">
+                            {!! $visitor->status_badge !!}
+                        </div>
                     </div>
-
                     @if($visitor->contacted_at)
-                        <div class="mt-6 pt-6 border-t border-gray-100">
-                            <p class="text-xs text-gray-500 mb-1">Contatado em:</p>
-                            <p class="text-sm font-bold text-gray-900">{{ $visitor->contacted_at->format('d/m/Y H:i') }}</p>
-                            @if($visitor->contactedBy)
-                                <p class="text-xs text-gray-500 mt-2">Por: {{ $visitor->contactedBy->name }}</p>
-                            @endif
+                        <div class="p-6 bg-gray-50/50">
+                            <div class="flex items-start gap-3">
+                                <div class="mt-1">
+                                    <i class="bi bi-check-circle-fill text-green-500"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-bold text-gray-900">Contatado em
+                                        {{ $visitor->contacted_at->format('d/m/Y') }}
+                                    </p>
+                                    <p class="text-[10px] text-gray-500">às {{ $visitor->contacted_at->format('H:i') }}</p>
+                                    @if($visitor->contactedBy)
+                                        <p class="text-[10px] text-gray-500 mt-1">Por: <span
+                                                class="font-bold">{{ $visitor->contactedBy->name }}</span></p>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
                     @endif
                 </div>
 
-                <!-- Zona -->
-                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-6">
-                    <h4 class="text-sm font-black text-gray-900 mb-4 uppercase tracking-wider">Zona</h4>
-                    @if($visitor->zone)
-                        <p class="text-lg font-bold text-blue-600">{{ $visitor->zone->name }}</p>
-                    @else
-                        <p class="text-sm text-gray-500 mb-4">Não atribuído</p>
-                        @if(Auth::user()->isAdmin() || Auth::user()->isSecretaria())
-                            <form method="POST" action="{{ route('visitors.assign-zone', $visitor) }}">
-                                @csrf
-                                <select name="zone_id" required
-                                    class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm mb-3">
-                                    <option value="">Selecione...</option>
-                                    @foreach(\App\Models\Zone::orderBy('name')->get() as $zone)
-                                        <option value="{{ $zone->id }}">{{ $zone->name }}</option>
-                                    @endforeach
-                                </select>
-                                <button type="submit"
-                                    class="w-full px-4 py-2 bg-blue-600 text-white rounded-xl font-bold text-xs hover:bg-blue-700 transition-all">
-                                    Atribuir Zona
-                                </button>
-                            </form>
-                        @endif
-                    @endif
-                </div>
+                <!-- Integração (Zona & Célula) -->
+                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-8 border-b border-gray-50 bg-gray-50/30">
+                        <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
+                            <i class="bi bi-diagram-3-fill text-purple-600"></i>
+                            Integração
+                        </h3>
+                    </div>
 
-                <!-- Célula -->
-                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-6">
-                    <h4 class="text-sm font-black text-gray-900 mb-4 uppercase tracking-wider">Célula</h4>
-                    @if($visitor->cell)
-                        <p class="text-lg font-bold text-green-600">{{ $visitor->cell->name }}</p>
-                    @else
-                        <p class="text-sm text-gray-500 mb-4">Não atribuído</p>
-                        @if($visitor->zone && (Auth::user()->isAdmin() || Auth::user()->isSecretaria() || Auth::user()->isPastorZona()))
-                            <form method="POST" action="{{ route('visitors.assign-cell', $visitor) }}">
-                                @csrf
-                                <select name="cell_id" required
-                                    class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm mb-3">
-                                    <option value="">Selecione...</option>
-                                    @foreach($cells as $cell)
-                                        <option value="{{ $cell->id }}">{{ $cell->name }}</option>
-                                    @endforeach
-                                </select>
-                                <button type="submit"
-                                    class="w-full px-4 py-2 bg-green-600 text-white rounded-xl font-bold text-xs hover:bg-green-700 transition-all">
-                                    Atribuir Célula
-                                </button>
-                            </form>
-                        @endif
-                    @endif
+                    <div class="p-6 space-y-6">
+                        <!-- Zona -->
+                        <div class="space-y-3">
+                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Zona</label>
+                            @if($visitor->zone)
+                                <div
+                                    class="flex items-center justify-between bg-blue-50 p-4 rounded-2xl border border-blue-100">
+                                    <span class="font-bold text-blue-700">{{ $visitor->zone->name }}</span>
+                                    @if(Auth::user()->isAdmin() || Auth::user()->isSecretaria())
+                                        <button onclick="document.getElementById('edit-zone-form').classList.toggle('hidden')"
+                                            class="text-blue-400 hover:text-blue-600">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                    @endif
+                                </div>
+                            @endif
+
+                            @if(!$visitor->zone || Auth::user()->isAdmin() || Auth::user()->isSecretaria())
+                                <form method="POST" action="{{ route('visitors.assign-zone', $visitor) }}" id="edit-zone-form"
+                                    class="{{ $visitor->zone ? 'hidden' : '' }} space-y-2">
+                                    @csrf
+                                    <select name="zone_id" required onchange="this.form.submit()"
+                                        class="searchable-select w-full px-4 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-xl text-sm font-bold text-gray-700 transition-all">
+                                        <option value="">Selecione a Zona...</option>
+                                        @foreach(\App\Models\Zone::orderBy('name')->get() as $zone)
+                                            <option value="{{ $zone->id }}" {{ $visitor->zone_id == $zone->id ? 'selected' : '' }}>
+                                                {{ $zone->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </form>
+                            @endif
+                        </div>
+
+                        <!-- Célula -->
+                        <div class="space-y-3">
+                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Célula</label>
+                            @if($visitor->cell)
+                                <div
+                                    class="flex items-center justify-between bg-green-50 p-4 rounded-2xl border border-green-100">
+                                    <span class="font-bold text-green-700">{{ $visitor->cell->name }}</span>
+                                    @if($visitor->zone && (Auth::user()->isAdmin() || Auth::user()->isSecretaria() || Auth::user()->isPastorZona()))
+                                        <button onclick="document.getElementById('edit-cell-form').classList.toggle('hidden')"
+                                            class="text-green-400 hover:text-green-600">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                    @endif
+                                </div>
+                            @endif
+
+                            @if(($visitor->zone && (Auth::user()->isAdmin() || Auth::user()->isSecretaria() || Auth::user()->isPastorZona())))
+                                <form method="POST" action="{{ route('visitors.assign-cell', $visitor) }}" id="edit-cell-form"
+                                    class="{{ $visitor->cell ? 'hidden' : '' }} space-y-2">
+                                    @csrf
+                                    <select name="cell_id" required onchange="this.form.submit()"
+                                        class="searchable-select w-full px-4 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-xl text-sm font-bold text-gray-700 transition-all">
+                                        <option value="">Selecione a Célula...</option>
+                                        @foreach($cells as $cell)
+                                            <option value="{{ $cell->id }}" {{ $visitor->cell_id == $cell->id ? 'selected' : '' }}>
+                                                {{ $cell->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </form>
+                            @elseif(!$visitor->zone)
+                                <p class="text-xs text-gray-400 italic bg-gray-50 p-3 rounded-xl text-center">
+                                    Atribua uma Zona primeiro para selecionar a célula.
+                                </p>
+                            @endif
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Cadastrado por -->
-                <div class="bg-gray-50 rounded-[2.5rem] p-6">
-                    <h4 class="text-xs font-black text-gray-500 mb-3 uppercase tracking-wider">Cadastrado por</h4>
-                    <p class="text-sm font-bold text-gray-900">{{ $visitor->creator->name }}</p>
-                    <p class="text-xs text-gray-500 mt-1">{{ $visitor->created_at->format('d/m/Y H:i') }}</p>
+                <div class="text-center space-y-2">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                        Cadastrado por {{ $visitor->creator->name }}
+                    </p>
+                    <p class="text-[10px] text-gray-300">
+                        {{ $visitor->created_at->format('d/m/Y \à\s H:i') }}
+                    </p>
                 </div>
             </div>
         </div>

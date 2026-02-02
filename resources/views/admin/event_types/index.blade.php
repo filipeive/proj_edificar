@@ -102,7 +102,7 @@
         </div>
 
         <!-- Grid View -->
-        <div x-show="view === 'grid'" class="grid grid-compact">
+        <div x-show="view === 'grid'" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             @forelse($eventTypes as $type)
                 <div
                     class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 flex flex-col compact-card">

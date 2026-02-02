@@ -114,7 +114,7 @@ class CellController
             $query->where('zone_id', $user->getZoneId());
         }
 
-        $supervisions = $query->orderBy('name')->get();
+        $supervisions = $query->with('zone')->orderBy('name')->get();
         $leaders = User::where('role', '!=', 'admin')->get();
 
         return view('admin.cells.create', [
@@ -184,7 +184,7 @@ class CellController
             $query->where('zone_id', $user->getZoneId());
         }
 
-        $supervisions = $query->orderBy('name')->get();
+        $supervisions = $query->with('zone')->orderBy('name')->get();
         $leaders = User::where('role', '!=', 'admin')->get();
 
         return view('admin.cells.edit', [

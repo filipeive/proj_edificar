@@ -16,7 +16,7 @@
                 <span class="font-bold text-sm">Voltar para o Calendário</span>
             </a>
 
-            <button type="button" onclick="confirmDelete('{{ route('weddings.destroy', $wedding) }}', 'delete-form')"
+            <button type="button" onclick="confirmDelete('delete-form', 'Deseja excluir este casamento?')"
                 class="group flex items-center justify-center px-4 py-2 text-red-500 hover:text-white hover:bg-red-500 rounded-xl transition-all duration-300 font-bold text-xs uppercase tracking-wider border border-red-100 hover:border-red-500">
                 <i class="bi bi-trash3-fill mr-2"></i> Remover
             </button>
@@ -111,7 +111,7 @@
                                 <label
                                     class="block text-xs font-black text-gray-400 uppercase tracking-wider mb-3 ml-1 group-focus-within:text-orange-500 transition-colors">Status</label>
                                 <select name="status"
-                                    class="w-full bg-white rounded-xl border-gray-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all duration-300 py-4 px-4 font-bold text-gray-800 shadow-sm">
+                                    class="w-full bg-white rounded-xl border-gray-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all duration-300 py-4 px-4 font-bold text-gray-800 shadow-sm appearance-none custom-select">
                                     <option value="scheduled" {{ $wedding->status == 'scheduled' ? 'selected' : '' }}>Agendado
                                     </option>
                                     <option value="completed" {{ $wedding->status == 'completed' ? 'selected' : '' }}>

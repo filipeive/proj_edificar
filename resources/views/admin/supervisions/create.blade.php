@@ -2,23 +2,24 @@
 
 @section('title', 'Criar Supervisão - Portal Life Church')
 @section('page-title', 'Criar Supervisão')
+@section('page-subtitle', 'Registar uma nova estrutura de supervisão no sistema')
 
 @section('content')
     <div class="w-full">
         <div class="bg-white rounded-lg shadow p-8">
-             <!-- voltar -->
-             <div class="mb-6 btn btn-danger">
-            <a href="{{ route('supervisions.index') }}">
-                <i class="bi bi-arrow-left-short"></i> Voltar
-            </a>
-            </div> 
+            <!-- voltar -->
+            <div class="mb-6 btn btn-danger">
+                <a href="{{ route('supervisions.index') }}">
+                    <i class="bi bi-arrow-left-short"></i> Voltar
+                </a>
+            </div>
             <form action="{{ route('supervisions.store') }}" method="POST">
                 @csrf
 
                 <div class="mb-6">
                     <label for="zone_id" class="block text-sm font-medium text-gray-700 mb-2">Zona</label>
                     <select name="zone_id" id="zone_id"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 searchable-select @error('zone_id') border-red-500 @enderror"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 searchable-select custom-select @error('zone_id') border-red-500 @enderror"
                         required>
                         <option value="">-- Selecione uma zona --</option>
                         @foreach($zones as $zone)
@@ -36,7 +37,7 @@
                     <label for="supervisor_id" class="block text-sm font-medium text-gray-700 mb-2">Supervisor
                         Responsável</label>
                     <select name="supervisor_id" id="supervisor_id"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 searchable-select @error('supervisor_id') border-red-500 @enderror">
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 searchable-select custom-select @error('supervisor_id') border-red-500 @enderror">
                         <option value="">-- Selecione um supervisor --</option>
                         @foreach($supervisors as $supervisor)
                             <option value="{{ $supervisor->id }}" @selected(old('supervisor_id') == $supervisor->id)>

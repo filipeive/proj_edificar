@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('title', 'Gestão de Supervisões - Portal Life Church')
+@section('page-title', 'Gestão de Supervisões')
+@section('page-subtitle', 'Administração de níveis de supervisão e cobertura ministerial')
 
 @section('header-actions')
     <div class="md:hidden">
@@ -13,25 +15,25 @@
 
 @section('content')
     <div class="space-y-8" x-data="{ 
-                view: window.innerWidth < 768 ? 'grid' : (localStorage.getItem('supervisions_view') || 'grid'),
-                selected: [],
-                updateView() {
-                    if (window.innerWidth < 768 && this.view === 'list') {
-                        this.view = 'grid';
+                    view: window.innerWidth < 768 ? 'grid' : (localStorage.getItem('supervisions_view') || 'grid'),
+                    selected: [],
+                    updateView() {
+                        if (window.innerWidth < 768 && this.view === 'list') {
+                            this.view = 'grid';
+                        }
+                    },
+                    toggleAll() {
+                        const allIds = {{ Js::from($supervisions->pluck('id')) }};
+                        if (this.selected.length === allIds.length) {
+                            this.selected = [];
+                        } else {
+                            this.selected = allIds;
+                        }
+                    },
+                    deleteSelected() {
+                        document.getElementById('bulk-delete-form').submit();
                     }
-                },
-                toggleAll() {
-                    const allIds = {{ Js::from($supervisions->pluck('id')) }};
-                    if (this.selected.length === allIds.length) {
-                        this.selected = [];
-                    } else {
-                        this.selected = allIds;
-                    }
-                },
-                deleteSelected() {
-                    document.getElementById('bulk-delete-form').submit();
-                }
-            }" x-init="$watch('view', value => localStorage.setItem('supervisions_view', value))"
+                }" x-init="$watch('view', value => localStorage.setItem('supervisions_view', value))"
         @resize.window.debounce.500ms="updateView()">
 
         <!-- Bulk Action Bar -->
@@ -110,7 +112,7 @@
 
         <!-- Grid View -->
         <template x-if="view === 'grid'">
-            <div class="grid grid-compact">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 @forelse($supervisions as $supervision)
                     <div class="group bg-white rounded-[2rem] p-7 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-100 relative overflow-hidden compact-card"
                         :class="{'ring-2 ring-blue-500 bg-blue-50/10': selected.includes({{ $supervision->id }})}">

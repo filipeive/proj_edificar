@@ -2,6 +2,7 @@
 
 @section('title', 'Editar Utilizador - Portal Life Church')
 @section('page-title', 'Editar Utilizador')
+@section('page-subtitle', 'Atualize as informações do membro ou líder do sistema')
 
 @section('content')
     <div class="max-w-6xl mx-auto px-4 py-8">
@@ -137,7 +138,7 @@
                                     </label>
                                     <div class="relative">
                                         <select name="role" id="role" required
-                                            class="w-full px-4 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 appearance-none @error('role') border-red-500 ring-red-500/10 @enderror"
+                                            class="w-full px-4 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 appearance-none custom-select @error('role') border-red-500 ring-red-500/10 @enderror"
                                             {{ $user->role === 'admin' ? 'disabled' : '' }}>
                                             <option value="">Selecione o papel</option>
                                             <option value="membro" {{ old('role', $user->role) == 'membro' ? 'selected' : '' }}>Membro</option>
@@ -175,7 +176,8 @@
                                     </label>
                                     <div class="relative">
                                         <select name="cell_id" id="cell_id"
-                                            class="w-full px-4 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 appearance-none @error('cell_id') border-red-500 ring-red-500/10 @enderror">
+                                            class="searchable-select w-full px-4 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 appearance-none custom-select @error('cell_id') border-red-500 ring-red-500/10 @enderror"
+                                            data-label="Célula">
                                             <option value="">Sem célula associada</option>
                                             @foreach($cells as $cell)
                                                 <option value="{{ $cell->id }}" {{ old('cell_id', $user->cell_id) == $cell->id ? 'selected' : '' }}>

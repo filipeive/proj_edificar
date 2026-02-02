@@ -22,6 +22,7 @@
 @section('content')
     <div class="space-y-8" x-data="{
         showTransferModal: false,
+        showZoneTransferModal: false,
         selectedCell: {},
         transfer(cell) {
             this.selectedCell = cell;
@@ -168,6 +169,12 @@
                             class="w-full bg-gray-50 text-gray-500 px-6 py-4 rounded-2xl hover:bg-gray-100 transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3">
                             <i class="bi bi-arrow-left"></i> Voltar à Lista
                         </a>
+                        @if(auth()->user()->isAdmin() || auth()->user()->isSecretaria())
+                            <button @click="showZoneTransferModal = true"
+                                class="w-full bg-amber-50 text-amber-600 px-6 py-4 rounded-2xl hover:bg-amber-100 transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3">
+                                <i class="bi bi-arrow-left-right"></i> Transferir de Zona
+                            </button>
+                        @endif
                     </div>
                 </div>
 
@@ -209,7 +216,7 @@
                     @csrf
                     <div class="space-y-2">
                         <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Selecione a Supervisão de Destino</label>
-                        <select name="supervision_id" required class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all">
+                        <select name="supervision_id" required class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all custom-select">
                             <option value="">Escolha uma supervisão...</option>
                             @foreach($availableSupervisions as $availSup)
                                 <option value="{{ $availSup->id }}">{{ $availSup->name }} ({{ $availSup->zone->name }})</option>
@@ -219,6 +226,40 @@
                     <div class="flex gap-3 pt-4">
                         <button type="button" @click="showTransferModal = false" class="flex-1 px-6 py-4 rounded-2xl bg-gray-50 text-gray-500 font-black text-xs uppercase tracking-widest hover:bg-gray-100 transition-all">Cancelar</button>
                         <button type="submit" class="flex-1 px-6 py-4 rounded-2xl bg-blue-600 text-white font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">Confirmar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Transfer Supervision to Zone Modal -->
+        <div x-show="showZoneTransferModal" 
+            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            style="display: none;">
+            <div @click.away="showZoneTransferModal = false" class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden animate-In">
+                <div class="p-8 border-b border-gray-100">
+                    <h3 class="text-xl font-black text-gray-900 leading-tight">Transferir Supervisão</h3>
+                    <p class="text-sm text-gray-500 mt-1">Mover {{ $supervision->name }} para outra zona pastoral</p>
+                </div>
+                <form action="{{ route('supervisions.reassign-zone', $supervision) }}" method="POST" class="p-8 space-y-6">
+                    @csrf
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Selecione a Zona de Destino</label>
+                        <select name="zone_id" required class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all custom-select">
+                            <option value="">Escolha uma zona...</option>
+                            @foreach($availableZones as $availZone)
+                                <option value="{{ $availZone->id }}">{{ $availZone->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" @click="showZoneTransferModal = false" class="flex-1 px-6 py-4 rounded-2xl bg-gray-50 text-gray-500 font-black text-xs uppercase tracking-widest hover:bg-gray-100 transition-all">Cancelar</button>
+                        <button type="submit" class="flex-1 px-6 py-4 rounded-2xl bg-blue-600 text-white font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">Confirmar Transferência</button>
                     </div>
                 </form>
             </div>

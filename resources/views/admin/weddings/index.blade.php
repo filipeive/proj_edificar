@@ -24,22 +24,22 @@
         }
     </style>
     <div class="container-fluid" x-data="{ 
-                view: window.innerWidth < 768 ? 'grid' : 'grid',
-                selected: [],
-                updateView() {
-                    if (window.innerWidth < 768 && this.view === 'list') {
-                        this.view = 'grid'; 
+                    view: window.innerWidth < 768 ? 'grid' : 'grid',
+                    selected: [],
+                    updateView() {
+                        if (window.innerWidth < 768 && this.view === 'list') {
+                            this.view = 'grid'; 
+                        }
+                    },
+                    toggleAll() {
+                        const allIds = {{ Js::from($weddings->pluck('id')) }};
+                        if (this.selected.length === allIds.length) {
+                            this.selected = [];
+                        } else {
+                            this.selected = allIds;
+                        }
                     }
-                },
-                toggleAll() {
-                    const allIds = {{ Js::from($weddings->pluck('id')) }};
-                    if (this.selected.length === allIds.length) {
-                        this.selected = [];
-                    } else {
-                        this.selected = allIds;
-                    }
-                }
-            }"
+                }"
         x-init="$watch('view', value => { if(value !== 'calendar') localStorage.setItem('weddings_view', value) }); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('weddings_view') || 'grid')"
         @resize.window.debounce.500ms="updateView()" x-cloak>
 
@@ -65,21 +65,21 @@
                     </button>
                     @if(auth()->user()->role === 'admin')
                         <form method="POST" action="{{ route('weddings.bulk-delete') }}" @submit.prevent="
-                                        Swal.fire({
-                                            title: 'Confirmação de Exclusão',
-                                            text: 'Tem certeza que deseja excluir ' + selected.length + ' casamento(s)? Esta ação é irreversível.',
-                                            icon: 'warning',
-                                            showCancelButton: true,
-                                            confirmButtonColor: '#d33',
-                                            cancelButtonColor: '#3085d6',
-                                            confirmButtonText: 'Sim, excluir!',
-                                            cancelButtonText: 'Cancelar'
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                $el.submit();
-                                            }
-                                        })
-                                      ">
+                                                Swal.fire({
+                                                    title: 'Confirmação de Exclusão',
+                                                    text: 'Tem certeza que deseja excluir ' + selected.length + ' casamento(s)? Esta ação é irreversível.',
+                                                    icon: 'warning',
+                                                    showCancelButton: true,
+                                                    confirmButtonColor: '#d33',
+                                                    cancelButtonColor: '#3085d6',
+                                                    confirmButtonText: 'Sim, excluir!',
+                                                    cancelButtonText: 'Cancelar'
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+                                                        $el.submit();
+                                                    }
+                                                })
+                                              ">
                             @csrf
                             <template x-for="id in selected" :key="id">
                                 <input type="hidden" name="wedding_ids[]" :value="id">
@@ -154,7 +154,7 @@
                 <div class="w-full md:w-auto">
                     <label class="block text-xs font-bold text-gray-700 mb-2">Status</label>
                     <select name="status"
-                        class="w-full md:w-48 px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+                        class="w-full md:w-48 px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 appearance-none custom-select">
                         <option value="">Todos</option>
                         <option value="scheduled" {{ request('status') == 'scheduled' ? 'selected' : '' }}>Agendado</option>
                         <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Realizado</option>
@@ -292,7 +292,8 @@
 
                                                 <button type="button"
                                                     onclick="confirmDelete('list-delete-wedding-{{ $wedding->id }}')"
-                                                    class="action-icon bg-gray-50 text-gray-400 hover:bg-red-500 hover:text-white" title="Excluir">
+                                                    class="action-icon bg-gray-50 text-gray-400 hover:bg-red-500 hover:text-white"
+                                                    title="Excluir">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </form>
@@ -322,7 +323,7 @@
             <div class="flex flex-col xl:flex-row gap-8">
                 <!-- Main Grid Area -->
                 <div class="flex-1">
-                    <div class="grid grid-compact">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         @forelse($weddings->take(6) as $wedding)
                             <div class="bg-white p-6 md:p-8 rounded-2xl md:rounded-[2rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 relative compact-card"
                                 :class="{'ring-2 ring-orange-500 bg-orange-50/10': selected.includes({{ $wedding->id }})}">
@@ -690,51 +691,51 @@
             };
 
             let tooltipContent = `
-                <div class="tooltip-header">
-                    <i class="bi bi-heart-fill"></i>
-                    <span>${event.title}</span>
-                </div>
-                <div class="tooltip-row">
-                    <i class="bi bi-calendar-event"></i>
-                    <span>${event.start.toLocaleDateString('pt-BR', {
+                    <div class="tooltip-header">
+                        <i class="bi bi-heart-fill"></i>
+                        <span>${event.title}</span>
+                    </div>
+                    <div class="tooltip-row">
+                        <i class="bi bi-calendar-event"></i>
+                        <span>${event.start.toLocaleDateString('pt-BR', {
                 weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
             })}</span>
-                </div>
-                `;
+                    </div>
+                    `;
 
             if (props.time) {
                 tooltipContent += `
-                <div class="tooltip-row">
-                    <i class="bi bi-clock-fill"></i>
-                    <span>${props.time}</span>
-                </div>
-                `;
+                    <div class="tooltip-row">
+                        <i class="bi bi-clock-fill"></i>
+                        <span>${props.time}</span>
+                    </div>
+                    `;
             }
 
             if (props.location) {
                 tooltipContent += `
-                <div class="tooltip-row">
-                    <i class="bi bi-geo-alt-fill"></i>
-                    <span>${props.location}</span>
-                </div>
-                `;
+                    <div class="tooltip-row">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <span>${props.location}</span>
+                    </div>
+                    `;
             }
 
             if (props.godparents) {
                 tooltipContent += `
-                <div class="tooltip-row">
-                    <i class="bi bi-people-fill"></i>
-                    <span>Padrinhos: ${props.godparents.substring(0, 50)}${props.godparents.length > 50 ? '...' : ''}</span>
-                </div>
-                `;
+                    <div class="tooltip-row">
+                        <i class="bi bi-people-fill"></i>
+                        <span>Padrinhos: ${props.godparents.substring(0, 50)}${props.godparents.length > 50 ? '...' : ''}</span>
+                    </div>
+                    `;
             }
 
             if (props.status) {
                 tooltipContent += `
-                <div class="tooltip-status status-${props.status}">
-                    ${statusLabels[props.status] || props.status}
-                </div>
-                `;
+                    <div class="tooltip-status status-${props.status}">
+                        ${statusLabels[props.status] || props.status}
+                    </div>
+                    `;
             }
 
             tooltip.innerHTML = tooltipContent;

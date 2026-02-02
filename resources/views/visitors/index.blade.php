@@ -185,32 +185,30 @@
                 </div>
             </div>
 
-            <form method="GET" action="{{ route('visitors.index') }}" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <form method="GET" action="{{ route('visitors.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Buscar</label>
                     <input type="text" name="search" value="{{ request('search') }}"
-                        class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                        class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                         placeholder="Nome, telefone, bairro...">
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Status</label>
                     <select name="status"
-                        class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        class="searchable-select w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white custom-select" data-label="Status">
                         <option value="">Todos</option>
                         <option value="pendente" {{ request('status') == 'pendente' ? 'selected' : '' }}>Pendente</option>
                         <option value="contatado" {{ request('status') == 'contatado' ? 'selected' : '' }}>Contatado</option>
                         <option value="integrado" {{ request('status') == 'integrado' ? 'selected' : '' }}>Integrado</option>
-                        <option value="sem_interesse" {{ request('status') == 'sem_interesse' ? 'selected' : '' }}>Sem
-                            Interesse
-                        </option>
+                        <option value="sem_interesse" {{ request('status') == 'sem_interesse' ? 'selected' : '' }}>Sem Interesse</option>
                     </select>
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Zona</label>
                     <select name="zone_id"
-                        class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        class="searchable-select w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white custom-select" data-label="Zona">
                         <option value="">Todas</option>
                         @foreach($zones as $zone)
                             <option value="{{ $zone->id }}" {{ request('zone_id') == $zone->id ? 'selected' : '' }}>
@@ -223,7 +221,7 @@
                 <div>
                     <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Data Início</label>
                     <input type="date" name="date_from" value="{{ request('date_from') }}"
-                        class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                 </div>
 
                 <div class="flex items-end gap-2">
@@ -244,7 +242,7 @@
             <!-- Grid View -->
             <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300"
                 x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-                class="grid grid-compact">
+                class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 @forelse($visitors as $visitor)
                     <div class="bg-white dark:bg-gray-800 p-4 md:p-8 rounded-2xl md:rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col group hover:shadow-xl transition-all duration-300 relative compact-card"
                         :class="{'ring-2 ring-blue-500 bg-blue-50/10 dark:bg-blue-900/10': selected.includes({{ $visitor->id }})}">

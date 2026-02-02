@@ -156,6 +156,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{visitor}', [\App\Http\Controllers\VisitorController::class, 'destroy'])->name('destroy');
 
         // Ações especiais
+        Route::get('/api/cells-by-zone', [\App\Http\Controllers\VisitorController::class, 'getCellsByZone'])->name('cells-by-zone');
         Route::post('/{visitor}/assign-zone', [\App\Http\Controllers\VisitorController::class, 'assignToZone'])->name('assign-zone');
         Route::post('/{visitor}/assign-cell', [\App\Http\Controllers\VisitorController::class, 'assignToCell'])->name('assign-cell');
         Route::post('/{visitor}/mark-contacted', [\App\Http\Controllers\VisitorController::class, 'markAsContacted'])->name('mark-contacted');
@@ -175,7 +176,25 @@ Route::middleware('auth')->group(function () {
 
         // Intermediate Restricted (Admin, Pastor Zona, Supervisor, Secretaria, Lider Celula)
         Route::middleware('role:admin,pastor_zona,supervisor,secretaria,pastor,lider_celula')->group(function () {
+            // Centralized Zones Management
+            Route::prefix('zones')->name('zones.')->group(function () {
+                // Read Access (Pastors, Admins, etc.)
+                Route::get('/', [ZoneController::class, 'index'])->name('index');
+                Route::get('{zone}', [ZoneController::class, 'show'])->name('show')->where('zone', '[0-9]+');
+
+                // Management Access (Admin/Secretaria only)
+                Route::middleware('role:admin,secretaria')->group(function () {
+                    Route::get('create', [ZoneController::class, 'create'])->name('create');
+                    Route::post('/', [ZoneController::class, 'store'])->name('store');
+                    Route::get('{zone}/edit', [ZoneController::class, 'edit'])->name('edit')->where('zone', '[0-9]+');
+                    Route::put('{zone}', [ZoneController::class, 'update'])->name('update')->where('zone', '[0-9]+');
+                    Route::delete('{zone}', [ZoneController::class, 'destroy'])->name('destroy')->where('zone', '[0-9]+');
+                    Route::delete('bulk-destroy', [ZoneController::class, 'bulkDestroy'])->name('bulk-destroy');
+                });
+            });
+
             // Gestão de Supervisões
+            Route::post('supervisions/{supervision}/reassign-zone', [SupervisionController::class, 'reassignZone'])->name('supervisions.reassign-zone');
             Route::delete('supervisions/bulk-destroy', [SupervisionController::class, 'bulkDestroy'])->name('supervisions.bulk-destroy');
             Route::resource('supervisions', SupervisionController::class);
 
@@ -209,15 +228,15 @@ Route::middleware('auth')->group(function () {
 
         // Highly Restricted (Admin & Secretaria Only)
         Route::middleware('role:admin,secretaria')->group(function () {
-            // Gestão de Zonas
-            Route::delete('zones/bulk-destroy', [ZoneController::class, 'bulkDestroy'])->name('zones.bulk-destroy');
-            Route::resource('zones', ZoneController::class);
             // Gestão de Utilizadores
             Route::delete('/users/bulk-destroy', [UserController::class, 'bulkDestroy'])->name('users.bulk-destroy');
             Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
             Route::post('/users/{user}/reassign-cell', [UserController::class, 'reassignCell'])->name('users.reassign-cell');
             Route::post('/users/{user}/remove-from-cell', [UserController::class, 'removeFromCell'])->name('users.remove-from-cell');
             Route::post('/users/{user}/update-observations', [UserController::class, 'updateObservations'])->name('users.update-observations');
+            Route::post('users/{user}/reassign-cell', [UserController::class, 'reassignCell'])->name('users.reassign-cell');
+            Route::post('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
+            Route::post('users/{user}/observations', [UserController::class, 'updateObservations'])->name('users.update-observations');
             Route::resource('users', UserController::class);
 
         });

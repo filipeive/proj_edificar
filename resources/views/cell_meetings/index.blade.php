@@ -292,7 +292,7 @@
                                             </a>
                                         @endcan
                                         @can('delete', $meeting)
-                                            <button type="button" @click="confirmDelete('{{ route('cell-meetings.destroy', $meeting) }}', 'delete-meeting-{{ $meeting->id }}')"
+                                            <button type="button" @click="confirmDelete('delete-meeting-{{ $meeting->id }}', 'Deseja excluir este encontro?')"
                                                 class="action-icon bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 hover:bg-red-600 dark:hover:bg-red-600 hover:text-white dark:hover:text-white shadow-sm" title="Excluir">
                                                 <i class="bi bi-trash-fill"></i>
                                             </button>
@@ -326,7 +326,7 @@
         <!-- Grid View -->
         <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-            class="grid grid-compact">
+            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             @foreach($meetings as $meeting)
                 <div class="bg-white dark:bg-gray-800 p-8 rounded-[3rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col group hover:shadow-2xl hover:shadow-blue-600/5 transition-all duration-500 relative overflow-hidden active:scale-95 compact-card">
                     <div class="absolute top-8 right-8 flex flex-col items-end gap-3 z-10">

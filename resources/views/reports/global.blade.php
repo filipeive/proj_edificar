@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('title', 'Relatório Global - Portal Life Church')
+@section('page-title', 'Relatório Global')
+@section('page-subtitle', 'Consolidação de métricas e performance financeira geral')
 
 @section('content')
     <div class="space-y-8">
@@ -32,7 +34,7 @@
                 <i class="bi bi-funnel text-blue-600"></i>
                 Filtros de Pesquisa
             </h2>
-            <form action="{{ route('reports.global') }}" method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            <form action="{{ route('reports.global') }}" method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div class="space-y-2">
                     <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Data Início</label>
                     <input type="date" name="start_date" value="{{ request('start_date', $startDate->format('Y-m-d')) }}"
@@ -46,7 +48,7 @@
                 <div class="space-y-2">
                     <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Zona</label>
                     <select name="zone_id" 
-                        class="w-full px-5 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700 appearance-none">
+                        class="w-full px-5 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700 appearance-none custom-select">
                         <option value="">Todas as Zonas</option>
                         @foreach($allZones as $zone)
                             <option value="{{ $zone->id }}" {{ request('zone_id') == $zone->id ? 'selected' : '' }}>
@@ -58,7 +60,7 @@
                 <div class="space-y-2">
                     <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Status</label>
                     <select name="status" 
-                        class="w-full px-5 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700 appearance-none">
+                        class="w-full px-5 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700 appearance-none custom-select">
                         <option value="">Todos os Status</option>
                         <option value="verificada" {{ request('status') == 'verificada' ? 'selected' : '' }}>Verificada</option>
                         <option value="pendente" {{ request('status') == 'pendente' ? 'selected' : '' }}>Pendente</option>

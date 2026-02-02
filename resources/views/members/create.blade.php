@@ -88,13 +88,15 @@
                             <i class="bi bi-people-fill mr-2"></i>Célula <span class="text-red-500">*</span>
                         </label>
                         @if($availableCells->isEmpty())
-                            <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg text-sm font-bold">
+                            <div
+                                class="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg text-sm font-bold">
                                 <i class="bi bi-exclamation-triangle mr-2"></i>
                                 Nenhuma célula disponível para o seu perfil. Contacte o administrador.
                             </div>
                         @endif
                         <select name="cell_id" id="cell_id" required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 @error('cell_id') border-red-500 @enderror">
+                            class="searchable-select w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 custom-select @error('cell_id') border-red-500 @enderror"
+                            data-label="Célula">
                             <option value="">-- Selecione uma célula --</option>
                             @foreach($availableCells as $cell)
                                 <option value="{{ $cell->id }}" {{ old('cell_id') == $cell->id ? 'selected' : '' }}>
@@ -140,7 +142,7 @@
                                 Cargo / Função <span class="text-red-500">*</span>
                             </label>
                             <select name="role" id="role" required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 @error('role') border-red-500 @enderror">
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 custom-select @error('role') border-red-500 @enderror">
                                 @foreach($allowedRoles as $role)
                                     <option value="{{ $role }}" {{ old('role') == $role ? 'selected' : '' }}>
                                         {{ ucfirst(str_replace('_', ' ', $role)) }}
@@ -195,7 +197,7 @@
                                 Pacote de Compromisso
                             </label>
                             <select name="package_id" id="package_id"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 custom-select">
                                 <option value="">Nenhum (pode escolher depois)</option>
                                 @foreach($packages as $package)
                                     <option value="{{ $package->id }}" {{ old('package_id') == $package->id ? 'selected' : '' }}>
