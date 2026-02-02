@@ -175,6 +175,17 @@
             .modern-select:focus {
                 box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
             }
+
+            /* Icon Inside Input */
+            .input-icon {
+                pointer-events: none;
+                transition: all 0.2s ease;
+            }
+
+            .search-input:focus ~ .input-icon-left,
+            .modern-select:focus ~ .input-icon-left {
+                transform: scale(1.1);
+            }
         </style>
 
         <!-- Enhanced Search & Actions Header -->
@@ -183,22 +194,30 @@
                 <!-- Search & Filters -->
                 <div class="flex-1 w-full xl:max-w-4xl">
                     <form method="GET" action="{{ route('members.index') }}" class="flex flex-col md:flex-row gap-3" x-data>
-                        <!-- Search Input - Compacto -->
-                        <div class="flex-1 relative group">
-                            <i class="bi bi-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 group-focus-within:text-blue-500 transition-all duration-200 text-sm group-focus-within:scale-110"></i>
+                        <!-- Search Input - Com ícone integrado -->
+                        <div class="flex-1 relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none md:hidden">
+                                <div class="w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
+                                    <i class="bi bi-search text-blue-600 dark:text-blue-400 text-sm"></i>
+                                </div>
+                            </div>
                             <input type="text" name="search" data-live-search="manual" value="{{ request('search') }}" 
                                 @input.debounce.500ms="$el.form.submit()"
-                                placeholder="Buscar membro..."
-                                class="search-input w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl focus:border-blue-400 dark:focus:border-blue-500 focus:bg-white dark:focus:bg-gray-700 font-medium text-sm transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-900 dark:text-white hover:border-gray-300 dark:hover:border-gray-500">
+                                placeholder="🔍   Buscar por nome, email..."
+                                class="search-input w-full pl-14 md:pl-4 pr-4 py-2.5 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl focus:border-blue-400 dark:focus:border-blue-500 focus:bg-white dark:focus:bg-gray-700 font-medium text-sm transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-900 dark:text-white hover:border-gray-300 dark:hover:border-gray-500">
                         </div>
 
-                        <!-- Cell Filter - Dropdown Moderno -->
+                        <!-- Cell Filter - Dropdown com ícone integrado -->
                         @if($userRole !== 'lider_celula' && $availableCells->count() > 1)
-                            <div class="relative group z-50">
-                                <i class="bi bi-funnel absolute left-3.5 top-1/2 -translate-y-1/2 text-purple-400 dark:text-purple-500 text-sm pointer-events-none z-10"></i>
+                            <div class="relative z-50">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <div class="w-9 h-9 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                                        <i class="bi bi-funnel-fill text-purple-600 dark:text-purple-400 text-sm"></i>
+                                    </div>
+                                </div>
                                 <select name="cell_id" 
                                     @change="$el.form.submit()"
-                                    class="modern-select w-full md:w-64 appearance-none pl-10 pr-10 py-2.5 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-xl font-semibold text-xs text-purple-700 dark:text-purple-300 cursor-pointer hover:bg-purple-100 dark:hover:bg-purple-900/30 hover:border-purple-300 dark:hover:border-purple-700 transition-all duration-200">
+                                    class="modern-select w-full md:w-64 appearance-none pl-14 pr-10 py-2.5 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-xl font-semibold text-sm text-purple-700 dark:text-purple-300 cursor-pointer hover:bg-purple-100 dark:hover:bg-purple-900/30 hover:border-purple-300 dark:hover:border-purple-600 transition-all duration-200">
                                     <option value="">Todas as Células</option>
                                     @foreach($availableCells as $cell)
                                         <option value="{{ $cell->id }}" {{ request('cell_id') == $cell->id ? 'selected' : '' }}>
@@ -206,8 +225,8 @@
                                         </option>
                                     @endforeach
                                 </select>
-                                <div class="select-arrow-wrapper absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                                    <i class="select-arrow bi bi-chevron-down text-purple-500 dark:text-purple-400 text-xs"></i>
+                                <div class="select-arrow-wrapper absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <i class="select-arrow bi bi-chevron-down text-purple-600 dark:text-purple-400 text-xs"></i>
                                 </div>
                             </div>
                         @endif
