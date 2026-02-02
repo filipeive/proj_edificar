@@ -65,6 +65,21 @@
             @endif
         </div>
 
+        <!-- FORMULÁRIOS PÚBLICOS -->
+        <div class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-2 mt-2">Formulários Públicos</div>
+        <div class="space-y-1">
+            <a href="{{ route('public.forms.pre-marital') }}"
+                class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('public.forms.pre-marital') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                <i class="bi bi-clipboard-heart-fill text-xl flex-shrink-0"></i>
+                <span class="sidebar-text ml-4 font-bold tracking-tight">Inscrição Pré‑Marital</span>
+            </a>
+            <a href="{{ route('public.reports.quarterly') }}"
+                class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('public.reports.quarterly') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                <i class="bi bi-file-earmark-text-fill text-xl flex-shrink-0"></i>
+                <span class="sidebar-text ml-4 font-bold tracking-tight">Relatório Trimestral</span>
+            </a>
+        </div>
+
         <!-- ATALHOS RÁPIDOS (Frequent Actions) -->
         @if($authUser && ($authUser->isLider() || $authUser->isResponsavelPacote() || $authUser->isAdmin() || $authUser->isComissaoObra()))
             <div class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-2 mt-2">Atalhos Rápidos</div>

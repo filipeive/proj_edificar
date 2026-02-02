@@ -32,6 +32,10 @@ Route::get('/cursos/{course:slug}/inscricao', [\App\Http\Controllers\PublicCours
 Route::post('/cursos/{course:slug}/inscricao', [\App\Http\Controllers\PublicCourseController::class, 'store'])->name('public.courses.store');
 Route::get('/inscricao-casais', [\App\Http\Controllers\PublicCourseController::class, 'showCasaisForm'])->name('public.courses.casais');
 Route::post('/inscricao-casais', [\App\Http\Controllers\PublicCourseController::class, 'storeCasaisEnrollment'])->name('public.courses.casais.store');
+Route::get('/inscricao-pre-marital', [\App\Http\Controllers\PublicFormController::class, 'showPreMaritalForm'])->name('public.forms.pre-marital');
+Route::post('/inscricao-pre-marital', [\App\Http\Controllers\PublicFormController::class, 'storePreMarital'])->name('public.forms.pre-marital.store');
+Route::get('/relatorio-trimestral', [\App\Http\Controllers\PublicFormController::class, 'showQuarterlyReportForm'])->name('public.reports.quarterly');
+Route::post('/relatorio-trimestral', [\App\Http\Controllers\PublicFormController::class, 'storeQuarterlyReport'])->name('public.reports.quarterly.store');
 
 // Setup Wizard Routes (No authentication required)
 Route::prefix('setup')->group(function () {
