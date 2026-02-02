@@ -274,7 +274,7 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div class="grid grid-cols-1 gap-8 mb-8">
             <!-- Próximos Eventos da Zona -->
             <div
                 class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 p-8">
@@ -322,47 +322,6 @@
                 </div>
             </div>
 
-            <!-- Últimos Cultos -->
-            <div
-                class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 p-8">
-                <div class="flex items-center justify-between mb-8">
-                    <h3 class="text-xl font-black text-gray-900 dark:text-white tracking-tight">Relatórios de Cultos</h3>
-                    <a href="{{ route('services.index') }}"
-                        class="text-xs font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest hover:text-orange-700 dark:hover:text-orange-300">Ver
-                        Todos</a>
-                </div>
-                <div class="space-y-6">
-                    @forelse($recentServices as $service)
-                        <div
-                            class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-2xl hover:bg-white dark:hover:bg-gray-600 hover:shadow-lg transition-all duration-300 border border-transparent hover:border-gray-100 dark:hover:border-gray-600">
-                            <div class="flex items-center space-x-4">
-                                <div
-                                    class="w-12 h-12 bg-white dark:bg-gray-800 rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 shadow-sm">
-                                    <i class="bi bi-journal-text text-2xl"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-black text-gray-900 dark:text-white">Culto de
-                                        {{ $service->date->translatedFormat('l, d/m') }}
-                                    </h4>
-                                    <p class="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">
-                                        {{ $service->theme ?? 'Sem Tema Definido' }}
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="font-black text-gray-900 dark:text-white">{{ $service->total_participation }}</p>
-                                <p class="text-[8px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">
-                                    Presentes</p>
-                            </div>
-                        </div>
-                    @empty
-                        <p
-                            class="text-center text-gray-400 dark:text-gray-500 py-10 font-bold uppercase tracking-widest text-[10px]">
-                            Nenhum
-                            relatório de culto registado recentemente.</p>
-                    @endforelse
-                </div>
-            </div>
         </div>
     </div>
 @endsection

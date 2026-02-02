@@ -29,7 +29,45 @@ class SettingController extends Controller
 
         $groups = Setting::select('group')->distinct()->pluck('group');
 
-        return view('admin.settings.index', compact('settings', 'groups', 'group'));
+        $backups = [];
+        $backupCount = 0;
+        $backupTotalBytes = 0;
+        $lastBackupAt = null;
+
+        if (Storage::disk('local')->exists('backups')) {
+            $files = Storage::disk('local')->files('backups');
+            foreach ($files as $file) {
+                $filename = basename($file);
+                $size = Storage::disk('local')->size($file);
+                $lastModified = Storage::disk('local')->lastModified($file);
+                $backups[] = [
+                    'path' => $file,
+                    'filename' => $filename,
+                    'size' => $size,
+                    'last_modified' => $lastModified,
+                ];
+                $backupTotalBytes += $size;
+            }
+
+            usort($backups, function ($a, $b) {
+                return $b['last_modified'] <=> $a['last_modified'];
+            });
+
+            $backupCount = count($backups);
+            if ($backupCount > 0) {
+                $lastBackupAt = $backups[0]['last_modified'];
+            }
+        }
+
+        return view('admin.settings.index', compact(
+            'settings',
+            'groups',
+            'group',
+            'backups',
+            'backupCount',
+            'backupTotalBytes',
+            'lastBackupAt'
+        ));
     }
 
     /**
@@ -157,5 +195,19 @@ class SettingController extends Controller
         file_put_contents($fullPath, $process->getOutput());
 
         return response()->download($fullPath)->deleteFileAfterSend(true);
+    }
+
+    public function downloadBackup(string $filename)
+    {
+        if (str_contains($filename, '..') || str_contains($filename, '/')) {
+            abort(404);
+        }
+
+        $path = 'backups/' . $filename;
+        if (!Storage::disk('local')->exists($path)) {
+            abort(404);
+        }
+
+        return Storage::disk('local')->download($path);
     }
 }

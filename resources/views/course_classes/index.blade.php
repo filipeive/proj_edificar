@@ -5,6 +5,10 @@
 @section('page-subtitle', 'Organização e acompanhamento de alunos e casais')
 
 @section('content')
+    @php
+        $canManageClasses = !auth()->user()->isPastorZona();
+    @endphp
+
     <div x-data="{ 
                      view: window.innerWidth < 768 ? 'grid' : 'list',
                      selected: [],
@@ -26,6 +30,7 @@
         @resize.window.debounce.500ms="updateView()">
         
         <!-- Bulk Action Bar -->
+        @if($canManageClasses)
         <div x-show="selected.length > 0" 
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="opacity-0 -translate-y-4"
@@ -88,18 +93,21 @@
                 </div>
             </div>
         </div>
+        @endif
 
         @section('header-actions')
-            <div class="flex items-center gap-2 md:hidden">
-                <a href="{{ route('course-classes.export-all') }}"
-                    class="bg-indigo-50 text-indigo-600 border border-indigo-100 p-2 rounded-lg hover:bg-indigo-100 transition-all flex items-center justify-center shadow-sm">
-                    <i class="bi bi-file-earmark-spreadsheet text-2xl"></i>
-                </a>
-                <a href="{{ route('course-classes.create', ['course_id' => request('course_id')]) }}"
-                    class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
-                    <i class="bi bi-plus-circle text-2xl"></i>
-                </a>
-            </div>
+            @if($canManageClasses)
+                <div class="flex items-center gap-2 md:hidden">
+                    <a href="{{ route('course-classes.export-all') }}"
+                        class="bg-indigo-50 text-indigo-600 border border-indigo-100 p-2 rounded-lg hover:bg-indigo-100 transition-all flex items-center justify-center shadow-sm">
+                        <i class="bi bi-file-earmark-spreadsheet text-2xl"></i>
+                    </a>
+                    <a href="{{ route('course-classes.create', ['course_id' => request('course_id')]) }}"
+                        class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
+                        <i class="bi bi-plus-circle text-2xl"></i>
+                    </a>
+                </div>
+            @endif
         @endsection
     <div class="container-fluid">
         <!-- Modern Header Section -->
@@ -149,19 +157,21 @@
                     </button>
                 </div>
 
-                <div class="hidden md:flex items-center gap-2">
-                    <a href="{{ route('course-classes.export-all') }}"
-                        class="bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 border border-indigo-50 dark:border-indigo-900/30 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white px-5 py-3 rounded-xl transition-all font-black text-[10px] uppercase tracking-widest flex items-center gap-2 shadow-sm">
-                        <i class="bi bi-file-earmark-spreadsheet text-base"></i>
-                        <span class="hidden lg:inline text-[8px]">Excel</span>
-                    </a>
-                    
-                    <a href="{{ route('course-classes.create', ['course_id' => request('course_id')]) }}"
-                        class="bg-blue-600 text-white px-6 py-4 rounded-2xl hover:bg-blue-700 transition-all font-black text-[10px] uppercase tracking-widest flex items-center shadow-lg shadow-blue-100 dark:shadow-none gap-2 group">
-                        <i class="bi bi-plus-lg text-base group-hover:rotate-90 transition-transform duration-300"></i>
-                        <span class="hidden sm:inline">Nova Turma</span>
-                    </a>
-                </div>
+                @if($canManageClasses)
+                    <div class="hidden md:flex items-center gap-2">
+                        <a href="{{ route('course-classes.export-all') }}"
+                            class="bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 border border-indigo-50 dark:border-indigo-900/30 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white px-5 py-3 rounded-xl transition-all font-black text-[10px] uppercase tracking-widest flex items-center gap-2 shadow-sm">
+                            <i class="bi bi-file-earmark-spreadsheet text-base"></i>
+                            <span class="hidden lg:inline text-[8px]">Excel</span>
+                        </a>
+                        
+                        <a href="{{ route('course-classes.create', ['course_id' => request('course_id')]) }}"
+                            class="bg-blue-600 text-white px-6 py-4 rounded-2xl hover:bg-blue-700 transition-all font-black text-[10px] uppercase tracking-widest flex items-center shadow-lg shadow-blue-100 dark:shadow-none gap-2 group">
+                            <i class="bi bi-plus-lg text-base group-hover:rotate-90 transition-transform duration-300"></i>
+                            <span class="hidden sm:inline">Nova Turma</span>
+                        </a>
+                    </div>
+                @endif
             </div>
         </div>
 
@@ -178,11 +188,13 @@
                     <table class="w-full text-left border-collapse table-compact">
                         <thead>
                             <tr class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
-                                <th class="px-6 py-4 w-10">
-                                    <input type="checkbox" @click="toggleAll()"
-                                        :checked="selected.length === {{ $classes->count() }} && selected.length > 0"
-                                        class="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 cursor-pointer bg-white dark:bg-gray-700">
-                                </th>
+                                @if($canManageClasses)
+                                    <th class="px-6 py-4 w-10">
+                                        <input type="checkbox" @click="toggleAll()"
+                                            :checked="selected.length === {{ $classes->count() }} && selected.length > 0"
+                                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 cursor-pointer bg-white dark:bg-gray-700">
+                                    </th>
+                                @endif
                                 <th class="px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Turma</th>
                                 <th class="px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Curso</th>
                                 <th class="px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Professores
@@ -198,11 +210,13 @@
                         <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                             @forelse($classes as $class)
                                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                                    <td class="px-6 py-4 relative">
-                                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 opacity-0 transition-opacity" :class="{'opacity-100': selected.includes({{ $class->id }})}"></div>
-                                        <input type="checkbox" value="{{ $class->id }}" x-model="selected"
-                                            class="class-checkbox rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 cursor-pointer bg-white dark:bg-gray-700">
-                                    </td>
+                                    @if($canManageClasses)
+                                        <td class="px-6 py-4 relative">
+                                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 opacity-0 transition-opacity" :class="{'opacity-100': selected.includes({{ $class->id }})}"></div>
+                                            <input type="checkbox" value="{{ $class->id }}" x-model="selected"
+                                                class="class-checkbox rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 cursor-pointer bg-white dark:bg-gray-700">
+                                        </td>
+                                    @endif
                                     <td class="px-6 py-4">
                                         <div class="font-bold text-gray-900 dark:text-white">{{ $class->name }}</div>
                                         <div class="text-xs text-gray-500 dark:text-gray-400">
@@ -256,27 +270,29 @@
                                             title="Ver detalhes">
                                             <i class="bi bi-eye-fill"></i>
                                         </a>
-                                        <a href="{{ route('course-classes.edit', $class) }}"
-                                            class="action-icon text-amber-600 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-200 hover:bg-amber-50 dark:hover:bg-amber-900/30"
-                                            title="Editar">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </a>
-                                        <form action="{{ route('course-classes.destroy', $class) }}" method="POST"
-                                            id="delete-form-{{ $class->id }}" class="inline-block">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="button"
-                                                onclick="confirmDelete('delete-form-{{ $class->id }}', 'Deseja excluir permanentemente esta turma?')"
-                                                class="action-icon text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-200 hover:bg-red-50 dark:hover:bg-red-900/30"
-                                                title="Excluir">
-                                                <i class="bi bi-trash-fill"></i>
-                                            </button>
-                                        </form>
+                                        @if($canManageClasses)
+                                            <a href="{{ route('course-classes.edit', $class) }}"
+                                                class="action-icon text-amber-600 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-200 hover:bg-amber-50 dark:hover:bg-amber-900/30"
+                                                title="Editar">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                            <form action="{{ route('course-classes.destroy', $class) }}" method="POST"
+                                                id="delete-form-{{ $class->id }}" class="inline-block">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button"
+                                                    onclick="confirmDelete('delete-form-{{ $class->id }}', 'Deseja excluir permanentemente esta turma?')"
+                                                    class="action-icon text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-200 hover:bg-red-50 dark:hover:bg-red-900/30"
+                                                    title="Excluir">
+                                                    <i class="bi bi-trash-fill"></i>
+                                                </button>
+                                            </form>
+                                        @endif
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
+                                    <td colspan="{{ $canManageClasses ? 7 : 6 }}" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
                                         <i class="bi bi-inbox text-4xl block mb-2"></i>
                                         Nenhuma turma encontrada.
                                     </td>
@@ -380,9 +396,11 @@
                             <a href="{{ route('course-classes.show', $class) }}" class="flex-1 bg-gray-900 dark:bg-white/10 text-white text-center py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 dark:hover:bg-blue-600 transition-all shadow-lg hover:shadow-blue-600/30 flex items-center justify-center gap-2">
                                 <i class="bi bi-eye-fill"></i> Detalhes
                             </a>
-                            <a href="{{ route('course-classes.edit', $class) }}" class="w-12 bg-white dark:bg-gray-700 border-2 border-gray-100 dark:border-gray-600 text-gray-400 dark:text-gray-300 flex items-center justify-center rounded-2xl hover:border-blue-500 hover:text-blue-500 dark:hover:border-blue-400 dark:hover:text-blue-400 transition-all">
-                                <i class="bi bi-pencil-fill"></i>
-                            </a>
+                            @if($canManageClasses)
+                                <a href="{{ route('course-classes.edit', $class) }}" class="w-12 bg-white dark:bg-gray-700 border-2 border-gray-100 dark:border-gray-600 text-gray-400 dark:text-gray-300 flex items-center justify-center rounded-2xl hover:border-blue-500 hover:text-blue-500 dark:hover:border-blue-400 dark:hover:text-blue-400 transition-all">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </a>
+                            @endif
                         </div>
                     </div>
                 </div>

@@ -32,6 +32,10 @@
 @endsection
 
 @section('content')
+    @php
+        $isPastorZona = auth()->user()->isPastorZona();
+    @endphp
+
     <div class="container-fluid">
         <div class="mb-8 hidden md:block">
             <a href="{{ route('course-classes.index', ['course_id' => $courseClass->course_id]) }}"
@@ -180,10 +184,12 @@
                                             {{ $meeting->date->format('d/m/Y') }}</p>
                                     </div>
                                 </div>
-                                <a href="{{ route('course-classes.attendance', [$courseClass, $meeting]) }}"
-                                    class="bg-white text-orange-600 p-2 rounded-lg shadow-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-orange-600 hover:text-white">
-                                    <i class="bi bi-card-checklist"></i>
-                                </a>
+                                @if(!$isPastorZona)
+                                    <a href="{{ route('course-classes.attendance', [$courseClass, $meeting]) }}"
+                                        class="bg-white text-orange-600 p-2 rounded-lg shadow-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-orange-600 hover:text-white">
+                                        <i class="bi bi-card-checklist"></i>
+                                    </a>
+                                @endif
                             </div>
                         @empty
                             <p class="text-center text-gray-400 py-4 text-sm italic">Nenhum encontro agendado.</p>

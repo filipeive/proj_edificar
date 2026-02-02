@@ -126,7 +126,7 @@
                     <!-- OPERAÇÃO ECLESIÁSTICA -->
                     <div class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-2">Operação Eclesiástica</div>
 
-                    @if ($authUser && ($authUser->isAdmin() || $authUser->isSecretaria() || $authUser->isPastor() || $authUser->isPastorZona()))
+                    @if ($authUser && ($authUser->isAdmin() || $authUser->isSecretaria() || $authUser->isPastor()))
                         <a href="{{ route('services.index') }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('services.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                             <i class="bi bi-journal-bookmark-fill text-xl flex-shrink-0"></i>
                             <span class="sidebar-text ml-4 font-bold tracking-tight">Cultos</span>
@@ -162,7 +162,7 @@
                             <div id="courses_menu" class="overflow-hidden {{ request()->routeIs('courses.*') || request()->routeIs('course-classes.*') ? '' : 'hidden' }}">
                                 <div class="ml-12 mt-2 space-y-1 border-l border-white/10 pl-4">
                                     <a href="{{ route('courses.index') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('courses.index') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Cursos</a>
-                                    @if ($authUser && ((!$authUser->isSupervisor() && !$authUser->isSecretaria()) || (($authUser->isSupervisor() || $authUser->isSecretaria()) && $authUser->hasAnyCourseEnrollment())))
+                                    @if ($authUser && ((!$authUser->isSupervisor() && !$authUser->isSecretaria() && !$authUser->isPastorZona()) || (($authUser->isSupervisor() || $authUser->isSecretaria() || $authUser->isPastorZona()) && $authUser->hasAnyCourseEnrollment())))
                                         <a href="{{ route('course-classes.index') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('course-classes.*') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Turmas</a>
                                     @endif
                                 </div>

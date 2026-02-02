@@ -172,6 +172,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/upload-logo', [\App\Http\Controllers\Admin\SettingController::class, 'uploadLogo'])->name('upload-logo');
             Route::post('/reset', [\App\Http\Controllers\Admin\SettingController::class, 'resetToDefaults'])->name('reset');
             Route::get('/backup', [\App\Http\Controllers\Admin\SettingController::class, 'backup'])->name('backup');
+            Route::get('/backup/{filename}', [\App\Http\Controllers\Admin\SettingController::class, 'downloadBackup'])->name('backup.download');
         });
 
         // Intermediate Restricted (Admin, Pastor Zona, Supervisor, Secretaria, Lider Celula)

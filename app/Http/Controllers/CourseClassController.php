@@ -18,7 +18,9 @@ class CourseClassController extends Controller
 {
     public function index(Request $request)
     {
-        if ((auth()->user()->isSupervisor() || auth()->user()->isSecretaria()) && !auth()->user()->hasAnyCourseEnrollment()) {
+        $user = auth()->user();
+
+        if (($user->isSupervisor() || $user->isSecretaria()) && !$user->hasAnyCourseEnrollment()) {
             abort(403, 'Você não está matriculada em nenhuma turma.');
         }
 
@@ -26,6 +28,14 @@ class CourseClassController extends Controller
         $type = $request->query('type');
 
         $query = CourseClass::with(['course', 'teacherMale', 'teacherFemale', 'assistantMale', 'assistantFemale']);
+
+        if ($user->isPastorZona()) {
+            $query->whereHas('courseEnrollments', function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                    ->orWhere('male_partner_id', $user->id)
+                    ->orWhere('female_partner_id', $user->id);
+            });
+        }
 
         if ($courseId) {
             $query->where('course_id', $courseId);
@@ -43,6 +53,8 @@ class CourseClassController extends Controller
 
     public function create(Request $request)
     {
+        $this->abortIfPastorZonaCannotManage();
+
         $courses = Course::all();
         $teachers = User::whereIn('role', ['pastor', 'supervisor', 'membro', 'admin', 'secretaria'])->orderBy('name')->get();
         $selectedCourseId = $request->query('course_id');
@@ -52,6 +64,8 @@ class CourseClassController extends Controller
 
     public function store(Request $request)
     {
+        $this->abortIfPastorZonaCannotManage();
+
         $validated = $request->validate([
             'course_id' => 'required|exists:courses,id',
             'name' => 'required|string|max:255',
@@ -76,6 +90,8 @@ class CourseClassController extends Controller
 
     public function show(CourseClass $courseClass)
     {
+        $this->abortIfPastorZonaNotEnrolled($courseClass);
+
         $courseClass->load([
             'course',
             'teacherMale',
@@ -94,6 +110,8 @@ class CourseClassController extends Controller
 
     public function edit(CourseClass $courseClass)
     {
+        $this->abortIfPastorZonaCannotManage();
+
         $courses = Course::where('is_active', true)->get();
         $teachers = User::whereIn('role', ['pastor', 'supervisor', 'membro', 'admin', 'secretaria', 'pastor_zona'])->get();
 
@@ -102,6 +120,8 @@ class CourseClassController extends Controller
 
     public function update(Request $request, CourseClass $courseClass)
     {
+        $this->abortIfPastorZonaCannotManage();
+
         $validated = $request->validate([
             'course_id' => 'required|exists:courses,id',
             'name' => 'required|string|max:255',
@@ -124,6 +144,8 @@ class CourseClassController extends Controller
 
     public function destroy(CourseClass $courseClass)
     {
+        $this->abortIfPastorZonaCannotManage();
+
         $courseClass->delete();
         return redirect()->route('course-classes.index')
             ->with('success', 'Turma removida com sucesso!');
@@ -131,6 +153,8 @@ class CourseClassController extends Controller
 
     public function storeMeeting(Request $request, CourseClass $courseClass)
     {
+        $this->abortIfPastorZonaCannotManage();
+
         $validated = $request->validate([
             'meeting_number' => 'required|integer',
             'date' => 'required|date',
@@ -145,6 +169,8 @@ class CourseClassController extends Controller
 
     public function attendance(CourseClass $courseClass, CourseClassMeeting $meeting)
     {
+        $this->abortIfPastorZonaNotEnrolled($courseClass);
+
         $courseClass->load(['courseEnrollments.user', 'coupleEnrollments']);
         $meeting->load('attendances');
 
@@ -153,6 +179,8 @@ class CourseClassController extends Controller
 
     public function storeAttendance(Request $request, CourseClass $courseClass, CourseClassMeeting $meeting)
     {
+        $this->abortIfPastorZonaCannotManage();
+
         $attendances = $request->input('attendance', []);
 
         foreach ($attendances as $enrollmentId => $status) {
@@ -178,6 +206,8 @@ class CourseClassController extends Controller
 
     public function addEnrollment(Request $request, CourseClass $courseClass)
     {
+        $this->abortIfPastorZonaCannotManage();
+
         $validated = $request->validate([
             'male_partner_id' => 'nullable|exists:users,id',
             'female_partner_id' => 'nullable|exists:users,id',
@@ -218,6 +248,8 @@ class CourseClassController extends Controller
 
     public function removeEnrollment(Request $request, CourseClass $courseClass)
     {
+        $this->abortIfPastorZonaCannotManage();
+
         $validated = $request->validate([
             'enrollment_id' => 'required|exists:course_enrollments,id',
         ]);
@@ -230,6 +262,8 @@ class CourseClassController extends Controller
 
     public function report(CourseClass $courseClass)
     {
+        $this->abortIfPastorZonaNotEnrolled($courseClass);
+
         $courseClass->load(['course', 'meetings.attendances', 'courseEnrollments.malePartner', 'courseEnrollments.femalePartner']);
 
         $stats = [
@@ -246,6 +280,8 @@ class CourseClassController extends Controller
 
     public function upcomingWeddings()
     {
+        $this->abortIfPastorZonaCannotManage();
+
         $enrollments = CourseEnrollment::whereNotNull('wedding_date')
             ->where('wedding_date', '>=', now())
             ->orderBy('wedding_date')
@@ -257,11 +293,15 @@ class CourseClassController extends Controller
 
     public function exportReport(CourseClass $courseClass)
     {
+        $this->abortIfPastorZonaNotEnrolled($courseClass);
+
         return Excel::download(new CourseClassReportExport($courseClass), 'relatorio_turma_' . $courseClass->id . '.xlsx');
     }
 
     public function exportPdf(CourseClass $courseClass)
     {
+        $this->abortIfPastorZonaNotEnrolled($courseClass);
+
         $courseClass->load(['course', 'teacherMale', 'teacherFemale', 'courseEnrollments.malePartner', 'courseEnrollments.femalePartner']);
 
         $pdf = Pdf::loadView('reports.course_class_pdf', compact('courseClass'));
@@ -271,6 +311,8 @@ class CourseClassController extends Controller
 
     public function exportAll(Request $request)
     {
+        $this->abortIfPastorZonaCannotManage();
+
         $classIds = $request->input('class_ids');
         return Excel::download(new \App\Exports\AllClassesExport($classIds), 'relatorio_geral_turmas.xlsx');
     }
@@ -280,6 +322,8 @@ class CourseClassController extends Controller
      */
     public function bulkDestroy(Request $request)
     {
+        $this->abortIfPastorZonaCannotManage();
+
         if (auth()->user()->role !== 'admin') {
             return redirect()->back()->with('error', 'Apenas administradores podem realizar esta ação.');
         }
@@ -293,6 +337,21 @@ class CourseClassController extends Controller
 
         return redirect()->route('course-classes.index')
             ->with('success', "{$deletedCount} turma(s) excluída(s) com sucesso!");
+    }
+
+    private function abortIfPastorZonaCannotManage(): void
+    {
+        if (auth()->user()->isPastorZona()) {
+            abort(403, 'Pastor de zona não tem permissão para gerir turmas.');
+        }
+    }
+
+    private function abortIfPastorZonaNotEnrolled(CourseClass $courseClass): void
+    {
+        $user = auth()->user();
+        if ($user->isPastorZona() && !$user->isEnrolledInClass($courseClass->id)) {
+            abort(403, 'Você não está matriculado nesta turma.');
+        }
     }
 
     private function checkCompletionStatus(CourseClass $courseClass)
