@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\CourseClass;
+use App\Models\CoupleEnrollment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
@@ -93,7 +95,43 @@ class CourseController extends Controller
 
         $enrollments = $query->latest()->get();
 
-        return view('courses.show', compact('course', 'enrollments', 'search'));
+        $publicCoupleEnrollments = CoupleEnrollment::where('course_id', $course->id)
+            ->whereNull('course_class_id')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        $courseClasses = CourseClass::where('course_id', $course->id)->orderBy('name')->get();
+
+        return view('courses.show', compact('course', 'enrollments', 'search', 'publicCoupleEnrollments', 'courseClasses'));
+    }
+
+    public function assignPublicEnrollment(Request $request, Course $course)
+    {
+        $user = auth()->user();
+        if (!$user || !in_array($user->role, ['admin', 'pastor'])) {
+            abort(403, 'Sem permissão.');
+        }
+
+        $validated = $request->validate([
+            'couple_enrollment_id' => 'required|exists:couple_enrollments,id',
+            'course_class_id' => 'required|exists:course_classes,id',
+        ]);
+
+        $enrollment = CoupleEnrollment::findOrFail($validated['couple_enrollment_id']);
+        if ($enrollment->course_id !== $course->id) {
+            return back()->with('error', 'Inscrição não pertence a este curso.');
+        }
+
+        $courseClass = CourseClass::findOrFail($validated['course_class_id']);
+        if ($courseClass->course_id !== $course->id) {
+            return back()->with('error', 'Turma não pertence a este curso.');
+        }
+
+        $enrollment->update([
+            'course_class_id' => $courseClass->id,
+            'status' => 'approved',
+        ]);
+
+        return back()->with('success', 'Inscrição atribuída à turma com sucesso!');
     }
 
     public function edit(Course $course)

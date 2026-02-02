@@ -435,6 +435,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('courses/export-global', [\App\Http\Controllers\CourseController::class, 'exportGlobalReport'])->name('courses.export-global');
     Route::post('courses/bulk-delete', [\App\Http\Controllers\CourseController::class, 'bulkDestroy'])->name('courses.bulk-delete');
+    Route::post('courses/{course}/assign-public-enrollment', [\App\Http\Controllers\CourseController::class, 'assignPublicEnrollment'])->name('courses.assign-public-enrollment');
     Route::resource('courses', \App\Http\Controllers\CourseController::class);
 
     Route::post('course-enrollments/bulk-destroy', [\App\Http\Controllers\CourseEnrollmentController::class, 'bulkDestroy'])->name('course-enrollments.bulk-destroy');

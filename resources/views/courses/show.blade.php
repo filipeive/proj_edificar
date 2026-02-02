@@ -32,7 +32,7 @@
 @endsection
 
 @section('content')
-        <div x-data="{ view: 'list' }" class="container-fluid">
+        <div x-data="{ view: 'list' }" class="w-full">
             <div class="mb-6 flex justify-between items-center hidden md:flex">
                 <a href="{{ route('courses.index') }}" class="text-gray-600 hover:text-orange-600 flex items-center transition font-semibold">
                     <i class="bi bi-arrow-left mr-2"></i> Voltar para Lista
@@ -45,7 +45,7 @@
             </a>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Info do Curso -->
             <div class="lg:col-span-1 space-y-8">
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-colors">
@@ -347,6 +347,54 @@
                         @endforelse
                     </div>
                 </div>
+                @if(isset($publicCoupleEnrollments) && $publicCoupleEnrollments->count() > 0)
+                    <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-colors">
+                        <div class="px-8 py-6 border-b border-gray-100 dark:border-gray-700 flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-gray-50/10 dark:bg-gray-700/10">
+                            <div>
+                                <h4 class="text-xl font-bold text-gray-800 dark:text-white">Inscrições Públicas</h4>
+                                <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">Pré‑Marital</p>
+                            </div>
+                            <div class="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                                {{ $publicCoupleEnrollments->count() }} pendentes
+                            </div>
+                        </div>
+                        <div class="divide-y divide-gray-100 dark:divide-gray-700">
+                            @foreach($publicCoupleEnrollments as $enrollment)
+                                <div class="px-8 py-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                                    <div class="space-y-2">
+                                        <p class="font-bold text-gray-900 dark:text-white">
+                                            {{ $enrollment->husband_name }} & {{ $enrollment->wife_name }}
+                                        </p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                                            {{ $enrollment->contacts }} · {{ $enrollment->address }}
+                                        </p>
+                                        <div class="flex flex-wrap gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                                            <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full">{{ $enrollment->relationship_type }}</span>
+                                            <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full">{{ $enrollment->is_church_member ? 'Membros' : 'Visitantes' }}</span>
+                                        </div>
+                                    </div>
+                                    @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
+                                        <form action="{{ route('courses.assign-public-enrollment', $course) }}" method="POST" class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                                            @csrf
+                                            <input type="hidden" name="couple_enrollment_id" value="{{ $enrollment->id }}">
+                                            <select name="course_class_id" required
+                                                class="w-full sm:w-56 px-4 py-3 rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-orange-500 focus:ring-orange-500 text-sm font-bold">
+                                                <option value="">Selecionar turma...</option>
+                                                @foreach($courseClasses as $class)
+                                                    <option value="{{ $class->id }}">{{ $class->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            <button type="submit"
+                                                class="px-6 py-3 bg-orange-600 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-orange-700 transition-all shadow-lg shadow-orange-600/20">
+                                                Atribuir à Turma
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
             </div>
             @endif
         </div>
