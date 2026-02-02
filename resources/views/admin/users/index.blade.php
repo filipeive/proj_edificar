@@ -145,7 +145,7 @@
                         <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Pesquisar</label>
                         <div class="relative group">
                             <i class="bi bi-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors"></i>
-                            <input type="text" name="search" id="liveSearch" value="{{ request('search') }}" placeholder="Pesquisar por nome, email ou telefone..." 
+                            <input type="text" name="search" id="liveSearch" data-live-search="manual" value="{{ request('search') }}" placeholder="Pesquisar por nome, email ou telefone..." 
                                 class="w-full pl-12 pr-6 py-3 bg-white border-transparent focus:ring-4 focus:ring-blue-100 rounded-xl font-bold text-sm transition-all">
                             <div id="searchSpinner" class="hidden absolute right-5 top-1/2 -translate-y-1/2">
                                 <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

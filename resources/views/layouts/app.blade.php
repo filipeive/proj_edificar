@@ -1538,6 +1538,27 @@
             });
         };
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInputs = document.querySelectorAll('input[name="search"]');
+
+            searchInputs.forEach((input) => {
+                const mode = (input.dataset.liveSearch || 'submit').toLowerCase();
+                if (mode === 'ajax' || mode === 'manual' || mode === 'off') return;
+
+                const form = input.closest('form');
+                if (!form) return;
+
+                let timeout = null;
+                input.addEventListener('input', function () {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => {
+                        form.submit();
+                    }, 500);
+                });
+            });
+        });
+    </script>
     @stack('scripts')
     <!-- PWA & Immersive Experience Script -->
     <script>

@@ -115,12 +115,20 @@
 
                 <!-- Tab: Members -->
                 <div x-show="activeTab === 'members'" x-transition.fade class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="p-8 md:p-10 flex justify-between items-center border-b border-gray-50">
+                    <div class="p-8 md:p-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-gray-50">
                         <div>
                             <h3 class="text-2xl font-black text-gray-900 tracking-tighter">Corpo de Membros</h3>
                             <p class="text-sm font-medium text-gray-400">Pessoas vinculadas diretamente a esta célula</p>
                         </div>
-                        <div class="flex gap-3">
+                        <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+                            <form action="{{ route('cells.show', $cell) }}" method="GET" class="w-full md:w-80">
+                                <div class="relative">
+                                    <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                    <input type="text" name="search" value="{{ request('search') }}"
+                                        placeholder="Pesquisar membro por nome ou email..."
+                                        class="w-full pl-11 pr-4 py-3 bg-gray-50/60 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all">
+                                </div>
+                            </form>
                             <a href="{{ route('members.create') }}?cell_id={{ $cell->id }}"
                                 class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-5 py-3 rounded-2xl flex items-center transition-all font-bold text-sm">
                                 <i class="bi bi-person-plus mr-2"></i> Adicionar

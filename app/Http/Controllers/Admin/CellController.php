@@ -143,7 +143,7 @@ class CellController
             ->with('success', 'Célula criada com sucesso!');
     }
 
-    public function show(Cell $cell): View
+    public function show(Request $request, Cell $cell): View
     {
         $user = auth()->user();
         $availableCellsQuery = Cell::orderBy('name');
@@ -158,21 +158,25 @@ class CellController
 
         $availableCells = $availableCellsQuery->where('id', '!=', $cell->id)->get();
 
-        return view(
-            'admin.cells.show',
-            [
-                'cell' => $cell->load('supervision', 'leader'),
-                'members' => $cell->members()
-                    ->where('is_active', true)
-                    ->paginate(20)
-                    ->withQueryString(),
-                'meetings' => $cell->meetings()
-                    ->orderBy('meeting_date', 'desc')
-                    ->paginate(10)
-                    ->withQueryString(),
-                'availableCells' => $availableCells
-            ]
-        );
+        $membersQuery = $cell->members()->where('is_active', true);
+
+        if ($request->filled('search')) {
+            $searchTerm = $request->input('search');
+            $membersQuery->where(function ($query) use ($searchTerm) {
+                $query->where('name', 'LIKE', '%' . $searchTerm . '%')
+                    ->orWhere('email', 'LIKE', '%' . $searchTerm . '%');
+            });
+        }
+
+        return view('admin.cells.show', [
+            'cell' => $cell->load('supervision', 'leader'),
+            'members' => $membersQuery->paginate(20)->withQueryString(),
+            'meetings' => $cell->meetings()
+                ->orderBy('meeting_date', 'desc')
+                ->paginate(10)
+                ->withQueryString(),
+            'availableCells' => $availableCells
+        ]);
     }
 
     public function edit(Cell $cell): View

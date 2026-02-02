@@ -188,7 +188,7 @@
             <form method="GET" action="{{ route('visitors.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Buscar</label>
-                    <input type="text" name="search" value="{{ request('search') }}"
+                    <input type="text" name="search" data-live-search="ajax" value="{{ request('search') }}"
                         class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                         placeholder="Nome, telefone, bairro...">
                 </div>

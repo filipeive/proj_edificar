@@ -148,7 +148,7 @@
                     <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Buscar</label>
                     <div class="relative">
                         <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                        <input type="text" name="search" value="{{ request('search') }}"
+                        <input type="text" name="search" data-live-search="ajax" value="{{ request('search') }}"
                             class="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                             placeholder="Nome do evento, local...">
                     </div>

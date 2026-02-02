@@ -109,7 +109,7 @@
                     <form method="GET" action="{{ route('members.index') }}" class="flex flex-col md:flex-row gap-3" x-data>
                         <div class="flex-1 relative group">
                             <i class="bi bi-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 group-focus-within:text-blue-500 transition-colors"></i>
-                            <input type="text" name="search" value="{{ request('search') }}" 
+                            <input type="text" name="search" data-live-search="manual" value="{{ request('search') }}" 
                                 @input.debounce.500ms="$el.form.submit()"
                                 placeholder="Pesquisa dinâmica por nome..."
                                 class="w-full pl-14 pr-4 py-4 bg-gray-50 dark:bg-gray-700/50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-medium text-sm transition-all shadow-inner placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-900 dark:text-white">

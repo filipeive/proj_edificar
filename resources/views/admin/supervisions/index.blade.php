@@ -70,7 +70,7 @@
                 <form action="{{ route('supervisions.index') }}" method="GET" class="contents">
                     <i
                         class="bi bi-search absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors"></i>
-                    <input type="text" name="search" value="{{ request('search') }}"
+                    <input type="text" name="search" data-live-search="manual" value="{{ request('search') }}"
                         placeholder="Pesquisar supervisão, zona ou supervisor..."
                         class="w-full pl-14 pr-6 py-4 bg-gray-50/50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all"
                         @input.debounce.500ms="$el.form.submit()">
