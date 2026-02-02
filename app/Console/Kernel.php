@@ -13,6 +13,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         Commands\CheckExpiringCommitments::class,
         Commands\CheckPendingContributions::class,
+        Commands\RunDatabaseBackup::class,
     ];
 
     /**
@@ -35,6 +36,11 @@ class Kernel extends ConsoleKernel
             ->weekly()
             ->sundays()
             ->at('02:00')
+            ->timezone('Africa/Maputo');
+
+        // Backup automático do banco - diariamente às 02:30
+        $schedule->command('database:backup')
+            ->dailyAt('02:30')
             ->timezone('Africa/Maputo');
     }
 

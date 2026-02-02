@@ -1226,27 +1226,20 @@
                     input.placeholder = '823562000';
                 }
 
-                input.addEventListener('focus', () => {
-                    input.value = input.value.replace(/\s+/g, '');
-                    if (!input.value) {
-                        input.value = '+258';
+                const normalizeLocalPhone = (value) => {
+                    const digits = value.replace(/\D/g, '');
+                    const local = digits.startsWith('258') ? digits.slice(3) : digits;
+                    if (local.length === 9) {
+                        return `${local.slice(0, 2)} ${local.slice(2, 5)} ${local.slice(5, 9)}`;
                     }
-                });
+                    return value.replace(/^\+?258\s*/, '');
+                };
+
+                input.value = normalizeLocalPhone(input.value);
 
                 input.addEventListener('blur', () => {
-                    if (input.value === '+258') {
-                        input.value = '';
-                        return;
-                    }
-                    const digits = input.value.replace(/\D/g, '');
-                    if (digits.length === 9 && !input.value.startsWith('+258')) {
-                        input.value = `+258${digits}`;
-                    }
-                    const normalized = input.value.replace(/\D/g, '');
-                    if (normalized.startsWith('258') && normalized.length === 12) {
-                        const local = normalized.slice(3);
-                        input.value = `+258 ${local.slice(0, 2)} ${local.slice(2, 5)} ${local.slice(5, 9)}`;
-                    }
+                    if (!input.value.trim()) return;
+                    input.value = normalizeLocalPhone(input.value);
                 });
             });
         }
