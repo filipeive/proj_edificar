@@ -20,6 +20,7 @@ class CoupleEnrollment extends Model
         'years_together',
         'leader_name',
         'has_pastoral_recommendation',
+        'is_church_member',
         'observations',
         'status',
         'course_class_id',

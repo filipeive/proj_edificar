@@ -100,12 +100,17 @@ class CourseClassController extends Controller
             'assistantFemale',
             'meetings.attendances',
             'courseEnrollments.malePartner',
-            'courseEnrollments.femalePartner'
+            'courseEnrollments.femalePartner',
+            'coupleEnrollments'
         ]);
 
         $availableUsers = User::orderBy('name')->get();
+        $publicCoupleEnrollments = CoupleEnrollment::where('course_id', $courseClass->course_id)
+            ->whereNull('course_class_id')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-        return view('course_classes.show', compact('courseClass', 'availableUsers'));
+        return view('course_classes.show', compact('courseClass', 'availableUsers', 'publicCoupleEnrollments'));
     }
 
     public function edit(CourseClass $courseClass)
@@ -182,6 +187,7 @@ class CourseClassController extends Controller
         $this->abortIfPastorZonaCannotManage();
 
         $attendances = $request->input('attendance', []);
+        $coupleAttendances = $request->input('attendance_couple', []);
 
         foreach ($attendances as $enrollmentId => $status) {
             CourseClassAttendance::updateOrCreate(
@@ -200,8 +206,40 @@ class CourseClassController extends Controller
             }
         }
 
+        foreach ($coupleAttendances as $enrollmentId => $status) {
+            CourseClassAttendance::updateOrCreate(
+                [
+                    'course_class_meeting_id' => $meeting->id,
+                    'enrollable_type' => CoupleEnrollment::class,
+                    'enrollable_id' => $enrollmentId,
+                ],
+                ['status' => $status]
+            );
+        }
+
         return redirect()->route('course-classes.show', $courseClass)
             ->with('success', 'Presenças registradas com sucesso!');
+    }
+
+    public function assignCoupleEnrollment(Request $request, CourseClass $courseClass)
+    {
+        $this->abortIfPastorZonaCannotManage();
+
+        $validated = $request->validate([
+            'couple_enrollment_id' => 'required|exists:couple_enrollments,id',
+        ]);
+
+        $enrollment = CoupleEnrollment::findOrFail($validated['couple_enrollment_id']);
+        if ($enrollment->course_id !== $courseClass->course_id) {
+            return back()->with('error', 'Inscrição não pertence a este curso.');
+        }
+
+        $enrollment->update([
+            'course_class_id' => $courseClass->id,
+            'status' => 'approved',
+        ]);
+
+        return back()->with('success', 'Inscrição atribuída à turma com sucesso!');
     }
 
     public function addEnrollment(Request $request, CourseClass $courseClass)

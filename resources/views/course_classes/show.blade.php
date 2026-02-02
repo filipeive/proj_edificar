@@ -388,6 +388,74 @@
                 </div>
                 </div>
                 @endif
+
+                @if($courseClass->coupleEnrollments->count() > 0)
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                            <h4 class="text-lg font-black text-gray-900 flex items-center">
+                                <i class="bi bi-people-fill text-blue-600 mr-2"></i> Casais do Formulário Público
+                            </h4>
+                            <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                {{ $courseClass->coupleEnrollments->count() }} Inscritos
+                            </span>
+                        </div>
+                        <div class="divide-y divide-gray-100">
+                            @foreach($courseClass->coupleEnrollments as $enrollment)
+                                <div class="p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                                    <div>
+                                        <p class="font-black text-gray-900">{{ $enrollment->husband_name }} & {{ $enrollment->wife_name }}</p>
+                                        <p class="text-xs text-gray-500">
+                                            {{ $enrollment->contacts }} · {{ $enrollment->address }}
+                                        </p>
+                                    </div>
+                                    <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest">
+                                        {{ $enrollment->relationship_type }}
+                                    </span>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                @if(isset($publicCoupleEnrollments) && $publicCoupleEnrollments->count() > 0)
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                            <div>
+                                <h4 class="text-lg font-black text-gray-900 flex items-center">
+                                    <i class="bi bi-clipboard-heart text-purple-600 mr-2"></i> Inscrições Públicas
+                                </h4>
+                                <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">Pré‑Marital</p>
+                            </div>
+                        </div>
+                        <div class="divide-y divide-gray-100">
+                            @foreach($publicCoupleEnrollments as $enrollment)
+                                <div class="p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                                    <div>
+                                        <p class="font-black text-gray-900">{{ $enrollment->husband_name }} & {{ $enrollment->wife_name }}</p>
+                                        <p class="text-xs text-gray-500">
+                                            {{ $enrollment->contacts }} · {{ $enrollment->address }}
+                                        </p>
+                                        <div class="mt-2 flex flex-wrap gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                                            <span class="px-2 py-1 bg-gray-50 rounded-full">{{ $enrollment->relationship_type }}</span>
+                                            <span class="px-2 py-1 bg-gray-50 rounded-full">{{ $enrollment->cell_zone ?? 'Sem célula' }}</span>
+                                            <span class="px-2 py-1 bg-gray-50 rounded-full">{{ $enrollment->is_church_member ? 'Membros' : 'Visitantes' }}</span>
+                                        </div>
+                                    </div>
+                                    @if(auth()->user()->isAdmin() || auth()->user()->isPastorSenior())
+                                        <form action="{{ route('course-classes.assign-couple-enrollment', $courseClass) }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="couple_enrollment_id" value="{{ $enrollment->id }}">
+                                            <button type="submit"
+                                                class="px-5 py-3 bg-purple-600 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-purple-700 transition-all shadow-lg shadow-purple-200">
+                                                Adicionar à Turma
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
     </div>

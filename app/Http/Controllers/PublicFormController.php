@@ -24,7 +24,9 @@ class PublicFormController extends Controller
             return redirect()->route('welcome')->with('error', 'Curso pré-marital não encontrado.');
         }
 
-        return view('public.courses.pre-marital', compact('course'));
+        $zones = Zone::orderBy('name')->get();
+
+        return view('public.courses.pre-marital', compact('course', 'zones'));
     }
 
     public function storePreMarital(Request $request)
@@ -36,9 +38,11 @@ class PublicFormController extends Controller
             'address' => 'required|string|max:255',
             'contacts' => 'required|string|max:255',
             'cell_zone' => 'nullable|string|max:255',
+            'zone_id' => 'nullable|exists:zones,id',
             'years_together_text' => 'nullable|string|max:255',
             'leader_name' => 'nullable|string|max:255',
             'has_pastoral_recommendation' => 'required|boolean',
+            'is_church_member' => 'required|boolean',
             'observations' => 'nullable|string',
         ]);
 
@@ -66,6 +70,12 @@ class PublicFormController extends Controller
         if ($yearsRaw !== '' && $years === 0) {
             $observations = trim(($observations ? $observations . ' | ' : '') . 'Tempo informado: ' . $yearsRaw);
         }
+        if (!empty($validated['zone_id'])) {
+            $zone = Zone::find($validated['zone_id']);
+            if ($zone) {
+                $observations = trim(($observations ? $observations . ' | ' : '') . 'Zona: ' . $zone->name);
+            }
+        }
 
         CoupleEnrollment::create([
             'course_id' => $validated['course_id'],
@@ -78,6 +88,7 @@ class PublicFormController extends Controller
             'years_together' => $years,
             'leader_name' => $validated['leader_name'] ?? null,
             'has_pastoral_recommendation' => $validated['has_pastoral_recommendation'],
+            'is_church_member' => $validated['is_church_member'],
             'observations' => $observations,
             'status' => 'pending',
         ]);
@@ -90,7 +101,8 @@ class PublicFormController extends Controller
     {
         $zones = Zone::orderBy('name')->get();
         $supervisions = Supervision::orderBy('name')->get();
-        return view('public.reports.quarterly', compact('zones', 'supervisions'));
+        $eventTypes = \App\Models\EventType::where('is_active', true)->get();
+        return view('public.reports.quarterly', compact('zones', 'supervisions', 'eventTypes'));
     }
 
     public function storeQuarterlyReport(Request $request)

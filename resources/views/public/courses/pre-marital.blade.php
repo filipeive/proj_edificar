@@ -90,12 +90,43 @@
 
                         <div>
                             <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">
-                                Zona de Célula
+                                Zona
                             </label>
-                            <input type="text" name="cell_zone"
-                                class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition placeholder-gray-600"
-                                placeholder="Ex: Centro">
+                            <select name="zone_id"
+                                class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition appearance-none">
+                                <option value="" class="bg-gray-900">Selecione a Zona</option>
+                                @foreach($zones as $zone)
+                                    <option value="{{ $zone->id }}" class="bg-gray-900">{{ $zone->name }}</option>
+                                @endforeach
+                            </select>
                         </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">
+                            São membros da Igreja?
+                        </label>
+                        <div class="flex space-x-6">
+                            <label class="flex items-center space-x-3 cursor-pointer group">
+                                <input type="radio" name="is_church_member" value="1" required
+                                    class="w-5 h-5 text-orange-600 bg-white/5 border-white/10 focus:ring-orange-500">
+                                <span class="text-gray-300 group-hover:text-white transition">Sim</span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer group">
+                                <input type="radio" name="is_church_member" value="0" required
+                                    class="w-5 h-5 text-orange-600 bg-white/5 border-white/10 focus:ring-orange-500">
+                                <span class="text-gray-300 group-hover:text-white transition">Não</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">
+                            Zona de Célula (opcional)
+                        </label>
+                        <input type="text" name="cell_zone"
+                            class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition placeholder-gray-600"
+                            placeholder="Ex: Centro">
                     </div>
 
                     <div>
