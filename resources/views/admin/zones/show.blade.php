@@ -102,10 +102,24 @@
                                         title="Transferir para outra zona">
                                         <i class="bi bi-arrow-left-right text-xl"></i>
                                     </button>
+                                    <a href="{{ route('supervisions.edit', $supervision) }}"
+                                        class="text-gray-300 hover:text-blue-600 transition-colors" title="Editar supervisão">
+                                        <i class="bi bi-pencil-square text-xl"></i>
+                                    </a>
                                     <a href="{{ route('supervisions.show', $supervision) }}"
                                         class="text-gray-300 hover:text-blue-600 transition-colors">
                                         <i class="bi bi-arrow-up-right-circle text-2xl"></i>
                                     </a>
+                                    <form action="{{ route('supervisions.destroy', $supervision) }}" method="POST"
+                                        id="delete-supervision-{{ $supervision->id }}" class="inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button"
+                                            onclick="confirmDelete('delete-supervision-{{ $supervision->id }}', 'Deseja excluir esta supervisão?')"
+                                            class="text-gray-300 hover:text-red-600 transition-colors" title="Eliminar supervisão">
+                                            <i class="bi bi-trash text-xl"></i>
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                             <h3 class="text-xl font-bold text-gray-900 mb-2">{{ $supervision->name }}</h3>
@@ -132,47 +146,83 @@
                 <!-- Tab Content: Células -->
                 <div x-show="activeTab === 'cells'" x-transition.fade
                     class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full table-compact">
-                            <thead>
-                                <tr class="bg-gray-50/50">
-                                    <th
-                                        class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                        Unidade</th>
-                                    <th
-                                        class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                        Supervisão</th>
-                                    <th
-                                        class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                        Liderança</th>
-                                    <th
-                                        class="px-10 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-50">
-                                @foreach($cells as $cell)
-                                    <tr class="hover:bg-gray-50/50 transition-colors group">
-                                        <td class="px-10 py-6 font-bold text-gray-900 line-clamp-1">{{ $cell->name }}</td>
-                                        <td class="px-10 py-6 text-sm text-gray-500 font-medium line-clamp-1">
-                                            {{ $cell->supervision->name }}
-                                        </td>
-                                        <td class="px-10 py-6 text-sm font-bold text-gray-700 line-clamp-1">
-                                            {{ $cell->leader->name ?? '-' }}
-                                        </td>
-                                        <td class="px-10 py-6 text-right">
-                                            <a href="{{ route('cells.show', $cell) }}" title="Detalhes"
-                                                class="action-icon text-gray-300 hover:text-blue-600 hover:bg-blue-50">
-                                                <i class="bi bi-chevron-right text-lg"></i>
-                                            </a>
-                                        </td>
+                    @if($cells->count() > 0)
+                        <div class="md:hidden divide-y divide-gray-50">
+                            @foreach($cells as $cell)
+                                <div class="p-6 flex items-start justify-between gap-4">
+                                    <div class="min-w-0 space-y-2">
+                                        <p class="text-sm font-black text-gray-900 leading-tight line-clamp-1">
+                                            {{ $cell->name }}
+                                        </p>
+                                        <div class="flex flex-wrap gap-2">
+                                            <span
+                                                class="px-3 py-1 bg-gray-100 rounded-full text-[10px] font-black text-gray-500 uppercase">
+                                                {{ $cell->supervision->name ?? 'Sem supervisão' }}
+                                            </span>
+                                            <span
+                                                class="px-3 py-1 bg-blue-50 rounded-full text-[10px] font-black text-blue-600 uppercase">
+                                                {{ $cell->leader->name ?? 'Sem líder' }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <a href="{{ route('cells.show', $cell) }}" title="Detalhes"
+                                        class="action-icon text-gray-300 hover:text-blue-600 hover:bg-blue-50">
+                                        <i class="bi bi-chevron-right text-lg"></i>
+                                    </a>
+                                </div>
+                            @endforeach
+                        </div>
+                        <div class="hidden md:block overflow-x-auto">
+                            <table class="w-full table-compact">
+                                <thead>
+                                    <tr class="bg-gray-50/50">
+                                        <th
+                                            class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                            Unidade</th>
+                                        <th
+                                            class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                            Supervisão</th>
+                                        <th
+                                            class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                            Liderança</th>
+                                        <th
+                                            class="px-10 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                        </th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody class="divide-y divide-gray-50">
+                                    @foreach($cells as $cell)
+                                        <tr class="hover:bg-gray-50/50 transition-colors group">
+                                            <td class="px-10 py-6 font-bold text-gray-900">
+                                                <span class="block line-clamp-1">{{ $cell->name }}</span>
+                                            </td>
+                                            <td class="px-10 py-6 text-sm text-gray-500 font-medium">
+                                                <span class="block line-clamp-1">
+                                                    {{ $cell->supervision->name ?? 'Sem supervisão' }}
+                                                </span>
+                                            </td>
+                                            <td class="px-10 py-6 text-sm font-bold text-gray-700">
+                                                <span class="block line-clamp-1">{{ $cell->leader->name ?? '-' }}</span>
+                                            </td>
+                                            <td class="px-10 py-6 text-right">
+                                                <a href="{{ route('cells.show', $cell) }}" title="Detalhes"
+                                                    class="action-icon text-gray-300 hover:text-blue-600 hover:bg-blue-50">
+                                                    <i class="bi bi-chevron-right text-lg"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div
+                            class="py-16 text-center bg-gray-50/50 rounded-[2.5rem] border-2 border-dashed border-gray-200 m-6">
+                            <p class="text-gray-400 font-bold italic">Nenhuma célula registrada nesta zona.</p>
+                        </div>
+                    @endif
                     @if($cells->hasPages())
-                        <div class="mt-6">
+                        <div class="p-6 border-t border-gray-50">
                             {{ $cells->links() }}
                         </div>
                     @endif
