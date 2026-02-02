@@ -5,9 +5,86 @@ use App\Models\Zone;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\DB;
+use App\Models\ServiceZoneParticipation;
+use App\Models\QuarterlyReport;
+use App\Models\Visitor;
 
 class ZoneController
 {
+    public function merge(Zone $zone): View
+    {
+        $targetZones = Zone::where('id', '!=', $zone->id)->orderBy('name')->get();
+        return view('admin.zones.merge', ['sourceZone' => $zone, 'targetZones' => $targetZones]);
+    }
+
+    public function processMerge(Request $request, Zone $zone)
+    {
+        $validated = $request->validate([
+            'target_zone_id' => 'required|exists:zones,id|different:zone'
+        ]);
+
+        $targetZone = Zone::findOrFail($validated['target_zone_id']);
+
+        try {
+            DB::transaction(function () use ($zone, $targetZone) {
+                // 1. Move Supervisions
+                $zone->supervisions()->update(['zone_id' => $targetZone->id]);
+
+                // 2. Move Contributions
+                $zone->contributions()->update(['zone_id' => $targetZone->id]);
+
+                // 3. Move Events
+                $zone->events()->update(['zone_id' => $targetZone->id]);
+
+                // 4. Move Visitors
+                Visitor::where('zone_id', $zone->id)->update(['zone_id' => $targetZone->id]);
+
+
+                // 5. Move Service Zone Participations
+                // Handle duplicate conflicts: if target already has participation for same service
+                $participations = ServiceZoneParticipation::where('zone_id', $zone->id)->get();
+                foreach ($participations as $participation) {
+                    $exists = ServiceZoneParticipation::where('service_id', $participation->service_id)
+                        ->where('zone_id', $targetZone->id)
+                        ->exists();
+
+                    if ($exists) {
+                        // Conflict: Delete source participation
+                        $participation->delete();
+                    } else {
+                        $participation->update(['zone_id' => $targetZone->id]);
+                    }
+                }
+
+                // 6. Move Quarterly Reports
+                $reports = QuarterlyReport::where('zone_id', $zone->id)->get();
+                foreach ($reports as $report) {
+                    $exists = QuarterlyReport::where('year', $report->year)
+                        ->where('quarter', $report->quarter)
+                        ->where('zone_id', $targetZone->id)
+                        ->exists();
+
+                    if ($exists) {
+                        // Conflict: Delete source report
+                        $report->delete();
+                    } else {
+                        $report->update(['zone_id' => $targetZone->id]);
+                    }
+                }
+
+                // 7. Delete Source Zone
+                $zone->delete();
+            });
+
+            return redirect()->route('zones.index')
+                ->with('success', "Zona '{$zone->name}' mesclada com '{$targetZone->name}' e excluída com sucesso.");
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Erro ao mesclar zonas: ' . $e->getMessage());
+        }
+    }
+
     public function index(Request $request): View
     {
         $user = auth()->user();

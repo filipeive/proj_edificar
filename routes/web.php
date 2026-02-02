@@ -188,12 +188,16 @@ Route::middleware('auth')->group(function () {
                     Route::post('/', [ZoneController::class, 'store'])->name('store');
                     Route::get('{zone}/edit', [ZoneController::class, 'edit'])->name('edit')->where('zone', '[0-9]+');
                     Route::put('{zone}', [ZoneController::class, 'update'])->name('update')->where('zone', '[0-9]+');
+                    Route::get('{zone}/merge', [ZoneController::class, 'merge'])->name('merge')->where('zone', '[0-9]+');
+                    Route::post('{zone}/merge', [ZoneController::class, 'processMerge'])->name('process-merge')->where('zone', '[0-9]+');
                     Route::delete('{zone}', [ZoneController::class, 'destroy'])->name('destroy')->where('zone', '[0-9]+');
                     Route::delete('bulk-destroy', [ZoneController::class, 'bulkDestroy'])->name('bulk-destroy');
                 });
             });
 
             // Gestão de Supervisões
+            Route::get('supervisions/{supervision}/merge', [SupervisionController::class, 'merge'])->name('supervisions.merge');
+            Route::post('supervisions/{supervision}/merge', [SupervisionController::class, 'processMerge'])->name('supervisions.process-merge');
             Route::post('supervisions/{supervision}/reassign-zone', [SupervisionController::class, 'reassignZone'])->name('supervisions.reassign-zone');
             Route::delete('supervisions/bulk-destroy', [SupervisionController::class, 'bulkDestroy'])->name('supervisions.bulk-destroy');
             Route::resource('supervisions', SupervisionController::class);

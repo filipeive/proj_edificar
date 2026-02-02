@@ -8,9 +8,16 @@
     <div class="w-full ">
         <div class="bg-white rounded-lg shadow p-8">
             <!-- voltar -->
-            <div class="mb-6 btn btn-danger">
-                <a href="{{ route('supervisions.index') }}">
-                    <i class="bi bi-arrow-left-short"></i> Voltar
+            <div class="flex justify-between items-center mb-6">
+                <div class="btn btn-danger">
+                    <a href="{{ route('supervisions.index') }}">
+                        <i class="bi bi-arrow-left-short"></i> Voltar
+                    </a>
+                </div>
+                <a href="{{ route('supervisions.merge', $supervision) }}"
+                    class="bg-red-50 text-red-600 px-4 py-2 rounded-lg hover:bg-red-100 transition-all font-bold text-sm border border-red-200 flex items-center">
+                    <i class="bi bi-intersect mr-2"></i>
+                    Mesclar Supervisão
                 </a>
             </div>
             <form action="{{ route('supervisions.update', $supervision) }}" method="POST">

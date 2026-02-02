@@ -31,11 +31,18 @@
                     </div>
                 </div>
 
-                <a href="{{ route('zones.index') }}"
-                    class="group flex items-center bg-gray-50 text-gray-500 px-6 py-4 rounded-2xl hover:bg-gray-100 transition-all font-bold text-xs uppercase tracking-widest">
-                    <i class="bi bi-arrow-left text-lg mr-2 group-hover:-translate-x-1 transition-transform"></i>
-                    Cancelar
-                </a>
+                <div class="flex items-center gap-3">
+                    <a href="{{ route('zones.merge', $zone) }}"
+                        class="group flex items-center bg-red-50 text-red-600 px-6 py-4 rounded-2xl hover:bg-red-100 transition-all font-bold text-xs uppercase tracking-widest border border-red-100">
+                        <i class="bi bi-intersect text-lg mr-2"></i>
+                        Mesclar
+                    </a>
+                    <a href="{{ route('zones.index') }}"
+                        class="group flex items-center bg-gray-50 text-gray-500 px-6 py-4 rounded-2xl hover:bg-gray-100 transition-all font-bold text-xs uppercase tracking-widest">
+                        <i class="bi bi-arrow-left text-lg mr-2 group-hover:-translate-x-1 transition-transform"></i>
+                        Cancelar
+                    </a>
+                </div>
             </div>
         </div>
         <!-- Form -->

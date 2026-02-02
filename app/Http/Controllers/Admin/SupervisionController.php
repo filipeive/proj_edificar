@@ -6,8 +6,70 @@ use App\Models\Zone;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
+use Illuminate\Support\Facades\DB;
+use App\Models\Cell;
+use App\Models\Contribution;
+
 class SupervisionController
 {
+    public function merge(Supervision $supervision): View
+    {
+        $targetSupervisions = Supervision::with('zone')
+            ->where('id', '!=', $supervision->id)
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.supervisions.merge', [
+            'sourceSupervision' => $supervision,
+            'targetSupervisions' => $targetSupervisions
+        ]);
+    }
+
+    public function processMerge(Request $request, Supervision $supervision)
+    {
+        $validated = $request->validate([
+            'target_supervision_id' => 'required|exists:supervisions,id|different:supervision'
+        ]);
+
+        $targetSupervision = Supervision::findOrFail($validated['target_supervision_id']);
+
+        try {
+            DB::transaction(function () use ($supervision, $targetSupervision) {
+                // 1. Move Cells (Handle name collisions if necessary, but unique is per supervision, so should be fine unless exactly same name exists)
+                // However, Cell unique constraint is ['name', 'supervision_id']. So moving might cause collision if target has cell with same name.
+
+                $cells = $supervision->cells;
+                foreach ($cells as $cell) {
+                    $exists = Cell::where('name', $cell->name)
+                        ->where('supervision_id', $targetSupervision->id)
+                        ->exists();
+
+                    if ($exists) {
+                        // Append suffix to avoid unique constraint violation
+                        $cell->update([
+                            'name' => $cell->name . ' (Mesclada)',
+                            'supervision_id' => $targetSupervision->id
+                        ]);
+                    } else {
+                        $cell->update(['supervision_id' => $targetSupervision->id]);
+                    }
+                }
+
+                // 2. Move Contributions
+                $supervision->contributions()->update(['supervision_id' => $targetSupervision->id]);
+
+                // 3. Delete Source Supervision
+                $supervision->delete();
+            });
+
+            return redirect()->route('supervisions.index')
+                ->with('success', "Supervisão '{$supervision->name}' mesclada com '{$targetSupervision->name}' e excluída com sucesso.");
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Erro ao mesclar supervisões: ' . $e->getMessage());
+        }
+    }
+
     public function index(Request $request): View
     {
         $user = auth()->user();
