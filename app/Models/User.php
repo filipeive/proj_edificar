@@ -157,6 +157,12 @@ class User extends Authenticatable
                 })->exists();
     }
 
+    // ESCOPOS
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
     // Helpers
     public function isAdmin()
     {
