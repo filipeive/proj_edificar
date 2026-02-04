@@ -71,11 +71,13 @@ class PackageController
             [
                 'package' => $package->load('userCommitments.user.cell.supervision.zone'),
                 'commitments' => $package->userCommitments()
+                    ->active()
                     ->with('user.cell.supervision.zone')
                     ->paginate(24)
                     ->withQueryString(),
-                'commitmentUserIds' => $package->userCommitments()->pluck('user_id'),
+                'commitmentUserIds' => $package->userCommitments()->active()->pluck('user_id'),
                 'commitmentPhones' => $package->userCommitments()
+                    ->active()
                     ->with('user')
                     ->get()
                     ->pluck('user.phone')
@@ -199,13 +201,22 @@ class PackageController
         // Update the commitment for this user and package
         $commitment = \App\Models\UserCommitment::where('user_id', $user->id)
             ->where('package_id', $package->id)
-            ->orderBy('created_at', 'desc')
+            ->active()
             ->first();
+
+        if (!$commitment) {
+            // Fallback to any latest commitment for this package if no active one found
+            $commitment = \App\Models\UserCommitment::where('user_id', $user->id)
+                ->where('package_id', $package->id)
+                ->orderBy('created_at', 'desc')
+                ->first();
+        }
 
         if ($commitment) {
             $commitment->update([
                 'committed_amount' => $validated['committed_amount'],
-                'cell_id' => $validated['cell_id']
+                'cell_id' => $validated['cell_id'],
+                'end_date' => null // Ensure it's active if we are editing it
             ]);
         } else {
             return back()->with('error', 'Compromisso não encontrado para este membro neste pacote.');
