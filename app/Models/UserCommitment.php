@@ -9,12 +9,13 @@ class UserCommitment extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 
-        'package_id', 
+        'user_id',
+        'package_id',
         'cell_id', // Adicionado
         'committed_amount', // Adicionado
-        'start_date', 
-        'end_date'];
+        'start_date',
+        'end_date'
+    ];
 
     protected $casts = [
         'start_date' => 'date',
@@ -37,7 +38,7 @@ class UserCommitment extends Model
     {
         return $query->where(function ($q) {
             $q->whereNull('end_date')
-              ->orWhere('end_date', '>', now());
+                ->orWhere('end_date', '>', now());
         });
     }
 
@@ -49,7 +50,8 @@ class UserCommitment extends Model
 
     public function daysUntilExpiration()
     {
-        if (!$this->end_date) return null;
+        if (!$this->end_date)
+            return null;
         return now()->diffInDays($this->end_date, false);
     }
 
@@ -57,5 +59,34 @@ class UserCommitment extends Model
     {
         $daysRemaining = $this->daysUntilExpiration();
         return $daysRemaining !== null && $daysRemaining > 0 && $daysRemaining <= $days;
+    }
+
+    // NOVOS HELPERS DE CAMPANHA
+    public function getTotalContributed()
+    {
+        return Contribution::where('user_id', $this->user_id)
+            ->where('package_id', $this->package_id)
+            ->where('status', 'verificada')
+            ->sum('amount');
+    }
+
+    public function getCampaignStatus()
+    {
+        $total = (float) $this->getTotalContributed();
+        $committed = (float) $this->committed_amount;
+
+        if ($total >= $committed) {
+            return $total > $committed ? 'surplus' : 'paid';
+        }
+
+        return $total > 0 ? 'partial' : 'pending';
+    }
+
+    public function getSurplusAmount()
+    {
+        $total = (float) $this->getTotalContributed();
+        $committed = (float) $this->committed_amount;
+
+        return max(0, $total - $committed);
     }
 }

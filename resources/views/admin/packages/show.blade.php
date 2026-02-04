@@ -181,7 +181,7 @@
                                     <th class="px-6 py-4 text-left">Membro</th>
                                     <th class="px-6 py-4 text-left">Valor</th>
                                     <th class="px-6 py-4 text-left hidden sm:table-cell">Célula</th>
-                                    <th class="px-6 py-4 text-center">Estado Mês</th>
+                                    <th class="px-6 py-4 text-center">Estado Campanha</th>
                                     <th class="px-6 py-4 text-right">Ações</th>
                                 </tr>
                             </thead>
@@ -215,22 +215,33 @@
                                         </td>
                                         <td class="px-6 py-4 text-center">
                                             @php
-                                                $currentMonthContribution = $commitment->user->contributions()
-                                                    ->where('package_id', $package->id)
-                                                    ->whereMonth('contribution_date', now()->month)
-                                                    ->whereYear('contribution_date', now()->year)
-                                                    ->first();
+                                                $status = $commitment->getCampaignStatus();
+                                                $totalContributed = $commitment->getTotalContributed();
                                             @endphp
-                                            @if($currentMonthContribution)
-                                                                        <span
-                                                                            class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide
-                                                                                        {{ $currentMonthContribution->isVerified() ? 'bg-green-100 text-green-700' :
-                                                ($currentMonthContribution->isRejected() ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700') }}">
-                                                                            {{ $currentMonthContribution->getStatusLabel() }}
-                                                                        </span>
+                                            @if($status === 'surplus')
+                                                <div class="flex flex-col items-center">
+                                                    <span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide bg-blue-100 text-blue-700">
+                                                        Pago com Acréscimo
+                                                    </span>
+                                                    <span class="text-[9px] text-blue-500 font-bold mt-1">
+                                                        + {{ number_format($commitment->getSurplusAmount(), 2, ',', '.') }} MT
+                                                    </span>
+                                                </div>
+                                            @elseif($status === 'paid')
+                                                <span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide bg-green-100 text-green-700">
+                                                    Pago ✓
+                                                </span>
+                                            @elseif($status === 'partial')
+                                                <div class="flex flex-col items-center">
+                                                    <span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide bg-yellow-100 text-yellow-700">
+                                                        Parcial
+                                                    </span>
+                                                    <span class="text-[9px] text-yellow-600 font-bold mt-1">
+                                                        {{ number_format($totalContributed, 2, ',', '.') }} MT
+                                                    </span>
+                                                </div>
                                             @else
-                                                <span
-                                                    class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide bg-gray-100 text-gray-400">
+                                                <span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide bg-gray-100 text-gray-400">
                                                     Pendente
                                                 </span>
                                             @endif
@@ -298,14 +309,12 @@
                                 class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 relative group compact-card">
                                 <div class="absolute top-4 right-4 flex items-center gap-2">
                                     @php
-                                        $currentMonthContribution = $commitment->user->contributions()
-                                            ->where('package_id', $package->id)
-                                            ->whereMonth('contribution_date', now()->month)
-                                            ->whereYear('contribution_date', now()->year)
-                                            ->first();
+                                        $status = $commitment->getCampaignStatus();
                                     @endphp
-                                    @if($currentMonthContribution)
-                                        <div class="w-2 h-2 rounded-full {{ $currentMonthContribution->isVerified() ? 'bg-green-500' : ($currentMonthContribution->isRejected() ? 'bg-red-500' : 'bg-yellow-500') }}"></div>
+                                    @if($status === 'surplus' || $status === 'paid')
+                                        <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                                    @elseif($status === 'partial')
+                                        <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
                                     @else
                                         <div class="w-2 h-2 rounded-full bg-gray-300"></div>
                                     @endif
