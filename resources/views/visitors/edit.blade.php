@@ -160,7 +160,7 @@
                 <!-- Right Column: Context & Status -->
                 <div class="space-y-8">
                     <!-- Status e Integração -->
-                    <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100">
                         <div class="p-8 border-b border-gray-50 bg-gray-50/30 flex items-center gap-3">
                             <i class="bi bi-star-fill text-yellow-500"></i>
                             <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Integração & Status</h3>
@@ -206,7 +206,7 @@
                     </div>
 
                     <!-- Culto e Convite -->
-                    <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100">
                         <div class="p-8 border-b border-gray-50 bg-gray-50/30 flex items-center gap-3">
                             <i class="bi bi-calendar-check text-blue-600"></i>
                             <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Contexto da Visita</h3>

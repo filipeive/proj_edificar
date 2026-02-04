@@ -160,7 +160,7 @@
                 <!-- Right Column: Context & Metadata -->
                 <div class="space-y-8">
                     <!-- Culto e Convite -->
-                    <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100">
                         <div class="p-8 border-b border-gray-50 bg-gray-50/30 flex items-center gap-3">
                             <i class="bi bi-calendar-check text-blue-600"></i>
                             <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Contexto da Visita</h3>
@@ -198,7 +198,7 @@
                     </div>
 
                     <!-- Atribuição -->
-                    <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100">
                         <div class="p-8 border-b border-gray-50 bg-gray-50/30 flex items-center gap-3">
                             <i class="bi bi-diagram-3-fill text-purple-600"></i>
                             <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Integração</h3>
