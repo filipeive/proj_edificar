@@ -72,6 +72,17 @@
             width: 280px;
         }
 
+        /* Prevent legacy collapse styles from affecting new structure */
+        .sidebar-collapsed {
+            width: 280px !important;
+        }
+
+        .sidebar-collapsed .sidebar-text {
+            opacity: 1 !important;
+            width: auto !important;
+            overflow: visible !important;
+        }
+
         .sidebar-text {
             transition: opacity 0.2s ease-in-out;
         }
@@ -732,9 +743,9 @@
         x-init="$watch('sidebarOpen', value => localStorage.setItem('sidebarOpen', value));">
 
         <!-- Sidebar Wrapper -->
-        <div :class="sidebarOpen ? 'w-[280px]' : 'w-0'"
+        <div :style="sidebarOpen ? 'width: 280px' : 'width: 0px'"
             class="hidden md:block transition-all duration-300 ease-in-out h-full overflow-hidden flex-shrink-0 relative">
-            <div class="w-[280px] h-full absolute top-0 left-0">
+            <div style="width: 280px" class="h-full absolute top-0 left-0">
                 @include('layouts.sidebar', ['sidebarId' => 'sidebar-desktop'])
             </div>
         </div>
