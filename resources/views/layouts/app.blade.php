@@ -271,7 +271,7 @@
             border-radius: 0.75rem;
             max-height: 400px;
             overflow-y: auto;
-            z-index: 50;
+            z-index: 9999;
             box-shadow: 0 10px 25px var(--shadow);
         }
 
@@ -288,7 +288,7 @@
             border-radius: 0.75rem;
             max-height: 500px;
             overflow-y: auto;
-            z-index: 50;
+            z-index: 9999;
             box-shadow: 0 10px 25px var(--shadow);
         }
 
@@ -628,6 +628,7 @@
             border-radius: 0.75rem;
             margin-top: 4px;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            z-index: 9999 !important;
             background: white;
             overflow: hidden;
         }
