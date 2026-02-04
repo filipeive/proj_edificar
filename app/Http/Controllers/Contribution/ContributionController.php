@@ -490,7 +490,7 @@ class ContributionController
 
         $contribution->update([
             'status' => 'cancelada',
-            'verified_by' => auth()->id(),
+            'verified_by_id' => auth()->id(),
             'notes' => $reason,
         ]);
 
