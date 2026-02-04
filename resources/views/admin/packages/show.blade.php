@@ -136,11 +136,12 @@
                 <!-- Toolbar -->
                 <div
                     class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <div class="relative w-full sm:w-64">
+                    <form action="{{ route('packages.show', $package) }}" method="GET" class="relative w-full sm:w-64">
                         <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                        <input type="text" x-model="search" placeholder="Pesquisar membro..."
-                            class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-blue-500 rounded-xl text-sm font-bold transition-all">
-                    </div>
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Pesquisar membro..."
+                            class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-blue-500 rounded-xl text-sm font-bold transition-all"
+                            onchange="this.form.submit()">
+                    </form>
 
                     <div class="flex items-center gap-2 w-full sm:w-auto">
                         <!-- Bulk Actions -->

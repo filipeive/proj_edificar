@@ -72,6 +72,12 @@ class PackageController
                 'package' => $package->load('userCommitments.user.cell.supervision.zone'),
                 'commitments' => $package->userCommitments()
                     ->active()
+                    ->when(request('search'), function ($query, $search) {
+                        $query->whereHas('user', function ($q) use ($search) {
+                            $q->where('name', 'like', "%{$search}%")
+                                ->orWhere('phone', 'like', "%{$search}%");
+                        });
+                    })
                     ->with('user.cell.supervision.zone')
                     ->paginate(24)
                     ->withQueryString(),
