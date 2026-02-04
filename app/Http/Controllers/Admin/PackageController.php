@@ -85,6 +85,15 @@ class PackageController
                     ->implode(', '),
                 'allPackages' => CommitmentPackage::orderBy('order')->get(),
                 'availableCells' => Cell::orderBy('name')->get(),
+                'users' => User::active()
+                    ->with([
+                        'commitments' => function ($q) {
+                            $q->whereNull('end_date')->orWhere('end_date', '>', now());
+                        },
+                        'commitments.package'
+                    ])
+                    ->orderBy('name')
+                    ->get(),
             ]
         );
     }

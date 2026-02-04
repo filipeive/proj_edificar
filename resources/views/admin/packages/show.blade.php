@@ -439,17 +439,38 @@
                     <!-- Add Member Box -->
                     <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-gray-100">
                         <h3 class="text-xs font-black text-gray-900 uppercase tracking-widest mb-4">Adicionar Membro</h3>
-                        <form action="{{ route('packages.assign', $package) }}" method="POST" class="space-y-4">
+                        <form action="{{ route('packages.assign', $package) }}" method="POST" class="space-y-4" 
+                              x-data="{ selectedUserPackage: '' }">
                             @csrf
                             <div>
-                                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Membro</label>
-                                <select name="user_id" required class="w-full bg-gray-50 border-none rounded-xl py-2.5 px-3 text-sm font-bold text-gray-900 appearance-none custom-select">
+                                <select name="user_id" required 
+                                        @change="selectedUserPackage = $event.target.options[$event.target.selectedIndex].dataset.currentPackage || ''"
+                                        class="w-full bg-gray-50 border-none rounded-xl py-2.5 px-3 text-sm font-bold text-gray-900 appearance-none custom-select">
                                     <option value="">Selecionar...</option>
-                                    @foreach(\App\Models\User::orderBy('name')->get() as $user)
-                                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                    @foreach($users as $user)
+                                        @php $currentCommitment = $user->commitments->first(); @endphp
+                                        <option value="{{ $user->id }}" 
+                                                data-current-package="{{ $currentCommitment ? $currentCommitment->package->name : '' }}">
+                                            {{ $user->name }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
+                            
+                            <template x-if="selectedUserPackage">
+                                <div class="p-3 bg-orange-50 border border-orange-100 rounded-xl">
+                                    <div class="flex gap-2">
+                                        <i class="bi bi-exclamation-triangle-fill text-orange-500 text-sm"></i>
+                                        <div>
+                                            <p class="text-[10px] font-bold text-orange-800 uppercase tracking-tight">Membro já Comprometido</p>
+                                            <p class="text-[9px] text-orange-700 leading-tight mt-0.5">
+                                                Este membro já está no pacote <strong x-text="selectedUserPackage"></strong>. 
+                                                Ao adicionar aqui, ele será movido para este novo pacote.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
                             <div>
                                 <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Valor (MT)</label>
                                 <input type="number" name="committed_amount" value="{{ $package->min_amount }}" step="0.01" required
