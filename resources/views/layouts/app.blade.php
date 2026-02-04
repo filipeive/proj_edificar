@@ -201,6 +201,12 @@
             .sidebar-collapsed {
                 width: 280px;
             }
+
+            .mobile-sidebar aside {
+                position: relative;
+                height: 100%;
+                transform: translateX(0);
+            }
         }
 
         /* Tooltip */
@@ -729,12 +735,12 @@
         <div :class="sidebarOpen ? 'w-[280px]' : 'w-0'"
             class="hidden md:block transition-all duration-300 ease-in-out h-full overflow-hidden flex-shrink-0 relative">
             <div class="w-[280px] h-full absolute top-0 left-0">
-                @include('layouts.sidebar')
+                @include('layouts.sidebar', ['sidebarId' => 'sidebar-desktop'])
             </div>
         </div>
 
         <!-- Mobile Sidebar -->
-        <div class="md:hidden fixed inset-0 z-50 flex" x-show="mobileSidebarOpen" x-cloak>
+        <div class="md:hidden fixed inset-0 z-50 flex mobile-sidebar" x-show="mobileSidebarOpen" x-cloak>
             <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="mobileSidebarOpen = false"
                 x-transition.opacity></div>
             <div class="relative w-[280px] h-full" x-show="mobileSidebarOpen"
@@ -742,7 +748,7 @@
                 x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0"
                 x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="translate-x-0"
                 x-transition:leave-end="-translate-x-full">
-                @include('layouts.sidebar')
+                @include('layouts.sidebar', ['sidebarId' => 'sidebar-mobile'])
             </div>
         </div>
 
@@ -937,7 +943,7 @@
 
     <script>
         // DOM Elements
-        const sidebar = document.getElementById('sidebar');
+        const sidebar = document.getElementById('sidebar-desktop') || document.getElementById('sidebar');
         const mobileOverlay = document.getElementById('mobileOverlay');
         const mainContent = document.getElementById('mainContent');
         const sidebarIcon = document.getElementById('sidebarIcon');
@@ -980,9 +986,11 @@
         }
 
         function toggleMobileSidebar() {
-            sidebar.classList.toggle('mobile-open');
-            mobileOverlay.classList.toggle('hidden');
-            document.body.style.overflow = sidebar.classList.contains('mobile-open') ? 'hidden' : '';
+            const mobileSidebar = document.getElementById('sidebar-mobile') || sidebar;
+            if (!mobileSidebar) return;
+            mobileSidebar.classList.toggle('mobile-open');
+            mobileOverlay?.classList.toggle('hidden');
+            document.body.style.overflow = mobileSidebar.classList.contains('mobile-open') ? 'hidden' : '';
         }
 
         function toggleMenu(menuId) {

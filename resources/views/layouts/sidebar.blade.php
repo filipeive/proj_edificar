@@ -13,9 +13,11 @@
         $pendingContributionsCount = $pendingQuery->count();
     }
     $logoPrimary = \App\Models\Setting::get('branding.logo_primary', asset('images/logo.png'));
+    $showInventoryOperacao = $authUser && ($authUser->isAdmin() || $authUser->isSecretaria());
+    $showInventoryFinanceira = $authUser && ($authUser->isAdmin() || $authUser->isEdificarManager() || $authUser->isResponsavelPacote() || $authUser->isComissaoObra() || $authUser->isTesouraria() || $authUser->isPastor());
 @endphp
-<aside id="sidebar"
-    class="sidebar-expanded bg-black text-white flex flex-col overflow-y-auto shadow-2xl transition-all duration-300 ease-in-out border-r border-white/5">
+<aside id="{{ $sidebarId ?? 'sidebar' }}" data-sidebar-id="{{ $sidebarId ?? 'sidebar' }}"
+    class="app-sidebar sidebar-expanded bg-black text-white flex flex-col h-full min-h-0 overflow-hidden shadow-2xl transition-all duration-300 ease-in-out border-r border-white/5">
     <!-- Header -->
     <div
         class="px-6 py-8 border-b border-white/5 flex items-center justify-between bg-black/50 backdrop-blur-xl sticky top-0 z-20">
@@ -30,10 +32,9 @@
             </div>
         </div>
     </div>
-    </div>
 
     <!-- Navigation -->
-    <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto custom-scrollbar">
+    <nav class="flex-1 min-h-0 px-4 py-6 space-y-1 overflow-y-auto custom-scrollbar">
         <!-- DASHBOARD -->
         <div class="pb-4">
             <a href="{{ route('dashboard') }}"
@@ -174,7 +175,7 @@
                         </a>
                     @endif
 
-                    @if ($authUser && ($authUser->isAdmin() || $authUser->isSecretaria()))
+                    @if ($showInventoryOperacao)
                         <a href="{{ route('inventory-items.index') }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('inventory-items.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                             <i class="bi bi-box-seam-fill text-xl flex-shrink-0"></i>
                             <span class="sidebar-text ml-4 font-bold tracking-tight">Inventário</span>
@@ -296,7 +297,7 @@
                     </div>
                 @endif
 
-                @if ($authUser && ($authUser->isAdmin() || $authUser->isSecretaria() || $authUser->isPastor() || $authUser->isTesouraria()))
+                @if ($showInventoryFinanceira && !$showInventoryOperacao)
                     <a href="{{ route('inventory-items.index') }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('inventory-items.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                         <i class="bi bi-box-seam text-xl flex-shrink-0"></i>
                         <span class="sidebar-text ml-4 font-bold tracking-tight">Inventário</span>
@@ -411,34 +412,36 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const sidebar = document.getElementById('sidebar');
-        if (!sidebar) return;
+        const sidebars = document.querySelectorAll('.app-sidebar');
+        if (!sidebars.length) return;
 
-        const activeItem = sidebar.querySelector(
-            '.nav-item.bg-orange-600, .nav-item.bg-blue-600, .nav-item.bg-indigo-600, .nav-item.bg-zinc-900, .nav-item.bg-zinc-900\\/50'
-        );
-        if (!activeItem) return;
+        sidebars.forEach((sidebar) => {
+            const activeItem = sidebar.querySelector(
+                '.nav-item.bg-orange-600, .nav-item.bg-blue-600, .nav-item.bg-indigo-600, .nav-item.bg-zinc-900, .nav-item.bg-zinc-900\\/50'
+            );
+            if (!activeItem) return;
 
-        const scrollContainer = activeItem.closest('.custom-scrollbar') || sidebar;
-        const stickyHeader = sidebar.querySelector('.sticky.top-0');
-        const headerOffset = stickyHeader ? stickyHeader.offsetHeight + 12 : 24;
+            const scrollContainer = activeItem.closest('.custom-scrollbar') || sidebar;
+            const stickyHeader = sidebar.querySelector('.sticky.top-0');
+            const headerOffset = stickyHeader ? stickyHeader.offsetHeight + 12 : 24;
 
-        const runScroll = () => {
-            const visibleTop = scrollContainer.scrollTop + headerOffset;
-            const visibleBottom = scrollContainer.scrollTop + scrollContainer.clientHeight - 16;
-            const itemTop = activeItem.offsetTop;
-            const itemBottom = itemTop + activeItem.offsetHeight;
+            const runScroll = () => {
+                const visibleTop = scrollContainer.scrollTop + headerOffset;
+                const visibleBottom = scrollContainer.scrollTop + scrollContainer.clientHeight - 16;
+                const itemTop = activeItem.offsetTop;
+                const itemBottom = itemTop + activeItem.offsetHeight;
 
-            const targetTop = itemTop - headerOffset;
-            const shouldScroll = itemTop < visibleTop || itemBottom > visibleBottom;
-            if (shouldScroll) {
-                scrollContainer.scrollTo({ top: Math.max(targetTop, 0), behavior: 'smooth' });
-            }
+                const targetTop = itemTop - headerOffset;
+                const shouldScroll = itemTop < visibleTop || itemBottom > visibleBottom;
+                if (shouldScroll) {
+                    scrollContainer.scrollTo({ top: Math.max(targetTop, 0), behavior: 'smooth' });
+                }
 
-            activeItem.classList.add('nav-item-highlight');
-            setTimeout(() => activeItem.classList.remove('nav-item-highlight'), 1800);
-        };
+                activeItem.classList.add('nav-item-highlight');
+                setTimeout(() => activeItem.classList.remove('nav-item-highlight'), 1800);
+            };
 
-        requestAnimationFrame(() => setTimeout(runScroll, 60));
+            requestAnimationFrame(() => setTimeout(runScroll, 60));
+        });
     });
 </script>
