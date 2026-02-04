@@ -29,6 +29,34 @@
             </button>
         @endif
     </div>
+    <!-- Cancel Modal -->
+    <div id="cancelModal"
+        class="fixed inset-0 bg-gray-900/90 backdrop-blur-sm hidden flex items-center justify-center z-[100] p-6">
+        <div class="bg-white rounded-[3rem] shadow-2xl p-10 w-full max-w-xl border border-gray-100">
+            <h3 class="text-2xl font-black text-gray-900 tracking-tighter mb-2">Cancelar Contribuição (Histórico)</h3>
+            <p class="text-sm text-gray-400 font-medium mb-8">Esta ação irá anular o valor financeiro do registro, mas
+                manterá os dados salvos para auditoria futura.</p>
+
+            <form action="{{ route('contributions.cancel', $contribution) }}" method="POST">
+                @csrf
+                <div class="mb-8">
+                    <textarea name="notes" rows="6" required
+                        class="w-full p-6 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-gray-800 font-medium text-sm text-gray-700"
+                        placeholder="Descreva obrigatoriamente o motivo do cancelamento deste registro..."></textarea>
+                </div>
+                <div class="flex gap-4">
+                    <button type="button" onclick="document.getElementById('cancelModal').classList.add('hidden')"
+                        class="flex-1 py-5 bg-gray-100 text-gray-500 rounded-2xl font-black text-xs uppercase tracking-widest">
+                        Voltar
+                    </button>
+                    <button type="submit"
+                        class="flex-1 py-5 bg-gray-900 text-white rounded-2xl hover:bg-black transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-gray-100">
+                        Confirmar Cancelamento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection
 
 @section('content')
@@ -264,4 +292,32 @@
         </div>
     </div>
 
+
+    <!-- Cancel Modal -->
+    <div id="cancelModal"
+        class="fixed inset-0 bg-gray-900/90 backdrop-blur-sm hidden flex items-center justify-center z-[100] p-6">
+        <div class="bg-white rounded-[3rem] shadow-2xl p-10 w-full max-w-xl border border-gray-100">
+            <h3 class="text-2xl font-black text-gray-900 tracking-tighter mb-2">Cancelar Contribuição (Histórico)</h3>
+            <p class="text-sm text-gray-400 font-medium mb-8">Esta ação irá anular o valor financeiro do registro, mas manterá os dados salvos para auditoria futura.</p>
+
+            <form action="{{ route('contributions.cancel', $contribution) }}" method="POST">
+                @csrf
+                <div class="mb-8">
+                    <textarea name="notes" rows="6" required
+                        class="w-full p-6 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-gray-800 font-medium text-sm text-gray-700"
+                        placeholder="Descreva obrigatoriamente o motivo do cancelamento deste registro..."></textarea>
+                </div>
+                <div class="flex gap-4">
+                    <button type="button" onclick="document.getElementById('cancelModal').classList.add('hidden')"
+                        class="flex-1 py-5 bg-gray-100 text-gray-500 rounded-2xl font-black text-xs uppercase tracking-widest">
+                        Voltar
+                    </button>
+                    <button type="submit"
+                        class="flex-1 py-5 bg-gray-900 text-white rounded-2xl hover:bg-black transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-gray-100">
+                        Confirmar Cancelamento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection

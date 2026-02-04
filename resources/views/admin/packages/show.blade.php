@@ -188,7 +188,7 @@
                             <tbody class="divide-y divide-gray-50">
                                 @forelse($commitments as $commitment)
                                     <tr class="hover:bg-gray-50/50 transition-colors"
-                                        x-show="!search || '{{ strtolower($commitment->user->name) }}'.includes(search.toLowerCase()) || '{{ $commitment->user->phone }}'.includes(search)">
+                                        x-show="!search || '{{ $commitment->user->name }}'.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(search.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')) || '{{ $commitment->user->phone }}'.includes(search)">
                                         <td class="px-6 py-4">
                                             <input type="checkbox" value="{{ $commitment->user_id }}" x-model="selected"
                                                 class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
@@ -321,7 +321,7 @@
                     <!-- Grid View -->
                     <div x-show="view === 'grid'" x-transition class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         @forelse($commitments as $commitment)
-                            <div x-show="!search || '{{ strtolower($commitment->user->name) }}'.includes(search.toLowerCase()) || '{{ $commitment->user->phone }}'.includes(search)"
+                            <div x-show="!search || '{{ $commitment->user->name }}'.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(search.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')) || '{{ $commitment->user->phone }}'.includes(search)"
                                 class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 relative group compact-card">
                                 <div class="absolute top-4 right-4 flex items-center gap-2">
                                     @php

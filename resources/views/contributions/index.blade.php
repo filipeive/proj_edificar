@@ -325,12 +325,25 @@
                         @endif
 
                         @if(auth()->user()->isAdmin() && $contribution->status !== 'cancelada')
-                            <button onclick="document.getElementById('cancel-form-{{ $contribution->id }}').classList.toggle('hidden')" 
+                            <button onclick="document.getElementById('cancel-form-grid-{{ $contribution->id }}').classList.toggle('hidden')" 
                                 class="w-10 h-10 bg-gray-100 text-gray-500 flex items-center justify-center rounded-xl hover:bg-gray-800 hover:text-white transition-all" title="Cancelar Lançamento">
                                 <i class="bi bi-slash-circle"></i>
                             </button>
                         @endif
                     </div>
+                    @if(auth()->user()->isAdmin() && $contribution->status !== 'cancelada')
+                        <div id="cancel-form-grid-{{ $contribution->id }}" class="hidden absolute left-0 bottom-16 mb-2 w-full p-6 bg-white shadow-2xl rounded-2xl border border-gray-100 z-10">
+                            <form action="{{ route('contributions.cancel', $contribution) }}" method="POST">
+                                @csrf
+                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-2">Motivo do Cancelamento</label>
+                                <textarea name="notes" required class="w-full p-3 rounded-xl bg-gray-50 border-none text-sm mb-4" rows="3" placeholder="Explique..."></textarea>
+                                <div class="flex gap-2">
+                                     <button type="button" onclick="document.getElementById('cancel-form-grid-{{ $contribution->id }}').classList.add('hidden')" class="flex-1 py-2 bg-gray-100 text-gray-500 rounded-lg text-[10px] font-black uppercase">Cancelar</button>
+                                     <button type="submit" class="flex-1 py-2 bg-gray-900 text-white rounded-lg text-[10px] font-black uppercase">Confirmar</button>
+                                </div>
+                            </form>
+                        </div>
+                    @endif
                 </div>
             @endforeach
         </div>
