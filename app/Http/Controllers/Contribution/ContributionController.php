@@ -290,6 +290,7 @@ class ContributionController
             'contribution_date' => 'required|date|before_or_equal:today',
             'package_id' => 'nullable|exists:commitment_packages,id',
             'proof_path' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'proof_message' => 'nullable|string|max:2000',
         ]);
 
         $targetUser = User::find($validated['user_id']);
@@ -315,6 +316,7 @@ class ContributionController
             'contribution_date' => $validated['contribution_date'],
             'package_id' => $validated['package_id'] ?? null,
             'proof_path' => $proofPath,
+            'proof_message' => $validated['proof_message'] ?? null,
             'status' => 'pendente',
         ]);
 
@@ -390,6 +392,7 @@ class ContributionController
             'amount' => 'required|numeric|min:0.01',
             'contribution_date' => 'required|date|before_or_equal:today',
             'proof_path' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'proof_message' => 'nullable|string|max:2000',
         ]);
 
         if ($request->hasFile('proof_path')) {

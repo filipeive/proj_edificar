@@ -151,30 +151,61 @@
                     </div>
                 </div>
 
-                <div class="mb-8">
+                <div class="mb-8" x-data="{ proofType: 'file' }">
                     <h3 class="text-lg font-bold text-gray-800 mb-4">
-                        <i class="bi bi-paperclip mr-2"></i>Comprovativo (Opcional)
+                        <i class="bi bi-paperclip mr-2"></i>Comprovativo
                     </h3>
 
-                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 transition"
-                        id="dropZone">
-                        <input type="file" name="proof_path" id="proof_path" class="hidden" accept=".pdf,.jpg,.jpeg,.png">
-                        <i class="bi bi-cloud-upload text-5xl text-gray-400 mb-3 block"></i>
-                        <p class="text-gray-600 font-medium mb-1">Clique para enviar ou arraste o arquivo</p>
-                        <p class="text-sm text-gray-500">PDF, JPG, PNG (Máx. 5MB)</p>
+                    <div class="flex p-1 bg-gray-100 rounded-xl mb-6">
+                        <button type="button" @click="proofType = 'file'"
+                            :class="proofType === 'file' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500'"
+                            class="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2">
+                            <i class="bi bi-file-earmark-arrow-up"></i> Ficheiro / Imagem
+                        </button>
+                        <button type="button" @click="proofType = 'message'"
+                            :class="proofType === 'message' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500'"
+                            class="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2">
+                            <i class="bi bi-chat-left-text"></i> Mensagem da Operadora
+                        </button>
                     </div>
 
-                    <div id="fileName" class="mt-4 hidden p-4 bg-green-50 border border-green-200 rounded-lg">
-                        <div class="flex items-center">
-                            <i class="bi bi-check-circle text-green-600 text-2xl mr-3"></i>
-                            <div>
-                                <p class="text-sm text-green-600 font-medium">Arquivo selecionado:</p>
-                                <p id="fileNameText" class="text-green-800 font-semibold"></p>
+                    <div x-show="proofType === 'file'" x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/30 transition group"
+                            id="dropZone">
+                            <input type="file" name="proof_path" id="proof_path" class="hidden"
+                                accept=".pdf,.jpg,.jpeg,.png">
+                            <i
+                                class="bi bi-cloud-upload text-5xl text-gray-400 mb-3 block group-hover:text-blue-500 transition-colors"></i>
+                            <p class="text-gray-600 font-medium mb-1">Clique para enviar ou arraste o arquivo</p>
+                            <p class="text-sm text-gray-500">PDF, JPG, PNG (Máx. 5MB)</p>
+                        </div>
+                        <div id="fileName" class="mt-4 hidden p-4 bg-green-50 border border-green-200 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="bi bi-check-circle text-green-600 text-2xl mr-3"></i>
+                                <div>
+                                    <p class="text-sm text-green-600 font-medium">Arquivo selecionado:</p>
+                                    <p id="fileNameText" class="text-green-800 font-semibold"></p>
+                                </div>
                             </div>
                         </div>
                     </div>
 
+                    <div x-show="proofType === 'message'" x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
+                        <label for="proof_message" class="block text-sm font-medium text-gray-700 mb-2">Cole aqui a mensagem
+                            de confirmação completa</label>
+                        <textarea name="proof_message" id="proof_message" rows="5"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400"
+                            placeholder="Ex: Ref: 123456789. Vocé enviou 1000.00 MT para..."></textarea>
+                        <p class="text-[10px] text-gray-400 mt-2 italic">* Use esta opção se não tiver o arquivo do
+                            comprovativo mas tiver a mensagem SMS da operadora.</p>
+                    </div>
+
                     @error('proof_path')
+                        <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                    @enderror
+                    @error('proof_message')
                         <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
                     @enderror
                 </div>

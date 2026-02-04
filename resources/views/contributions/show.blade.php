@@ -5,30 +5,26 @@
 
 @section('header-actions')
     <div class="flex items-center gap-2 md:hidden">
-        <a href="{{ route('contributions.index') }}"
-            class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+        <a href="{{ route('contributions.index') }}" class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
             title="Voltar à lista">
             <i class="bi bi-arrow-left"></i>
         </a>
         @if($contribution->status === 'pendente' && auth()->id() === $contribution->user_id)
             <a href="{{ route('contributions.edit', $contribution) }}"
-                class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50"
-                title="Corrigir registro">
+                class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50" title="Corrigir registro">
                 <i class="bi bi-pencil-square"></i>
             </a>
         @endif
         @if($canManage && $contribution->status === 'pendente')
             <form action="{{ route('contributions.verify', $contribution) }}" method="POST" class="inline">
                 @csrf
-                <button type="submit"
-                    class="action-icon text-gray-600 hover:text-green-600 hover:bg-green-50"
+                <button type="submit" class="action-icon text-gray-600 hover:text-green-600 hover:bg-green-50"
                     title="Validar oferta">
                     <i class="bi bi-patch-check"></i>
                 </button>
             </form>
             <button onclick="document.getElementById('rejectModal').classList.remove('hidden')"
-                class="action-icon text-gray-600 hover:text-red-600 hover:bg-red-50"
-                title="Rejeitar">
+                class="action-icon text-gray-600 hover:text-red-600 hover:bg-red-50" title="Rejeitar">
                 <i class="bi bi-x-circle"></i>
             </button>
         @endif
@@ -157,6 +153,25 @@
                                 class="px-10 py-5 bg-purple-600 text-white rounded-2xl hover:bg-purple-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-purple-100">
                                 Visualizar Documento
                             </a>
+                        </div>
+                    </div>
+                @endif
+
+                @if($contribution->proof_message)
+                    <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="p-8 border-b border-gray-50">
+                            <h2 class="text-xl font-black text-gray-900 flex items-center gap-3">
+                                <i class="bi bi-chat-left-dots text-blue-600"></i>
+                                Mensagem de Confirmação
+                            </h2>
+                        </div>
+                        <div class="p-10">
+                            <div class="p-6 bg-blue-50 border border-blue-100 rounded-3xl">
+                                <p class="text-sm font-medium text-blue-900 leading-relaxed whitespace-pre-line">
+                                    {{ $contribution->proof_message }}</p>
+                            </div>
+                            <p class="text-[10px] text-gray-400 mt-4 uppercase font-bold tracking-widest text-center">Texto
+                                extraído da operadora</p>
                         </div>
                     </div>
                 @endif

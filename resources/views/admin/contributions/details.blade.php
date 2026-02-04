@@ -44,14 +44,31 @@
 
             <div class="mt-6">
                 <p class="text-sm text-gray-500">Comprovativo</p>
-                @if($contribution->proof_path)
-                    <a href="{{ route('contributions.receipt', $contribution) }}" target="_blank"
-                        class="inline-block mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                        Ver Comprovativo
-                    </a>
-                @else
-                    <p class="mt-2 text-gray-500">Sem comprovativo anexado.</p>
-                @endif
+                <div class="mt-2 space-y-4">
+                    @if($contribution->proof_path)
+                        <div>
+                            <p class="text-xs text-gray-400 mb-1">Ficheiro Anexado:</p>
+                            <a href="{{ route('contributions.receipt', $contribution) }}" target="_blank"
+                                class="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
+                                <i class="bi bi-file-earmark-pdf mr-1"></i> Ver Comprovativo
+                            </a>
+                        </div>
+                    @endif
+
+                    @if($contribution->proof_message)
+                        <div>
+                            <p class="text-xs text-gray-400 mb-1">Mensagem da Operadora:</p>
+                            <div
+                                class="p-4 bg-blue-50 border border-blue-100 rounded text-sm text-blue-900 whitespace-pre-line">
+                                {{ $contribution->proof_message }}
+                            </div>
+                        </div>
+                    @endif
+
+                    @if(!$contribution->proof_path && !$contribution->proof_message)
+                        <p class="text-gray-500 italic">Sem comprovativo anexado.</p>
+                    @endif
+                </div>
             </div>
 
             <div class="mt-6 border-t pt-4">

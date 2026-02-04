@@ -34,31 +34,64 @@
                 @enderror
             </div>
 
-            @if($contribution->proof_path)
-                <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded">
-                    <p class="text-sm text-gray-600 mb-2">Comprovativo Atual:</p>
-                    <a href="{{ route('contributions.receipt', $contribution) }}" target="_blank"
-                        class="text-blue-600 hover:text-blue-800 text-sm">
-                        <i class="bi bi-download"></i> Ver Arquivo
-                    </a>
-                </div>
-            @endif
-
-            <div class="mb-6">
-                <label for="proof_path" class="block text-sm font-medium text-gray-700 mb-2">
-                    <i class="bi bi-paperclip mr-2"></i>Novo Comprovativo (Opcional)
+            <div class="mb-8" x-data="{ proofType: '{{ $contribution->proof_message ? 'message' : 'file' }}' }">
+                <label class="block text-sm font-medium text-gray-700 mb-4">
+                    <i class="bi bi-paperclip mr-2"></i>Comprovativo
                 </label>
-                <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-gray-400 transition"
-                    id="dropZone">
-                    <input type="file" name="proof_path" id="proof_path" class="hidden" accept=".pdf,.jpg,.jpeg,.png">
-                    <i class="bi bi-cloud-upload text-3xl text-gray-400 mb-2"></i>
-                    <p class="text-gray-600">Clique para enviar ou arraste o arquivo</p>
-                    <p class="text-sm text-gray-500 mt-2">PDF, JPG, PNG (Máx. 5MB)</p>
+
+                <div class="flex p-1 bg-gray-100 rounded-xl mb-6">
+                    <button type="button" @click="proofType = 'file'"
+                        :class="proofType === 'file' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500'"
+                        class="flex-1 py-2 rounded-lg text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2">
+                        <i class="bi bi-file-earmark-arrow-up"></i> Ficheiro
+                    </button>
+                    <button type="button" @click="proofType = 'message'"
+                        :class="proofType === 'message' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500'"
+                        class="flex-1 py-2 rounded-lg text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2">
+                        <i class="bi bi-chat-left-text"></i> Mensagem
+                    </button>
                 </div>
-                <div id="fileName" class="mt-3 text-sm text-green-600 hidden">
-                    <i class="bi bi-check-circle"></i> <span id="fileNameText"></span>
+
+                <div x-show="proofType === 'file'">
+                    @if($contribution->proof_path)
+                        <div
+                            class="mb-4 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <i class="bi bi-file-earmark-check text-green-600 text-xl"></i>
+                                <div>
+                                    <p class="text-xs text-green-600 font-bold uppercase">Arquivo Atual</p>
+                                    <a href="{{ route('contributions.receipt', $contribution) }}" target="_blank"
+                                        class="text-sm font-medium text-green-800 hover:underline">Visualizar
+                                        Comprovativo</a>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/30 transition group"
+                        id="dropZone">
+                        <input type="file" name="proof_path" id="proof_path" class="hidden"
+                            accept=".pdf,.jpg,.jpeg,.png">
+                        <i
+                            class="bi bi-cloud-upload text-3xl text-gray-400 mb-2 group-hover:text-blue-500 transition-colors"></i>
+                        <p class="text-gray-600 text-sm">Clique para alterar ou arraste o arquivo</p>
+                        <p class="text-[10px] text-gray-400 mt-2">PDF, JPG, PNG (Máx. 5MB)</p>
+                    </div>
+                    <div id="fileName" class="mt-3 text-sm text-green-600 hidden">
+                        <i class="bi bi-check-circle"></i> <span id="fileNameText"></span>
+                    </div>
                 </div>
+
+                <div x-show="proofType === 'message'">
+                    <textarea name="proof_message" id="proof_message" rows="5"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400 text-sm"
+                        placeholder="Cole aqui a mensagem da operadora...">{{ old('proof_message', $contribution->proof_message) }}</textarea>
+                </div>
+
                 @error('proof_path')
+                    <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                @enderror
+                @error('proof_message')
                     <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
                 @enderror
             </div>

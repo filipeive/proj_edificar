@@ -15,6 +15,7 @@ class Contribution extends Model
         'supervision_id',
         'zone_id',
         'proof_path',
+        'proof_message',
         'contribution_date',
         'package_id',
         'notes',
