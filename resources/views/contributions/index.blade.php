@@ -86,6 +86,7 @@
                         <option value="pendente" {{ request('status') === 'pendente' ? 'selected' : '' }}>Pendente</option>
                         <option value="verificada" {{ request('status') === 'verificada' ? 'selected' : '' }}>Verificada</option>
                         <option value="rejeitada" {{ request('status') === 'rejeitada' ? 'selected' : '' }}>Rejeitada</option>
+                        <option value="cancelada" {{ request('status') === 'cancelada' ? 'selected' : '' }}>Cancelada</option>
                     </select>
                 </div>
 
@@ -165,9 +166,13 @@
                                             <span class="px-4 py-1 bg-yellow-50 text-yellow-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-yellow-100 flex items-center gap-2 animate-pulse">
                                                 <i class="bi bi-lightning-charge-fill"></i> Em Análise
                                             </span>
-                                        @else
+                                        @elseif($contribution->status === 'rejeitada')
                                             <span class="px-4 py-1 bg-red-50 text-red-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-red-100 flex items-center gap-2">
                                                 <i class="bi bi-x-square-fill"></i> Rejeitado
+                                            </span>
+                                        @else
+                                            <span class="px-4 py-1 bg-gray-50 text-gray-400 rounded-full text-[10px] font-black uppercase tracking-widest border border-gray-100 flex items-center gap-2">
+                                                <i class="bi bi-slash-circle-fill"></i> Cancelado
                                             </span>
                                         @endif
                                     </div>
@@ -209,6 +214,13 @@
                                                 </a>
                                             @endif
                                         @endif
+
+                                        @if(auth()->user()->isAdmin() && $contribution->status !== 'cancelada')
+                                            <button onclick="document.getElementById('cancel-form-{{ $contribution->id }}').classList.toggle('hidden')" 
+                                                class="action-icon bg-gray-100 text-gray-500 hover:bg-gray-800 hover:text-white" title="Cancelar Lançamento">
+                                                <i class="bi bi-slash-circle"></i>
+                                            </button>
+                                        @endif
                                     </div>
                                     @if(auth()->user()->isComissaoObra() || auth()->user()->isAdmin())
                                     <div id="reject-form-{{ $contribution->id }}" class="hidden mt-2 p-4 bg-gray-50 rounded-2xl border border-gray-100 text-left">
@@ -217,6 +229,15 @@
                                             <label class="text-[10px] font-black uppercase text-gray-400 block mb-2">Motivo da Rejeição</label>
                                             <textarea name="notes" required class="w-full p-3 rounded-xl border-gray-200 text-sm mb-2" placeholder="Descreva o motivo..."></textarea>
                                             <button type="submit" class="w-full py-2 bg-red-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest">Rejeitar Agora</button>
+                                        </form>
+                                    </div>
+
+                                    <div id="cancel-form-{{ $contribution->id }}" class="hidden mt-2 p-4 bg-gray-50 rounded-2xl border border-gray-100 text-left">
+                                        <form action="{{ route('contributions.cancel', $contribution) }}" method="POST">
+                                            @csrf
+                                            <label class="text-[10px] font-black uppercase text-gray-400 block mb-2">Motivo do Cancelamento (Histórico)</label>
+                                            <textarea name="notes" required class="w-full p-3 rounded-xl border-gray-200 text-sm mb-2" placeholder="Explique porque está cancelando este lançamento..."></textarea>
+                                            <button type="submit" class="w-full py-2 bg-gray-800 text-white rounded-xl font-black text-[10px] uppercase tracking-widest">Confirmar Cancelamento</button>
                                         </form>
                                     </div>
                                     @endif
@@ -251,8 +272,10 @@
                             <span class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-green-100">Validado</span>
                         @elseif($contribution->status === 'pendente')
                             <span class="px-3 py-1 bg-yellow-50 text-yellow-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-yellow-100 animate-pulse">Pendente</span>
-                        @else
+                        @elseif($contribution->status === 'rejeitada')
                             <span class="px-3 py-1 bg-red-50 text-red-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-red-100">Rejeitado</span>
+                        @else
+                            <span class="px-3 py-1 bg-gray-50 text-gray-400 rounded-full text-[9px] font-black uppercase tracking-widest border border-gray-100">Cancelado</span>
                         @endif
                     </div>
 

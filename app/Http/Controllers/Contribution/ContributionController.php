@@ -470,6 +470,29 @@ class ContributionController
 
         return back()->with('success', 'Contribuição rejeitada!');
     }
+
+    public function cancel(Request $request, Contribution $contribution)
+    {
+        $user = auth()->user();
+
+        if ($user->role !== 'admin') {
+            abort(403, 'Apenas o administrador pode cancelar contribuições.');
+        }
+
+        $validated = $request->validate([
+            'notes' => 'required|string|min:5',
+        ]);
+
+        $reason = "CANCELADA: " . $validated['notes'];
+
+        $contribution->update([
+            'status' => 'cancelada',
+            'verified_by' => auth()->id(),
+            'notes' => $reason,
+        ]);
+
+        return back()->with('success', 'Contribuição cancelada com sucesso!');
+    }
     public function downloadReceipt(Contribution $contribution)
     {
         $user = auth()->user();

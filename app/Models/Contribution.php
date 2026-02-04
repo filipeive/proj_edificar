@@ -84,6 +84,11 @@ class Contribution extends Model
         return $query->where('status', 'rejeitada');
     }
 
+    public function scopeCanceled($query)
+    {
+        return $query->where('status', 'cancelada');
+    }
+
     public function scopeThisMonth($query)
     {
         $now = now();
@@ -109,6 +114,11 @@ class Contribution extends Model
         return $this->status === 'rejeitada';
     }
 
+    public function isCanceled()
+    {
+        return $this->status === 'cancelada';
+    }
+
     public function canBeEdited()
     {
         return $this->status === 'pending';
@@ -120,6 +130,7 @@ class Contribution extends Model
             'pending' => 'Pendente',
             'verificada' => 'Verificada ✓',
             'rejeitada' => 'Rejeitada ✗',
+            'cancelada' => 'Cancelada Ø',
         ];
         return $labels[$this->status] ?? $this->status;
     }
@@ -130,6 +141,7 @@ class Contribution extends Model
             'pending' => 'yellow',
             'verificada' => 'green',
             'rejeitada' => 'red',
+            'cancelada' => 'gray',
         ];
         return $colors[$this->status] ?? 'gray';
     }

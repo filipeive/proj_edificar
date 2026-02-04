@@ -289,6 +289,8 @@ Route::middleware('auth')->group(function () {
             ->name('contributions.verify');
         Route::post('/{contribution}/reject', [ContributionController::class, 'reject'])
             ->name('contributions.reject');
+        Route::post('/{contribution}/cancel', [ContributionController::class, 'cancel'])
+            ->name('contributions.cancel');
         Route::get('/{contribution}/details', [ContributionController::class, 'adminShow'])
             ->name('admin.contributions.show');
     });
