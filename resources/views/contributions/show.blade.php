@@ -209,12 +209,19 @@
             <!-- Management & Notes -->
             <div class="space-y-8">
                 @if($contribution->notes)
-                    <div class="bg-gray-900 text-white rounded-[2.5rem] shadow-xl p-10 relative overflow-hidden">
+                    <div
+                        class="{{ $contribution->status === 'cancelada' ? 'bg-red-50 border border-red-100' : 'bg-gray-900 text-white shadow-xl' }} rounded-[2.5rem] p-10 relative overflow-hidden">
                         <div class="relative z-10 space-y-4">
-                            <p class="text-[10px] font-black text-blue-300 uppercase tracking-[0.2em]">Notas de Verificação</p>
-                            <p class="text-sm font-medium leading-relaxed italic text-gray-300">"{{ $contribution->notes }}"</p>
+                            <p
+                                class="text-[10px] font-black {{ $contribution->status === 'cancelada' ? 'text-red-400' : 'text-blue-300' }} uppercase tracking-[0.2em]">
+                                {{ $contribution->status === 'cancelada' ? 'Motivo do Cancelamento' : 'Notas de Verificação' }}
+                            </p>
+                            <p
+                                class="text-sm font-medium leading-relaxed {{ $contribution->status === 'cancelada' ? 'text-red-900' : 'text-gray-300' }} italic">
+                                "{{ $contribution->notes }}"</p>
                         </div>
-                        <i class="bi bi-quote absolute -right-4 -bottom-4 text-9xl text-white opacity-5"></i>
+                        <i
+                            class="bi bi-quote absolute -right-4 -bottom-4 text-9xl {{ $contribution->status === 'cancelada' ? 'text-red-600 opacity-5' : 'text-white opacity-5' }}"></i>
                     </div>
                 @endif
 
@@ -298,7 +305,8 @@
         class="fixed inset-0 bg-gray-900/90 backdrop-blur-sm hidden flex items-center justify-center z-[100] p-6">
         <div class="bg-white rounded-[3rem] shadow-2xl p-10 w-full max-w-xl border border-gray-100">
             <h3 class="text-2xl font-black text-gray-900 tracking-tighter mb-2">Cancelar Contribuição (Histórico)</h3>
-            <p class="text-sm text-gray-400 font-medium mb-8">Esta ação irá anular o valor financeiro do registro, mas manterá os dados salvos para auditoria futura.</p>
+            <p class="text-sm text-gray-400 font-medium mb-8">Esta ação irá anular o valor financeiro do registro, mas
+                manterá os dados salvos para auditoria futura.</p>
 
             <form action="{{ route('contributions.cancel', $contribution) }}" method="POST">
                 @csrf

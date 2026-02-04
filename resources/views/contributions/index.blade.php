@@ -266,7 +266,7 @@
             x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
             class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             @foreach($contributions as $contribution)
-                <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 relative compact-card">
+                <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 relative compact-card {{ $contribution->status === 'cancelada' ? 'opacity-60 grayscale bg-gray-50' : '' }}">
                     <div class="absolute top-6 right-6">
                         @if ($contribution->status === 'verificada')
                             <span class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-green-100">Validado</span>
