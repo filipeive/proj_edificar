@@ -168,7 +168,8 @@
                         <div class="p-10">
                             <div class="p-6 bg-blue-50 border border-blue-100 rounded-3xl">
                                 <p class="text-sm font-medium text-blue-900 leading-relaxed whitespace-pre-line">
-                                    {{ $contribution->proof_message }}</p>
+                                    {{ $contribution->proof_message }}
+                                </p>
                             </div>
                             <p class="text-[10px] text-gray-400 mt-4 uppercase font-bold tracking-widest text-center">Texto
                                 extraído da operadora</p>
@@ -186,6 +187,21 @@
                             <p class="text-sm font-medium leading-relaxed italic text-gray-300">"{{ $contribution->notes }}"</p>
                         </div>
                         <i class="bi bi-quote absolute -right-4 -bottom-4 text-9xl text-white opacity-5"></i>
+                    </div>
+                @endif
+
+                @if(auth()->user()->isAdmin() && $contribution->status !== 'cancelada')
+                    <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 space-y-6">
+                        <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Gestão de Histórico (Admin)
+                        </h3>
+                        <div class="space-y-3">
+                            <button onclick="document.getElementById('cancelModal').classList.remove('hidden')"
+                                class="w-full py-5 bg-gray-900 text-white rounded-2xl hover:bg-black transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-gray-100">
+                                <i class="bi bi-slash-circle mr-2"></i> Cancelar Lançamento
+                            </button>
+                            <p class="text-[9px] text-gray-400 text-center italic">Isso manterá o registro para conferência, mas
+                                removerá o valor dos totais.</p>
+                        </div>
                     </div>
                 @endif
 

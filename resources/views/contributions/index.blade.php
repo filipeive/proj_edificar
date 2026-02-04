@@ -323,6 +323,13 @@
                                 </a>
                             @endif
                         @endif
+
+                        @if(auth()->user()->isAdmin() && $contribution->status !== 'cancelada')
+                            <button onclick="document.getElementById('cancel-form-{{ $contribution->id }}').classList.toggle('hidden')" 
+                                class="w-10 h-10 bg-gray-100 text-gray-500 flex items-center justify-center rounded-xl hover:bg-gray-800 hover:text-white transition-all" title="Cancelar Lançamento">
+                                <i class="bi bi-slash-circle"></i>
+                            </button>
+                        @endif
                     </div>
                 </div>
             @endforeach
