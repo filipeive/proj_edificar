@@ -196,12 +196,10 @@ class PackageController
             'cell_id' => $validated['cell_id']
         ]);
 
-        // Update the active commitment for this user and package
+        // Update the commitment for this user and package
         $commitment = \App\Models\UserCommitment::where('user_id', $user->id)
             ->where('package_id', $package->id)
-            ->where(function ($q) {
-                $q->whereNull('end_date')->orWhere('end_date', '>', now());
-            })
+            ->orderBy('created_at', 'desc')
             ->first();
 
         if ($commitment) {
@@ -209,6 +207,8 @@ class PackageController
                 'committed_amount' => $validated['committed_amount'],
                 'cell_id' => $validated['cell_id']
             ]);
+        } else {
+            return back()->with('error', 'Compromisso não encontrado para este membro neste pacote.');
         }
 
         return back()->with('success', 'Dados do membro atualizados com sucesso!');
