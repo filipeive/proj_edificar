@@ -72,6 +72,14 @@ class CommitmentPackage extends Model
             ->where('status', 'verificada')
             ->sum('amount');
     }
+
+    public function getTotalConfirmedAmount()
+    {
+        return $this->contributions()
+            ->where('status', 'verificada')
+            ->sum('amount');
+    }
+
     public function userCommitments()
     {
         return $this->hasMany(UserCommitment::class, 'package_id');

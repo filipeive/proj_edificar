@@ -99,4 +99,20 @@ class UserCommitment extends Model
         $total = (float) $this->getTotalContributed();
         return min(100, round(($total / $committed) * 100));
     }
+
+    public function getTotalPending()
+    {
+        return Contribution::where('user_id', $this->user_id)
+            ->where('package_id', $this->package_id)
+            ->where('status', 'pendente')
+            ->sum('amount');
+    }
+
+    public function getTotalCanceled()
+    {
+        return Contribution::where('user_id', $this->user_id)
+            ->where('package_id', $this->package_id)
+            ->where('status', 'cancelada')
+            ->sum('amount');
+    }
 }

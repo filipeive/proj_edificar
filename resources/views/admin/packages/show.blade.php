@@ -73,7 +73,16 @@
         </div>
 
         <!-- Top Stats Bar (Horizontal) -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+            <!-- Global Confirmed Amount -->
+            <div class="bg-gradient-to-br from-green-500 to-green-600 p-5 rounded-2xl shadow-lg shadow-green-200 border border-green-400 flex flex-col justify-between text-white">
+                <span class="text-[10px] font-black text-green-100 uppercase tracking-widest">Valor Confirmado</span>
+                <div class="flex items-end justify-between mt-2">
+                    <span class="text-xl font-black">{{ number_format($package->getTotalConfirmedAmount(), 2, ',', '.') }}</span>
+                    <span class="text-[10px] font-bold text-green-100 mb-1">MT</span>
+                </div>
+            </div>
+
             <!-- Min Amount -->
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
                 <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Valor Mínimo</span>
@@ -244,6 +253,26 @@
                                                         Pendente
                                                     </span>
                                                 @endif
+                                                
+                                                <!-- Mini Breakdown -->
+                                                @php
+                                                    $pending = $commitment->getTotalPending();
+                                                    $canceled = $commitment->getTotalCanceled();
+                                                @endphp
+                                                @if($pending > 0 || $canceled > 0)
+                                                    <div class="flex flex-col gap-0.5 mt-1 items-center">
+                                                        @if($pending > 0)
+                                                            <span class="text-[8px] font-black text-yellow-600 bg-yellow-50 px-1.5 rounded" title="Pendente">
+                                                                P: {{ number_format($pending, 0, ',', '.') }}
+                                                            </span>
+                                                        @endif
+                                                        @if($canceled > 0)
+                                                            <span class="text-[8px] font-black text-red-500 bg-red-50 px-1.5 rounded line-through decoration-red-300" title="Cancelado">
+                                                                C: {{ number_format($canceled, 0, ',', '.') }}
+                                                            </span>
+                                                        @endif
+                                                    </div>
+                                                @endif
 
                                                 <!-- Mini Progress Bar -->
                                                 <div class="w-full max-w-[80px] h-1 bg-gray-100 rounded-full overflow-hidden mt-1">
@@ -363,8 +392,34 @@
                                         <span class="text-gray-400 font-bold uppercase">Célula</span>
                                         <span class="font-medium text-gray-600 truncate max-w-[100px]">{{ $commitment->user->cell->name ?? '-' }}</span>
                                     </div>
-                                    @php $progress = $commitment->getProgressPercentage(); @endphp
-                                    <div class="pt-2">
+                                    @php
+                                        $progress = $commitment->getProgressPercentage();
+                                        $pending = $commitment->getTotalPending();
+                                        $canceled = $commitment->getTotalCanceled();
+                                        $confirmed = $commitment->getTotalContributed();
+                                    @endphp
+                                    
+                                    <!-- Detailed Stats -->
+                                    <div class="grid grid-cols-2 gap-y-1 gap-x-2 my-3 pt-2 border-t border-gray-50">
+                                        <div class="flex flex-col">
+                                            <span class="text-[8px] font-black uppercase text-gray-400">Validado</span>
+                                            <span class="text-[10px] font-black text-green-600">{{ number_format($confirmed, 2, ',', '.') }}</span>
+                                        </div>
+                                        @if($pending > 0)
+                                        <div class="flex flex-col">
+                                            <span class="text-[8px] font-black uppercase text-gray-400">Pendente</span>
+                                            <span class="text-[10px] font-black text-yellow-600">{{ number_format($pending, 2, ',', '.') }}</span>
+                                        </div>
+                                        @endif
+                                        @if($canceled > 0)
+                                        <div class="flex flex-col">
+                                            <span class="text-[8px] font-black uppercase text-gray-400">Cancelado</span>
+                                            <span class="text-[10px] font-black text-red-500 line-through decoration-red-300">{{ number_format($canceled, 2, ',', '.') }}</span>
+                                        </div>
+                                        @endif
+                                    </div>
+
+                                    <div class="pt-1">
                                         <div class="flex justify-between items-center text-[9px] mb-1">
                                             <span class="text-gray-400 font-bold uppercase text-[8px]">Progresso</span>
                                             <span class="font-black text-blue-600">{{ $progress }}%</span>
