@@ -29,10 +29,7 @@
                         Gestão/Edificar</small></p>
             </div>
         </div>
-        <button onclick="toggleSidebar()"
-            class="hidden md:flex text-gray-400 hover:text-white transition-all p-2 hover:bg-white/5 rounded-xl border border-transparent hover:border-white/10">
-            <i id="sidebarIcon" class="bi bi-layout-sidebar-inset-reverse text-2xl"></i>
-        </button>
+    </div>
     </div>
 
     <!-- Navigation -->

@@ -721,9 +721,30 @@
     <div id="mobileOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden mobile-overlay md:hidden"
         onclick="toggleMobileSidebar()"></div>
 
-    <div class="flex h-screen bg-gray-100">
-        <!-- Sidebar -->
-        @include('layouts.sidebar')
+    <div class="flex h-screen bg-gray-100"
+        x-data="{ sidebarOpen: localStorage.getItem('sidebarOpen') !== 'false', mobileSidebarOpen: false }"
+        x-init="$watch('sidebarOpen', value => localStorage.setItem('sidebarOpen', value));">
+
+        <!-- Sidebar Wrapper -->
+        <div :class="sidebarOpen ? 'w-[280px]' : 'w-0'"
+            class="hidden md:block transition-all duration-300 ease-in-out h-full overflow-hidden flex-shrink-0 relative">
+            <div class="w-[280px] h-full absolute top-0 left-0">
+                @include('layouts.sidebar')
+            </div>
+        </div>
+
+        <!-- Mobile Sidebar -->
+        <div class="md:hidden fixed inset-0 z-50 flex" x-show="mobileSidebarOpen" x-cloak>
+            <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="mobileSidebarOpen = false"
+                x-transition.opacity></div>
+            <div class="relative w-[280px] h-full" x-show="mobileSidebarOpen"
+                x-transition:enter="transition ease-out duration-300 transform"
+                x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0"
+                x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="translate-x-0"
+                x-transition:leave-end="-translate-x-full">
+                @include('layouts.sidebar')
+            </div>
+        </div>
 
         <!-- Main Content -->
         <div id="mainContent" class="flex-1 flex flex-col overflow-hidden">
@@ -732,8 +753,14 @@
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-4 flex-1">
                         <!-- Mobile Menu Button -->
-                        <button onclick="toggleMobileSidebar()"
+                        <button @click="mobileSidebarOpen = true"
                             class="md:hidden text-gray-600 hover:text-gray-800 p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                            <i class="bi bi-list text-2xl"></i>
+                        </button>
+
+                        <!-- Desktop Sidebar Toggle -->
+                        <button @click="sidebarOpen = !sidebarOpen"
+                            class="hidden md:flex text-gray-600 hover:text-gray-800 p-2 hover:bg-gray-100 rounded-lg transition-colors mr-2">
                             <i class="bi bi-list text-2xl"></i>
                         </button>
 
