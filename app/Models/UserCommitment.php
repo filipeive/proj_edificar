@@ -89,4 +89,14 @@ class UserCommitment extends Model
 
         return max(0, $total - $committed);
     }
+
+    public function getProgressPercentage()
+    {
+        $committed = (float) $this->committed_amount;
+        if ($committed <= 0)
+            return 0;
+
+        $total = (float) $this->getTotalContributed();
+        return min(100, round(($total / $committed) * 100));
+    }
 }

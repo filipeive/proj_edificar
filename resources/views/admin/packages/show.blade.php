@@ -217,34 +217,40 @@
                                             @php
                                                 $status = $commitment->getCampaignStatus();
                                                 $totalContributed = $commitment->getTotalContributed();
+                                                $progress = $commitment->getProgressPercentage();
                                             @endphp
-                                            @if($status === 'surplus')
-                                                <div class="flex flex-col items-center">
+                                            
+                                            <div class="flex flex-col items-center gap-2">
+                                                @if($status === 'surplus')
                                                     <span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide bg-blue-100 text-blue-700">
                                                         Pago com Acréscimo
                                                     </span>
-                                                    <span class="text-[9px] text-blue-500 font-bold mt-1">
+                                                    <span class="text-[9px] text-blue-500 font-bold">
                                                         + {{ number_format($commitment->getSurplusAmount(), 2, ',', '.') }} MT
                                                     </span>
-                                                </div>
-                                            @elseif($status === 'paid')
-                                                <span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide bg-green-100 text-green-700">
-                                                    Pago ✓
-                                                </span>
-                                            @elseif($status === 'partial')
-                                                <div class="flex flex-col items-center">
+                                                @elseif($status === 'paid')
+                                                    <span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide bg-green-100 text-green-700">
+                                                        Pago ✓
+                                                    </span>
+                                                @elseif($status === 'partial')
                                                     <span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide bg-yellow-100 text-yellow-700">
                                                         Parcial
                                                     </span>
-                                                    <span class="text-[9px] text-yellow-600 font-bold mt-1">
+                                                    <span class="text-[9px] text-yellow-600 font-bold">
                                                         {{ number_format($totalContributed, 2, ',', '.') }} MT
                                                     </span>
+                                                @else
+                                                    <span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide bg-gray-100 text-gray-400">
+                                                        Pendente
+                                                    </span>
+                                                @endif
+
+                                                <!-- Mini Progress Bar -->
+                                                <div class="w-full max-w-[80px] h-1 bg-gray-100 rounded-full overflow-hidden mt-1">
+                                                    <div class="h-full bg-blue-500 transition-all duration-500" style="width: {{ $progress }}%"></div>
                                                 </div>
-                                            @else
-                                                <span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide bg-gray-100 text-gray-400">
-                                                    Pendente
-                                                </span>
-                                            @endif
+                                                <span class="text-[9px] font-bold text-gray-400">{{ $progress }}%</span>
+                                            </div>
                                         </td>
                                         <td class="px-6 py-4">
                                             <div class="flex items-center justify-end gap-1">
@@ -279,6 +285,16 @@
                                                                 <i class="bi bi-chat-dots-fill"></i>
                                                             </button>
                                                         @endif
+
+                                                        <a href="{{ route('contributions.create') }}?user_id={{ $commitment->user_id }}&package_id={{ $package->id }}" 
+                                                           class="p-2 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors" title="Adicionar Pagamento">
+                                                            <i class="bi bi-plus-circle-fill"></i>
+                                                        </a>
+
+                                                        <a href="{{ route('users.show', $commitment->user_id) }}" 
+                                                           class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors" title="Ver Perfil">
+                                                            <i class="bi bi-person-fill"></i>
+                                                        </a>
 
                                                         <form action="{{ route('packages.members.remove', [$package, $commitment->user_id]) }}" method="POST"
                                                             onsubmit="return confirm('Remover membro?');" class="inline">
@@ -347,6 +363,16 @@
                                         <span class="text-gray-400 font-bold uppercase">Célula</span>
                                         <span class="font-medium text-gray-600 truncate max-w-[100px]">{{ $commitment->user->cell->name ?? '-' }}</span>
                                     </div>
+                                    @php $progress = $commitment->getProgressPercentage(); @endphp
+                                    <div class="pt-2">
+                                        <div class="flex justify-between items-center text-[9px] mb-1">
+                                            <span class="text-gray-400 font-bold uppercase text-[8px]">Progresso</span>
+                                            <span class="font-black text-blue-600">{{ $progress }}%</span>
+                                        </div>
+                                        <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                            <div class="h-full bg-blue-500 rounded-full transition-all duration-500" style="width: {{ $progress }}%"></div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="grid grid-cols-2 gap-2 mb-2">
@@ -387,6 +413,10 @@
                                             SMS
                                         </button>
                                     @endif
+                                    <div class="w-px h-3 bg-gray-200"></div>
+                                    <a href="{{ route('users.show', $commitment->user_id) }}" class="text-gray-400 hover:text-gray-600 text-[10px] font-bold uppercase" title="Perfil">
+                                        Perfil
+                                    </a>
                                 </div>
                             </div>
                         @empty
@@ -489,6 +519,15 @@
                         <h3 class="font-bold text-gray-900">Editar Membro</h3>
                         <button @click="show = false" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button>
                     </div>
+                    @if($errors->any())
+                        <div class="p-4 bg-red-50 text-red-600 text-xs font-bold border-b border-red-100">
+                            <ul>
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
                     <form action="{{ route('packages.update-member', $package) }}" method="POST" class="p-6 space-y-4">
                         @csrf
                         <input type="hidden" name="user_id" :value="userId">
