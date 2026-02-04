@@ -33,7 +33,7 @@ class SetupController extends Controller
             'church_name' => 'required|string|max:255',
             'church_description' => 'nullable|string',
             'church_email' => 'required|email',
-            'church_phone' => 'nullable|regex:/^(\\+?258)?\\d{9}$/',
+            'church_phone' => 'nullable|moz_phone',
             'church_address' => 'nullable|string',
         ]);
 

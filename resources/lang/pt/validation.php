@@ -11,6 +11,7 @@ return [
     'exists' => 'O :attribute selecionado é inválido.',
     'unique' => 'Este :attribute já está em uso.',
     'confirmed' => 'A confirmação de :attribute não confere.',
+    'moz_phone' => 'O contacto deve ter 9 dígitos.',
     'min' => [
         'string' => 'O campo :attribute deve ter no mínimo :min caracteres.',
         'numeric' => 'O campo :attribute deve ser no mínimo :min.',
@@ -25,5 +26,7 @@ return [
         'email' => 'e-mail',
         'password' => 'senha',
         'name' => 'nome',
+        'phone' => 'contacto',
+        'church_phone' => 'contacto',
     ],
 ];

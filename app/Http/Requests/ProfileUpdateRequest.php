@@ -25,7 +25,7 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
-            'phone' => ['nullable', 'regex:/^(\\+?258)?\\d{9}$/'],
+            'phone' => ['nullable', 'moz_phone'],
             'notification_preferences' => ['nullable', 'array'],
             'notification_preferences.*' => ['boolean'],
         ];

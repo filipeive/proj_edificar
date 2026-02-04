@@ -183,7 +183,7 @@ class PackageController
 
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
-            'phone' => 'nullable|regex:/^(\\+?258)?\\d{9}$/',
+            'phone' => 'nullable|moz_phone',
             'cell_id' => 'nullable|exists:cells,id',
             'committed_amount' => 'required|numeric|min:0',
         ]);
@@ -350,7 +350,7 @@ class PackageController
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'phone' => 'nullable|regex:/^(\\+?258)?\\d{9}$/',
+            'phone' => 'nullable|moz_phone',
             'cell_id' => 'required|exists:cells,id',
             'committed_amount' => 'nullable|numeric|min:0',
         ]);

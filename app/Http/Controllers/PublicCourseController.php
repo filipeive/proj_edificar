@@ -27,7 +27,7 @@ class PublicCourseController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
-            'phone' => 'required|regex:/^(\\+?258)?\\d{9}$/',
+            'phone' => 'required|moz_phone',
             'observations' => 'nullable|string',
         ]);
 
