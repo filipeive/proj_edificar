@@ -180,7 +180,7 @@
                                     {{ substr($cell->name, 0, 1) }}
                                 </div>
                                 <div>
-                                    <h3 class="text-xl font-black text-gray-900 leading-tight mb-1">{{ $cell->display_name }}</h3>
+                                    <h3 class="text-xl font-black text-gray-900 leading-tight mb-1">{{ $cell->name }}</h3>
                                     <div
                                         class="flex items-center text-[10px] font-black text-gray-400 uppercase tracking-widest gap-2">
                                         <span
@@ -293,7 +293,7 @@
                                             class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm font-black">
                                             {{ substr($cell->name, 0, 1) }}
                                         </div>
-                                        <p class="font-black text-gray-900 uppercase tracking-tight">{{ $cell->display_name }}</p>
+                                        <p class="font-black text-gray-900 uppercase tracking-tight">{{ $cell->name }}</p>
                                     </div>
                                 </td>
                                 <td class="px-6 py-7">
