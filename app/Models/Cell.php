@@ -92,4 +92,9 @@ class Cell extends Model
             ->count();
     }
 
+    public function getDisplayNameAttribute()
+    {
+        $zoneName = $this->supervision->zone->name ?? 'Sem Zona';
+        return $this->name . ' - ' . $zoneName;
+    }
 }

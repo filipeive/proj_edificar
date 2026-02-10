@@ -184,7 +184,7 @@
                                             <option value="">Sem célula associada</option>
                                             @foreach($cells as $cell)
                                                 <option value="{{ $cell->id }}" {{ old('cell_id', $user->cell_id) == $cell->id ? 'selected' : '' }}>
-                                                    {{ $cell->name }}
+                                                    {{ $cell->display_name }}
                                                 </option>
                                             @endforeach
                                         </select>

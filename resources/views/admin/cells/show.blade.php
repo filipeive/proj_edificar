@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', "Célula $cell->name - Portal Life Church")
-@section('page-title', $cell->name)
+@section('title', "Célula $cell->display_name - Portal Life Church")
+@section('page-title', $cell->display_name)
 @section('page-subtitle', 'Gestão da célula e membros')
 
 @section('header-actions')
@@ -396,7 +396,7 @@
                         <select name="cell_id" required class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all appearance-none custom-select">
                             <option value="">Escolha uma célula...</option>
                             @foreach($availableCells as $availCell)
-                                <option value="{{ $availCell->id }}">{{ $availCell->name }} ({{ $availCell->supervision->name }})</option>
+                                <option value="{{ $availCell->id }}">{{ $availCell->display_name }}</option>
                             @endforeach
                         </select>
                     </div>

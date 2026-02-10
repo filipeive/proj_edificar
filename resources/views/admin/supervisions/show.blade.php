@@ -219,7 +219,7 @@
                         <select name="supervision_id" required class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all custom-select">
                             <option value="">Escolha uma supervisão...</option>
                             @foreach($availableSupervisions as $availSup)
-                                <option value="{{ $availSup->id }}">{{ $availSup->name }} ({{ $availSup->zone->name }})</option>
+                                <option value="{{ $availSup->id }}">{{ $availSup->display_name }}</option>
                             @endforeach
                         </select>
                     </div>

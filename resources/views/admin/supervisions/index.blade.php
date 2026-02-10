@@ -15,25 +15,25 @@
 
 @section('content')
     <div class="space-y-8" x-data="{ 
-                    view: window.innerWidth < 768 ? 'grid' : (localStorage.getItem('supervisions_view') || 'grid'),
-                    selected: [],
-                    updateView() {
-                        if (window.innerWidth < 768 && this.view === 'list') {
-                            this.view = 'grid';
-                        }
-                    },
-                    toggleAll() {
-                        const allIds = {{ Js::from($supervisions->pluck('id')) }};
-                        if (this.selected.length === allIds.length) {
-                            this.selected = [];
-                        } else {
-                            this.selected = allIds;
-                        }
-                    },
-                    deleteSelected() {
-                        document.getElementById('bulk-delete-form').submit();
-                    }
-                }" x-init="$watch('view', value => localStorage.setItem('supervisions_view', value))"
+                            view: window.innerWidth < 768 ? 'grid' : (localStorage.getItem('supervisions_view') || 'grid'),
+                            selected: [],
+                            updateView() {
+                                if (window.innerWidth < 768 && this.view === 'list') {
+                                    this.view = 'grid';
+                                }
+                            },
+                            toggleAll() {
+                                const allIds = {{ Js::from($supervisions->pluck('id')) }};
+                                if (this.selected.length === allIds.length) {
+                                    this.selected = [];
+                                } else {
+                                    this.selected = allIds;
+                                }
+                            },
+                            deleteSelected() {
+                                document.getElementById('bulk-delete-form').submit();
+                            }
+                        }" x-init="$watch('view', value => localStorage.setItem('supervisions_view', value))"
         @resize.window.debounce.500ms="updateView()">
 
         <!-- Bulk Action Bar -->

@@ -620,7 +620,7 @@
                             <select name="cell_id" x-model="cellId" class="w-full mt-1 bg-gray-50 border-none rounded-xl text-sm font-bold text-gray-900 custom-select">
                                 <option value="">Sem Célula</option>
                                 @foreach(\App\Models\Cell::orderBy('name')->get() as $cell)
-                                    <option value="{{ $cell->id }}">{{ $cell->name }}</option>
+                                    <option value="{{ $cell->id }}">{{ $cell->display_name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -659,7 +659,7 @@
                             <select name="cell_id" required class="w-full mt-1 bg-gray-50 border-none rounded-xl text-sm font-bold text-gray-900 custom-select">
                                 <option value="">Selecionar...</option>
                                 @foreach($availableCells as $cell)
-                                    <option value="{{ $cell->id }}">{{ $cell->name }}</option>
+                                    <option value="{{ $cell->id }}">{{ $cell->display_name }}</option>
                                 @endforeach
                             </select>
                         </div>

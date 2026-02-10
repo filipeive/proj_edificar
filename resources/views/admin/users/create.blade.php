@@ -106,7 +106,7 @@
                                         <option value="">Sem célula</option>
                                         @foreach($cells as $cell)
                                             <option value="{{ $cell->id }}" {{ old('cell_id') == $cell->id ? 'selected' : '' }}>
-                                                {{ $cell->name }}
+                                                {{ $cell->display_name }}
                                             </option>
                                         @endforeach
                                     </select>

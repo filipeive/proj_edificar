@@ -66,4 +66,9 @@ class Supervision extends Model
             ->where('status', 'verificada')
             ->sum('amount');
     }
+
+    public function getDisplayNameAttribute()
+    {
+        return $this->name . ' - ' . ($this->zone->name ?? 'Sem Zona');
+    }
 }
