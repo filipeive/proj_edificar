@@ -345,7 +345,8 @@
                         <img src="{{ $logoPrimary }}" alt="{{ $churchName }}" class="h-8 w-auto">
                     </div>
                     <div class="flex flex-col">
-                        <span class="text-xl font-black tracking-tighter text-gray-900 uppercase leading-none">{{ $churchName }}</span>
+                        <span
+                            class="text-xl font-black tracking-tighter text-gray-900 uppercase leading-none">{{ $churchName }}</span>
                         <span class="text-[9px] text-orange-600 font-black uppercase tracking-[0.3em]">Portal de
                             Gestão</span>
                     </div>
@@ -619,8 +620,8 @@
                                         <p class="text-white font-black text-lg">Equipar</p>
                                     </div>
                                 </div>
-                                @if($activeCourses->count())
-                                    <a href="{{ route('public.courses.register', $activeCourses->first()->slug) }}"
+                                @if($activeCourses->count() || Route::has('public.forms.pre-marital'))
+                                    <a href="{{ route('public.forms.pre-marital') }}"
                                         class="mt-4 inline-flex items-center justify-center w-full bg-green-600 text-white py-3 rounded-2xl text-[10px] uppercase tracking-widest font-black hover:bg-green-700 transition">
                                         Inscrever-se
                                     </a>

@@ -18,7 +18,7 @@
         .auth-bg {
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #020617 100%);
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
         .auth-bg::before {
