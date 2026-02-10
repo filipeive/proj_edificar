@@ -140,6 +140,7 @@ class UserController
             'role' => 'required|in:membro,lider_celula,supervisor,pastor_zona,secretaria,admin,comissao_obra,responsavel_pacote,tesouraria,pastor,pastor_senior',
             'cell_id' => 'nullable|exists:cells,id',
             'is_active' => 'boolean',
+            'menu_permissions' => 'nullable|array',
         ]);
 
         $oldRole = $user->role;

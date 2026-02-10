@@ -39,13 +39,20 @@
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-2">
             <div class="flex flex-wrap gap-2">
                 @foreach($groups as $groupName)
-                    <button @click="activeTab = '{{ $groupName }}'"
-                        :class="activeTab === '{{ $groupName }}' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'"
-                        class="px-6 py-3 rounded-xl font-bold text-sm transition-all">
-                        {{ ucfirst($groupName) }}
+                    <button @click="activeTab = '{{ $groupName }}'" type="button"
+                        :class="activeTab === '{{ $groupName }}' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-gray-600 hover:bg-gray-100'"
+                        class="px-6 py-3 rounded-xl font-bold text-sm transition-all duration-300">
+                        {{ ucfirst($groupName === 'branding' ? 'Marca e Design' : ($groupName === 'permissions' ? 'Acessos & Permissões' : $groupName)) }}
                     </button>
                 @endforeach
-                <button @click="activeTab = 'backup'"
+                @if(!$groups->contains('permissions'))
+                    <button @click="activeTab = 'permissions'" type="button"
+                        :class="activeTab === 'permissions' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-gray-600 hover:bg-gray-100'"
+                        class="px-6 py-3 rounded-xl font-bold text-sm transition-all duration-300">
+                        Acessos & Permissões
+                    </button>
+                @endif
+                <button @click="activeTab = 'backup'" type="button"
                     :class="activeTab === 'backup' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'"
                     class="px-6 py-3 rounded-xl font-bold text-sm transition-all">
                     Backup
@@ -110,7 +117,7 @@
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-2">Logo Principal</label>
                             <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center">
-                                <img src="{{ $settings['branding.logo_primary']['value'] ?? '/images/logo-white-orange.png' }}"
+                                <img src="{{ isset($settings['branding.logo_primary']['value']) ? asset($settings['branding.logo_primary']['value']) : asset('images/logo-white-orange.png') }}"
                                     alt="Logo Principal" class="h-16 mx-auto mb-2">
                                 <button type="button" onclick="document.getElementById('logo-primary').click()"
                                     class="text-sm text-blue-600 font-bold">Alterar</button>
@@ -121,7 +128,7 @@
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-2">Logo Secundário</label>
                             <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center">
-                                <img src="{{ $settings['branding.logo_secondary']['value'] ?? '/images/logo.png' }}"
+                                <img src="{{ isset($settings['branding.logo_secondary']['value']) ? asset($settings['branding.logo_secondary']['value']) : asset('images/logo.png') }}"
                                     alt="Logo Secundário" class="h-16 mx-auto mb-2">
                                 <button type="button" onclick="document.getElementById('logo-secondary').click()"
                                     class="text-sm text-blue-600 font-bold">Alterar</button>
@@ -132,7 +139,7 @@
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-2">Favicon</label>
                             <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center">
-                                <img src="{{ $settings['branding.favicon']['value'] ?? '/favicon.png' }}"
+                                <img src="{{ isset($settings['branding.favicon']['value']) ? asset($settings['branding.favicon']['value']) : asset('favicon.png') }}"
                                     alt="Favicon" class="h-16 mx-auto mb-2">
                                 <button type="button" onclick="document.getElementById('logo-favicon').click()"
                                     class="text-sm text-blue-600 font-bold">Alterar</button>
@@ -280,6 +287,118 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Permissions Settings -->
+            <div x-show="activeTab === 'permissions'" x-transition x-data="{ activeRole: 'membro' }">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                    <div>
+                        <h3 class="text-2xl font-black text-gray-900">Acessos & Permissões</h3>
+                        <p class="text-sm text-gray-500">Gerencie a visibilidade padrão do menu para cada papel do sistema.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <label class="text-sm font-bold text-gray-700">Editar Papel:</label>
+                        <select x-model="activeRole" class="px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-blue-500 outline-none font-bold text-sm bg-gray-50">
+                            <option value="membro">Membro</option>
+                            <option value="lider_celula">Líder de Célula</option>
+                            <option value="supervisor">Supervisor</option>
+                            <option value="pastor_zona">Pastor de Zona</option>
+                            <option value="secretaria">Secretária</option>
+                            <option value="comissao_obra">Comissão de Obra</option>
+                            <option value="responsavel_pacote">Responsável de Pacote</option>
+                            <option value="tesouraria">Tesouraria</option>
+                            <option value="pastor">Pastor</option>
+                            <option value="pastor_senior">Pastor Senior</option>
+                        </select>
+                    </div>
+                </div>
+
+                @php
+                    $permissionCategories = [
+                        'Dashboards' => [
+                            'dashboard_edificar' => ['label' => 'Painel Edificar', 'icon' => 'bi-graph-up-arrow'],
+                            'dashboard_packages' => ['label' => 'Painel do Pacote', 'icon' => 'bi-speedometer2'],
+                        ],
+                        'Operação Eclesiástica' => [
+                            'menu_services' => ['label' => 'Cultos', 'icon' => 'bi-journal-bookmark-fill'],
+                            'menu_events' => ['label' => 'Eventos', 'icon' => 'bi-calendar-check-fill'],
+                            'menu_weddings' => ['label' => 'Casamentos', 'icon' => 'bi-heart-fill'],
+                            'menu_visitors' => ['label' => 'Visitantes', 'icon' => 'bi-person-plus-fill'],
+                            'menu_courses' => ['label' => 'Escola Ministerial', 'icon' => 'bi-mortarboard-fill'],
+                            'menu_quarterly_reports' => ['label' => 'Relatórios Trimestrais', 'icon' => 'bi-file-earmark-bar-graph-fill'],
+                            'menu_inventory' => ['label' => 'Inventário', 'icon' => 'bi-box-seam-fill'],
+                        ],
+                        'Células & Discipulado' => [
+                            'menu_cell_meetings' => ['label' => 'Encontros de Célula', 'icon' => 'bi-people-fill'],
+                            'menu_members' => ['label' => 'Gestão de Membros', 'icon' => 'bi-person-lines-fill'],
+                            'menu_zones' => ['label' => 'Zonas', 'icon' => 'bi-geo-fill'],
+                            'menu_supervisions' => ['label' => 'Supervisões', 'icon' => 'bi-diagram-2-fill'],
+                            'menu_cells' => ['label' => 'Células', 'icon' => 'bi-diagram-3-fill'],
+                        ],
+                        'Financeira & Edificar' => [
+                            'menu_packages' => ['label' => 'Gestão de Pacotes', 'icon' => 'bi-box-seam-fill'],
+                            'menu_contributions_all' => ['label' => 'Ver Todas Contribuições', 'icon' => 'bi-cash-stack'],
+                            'menu_finance' => ['label' => 'Módulo Financeiro', 'icon' => 'bi-pie-chart-fill'],
+                        ],
+                        'Sistema' => [
+                            'menu_stats' => ['label' => 'Estatísticas Globais', 'icon' => 'bi-bar-chart-line-fill'],
+                            'menu_users' => ['label' => 'Gestão de Utilizadores', 'icon' => 'bi-person-lock'],
+                            'menu_settings' => ['label' => 'Configurações do Sistema', 'icon' => 'bi-gear-fill'],
+                        ],
+                    ];
+
+                    $roles = ['membro', 'lider_celula', 'supervisor', 'pastor_zona', 'secretaria', 'comissao_obra', 'responsavel_pacote', 'tesouraria', 'pastor', 'pastor_senior'];
+                @endphp
+
+                <div class="space-y-8">
+                    @foreach($roles as $roleKey)
+                        <div x-show="activeRole === '{{ $roleKey }}'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6">
+                            @foreach($permissionCategories as $category => $items)
+                                <div class="bg-gray-50 border border-gray-100 rounded-3xl overflow-hidden">
+                                    <div class="px-6 py-4 bg-white border-b border-gray-100">
+                                        <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest">{{ $category }}</h4>
+                                    </div>
+                                    <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        @foreach($items as $key => $data)
+                                            <div class="flex items-center justify-between p-4 bg-white rounded-2xl border border-gray-100 shadow-sm hover:border-blue-200 transition-colors group">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                                        <i class="bi {{ $data['icon'] }} text-lg"></i>
+                                                    </div>
+                                                    <span class="text-sm font-bold text-gray-700">{{ $data['label'] }}</span>
+                                                </div>
+                                                <label class="relative inline-flex items-center cursor-pointer">
+                                                    @php
+                                                        $settingKey = "permissions.role_{$roleKey}";
+                                                        $rolePerms = $settings[$settingKey]['value'] ?? [];
+                                                        if(is_string($rolePerms)) $rolePerms = json_decode($rolePerms, true) ?? [];
+                                                        $isChecked = $rolePerms[$key] ?? false;
+                                                        
+                                                        // Fallback logic for initial visual state if no setting exists
+                                                        if (!isset($settings[$settingKey])) {
+                                                            // Simple default logic to WOW the user with pre-filled state
+                                                            $isChecked = match($roleKey) {
+                                                                'pastor_senior' => true,
+                                                                'pastor' => !in_array($key, ['menu_users', 'menu_settings']),
+                                                                'secretaria' => in_array($key, ['menu_services', 'menu_weddings', 'menu_visitors', 'menu_members', 'menu_inventory']),
+                                                                'lider_celula' => in_array($key, ['menu_cell_meetings', 'menu_members', 'menu_contributions_all']),
+                                                                default => false
+                                                            };
+                                                        }
+                                                    @endphp
+                                                    <input type="hidden" name="settings[{{ $settingKey }}][{{ $key }}]" value="0">
+                                                    <input type="checkbox" name="settings[{{ $settingKey }}][{{ $key }}]" value="1" 
+                                                        class="sr-only peer" {{ $isChecked ? 'checked' : '' }}>
+                                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endforeach
                 </div>
             </div>
 

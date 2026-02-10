@@ -86,11 +86,11 @@ class SettingController extends Controller
         $updatedCount = 0;
         foreach ($settings as $key => $value) {
             $existing = Setting::where('key', $key)->first();
+            $type = $existing->type ?? (is_array($value) ? 'json' : 'string');
+            $group = $existing->group ?? (str_starts_with($key, 'permissions.') ? 'permissions' : 'general');
 
-            if ($existing) {
-                Setting::set($key, $value, $existing->type, $existing->group);
-                $updatedCount++;
-            }
+            Setting::set($key, $value, $type, $group);
+            $updatedCount++;
         }
 
         // Note: maintenance_mode setting is saved but does NOT run artisan down/up
@@ -115,7 +115,7 @@ class SettingController extends Controller
 
         $file = $request->file('logo');
         $filename = 'logo_' . $request->type . '_' . time() . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs('public/branding', $filename);
+        $path = $file->storeAs('branding', $filename, 'public');
 
         $publicPath = '/storage/branding/' . $filename;
 

@@ -6,20 +6,17 @@
 
 @section('header-actions')
     <div class="flex items-center gap-2 md:hidden">
-        <button onclick="toggleEmailModal()"
-            class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+        <button onclick="toggleEmailModal()" class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
             title="Partilhar email">
             <i class="bi bi-envelope"></i>
         </button>
         <a href="{{ route('events.pdf', $event) }}"
-            class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50"
-            title="Exportar PDF">
+            class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50" title="Exportar PDF">
             <i class="bi bi-file-earmark-pdf"></i>
         </a>
         @can('update', $event)
             <a href="{{ route('events.edit', $event) }}"
-                class="action-icon text-gray-600 hover:text-yellow-600 hover:bg-yellow-50"
-                title="Editar">
+                class="action-icon text-gray-600 hover:text-yellow-600 hover:bg-yellow-50" title="Editar">
                 <i class="bi bi-pencil-square"></i>
             </a>
         @endcan
@@ -63,7 +60,13 @@
                         <p class="text-orange-200 text-sm font-bold uppercase tracking-widest mb-2">
                             {{ $event->eventType->name }}
                         </p>
-                        <h3 class="text-4xl font-black mb-4">{{ $event->name ?? $event->eventType->name }}</h3>
+                        <h3 class="text-4xl font-black mb-4 flex items-center gap-4">
+                            {{ $event->name ?? $event->eventType->name }}
+                            @if($event->isPassed())
+                                <span
+                                    class="px-3 py-1 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl text-xs font-black uppercase tracking-widest">Realizado</span>
+                            @endif
+                        </h3>
                         <div class="flex flex-wrap gap-6 text-sm">
                             <span class="flex items-center"><i class="bi bi-calendar3 mr-2"></i>
                                 {{ $event->date->format('d/m/Y') }}

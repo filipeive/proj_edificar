@@ -40,4 +40,13 @@ class Event extends Model
     {
         return $this->belongsTo(Cell::class);
     }
+
+    /**
+     * Check if the event has already passed.
+     */
+    public function isPassed(): bool
+    {
+        $targetDate = $this->end_date ?? $this->date;
+        return $targetDate->isPast() && !$targetDate->isToday();
+    }
 }

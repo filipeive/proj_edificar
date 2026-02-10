@@ -12,7 +12,8 @@
         }
         $pendingContributionsCount = $pendingQuery->count();
     }
-    $logoPrimary = \App\Models\Setting::get('branding.logo_primary', asset('images/logo.png'));
+    $logoPrimary = \App\Models\Setting::get('branding.logo_primary');
+    $logoPrimary = $logoPrimary ? asset($logoPrimary) : asset('images/logo.png');
     $showInventoryOperacao = $authUser && ($authUser->isAdmin() || $authUser->isSecretaria());
     $showInventoryFinanceira = $authUser && ($authUser->isAdmin() || $authUser->isEdificarManager() || $authUser->isResponsavelPacote() || $authUser->isComissaoObra() || $authUser->isTesouraria() || $authUser->isPastor());
 @endphp
@@ -23,7 +24,7 @@
         class="px-6 py-8 border-b border-white/5 flex items-center justify-between bg-black/50 backdrop-blur-xl sticky top-0 z-20">
         <div class="flex items-center space-x-3 overflow-hidden">
             <div class="flex-shrink-0 p-2 bg-orange-600 rounded-xl shadow-lg shadow-orange-600/20">
-                <img src="{{ $logoPrimary }}" alt="Logo" class="h-8 w-auto brightness-0 invert">
+                <img src="{{ $logoPrimary }}" alt="Logo" class="h-8 w-auto">
             </div>
             <div class="sidebar-text">
                 <h1 class="text-lg font-black tracking-tighter text-white uppercase leading-none">Life - APP</h1>
@@ -44,7 +45,7 @@
                 <span class="tooltip">Dashboard Geral</span>
             </a>
 
-            @if ($authUser && $authUser->isEdificarManager())
+            @if ($authUser && $authUser->hasPermission('dashboard_edificar'))
                 <a href="{{ route('edificar.dashboard') }}"
                     class="nav-item relative flex items-center px-4 py-3.5 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('edificar.dashboard') ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/30' : 'text-slate-400' }}">
                     <i class="bi bi-graph-up-arrow text-xl flex-shrink-0"></i>
@@ -53,7 +54,7 @@
                 </a>
             @endif
 
-            @if ($authUser && $authUser->isResponsavelPacote())
+            @if ($authUser && $authUser->hasPermission('dashboard_packages'))
                 <a href="{{ route('packages.dashboard') }}"
                     class="nav-item relative flex items-center px-4 py-3.5 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('packages.dashboard') ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/30' : 'text-slate-400' }}">
                     <i class="bi bi-speedometer2 text-xl flex-shrink-0"></i>
@@ -124,33 +125,35 @@
                     <!-- OPERAÇÃO ECLESIÁSTICA -->
                     <div class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-2">Operação Eclesiástica</div>
 
-                    @if ($authUser && ($authUser->isAdmin() || $authUser->isSecretaria() || $authUser->isPastor()))
+                    @if ($authUser && $authUser->hasPermission('menu_services'))
                         <a href="{{ route('services.index') }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('services.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                             <i class="bi bi-journal-bookmark-fill text-xl flex-shrink-0"></i>
                             <span class="sidebar-text ml-4 font-bold tracking-tight">Cultos</span>
                         </a>
                     @endif
 
-                    <a href="{{ route('events.index') }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('events.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
-                        <i class="bi bi-calendar-check-fill text-xl flex-shrink-0"></i>
-                        <span class="sidebar-text ml-4 font-bold tracking-tight">Eventos</span>
-                    </a>
+                    @if ($authUser && $authUser->hasPermission('menu_events'))
+                        <a href="{{ route('events.index') }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('events.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                            <i class="bi bi-calendar-check-fill text-xl flex-shrink-0"></i>
+                            <span class="sidebar-text ml-4 font-bold tracking-tight">Eventos</span>
+                        </a>
+                    @endif
 
-                    @if ($authUser && ($authUser->isAdmin() || $authUser->isSecretaria() || $authUser->isPastor()))
+                    @if ($authUser && $authUser->hasPermission('menu_weddings'))
                         <a href="{{ route('weddings.index') }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('weddings.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                             <i class="bi bi-heart-fill text-xl flex-shrink-0"></i>
                             <span class="sidebar-text ml-4 font-bold tracking-tight">Casamentos</span>
                         </a>
                     @endif
 
-                    @if ($authUser && ($authUser->isAdmin() || $authUser->isSecretaria() || $authUser->isPastorZona()))
+                    @if ($authUser && $authUser->hasPermission('menu_visitors'))
                         <a href="{{ route('visitors.index') }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('visitors.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                             <i class="bi bi-person-plus-fill text-xl flex-shrink-0"></i>
                             <span class="sidebar-text ml-4 font-bold tracking-tight">Visitantes</span>
                         </a>
                     @endif
 
-                    @if ($authUser && ($authUser->isAdmin() || $authUser->role !== 'comissao_obra'))
+                    @if ($authUser && $authUser->hasPermission('menu_courses'))
                         <div>
                             <button class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('courses.*') || request()->routeIs('course-classes.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" onclick="toggleMenu('courses_menu')">
                                 <i class="bi bi-mortarboard-fill text-xl flex-shrink-0"></i>
@@ -168,14 +171,14 @@
                         </div>
                     @endif
 
-                    @if ($authUser && ($authUser->isAdmin() || $authUser->isPastor() || $authUser->isPastorZona() || $authUser->isSupervisor()))
+                    @if ($authUser && $authUser->hasPermission('menu_quarterly_reports'))
                         <a href="{{ route('quarterly-reports.index') }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('quarterly-reports.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                             <i class="bi bi-file-earmark-bar-graph-fill text-xl flex-shrink-0"></i>
                             <span class="sidebar-text ml-4 font-bold tracking-tight">Relatórios Trimestrais</span>
                         </a>
                     @endif
 
-                    @if ($showInventoryOperacao)
+                    @if ($authUser && $authUser->hasPermission('menu_inventory'))
                         <a href="{{ route('inventory-items.index') }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('inventory-items.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                             <i class="bi bi-box-seam-fill text-xl flex-shrink-0"></i>
                             <span class="sidebar-text ml-4 font-bold tracking-tight">Inventário</span>
@@ -194,14 +197,14 @@
                         </a>
                     @endif
 
-                    @if ($authUser && $authUser->role !== 'membro' && $authUser->role !== 'comissao_obra' && $authUser->role !== 'secretaria' && $authUser->role !== 'tesouraria' && $authUser->role !== 'responsavel')
+                    @if ($authUser && $authUser->hasPermission('menu_cell_meetings'))
                         <a href="{{ route('cell-meetings.index') }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('cell-meetings.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                             <i class="bi bi-people-fill text-xl flex-shrink-0"></i>
                             <span class="sidebar-text ml-4 font-bold tracking-tight">Encontros</span>
                         </a>
                     @endif
 
-                    @if ($authUser && ($authUser->isAdmin() || $authUser->isPastor() || $authUser->isPastorZona() || $authUser->isSupervisor() || $authUser->isLider() || $authUser->isTimoteo() || $authUser->isSecretaria() || $authUser->isPastorZona()))
+                    @if ($authUser && $authUser->hasPermission('menu_members'))
                         <a href="{{ route('members.index') }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('members.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                             <i class="bi bi-person-lines-fill text-xl flex-shrink-0"></i>
                             <span class="sidebar-text ml-4 font-bold tracking-tight">Membros</span>
@@ -215,17 +218,21 @@
                         </a>
                     @endif
 
-                    @if ($authUser->isAdmin() || $authUser->isPastorZona() || $authUser->isSupervisor())
-                        @if($authUser && ($authUser->isAdmin() || $authUser->isPastorZona()))
+                    @if ($authUser && $authUser->hasPermission('menu_zones'))
                         <a href="{{ route('zones.index') }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('zones.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                             <i class="bi bi-geo-fill text-xl flex-shrink-0"></i>
                             <span class="sidebar-text ml-4 font-bold tracking-tight">Zonas</span>
                         </a>
+                    @endif
+
+                    @if ($authUser && $authUser->hasPermission('menu_supervisions'))
                         <a href="{{ route('supervisions.index') }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('supervisions.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                             <i class="bi bi-diagram-2-fill text-xl flex-shrink-0"></i>
                             <span class="sidebar-text ml-4 font-bold tracking-tight">Supervisões</span>
                         </a>
-                        @endif
+                    @endif
+
+                    @if ($authUser && $authUser->hasPermission('menu_cells'))
                         <a href="{{ route('cells.index') }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('cells.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                             <i class="bi bi-diagram-3-fill text-xl flex-shrink-0"></i>
                             <span class="sidebar-text ml-4 font-bold tracking-tight">Células</span>
@@ -236,7 +243,7 @@
                 <!-- GESTÃO FINANCEIRA & EDIFICAR -->
                 <div class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-4">Gestão Financeira & Edificar</div>
 
-                @if ($authUser && ($authUser->isAdmin() || $authUser->isEdificarManager() || $authUser->isResponsavelPacote() || $authUser->isComissaoObra()))
+                @if ($authUser && $authUser->hasPermission('menu_packages'))
                     <a href="{{ route('packages.index') }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('packages.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                         <i class="bi bi-box-seam-fill text-xl flex-shrink-0"></i>
                         <span class="sidebar-text ml-4 font-bold tracking-tight">Pacotes</span>
@@ -255,7 +262,7 @@
                             @if ($authUser && !$authUser->isAdmin())
                                 <a href="{{ route('contributions.index', ['mine' => 1]) }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('contributions.index') && request()->query('mine') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Minhas Contribuições</a>
                             @endif
-                            @if ($authUser && ($authUser->isAdmin() || $authUser->isPastorSenior() || $authUser->isPastorZona() || $authUser->isSupervisor() || $authUser->isLider() || $authUser->isComissaoObra() || $authUser->isResponsavelPacote()))
+                            @if ($authUser && $authUser->hasPermission('menu_contributions_all'))
                                 <a href="{{ route('contributions.index') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('contributions.index') && !request()->query('mine') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">
                                     @if ($authUser->isAdmin() || $authUser->isComissaoObra()) Todas
                                     @elseif ($authUser->isResponsavelPacote()) Dos Meus Pacotes
@@ -280,7 +287,7 @@
                     </div>
                 </div>
 
-                @if ($authUser && ($authUser->isAdmin() || $authUser->isPastor() || $authUser->isTesouraria()))
+                @if ($authUser && $authUser->hasPermission('menu_finance'))
                     <div>
                         <button class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('financial.dashboard') || request()->routeIs('requisitions.*') || request()->routeIs('expenses.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" onclick="toggleMenu('financial_menu')">
                             <i class="bi bi-pie-chart-fill text-xl flex-shrink-0"></i>
@@ -310,7 +317,7 @@
             <!-- SISTEMA & RELATÓRIOS -->
             <div class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-4">Sistema & Relatórios</div>
 
-            @if ($authUser && ($authUser->isAdmin() || $authUser->isPastor() || $authUser->isPastorZona() || $authUser->isSupervisor() || $authUser->isComissaoObra()))
+            @if ($authUser && $authUser->hasPermission('menu_stats'))
                 <div>
                     <button class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('reports.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" onclick="toggleMenu('reports')">
                         <i class="bi bi-bar-chart-line-fill text-xl flex-shrink-0"></i>
@@ -336,14 +343,14 @@
                 </div>
             @endif
 
-            @if ($authUser && ($authUser->isAdmin() || $authUser->isPastorSenior()))
+            @if ($authUser && $authUser->hasPermission('menu_users'))
                 <a href="{{ route('users.index') }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('users.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                     <i class="bi bi-person-lock text-xl flex-shrink-0"></i>
                     <span class="sidebar-text ml-4 font-bold tracking-tight">Utilizadores</span>
                 </a>
             @endif
 
-            @if ($authUser && ($authUser->isAdmin() || $authUser->isPastor()))
+            @if ($authUser && $authUser->hasPermission('menu_settings'))
                 <a href="{{ route('settings.index') }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('settings.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                     <i class="bi bi-gear-fill text-xl flex-shrink-0"></i>
                     <span class="sidebar-text ml-4 font-bold tracking-tight">Configurações</span>

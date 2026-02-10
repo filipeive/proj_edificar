@@ -213,9 +213,8 @@
                                                         class="text-sm font-black text-gray-900 dark:text-gray-100">{{ $event->date->format('d/m/Y') }}</span>
                                                     <span
                                                         class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase">{{ $event->date->translatedFormat('l') }}</span>
-                                                    @if($event->end_date)
-                                                        <span class="text-[10px] font-bold text-blue-500 dark:text-blue-400 mt-1">até
-                                                            {{ $event->end_date->format('d/m/Y') }}</span>
+                                                    @if($event->isPassed())
+                                                        <span class="mt-1 px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 rounded text-[9px] font-black uppercase tracking-tighter w-fit">Realizado</span>
                                                     @endif
                                                 </div>
                                             </td>
@@ -337,8 +336,12 @@
                                 class="text-base font-black text-gray-900 dark:text-white leading-tight mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors uppercase tracking-tighter line-clamp-1">
                                 {{ $event->name }}
                             </h4>
-                            <span
-                                class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">{{ $event->eventType->name }}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">{{ $event->eventType->name }}</span>
+                                @if($event->isPassed())
+                                    <span class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 rounded text-[8px] font-black uppercase tracking-tighter">Realizado</span>
+                                @endif
+                            </div>
                         </div>
 
                             <div class="space-y-3 mb-6 flex-1">

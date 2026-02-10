@@ -22,6 +22,7 @@ class User extends Authenticatable
         'observations',
         'notification_preferences',
         'last_login_at',
+        'menu_permissions',
     ];
 
     protected $hidden = [
@@ -37,6 +38,7 @@ class User extends Authenticatable
             'is_active' => 'boolean',
             'notification_preferences' => 'array',
             'last_login_at' => 'datetime',
+            'menu_permissions' => 'array',
         ];
     }
 
@@ -319,5 +321,63 @@ class User extends Authenticatable
             ->whereBetween('contribution_date', [$monthStart, $monthEnd])
             ->where('status', 'verificada')
             ->sum('amount');
+    }
+
+    /**
+     * Check if user has specific menu/feature permission
+     */
+    public function hasPermission(string $permission): bool
+    {
+        // Admin and Pastor Senior have all permissions
+        if ($this->isAdmin() || $this->isPastorSenior()) {
+            return true;
+        }
+
+        $perms = $this->menu_permissions ?? [];
+
+        // If explicitly defined in custom permissions, return that
+        if (array_key_exists($permission, $perms)) {
+            return (bool) $perms[$permission];
+        }
+
+        // Check for role-based overrides in Settings
+        $roleDefaults = Setting::get("permissions.role_{$this->role}", []);
+        if (is_array($roleDefaults) && array_key_exists($permission, $roleDefaults)) {
+            return (bool) $roleDefaults[$permission];
+        }
+
+        // Fallback to hardcoded role-based logic if not defined elsewhere
+        return match ($permission) {
+            'dashboard_edificar' => $this->isEdificarManager(),
+            'dashboard_packages' => $this->isResponsavelPacote(),
+
+            // Operação
+            'menu_services' => $this->isAdmin() || $this->isSecretaria() || $this->isPastor(),
+            'menu_events' => true, // Default for most
+            'menu_weddings' => $this->isAdmin() || $this->isSecretaria() || $this->isPastor(),
+            'menu_visitors' => $this->isAdmin() || $this->isSecretaria() || $this->isPastorZona(),
+            'menu_courses' => true,
+            'menu_quarterly_reports' => $this->isAdmin() || $this->isPastor() || $this->isPastorZona() || $this->isSupervisor(),
+            'menu_inventory' => $this->isAdmin() || $this->isSecretaria() || $this->isEdificarManager() || $this->isTesouraria(),
+
+            // Células
+            'menu_cell_meetings' => $this->isLider() || $this->isTimoteo() || $this->isSupervisor() || $this->isPastorZona() || $this->isAdmin(),
+            'menu_members' => $this->isLider() || $this->isTimoteo() || $this->isSupervisor() || $this->isPastorZona() || $this->isAdmin() || $this->isSecretaria(),
+            'menu_zones' => $this->isAdmin() || $this->isPastorZona(),
+            'menu_supervisions' => $this->isAdmin() || $this->isPastorZona(),
+            'menu_cells' => $this->isAdmin() || $this->isPastorZona() || $this->isSupervisor(),
+
+            // Financeira
+            'menu_packages' => $this->isEdificarManager() || $this->isResponsavelPacote(),
+            'menu_contributions_all' => $this->isEdificarManager() || $this->isResponsavelPacote() || $this->isPastor() || $this->isPastorZona() || $this->isSupervisor() || $this->isLider(),
+            'menu_finance' => $this->isAdmin() || $this->isPastor() || $this->isTesouraria(),
+
+            // Sistema
+            'menu_stats' => $this->isAdmin() || $this->isPastor() || $this->isPastorZona() || $this->isSupervisor() || $this->isComissaoObra(),
+            'menu_users' => $this->isAdmin() || $this->isPastorSenior(),
+            'menu_settings' => $this->isAdmin() || $this->isPastor(),
+
+            default => false,
+        };
     }
 }
