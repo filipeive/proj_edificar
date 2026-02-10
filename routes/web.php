@@ -449,6 +449,8 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('role:admin,pastor,secretaria,pastor_senior')->group(function () {
         Route::get('couple-enrollments', [\App\Http\Controllers\CoupleEnrollmentController::class, 'index'])->name('couple-enrollments.index');
+        Route::get('couple-enrollments/{couple_enrollment}/edit', [\App\Http\Controllers\CoupleEnrollmentController::class, 'edit'])->name('couple-enrollments.edit');
+        Route::put('couple-enrollments/{couple_enrollment}', [\App\Http\Controllers\CoupleEnrollmentController::class, 'update'])->name('couple-enrollments.update');
         Route::delete('couple-enrollments/{couple_enrollment}', [\App\Http\Controllers\CoupleEnrollmentController::class, 'destroy'])->name('couple-enrollments.destroy');
         Route::post('couple-enrollments/{couple_enrollment}/assign-class', [\App\Http\Controllers\CoupleEnrollmentController::class, 'assignClass'])->name('couple-enrollments.assign-class');
         Route::get('couple-enrollments-export', [\App\Http\Controllers\CoupleEnrollmentController::class, 'export'])->name('couple-enrollments.export');

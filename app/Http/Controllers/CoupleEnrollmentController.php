@@ -125,6 +125,36 @@ class CoupleEnrollmentController extends Controller
 
         return $response;
     }
+    public function edit(CoupleEnrollment $coupleEnrollment)
+    {
+        $courses = Course::orderBy('name')->get();
+        return view('couple_enrollments.edit', compact('coupleEnrollment', 'courses'));
+    }
+
+    public function update(Request $request, CoupleEnrollment $coupleEnrollment)
+    {
+        $validated = $request->validate([
+            'husband_name' => 'required|string|max:255',
+            'wife_name' => 'required|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'phone' => 'nullable|string|max:20',
+            'address' => 'required|string|max:255',
+            'contacts' => 'required|string|max:255',
+            'relationship_type' => 'required|in:namoro,noivos,vivendo_maritalmente,casados',
+            'years_together' => 'required|integer|min:0',
+            'cell_zone' => 'nullable|string|max:255',
+            'leader_name' => 'nullable|string|max:255',
+            'is_church_member' => 'required|boolean',
+            'has_pastoral_recommendation' => 'required|boolean',
+            'observations' => 'nullable|string',
+            'course_id' => 'required|exists:courses,id',
+        ]);
+
+        $coupleEnrollment->update($validated);
+
+        return redirect()->route('couple-enrollments.index')->with('success', 'Inscrição atualizada com sucesso!');
+    }
+
     public function updateStatus(Request $request, CoupleEnrollment $coupleEnrollment)
     {
         $validated = $request->validate([

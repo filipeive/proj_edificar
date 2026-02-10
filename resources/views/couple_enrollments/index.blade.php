@@ -138,6 +138,10 @@
                                             </div>
                                         @endif
 
+                                        <a href="{{ route('couple-enrollments.edit', $enrollment) }}" class="p-2 text-gray-400 hover:text-blue-500 transition-colors">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </a>
+
                                         <form action="{{ route('couple-enrollments.destroy', $enrollment) }}" method="POST" 
                                               onsubmit="return confirm('Tem certeza que deseja excluir esta inscrição?')">
                                             @csrf
