@@ -29,7 +29,7 @@
                         <!-- Nome do Esposo -->
                         <div>
                             <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Nome
-                                do Noivo / Parceiro</label>
+                                do Noivo / Parceiro <span class="text-red-500">*</span></label>
                             <input type="text" name="husband_name" required
                                 class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition placeholder-gray-600"
                                 placeholder="Nome completo">
@@ -38,7 +38,7 @@
                         <!-- Nome da Esposa -->
                         <div>
                             <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Nome
-                                da Noiva / Parceira</label>
+                                da Noiva / Parceira <span class="text-red-500">*</span></label>
                             <input type="text" name="wife_name" required
                                 class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition placeholder-gray-600"
                                 placeholder="Nome completo">
@@ -49,7 +49,7 @@
                         <!-- Tipo de Relação -->
                         <div>
                             <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Tipo
-                                de Relação</label>
+                                de Relação <span class="text-red-500">*</span></label>
                             <select name="relationship_type" required
                                 class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition appearance-none">
                                 <option value="" class="bg-gray-900">Selecione...</option>
@@ -63,7 +63,7 @@
                         <!-- Anos de Relacionamento -->
                         <div>
                             <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Anos
-                                de Relacionamento</label>
+                                de Relacionamento <span class="text-red-500">*</span></label>
                             <input type="number" name="years_together" required min="0"
                                 class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition placeholder-gray-600"
                                 placeholder="Ex: 5">
@@ -72,8 +72,8 @@
 
                     <!-- Morada -->
                     <div>
-                        <label
-                            class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Morada</label>
+                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Morada
+                            <span class="text-red-500">*</span></label>
                         <input type="text" name="address" required
                             class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition placeholder-gray-600"
                             placeholder="Endereço completo">
@@ -83,7 +83,8 @@
                         <!-- Contactos -->
                         <div>
                             <label
-                                class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Contactos</label>
+                                class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Contactos
+                                <span class="text-red-500">*</span></label>
                             <input type="text" name="contacts" required
                                 class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition placeholder-gray-600"
                                 placeholder="Telemóvel / WhatsApp">
@@ -111,7 +112,7 @@
                     <!-- Recomendação Pastoral -->
                     <div>
                         <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Tem
-                            Recomendação da Pastoral?</label>
+                            Recomendação da Pastoral? <span class="text-red-500">*</span></label>
                         <div class="flex space-x-6">
                             <label class="flex items-center space-x-3 cursor-pointer group">
                                 <input type="radio" name="has_pastoral_recommendation" value="1" required

@@ -41,7 +41,7 @@
 
                     <div>
                         <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">
-                            Nome do Casal
+                            Nome do Casal <span class="text-red-500">*</span>
                         </label>
                         <input type="text" name="couple_name" required
                             class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition placeholder-gray-600"
@@ -51,7 +51,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">
-                                Tipo de Relação
+                                Tipo de Relação <span class="text-red-500">*</span>
                             </label>
                             <select name="relationship_type" required
                                 class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition appearance-none">
@@ -74,7 +74,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Morada</label>
+                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Morada
+                            <span class="text-red-500">*</span></label>
                         <input type="text" name="address" required
                             class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition placeholder-gray-600"
                             placeholder="Endereço completo">
@@ -82,7 +83,9 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Contactos</label>
+                            <label
+                                class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Contactos
+                                <span class="text-red-500">*</span></label>
                             <input type="text" name="contacts" required
                                 class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition placeholder-gray-600"
                                 placeholder="Telemóvel / WhatsApp">
@@ -104,7 +107,7 @@
 
                     <div>
                         <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">
-                            São membros da Igreja?
+                            São membros da Igreja? <span class="text-red-500">*</span>
                         </label>
                         <div class="flex space-x-6">
                             <label class="flex items-center space-x-3 cursor-pointer group">
@@ -140,7 +143,7 @@
 
                     <div>
                         <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">
-                            Tem Recomendação da Supervisão?
+                            Tem Recomendação da Supervisão? <span class="text-red-500">*</span>
                         </label>
                         <div class="flex space-x-6">
                             <label class="flex items-center space-x-3 cursor-pointer group">

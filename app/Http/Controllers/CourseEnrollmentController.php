@@ -33,7 +33,7 @@ class CourseEnrollmentController extends Controller
 
     public function show(CourseEnrollment $courseEnrollment)
     {
-        $courseEnrollment->load(['course', 'courseClass', 'malePartner', 'femalePartner', 'user']);
+        $courseEnrollment->load(['course', 'courseClass.course', 'malePartner', 'femalePartner', 'user', 'attendances.meeting']);
         return view('course_enrollments.show', ['enrollment' => $courseEnrollment]);
     }
 
@@ -145,5 +145,29 @@ class CourseEnrollmentController extends Controller
         $deletedCount = CourseEnrollment::whereIn('id', $validated['enrollment_ids'])->delete();
 
         return redirect()->back()->with('success', "{$deletedCount} matrícula(s) removida(s) com sucesso!");
+    }
+
+    public function assignClass(Request $request, CourseEnrollment $courseEnrollment)
+    {
+        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'pastor' && auth()->user()->role !== 'secretaria') {
+            return redirect()->back()->with('error', 'Acesso negado.');
+        }
+
+        $validated = $request->validate([
+            'course_class_id' => 'required|exists:course_classes,id',
+        ]);
+
+        $courseClass = \App\Models\CourseClass::findOrFail($validated['course_class_id']);
+
+        if ($courseClass->course_id !== $courseEnrollment->course_id) {
+            return back()->with('error', 'Esta turma não pertence ao curso da matrícula.');
+        }
+
+        $courseEnrollment->update([
+            'course_class_id' => $courseClass->id,
+            'status' => 'cursando', // Move from 'enrolled' (initial) to 'cursando'
+        ]);
+
+        return back()->with('success', 'Aluno atribuído à turma com sucesso!');
     }
 }

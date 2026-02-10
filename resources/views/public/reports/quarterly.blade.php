@@ -4,47 +4,45 @@
 
 @section('content')
     <div class="min-h-screen bg-gray-900 py-10 px-4 sm:px-6 lg:px-8 relative">
-        <div class="max-w-6xl mx-auto space-y-8 relative z-10"
-            x-data="{
-                step: 1,
-                zoneId: '',
-                supervisionId: '',
-                zones: {{ Js::from($zones) }},
-                supervisions: {{ Js::from($supervisions) }},
-                filteredSupervisions: [],
-                init() {
-                    if (this.zones.length === 1) {
-                        this.zoneId = this.zones[0].id;
-                        this.$nextTick(() => this.updateSupervisions());
-                    } else {
-                        this.updateSupervisions();
-                    }
-                },
-                updateSupervisions() {
-                    if (!this.zoneId) {
-                        this.filteredSupervisions = [];
-                        this.supervisionId = '';
-                        return;
-                    }
-                    this.filteredSupervisions = this.supervisions.filter(s => Number(s.zone_id) === Number(this.zoneId));
-                    if (this.filteredSupervisions.length === 1) {
-                        this.$nextTick(() => {
-                            this.supervisionId = this.filteredSupervisions[0].id;
-                        });
-                    }
-                },
-                nextStep() {
-                    if (this.step === 1) {
-                        if (!this.zoneId || !this.supervisionId) {
-                            alert('Por favor, selecione a Zona e Supervisão.');
+        <div class="max-w-6xl mx-auto space-y-8 relative z-10" x-data="{
+                    step: 1,
+                    zoneId: '',
+                    supervisionId: '',
+                    zones: {{ Js::from($zones) }},
+                    supervisions: {{ Js::from($supervisions) }},
+                    filteredSupervisions: [],
+                    init() {
+                        if (this.zones.length === 1) {
+                            this.zoneId = this.zones[0].id;
+                            this.$nextTick(() => this.updateSupervisions());
+                        } else {
+                            this.updateSupervisions();
+                        }
+                    },
+                    updateSupervisions() {
+                        if (!this.zoneId) {
+                            this.filteredSupervisions = [];
+                            this.supervisionId = '';
                             return;
                         }
+                        this.filteredSupervisions = this.supervisions.filter(s => Number(s.zone_id) === Number(this.zoneId));
+                        if (this.filteredSupervisions.length === 1) {
+                            this.$nextTick(() => {
+                                this.supervisionId = this.filteredSupervisions[0].id;
+                            });
+                        }
+                    },
+                    nextStep() {
+                        if (this.step === 1) {
+                            if (!this.zoneId || !this.supervisionId) {
+                                alert('Por favor, selecione a Zona e Supervisão.');
+                                return;
+                            }
+                        }
+                        this.step++;
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
                     }
-                    this.step++;
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
-            }"
-            x-init="init()">
+                }" x-init="init()">
             @if ($errors->any())
                 <div class="bg-red-500/10 border border-red-500/30 text-red-200 p-4 rounded-2xl">
                     <h3 class="text-sm font-black uppercase tracking-widest">Existem erros no formulário</h3>
@@ -62,7 +60,8 @@
                 </div>
             @endif
 
-            <div class="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 md:p-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10">
+            <div
+                class="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 md:p-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10">
                 <div>
                     <div class="flex items-center gap-2 text-xs font-bold text-blue-300 uppercase tracking-widest mb-2">
                         <span>Relatórios Trimestrais</span>
@@ -89,7 +88,8 @@
                 </div>
             </div>
 
-            <form action="{{ route('public.reports.quarterly.store') }}" method="POST" id="reportForm" class="space-y-8 pb-12 relative z-10">
+            <form action="{{ route('public.reports.quarterly.store') }}" method="POST" id="reportForm"
+                class="space-y-8 pb-12 relative z-10">
                 @csrf
 
                 <div x-show="step === 1" x-transition:enter="transition ease-out duration-300"
@@ -98,13 +98,15 @@
                     <div class="bg-white/5 rounded-[2.5rem] border border-white/10 overflow-hidden">
                         <div class="p-8 border-b border-white/10 bg-white/5">
                             <h2 class="text-lg font-black text-white flex items-center gap-3">
-                                <span class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm">1</span>
+                                <span
+                                    class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm">1</span>
                                 Identificação e Estatísticas
                             </h2>
                         </div>
                         <div class="p-8 grid grid-cols-1 md:grid-cols-4 gap-8">
                             <div class="space-y-2">
-                                <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Zona</label>
+                                <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Zona
+                                    <span class="text-red-500">*</span></label>
                                 <select name="zone_id" required x-model="zoneId" @change="updateSupervisions()"
                                     class="w-full px-5 py-4 bg-white/10 border border-white/10 focus:bg-white/10 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-white appearance-none custom-select">
                                     <option value="">Selecione a Zona</option>
@@ -114,7 +116,9 @@
                                 </select>
                             </div>
                             <div class="space-y-2">
-                                <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Supervisão</label>
+                                <label
+                                    class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Supervisão
+                                    <span class="text-red-500">*</span></label>
                                 <select name="supervision_id" required x-model="supervisionId"
                                     class="w-full px-5 py-4 bg-white/10 border border-white/10 focus:bg-white/10 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-white appearance-none custom-select">
                                     <option value="">Selecione a Supervisão</option>
@@ -124,12 +128,14 @@
                                 </select>
                             </div>
                             <div class="space-y-2">
-                                <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Ano</label>
+                                <label
+                                    class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Ano</label>
                                 <input type="number" name="year" value="{{ date('Y') }}"
                                     class="w-full px-5 py-4 bg-white/10 border border-white/10 focus:bg-white/10 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-white">
                             </div>
                             <div class="space-y-2">
-                                <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Trimestre</label>
+                                <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Trimestre
+                                    <span class="text-red-500">*</span></label>
                                 <select name="quarter" required
                                     class="w-full px-5 py-4 bg-white/10 border border-white/10 focus:bg-white/10 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-white appearance-none custom-select">
                                     <option value="1">1º Trimestre</option>
@@ -156,7 +162,8 @@
                             @endphp
                             @foreach($stats as $field => $data)
                                 <div class="space-y-2">
-                                    <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-1 flex items-center gap-1">
+                                    <label
+                                        class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-1 flex items-center gap-1">
                                         <i class="bi {{ $data['icon'] }} text-{{ $data['color'] }}-400"></i>
                                         {{ $data['label'] }}
                                     </label>
@@ -183,7 +190,8 @@
                         <div class="bg-white/5 rounded-[2.5rem] border border-white/10 overflow-hidden">
                             <div class="p-8 border-b border-white/10 bg-white/5">
                                 <h2 class="text-lg font-black text-white flex items-center gap-3">
-                                    <span class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm">2</span>
+                                    <span
+                                        class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm">2</span>
                                     Alvos e Resultados
                                 </h2>
                             </div>
@@ -198,7 +206,8 @@
                                     ];
                                 @endphp
                                 @foreach($results as $field => $label)
-                                    <div class="flex items-center justify-between p-4 bg-white/10 rounded-2xl group hover:bg-white/20 transition-all border border-white/10">
+                                    <div
+                                        class="flex items-center justify-between p-4 bg-white/10 rounded-2xl group hover:bg-white/20 transition-all border border-white/10">
                                         <span class="text-sm font-black text-gray-200">{{ $label }}</span>
                                         <input type="number" name="{{ $field }}" value="0" min="0" required
                                             class="w-24 px-4 py-2 bg-white/10 border border-white/10 focus:ring-4 focus:ring-blue-500/10 rounded-xl font-black text-center text-white">
@@ -218,8 +227,10 @@
                                 @foreach($eventTypes as $index => $type)
                                     <div class="p-4 bg-white/10 rounded-2xl space-y-3 border border-white/10">
                                         <div class="flex items-center justify-between">
-                                            <span class="text-xs font-black text-gray-300 uppercase tracking-widest">{{ $type->name }}</span>
-                                            <input type="hidden" name="events[{{ $index }}][event_type_id]" value="{{ $type->id }}">
+                                            <span
+                                                class="text-xs font-black text-gray-300 uppercase tracking-widest">{{ $type->name }}</span>
+                                            <input type="hidden" name="events[{{ $index }}][event_type_id]"
+                                                value="{{ $type->id }}">
                                             <input type="number" name="events[{{ $index }}][count]" value="0" min="0"
                                                 class="w-16 px-2 py-1 bg-white/10 border border-white/10 focus:ring-0 rounded-lg text-center font-black text-white">
                                         </div>

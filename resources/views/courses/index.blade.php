@@ -239,7 +239,7 @@
                                             </td>
                                             <td class="px-8 py-6 text-center">
                                                 <span
-                                                    class="text-sm font-black text-gray-700 dark:text-gray-300">{{ $course->enrollments_count }}</span>
+                                                    class="text-sm font-black text-gray-700 dark:text-gray-300">{{ $course->enrollments_count + $course->couple_enrollments_count }}</span>
                                             </td>
                                             <td class="px-8 py-6 text-center text-xs font-bold">
                                                 @if($course->registration_open)
@@ -318,7 +318,7 @@
                                 <div class="bg-gray-50 dark:bg-gray-700 rounded-2xl mb-6 space-y-3 p-4">
                                     <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
                                         <span class="text-gray-400 dark:text-gray-500">Total Alunos</span>
-                                        <span class="text-gray-900 dark:text-white text-sm">{{ $course->enrollments_count }}</span>
+                                        <span class="text-gray-900 dark:text-white text-sm">{{ $course->enrollments_count + $course->couple_enrollments_count }}</span>
                                     </div>
                                     <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
                                         <span class="text-gray-400 dark:text-gray-500">Slug</span>

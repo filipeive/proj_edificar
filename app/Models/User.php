@@ -357,6 +357,7 @@ class User extends Authenticatable
             'menu_weddings' => $this->isAdmin() || $this->isSecretaria() || $this->isPastor(),
             'menu_visitors' => $this->isAdmin() || $this->isSecretaria() || $this->isPastorZona(),
             'menu_courses' => true,
+            'menu_public_enrollments' => $this->isAdmin() || $this->isPastor() || $this->isSecretaria() || $this->isPastorSenior(),
             'menu_quarterly_reports' => $this->isAdmin() || $this->isPastor() || $this->isPastorZona() || $this->isSupervisor(),
             'menu_inventory' => $this->isAdmin() || $this->isSecretaria() || $this->isEdificarManager() || $this->isTesouraria(),
 

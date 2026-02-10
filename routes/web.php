@@ -442,8 +442,17 @@ Route::middleware('auth')->group(function () {
 
     Route::post('course-enrollments/bulk-destroy', [\App\Http\Controllers\CourseEnrollmentController::class, 'bulkDestroy'])->name('course-enrollments.bulk-destroy');
     Route::resource('course-enrollments', \App\Http\Controllers\CourseEnrollmentController::class);
+    Route::post('course-enrollments/{course_enrollment}/assign-class', [\App\Http\Controllers\CourseEnrollmentController::class, 'assignClass'])->name('course-enrollments.assign-class');
     Route::post('courses/{course}/enroll', [\App\Http\Controllers\CourseEnrollmentController::class, 'enroll'])->name('courses.enroll');
     Route::post('enrollments/{course_enrollment}/status', [\App\Http\Controllers\CourseEnrollmentController::class, 'updateStatus'])->name('enrollments.status');
+    Route::post('couple-enrollments/{couple_enrollment}/status', [\App\Http\Controllers\CoupleEnrollmentController::class, 'updateStatus'])->name('couple-enrollments.status');
+
+    Route::middleware('role:admin,pastor,secretaria,pastor_senior')->group(function () {
+        Route::get('couple-enrollments', [\App\Http\Controllers\CoupleEnrollmentController::class, 'index'])->name('couple-enrollments.index');
+        Route::delete('couple-enrollments/{couple_enrollment}', [\App\Http\Controllers\CoupleEnrollmentController::class, 'destroy'])->name('couple-enrollments.destroy');
+        Route::post('couple-enrollments/{couple_enrollment}/assign-class', [\App\Http\Controllers\CoupleEnrollmentController::class, 'assignClass'])->name('couple-enrollments.assign-class');
+        Route::get('couple-enrollments-export', [\App\Http\Controllers\CoupleEnrollmentController::class, 'export'])->name('couple-enrollments.export');
+    });
 
     // ===== PERFIL DO UTILIZADOR =====
     Route::prefix('profile')->group(function () {

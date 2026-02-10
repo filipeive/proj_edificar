@@ -26,8 +26,10 @@ class CourseClassController extends Controller
 
         $courseId = $request->query('course_id');
         $type = $request->query('type');
+        $status = $request->query('status');
 
-        $query = CourseClass::with(['course', 'teacherMale', 'teacherFemale', 'assistantMale', 'assistantFemale']);
+        $query = CourseClass::with(['course', 'teacherMale', 'teacherFemale', 'assistantMale', 'assistantFemale'])
+            ->withCount(['courseEnrollments', 'coupleEnrollments']);
 
         if ($user->isPastorZona()) {
             $query->whereHas('courseEnrollments', function ($q) use ($user) {
@@ -45,10 +47,16 @@ class CourseClassController extends Controller
             $query->where('type', $type);
         }
 
-        $classes = $query->latest()->paginate(10);
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        // Grouping logic for the view: get all but organized
+        $classes = $query->latest()->get();
+        $groupedClasses = $classes->groupBy('course_id');
         $courses = Course::all();
 
-        return view('course_classes.index', compact('classes', 'courses'));
+        return view('course_classes.index', compact('groupedClasses', 'courses', 'courseId', 'type', 'status'));
     }
 
     public function create(Request $request)
@@ -99,10 +107,16 @@ class CourseClassController extends Controller
             'assistantMale',
             'assistantFemale',
             'meetings.attendances',
+            'courseEnrollments.user',
             'courseEnrollments.malePartner',
             'courseEnrollments.femalePartner',
             'coupleEnrollments'
         ]);
+
+        // Merge for the "Students" list
+        $allStudents = $courseClass->courseEnrollments
+            ->concat($courseClass->coupleEnrollments)
+            ->sortByDesc('created_at');
 
         $availableUsers = User::orderBy('name')->get();
         $publicCoupleEnrollments = CoupleEnrollment::where('course_id', $courseClass->course_id)
@@ -110,7 +124,7 @@ class CourseClassController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('course_classes.show', compact('courseClass', 'availableUsers', 'publicCoupleEnrollments'));
+        return view('course_classes.show', compact('courseClass', 'allStudents', 'availableUsers', 'publicCoupleEnrollments'));
     }
 
     public function edit(CourseClass $courseClass)
@@ -414,4 +428,6 @@ class CourseClassController extends Controller
             }
         }
     }
+
+
 }

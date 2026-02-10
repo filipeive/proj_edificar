@@ -12,6 +12,12 @@
                 class="px-4 py-1.5 bg-{{ $cardColor }}-50 dark:bg-{{ $cardColor }}-900/20 text-{{ $cardColor }}-600 dark:text-{{ $cardColor }}-400 text-[10px] font-black uppercase rounded-xl tracking-widest border border-{{ $cardColor }}-100/50 dark:border-{{ $cardColor }}-800/50">
                 {{ $course->category ?? 'Geral' }}
             </span>
+            @if($type === 'enrolled')
+                <span
+                    class="px-3 py-1 bg-green-500/10 text-green-600 dark:text-green-400 text-[10px] font-black uppercase rounded-full tracking-widest border border-green-500/20">
+                    <i class="bi bi-check-circle-fill mr-1"></i> Matriculado
+                </span>
+            @endif
             @if(!$course->is_active)
                 <span
                     class="px-3 py-1 bg-gray-100 text-gray-500 text-[10px] font-black uppercase rounded-full tracking-widest">
@@ -21,7 +27,7 @@
         </div>
 
         <h4
-            class="text-2xl font-black text-gray-900 dark:text-white mb-3 group-hover:text-{{ $cardColor }}-600 dark:group-hover:text-{{ $cardColor }}-400 transition-colors leading-tight">
+            class="text-2xl font-black text-gray-900 dark:text-white mb-3 group-hover:text-{{ $cardColor }}-600 dark:group-hover:text-{{ $cardColor }}-400 transition-colors duration-300 leading-tight">
             {{ $course->name }}
         </h4>
 
@@ -40,7 +46,7 @@
                 <div class="w-8 h-8 rounded-lg bg-gray-50 dark:bg-gray-700 flex items-center justify-center mr-3">
                     <i class="bi bi-people text-{{ $cardColor }}-500 dark:text-{{ $cardColor }}-400"></i>
                 </div>
-                {{ $course->enrollments_count }} Alunos
+                {{ $course->enrollments_count + $course->couple_enrollments_count }} Alunos
             </div>
         </div>
 
@@ -72,12 +78,4 @@
         </div>
     </div>
 
-    <!-- Decorative status tag -->
-    @if($type === 'enrolled')
-        <div class="absolute top-0 right-0 mt-4 mr-4">
-            <div class="bg-green-500 text-white p-1 rounded-full px-2 text-[8px] font-black uppercase tracking-tighter">
-                Matriculado
-            </div>
-        </div>
-    @endif
 </div>

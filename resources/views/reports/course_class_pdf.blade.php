@@ -119,8 +119,16 @@
         </tr>
         <tr>
             <td><strong>Professor(a):</strong> {{ $courseClass->teacherMale->name ?? 'N/A' }} /
-                {{ $courseClass->teacherFemale->name ?? 'N/A' }}</td>
-            <td><strong>Status:</strong> {{ ucfirst($courseClass->status) }}</td>
+                {{ $courseClass->teacherFemale->name ?? 'N/A' }}
+            </td>
+            <td><strong>Auxiliares:</strong> {{ $courseClass->assistantMale->name ?? '---' }} /
+                {{ $courseClass->assistantFemale->name ?? '---' }}
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Status:</strong> {{ ucfirst(str_replace('_', ' ', $courseClass->status)) }}</td>
+            <td><strong>Vagas Ocupadas:</strong>
+                {{ $courseClass->course_enrollments_count + $courseClass->couple_enrollments_count }}</td>
         </tr>
         <tr>
             <td><strong>Data de Início:</strong>

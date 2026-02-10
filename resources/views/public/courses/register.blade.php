@@ -28,7 +28,7 @@
                     <!-- Nome Completo -->
                     <div>
                         <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Nome
-                            Completo</label>
+                            Completo <span class="text-red-500">*</span></label>
                         <input type="text" name="name" required
                             class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition placeholder-gray-600"
                             placeholder="Seu nome completo">
@@ -36,8 +36,8 @@
 
                     <!-- Email -->
                     <div>
-                        <label
-                            class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Email</label>
+                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Email
+                            <span class="text-red-500">*</span></label>
                         <input type="email" name="email" required
                             class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition placeholder-gray-600"
                             placeholder="seu@email.com">
@@ -46,7 +46,7 @@
                     <!-- Telefone -->
                     <div>
                         <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Telefone /
-                            WhatsApp</label>
+                            WhatsApp <span class="text-red-500">*</span></label>
                         <input type="text" name="phone" required
                             class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition placeholder-gray-600"
                             placeholder="+244 9XX XXX XXX">

@@ -19,7 +19,7 @@ class CourseController extends Controller
         // 1. Courses the user is enrolled in
         $enrolledCourses = Course::whereHas('enrollments', function ($q) use ($user) {
             $q->where('user_id', $user->id);
-        })->withCount('enrollments')->get();
+        })->withCount(['enrollments', 'coupleEnrollments'])->get();
 
         // 2. Available courses for the user
         $availableCourses = Course::whereDoesntHave('enrollments', function ($q) use ($user) {
@@ -36,13 +36,13 @@ class CourseController extends Controller
                 $q->whereNull('target_role')
                     ->orWhere('target_role', $user->role);
             })
-            ->withCount('enrollments')
+            ->withCount(['enrollments', 'coupleEnrollments'])
             ->get();
 
         // 3. For admins/pastors, list all courses separately if needed (optional)
         $allCourses = collect();
         if ($user->role === 'admin' || $user->role === 'pastor') {
-            $allCourses = Course::withCount('enrollments')->get();
+            $allCourses = Course::withCount(['enrollments', 'coupleEnrollments'])->get();
         }
 
         return view('courses.index', compact('enrolledCourses', 'availableCourses', 'allCourses'));
@@ -75,11 +75,14 @@ class CourseController extends Controller
     public function show(Request $request, Course $course)
     {
         $search = $request->input('search');
+        $classId = $request->input('course_class_id');
+        $status = $request->input('status');
 
-        $query = $course->enrollments()->with(['user', 'malePartner', 'femalePartner']);
+        // 1. Fetch individual enrollments (CourseEnrollment)
+        $enrollmentsQuery = $course->enrollments()->with(['user', 'malePartner', 'femalePartner', 'courseClass']);
 
         if ($search) {
-            $query->where(function ($q) use ($search) {
+            $enrollmentsQuery->where(function ($q) use ($search) {
                 $q->whereHas('user', function ($qu) use ($search) {
                     $qu->where('name', 'like', "%{$search}%")
                         ->orWhere('email', 'like', "%{$search}%");
@@ -93,15 +96,67 @@ class CourseController extends Controller
             });
         }
 
-        $enrollments = $query->latest()->get();
+        if ($classId) {
+            $enrollmentsQuery->where('course_class_id', $classId);
+        }
 
+        if ($status) {
+            $enrollmentsQuery->where('status', $status);
+        }
+
+        $individualEnrollments = $enrollmentsQuery->latest()->get();
+
+        // 2. Fetch approved couple enrollments (CoupleEnrollment with class assigned)
+        $coupleQuery = CoupleEnrollment::where('course_id', $course->id)
+            ->whereNotNull('course_class_id')
+            ->with('courseClass');
+
+        if ($search) {
+            $coupleQuery->where(function ($q) use ($search) {
+                $q->where('husband_name', 'like', "%{$search}%")
+                    ->orWhere('wife_name', 'like', "%{$search}%")
+                    ->orWhere('contacts', 'like', "%{$search}%");
+            });
+        }
+
+        if ($classId) {
+            $coupleQuery->where('course_class_id', $classId);
+        }
+
+        if ($status) {
+            $coupleQuery->where('status', $status);
+        }
+
+        $coupleEnrollments = $coupleQuery->latest()->get();
+
+        // 3. Merge for the "Students" list (using a common indicator)
+        $allStudents = $individualEnrollments->concat($coupleEnrollments)->sortByDesc('created_at');
+
+        // 4. Statistics (including both types)
+        $stats = [
+            'total' => $course->enrollments()->count() + CoupleEnrollment::where('course_id', $course->id)->whereNotNull('course_class_id')->count(),
+            'completed' => $course->enrollments()->where('status', 'completed')->count() + CoupleEnrollment::where('course_id', $course->id)->whereNotNull('course_class_id')->whereIn('status', ['completed', 'approved', 'aprovado'])->count(),
+            'enrolled' => $course->enrollments()->where('status', 'enrolled')->count() + CoupleEnrollment::where('course_id', $course->id)->whereNotNull('course_class_id')->whereIn('status', ['enrolled', 'cursando', 'em_andamento'])->count(),
+        ];
+
+        // 5. Public Inbox (Pending Couple Enrollments)
         $publicCoupleEnrollments = CoupleEnrollment::where('course_id', $course->id)
             ->whereNull('course_class_id')
             ->orderBy('created_at', 'desc')
             ->get();
+
         $courseClasses = CourseClass::where('course_id', $course->id)->orderBy('name')->get();
 
-        return view('courses.show', compact('course', 'enrollments', 'search', 'publicCoupleEnrollments', 'courseClasses'));
+        return view('courses.show', compact(
+            'course',
+            'allStudents',
+            'search',
+            'classId',
+            'status',
+            'publicCoupleEnrollments',
+            'courseClasses',
+            'stats'
+        ));
     }
 
     public function assignPublicEnrollment(Request $request, Course $course)
