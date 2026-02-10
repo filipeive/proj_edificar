@@ -9,7 +9,7 @@ use Laravel\Breeze\Features;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, NormalizesMozPhone;
+    use HasFactory, Notifiable, NormalizesMozPhone, \App\Models\Concerns\LogsActivity;
 
     protected $fillable = [
         'name',
@@ -21,6 +21,7 @@ class User extends Authenticatable
         'is_active',
         'observations',
         'notification_preferences',
+        'last_login_at',
     ];
 
     protected $hidden = [
@@ -35,6 +36,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_active' => 'boolean',
             'notification_preferences' => 'array',
+            'last_login_at' => 'datetime',
         ];
     }
 
@@ -231,8 +233,8 @@ class User extends Authenticatable
 
     public function hasRole($role)
     {
-        // Admin total
-        if ($this->role === 'admin') {
+        // Admin e Pastor Senior - acesso total
+        if ($this->role === 'admin' || $this->role === 'pastor_senior') {
             return true;
         }
 

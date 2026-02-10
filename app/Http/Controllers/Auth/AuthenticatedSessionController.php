@@ -28,6 +28,11 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Record last login and log activity
+        $user = auth()->user();
+        $user->update(['last_login_at' => now()]);
+        $user->logActivity('login', 'Sessão iniciada no sistema');
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
@@ -36,6 +41,11 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        // Log logout activity before session is invalidated
+        if (auth()->check()) {
+            auth()->user()->logActivity('logout', 'Sessão terminada');
+        }
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();

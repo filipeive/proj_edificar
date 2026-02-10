@@ -100,7 +100,7 @@ Route::middleware('auth')->group(function () {
 
     // Dashboard Admin
     Route::get('/admin/dashboard', AdminDashboardController::class)
-        ->middleware('role:admin')
+        ->middleware('role:admin,pastor_senior')
         ->name('dashboard.admin');
 
     // Dashboard Pastor de Zona
@@ -236,7 +236,7 @@ Route::middleware('auth')->group(function () {
         });
 
         // Highly Restricted (Admin & Secretaria Only)
-        Route::middleware('role:admin,secretaria')->group(function () {
+        Route::middleware('role:admin,secretaria,pastor_senior')->group(function () {
             // Gestão de Utilizadores
             Route::delete('/users/bulk-destroy', [UserController::class, 'bulkDestroy'])->name('users.bulk-destroy');
             Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
@@ -246,13 +246,14 @@ Route::middleware('auth')->group(function () {
             Route::post('users/{user}/reassign-cell', [UserController::class, 'reassignCell'])->name('users.reassign-cell');
             Route::post('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
             Route::post('users/{user}/observations', [UserController::class, 'updateObservations'])->name('users.update-observations');
+            Route::get('users/{user}/activity', [UserController::class, 'activity'])->name('users.activity');
             Route::resource('users', UserController::class);
 
         });
     });
 
     // Gestão de Pacotes (Acesso Expandido)
-    Route::prefix('admin')->middleware('role:admin,secretaria,comissao_obra,responsavel_pacote')->group(function () {
+    Route::prefix('admin')->middleware('role:admin,secretaria,comissao_obra,responsavel_pacote,pastor_senior')->group(function () {
         Route::post('packages/{package}/assign', [PackageController::class, 'assignMember'])->name('packages.assign');
         Route::post('packages/{package}/update-member', [PackageController::class, 'updateMember'])->name('packages.update-member');
         Route::post('packages/{package}/bulk-sms', [PackageController::class, 'sendBulkSms'])->name('packages.send-bulk-sms');
@@ -389,8 +390,7 @@ Route::middleware('auth')->group(function () {
     Route::get('quarterly-reports/export-annual', [\App\Http\Controllers\QuarterlyReportController::class, 'exportAnnual'])->name('quarterly-reports.export-annual');
     Route::delete('quarterly-reports/bulk-destroy', [\App\Http\Controllers\QuarterlyReportController::class, 'bulkDestroy'])->name('quarterly-reports.bulk-destroy');
     Route::resource('quarterly-reports', \App\Http\Controllers\QuarterlyReportController::class);
-    Route::post('packages/{package}/assign', [\App\Http\Controllers\Admin\PackageController::class, 'assignMember'])->name('packages.assign');
-    Route::post('packages/{package}/send-bulk-sms', [\App\Http\Controllers\Admin\PackageController::class, 'sendBulkSms'])->name('packages.send-bulk-sms');
+    // Quarterly Reports management handled by resource route at 392
     // Edificar Dashboard
     Route::get('project-edificar/dashboard', [\App\Http\Controllers\Admin\EdificarDashboardController::class, 'index'])
         ->middleware('role:admin,comissao_obra,pastor_senior')

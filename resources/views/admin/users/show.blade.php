@@ -25,7 +25,7 @@
 @endsection
 
 @section('content')
-    <div class="space-y-8 max-w-full">
+    <div class="space-y-8 w-full">
         <!-- Main Profile Banner -->
         <div class="bg-white rounded-[3rem] shadow-sm border border-gray-100 p-8 md:p-12 overflow-hidden relative group">
             <div
@@ -101,6 +101,10 @@
                         class="w-full py-5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-[1.5rem] font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-100 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3">
                         <i class="bi bi-plus-circle-fill"></i> Lançar Nova Oferta
                     </a>
+                    <a href="{{ route('users.activity', $user) }}"
+                        class="w-full py-4 bg-gray-50 border border-gray-200 text-gray-700 rounded-[1.5rem] font-black text-xs uppercase tracking-widest hover:bg-gray-100 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3">
+                        <i class="bi bi-clock-history"></i> Ver Atividades
+                    </a>
                 </div>
             </div>
         </div>
@@ -141,7 +145,8 @@
                         <span class="text-xs font-bold text-blue-600">MT</span>
                     </div>
                     <p class="text-[10px] font-bold text-gray-400 uppercase mt-2">
-                        {{ $user->contributions->where('status', 'verificada')->count() }} Ofertas</p>
+                        {{ $user->contributions->where('status', 'verificada')->count() }} Ofertas
+                    </p>
                 </div>
                 <i
                     class="bi bi-graph-up-arrow absolute -right-4 -bottom-4 text-8xl text-gray-50 opacity-50 group-hover:scale-110 transition-transform duration-500"></i>
@@ -212,17 +217,19 @@
                                                         <tr class="hover:bg-gray-50/70 transition-colors group">
                                                             <td class="px-10 py-6">
                                                                 <p class="text-sm font-bold text-gray-900">
-                                                                    {{ $contribution->contribution_date->format('d/m/Y') }}</p>
+                                                                    {{ $contribution->contribution_date->format('d/m/Y') }}
+                                                                </p>
                                                             </td>
                                                             <td class="px-10 py-6">
                                                                 <p class="text-sm font-black text-green-600">
-                                                                    {{ number_format($contribution->amount, 0, ',', '.') }} MT</p>
+                                                                    {{ number_format($contribution->amount, 0, ',', '.') }} MT
+                                                                </p>
                                                             </td>
                                                             <td class="px-10 py-6 text-center">
                                                                 <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest {{ 
-                                                                            $contribution->status == 'verificada' ? 'bg-green-50 text-green-600' :
+                                                                                                                                    $contribution->status == 'verificada' ? 'bg-green-50 text-green-600' :
                                     ($contribution->status == 'pendente' ? 'bg-yellow-50 text-yellow-600' : 'bg-red-50 text-red-600') 
-                                                                        }}">
+                                                                                                                                }}">
                                                                     {{ $contribution->status }}
                                                                 </span>
                                                             </td>

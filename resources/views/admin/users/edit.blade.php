@@ -5,7 +5,7 @@
 @section('page-subtitle', 'Atualize as informações do membro ou líder do sistema')
 
 @section('content')
-    <div class="max-w-6xl mx-auto px-4 py-8">
+    <div class="w-full">
         <!-- Header with Back Button and Quick Stats -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div class="flex items-center gap-4">
@@ -149,6 +149,9 @@
                                             <option value="comissao_obra" {{ old('role', $user->role) == 'comissao_obra' ? 'selected' : '' }}>Comissão de Obra</option>
                                             <option value="responsavel_pacote" {{ old('role', $user->role) == 'responsavel_pacote' ? 'selected' : '' }}>Responsável de
                                                 Pacote</option>
+                                            <option value="tesouraria" {{ old('role', $user->role) == 'tesouraria' ? 'selected' : '' }}>Tesouraria</option>
+                                            <option value="pastor" {{ old('role', $user->role) == 'pastor' ? 'selected' : '' }}>Pastor</option>
+                                            <option value="pastor_senior" {{ old('role', $user->role) == 'pastor_senior' ? 'selected' : '' }}>Pastor Senior</option>
                                             <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>
                                                 Administrador</option>
                                         </select>

@@ -336,7 +336,7 @@
                 </div>
             @endif
 
-            @if ($authUser && $authUser->isAdmin())
+            @if ($authUser && ($authUser->isAdmin() || $authUser->isPastorSenior()))
                 <a href="{{ route('users.index') }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('users.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                     <i class="bi bi-person-lock text-xl flex-shrink-0"></i>
                     <span class="sidebar-text ml-4 font-bold tracking-tight">Utilizadores</span>

@@ -23,8 +23,8 @@ class UserController
 
     public function index(Request $request): View
     {
-        // Bloquear acesso para secretaria e outros não-admins
-        if (!auth()->user()->isAdmin()) {
+        // Bloquear acesso para não-admins e não-pastor_senior
+        if (!auth()->user()->isAdmin() && !auth()->user()->isPastorSenior()) {
             abort(403, 'Acesso não autorizado.');
         }
 
@@ -92,7 +92,7 @@ class UserController
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6|confirmed',
             'phone' => 'nullable|moz_phone',
-            'role' => 'required|in:membro,lider_celula,supervisor,pastor_zona,secretaria,admin,comissao_obra,responsavel_pacote,tesouraria,pastor_senior',
+            'role' => 'required|in:membro,lider_celula,supervisor,pastor_zona,secretaria,admin,comissao_obra,responsavel_pacote,tesouraria,pastor,pastor_senior',
             'cell_id' => 'nullable|exists:cells,id',
             'is_active' => 'boolean',
         ]);
@@ -100,6 +100,9 @@ class UserController
         $plainPassword = $validated['password'];
         $validated['password'] = bcrypt($plainPassword);
         $user = User::create($validated);
+
+        // Log activity
+        auth()->user()->logActivity('create', "Criou o utilizador {$user->name}", $user);
 
         // Notificar novo usuário
         if ($user->wantsNotification('member_created')) {
@@ -134,13 +137,16 @@ class UserController
             'name' => 'required|string|max:255',
             'email' => "required|email|unique:users,email,{$user->id}",
             'phone' => 'nullable|moz_phone',
-            'role' => 'required|in:membro,lider_celula,supervisor,pastor_zona,secretaria,admin,comissao_obra,responsavel_pacote,tesouraria,pastor_senior',
+            'role' => 'required|in:membro,lider_celula,supervisor,pastor_zona,secretaria,admin,comissao_obra,responsavel_pacote,tesouraria,pastor,pastor_senior',
             'cell_id' => 'nullable|exists:cells,id',
             'is_active' => 'boolean',
         ]);
 
         $oldRole = $user->role;
         $user->update($validated);
+
+        // Log activity
+        auth()->user()->logActivity('update', "Atualizou o utilizador {$user->name}", $user);
 
         // Notificar se mudou o role
         if ($oldRole !== $validated['role']) {
@@ -159,9 +165,25 @@ class UserController
             return back()->with('error', 'Não pode deletar admin!');
         }
 
+        // Log activity before deletion
+        auth()->user()->logActivity('delete', "Eliminou o utilizador {$user->name} ({$user->email})");
+
         $user->delete();
         return redirect()->route('users.index')
             ->with('success', 'Utilizador deletado com sucesso!');
+    }
+
+    /**
+     * Ver histórico de atividades do utilizador
+     */
+    public function activity(User $user): View
+    {
+        $activities = $user->activities()->paginate(20);
+
+        return view('admin.users.activity', [
+            'user' => $user,
+            'activities' => $activities,
+        ]);
     }
 
     /**

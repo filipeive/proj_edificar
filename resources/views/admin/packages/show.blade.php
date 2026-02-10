@@ -22,6 +22,9 @@
 @endsection
 
 @section('content')
+    <style>
+        .ts-dropdown { z-index: 12000 !important; }
+    </style>
     <div class="space-y-6" x-data="{ 
                                 view: window.innerWidth < 768 ? 'grid' : 'list', 
                                 search: '',
@@ -591,7 +594,7 @@
              x-show="show" x-cloak class="fixed inset-0 z-50 overflow-y-auto">
             <div class="flex items-center justify-center min-h-screen px-4">
                 <div @click="show = false" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"></div>
-                <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md z-10 relative overflow-hidden">
+                <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md relative overflow-visible">
                     <div class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
                         <h3 class="font-bold text-gray-900">Editar Membro</h3>
                         <button @click="show = false" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button>
@@ -636,7 +639,7 @@
         <div x-data="{ show: false }" @open-quick-member-modal.window="show = true" x-show="show" x-cloak class="fixed inset-0 z-50 overflow-y-auto">
             <div class="flex items-center justify-center min-h-screen px-4">
                 <div @click="show = false" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"></div>
-                <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md z-10 relative overflow-hidden">
+                <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md relative overflow-visible">
                     <div class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
                         <h3 class="font-bold text-gray-900">Novo Membro Rápido</h3>
                         <button @click="show = false" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button>

@@ -160,9 +160,15 @@
                         <select name="role" class="w-full px-6 py-3 bg-white border-transparent focus:ring-4 focus:ring-blue-100 rounded-xl font-bold text-sm appearance-none transition-all custom-select">
                             <option value="">Todos os Papéis</option>
                             <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Administrador</option>
+                            <option value="pastor_senior" {{ request('role') == 'pastor_senior' ? 'selected' : '' }}>Pastor Senior</option>
+                            <option value="pastor" {{ request('role') == 'pastor' ? 'selected' : '' }}>Pastor</option>
                             <option value="pastor_zona" {{ request('role') == 'pastor_zona' ? 'selected' : '' }}>Pastor de Zona</option>
                             <option value="supervisor" {{ request('role') == 'supervisor' ? 'selected' : '' }}>Supervisor</option>
                             <option value="lider_celula" {{ request('role') == 'lider_celula' ? 'selected' : '' }}>Líder de Célula</option>
+                            <option value="secretaria" {{ request('role') == 'secretaria' ? 'selected' : '' }}>Secretária</option>
+                            <option value="tesouraria" {{ request('role') == 'tesouraria' ? 'selected' : '' }}>Tesouraria</option>
+                            <option value="comissao_obra" {{ request('role') == 'comissao_obra' ? 'selected' : '' }}>Comissão de Obra</option>
+                            <option value="responsavel_pacote" {{ request('role') == 'responsavel_pacote' ? 'selected' : '' }}>Resp. de Pacote</option>
                             <option value="membro" {{ request('role') == 'membro' ? 'selected' : '' }}>Membro</option>
                         </select>
                     </div>
@@ -243,14 +249,32 @@
                                         @case('admin')
                                             <span class="px-4 py-1.5 bg-red-50 text-red-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-red-100 flex items-center justify-center gap-2">Admin</span>
                                             @break
+                                        @case('pastor_senior')
+                                            <span class="px-4 py-1.5 bg-red-50 text-red-700 rounded-lg text-[10px] font-black uppercase tracking-widest border border-red-200 flex items-center justify-center gap-2">Pastor Senior</span>
+                                            @break
+                                        @case('pastor')
+                                            <span class="px-4 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-indigo-100 flex items-center justify-center gap-2">Pastor</span>
+                                            @break
                                         @case('pastor_zona')
-                                            <span class="px-4 py-1.5 bg-purple-50 text-purple-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-purple-100 flex items-center justify-center gap-2">Pastor</span>
+                                            <span class="px-4 py-1.5 bg-purple-50 text-purple-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-purple-100 flex items-center justify-center gap-2">Pastor Zona</span>
                                             @break
                                         @case('supervisor')
                                             <span class="px-4 py-1.5 bg-orange-50 text-orange-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-orange-100 flex items-center justify-center gap-2">Supervisor</span>
                                             @break
                                         @case('lider_celula')
                                             <span class="px-4 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-blue-100 flex items-center justify-center gap-2">Líder</span>
+                                            @break
+                                        @case('secretaria')
+                                            <span class="px-4 py-1.5 bg-teal-50 text-teal-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-teal-100 flex items-center justify-center gap-2">Secretária</span>
+                                            @break
+                                        @case('tesouraria')
+                                            <span class="px-4 py-1.5 bg-emerald-50 text-emerald-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-emerald-100 flex items-center justify-center gap-2">Tesouraria</span>
+                                            @break
+                                        @case('comissao_obra')
+                                            <span class="px-4 py-1.5 bg-yellow-50 text-yellow-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-yellow-100 flex items-center justify-center gap-2">Comissão Obra</span>
+                                            @break
+                                        @case('responsavel_pacote')
+                                            <span class="px-4 py-1.5 bg-cyan-50 text-cyan-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-cyan-100 flex items-center justify-center gap-2">Resp. Pacote</span>
                                             @break
                                         @default
                                             <span class="px-4 py-1.5 bg-gray-50 text-gray-500 rounded-lg text-[10px] font-black uppercase tracking-widest border border-gray-100 flex items-center justify-center gap-2">Membro</span>
@@ -344,14 +368,32 @@
                                 @case('admin')
                                     <span class="px-3 py-1 bg-red-50 text-red-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-red-100">Admin</span>
                                     @break
+                                @case('pastor_senior')
+                                    <span class="px-3 py-1 bg-red-50 text-red-700 rounded-full text-[10px] font-black uppercase tracking-widest border border-red-200">Pastor Senior</span>
+                                    @break
+                                @case('pastor')
+                                    <span class="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-indigo-100">Pastor</span>
+                                    @break
                                 @case('pastor_zona')
-                                    <span class="px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-purple-100">Pastor</span>
+                                    <span class="px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-purple-100">Pastor Zona</span>
                                     @break
                                 @case('supervisor')
                                     <span class="px-3 py-1 bg-orange-50 text-orange-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-orange-100">Supervisor</span>
                                     @break
                                 @case('lider_celula')
                                     <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-100">Líder</span>
+                                    @break
+                                @case('secretaria')
+                                    <span class="px-3 py-1 bg-teal-50 text-teal-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-teal-100">Secretária</span>
+                                    @break
+                                @case('tesouraria')
+                                    <span class="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-100">Tesouraria</span>
+                                    @break
+                                @case('comissao_obra')
+                                    <span class="px-3 py-1 bg-yellow-50 text-yellow-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-yellow-100">Comissão Obra</span>
+                                    @break
+                                @case('responsavel_pacote')
+                                    <span class="px-3 py-1 bg-cyan-50 text-cyan-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-cyan-100">Resp. Pacote</span>
                                     @break
                                 @default
                                     <span class="px-3 py-1 bg-gray-50 text-gray-500 rounded-full text-[10px] font-black uppercase tracking-widest border border-gray-100">Membro</span>
