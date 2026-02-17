@@ -231,7 +231,7 @@ class CellMeetingController extends Controller
             $cells = collect();
         }
 
-        $leadersQuery = User::whereIn('role', ['admin', 'pastor', 'pastor_zona', 'supervisor', 'lider_celula', 'timoteo']);
+        $leadersQuery = User::whereIn('role', ['admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'sub_supervisor', 'lider_celula', 'timoteo']);
 
         if ($user->isPastorZona()) {
             $zoneId = $user->getZoneId();
@@ -276,7 +276,7 @@ class CellMeetingController extends Controller
         $zones = Zone::orderBy('name')->get();
         $supervisions = Supervision::orderBy('name')->get();
 
-        $allLeaders = User::whereIn('role', ['admin', 'pastor', 'pastor_zona', 'supervisor', 'lider_celula', 'timoteo'])->orderBy('name')->get();
+        $allLeaders = User::whereIn('role', ['admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'sub_supervisor', 'lider_celula', 'timoteo'])->orderBy('name')->get();
 
         return view('cell_meetings.create', compact('cells', 'leaders', 'members', 'zones', 'supervisions', 'allLeaders'));
     }
@@ -453,7 +453,7 @@ class CellMeetingController extends Controller
             $cells = Cell::where('leader_id', $user->id)->get();
         }
 
-        $leadersQuery = User::whereIn('role', ['admin', 'pastor', 'pastor_zona', 'supervisor', 'lider_celula', 'timoteo']);
+        $leadersQuery = User::whereIn('role', ['admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'sub_supervisor', 'lider_celula', 'timoteo']);
 
         if ($user->isPastorZona()) {
             $zoneId = $user->getZoneId();
@@ -498,7 +498,7 @@ class CellMeetingController extends Controller
         $zones = Zone::orderBy('name')->get();
         $supervisions = Supervision::orderBy('name')->get();
 
-        $allLeaders = User::whereIn('role', ['admin', 'pastor', 'pastor_zona', 'supervisor', 'lider_celula', 'timoteo'])->orderBy('name')->get();
+        $allLeaders = User::whereIn('role', ['admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'sub_supervisor', 'lider_celula', 'timoteo'])->orderBy('name')->get();
 
         return view('cell_meetings.edit', compact('cellMeeting', 'cells', 'leaders', 'members', 'attendances', 'zones', 'supervisions', 'allLeaders'));
     }

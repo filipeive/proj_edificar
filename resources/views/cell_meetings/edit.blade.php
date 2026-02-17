@@ -7,7 +7,7 @@
 @section('content')
     <div class="space-y-8" x-data="{ 
         meetingType: '{{ old('meeting_type', $cellMeeting->meeting_type) }}',
-        selectedRoles: ['admin', 'pastor', 'pastor_zona', 'supervisor', 'lider_celula', 'timoteo']
+        selectedRoles: ['admin', 'pastor', 'pastor_senior', 'pastor_zona', 'supervisor', 'sub_supervisor', 'lider_celula', 'timoteo']
     }">
         <div class="mb-6">
             <a href="{{ route('cell-meetings.index') }}"
@@ -141,8 +141,11 @@
                             
                             <div class="flex flex-wrap gap-2">
                                 <template x-for="role in [
-                                    {id: 'pastor_zona', label: 'Pastores'},
+                                    {id: 'pastor_senior', label: 'Pastor Senior'},
+                                    {id: 'pastor', label: 'Pastores'},
+                                    {id: 'pastor_zona', label: 'Coordenação'},
                                     {id: 'supervisor', label: 'Supervisores'},
+                                    {id: 'sub_supervisor', label: 'Sub-Sup'},
                                     {id: 'lider_celula', label: 'Líderes'},
                                     {id: 'timoteo', label: 'Timóteos'}
                                 ]">
@@ -160,7 +163,7 @@
                                 $currentParticipants = $cellMeeting->participants->pluck('id')->toArray();
                             @endphp
                             @foreach($allLeaders as $official)
-                                <label x-show="selectedRoles.includes('{{ $official->role }}') || ['admin', 'pastor'].includes('{{ $official->role }}')" 
+                                <label x-show="selectedRoles.includes('{{ $official->role }}') || ['admin', 'pastor_senior', 'pastor'].includes('{{ $official->role }}')" 
                                     x-transition.fade
                                     class="flex items-center p-4 bg-white rounded-2xl border border-orange-100 hover:border-orange-300 transition-all cursor-pointer group shadow-sm">
                                     <input type="checkbox" name="participants[]" value="{{ $official->id }}"

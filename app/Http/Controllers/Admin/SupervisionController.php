@@ -114,9 +114,14 @@ class SupervisionController
                     ->orWhere('role', 'pastor_zona');
             })->orderBy('name')->get();
 
+        $subSupervisors = \App\Models\User::whereIn('role', ['lider_celula', 'timoteo', 'sub_supervisor'])
+            ->orderBy('name')
+            ->get();
+
         return view('admin.supervisions.create', [
             'zones' => $zones,
-            'supervisors' => $supervisors
+            'supervisors' => $supervisors,
+            'subSupervisors' => $subSupervisors
         ]);
     }
 
@@ -126,10 +131,15 @@ class SupervisionController
             'name' => 'required|string|max:255',
             'zone_id' => 'required|exists:zones,id',
             'supervisor_id' => 'nullable|exists:users,id',
+            'sub_supervisor_id' => 'nullable|exists:users,id',
             'description' => 'nullable|string',
         ]);
 
-        Supervision::create($validated);
+        $supervision = Supervision::create($validated);
+
+        if (!empty($validated['sub_supervisor_id'])) {
+            \App\Models\User::where('id', $validated['sub_supervisor_id'])->update(['role' => 'sub_supervisor']);
+        }
 
         return redirect()->route('supervisions.index')
             ->with('success', 'Supervisão criada com sucesso!');
@@ -177,10 +187,15 @@ class SupervisionController
                     ->orWhere('role', 'pastor_zona');
             })->orderBy('name')->get();
 
+        $subSupervisors = \App\Models\User::whereIn('role', ['lider_celula', 'timoteo', 'sub_supervisor'])
+            ->orderBy('name')
+            ->get();
+
         return view('admin.supervisions.edit', [
             'supervision' => $supervision,
             'zones' => $zones,
-            'supervisors' => $supervisors
+            'supervisors' => $supervisors,
+            'subSupervisors' => $subSupervisors
         ]);
     }
 
@@ -190,10 +205,15 @@ class SupervisionController
             'name' => 'required|string|max:255',
             'zone_id' => 'required|exists:zones,id',
             'supervisor_id' => 'nullable|exists:users,id',
+            'sub_supervisor_id' => 'nullable|exists:users,id',
             'description' => 'nullable|string',
         ]);
 
         $supervision->update($validated);
+
+        if (!empty($validated['sub_supervisor_id'])) {
+            \App\Models\User::where('id', $validated['sub_supervisor_id'])->update(['role' => 'sub_supervisor']);
+        }
 
         return redirect()->route('supervisions.index')
             ->with('success', 'Supervisão atualizada com sucesso!');

@@ -38,10 +38,20 @@
                     <span>Supervisão</span>
                 </div>
                 <p class="text-3xl font-black text-gray-900 tracking-tighter">{{ $supervision->name }}</p>
-                <div class="flex items-center gap-2 mt-2">
+                <div class="flex flex-wrap gap-2 mt-2">
                     <span class="px-3 py-1 bg-gray-100 rounded-full text-[10px] font-bold text-gray-500 uppercase tracking-widest">
                         Zona: {{ $supervision->zone->name }}
                     </span>
+                    @if($supervision->supervisor)
+                        <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                            Sup: {{ $supervision->supervisor->name }}
+                        </span>
+                    @endif
+                    @if($supervision->subSupervisor)
+                        <span class="px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                            Sub: {{ $supervision->subSupervisor->name }}
+                        </span>
+                    @endif
                 </div>
             </div>
 

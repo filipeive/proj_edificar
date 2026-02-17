@@ -15,25 +15,25 @@
 
 @section('content')
     <div class="space-y-8" x-data="{ 
-                            view: window.innerWidth < 768 ? 'grid' : (localStorage.getItem('supervisions_view') || 'grid'),
-                            selected: [],
-                            updateView() {
-                                if (window.innerWidth < 768 && this.view === 'list') {
-                                    this.view = 'grid';
+                                view: window.innerWidth < 768 ? 'grid' : (localStorage.getItem('supervisions_view') || 'grid'),
+                                selected: [],
+                                updateView() {
+                                    if (window.innerWidth < 768 && this.view === 'list') {
+                                        this.view = 'grid';
+                                    }
+                                },
+                                toggleAll() {
+                                    const allIds = {{ Js::from($supervisions->pluck('id')) }};
+                                    if (this.selected.length === allIds.length) {
+                                        this.selected = [];
+                                    } else {
+                                        this.selected = allIds;
+                                    }
+                                },
+                                deleteSelected() {
+                                    document.getElementById('bulk-delete-form').submit();
                                 }
-                            },
-                            toggleAll() {
-                                const allIds = {{ Js::from($supervisions->pluck('id')) }};
-                                if (this.selected.length === allIds.length) {
-                                    this.selected = [];
-                                } else {
-                                    this.selected = allIds;
-                                }
-                            },
-                            deleteSelected() {
-                                document.getElementById('bulk-delete-form').submit();
-                            }
-                        }" x-init="$watch('view', value => localStorage.setItem('supervisions_view', value))"
+                            }" x-init="$watch('view', value => localStorage.setItem('supervisions_view', value))"
         @resize.window.debounce.500ms="updateView()">
 
         <!-- Bulk Action Bar -->
@@ -157,6 +157,12 @@
                                         class="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Líder</span>
                                     <span
                                         class="text-[10px] font-bold text-gray-700 block truncate">{{ $supervision->supervisor->name ?? 'Vago' }}</span>
+                                    @if($supervision->subSupervisor)
+                                        <span
+                                            class="text-[9px] font-black text-blue-400 uppercase tracking-widest block mt-2 mb-0.5">Sub-Sup</span>
+                                        <span
+                                            class="text-[10px] font-bold text-gray-600 block truncate">{{ $supervision->subSupervisor->name }}</span>
+                                    @endif
                                 </div>
                             </div>
 
@@ -240,7 +246,11 @@
                                 </td>
                                 <td class="px-6 py-6">
                                     <span
-                                        class="text-sm font-bold text-gray-700">{{ $supervision->supervisor->name ?? 'Vago' }}</span>
+                                        class="text-sm font-bold text-gray-700 block">{{ $supervision->supervisor->name ?? 'Vago' }}</span>
+                                    @if($supervision->subSupervisor)
+                                        <span class="text-xs font-medium text-gray-400 block mt-1">Sub:
+                                            {{ $supervision->subSupervisor->name }}</span>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-6 text-center font-black text-gray-700">{{ $supervision->cells->count() }}
                                 </td>

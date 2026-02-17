@@ -68,6 +68,26 @@
                 </div>
 
                 <div class="mb-6">
+                    <label for="sub_supervisor_id" class="block text-sm font-medium text-gray-700 mb-2">Sub-Supervisor
+                        (Opcional)</label>
+                    <select name="sub_supervisor_id" id="sub_supervisor_id"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 searchable-select custom-select @error('sub_supervisor_id') border-red-500 @enderror">
+                        <option value="">-- Selecione um sub-supervisor --</option>
+                        @foreach($subSupervisors as $sub)
+                            <option value="{{ $sub->id }}" @selected(old('sub_supervisor_id', $supervision->sub_supervisor_id) == $sub->id)>
+                                {{ $sub->name }} ({{ $sub->role }})
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('sub_supervisor_id')
+                        <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                    @enderror
+                    <p class="text-xs text-gray-500 mt-1">
+                        <i class="bi bi-info-circle"></i> O usuário selecionado será promovido a Sub-Supervisor.
+                    </p>
+                </div>
+
+                <div class="mb-6">
                     <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Nome da Supervisão</label>
                     <input type="text" name="name" id="name"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 @error('name') border-red-500 @enderror"

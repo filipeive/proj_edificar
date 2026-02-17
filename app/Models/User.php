@@ -112,6 +112,11 @@ class User extends Authenticatable
         return $this->hasMany(Supervision::class, 'supervisor_id');
     }
 
+    public function subSupervisedSupervisions()
+    {
+        return $this->hasMany(Supervision::class, 'sub_supervisor_id');
+    }
+
     public function quarterlyReports()
     {
         return $this->hasMany(QuarterlyReport::class, 'supervisor_id');
@@ -198,6 +203,11 @@ class User extends Authenticatable
         return $this->role === 'supervisor';
     }
 
+    public function isSubSupervisor()
+    {
+        return $this->role === 'sub_supervisor';
+    }
+
     public function isLider()
     {
         return $this->role === 'lider_celula';
@@ -280,7 +290,7 @@ class User extends Authenticatable
             return $zoneIds;
         }
 
-        if ($this->isSupervisor()) {
+        if ($this->isSupervisor() || $this->isSubSupervisor()) {
             return Supervision::whereIn('id', $this->getManagedSupervisionIds())->pluck('zone_id')->unique();
         }
 
@@ -303,6 +313,10 @@ class User extends Authenticatable
                 $ids = collect([$this->cell->supervision_id]);
             }
             return $ids;
+        }
+
+        if ($this->isSubSupervisor()) {
+            return $this->subSupervisedSupervisions()->pluck('id');
         }
 
         return collect();
@@ -363,23 +377,23 @@ class User extends Authenticatable
             'menu_visitors' => $this->isAdmin() || $this->isSecretaria() || $this->isPastorZona() || $this->isPastor(),
             'menu_courses' => true,
             'menu_public_enrollments' => $this->isAdmin() || $this->isPastor() || $this->isSecretaria() || $this->isPastorSenior(),
-            'menu_quarterly_reports' => $this->isAdmin() || $this->isPastor() || $this->isPastorZona() || $this->isSupervisor(),
+            'menu_quarterly_reports' => $this->isAdmin() || $this->isPastor() || $this->isPastorZona() || $this->isSupervisor() || $this->isSubSupervisor(),
             'menu_inventory' => $this->isAdmin() || $this->isSecretaria() || $this->isEdificarManager() || $this->isTesouraria(),
 
             // Células
-            'menu_cell_meetings' => $this->isLider() || $this->isTimoteo() || $this->isSupervisor() || $this->isPastorZona() || $this->isPastor() || $this->isAdmin(),
-            'menu_members' => $this->isLider() || $this->isTimoteo() || $this->isSupervisor() || $this->isPastorZona() || $this->isPastor() || $this->isAdmin() || $this->isSecretaria(),
+            'menu_cell_meetings' => $this->isLider() || $this->isTimoteo() || $this->isSupervisor() || $this->isSubSupervisor() || $this->isPastorZona() || $this->isPastor() || $this->isAdmin(),
+            'menu_members' => $this->isLider() || $this->isTimoteo() || $this->isSupervisor() || $this->isSubSupervisor() || $this->isPastorZona() || $this->isPastor() || $this->isAdmin() || $this->isSecretaria(),
             'menu_zones' => $this->isAdmin() || $this->isPastorZona() || $this->isPastor(),
             'menu_supervisions' => $this->isAdmin() || $this->isPastorZona() || $this->isPastor(),
-            'menu_cells' => $this->isAdmin() || $this->isPastorZona() || $this->isSupervisor() || $this->isPastor(),
+            'menu_cells' => $this->isAdmin() || $this->isPastorZona() || $this->isSupervisor() || $this->isSubSupervisor() || $this->isPastor(),
 
             // Financeira
             'menu_packages' => $this->isEdificarManager() || $this->isResponsavelPacote(),
-            'menu_contributions_all' => $this->isEdificarManager() || $this->isResponsavelPacote() || $this->isPastor() || $this->isPastorZona() || $this->isSupervisor() || $this->isLider(),
+            'menu_contributions_all' => $this->isEdificarManager() || $this->isResponsavelPacote() || $this->isPastor() || $this->isPastorZona() || $this->isSupervisor() || $this->isSubSupervisor() || $this->isLider(),
             'menu_finance' => $this->isAdmin() || $this->isPastor() || $this->isTesouraria(),
 
             // Sistema
-            'menu_stats' => $this->isAdmin() || $this->isPastor() || $this->isPastorZona() || $this->isSupervisor() || $this->isComissaoObra(),
+            'menu_stats' => $this->isAdmin() || $this->isPastor() || $this->isPastorZona() || $this->isSupervisor() || $this->isSubSupervisor() || $this->isComissaoObra(),
             'menu_users' => $this->isAdmin() || $this->isPastorSenior(),
             'menu_settings' => $this->isAdmin() || $this->isPastor(),
 

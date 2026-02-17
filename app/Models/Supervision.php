@@ -14,6 +14,7 @@ class Supervision extends Model
         'name',
         'zone_id',
         'supervisor_id',
+        'sub_supervisor_id',
         'is_active',
     ];
 
@@ -40,6 +41,11 @@ class Supervision extends Model
     public function supervisor()
     {
         return $this->belongsTo(User::class, 'supervisor_id');
+    }
+
+    public function subSupervisor()
+    {
+        return $this->belongsTo(User::class, 'sub_supervisor_id');
     }
 
     // HELPERS
