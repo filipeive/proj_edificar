@@ -30,6 +30,11 @@ class Cell extends Model
         return $this->hasMany(Contribution::class);
     }
 
+    public function timoteos()
+    {
+        return $this->hasMany(User::class, 'cell_id')->where('role', 'timoteo');
+    }
+
     public function timoteo()
     {
         return $this->belongsTo(User::class, 'timoteo_id');
@@ -47,7 +52,7 @@ class Cell extends Model
 
     public function visitors()
     {
-        return $this->hasMany(CellVisitor::class);
+        return $this->hasMany(Visitor::class);
     }
 
     public function discipleships()

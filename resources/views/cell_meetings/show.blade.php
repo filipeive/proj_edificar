@@ -75,16 +75,41 @@
                             <span
                                 class="text-sm font-bold text-blue-100">{{ $cellMeeting->meeting_date->format('d/m/Y') }}</span>
                         </div>
-                        <h3 class="text-4xl md:text-6xl font-black tracking-tighter">{{ $cellMeeting->cell->name }}</h3>
+                        <h3 class="text-4xl md:text-6xl font-black tracking-tighter">{{ $cellMeeting->cell?->name ?? $cellMeeting->zone?->name ?? $cellMeeting->supervision?->name ?? $cellMeeting->meeting_type_label }}</h3>
                         <div class="flex flex-wrap gap-4 text-[10px] font-black uppercase tracking-widest">
-                            <a href="{{ route('cells.show', $cellMeeting->cell) }}"
-                                class="group flex items-center bg-white/20 hover:bg-white/40 px-6 py-3 rounded-2xl transition-all border border-white/20 hover:border-white/40 shadow-sm">
-                                <i class="bi bi-box-arrow-up-right mr-3 group-hover:scale-110 transition-transform"></i>
-                                Ir para Célula: {{ $cellMeeting->cell->name }}
-                            </a>
-                            <span class="flex items-center bg-black/10 px-4 py-2 rounded-xl">
-                                <i class="bi bi-diagram-3 mr-2"></i> {{ $cellMeeting->cell->supervision->name }}
-                            </span>
+                            @if($cellMeeting->cell)
+                                <a href="{{ route('cells.show', $cellMeeting->cell) }}"
+                                    class="group flex items-center bg-white/20 hover:bg-white/40 px-6 py-3 rounded-2xl transition-all border border-white/20 hover:border-white/40 shadow-sm">
+                                    <i class="bi bi-box-arrow-up-right mr-3 group-hover:scale-110 transition-transform"></i>
+                                    Célula: {{ $cellMeeting->cell->name }}
+                                </a>
+                                @if($cellMeeting->cell->supervision)
+                                    <span class="flex items-center bg-black/10 px-4 py-3 rounded-xl">
+                                        <i class="bi bi-diagram-3 mr-2"></i> {{ $cellMeeting->cell->supervision->name }}
+                                    </span>
+                                @endif
+                            @elseif($cellMeeting->supervision)
+                                <a href="{{ route('supervisions.show', $cellMeeting->supervision) }}"
+                                    class="group flex items-center bg-white/20 hover:bg-white/40 px-6 py-3 rounded-2xl transition-all border border-white/20 hover:border-white/40 shadow-sm">
+                                    <i class="bi bi-diagram-3 mr-3 group-hover:scale-110 transition-transform"></i>
+                                    Supervisão: {{ $cellMeeting->supervision->name }}
+                                </a>
+                                @if($cellMeeting->supervision->zone)
+                                    <span class="flex items-center bg-black/10 px-4 py-3 rounded-xl">
+                                        <i class="bi bi-globe mr-2"></i> {{ $cellMeeting->supervision->zone->name }}
+                                    </span>
+                                @endif
+                            @elseif($cellMeeting->zone)
+                                <a href="{{ route('zones.show', $cellMeeting->zone) }}"
+                                    class="group flex items-center bg-white/20 hover:bg-white/40 px-6 py-3 rounded-2xl transition-all border border-white/20 hover:border-white/40 shadow-sm">
+                                    <i class="bi bi-globe mr-3 group-hover:scale-110 transition-transform"></i>
+                                    Zona: {{ $cellMeeting->zone->name }}
+                                </a>
+                            @else
+                                <span class="flex items-center bg-white/20 px-6 py-3 rounded-2xl border border-white/20">
+                                    <i class="bi bi-calendar-event mr-3"></i> Encontro Geral
+                                </span>
+                            @endif
                         </div>
                     </div>
                     <div
@@ -376,6 +401,7 @@
                 <div class="bg-gray-900 dark:bg-black rounded-[2.5rem] p-10 text-white space-y-6">
                     <h4 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">Centro de Operações</h4>
                     <div class="space-y-3">
+                        @if($cellMeeting->cell)
                         <a href="{{ route('cells.show', $cellMeeting->cell) }}"
                             class="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all font-bold group">
                             <div
@@ -384,6 +410,7 @@
                             </div>
                             <span class="text-sm">Explorar Unidade</span>
                         </a>
+                        @endif
 
                         <button onclick="toggleEmailModal()"
                             class="w-full flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all font-bold group">

@@ -392,6 +392,17 @@
                                                                             </button>
                                                                         </form>
                                                                     @endforeach
+                                                                    <div class="border-t border-gray-100 dark:border-gray-700 mt-1 pt-1">
+                                                                        <form action="{{ $student instanceof \App\Models\CoupleEnrollment ? route('couple-enrollments.destroy', $student) : route('course-enrollments.destroy', $student) }}" method="POST"
+                                                                            onsubmit="return confirm('Tem certeza que deseja remover esta matrícula?')">
+                                                                            @csrf
+                                                                            @method('DELETE')
+                                                                            <button type="submit"
+                                                                                class="w-full text-left px-4 py-2 text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center gap-2">
+                                                                                <i class="bi bi-trash3"></i> Remover
+                                                                            </button>
+                                                                        </form>
+                                                                    </div>
                                                                 </div>
                                                         </div>
                                                     </div>

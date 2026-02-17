@@ -299,6 +299,22 @@ class UserController
             $selectedCell = $user->cell;
         }
 
+        // Pré-preenchimento opcional a partir de um visitante
+        $prefill = [];
+        if ($request->filled('visitor_id')) {
+            $visitor = \App\Models\Visitor::find($request->visitor_id);
+            if ($visitor) {
+                $prefill = [
+                    'name' => $visitor->name,
+                    'phone' => $visitor->phone,
+                    'cell_id' => $visitor->cell_id,
+                ];
+                if (!$selectedCell && $visitor->cell_id) {
+                    $selectedCell = \App\Models\Cell::find($visitor->cell_id);
+                }
+            }
+        }
+
         // Definir papéis permitidos
         $allowedRoles = ['membro'];
         if ($user->isAdmin() || $user->isPastorZona() || $user->isSupervisor()) {
@@ -311,6 +327,7 @@ class UserController
             'userRole' => $user->role,
             'selectedCell' => $selectedCell,
             'allowedRoles' => $allowedRoles,
+            'prefill' => $prefill,
         ]);
     }
 

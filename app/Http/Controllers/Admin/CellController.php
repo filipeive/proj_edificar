@@ -115,11 +115,13 @@ class CellController
         }
 
         $supervisions = $query->with('zone')->orderBy('name')->get();
-        $leaders = User::where('role', '!=', 'admin')->get();
+        $leaders = User::where('role', 'lider_celula')->get();
+        $timoteos = User::where('role', 'timoteo')->get();
 
         return view('admin.cells.create', [
             'supervisions' => $supervisions,
             'leaders' => $leaders,
+            'timoteos' => $timoteos,
         ]);
     }
 
@@ -129,9 +131,20 @@ class CellController
             'name' => 'required|string|max:255',
             'supervision_id' => 'required|exists:supervisions,id',
             'leader_id' => 'required|exists:users,id',
+            'timoteos' => 'nullable|array',
+            'timoteos.*' => 'exists:users,id'
         ]);
 
-        $cell = Cell::create($validated);
+        $cell = Cell::create([
+            'name' => $validated['name'],
+            'supervision_id' => $validated['supervision_id'],
+            'leader_id' => $validated['leader_id'],
+        ]);
+
+        // Sync Timoteos
+        if ($request->has('timoteos')) {
+            User::whereIn('id', $validated['timoteos'])->update(['cell_id' => $cell->id]);
+        }
 
         // Atribuir líder à célula
         User::find($validated['leader_id'])->update(['cell_id' => $cell->id]);
@@ -189,12 +202,14 @@ class CellController
         }
 
         $supervisions = $query->with('zone')->orderBy('name')->get();
-        $leaders = User::where('role', '!=', 'admin')->get();
+        $leaders = User::where('role', 'lider_celula')->get();
+        $timoteos = User::where('role', 'timoteo')->get();
 
         return view('admin.cells.edit', [
             'cell' => $cell,
             'supervisions' => $supervisions,
             'leaders' => $leaders,
+            'timoteos' => $timoteos,
         ]);
     }
 
@@ -204,9 +219,27 @@ class CellController
             'name' => 'required|string|max:255',
             'supervision_id' => 'required|exists:supervisions,id',
             'leader_id' => 'required|exists:users,id',
+            'timoteos' => 'nullable|array',
+            'timoteos.*' => 'exists:users,id'
         ]);
 
-        $cell->update($validated);
+        $cell->update([
+            'name' => $validated['name'],
+            'supervision_id' => $validated['supervision_id'],
+            'leader_id' => $validated['leader_id'],
+        ]);
+
+        // Sync Timoteos
+        // 1. Unset cell_id for users currently assigned but not in the new list
+        User::where('cell_id', $cell->id)
+            ->where('role', 'timoteo')
+            ->whereNotIn('id', $validated['timoteos'] ?? [])
+            ->update(['cell_id' => null]);
+
+        // 2. Set cell_id for new list
+        if (!empty($validated['timoteos'])) {
+            User::whereIn('id', $validated['timoteos'])->update(['cell_id' => $cell->id]);
+        }
 
         // Atualizar líder
         if ($request->leader_id != $cell->leader_id) {
@@ -241,6 +274,7 @@ class CellController
         $deletedCount = 0;
         $skippedCount = 0;
 
+        /** @var \App\Models\Cell $cell */
         foreach ($cells as $cell) {
             if ($cell->members()->exists()) {
                 $skippedCount++;
@@ -275,5 +309,24 @@ class CellController
         $cell->update(['supervision_id' => $validated['supervision_id']]);
 
         return back()->with('success', 'Célula transferida de supervisão com sucesso!');
+    }
+
+    public function assignTimoteo(Request $request, Cell $cell)
+    {
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        $user = User::findOrFail($validated['user_id']);
+
+        // Verificar se usuário pertence à célula
+        if ($user->cell_id !== $cell->id) {
+            return back()->with('error', 'O usuário não pertence a esta célula!');
+        }
+
+        // Promover a Timóteo
+        $user->update(['role' => 'timoteo']);
+
+        return back()->with('success', "{$user->name} foi promovido(a) a Timóteo com sucesso!");
     }
 }

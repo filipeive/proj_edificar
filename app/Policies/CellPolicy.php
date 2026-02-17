@@ -26,8 +26,8 @@ class CellPolicy
             return $cell->supervision_id === $user->supervisedSupervisions()->first()?->id;
         }
 
-        if ($user->isLider()) {
-            return $cell->leader_id === $user->id || $cell->timoteo_id === $user->id;
+        if ($user->isLider() || $user->isTimoteo()) {
+            return $cell->leader_id === $user->id || $user->cell_id === $cell->id;
         }
 
         return false;
@@ -52,8 +52,8 @@ class CellPolicy
             return $cell->supervision_id === $user->supervisedSupervisions()->first()?->id;
         }
 
-        if ($user->isLider()) {
-            return $cell->leader_id === $user->id;
+        if ($user->isLider() || $user->isTimoteo()) {
+            return $cell->leader_id === $user->id || $user->cell_id === $cell->id;
         }
 
         return false;

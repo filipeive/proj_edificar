@@ -5,7 +5,10 @@
 @section('page-subtitle', 'Atualize os dados da reunião da célula')
 
 @section('content')
-    <div class="space-y-8" x-data="{ meetingType: '{{ old('meeting_type', $cellMeeting->meeting_type) }}' }">
+    <div class="space-y-8" x-data="{ 
+        meetingType: '{{ old('meeting_type', $cellMeeting->meeting_type) }}',
+        selectedRoles: ['admin', 'pastor', 'pastor_zona', 'supervisor', 'lider_celula', 'timoteo']
+    }">
         <div class="mb-6">
             <a href="{{ route('cell-meetings.index') }}"
                 class="text-blue-600 hover:text-blue-800 flex items-center transition font-bold">
@@ -32,9 +35,24 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div>
-                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Célula *</label>
-                        <select name="cell_id" required
+                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Tipo de Encontro *</label>
+                        <select name="meeting_type" x-model="meetingType" required
                             class="w-full rounded-2xl border-gray-100 bg-gray-50/50 focus:ring-blue-500 focus:border-blue-500 font-bold py-3">
+                            <option value="normal">Reunião de Célula</option>
+                            <option value="leadership">Reunião de Liderança</option>
+                            <option value="supervision">Reunião de Supervisão</option>
+                            <option value="zone">Reunião de Zona</option>
+                            <option value="general">Reunião Geral</option>
+                            <option value="other">Outro / Especial</option>
+                        </select>
+                        @error('meeting_type') <p class="text-red-500 text-[10px] font-bold mt-2 uppercase tracking-tighter">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div x-show="meetingType === 'normal'" x-transition>
+                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Célula *</label>
+                        <select name="cell_id"
+                            class="w-full rounded-2xl border-gray-100 bg-gray-50/50 focus:ring-blue-500 focus:border-blue-500 font-bold py-3"
+                            :required="meetingType === 'normal'">
                             <option value="">Selecione a célula</option>
                             @foreach($cells as $cell)
                                 <option value="{{ $cell->id }}" {{ old('cell_id', $cellMeeting->cell_id) == $cell->id ? 'selected' : '' }}>
@@ -45,17 +63,34 @@
                         @error('cell_id') <p class="text-red-500 text-[10px] font-bold mt-2 uppercase tracking-tighter">{{ $message }}</p> @enderror
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Tipo de Encontro *</label>
-                        <select name="meeting_type" x-model="meetingType" required
-                            class="w-full rounded-2xl border-gray-100 bg-gray-50/50 focus:ring-blue-500 focus:border-blue-500 font-bold py-3">
-                            <option value="normal">Reunião Normal (Célula)</option>
-                            <option value="leadership">Reunião de Liderança</option>
-                            <option value="supervision">Reunião de Supervisão</option>
-                            <option value="zone">Reunião de Zona</option>
-                            <option value="other">Outro / Especial</option>
+                    <div x-show="meetingType === 'zone'" x-transition>
+                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Zona *</label>
+                        <select name="zone_id"
+                            class="w-full rounded-2xl border-gray-100 bg-gray-50/50 focus:ring-blue-500 focus:border-blue-500 font-bold py-3"
+                            :required="meetingType === 'zone'">
+                            <option value="">Selecione a zona</option>
+                            @foreach($zones as $zone)
+                                <option value="{{ $zone->id }}" {{ old('zone_id', $cellMeeting->zone_id) == $zone->id ? 'selected' : '' }}>
+                                    {{ $zone->name }}
+                                </option>
+                            @endforeach
                         </select>
-                        @error('meeting_type') <p class="text-red-500 text-[10px] font-bold mt-2 uppercase tracking-tighter">{{ $message }}</p> @enderror
+                        @error('zone_id') <p class="text-red-500 text-[10px] font-bold mt-2 uppercase tracking-tighter">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div x-show="meetingType === 'supervision'" x-transition>
+                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Supervisão *</label>
+                        <select name="supervision_id"
+                            class="w-full rounded-2xl border-gray-100 bg-gray-50/50 focus:ring-blue-500 focus:border-blue-500 font-bold py-3"
+                            :required="meetingType === 'supervision'">
+                            <option value="">Selecione a supervisão</option>
+                            @foreach($supervisions as $sup)
+                                <option value="{{ $sup->id }}" {{ old('supervision_id', $cellMeeting->supervision_id) == $sup->id ? 'selected' : '' }}>
+                                    {{ $sup->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('supervision_id') <p class="text-red-500 text-[10px] font-bold mt-2 uppercase tracking-tighter">{{ $message }}</p> @enderror
                     </div>
 
                     <div>
@@ -96,7 +131,56 @@
                     </div>
                 </div>
 
-                <!-- Attendance Section (For Normal Meetings) -->
+                <!-- Participants Section (Visible only for non-normal meetings) -->
+                <div x-show="meetingType !== 'normal'" x-transition.fade class="space-y-6">
+                    <div class="p-8 bg-orange-50/50 rounded-[2.5rem] border border-orange-100">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                            <h5 class="text-xs font-black uppercase tracking-widest text-orange-600 flex items-center">
+                                <i class="bi bi-person-badge-fill mr-2"></i> Registro de Participantes (Oficiais)
+                            </h5>
+                            
+                            <div class="flex flex-wrap gap-2">
+                                <template x-for="role in [
+                                    {id: 'pastor_zona', label: 'Pastores'},
+                                    {id: 'supervisor', label: 'Supervisores'},
+                                    {id: 'lider_celula', label: 'Líderes'},
+                                    {id: 'timoteo', label: 'Timóteos'}
+                                ]">
+                                    <label class="inline-flex items-center px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter transition-all cursor-pointer border"
+                                        :class="selectedRoles.includes(role.id) ? 'bg-orange-600 text-white border-orange-600' : 'bg-white text-orange-600 border-orange-200 hover:border-orange-400'">
+                                        <input type="checkbox" :value="role.id" x-model="selectedRoles" class="hidden">
+                                        <span x-text="role.label"></span>
+                                    </label>
+                                </template>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-h-96 overflow-y-auto p-2">
+                            @php
+                                $currentParticipants = $cellMeeting->participants->pluck('id')->toArray();
+                            @endphp
+                            @foreach($allLeaders as $official)
+                                <label x-show="selectedRoles.includes('{{ $official->role }}') || ['admin', 'pastor'].includes('{{ $official->role }}')" 
+                                    x-transition.fade
+                                    class="flex items-center p-4 bg-white rounded-2xl border border-orange-100 hover:border-orange-300 transition-all cursor-pointer group shadow-sm">
+                                    <input type="checkbox" name="participants[]" value="{{ $official->id }}"
+                                        {{ in_array($official->id, $currentParticipants) ? 'checked' : '' }}
+                                        class="w-5 h-5 text-orange-600 border-gray-200 rounded-lg focus:ring-orange-500">
+                                    <div class="ml-3">
+                                        <p class="text-xs font-black text-gray-800 group-hover:text-orange-700">{{ $official->name }}</p>
+                                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{{ $official->role }}</p>
+                                    </div>
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Ata do Encontro (Resumo Formal)</label>
+                        <textarea name="minutes" rows="10" placeholder="Descreva os pontos abordados, decisões tomadas e orientações dadas..."
+                            class="w-full rounded-[2rem] border-gray-100 bg-gray-50/50 focus:ring-orange-500 focus:border-orange-500 font-medium p-6">{{ old('minutes', $cellMeeting->minutes) }}</textarea>
+                    </div>
+                </div>
                 <div x-show="meetingType === 'normal'" x-transition.fade class="space-y-8">
                     @if($members->count() > 0)
                         <div class="bg-blue-50/50 p-8 rounded-[2.5rem] border border-blue-100">

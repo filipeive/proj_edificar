@@ -99,7 +99,7 @@
                             data-label="Célula">
                             <option value="">-- Selecione uma célula --</option>
                             @foreach($availableCells as $cell)
-                                <option value="{{ $cell->id }}" {{ old('cell_id') == $cell->id ? 'selected' : '' }}>
+                                <option value="{{ $cell->id }}" {{ (old('cell_id', $prefill['cell_id'] ?? '')) == $cell->id ? 'selected' : '' }}>
                                     {{ $cell->name }}
                                     @if($cell->supervision)
                                         ({{ $cell->supervision->name }})
@@ -130,7 +130,7 @@
                             </label>
                             <input type="text" name="name" id="name" required
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 @error('name') border-red-500 @enderror"
-                                value="{{ old('name') }}" placeholder="João Silva">
+                                value="{{ old('name', $prefill['name'] ?? '') }}" placeholder="João Silva">
                             @error('name')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
@@ -163,7 +163,7 @@
                             </label>
                             <input type="tel" name="phone" id="phone"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 @error('phone') border-red-500 @enderror"
-                                value="{{ old('phone') }}" placeholder="823562000">
+                                value="{{ old('phone', $prefill['phone'] ?? '') }}" placeholder="823562000">
                             @error('phone')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror

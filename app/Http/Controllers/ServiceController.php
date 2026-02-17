@@ -402,7 +402,7 @@ class ServiceController extends Controller
 
         $query = Service::query();
 
-        // Filters
+        // Filters applied to both charts and list
         if ($request->filled('date_from')) {
             $query->where('date', '>=', $request->date_from);
         }
@@ -417,7 +417,8 @@ class ServiceController extends Controller
             }
         }
 
-        $trendServices = $query->with('zoneParticipations')->orderBy('date', 'desc')->get()->reverse();
+        // Get trend data for charts (all records in range)
+        $trendServices = (clone $query)->with('zoneParticipations')->orderBy('date', 'desc')->get()->reverse();
 
         $stats = [
             'labels' => $trendServices->map(fn($s) => \Carbon\Carbon::parse($s->date)->format('d/m'))->values(),
@@ -426,7 +427,20 @@ class ServiceController extends Controller
             'salvations' => $trendServices->map(fn($s) => $s->adults_salvations + $s->children_salvations)->values(),
         ];
 
-        return view('services.report', compact('stats', 'trendServices'));
+        // Search filter for the list specifically
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('theme', 'like', "%{$search}%")
+                    ->orWhere('preacher_name', 'like', "%{$search}%");
+            });
+        }
+
+        $paginatedServices = $query->orderBy('date', 'desc')
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('services.report', compact('stats', 'trendServices', 'paginatedServices'));
     }
 
     public function exportMonthly(Request $request)

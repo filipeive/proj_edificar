@@ -18,6 +18,8 @@
         x-data="{ 
             view: window.innerWidth < 768 ? 'grid' : (localStorage.getItem('cells_view') || 'grid'),
             selected: [],
+            showAssignModal: false,
+            selectedCell: { name: '', id: null, members: [] },
             updateView() {
                 if (window.innerWidth < 768 && this.view === 'list') {
                     this.view = 'grid';
@@ -33,6 +35,10 @@
             },
             deleteSelected() {
                 document.getElementById('bulk-delete-form').submit();
+            },
+            openAssignModal(cell) {
+                this.selectedCell = cell;
+                this.showAssignModal = true;
             }
         }"
         x-init="$watch('view', value => localStorage.setItem('cells_view', value))"
@@ -189,6 +195,11 @@
                                 </div>
                             </div>
                             <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button @click="openAssignModal({ id: {{ $cell->id }}, name: '{{ $cell->name }}', members: {{ $cell->members->where('role', 'membro')->values() }} })"
+                                    title="Atribuir Auxiliar/Timóteo"
+                                    class="w-10 h-10 rounded-xl bg-orange-50 hover:bg-orange-600 text-orange-400 hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                    <i class="bi bi-person-plus"></i>
+                                </button>
                                 <a href="{{ route('cells.edit', $cell) }}"
                                     class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-blue-50 text-gray-400 hover:text-blue-600 flex items-center justify-center transition-all shadow-sm">
                                     <i class="bi bi-pencil-square"></i>
@@ -255,7 +266,6 @@
             </div>
         </template>
 
-        <!-- List View -->
         <template x-if="view === 'list'">
             <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden overflow-x-auto">
                 <table class="w-full text-left table-compact">
@@ -316,6 +326,11 @@
                                     {{ $cell->members->count() }}</td>
                                 <td class="px-6 py-7 text-right">
                                     <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                        <button @click="openAssignModal({ id: {{ $cell->id }}, name: '{{ $cell->name }}', members: {{ $cell->members->where('role', 'membro')->values() }} })"
+                                            title="Atribuir Auxiliar/Timóteo"
+                                            class="action-icon bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white">
+                                            <i class="bi bi-person-plus"></i>
+                                        </button>
                                         <a href="{{ route('cells.show', $cell) }}" title="Detalhes"
                                             class="action-icon bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white">
                                             <i class="bi bi-speedometer2"></i>
@@ -332,6 +347,64 @@
                 </table>
             </div>
         </template>
+
+        <!-- Assign Timoteo Modal -->
+        <div x-show="showAssignModal" 
+            class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            style="display: none;">
+            <div @click.away="showAssignModal = false" class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-hidden animate-In">
+                <div class="p-8 border-b border-gray-100 flex justify-between items-center">
+                    <div>
+                        <h3 class="text-xl font-black text-gray-900 leading-tight">Escolher Novo Timóteo</h3>
+                        <p class="text-sm text-gray-500 mt-1" x-text="'Célula ' + selectedCell.name"></p>
+                    </div>
+                    <button @click="showAssignModal = false" class="text-gray-400 hover:text-gray-600">
+                        <i class="bi bi-x-lg text-xl"></i>
+                    </button>
+                </div>
+                
+                <div class="p-8">
+                    <div class="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                        <template x-for="member in selectedCell.members" :key="member.id">
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-blue-200 transition-all group">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-blue-600 font-bold" x-text="member.name.substring(0, 1)"></div>
+                                    <div class="min-w-0">
+                                        <p class="text-sm font-bold text-gray-900 truncate" x-text="member.name"></p>
+                                        <p class="text-[10px] text-gray-400 truncate" x-text="member.email"></p>
+                                    </div>
+                                </div>
+                                <form :action="'{{ url('/admin/cells') }}/' + selectedCell.id + '/assign-timoteo'" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="user_id" :value="member.id">
+                                    <button type="submit" 
+                                        class="px-4 py-2 bg-white text-orange-600 border border-orange-100 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-orange-600 hover:text-white transition-all shadow-sm">
+                                        Promover
+                                    </button>
+                                </form>
+                            </div>
+                        </template>
+                        <template x-if="selectedCell.members && selectedCell.members.length === 0">
+                            <div class="text-center py-10">
+                                <p class="text-gray-400 italic">Nenhum membro comum nesta célula disponível para promoção.</p>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+                
+                <div class="p-8 bg-gray-50 border-t border-gray-100">
+                    <p class="text-[10px] text-gray-400 font-medium leading-relaxed">
+                        <i class="bi bi-info-circle mr-1"></i> A promoção a Timóteo concede ao membro as mesmas permissões operacionais do líder para esta célula.
+                    </p>
+                </div>
+            </div>
+        </div>
 
         <!-- Paginação -->
         @if($cells->hasPages())

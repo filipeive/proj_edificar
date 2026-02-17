@@ -11,6 +11,8 @@ class CellMeeting extends Model
 
     protected $fillable = [
         'cell_id',
+        'zone_id',
+        'supervision_id',
         'meeting_date',
         'theme',
         'biblical_text',
@@ -33,6 +35,16 @@ class CellMeeting extends Model
         return $this->belongsTo(Cell::class);
     }
 
+    public function zone()
+    {
+        return $this->belongsTo(Zone::class);
+    }
+
+    public function supervision()
+    {
+        return $this->belongsTo(Supervision::class);
+    }
+
     public function leader()
     {
         return $this->belongsTo(User::class, 'leader_id');
@@ -52,5 +64,28 @@ class CellMeeting extends Model
     public function visitors()
     {
         return $this->hasMany(Visitor::class, 'cell_id', 'cell_id');
+    }
+
+    /**
+     * Check if this is a cell-specific meeting (normal type).
+     */
+    public function isCellMeeting(): bool
+    {
+        return $this->meeting_type === 'normal';
+    }
+
+    /**
+     * Get a human-readable label for the meeting type.
+     */
+    public function getMeetingTypeLabelAttribute(): string
+    {
+        return match ($this->meeting_type) {
+            'leadership' => 'Reunião de Liderança',
+            'supervision' => 'Reunião de Supervisão',
+            'zone' => 'Reunião de Zona',
+            'general' => 'Reunião Geral',
+            'other' => 'Encontro Especial',
+            default => 'Reunião de Célula',
+        };
     }
 }

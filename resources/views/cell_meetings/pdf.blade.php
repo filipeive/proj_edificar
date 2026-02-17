@@ -59,12 +59,32 @@
         <table class="info-grid">
             <tr>
                 <td style="width: 60%;">
-                    <div class="label">UNIDADE / CÉLULA</div>
-                    <div class="value">{{ $cellMeeting->cell->name }}</div>
+                    <div class="label">UNIDADE / LOCAL</div>
+                    <div class="value">
+                        @if($cellMeeting->cell)
+                            {{ $cellMeeting->cell->name }}
+                        @elseif($cellMeeting->zone)
+                            {{ $cellMeeting->zone->name }}
+                        @elseif($cellMeeting->supervision)
+                            {{ $cellMeeting->supervision->name }}
+                        @elseif($cellMeeting->meeting_type === 'general')
+                            Reunião Geral
+                        @else
+                            Encontro Geral
+                        @endif
+                    </div>
                 </td>
                 <td>
                     <div class="label">SUPERVISÃO / ZONA</div>
-                    <div class="value">{{ $cellMeeting->cell->supervision->name }} ({{ $cellMeeting->cell->supervision->zone->name }})</div>
+                    <div class="value">
+                        @if($cellMeeting->cell)
+                            {{ $cellMeeting->cell->supervision->name }} ({{ $cellMeeting->cell->supervision->zone->name }})
+                        @elseif($cellMeeting->supervision)
+                            {{ $cellMeeting->supervision->zone->name ?? 'N/D' }}
+                        @else
+                            N/D
+                        @endif
+                    </div>
                 </td>
             </tr>
             <tr>

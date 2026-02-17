@@ -97,6 +97,11 @@ class User extends Authenticatable
         return $this->hasMany(Cell::class, 'leader_id');
     }
 
+    public function assignedCell()
+    {
+        return $this->belongsTo(Cell::class, 'cell_id');
+    }
+
     public function timoteoCells()
     {
         return $this->hasMany(Cell::class, 'timoteo_id');
@@ -215,7 +220,7 @@ class User extends Authenticatable
 
     public function isEdificarManager()
     {
-        return in_array($this->role, ['admin', 'pastor_senior', 'comissao_obra']);
+        return in_array($this->role, ['admin', 'pastor_senior', 'comissao_obra', 'pastor']);
     }
 
     public function isComissaoObra()
@@ -355,18 +360,18 @@ class User extends Authenticatable
             'menu_services' => $this->isAdmin() || $this->isSecretaria() || $this->isPastor(),
             'menu_events' => true, // Default for most
             'menu_weddings' => $this->isAdmin() || $this->isSecretaria() || $this->isPastor(),
-            'menu_visitors' => $this->isAdmin() || $this->isSecretaria() || $this->isPastorZona(),
+            'menu_visitors' => $this->isAdmin() || $this->isSecretaria() || $this->isPastorZona() || $this->isPastor(),
             'menu_courses' => true,
             'menu_public_enrollments' => $this->isAdmin() || $this->isPastor() || $this->isSecretaria() || $this->isPastorSenior(),
             'menu_quarterly_reports' => $this->isAdmin() || $this->isPastor() || $this->isPastorZona() || $this->isSupervisor(),
             'menu_inventory' => $this->isAdmin() || $this->isSecretaria() || $this->isEdificarManager() || $this->isTesouraria(),
 
             // Células
-            'menu_cell_meetings' => $this->isLider() || $this->isTimoteo() || $this->isSupervisor() || $this->isPastorZona() || $this->isAdmin(),
-            'menu_members' => $this->isLider() || $this->isTimoteo() || $this->isSupervisor() || $this->isPastorZona() || $this->isAdmin() || $this->isSecretaria(),
-            'menu_zones' => $this->isAdmin() || $this->isPastorZona(),
-            'menu_supervisions' => $this->isAdmin() || $this->isPastorZona(),
-            'menu_cells' => $this->isAdmin() || $this->isPastorZona() || $this->isSupervisor(),
+            'menu_cell_meetings' => $this->isLider() || $this->isTimoteo() || $this->isSupervisor() || $this->isPastorZona() || $this->isPastor() || $this->isAdmin(),
+            'menu_members' => $this->isLider() || $this->isTimoteo() || $this->isSupervisor() || $this->isPastorZona() || $this->isPastor() || $this->isAdmin() || $this->isSecretaria(),
+            'menu_zones' => $this->isAdmin() || $this->isPastorZona() || $this->isPastor(),
+            'menu_supervisions' => $this->isAdmin() || $this->isPastorZona() || $this->isPastor(),
+            'menu_cells' => $this->isAdmin() || $this->isPastorZona() || $this->isSupervisor() || $this->isPastor(),
 
             // Financeira
             'menu_packages' => $this->isEdificarManager() || $this->isResponsavelPacote(),

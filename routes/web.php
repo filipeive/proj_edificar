@@ -213,8 +213,11 @@ Route::middleware('auth')->group(function () {
             Route::post('/cells/{cell}/attendance', [\App\Http\Controllers\AttendanceController::class, 'store'])->name('cells.attendance.store');
             Route::post('/cells/{cell}/visitors', [\App\Http\Controllers\AttendanceController::class, 'storeVisitor'])->name('cells.visitors.store');
             Route::post('/cells/{cell}/discipleships', [\App\Http\Controllers\AttendanceController::class, 'storeDiscipleship'])->name('cells.discipleships.store');
+            Route::put('/cells/{cell}/discipleships/{discipleship}', [\App\Http\Controllers\AttendanceController::class, 'updateDiscipleship'])->name('cells.discipleships.update');
+            Route::delete('/cells/{cell}/discipleships/{discipleship}', [\App\Http\Controllers\AttendanceController::class, 'destroyDiscipleship'])->name('cells.discipleships.destroy');
             Route::post('/cells/{cell}/conversions', [\App\Http\Controllers\AttendanceController::class, 'storeConversion'])->name('cells.conversions.store');
             Route::post('/cells/{cell}/reassign-supervision', [CellController::class, 'reassignSupervision'])->name('cells.reassign-supervision');
+            Route::post('/cells/{cell}/assign-timoteo', [CellController::class, 'assignTimoteo'])->name('cells.assign-timoteo');
             Route::delete('cells/bulk-destroy', [CellController::class, 'bulkDestroy'])->name('cells.bulk-destroy');
             Route::resource('cells', CellController::class);
 

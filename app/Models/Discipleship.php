@@ -12,6 +12,7 @@ class Discipleship extends Model
         'mentor_name',
         'start_date',
         'current_lesson',
+        'observations',
     ];
 
     protected $casts = [

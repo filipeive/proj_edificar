@@ -53,24 +53,79 @@
                 </div>
             </div>
 
-            <!-- Líder -->
-            <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col justify-center">
-                <div class="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">
-                    <i class="bi bi-person-badge"></i>
-                    <span>Liderança</span>
-                </div>
-                @if ($cell->leader)
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 font-black text-2xl">
-                            {{ substr($cell->leader->name, 0, 1) }}
+            <!-- Líder e Timóteos -->
+            <div class="bg-gray-900 rounded-[2rem] shadow-xl border border-gray-800 p-8 flex flex-col justify-center text-white relative overflow-hidden group">
+                <div class="relative z-10">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">
+                            <i class="bi bi-person-badge-fill text-orange-500"></i>
+                            <span>Equipe de Liderança</span>
                         </div>
-                        <a href="{{ route('users.show', $cell->leader) }}" class="text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors leading-tight">
-                            {{ $cell->leader->name }}
+                        <a href="{{ route('cells.edit', $cell) }}" class="text-[9px] font-black text-blue-400 hover:text-blue-300 uppercase tracking-widest transition-colors">
+                            <i class="bi bi-pencil-square mr-1"></i> Gerir
                         </a>
                     </div>
-                @else
-                    <p class="text-lg font-bold text-gray-300 italic">Sem líder designado</p>
-                @endif
+
+                    @if ($cell->leader)
+                        <div class="flex items-center gap-4 mb-6 pb-6 border-b border-white/5">
+                            <div class="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-400 font-black text-2xl shadow-inner border border-white/5">
+                                {{ substr($cell->leader->name, 0, 1) }}
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <a href="{{ route('users.show', $cell->leader) }}" class="text-xl font-black text-white hover:text-blue-400 transition-colors leading-tight line-clamp-1 tracking-tight">
+                                    {{ $cell->leader->name }}
+                                </a>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-[9px] font-black text-blue-500 uppercase tracking-widest bg-blue-500/10 px-2 py-0.5 rounded">Líder</span>
+                                    <div class="flex gap-2">
+                                        @if($cell->leader->phone)
+                                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $cell->leader->phone) }}" target="_blank" class="text-gray-500 hover:text-green-500 transition-colors">
+                                                <i class="bi bi-whatsapp text-xs"></i>
+                                            </a>
+                                        @endif
+                                        <a href="mailto:{{ $cell->leader->email }}" class="text-gray-500 hover:text-blue-400 transition-colors">
+                                            <i class="bi bi-envelope text-xs"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    <div class="space-y-4">
+                        @forelse($cell->timoteos as $timoteo)
+                            <div class="flex items-center gap-3 bg-white/5 p-3 rounded-2xl border border-white/5 hover:bg-white/10 transition-all group/item">
+                                <div class="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-400 font-black text-sm">
+                                    {{ substr($timoteo->name, 0, 1) }}
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <a href="{{ route('users.show', $timoteo) }}" class="text-sm font-bold text-gray-200 hover:text-orange-400 transition-colors line-clamp-1">
+                                        {{ $timoteo->name }}
+                                    </a>
+                                    <p class="text-[8px] font-black text-orange-500/50 uppercase tracking-widest mt-0.5">Auxiliar / Timóteo</p>
+                                </div>
+                                <div class="flex gap-2 opacity-0 group-hover/item:opacity-100 transition-opacity">
+                                    @if($timoteo->phone)
+                                        <a href="tel:{{ $timoteo->phone }}" class="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all">
+                                            <i class="bi bi-telephone text-[10px]"></i>
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+                        @empty
+                            @if(!$cell->leader)
+                                <div class="py-4 text-center">
+                                    <p class="text-sm font-bold text-gray-600 italic">Sem liderança designada</p>
+                                    <a href="{{ route('cells.edit', $cell) }}" class="text-[10px] font-black text-blue-500 uppercase tracking-widest mt-2 block">Atribuir Agora</a>
+                                </div>
+                            @endif
+                        @endforelse
+                    </div>
+                </div>
+                <!-- Background decoration -->
+                <div class="absolute -right-8 -bottom-8 text-9xl text-white/5 rotate-12 group-hover:scale-110 transition-transform duration-500">
+                    <i class="bi bi-shield-check"></i>
+                </div>
             </div>
 
             <!-- Total Membros -->

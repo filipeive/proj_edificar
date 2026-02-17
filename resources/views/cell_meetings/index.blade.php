@@ -112,12 +112,12 @@
         <!-- Filter Bar -->
         <div class="bg-white dark:bg-gray-800 p-6 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
             <form action="{{ route('cell-meetings.index') }}" method="GET" class="flex flex-col xl:flex-row xl:items-end gap-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 flex-1">
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4 flex-1">
                     <div class="text-black dark:text-white">
                         <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Pesquisar</label>
                         <div class="relative group">
                             <i class="bi bi-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors"></i>
-                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Tema, líder ou célula..."
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Tema, líder..."
                                 class="w-full pl-14 pr-6 py-4 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white">
                         </div>
                     </div>
@@ -125,7 +125,7 @@
                     <div class="text-black dark:text-white">
                         <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Célula</label>
                         <select name="cell_id" class="searchable-select w-full py-4 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white" data-label="Célula">
-                            <option value="">Todas as Células</option>
+                            <option value="">Todas</option>
                             @foreach($cells as $cell)
                                 <option value="{{ $cell->id }}" {{ request('cell_id') == $cell->id ? 'selected' : '' }}>{{ $cell->name }}</option>
                             @endforeach
@@ -133,13 +133,34 @@
                     </div>
 
                     <div class="text-black dark:text-white">
+                        <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Supervisão</label>
+                        <select name="supervision_id" class="searchable-select w-full py-4 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white" data-label="Supervisão">
+                            <option value="">Todas</option>
+                            @foreach($supervisions as $sup)
+                                <option value="{{ $sup->id }}" {{ request('supervision_id') == $sup->id ? 'selected' : '' }}>{{ $sup->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="text-black dark:text-white">
+                        <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Zona</label>
+                        <select name="zone_id" class="searchable-select w-full py-4 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white" data-label="Zona">
+                            <option value="">Todas</option>
+                            @foreach($zones as $zone)
+                                <option value="{{ $zone->id }}" {{ request('zone_id') == $zone->id ? 'selected' : '' }}>{{ $zone->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="text-black dark:text-white">
                         <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Tipo</label>
                         <select name="meeting_type" class="w-full py-4 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white">
-                            <option value="">Todos os Tipos</option>
-                            <option value="normal" {{ request('meeting_type') == 'normal' ? 'selected' : '' }}>Reunião de Célula</option>
+                            <option value="">Todos</option>
+                            <option value="normal" {{ request('meeting_type') == 'normal' ? 'selected' : '' }}>Célula</option>
                             <option value="leadership" {{ request('meeting_type') == 'leadership' ? 'selected' : '' }}>Liderança</option>
                             <option value="supervision" {{ request('meeting_type') == 'supervision' ? 'selected' : '' }}>Supervisão</option>
                             <option value="zone" {{ request('meeting_type') == 'zone' ? 'selected' : '' }}>Zona</option>
+                            <option value="other" {{ request('meeting_type') == 'other' ? 'selected' : '' }}>Outro</option>
                         </select>
                     </div>
 
@@ -147,7 +168,7 @@
                         <button type="submit" class="flex-1 bg-gray-900 dark:bg-black text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 transition-all flex items-center justify-center gap-2 py-4">
                             <i class="bi bi-filter"></i> Filtrar
                         </button>
-                        @if(request()->anyFilled(['search', 'cell_id', 'meeting_type', 'date_start', 'date_end']))
+                        @if(request()->anyFilled(['search', 'cell_id', 'supervision_id', 'zone_id', 'meeting_type', 'date_start', 'date_end']))
                             <a href="{{ route('cell-meetings.index') }}" class="w-14 h-14 bg-gray-100 dark:bg-gray-700 text-gray-500 rounded-2xl hover:bg-red-50 hover:text-red-600 transition-all flex items-center justify-center">
                                 <i class="bi bi-x-lg"></i>
                             </a>
@@ -209,7 +230,7 @@
                                         class="w-5 h-5 text-blue-600 border-gray-200 rounded-lg focus:ring-blue-500/20 transition-all">
                                 </label>
                             </th>
-                            <th class="px-8 py-5 text-left text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Data / Célula</th>
+                            <th class="px-8 py-5 text-left text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Data / Local</th>
                             <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Responsável / Tema</th>
                             <th class="px-10 py-5 text-center text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Participação</th>
                             <th class="px-10 py-5 text-center text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Tipo</th>
@@ -231,7 +252,7 @@
                                             <a href="{{ route('cell-meetings.show', $meeting) }}">{{ $meeting->meeting_date->format('d/m/Y') }}</a>
                                         </span>
                                         <span class="text-[10px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest mt-0.5">
-                                            {{ $meeting->cell->name }}
+                                            {{ $meeting->cell?->name ?? $meeting->zone?->name ?? $meeting->supervision?->name ?? $meeting->meeting_type_label }}
                                         </span>
                                     </div>
                                 </td>
@@ -261,23 +282,27 @@
                                     </div>
                                 </td>
                                 <td class="px-10 py-6 text-center">
-                                    @php
-                                        $typeStyles = [
-                                            'normal' => 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800',
-                                            'leadership' => 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-800',
-                                            'supervision' => 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-100 dark:border-amber-800',
-                                            'zone' => 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-800',
-                                        ];
-                                        $style = $typeStyles[$meeting->meeting_type] ?? 'bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 border-gray-100 dark:border-gray-600';
-                                    @endphp
-                                    <span class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border {{ $style }} shadow-sm">
-                                        @switch($meeting->meeting_type)
-                                            @case('leadership') Liderança @break
-                                            @case('supervision') Supervisão @break
-                                            @case('zone') Zona @break
-                                            @default Célula
-                                        @endswitch
-                                    </span>
+                                        @php
+                                            $typeStyles = [
+                                                'normal' => 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800',
+                                                'leadership' => 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-800',
+                                                'supervision' => 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-100 dark:border-amber-800',
+                                                'zone' => 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-800',
+                                                'general' => 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-800',
+                                                'other' => 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-100 dark:border-gray-700',
+                                            ];
+                                            $style = $typeStyles[$meeting->meeting_type] ?? 'bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 border-gray-100 dark:border-gray-600';
+                                        @endphp
+                                        <span class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border {{ $style }} shadow-sm">
+                                            @switch($meeting->meeting_type)
+                                                @case('leadership') Liderança @break
+                                                @case('supervision') Supervisão @break
+                                                @case('zone') Zona @break
+                                                @case('general') Geral @break
+                                                @case('other') Especial @break
+                                                @default Célula
+                                            @endswitch
+                                        </span>
                                 </td>
                                 <td class="px-10 py-6 text-right">
                                     <div class="flex items-center justify-end gap-2">
@@ -361,7 +386,7 @@
                         <h4 class="text-lg font-black text-gray-900 dark:text-white leading-none tracking-tighter group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
                             {{ $meeting->meeting_date->format('d/m/Y') }}
                         </h4>
-                        <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] line-clamp-1">{{ $meeting->cell->name }}</p>
+                        <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] line-clamp-1">{{ $meeting->cell?->name ?? $meeting->zone?->name ?? $meeting->supervision?->name ?? $meeting->meeting_type_label }}</p>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4 mb-8">

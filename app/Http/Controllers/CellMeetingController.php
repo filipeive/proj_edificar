@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Cell;
 use App\Models\CellMeeting;
+use App\Models\Zone;
+use App\Models\Supervision;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -22,22 +24,27 @@ class CellMeetingController extends Controller
         Gate::authorize('viewAny', CellMeeting::class);
 
         $user = auth()->user();
-        $query = CellMeeting::with(['cell', 'leader']);
+        $query = CellMeeting::with(['cell', 'leader', 'zone', 'supervision']);
 
         // Base Hierarchical Filter
         if ($user->role === 'pastor_zona') {
             $zoneId = $user->getZoneId();
-            $query->whereHas('cell.supervision', function ($q) use ($zoneId) {
-                $q->where('zone_id', $zoneId);
+            $query->where(function ($q) use ($zoneId) {
+                $q->whereHas('cell.supervision', function ($sq) use ($zoneId) {
+                    $sq->where('zone_id', $zoneId);
+                })->orWhere('zone_id', $zoneId);
             });
         } elseif ($user->role === 'supervisor') {
             $supervisionIds = $user->getManagedSupervisionIds();
-            $query->whereHas('cell', function ($q) use ($supervisionIds) {
-                $q->whereIn('supervision_id', $supervisionIds);
+            $query->where(function ($q) use ($supervisionIds) {
+                $q->whereHas('cell', function ($cq) use ($supervisionIds) {
+                    $cq->whereIn('supervision_id', $supervisionIds);
+                })->orWhereIn('supervision_id', $supervisionIds);
             });
-        } elseif ($user->role === 'lider_celula') {
+        } elseif ($user->role === 'lider_celula' || $user->role === 'timoteo') {
             $query->whereHas('cell', function ($q) use ($user) {
-                $q->where('leader_id', $user->id);
+                $q->where('leader_id', $user->id)
+                    ->orWhere('id', $user->cell_id);
             });
         }
 
@@ -72,6 +79,14 @@ class CellMeetingController extends Controller
             $query->whereDate('meeting_date', '<=', $request->date_end);
         }
 
+        if ($request->filled('zone_id')) {
+            $query->where('zone_id', $request->zone_id);
+        }
+
+        if ($request->filled('supervision_id')) {
+            $query->where('supervision_id', $request->supervision_id);
+        }
+
         $meetings = $query->orderBy('meeting_date', 'desc')->paginate(15)->withQueryString();
 
         // Data for filters
@@ -96,7 +111,10 @@ class CellMeetingController extends Controller
             'total_decisions' => $statsQuery->whereNotNull('decisions')->where('decisions', '!=', '')->count(),
         ];
 
-        return view('cell_meetings.index', compact('meetings', 'cells', 'stats'));
+        $zones = Zone::orderBy('name')->get();
+        $supervisions = Supervision::orderBy('name')->get();
+
+        return view('cell_meetings.index', compact('meetings', 'cells', 'stats', 'zones', 'supervisions'));
     }
 
     public function export(Request $request)
@@ -180,8 +198,10 @@ class CellMeetingController extends Controller
             })->get();
         } elseif ($user->role === 'supervisor') {
             $cells = Cell::whereIn('supervision_id', $user->getManagedSupervisionIds())->get();
-        } elseif ($user->role === 'lider_celula') {
-            $cells = Cell::where('leader_id', $user->id)->get();
+        } elseif ($user->role === 'lider_celula' || $user->role === 'timoteo') {
+            $cells = Cell::where('leader_id', $user->id)
+                ->orWhere('id', $user->cell_id)
+                ->orderBy('name')->get();
         } else {
             $cells = collect();
         }
@@ -210,7 +230,7 @@ class CellMeetingController extends Controller
                         $sq->whereIn('id', $supervisionIds);
                     });
             });
-        } elseif ($user->isLider()) {
+        } elseif ($user->isLider() || $user->isTimoteo()) {
             $leadersQuery->where('id', $user->id)
                 ->orWhere('cell_id', $user->cell_id);
         }
@@ -221,14 +241,19 @@ class CellMeetingController extends Controller
         $members = collect();
         if ($selectedCellId) {
             $members = User::where('cell_id', $selectedCellId)->where('is_active', true)->orderBy('name')->get();
-        } elseif ($user->role === 'lider_celula') {
-            $cell = $user->ledCells()->first();
+        } elseif ($user->role === 'lider_celula' || $user->role === 'timoteo') {
+            $cell = Cell::where('leader_id', $user->id)->orWhere('id', $user->cell_id)->first();
             if ($cell) {
                 $members = $cell->members()->where('is_active', true)->orderBy('name')->get();
             }
         }
 
-        return view('cell_meetings.create', compact('cells', 'leaders', 'members'));
+        $zones = Zone::orderBy('name')->get();
+        $supervisions = Supervision::orderBy('name')->get();
+
+        $allLeaders = User::whereIn('role', ['admin', 'pastor', 'pastor_zona', 'supervisor', 'lider_celula', 'timoteo'])->orderBy('name')->get();
+
+        return view('cell_meetings.create', compact('cells', 'leaders', 'members', 'zones', 'supervisions', 'allLeaders'));
     }
 
     public function store(Request $request)
@@ -236,7 +261,9 @@ class CellMeetingController extends Controller
         Gate::authorize('create', CellMeeting::class);
 
         $validated = $request->validate([
-            'cell_id' => 'required|exists:cells,id',
+            'cell_id' => 'required_if:meeting_type,normal|nullable|exists:cells,id',
+            'zone_id' => 'required_if:meeting_type,zone|nullable|exists:zones,id',
+            'supervision_id' => 'required_if:meeting_type,supervision|nullable|exists:supervisions,id',
             'meeting_date' => 'required|date',
             'theme' => 'nullable|string|max:255',
             'biblical_text' => 'nullable|string|max:255',
@@ -245,7 +272,7 @@ class CellMeetingController extends Controller
             'children_count' => 'required|integer|min:0',
             'visitors_count' => 'required|integer|min:0',
             'decisions' => 'nullable|string',
-            'meeting_type' => 'required|string|in:normal,leadership,supervision,zone,other',
+            'meeting_type' => 'required|string|in:normal,leadership,supervision,zone,general,other',
             'minutes' => 'nullable|string',
             'participants' => 'nullable|array',
             'participants.*' => 'exists:users,id',
@@ -256,13 +283,20 @@ class CellMeetingController extends Controller
             'reasons.*' => 'nullable|string|max:255',
         ]);
 
-        // Check for duplicate meeting on same date for same cell
-        $exists = CellMeeting::where('cell_id', $validated['cell_id'])
-            ->where('meeting_date', $validated['meeting_date'])
-            ->exists();
+        // Set correct associations based on meeting type
+        $validated['cell_id'] = $validated['meeting_type'] === 'normal' ? ($validated['cell_id'] ?? null) : null;
+        $validated['zone_id'] = $validated['meeting_type'] === 'zone' ? ($validated['zone_id'] ?? null) : null;
+        $validated['supervision_id'] = $validated['meeting_type'] === 'supervision' ? ($validated['supervision_id'] ?? null) : null;
 
-        if ($exists) {
-            return back()->withErrors(['meeting_date' => 'Já existe um encontro registrado para esta célula nesta data.'])->withInput();
+        // Check for duplicate meeting on same date for same cell (only for cell meetings)
+        if (!empty($validated['cell_id'])) {
+            $exists = CellMeeting::where('cell_id', $validated['cell_id'])
+                ->where('meeting_date', $validated['meeting_date'])
+                ->exists();
+
+            if ($exists) {
+                return back()->withErrors(['meeting_date' => 'Já existe um encontro registrado para esta célula nesta data.'])->withInput();
+            }
         }
 
         $meeting = CellMeeting::create($validated);
@@ -271,35 +305,37 @@ class CellMeetingController extends Controller
             $meeting->participants()->sync($request->participants);
         }
 
-        // Record attendance for ALL members of the cell
-        $allCellMembers = User::where('cell_id', $meeting->cell_id)->where('is_active', true)->pluck('id');
-        $presentIds = $request->input('present_members', []);
-        $reasons = $request->input('reasons', []);
+        // Record attendance only for cell meetings
+        if ($meeting->cell_id) {
+            $allCellMembers = User::where('cell_id', $meeting->cell_id)->where('is_active', true)->pluck('id');
+            $presentIds = $request->input('present_members', []);
+            $reasons = $request->input('reasons', []);
 
-        foreach ($allCellMembers as $userId) {
-            $isPresent = in_array($userId, $presentIds);
-            \App\Models\Attendance::updateOrCreate(
-                [
-                    'user_id' => $userId,
-                    'cell_id' => $meeting->cell_id,
-                    'date' => \Carbon\Carbon::parse($meeting->meeting_date)->format('Y-m-d'),
-                    'type' => 'cell',
-                ],
-                [
-                    'status' => $isPresent,
-                    'reason' => $isPresent ? null : ($reasons[$userId] ?? null),
-                ]
-            );
+            foreach ($allCellMembers as $userId) {
+                $isPresent = in_array($userId, $presentIds);
+                \App\Models\Attendance::updateOrCreate(
+                    [
+                        'user_id' => $userId,
+                        'cell_id' => $meeting->cell_id,
+                        'date' => \Carbon\Carbon::parse($meeting->meeting_date)->format('Y-m-d'),
+                        'type' => 'cell',
+                    ],
+                    [
+                        'status' => $isPresent,
+                        'reason' => $isPresent ? null : ($reasons[$userId] ?? null),
+                    ]
+                );
+            }
         }
 
-        return redirect()->route('cell-meetings.index')->with('success', 'Encontro de célula registrado com sucesso!');
+        return redirect()->route('cell-meetings.index')->with('success', 'Encontro registrado com sucesso!');
     }
 
     public function show(CellMeeting $cellMeeting)
     {
         Gate::authorize('view', $cellMeeting);
 
-        $date = $cellMeeting->meeting_date?->format('Y-m-d');
+        $date = $cellMeeting->meeting_date ? Carbon::parse($cellMeeting->meeting_date)->format('Y-m-d') : null;
         $cellMeeting->load([
             'cell.supervision.zone',
             'leader',
@@ -318,7 +354,7 @@ class CellMeetingController extends Controller
     {
         Gate::authorize('view', $cellMeeting);
 
-        $date = $cellMeeting->meeting_date?->format('Y-m-d');
+        $date = $cellMeeting->meeting_date ? Carbon::parse($cellMeeting->meeting_date)->format('Y-m-d') : null;
         $cellMeeting->load([
             'cell.supervision.zone',
             'leader',
@@ -331,7 +367,8 @@ class CellMeetingController extends Controller
         ]);
 
         $pdf = Pdf::loadView('cell_meetings.pdf', compact('cellMeeting'));
-        return $pdf->download("Encontro_{$cellMeeting->cell->name}_{$cellMeeting->meeting_date?->format('d-m-Y')}.pdf");
+        $filename = "Encontro_" . ($cellMeeting->cell?->name ?? $cellMeeting->zone?->name ?? $cellMeeting->supervision?->name ?? $cellMeeting->meeting_type_label) . "_" . ($cellMeeting->meeting_date ? Carbon::parse($cellMeeting->meeting_date)->format('d-m-Y') : 'data-nd');
+        return $pdf->download(str_replace(' ', '_', $filename) . ".pdf");
     }
 
     public function sendEmail(Request $request, CellMeeting $cellMeeting)
@@ -342,7 +379,7 @@ class CellMeetingController extends Controller
             'email' => 'required|email'
         ]);
 
-        $date = $cellMeeting->meeting_date?->format('Y-m-d');
+        $date = $cellMeeting->meeting_date ? Carbon::parse($cellMeeting->meeting_date)->format('Y-m-d') : null;
         $cellMeeting->load([
             'cell.supervision.zone',
             'leader',
@@ -356,8 +393,10 @@ class CellMeetingController extends Controller
 
         try {
             Mail::send('emails.cell_meeting_report', ['cellMeeting' => $cellMeeting], function ($message) use ($validated, $cellMeeting) {
+                $subjectName = $cellMeeting->cell?->name ?? $cellMeeting->zone?->name ?? $cellMeeting->supervision?->name ?? $cellMeeting->meeting_type_label;
+                $formattedDate = $cellMeeting->meeting_date ? Carbon::parse($cellMeeting->meeting_date)->format('d/m/Y') : 'N/D';
                 $message->to($validated['email'])
-                    ->subject("Relatório de Encontro: {$cellMeeting->cell->name} - " . ($cellMeeting->meeting_date?->format('d/m/Y') ?? 'N/D'));
+                    ->subject("Relatório de Encontro: {$subjectName} - {$formattedDate}");
             });
 
             return back()->with('success', 'Relatório enviado com sucesso!');
@@ -424,12 +463,17 @@ class CellMeetingController extends Controller
             ->get();
 
         $attendances = \App\Models\Attendance::where('cell_id', $cellMeeting->cell_id)
-            ->where('date', $cellMeeting->meeting_date->format('Y-m-d'))
+            ->where('date', $cellMeeting->meeting_date ? Carbon::parse($cellMeeting->meeting_date)->format('Y-m-d') : null)
             ->where('type', 'cell')
             ->get()
             ->keyBy('user_id');
 
-        return view('cell_meetings.edit', compact('cellMeeting', 'cells', 'leaders', 'members', 'attendances'));
+        $zones = Zone::orderBy('name')->get();
+        $supervisions = Supervision::orderBy('name')->get();
+
+        $allLeaders = User::whereIn('role', ['admin', 'pastor', 'pastor_zona', 'supervisor', 'lider_celula', 'timoteo'])->orderBy('name')->get();
+
+        return view('cell_meetings.edit', compact('cellMeeting', 'cells', 'leaders', 'members', 'attendances', 'zones', 'supervisions', 'allLeaders'));
     }
 
     public function update(Request $request, CellMeeting $cellMeeting)
@@ -437,9 +481,11 @@ class CellMeetingController extends Controller
         Gate::authorize('update', $cellMeeting);
 
         $validated = $request->validate([
-            'cell_id' => 'required|exists:cells,id',
+            'cell_id' => 'required_if:meeting_type,normal|nullable|exists:cells,id',
+            'zone_id' => 'required_if:meeting_type,zone|nullable|exists:zones,id',
+            'supervision_id' => 'required_if:meeting_type,supervision|nullable|exists:supervisions,id',
             'meeting_date' => 'required|date',
-            'meeting_type' => 'required|string|in:normal,leadership,supervision,zone,other',
+            'meeting_type' => 'required|string|in:normal,leadership,supervision,zone,general,other',
             'minutes' => 'nullable|string',
             'participants' => 'nullable|array',
             'participants.*' => 'exists:users,id',
@@ -457,14 +503,21 @@ class CellMeetingController extends Controller
             'reasons.*' => 'nullable|string|max:255',
         ]);
 
-        // Check for duplicate meeting on same date for same cell (excluding current)
-        $exists = CellMeeting::where('cell_id', $validated['cell_id'])
-            ->where('meeting_date', $validated['meeting_date'])
-            ->where('id', '!=', $cellMeeting->id)
-            ->exists();
+        // Set correct associations based on meeting type
+        $validated['cell_id'] = $validated['meeting_type'] === 'normal' ? ($validated['cell_id'] ?? null) : null;
+        $validated['zone_id'] = $validated['meeting_type'] === 'zone' ? ($validated['zone_id'] ?? null) : null;
+        $validated['supervision_id'] = $validated['meeting_type'] === 'supervision' ? ($validated['supervision_id'] ?? null) : null;
 
-        if ($exists) {
-            return back()->withErrors(['meeting_date' => 'Já existe um encontro registrado para esta célula nesta data.'])->withInput();
+        // Check for duplicate meeting on same date for same cell (excluding current, only for cell meetings)
+        if (!empty($validated['cell_id'])) {
+            $exists = CellMeeting::where('cell_id', $validated['cell_id'])
+                ->where('meeting_date', $validated['meeting_date'])
+                ->where('id', '!=', $cellMeeting->id)
+                ->exists();
+
+            if ($exists) {
+                return back()->withErrors(['meeting_date' => 'Já existe um encontro registrado para esta célula nesta data.'])->withInput();
+            }
         }
 
         $cellMeeting->update($validated);
@@ -473,28 +526,30 @@ class CellMeetingController extends Controller
             $cellMeeting->participants()->sync($request->participants);
         }
 
-        // Record attendance for ALL members of the cell
-        $allCellMembers = User::where('cell_id', $cellMeeting->cell_id)->where('is_active', true)->pluck('id');
-        $presentIds = $request->input('present_members', []);
-        $reasons = $request->input('reasons', []);
+        // Record attendance only for cell meetings
+        if ($cellMeeting->cell_id) {
+            $allCellMembers = User::where('cell_id', $cellMeeting->cell_id)->where('is_active', true)->pluck('id');
+            $presentIds = $request->input('present_members', []);
+            $reasons = $request->input('reasons', []);
 
-        foreach ($allCellMembers as $userId) {
-            $isPresent = in_array($userId, $presentIds);
-            \App\Models\Attendance::updateOrCreate(
-                [
-                    'user_id' => $userId,
-                    'cell_id' => $cellMeeting->cell_id,
-                    'date' => \Carbon\Carbon::parse($cellMeeting->meeting_date)->format('Y-m-d'),
-                    'type' => 'cell',
-                ],
-                [
-                    'status' => $isPresent,
-                    'reason' => $isPresent ? null : ($reasons[$userId] ?? null),
-                ]
-            );
+            foreach ($allCellMembers as $userId) {
+                $isPresent = in_array($userId, $presentIds);
+                \App\Models\Attendance::updateOrCreate(
+                    [
+                        'user_id' => $userId,
+                        'cell_id' => $cellMeeting->cell_id,
+                        'date' => \Carbon\Carbon::parse($cellMeeting->meeting_date)->format('Y-m-d'),
+                        'type' => 'cell',
+                    ],
+                    [
+                        'status' => $isPresent,
+                        'reason' => $isPresent ? null : ($reasons[$userId] ?? null),
+                    ]
+                );
+            }
         }
 
-        return redirect()->route('cell-meetings.index')->with('success', 'Encontro de célula atualizado com sucesso!');
+        return redirect()->route('cell-meetings.index')->with('success', 'Encontro atualizado com sucesso!');
     }
 
     public function destroy(CellMeeting $cellMeeting)
