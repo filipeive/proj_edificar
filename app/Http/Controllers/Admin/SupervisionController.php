@@ -247,4 +247,50 @@ class SupervisionController
 
         return back()->with('success', 'Supervisão transferida com sucesso para a nova zona!');
     }
+
+    public function storeQuickSupervisor(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'nullable|moz_phone',
+            'zone_id' => 'required|exists:zones,id',
+        ]);
+
+        $email = $this->generateAutoEmail($validated['name']);
+        $plainPassword = \Illuminate\Support\Str::random(8);
+
+        $newUser = \App\Models\User::create([
+            'name' => $validated['name'],
+            'email' => $email,
+            'phone' => $validated['phone'] ?? null,
+            'password' => \Illuminate\Support\Facades\Hash::make($plainPassword),
+            'role' => 'supervisor',
+            'is_active' => true,
+        ]);
+
+        if ($newUser->wantsNotification('member_created')) {
+            $newUser->notify(new \App\Notifications\MemberCreatedNotification($newUser, $plainPassword));
+        }
+
+        return back()
+            ->with('success', 'Supervisor criado com sucesso!')
+            ->with('info', "Credenciais geradas — Email: {$email} | Senha: {$plainPassword}");
+    }
+
+    private function generateAutoEmail(string $name): string
+    {
+        $base = \Illuminate\Support\Str::slug($name, '.');
+        $base = $base !== '' ? $base : 'supervisor';
+        $host = parse_url(config('app.url'), PHP_URL_HOST) ?: 'edificar.local';
+
+        $email = "{$base}@{$host}";
+        $suffix = 1;
+
+        while (\App\Models\User::where('email', $email)->exists()) {
+            $email = "{$base}{$suffix}@{$host}";
+            $suffix++;
+        }
+
+        return $email;
+    }
 }

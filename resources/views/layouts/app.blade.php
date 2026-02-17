@@ -1574,10 +1574,26 @@
                 icon: 'info',
                 title: title,
                 text: message,
-                timer: 4000,
-                showConfirmButton: false
+                timer: 8000,
+                showConfirmButton: true
             });
         };
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            @if(session('success'))
+                window.showSuccess(@json(session('success')));
+            @endif
+            @if(session('error'))
+                window.showError(@json(session('error')));
+            @endif
+            @if(session('warning'))
+                window.showWarning(@json(session('warning')));
+            @endif
+            @if(session('info'))
+                window.showInfo(@json(session('info')));
+            @endif
+        });
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {

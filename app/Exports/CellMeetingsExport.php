@@ -46,16 +46,33 @@ class CellMeetingsExport implements FromCollection, WithHeadings, WithMapping, W
 
     public function map($meeting): array
     {
+        $targetName = 'Geral / Outros';
+
+        if ($meeting->cell) {
+            $targetName = $meeting->cell->name;
+        } elseif ($meeting->supervision) {
+            $targetName = "SUPERVISÃO: " . $meeting->supervision->name;
+        } elseif ($meeting->zone) {
+            $targetName = "ZONA: " . $meeting->zone->name;
+        }
+
         return [
             $meeting->meeting_date->format('d/m/Y'),
-            $meeting->cell->name,
-            ucfirst($meeting->meeting_type),
+            $targetName,
+            match ($meeting->meeting_type) {
+                'leadership' => 'Liderança',
+                'supervision' => 'Supervisão',
+                'zone' => 'Zona',
+                'general' => 'Geral',
+                'other' => 'Especial',
+                default => 'Célula',
+            },
             $meeting->leader->name ?? 'N/A',
             $meeting->theme ?? '',
-            $meeting->adults_count,
-            $meeting->children_count,
-            $meeting->visitors_count,
-            $meeting->adults_count + $meeting->children_count + $meeting->visitors_count,
+            (int) $meeting->adults_count,
+            (int) $meeting->children_count,
+            (int) $meeting->visitors_count,
+            (int) ($meeting->adults_count + $meeting->children_count + $meeting->visitors_count),
             $meeting->decisions ?? '',
         ];
     }

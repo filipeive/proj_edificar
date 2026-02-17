@@ -18,28 +18,6 @@
                     </script>
                 @endpush
             @endif
-            @if(session('success'))
-                <div class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-800 px-6 py-4 rounded-2xl font-bold">
-                    <i class="bi bi-check-circle-fill mr-2"></i>
-                    {{ session('success') }}
-                </div>
-                @push('scripts')
-                    <script>
-                        window.showSuccess(@json(session('success')));
-                    </script>
-                @endpush
-            @endif
-            @if(session('error'))
-                <div class="mb-6 bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-2xl font-bold">
-                    <i class="bi bi-exclamation-circle-fill mr-2"></i>
-                    {{ session('error') }}
-                </div>
-                @push('scripts')
-                    <script>
-                        window.showError(@json(session('error')));
-                    </script>
-                @endpush
-            @endif
             <form action="{{ route('members.store') }}" method="POST">
                 @csrf
 

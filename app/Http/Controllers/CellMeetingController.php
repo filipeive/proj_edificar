@@ -122,22 +122,27 @@ class CellMeetingController extends Controller
         Gate::authorize('viewAny', CellMeeting::class);
 
         $user = auth()->user();
-        $query = CellMeeting::with(['cell', 'leader']);
+        $query = CellMeeting::with(['cell', 'leader', 'zone', 'supervision']);
 
         // Apply same filters as index
         if ($user->role === 'pastor_zona') {
             $zoneId = $user->getZoneId();
-            $query->whereHas('cell.supervision', function ($q) use ($zoneId) {
-                $q->where('zone_id', $zoneId);
+            $query->where(function ($q) use ($zoneId) {
+                $q->whereHas('cell.supervision', function ($sq) use ($zoneId) {
+                    $sq->where('zone_id', $zoneId);
+                })->orWhere('zone_id', $zoneId);
             });
         } elseif ($user->role === 'supervisor') {
             $supervisionIds = $user->getManagedSupervisionIds();
-            $query->whereHas('cell', function ($q) use ($supervisionIds) {
-                $q->whereIn('supervision_id', $supervisionIds);
+            $query->where(function ($q) use ($supervisionIds) {
+                $q->whereHas('cell', function ($cq) use ($supervisionIds) {
+                    $cq->whereIn('supervision_id', $supervisionIds);
+                })->orWhereIn('supervision_id', $supervisionIds);
             });
-        } elseif ($user->role === 'lider_celula') {
+        } elseif ($user->role === 'lider_celula' || $user->role === 'timoteo') {
             $query->whereHas('cell', function ($q) use ($user) {
-                $q->where('leader_id', $user->id);
+                $q->where('leader_id', $user->id)
+                    ->orWhere('id', $user->cell_id);
             });
         }
 
@@ -161,6 +166,26 @@ class CellMeetingController extends Controller
 
         if ($request->filled('meeting_type')) {
             $query->where('meeting_type', $request->meeting_type);
+        }
+
+        if ($request->filled('date_start')) {
+            $query->whereDate('meeting_date', '>=', $request->date_start);
+        }
+
+        if ($request->filled('date_end')) {
+            $query->whereDate('meeting_date', '<=', $request->date_end);
+        }
+
+        if ($request->filled('zone_id')) {
+            $query->where('zone_id', $request->zone_id);
+        }
+
+        if ($request->filled('supervision_id')) {
+            $query->where('supervision_id', $request->supervision_id);
+        }
+
+        if ($request->filled('meeting_id')) {
+            $query->where('id', $request->meeting_id);
         }
 
         $meetings = $query->orderBy('meeting_date', 'desc')->get();
@@ -358,6 +383,7 @@ class CellMeetingController extends Controller
         $cellMeeting->load([
             'cell.supervision.zone',
             'leader',
+            'participants',
             'attendances' => function ($query) use ($date) {
                 $query->where('date', $date)->with('member');
             },
@@ -383,6 +409,7 @@ class CellMeetingController extends Controller
         $cellMeeting->load([
             'cell.supervision.zone',
             'leader',
+            'participants',
             'attendances' => function ($query) use ($date) {
                 $query->where('date', $date)->with('member');
             },

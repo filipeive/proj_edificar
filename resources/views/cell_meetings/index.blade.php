@@ -96,16 +96,20 @@
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-lg group">
-                <div class="flex items-center gap-5">
-                    <div class="w-14 h-14 rounded-2xl bg-red-50 dark:bg-red-900/30 text-red-600 flex items-center justify-center text-2xl group-hover:bg-red-600 group-hover:text-white transition-all">
-                        <i class="bi bi-heart-pulse"></i>
+            <div class="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-lg group flex flex-col justify-between">
+                <div class="flex items-center gap-5 mb-4">
+                    <div class="w-14 h-14 rounded-2xl bg-orange-50 dark:bg-orange-900/30 text-orange-600 flex items-center justify-center text-2xl group-hover:bg-orange-600 group-hover:text-white transition-all">
+                        <i class="bi bi-file-earmark-excel"></i>
                     </div>
                     <div>
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Conversões</p>
-                        <p class="text-3xl font-black text-gray-900 dark:text-white tracking-tighter">{{ $stats['total_decisions'] }}</p>
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Backup Excel</p>
+                        <p class="text-xl font-black text-gray-900 dark:text-white tracking-tighter">Exportar Lista</p>
                     </div>
                 </div>
+                <a href="{{ route('cell-meetings.export', request()->all()) }}" 
+                   class="w-full bg-gray-900 dark:bg-black text-white text-[10px] font-black uppercase tracking-widest py-3 rounded-xl text-center hover:bg-emerald-600 transition-all">
+                   Gerar Relatório
+                </a>
             </div>
         </div>
         @endif

@@ -205,6 +205,7 @@ Route::middleware('auth')->group(function () {
             Route::post('supervisions/{supervision}/merge', [SupervisionController::class, 'processMerge'])->name('supervisions.process-merge');
             Route::post('supervisions/{supervision}/reassign-zone', [SupervisionController::class, 'reassignZone'])->name('supervisions.reassign-zone');
             Route::delete('supervisions/bulk-destroy', [SupervisionController::class, 'bulkDestroy'])->name('supervisions.bulk-destroy');
+            Route::post('supervisions/quick-supervisor', [SupervisionController::class, 'storeQuickSupervisor'])->name('supervisions.quick-supervisor');
             Route::resource('supervisions', SupervisionController::class);
 
             // Gestão de Células

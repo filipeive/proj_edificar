@@ -25,16 +25,6 @@
                 </form>
             </div>
         </div>
-        @if(session('success'))
-            @push('scripts')
-                <script>window.showSuccess(@json(session('success')));</script>
-            @endpush
-        @endif
-        @if(session('error'))
-            @push('scripts')
-                <script>window.showError(@json(session('error')));</script>
-            @endpush
-        @endif
         <!-- Tabs -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-2">
             <div class="flex flex-wrap gap-2">
