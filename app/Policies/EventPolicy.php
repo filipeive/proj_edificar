@@ -10,12 +10,12 @@ class EventPolicy
 {
     public function viewAny(User $user): bool
     {
-        return in_array($user->role, ['admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'secretaria', 'tesouraria', 'lider_celula', 'membro']);
+        return in_array($user->role, ['admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'secretaria', 'tesouraria', 'lider_celula', 'membro', 'administracao']);
     }
 
     public function view(User $user, Event $event): bool
     {
-        if ($user->isAdmin() || $user->isSecretaria() || $user->isPastor()) {
+        if ($user->isAdmin() || $user->isSecretaria() || $user->isPastor() || $user->isAdministracao()) {
             return true;
         }
 

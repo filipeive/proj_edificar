@@ -142,10 +142,10 @@
     <table>
         <thead>
             <tr>
-                <th width="30%">Casal (Ele & Ela)</th>
+                <th width="30%">Inscrito / Casal</th>
+                <th width="15%">Tipo</th>
                 <th width="15%">Status</th>
-                <th width="15%">Presença</th>
-                <th width="20%">Recomendação</th>
+                <th width="20%">Presença</th>
                 <th width="20%">Observações</th>
             </tr>
         </thead>
@@ -153,6 +153,7 @@
             @foreach($courseClass->courseEnrollments as $enrollment)
                 <tr>
                     <td>{{ $enrollment->malePartner->name ?? 'N/A' }} & {{ $enrollment->femalePartner->name ?? 'N/A' }}</td>
+                    <td>Matrícula Interna</td>
                     <td>
                         <span class="status-badge status-{{ $enrollment->status }}">
                             {{ ucfirst($enrollment->status) }}
@@ -162,8 +163,33 @@
                         {{ $enrollment->attendance_count }} Presenças<br>
                         <small>{{ $enrollment->absence_count }} Faltas</small>
                     </td>
-                    <td>{{ $enrollment->recommendation ?? '---' }}</td>
                     <td>{{ $enrollment->notes ?? '---' }}</td>
+                </tr>
+            @endforeach
+            @foreach($courseClass->coupleEnrollments as $enrollment)
+                <tr>
+                    <td>{{ $enrollment->husband_name }} & {{ $enrollment->wife_name }}</td>
+                    <td>Inscrição Pública</td>
+                    <td>
+                        <span class="status-badge status-{{ $enrollment->status }}">
+                            {{ ucfirst($enrollment->status) }}
+                        </span>
+                    </td>
+                    <td>---</td>
+                    <td>{{ $enrollment->observations ?? '---' }}</td>
+                </tr>
+            @endforeach
+            @foreach($courseClass->ministerialEnrollments as $enrollment)
+                <tr>
+                    <td>{{ $enrollment->full_name }}</td>
+                    <td>Inscrição Individual</td>
+                    <td>
+                        <span class="status-badge status-{{ $enrollment->status }}">
+                            {{ ucfirst($enrollment->status) }}
+                        </span>
+                    </td>
+                    <td>---</td>
+                    <td>{{ $enrollment->observations ?? '---' }}</td>
                 </tr>
             @endforeach
         </tbody>

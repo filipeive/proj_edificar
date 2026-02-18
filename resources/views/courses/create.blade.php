@@ -76,7 +76,18 @@
                                 @error('target_role') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
 
-                            <div class="flex items-center space-x-3 pt-8">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-widest">Data
+                                    Limite de Inscrição</label>
+                                <input type="date" name="registration_deadline" value="{{ old('registration_deadline') }}"
+                                    class="w-full rounded-xl border-gray-200 focus:ring-orange-500 focus:border-orange-500 p-4">
+                                @error('registration_deadline') <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-8">
+                            <div class="flex items-center space-x-3">
                                 <input type="hidden" name="is_active" value="0">
                                 <input type="checkbox" name="is_active" value="1" id="is_active" {{ old('is_active', 1) ? 'checked' : '' }}
                                     class="w-5 h-5 text-orange-600 border-gray-300 rounded focus:ring-orange-500">

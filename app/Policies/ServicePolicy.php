@@ -10,26 +10,26 @@ class ServicePolicy
 {
     public function viewAny(User $user): bool
     {
-        return in_array($user->role, ['admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'secretaria', 'tesouraria']);
+        return in_array($user->role, ['admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'secretaria', 'tesouraria', 'administracao']);
     }
 
     public function view(User $user, Service $service): bool
     {
-        return in_array($user->role, ['admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'secretaria', 'tesouraria']);
+        return in_array($user->role, ['admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'secretaria', 'tesouraria', 'administracao']);
     }
 
     public function create(User $user): bool
     {
-        return $user->isAdmin() || $user->isSecretaria() || $user->isPastor() || $user->isPastorZona();
+        return $user->isAdmin() || $user->isSecretaria() || $user->isPastor() || $user->isPastorZona() || $user->isAdministracao();
     }
 
     public function update(User $user, Service $service): bool
     {
-        return $user->isAdmin() || $user->isSecretaria() || $user->isPastor() || $user->isPastorZona();
+        return $user->isAdmin() || $user->isSecretaria() || $user->isPastor() || $user->isPastorZona() || $user->isAdministracao();
     }
 
     public function delete(User $user, Service $service): bool
     {
-        return $user->isAdmin() || $user->isSecretaria();
+        return $user->isAdmin() || $user->isSecretaria() || $user->isAdministracao();
     }
 }

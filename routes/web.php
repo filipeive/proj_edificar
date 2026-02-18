@@ -34,6 +34,11 @@ Route::get('/inscricao-casais', [\App\Http\Controllers\PublicCourseController::c
 Route::post('/inscricao-casais', [\App\Http\Controllers\PublicCourseController::class, 'storeCasaisEnrollment'])->name('public.courses.casais.store');
 Route::get('/inscricao-pre-marital', [\App\Http\Controllers\PublicFormController::class, 'showPreMaritalForm'])->name('public.forms.pre-marital');
 Route::post('/inscricao-pre-marital', [\App\Http\Controllers\PublicFormController::class, 'storePreMarital'])->name('public.forms.pre-marital.store');
+
+// Ministerial Forms (Dynamic Slug)
+Route::get('/inscricao/{slug}', [\App\Http\Controllers\PublicFormController::class, 'showMinisterialForm'])->name('public.forms.ministerial');
+Route::post('/inscricao/ministerial', [\App\Http\Controllers\PublicFormController::class, 'storeMinisterialForm'])->name('public.forms.ministerial.store');
+
 Route::get('/relatorio-trimestral', [\App\Http\Controllers\PublicFormController::class, 'showQuarterlyReportForm'])->name('public.reports.quarterly');
 Route::post('/relatorio-trimestral', [\App\Http\Controllers\PublicFormController::class, 'storeQuarterlyReport'])->name('public.reports.quarterly.store');
 
@@ -128,6 +133,11 @@ Route::middleware('auth')->group(function () {
         ->middleware('role:secretaria')
         ->name('dashboard.secretaria');
 
+    // Dashboard Administração
+    Route::get('/administracao/dashboard', \App\Http\Controllers\Dashboard\AdministracaoDashboardController::class)
+        ->middleware('role:administracao')
+        ->name('dashboard.administracao');
+
     // Criar Membros contexto das rotas abaixo
     // Criar Membros contexto das rotas abaixo
     Route::match(['get', 'post'], '/admin/visitors/batch-destroy', [\App\Http\Controllers\VisitorController::class, 'bulkDestroy'])
@@ -148,7 +158,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // Visitantes (Admin, Secretaria, Pastor de Zona)
-    Route::middleware('role:admin,secretaria,pastor_zona')->prefix('visitors')->name('visitors.')->group(function () {
+    Route::middleware('role:admin,secretaria,pastor_zona,administracao')->prefix('visitors')->name('visitors.')->group(function () {
         Route::get('/', [\App\Http\Controllers\VisitorController::class, 'index'])->name('index');
 
         Route::get('/export', [\App\Http\Controllers\VisitorController::class, 'export'])->name('export');
@@ -177,10 +187,14 @@ Route::middleware('auth')->group(function () {
             Route::post('/reset', [\App\Http\Controllers\Admin\SettingController::class, 'resetToDefaults'])->name('reset');
             Route::get('/backup', [\App\Http\Controllers\Admin\SettingController::class, 'backup'])->name('backup');
             Route::get('/backup/{filename}', [\App\Http\Controllers\Admin\SettingController::class, 'downloadBackup'])->name('backup.download');
+
+            // Public Form Settings
+            Route::get('/public-forms', [\App\Http\Controllers\Admin\PublicFormSettingController::class, 'index'])->name('public-forms');
+            Route::post('/public-forms', [\App\Http\Controllers\Admin\PublicFormSettingController::class, 'store'])->name('public-forms.store');
         });
 
         // Intermediate Restricted (Admin, Pastor Zona, Supervisor, Secretaria, Lider Celula)
-        Route::middleware('role:admin,pastor_zona,supervisor,secretaria,pastor,lider_celula')->group(function () {
+        Route::middleware('role:admin,pastor_zona,supervisor,secretaria,pastor,lider_celula,administracao')->group(function () {
             // Centralized Zones Management
             Route::prefix('zones')->name('zones.')->group(function () {
                 // Read Access (Pastors, Admins, etc.)
@@ -432,6 +446,7 @@ Route::middleware('auth')->group(function () {
     Route::post('course-classes/{course_class}/attendance/{meeting}', [\App\Http\Controllers\CourseClassController::class, 'storeAttendance'])->name('course-classes.attendance.store');
     Route::post('course-classes/{course_class}/add-enrollment', [\App\Http\Controllers\CourseClassController::class, 'addEnrollment'])->name('course-classes.add-enrollment');
     Route::post('course-classes/{course_class}/assign-couple-enrollment', [\App\Http\Controllers\CourseClassController::class, 'assignCoupleEnrollment'])->name('course-classes.assign-couple-enrollment');
+    Route::post('course-classes/{course_class}/assign-ministerial-enrollment', [\App\Http\Controllers\CourseClassController::class, 'assignMinisterialEnrollment'])->name('course-classes.assign-ministerial-enrollment');
     Route::post('course-classes/{course_class}/remove-enrollment', [\App\Http\Controllers\CourseClassController::class, 'removeEnrollment'])->name('course-classes.remove-enrollment');
     Route::post('course-classes/{course_class}/meetings', [\App\Http\Controllers\CourseClassController::class, 'storeMeeting'])->name('course-classes.meetings.store');
     Route::get('course-classes/{course_class}/report', [\App\Http\Controllers\CourseClassController::class, 'report'])->name('course-classes.report');
@@ -440,6 +455,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('course-classes', \App\Http\Controllers\CourseClassController::class);
 
     Route::get('courses/export-global', [\App\Http\Controllers\CourseController::class, 'exportGlobalReport'])->name('courses.export-global');
+    Route::post('course-classes/{course_class}/move', [\App\Http\Controllers\CourseClassController::class, 'move'])->name('course-classes.move');
     Route::post('courses/bulk-delete', [\App\Http\Controllers\CourseController::class, 'bulkDestroy'])->name('courses.bulk-delete');
     Route::post('courses/{course}/assign-public-enrollment', [\App\Http\Controllers\CourseController::class, 'assignPublicEnrollment'])->name('courses.assign-public-enrollment');
     Route::resource('courses', \App\Http\Controllers\CourseController::class);
@@ -452,12 +468,22 @@ Route::middleware('auth')->group(function () {
     Route::post('couple-enrollments/{couple_enrollment}/status', [\App\Http\Controllers\CoupleEnrollmentController::class, 'updateStatus'])->name('couple-enrollments.status');
 
     Route::middleware('role:admin,pastor,secretaria,pastor_senior')->group(function () {
+        // Couple Enrollments
         Route::get('couple-enrollments', [\App\Http\Controllers\CoupleEnrollmentController::class, 'index'])->name('couple-enrollments.index');
+        Route::get('couple-enrollments/{couple_enrollment}', [\App\Http\Controllers\CoupleEnrollmentController::class, 'show'])->name('couple-enrollments.show');
         Route::get('couple-enrollments/{couple_enrollment}/edit', [\App\Http\Controllers\CoupleEnrollmentController::class, 'edit'])->name('couple-enrollments.edit');
         Route::put('couple-enrollments/{couple_enrollment}', [\App\Http\Controllers\CoupleEnrollmentController::class, 'update'])->name('couple-enrollments.update');
         Route::delete('couple-enrollments/{couple_enrollment}', [\App\Http\Controllers\CoupleEnrollmentController::class, 'destroy'])->name('couple-enrollments.destroy');
         Route::post('couple-enrollments/{couple_enrollment}/assign-class', [\App\Http\Controllers\CoupleEnrollmentController::class, 'assignClass'])->name('couple-enrollments.assign-class');
         Route::get('couple-enrollments-export', [\App\Http\Controllers\CoupleEnrollmentController::class, 'export'])->name('couple-enrollments.export');
+
+        // Ministerial Enrollments
+        Route::get('ministerial-enrollments', [\App\Http\Controllers\MinisterialEnrollmentController::class, 'index'])->name('ministerial-enrollments.index');
+        Route::get('ministerial-enrollments/{ministerial_enrollment}', [\App\Http\Controllers\MinisterialEnrollmentController::class, 'show'])->name('ministerial-enrollments.show');
+        Route::get('ministerial-enrollments/{ministerial_enrollment}/edit', [\App\Http\Controllers\MinisterialEnrollmentController::class, 'edit'])->name('ministerial-enrollments.edit');
+        Route::put('ministerial-enrollments/{ministerial_enrollment}', [\App\Http\Controllers\MinisterialEnrollmentController::class, 'update'])->name('ministerial-enrollments.update');
+        Route::delete('ministerial-enrollments/{ministerial_enrollment}', [\App\Http\Controllers\MinisterialEnrollmentController::class, 'destroy'])->name('ministerial-enrollments.destroy');
+        Route::post('ministerial-enrollments/{ministerial_enrollment}/convert', [\App\Http\Controllers\MinisterialEnrollmentController::class, 'convertToUser'])->name('ministerial-enrollments.convert');
     });
 
     // ===== PERFIL DO UTILIZADOR =====

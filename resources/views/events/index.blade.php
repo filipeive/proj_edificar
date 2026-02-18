@@ -10,10 +10,12 @@
             class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100">
             <i class="bi bi-gear-fill text-2xl"></i>
         </a>
+        @can('create', App\Models\Event::class)
         <a href="{{ route('events.create') }}"
             class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100">
             <i class="bi bi-calendar-plus text-2xl"></i>
         </a>
+        @endcan
     </div>
 @endsection
 
@@ -713,7 +715,9 @@
                     info.el.querySelector('.fc-event-title').prepend(iconEl);
                 },
                 dateClick: function (info) {
+                    @can('create', App\Models\Event::class)
                     window.location.href = '{{ route("events.create") }}?date=' + info.dateStr;
+                    @endcan
                 },
                 loading: function (isLoading) {
                     if (isLoading) {

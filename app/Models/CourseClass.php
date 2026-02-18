@@ -71,8 +71,15 @@ class CourseClass extends Model
         return $this->hasMany(CoupleEnrollment::class);
     }
 
+    public function ministerialEnrollments()
+    {
+        return $this->hasMany(MinisterialEnrollment::class);
+    }
+
     public function getEnrollmentsCountAttribute()
     {
-        return $this->courseEnrollments()->count() + $this->coupleEnrollments()->count();
+        return $this->courseEnrollments()->count() +
+            $this->coupleEnrollments()->count() +
+            $this->ministerialEnrollments()->count();
     }
 }

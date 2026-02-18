@@ -49,11 +49,11 @@
                         <div class="space-y-6 max-w-3xl">
                             <!-- Voltar-->
                             <div class="flex flex-wrap items-center gap-4">
-                            <a href="{{ route('cell-meetings.index') }}"
-                                class="w-10 h-10 rounded-xl bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 flex items-center justify-center hover:text-blue-600 transition-all"
-                                title="Voltar">
-                                <i class="bi bi-arrow-left"></i>
-                            </a>
+                                <a href="{{ route('cell-meetings.index') }}"
+                                    class="w-10 h-10 rounded-xl bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 flex items-center justify-center hover:text-blue-600 transition-all"
+                                    title="Voltar">
+                                    <i class="bi bi-arrow-left"></i>
+                                </a>
                             </div>
                             <div class="flex flex-wrap items-center gap-4">
                                 @php

@@ -22,10 +22,14 @@ class CourseEnrollmentController extends Controller
             return back()->with('error', 'Você já está matriculado neste curso.');
         }
 
+        if (!$course->isRegistrationOpen()) {
+            return back()->with('error', 'As inscrições para este curso estão encerradas.');
+        }
+
         CourseEnrollment::create([
             'course_id' => $course->id,
             'user_id' => $user->id,
-            'status' => 'enrolled',
+            'status' => 'cursando',
         ]);
 
         return back()->with('success', 'Matrícula realizada com sucesso!');
@@ -123,7 +127,7 @@ class CourseEnrollmentController extends Controller
     public function updateStatus(Request $request, CourseEnrollment $courseEnrollment)
     {
         $validated = $request->validate([
-            'status' => 'required|in:cursando,aprovado,reprovado,desistente,enrolled,completed,dropped',
+            'status' => 'required|in:cursando,aprovado,reprovado,desistente',
         ]);
 
         $courseEnrollment->update($validated);
@@ -165,7 +169,7 @@ class CourseEnrollmentController extends Controller
 
         $courseEnrollment->update([
             'course_class_id' => $courseClass->id,
-            'status' => 'cursando', // Move from 'enrolled' (initial) to 'cursando'
+            'status' => 'cursando', // Move to 'cursando' when assigned to a class
         ]);
 
         return back()->with('success', 'Aluno atribuído à turma com sucesso!');

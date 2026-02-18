@@ -57,10 +57,16 @@
         ];
     @endphp
     <div x-data="{ 
-        activeTab: 'students',
-        view: localStorage.getItem('course_details_view') || 'list'
+        activeTab: 'classes',
+        view: localStorage.getItem('course_details_view') || 'list',
+        showMoveModal: false,
+        movingClass: null,
+        targetCourseId: '',
+        manageSearch: '',
+        manageClassFilter: '',
+        manageStatusFilter: ''
     }" 
-    x-init="$watch('view', val => localStorage.setItem('course_details_view', val))"
+    x-init="console.log('Course Details Alpine initialized'); $watch('view', val => localStorage.setItem('course_details_view', val))"
     class="w-full space-y-8">
         <!-- Breadcrumbs & Actions -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -91,9 +97,10 @@
 
                 @php
                     $isEnrolled = $course->enrollments->where('user_id', auth()->id())->first();
+                    $isRegistrationOpen = $course->isRegistrationOpen();
                 @endphp
 
-                @if(!$isEnrolled)
+                @if(!$isEnrolled && $isRegistrationOpen)
                     <form action="{{ route('courses.enroll', $course) }}" method="POST" class="inline">
                         @csrf
                         <button type="submit"
@@ -101,6 +108,10 @@
                             <i class="bi bi-person-plus-fill"></i> Matricular-me
                         </button>
                     </form>
+                @elseif(!$isEnrolled && !$isRegistrationOpen)
+                    <span class="px-4 py-2 bg-gray-100 dark:bg-gray-700/50 text-gray-400 rounded-xl font-bold text-xs uppercase tracking-widest border border-gray-200 dark:border-gray-700 opacity-60">
+                        Inscrições Encerradas
+                    </span>
                 @endif
             </div>
         </div>
@@ -112,10 +123,17 @@
                 <div class="absolute top-0 right-0 w-64 h-64 bg-orange-50/50 dark:bg-orange-900/10 rounded-full -mr-32 -mt-32 transition-transform group-hover:scale-110 duration-700"></div>
 
                 <div class="relative z-10 space-y-6">
-                    <div>
-                        <span class="px-3 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-[10px] font-black uppercase rounded-full tracking-widest mb-4 inline-block">
+                    <div class="flex items-center gap-3">
+                        <span class="px-3 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-[10px] font-black uppercase rounded-full tracking-widest inline-block">
                             {{ $course->category ?? 'Geral' }}
                         </span>
+                        @if($course->registration_deadline)
+                            <span class="px-3 py-1 {{ $course->isRegistrationOpen() ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }} text-[10px] font-black uppercase rounded-full tracking-widest inline-block">
+                                <i class="bi bi-calendar-event mr-1"></i> Data Limite: {{ \Carbon\Carbon::parse($course->registration_deadline)->format('d/m/Y') }}
+                            </span>
+                        @endif
+                    </div>
+                    <div>
                         <h1 class="text-4xl font-black text-gray-900 dark:text-white tracking-tight leading-none mb-4">{{ $course->name }}</h1>
                         <p class="text-gray-600 dark:text-gray-400 leading-relaxed font-medium">
                             {{ $course->description ?? 'Sem descrição disponível.' }}
@@ -151,7 +169,7 @@
                 <div class="relative z-10 h-full flex flex-col justify-between">
                     <div>
                         <p class="text-xs font-black uppercase tracking-[0.2em] text-blue-100/70">Total Matriculados</p>
-                        <p class="text-5xl font-black mt-2">{{ $stats['total'] }}</p>
+                        <p class="text-5xl font-black mt-2">{{ $stats['total_students'] }}</p>
                     </div>
                     <div class="pt-4 border-t border-white/10 mt-auto">
                         <div class="flex items-center gap-2 text-[10px] font-bold">
@@ -162,13 +180,13 @@
                 </div>
             </div>
 
-            <!-- Stats Card 2: Formados & Ativos -->
+            <!-- Stats Card 2: Turmas & Pendentes -->
             <div class="bg-white dark:bg-gray-800 rounded-[2.5rem] p-8 shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col justify-between">
                 <div class="space-y-6">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Formados</p>
-                            <p class="text-2xl font-black text-green-600 dark:text-green-400">{{ $stats['completed'] }}</p>
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Turmas Ativas</p>
+                            <p class="text-2xl font-black text-green-600 dark:text-green-400">{{ $stats['active_classes'] }}</p>
                         </div>
                         <div class="w-12 h-12 bg-green-50 dark:bg-green-900/20 rounded-2xl flex items-center justify-center text-green-600">
                             <i class="bi bi-mortarboard-fill text-xl"></i>
@@ -177,23 +195,20 @@
 
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Em Curso</p>
-                            <p class="text-2xl font-black text-orange-500">{{ $stats['enrolled'] }}</p>
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Inscrições Públicas</p>
+                            <p class="text-2xl font-black text-orange-500">{{ $stats['pending_public'] }}</p>
                         </div>
                         <div class="w-12 h-12 bg-orange-50 dark:bg-orange-900/20 rounded-2xl flex items-center justify-center text-orange-500">
-                            <i class="bi bi-person-walking text-xl"></i>
+                            <i class="bi bi-inbox-fill text-xl"></i>
                         </div>
                     </div>
                 </div>
                 <div class="pt-4 border-t border-gray-50 dark:border-gray-700 mt-4">
                     <div class="flex justify-between items-center">
-                         <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Taxa de Sucesso</p>
+                         <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Matrículas Públicas</p>
                          <span class="text-xs font-bold text-gray-900 dark:text-white">
-                            {{ $stats['total'] > 0 ? round(($stats['completed'] / $stats['total']) * 100) : 0 }}%
+                            {{ $stats['pending_public'] }} pendentes
                          </span>
-                    </div>
-                    <div class="w-full h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full mt-2 overflow-hidden">
-                        <div class="h-full bg-green-500" style="width: {{ $stats['total'] > 0 ? ($stats['completed'] / $stats['total']) * 100 : 0 }}%"></div>
                     </div>
                 </div>
             </div>
@@ -201,10 +216,10 @@
 
         <!-- Tabs Navigation -->
         <div class="flex items-center gap-8 border-b border-gray-100 dark:border-gray-700">
-            <button @click="activeTab = 'students'" 
-                :class="activeTab === 'students' ? 'text-orange-600 border-orange-600' : 'text-gray-400 border-transparent hover:text-gray-600 dark:hover:text-gray-200'"
+            <button @click="activeTab = 'classes'" 
+                :class="activeTab === 'classes' ? 'text-orange-600 border-orange-600' : 'text-gray-400 border-transparent hover:text-gray-600 dark:hover:text-gray-200'"
                 class="pb-4 border-b-2 font-black text-xs uppercase tracking-[0.2em] transition-all">
-                Alunos Matriculados
+                Turmas
             </button>
             @if(isset($publicCoupleEnrollments) && $publicCoupleEnrollments->count() > 0)
                 <button @click="activeTab = 'public'" 
@@ -216,256 +231,98 @@
                     </span>
                 </button>
             @endif
+            <button @click="activeTab = 'manage'" 
+                :class="activeTab === 'manage' ? 'text-blue-600 border-blue-600' : 'text-gray-400 border-transparent hover:text-gray-600 dark:hover:text-gray-200'"
+                class="pb-4 border-b-2 font-black text-xs uppercase tracking-[0.2em] transition-all flex items-center gap-2">
+                Matrículas
+                <span class="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full text-[8px]">
+                    {{ $courseEnrollments->count() + $coupleEnrollments->count() }}
+                </span>
+            </button>
         </div>
 
         <div class="w-full">
-            <!-- TAB: STUDENTS -->
-            <div x-show="activeTab === 'students'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
+            <!-- TAB: CLASSES -->
+            <div x-show="activeTab === 'classes'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
                 class="space-y-6">
+                
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-black text-gray-900 dark:text-white">Lista de Turmas</h3>
+                    @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
+                        <a href="{{ route('course-classes.create', ['course_id' => $course->id]) }}" 
+                           class="px-4 py-2 bg-zinc-900 dark:bg-zinc-700 text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-zinc-800 transition-all flex items-center gap-2">
+                            <i class="bi bi-plus-lg"></i> Nova Turma
+                        </a>
+                    @endif
+                </div>
 
-                @if(!auth()->user()->isSupervisor() || auth()->user()->isEnrolledInCourse($course->id))
-                    <div class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                        <!-- List Header -->
-                        <div class="px-8 py-6 border-b border-gray-100 dark:border-gray-700 flex flex-col md:flex-row justify-between items-center bg-gray-50/10 dark:bg-gray-700/10 gap-4">
-                            <div class="flex items-center gap-4">
-                                <h4 class="text-xl font-black text-gray-900 dark:text-white">Alunos</h4>
-                                <div class="flex bg-gray-50 dark:bg-gray-900 p-1 rounded-xl border border-gray-100 dark:border-gray-700">
-                                    <button @click="view = 'list'" 
-                                        :class="view === 'list' ? 'bg-white dark:bg-gray-800 text-orange-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
-                                        class="p-2 rounded-lg transition-all">
-                                        <i class="bi bi-list-ul"></i>
-                                    </button>
-                                    <button @click="view = 'grid'" 
-                                        :class="view === 'grid' ? 'bg-white dark:bg-gray-800 text-orange-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
-                                        class="p-2 rounded-lg transition-all">
-                                        <i class="bi bi-grid-fill"></i>
-                                    </button>
-                                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @forelse($course->classes as $class)
+                        <div class="bg-white dark:bg-gray-800 rounded-[2rem] p-6 shadow-sm border border-gray-100 dark:border-gray-700 hover:border-orange-500/30 transition-all group">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="px-3 py-1 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 text-[9px] font-black uppercase rounded-full border border-gray-100 dark:border-gray-600">
+                                    {{ $class->type === 'pre_nupcial' ? 'Curso Noivos' : 'Casais Vivendo' }}
+                                </span>
+                                <span class="px-3 py-1 {{ $class->status === 'concluida' ? 'bg-green-100 text-green-700 border-green-200' : ($class->status === 'cancelada' ? 'bg-red-100 text-red-700 border-red-200' : 'bg-blue-100 text-blue-700 border-blue-200') }} text-[9px] font-black uppercase rounded-full border">
+                                    {{ ucfirst(str_replace('_', ' ', $class->status)) }}
+                                </span>
                             </div>
 
-                            <div class="flex flex-wrap items-center gap-3">
-                                @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
-                                    <button type="button" id="bulkDeleteBtn" onclick="bulkDelete()" disabled
-                                        class="bg-red-50 text-red-600 border border-red-100 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all hidden">
-                                        Remover Selecionados
-                                    </button>
-                                @endif
-                                
-                                <form action="{{ route('courses.show', $course) }}" method="GET" class="flex flex-wrap items-center gap-2">
-                                    <!-- Class Filter -->
-                                    <select name="course_class_id" onchange="this.form.submit()"
-                                        class="pl-4 pr-8 py-2 rounded-xl bg-gray-50 dark:bg-gray-900 border-transparent focus:bg-white focus:ring-2 focus:ring-orange-500 transition-all text-[10px] font-black uppercase tracking-widest text-gray-500">
-                                        <option value="">Todas as Turmas</option>
-                                        @foreach($courseClasses as $class)
-                                            <option value="{{ $class->id }}" {{ $classId == $class->id ? 'selected' : '' }}>
-                                                {{ $class->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-
-                                    <!-- Status Filter -->
-                                    <select name="status" onchange="this.form.submit()"
-                                        class="pl-4 pr-8 py-2 rounded-xl bg-gray-50 dark:bg-gray-900 border-transparent focus:bg-white focus:ring-2 focus:ring-orange-500 transition-all text-[10px] font-black uppercase tracking-widest text-gray-500">
-                                        <option value="">Todos os Status</option>
-                                        @foreach(['enrolled' => 'Em Curso', 'completed' => 'Concluído', 'dropped' => 'Desistiu'] as $s => $l)
-                                            <option value="{{ $s }}" {{ $status == $s ? 'selected' : '' }}>{{ $l }}</option>
-                                        @endforeach
-                                    </select>
-
-                                    <div class="relative">
-                                        <input type="text" name="search" value="{{ $search ?? '' }}" 
-                                            placeholder="Pesquisar..." 
-                                            class="w-48 pl-10 pr-4 py-2 rounded-xl bg-gray-50 dark:bg-gray-900 border-transparent focus:bg-white focus:ring-2 focus:ring-orange-500 transition-all text-xs font-bold">
-                                        <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <h4 class="text-lg font-black text-gray-900 dark:text-white mb-2 group-hover:text-orange-600 transition-colors">{{ $class->name }}</h4>
+                            
+                            <div class="space-y-3 mb-6">
+                                <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                                    <i class="bi bi-person-badge text-xs"></i>
+                                    <span class="text-xs font-bold">{{ $class->teacherMale->name ?? 'Sem Professor' }}</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="flex items-center gap-1">
+                                        <i class="bi bi-people text-xs text-blue-500"></i>
+                                        <span class="text-xs font-black text-gray-700 dark:text-gray-300">{{ $class->course_enrollments_count + $class->couple_enrollments_count }} Alunos</span>
                                     </div>
-
-                                    @if($search || $classId || $status)
-                                        <a href="{{ route('courses.show', $course) }}" class="p-2 text-gray-400 hover:text-red-600 transition-colors" title="Limpar filtros">
-                                            <i class="bi bi-x-circle-fill"></i>
-                                        </a>
+                                    @if($class->start_date)
+                                        <div class="flex items-center gap-1">
+                                            <i class="bi bi-calendar-check text-xs text-orange-500"></i>
+                                            <span class="text-xs font-black text-gray-700 dark:text-gray-300">{{ $class->start_date->format('d/m/Y') }}</span>
+                                        </div>
                                     @endif
-                                </form>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-2 pt-6 border-t border-gray-100 dark:border-gray-700">
+                                <a href="{{ route('course-classes.show', $class) }}" 
+                                   class="flex-1 h-11 flex items-center justify-center bg-zinc-900 dark:bg-zinc-700 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all shadow-md">
+                                    Detalhes
+                                </a>
+                                @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
+                                    <div class="flex items-center gap-1 h-11">
+                                        <button @click="showMoveModal = true; movingClass = {{ \Illuminate\Support\Js::from(['id' => $class->id, 'name' => $class->name]) }}"
+                                                class="w-10 h-11 flex items-center justify-center text-gray-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-xl transition-all"
+                                                title="Mover Turma">
+                                            <i class="bi bi-arrow-left-right text-sm"></i>
+                                        </button>
+                                        <form action="{{ route('course-classes.destroy', $class) }}" method="POST" onsubmit="return confirm('Excluir esta turma?');" class="inline m-0">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="w-10 h-11 flex items-center justify-center text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all" title="Excluir">
+                                                <i class="bi bi-trash3 text-sm"></i>
+                                            </button>
+                                        </form>
+                                        <a href="{{ route('course-classes.edit', $class) }}" 
+                                           class="w-10 h-11 flex items-center justify-center text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all" title="Editar">
+                                            <i class="bi bi-pencil-square text-sm"></i>
+                                        </a>
+                                    </div>
+                                @endif
                             </div>
                         </div>
-
-                        <form id="bulkActionForm" action="{{ route('course-enrollments.bulk-destroy') }}" method="POST">@csrf</form>
-
-                        <!-- LIST VIEW -->
-                        <div x-show="view === 'list'" class="overflow-x-auto">
-                            <table class="w-full text-left">
-                                <thead>
-                                    <tr class="bg-gray-50/50 dark:bg-gray-900/50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 dark:border-gray-700">
-                                        @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
-                                            <th class="px-8 py-5 w-10 text-center"><input type="checkbox" id="selectAllCheckbox" class="rounded border-gray-300 text-orange-600"></th>
-                                        @endif
-                                        <th class="px-8 py-5">Aluno / Casal</th>
-                                        <th class="px-8 py-5">Tipo</th>
-                                        <th class="px-8 py-5">Turma</th>
-                                        <th class="px-8 py-5">Status</th>
-                                        @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
-                                            <th class="px-8 py-5 text-right">Ações</th>
-                                        @endif
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-100 dark:divide-gray-700 font-medium">
-                                    @forelse($allStudents as $student)
-                                        <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors group">
-                                            @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
-                                                <td class="px-8 py-6 text-center">
-                                                    @if($student instanceof \App\Models\CourseEnrollment)
-                                                        <input type="checkbox" name="enrollment_ids[]" value="{{ $student->id }}" form="bulkActionForm" class="enrollment-checkbox rounded border-gray-300 text-orange-600">
-                                                    @endif
-                                                </td>
-                                            @endif
-                                            <td class="px-8 py-6">
-                                                <div class="flex items-center gap-4">
-                                                    <div class="w-10 h-10 rounded-full {{ $student instanceof \App\Models\CoupleEnrollment ? 'bg-purple-100 text-purple-600' : 'bg-orange-100 text-orange-600' }} flex items-center justify-center font-black">
-                                                        @if($student instanceof \App\Models\CoupleEnrollment)
-                                                            <i class="bi bi-heart-fill"></i>
-                                                        @else
-                                                            {{ $student->user_id ? substr($student->user->name, 0, 1) : substr($student->malePartner->name ?? 'N', 0, 1) }}
-                                                        @endif
-                                                    </div>
-                                                    <div>
-                                                        <p class="text-sm font-black text-gray-900 dark:text-white leading-none">
-                                                            @if($student instanceof \App\Models\CoupleEnrollment)
-                                                                {{ $student->husband_name }} & {{ $student->wife_name }}
-                                                            @else
-                                                                {{ $student->user_id ? $student->user->name : ($student->malePartner->name ?? 'N/A') . ' & ' . ($student->femalePartner->name ?? 'N/A') }}
-                                                            @endif
-                                                        </p>
-                                                        <p class="text-[10px] text-gray-400 mt-1 uppercase tracking-tighter">
-                                                            @if($student instanceof \App\Models\CoupleEnrollment)
-                                                                {{ $student->contacts }}
-                                                            @else
-                                                                {{ $student->user_id ? $student->user->email : 'Matrícula Casal' }}
-                                                            @endif
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="px-8 py-6">
-                                                <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">
-                                                    {{ $student instanceof \App\Models\CoupleEnrollment ? 'Inscrição Pública' : 'Matrícula Interna' }}
-                                                </span>
-                                            </td>
-                                            <td class="px-8 py-6">
-                                                <span class="text-xs font-black text-gray-700 dark:text-gray-300">
-                                                    {{ $student->courseClass->name ?? 'Sem Turma' }}
-                                                </span>
-                                            </td>
-                                             <td class="px-8 py-6">
-                                                @php
-                                                    $currentStatus = $student->status;
-                                                    $style = $statusStyles[$currentStatus] ?? $statusStyles['default'];
-                                                    $label = $statusLabels[$currentStatus] ?? $statusLabels['default'];
-                                                @endphp
-                                                <span class="px-3 py-1 {{ $style }} text-[9px] font-black uppercase rounded-full border">
-                                                    {{ $label }}
-                                                </span>
-                                            </td>
-                                            @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
-                                                <td class="px-8 py-6 text-right">
-                                                    <div class="flex items-center justify-end gap-2 text-gray-400">
-                                                        @if($student instanceof \App\Models\CourseEnrollment)
-                                                            <a href="{{ route('course-enrollments.show', $student) }}" class="p-2 hover:text-orange-600 transition-colors">
-                                                                <i class="bi bi-eye"></i>
-                                                            </a>
-                                                        @endif
-                                                        <div x-data="{ open: false }" class="relative">
-                                                            <button @click="open = !open" class="p-2 hover:text-orange-600 transition-colors">
-                                                                <i class="bi bi-three-dots-vertical"></i>
-                                                            </button>
-                                                                <div x-show="open" @click.away="open = false" 
-                                                                    class="absolute right-0 bottom-full mb-2 w-48 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 z-50">
-                                                                    <p class="px-4 py-2 text-[8px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50 dark:border-gray-700 mb-1">Mudar Status</p>
-                                                                    @php
-                                                                        $availableStatuses = ['cursando' => 'Cursando', 'aprovado' => 'Aprovado', 'reprovado' => 'Reprovado', 'desistente' => 'Desistiu'];
-                                                                    @endphp
-                                                                    @foreach($availableStatuses as $s => $l)
-                                                                        <form action="{{ $student instanceof \App\Models\CoupleEnrollment ? route('couple-enrollments.status', $student) : route('enrollments.status', $student) }}" method="POST">
-                                                                            @csrf
-                                                                            <input type="hidden" name="status" value="{{ $s }}">
-                                                                            <button type="submit"
-                                                                                class="w-full text-left px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 dark:hover:bg-gray-700 {{ ($student->status == $s || ($s == 'cursando' && $student->status == 'enrolled') || ($s == 'aprovado' && $student->status == 'completed')) ? 'text-orange-600 bg-orange-50/50' : 'text-gray-500' }}">
-                                                                                {{ $l }}
-                                                                            </button>
-                                                                        </form>
-                                                                    @endforeach
-                                                                    <div class="border-t border-gray-100 dark:border-gray-700 mt-1 pt-1">
-                                                                        <form action="{{ $student instanceof \App\Models\CoupleEnrollment ? route('couple-enrollments.destroy', $student) : route('course-enrollments.destroy', $student) }}" method="POST"
-                                                                            onsubmit="return confirm('Tem certeza que deseja remover esta matrícula?')">
-                                                                            @csrf
-                                                                            @method('DELETE')
-                                                                            <button type="submit"
-                                                                                class="w-full text-left px-4 py-2 text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center gap-2">
-                                                                                <i class="bi bi-trash3"></i> Remover
-                                                                            </button>
-                                                                        </form>
-                                                                    </div>
-                                                                </div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            @endif
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="6" class="px-8 py-20 text-center">
-                                                <div class="flex flex-col items-center gap-4 text-gray-300 dark:text-gray-600">
-                                                    <i class="bi bi-people-fill text-6xl"></i>
-                                                    <p class="text-sm font-black uppercase tracking-widest">Nenhum aluno encontrado com esses filtros</p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
+                    @empty
+                        <div class="col-span-full py-12 text-center bg-gray-50 dark:bg-gray-900/50 rounded-[2rem] border border-dashed border-gray-200 dark:border-gray-700">
+                            <i class="bi bi-mortarboard text-4xl text-gray-200"></i>
+                            <p class="text-sm font-black text-gray-400 uppercase tracking-widest mt-4">Nenhuma turma cadastrada</p>
                         </div>
-
-                        <!-- GRID VIEW -->
-                        <div x-show="view === 'grid'" class="p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-                             @foreach($allStudents as $student)
-                                <div class="bg-gray-50 dark:bg-gray-900/50 rounded-3xl p-6 border border-gray-100 dark:border-gray-700/50 hover:border-orange-200 transition-all group">
-                                    <div class="flex justify-between items-start mb-6">
-                                        <div class="w-12 h-12 rounded-2xl bg-white dark:bg-gray-800 shadow-sm flex items-center justify-center text-orange-600 font-black text-xl">
-                                            @if($student instanceof \App\Models\CoupleEnrollment)
-                                                <i class="bi bi-heart-fill text-purple-600"></i>
-                                            @else
-                                                {{ substr($student->user->name ?? $student->malePartner->name ?? 'N', 0, 1) }}
-                                            @endif
-                                        </div>
-                                        <span class="px-2 py-1 {{ $statusStyles[$student->status] ?? $statusStyles['default'] }} text-[8px] font-black uppercase rounded-lg border">
-                                            {{ $statusLabels[$student->status] ?? $statusLabels['default'] }}
-                                        </span>
-                                    </div>
-                                    <h5 class="text-sm font-black text-gray-900 dark:text-white mb-1 leading-tight line-clamp-1">
-                                        @if($student instanceof \App\Models\CoupleEnrollment)
-                                            {{ $student->husband_name }} & {{ $student->wife_name }}
-                                        @else
-                                            {{ $student->user_id ? $student->user->name : ($student->malePartner->name ?? 'N/A') . ' & ' . ($student->femalePartner->name ?? 'N/A') }}
-                                        @endif
-                                    </h5>
-                                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-tighter mb-6 truncate">
-                                        {{ $student instanceof \App\Models\CoupleEnrollment ? $student->contacts : ($student->user->email ?? 'Matrícula Casal') }}
-                                    </p>
-                                    
-                                    <div class="flex items-center justify-between pt-4 border-t border-gray-200/50 dark:border-gray-700/50">
-                                        <div>
-                                            <p class="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none">Turma</p>
-                                            <p class="text-xs font-black text-gray-800 dark:text-gray-200 mt-1">{{ $student->courseClass->name ?? 'Sem Turma' }}</p>
-                                        </div>
-                                        @if($student instanceof \App\Models\CourseEnrollment)
-                                            <a href="{{ route('course-enrollments.show', $student) }}" class="w-8 h-8 rounded-full bg-white dark:bg-gray-800 flex items-center justify-center text-gray-400 hover:text-orange-600 shadow-sm transition-colors">
-                                                <i class="bi bi-arrow-right"></i>
-                                            </a>
-                                        @endif
-                                    </div>
-                                </div>
-                             @endforeach
-                        </div>
-                    </div>
-                @endif
+                    @endforelse
+                </div>
             </div>
 
             <!-- TAB: PUBLIC INBOX -->
@@ -503,7 +360,7 @@
                                         <select name="course_class_id" required
                                             class="w-full sm:w-56 px-4 py-3 rounded-2xl bg-gray-50 dark:bg-gray-900 border-transparent focus:bg-white focus:ring-4 focus:ring-purple-100 dark:focus:ring-purple-900/20 transition-all text-sm font-bold text-gray-900 dark:text-white">
                                             <option value="">Selecionar turma...</option>
-                                            @foreach($courseClasses as $class)
+                                            @foreach($course->classes as $class)
                                                 <option value="{{ $class->id }}">{{ $class->name }}</option>
                                             @endforeach
                                         </select>
@@ -513,6 +370,13 @@
                                         </button>
                                     </form>
                                 @endif
+                                <form action="{{ route('couple-enrollments.destroy', $enrollment) }}" method="POST" onsubmit="return confirm('Excluir esta inscrição?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="p-2 text-gray-400 hover:text-red-500 transition-colors">
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
+                                </form>
                             </div>
                         @endforeach
                     </div>
@@ -523,8 +387,233 @@
                     </div>
                 @endif
             </div>
+
+            <!-- TAB: MANAGE ENROLLMENTS -->
+            <div x-show="activeTab === 'manage'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
+                class="space-y-6">
+                
+                <!-- Filters & Search -->
+                <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-100 dark:border-gray-700 shadow-sm">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="relative">
+                            <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" x-model="manageSearch" placeholder="Pesquisar por nome..." 
+                                class="w-full pl-11 pr-4 py-3 rounded-2xl bg-gray-50 dark:bg-gray-900 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 transition-all text-sm font-bold text-gray-900 dark:text-white">
+                        </div>
+                        <div>
+                            <select x-model="manageClassFilter" 
+                                class="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-gray-900 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 transition-all text-sm font-bold text-gray-900 dark:text-white">
+                                <option value="">Todas as Turmas</option>
+                                @foreach($course->classes as $c)
+                                    <option value="{{ $c->name }}">{{ $c->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <select x-model="manageStatusFilter" 
+                                class="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-gray-900 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 transition-all text-sm font-bold text-gray-900 dark:text-white">
+                                <option value="">Todos os Status</option>
+                                @foreach($statusLabels as $k => $v)
+                                    <option value="{{ $k }}">{{ $v }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unified Enrollment List -->
+                <div class="bg-white dark:bg-gray-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="bg-gray-50 dark:bg-gray-900/50">
+                                    <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Estudante(s) / Tipo</th>
+                                    <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Turma</th>
+                                    <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Status</th>
+                                    <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50 dark:divide-gray-700 text-sm">
+                                @foreach($courseEnrollments as $enrollment)
+                                    <tr x-show="(manageSearch === '' || '{{ strtolower($enrollment->user->name ?? '') }}'.includes(manageSearch.toLowerCase())) && 
+                                               (manageClassFilter === '' || '{{ $enrollment->courseClass->name ?? '' }}' === manageClassFilter) &&
+                                               (manageStatusFilter === '' || '{{ $enrollment->status }}' === manageStatusFilter)"
+                                        class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors group">
+                                        <td class="px-8 py-6">
+                                            <div class="flex items-center gap-4">
+                                                <div class="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-900/20 text-orange-600 flex items-center justify-center font-bold text-xs uppercase">
+                                                    @if($enrollment->user)
+                                                        {{ strtoupper(substr($enrollment->user->name, 0, 1)) }}
+                                                    @elseif($enrollment->malePartner)
+                                                        <i class="bi bi-people-fill"></i>
+                                                    @else
+                                                        ?
+                                                    @endif
+                                                </div>
+                                                <div>
+                                                    <p class="font-bold text-gray-900 dark:text-white">
+                                                        @if($enrollment->user)
+                                                            {{ $enrollment->user->name }}
+                                                        @elseif($enrollment->malePartner && $enrollment->femalePartner)
+                                                            {{ $enrollment->malePartner->name }} & {{ $enrollment->femalePartner->name }}
+                                                        @else
+                                                            {{ $enrollment->user->name ?? 'Usuário Removido' }}
+                                                        @endif
+                                                    </p>
+                                                    <span class="text-[9px] font-black uppercase text-blue-500 tracking-wider">
+                                                        {{ ($enrollment->malePartner) ? 'Casal' : 'Individual' }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-8 py-6 text-center">
+                                            <span class="px-3 py-1 bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 text-[10px] font-bold rounded-lg border border-gray-100 dark:border-gray-700">
+                                                {{ $enrollment->courseClass->name ?? 'Sem Turma' }}
+                                            </span>
+                                        </td>
+                                        <td class="px-8 py-6 text-center">
+                                            <span class="px-3 py-1 {{ $statusStyles[$enrollment->status] ?? $statusStyles['default'] }} text-[9px] font-black uppercase rounded-full border">
+                                                {{ $statusLabels[$enrollment->status] ?? $statusLabels['default'] }}
+                                            </span>
+                                        </td>
+                                        <td class="px-8 py-6 text-right">
+                                            <div class="flex items-center justify-end gap-2">
+                                                <a href="{{ route('course-enrollments.edit', $enrollment) }}" class="p-2 text-gray-400 hover:text-blue-600 transition-colors" title="Editar Matrícula">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </a>
+                                                <form action="{{ route('course-enrollments.destroy', $enrollment) }}" method="POST" onsubmit="return confirm('Remover matrícula?')" class="m-0 flex">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="p-2 text-gray-400 hover:text-red-500 transition-colors" title="Remover">
+                                                        <i class="bi bi-trash3"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+
+                                @foreach($coupleEnrollments as $enrollment)
+                                    <tr x-show="(manageSearch === '' || '{{ strtolower($enrollment->husband_name . ' ' . $enrollment->wife_name) }}'.includes(manageSearch.toLowerCase())) && 
+                                               (manageClassFilter === '' || '{{ $enrollment->courseClass->name ?? '' }}' === manageClassFilter) &&
+                                               (manageStatusFilter === '' || '{{ $enrollment->status }}' === manageStatusFilter)"
+                                        class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors group">
+                                        <td class="px-8 py-6">
+                                            <div class="flex items-center gap-4">
+                                                <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-900/20 text-purple-600 flex items-center justify-center font-bold text-xs">
+                                                    <i class="bi bi-heart-fill"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="font-bold text-gray-900 dark:text-white">{{ $enrollment->husband_name }} & {{ $enrollment->wife_name }}</p>
+                                                    <span class="text-[9px] font-black uppercase text-purple-500 tracking-wider">Casal</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-8 py-6 text-center">
+                                            <span class="px-3 py-1 bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 text-[10px] font-bold rounded-lg border border-gray-100 dark:border-gray-700">
+                                                {{ $enrollment->courseClass->name ?? 'Sem Turma' }}
+                                            </span>
+                                        </td>
+                                        <td class="px-8 py-6 text-center">
+                                            <span class="px-3 py-1 {{ $statusStyles[$enrollment->status] ?? $statusStyles['default'] }} text-[9px] font-black uppercase rounded-full border">
+                                                {{ $statusLabels[$enrollment->status] ?? $statusLabels['default'] }}
+                                            </span>
+                                        </td>
+                                        <td class="px-8 py-6 text-right">
+                                            <div class="flex items-center justify-end gap-2">
+                                                <a href="{{ route('couple-enrollments.edit', $enrollment) }}" class="p-2 text-gray-400 hover:text-blue-600 transition-colors" title="Editar Matrícula">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </a>
+                                                <form action="{{ route('couple-enrollments.destroy', $enrollment) }}" method="POST" onsubmit="return confirm('Remover matrícula?')" class="m-0 flex">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="p-2 text-gray-400 hover:text-red-500 transition-colors" title="Remover">
+                                                        <i class="bi bi-trash3"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    <!-- Move Class Modal -->
+    <div x-show="showMoveModal" 
+         class="fixed inset-0 z-[100] overflow-y-auto" 
+         x-cloak>
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div x-show="showMoveModal" 
+                 x-transition:enter="ease-out duration-300" 
+                 x-transition:enter-start="opacity-0" 
+                 x-transition:enter-end="opacity-100" 
+                 x-transition:leave="ease-in duration-200" 
+                 x-transition:leave-start="opacity-100" 
+                 x-transition:leave-end="opacity-0" 
+                 class="fixed inset-0 transition-opacity bg-gray-900/60 backdrop-blur-sm" 
+                 @click="showMoveModal = false"></div>
+
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+
+            <div x-show="showMoveModal" 
+                 x-transition:enter="ease-out duration-300" 
+                 x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
+                 x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" 
+                 x-transition:leave="ease-in duration-200" 
+                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" 
+                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
+                 class="inline-block px-4 pt-5 pb-4 overflow-hidden text-left align-bottom transition-all transform bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-2xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-8">
+                
+                <div class="absolute top-0 right-0 pt-6 pr-6">
+                    <button @click="showMoveModal = false" class="text-gray-400 hover:text-gray-500 focus:outline-none">
+                        <i class="bi bi-x-lg text-xl"></i>
+                    </button>
+                </div>
+
+                <div class="sm:flex sm:items-start">
+                    <div class="w-full mt-3 text-center sm:mt-0 sm:text-left">
+                        <h3 class="text-2xl font-black text-gray-900 dark:text-white leading-tight mb-2">
+                            Mover Turma
+                        </h3>
+                        <p class="text-sm font-medium text-gray-500 mb-8">
+                            Selecione o curso de destino para a turma <span class="text-orange-600 font-bold" x-text="movingClass?.name"></span>.
+                        </p>
+
+                        <form :action="movingClass ? '/course-classes/' + movingClass.id + '/move' : ''" method="POST" class="space-y-6">
+                            @csrf
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Curso de Destino</label>
+                                <select name="target_course_id" x-model="targetCourseId" required
+                                    class="w-full px-5 py-4 rounded-2xl bg-gray-50 dark:bg-gray-900 border-transparent focus:bg-white focus:ring-4 focus:ring-orange-100 dark:focus:ring-orange-900/20 transition-all text-sm font-bold text-gray-900 dark:text-white">
+                                    <option value="">Selecione um curso...</option>
+                                    @foreach($allCourses as $c)
+                                        <option value="{{ $c->id }}">{{ $c->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="pt-4 flex flex-col sm:flex-row gap-3">
+                                <button type="submit" :disabled="!targetCourseId"
+                                    class="flex-1 px-8 py-4 bg-orange-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-orange-700 transition-all shadow-xl shadow-orange-600/20 disabled:opacity-50 disabled:shadow-none">
+                                    Confirmar Mudança
+                                </button>
+                                <button type="button" @click="showMoveModal = false"
+                                    class="flex-1 px-8 py-4 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-600 transition-all">
+                                    Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+</div>
 @endsection
 
 @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')

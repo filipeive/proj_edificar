@@ -110,21 +110,30 @@ class CourseClassController extends Controller
             'courseEnrollments.user',
             'courseEnrollments.malePartner',
             'courseEnrollments.femalePartner',
-            'coupleEnrollments'
+            'coupleEnrollments',
+            'ministerialEnrollments'
         ]);
 
         // Merge for the "Students" list
         $allStudents = $courseClass->courseEnrollments
             ->concat($courseClass->coupleEnrollments)
+            ->concat($courseClass->ministerialEnrollments)
             ->sortByDesc('created_at');
 
         $availableUsers = User::orderBy('name')->get();
+
+        // Public Inboxes
         $publicCoupleEnrollments = CoupleEnrollment::where('course_id', $courseClass->course_id)
             ->whereNull('course_class_id')
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('course_classes.show', compact('courseClass', 'allStudents', 'availableUsers', 'publicCoupleEnrollments'));
+        $publicMinisterialEnrollments = \App\Models\MinisterialEnrollment::where('course_id', $courseClass->course_id)
+            ->whereNull('course_class_id')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('course_classes.show', compact('courseClass', 'allStudents', 'availableUsers', 'publicCoupleEnrollments', 'publicMinisterialEnrollments'));
     }
 
     public function edit(CourseClass $courseClass)
@@ -161,12 +170,34 @@ class CourseClassController extends Controller
             ->with('success', 'Turma atualizada com sucesso!');
     }
 
+    public function move(Request $request, CourseClass $courseClass)
+    {
+        $this->abortIfPastorZonaCannotManage();
+
+        $validated = $request->validate([
+            'target_course_id' => 'required|exists:courses,id',
+        ]);
+
+        $newCourse = Course::findOrFail($validated['target_course_id']);
+
+        // Update Class
+        $courseClass->update([
+            'course_id' => $newCourse->id,
+        ]);
+
+        // Update Enrollments
+        CourseEnrollment::where('course_class_id', $courseClass->id)->update(['course_id' => $newCourse->id]);
+        CoupleEnrollment::where('course_class_id', $courseClass->id)->update(['course_id' => $newCourse->id]);
+
+        return redirect()->back()->with('success', "Turma movida para o curso '{$newCourse->name}' com sucesso!");
+    }
+
     public function destroy(CourseClass $courseClass)
     {
         $this->abortIfPastorZonaCannotManage();
 
         $courseClass->delete();
-        return redirect()->route('course-classes.index')
+        return redirect()->back()
             ->with('success', 'Turma removida com sucesso!');
     }
 
@@ -256,30 +287,60 @@ class CourseClassController extends Controller
         return back()->with('success', 'Inscrição atribuída à turma com sucesso!');
     }
 
+    public function assignMinisterialEnrollment(Request $request, CourseClass $courseClass)
+    {
+        $this->abortIfPastorZonaCannotManage();
+
+        $validated = $request->validate([
+            'ministerial_enrollment_id' => 'required|exists:ministerial_enrollments,id',
+        ]);
+
+        $enrollment = \App\Models\MinisterialEnrollment::findOrFail($validated['ministerial_enrollment_id']);
+        if ($enrollment->course_id !== $courseClass->course_id) {
+            return back()->with('error', 'Inscrição não pertence a este curso.');
+        }
+
+        $enrollment->update([
+            'course_class_id' => $courseClass->id,
+            'status' => 'enrolled',
+        ]);
+
+        return redirect()->route('course-classes.show', $courseClass)
+            ->with('success', 'Inscrição ministerial vinculada à turma!');
+    }
+
     public function addEnrollment(Request $request, CourseClass $courseClass)
     {
         $this->abortIfPastorZonaCannotManage();
 
         $validated = $request->validate([
+            'user_id' => 'nullable|exists:users,id',
             'male_partner_id' => 'nullable|exists:users,id',
             'female_partner_id' => 'nullable|exists:users,id',
             'wedding_date' => 'nullable|date',
             'is_church_member' => 'required|boolean',
         ]);
 
-        if (!$validated['male_partner_id'] && !$validated['female_partner_id']) {
-            return back()->with('error', 'Selecione pelo menos um parceiro.');
+        if (!($validated['user_id'] ?? null) && !($validated['male_partner_id'] ?? null) && !($validated['female_partner_id'] ?? null)) {
+            return back()->with('error', 'Selecione pelo menos um aluno ou parceiro.');
         }
 
-        $enrollment = CourseEnrollment::create([
+        $enrollmentData = [
             'course_id' => $courseClass->course_id,
             'course_class_id' => $courseClass->id,
-            'male_partner_id' => $validated['male_partner_id'],
-            'female_partner_id' => $validated['female_partner_id'],
-            'wedding_date' => $validated['wedding_date'],
             'is_church_member' => $validated['is_church_member'],
             'status' => 'cursando',
-        ]);
+        ];
+
+        if (!empty($validated['user_id'])) {
+            $enrollmentData['user_id'] = $validated['user_id'];
+        } else {
+            $enrollmentData['male_partner_id'] = $validated['male_partner_id'] ?? null;
+            $enrollmentData['female_partner_id'] = $validated['female_partner_id'] ?? null;
+            $enrollmentData['wedding_date'] = $validated['wedding_date'] ?? null;
+        }
+
+        $enrollment = CourseEnrollment::create($enrollmentData);
 
         if (!empty($validated['wedding_date'])) {
             \App\Models\Wedding::updateOrCreate(
@@ -316,18 +377,22 @@ class CourseClassController extends Controller
     {
         $this->abortIfPastorZonaNotEnrolled($courseClass);
 
-        $courseClass->load(['course', 'meetings.attendances', 'courseEnrollments.malePartner', 'courseEnrollments.femalePartner']);
+        $courseClass->load(['course', 'meetings.attendances', 'courseEnrollments.malePartner', 'courseEnrollments.femalePartner', 'coupleEnrollments', 'ministerialEnrollments']);
+
+        $allEnrollments = $courseClass->courseEnrollments
+            ->concat($courseClass->coupleEnrollments)
+            ->concat($courseClass->ministerialEnrollments);
 
         $stats = [
-            'total_enrolled' => $courseClass->courseEnrollments->count(),
+            'total_enrolled' => $allEnrollments->count(),
             'started' => $courseClass->courseEnrollments->where('attendance_count', '>', 0)->count(),
-            'completed' => $courseClass->courseEnrollments->where('status', 'aprovado')->count(),
-            'failed' => $courseClass->courseEnrollments->where('status', 'reprovado')->count(),
-            'active' => $courseClass->courseEnrollments->where('status', 'cursando')->count(),
+            'completed' => $allEnrollments->where('status', 'aprovado')->count(),
+            'failed' => $allEnrollments->where('status', 'reprovado')->count(),
+            'active' => $allEnrollments->where('status', 'cursando')->count(),
             'average_attendance' => $courseClass->courseEnrollments->avg('attendance_count') ?? 0,
         ];
 
-        return view('course_classes.report', compact('courseClass', 'stats'));
+        return view('course_classes.report', compact('courseClass', 'stats', 'allEnrollments'));
     }
 
     public function upcomingWeddings()
@@ -354,7 +419,7 @@ class CourseClassController extends Controller
     {
         $this->abortIfPastorZonaNotEnrolled($courseClass);
 
-        $courseClass->load(['course', 'teacherMale', 'teacherFemale', 'courseEnrollments.malePartner', 'courseEnrollments.femalePartner']);
+        $courseClass->load(['course', 'teacherMale', 'teacherFemale', 'courseEnrollments.malePartner', 'courseEnrollments.femalePartner', 'coupleEnrollments', 'ministerialEnrollments']);
 
         $pdf = Pdf::loadView('reports.course_class_pdf', compact('courseClass'));
 

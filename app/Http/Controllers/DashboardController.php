@@ -19,6 +19,7 @@ class DashboardController
             'lider_celula' => redirect()->route('dashboard.lider'),
             'secretaria' => redirect()->route('dashboard.secretaria'),
             'tesouraria' => redirect()->route('financial.dashboard'),
+            'administracao' => redirect()->route('dashboard.administracao'),
             'membro' => redirect()->route('dashboard.membro'),
             default => redirect()->route('dashboard.membro'),
         };

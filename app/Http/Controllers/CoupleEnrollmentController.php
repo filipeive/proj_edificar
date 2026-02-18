@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CoupleEnrollment;
 use App\Models\Course;
 use App\Models\CourseClass;
+use App\Models\Zone;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -28,7 +29,9 @@ class CoupleEnrollmentController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('husband_name', 'like', "%{$search}%")
                     ->orWhere('wife_name', 'like', "%{$search}%")
-                    ->orWhere('contacts', 'like', "%{$search}%");
+                    ->orWhere('contacts', 'like', "%{$search}%")
+                    ->orWhere('husband_phone', 'like', "%{$search}%")
+                    ->orWhere('wife_phone', 'like', "%{$search}%");
             });
         }
 
@@ -37,6 +40,11 @@ class CoupleEnrollmentController extends Controller
         $classes = CourseClass::orderBy('name')->get();
 
         return view('couple_enrollments.index', compact('enrollments', 'courses', 'classes'));
+    }
+
+    public function show(CoupleEnrollment $coupleEnrollment)
+    {
+        return view('couple_enrollments.show', compact('coupleEnrollment'));
     }
 
     public function assignClass(Request $request, CoupleEnrollment $coupleEnrollment)
@@ -87,7 +95,10 @@ class CoupleEnrollmentController extends Controller
                 'Marido',
                 'Esposa',
                 'Tipo Relação',
-                'Endereço',
+                'Endereço Parceiro',
+                'Endereço Parceira',
+                'Tel. Parceiro',
+                'Tel. Parceira',
                 'Contatos',
                 'Célula/Zona',
                 'Anos Juntos',
@@ -106,6 +117,9 @@ class CoupleEnrollmentController extends Controller
                     $enrollment->wife_name,
                     $enrollment->relationship_type,
                     $enrollment->address,
+                    $enrollment->wife_address ?? '',
+                    $enrollment->husband_phone ?? '',
+                    $enrollment->wife_phone ?? '',
                     $enrollment->contacts,
                     $enrollment->cell_zone,
                     $enrollment->years_together,
@@ -128,7 +142,8 @@ class CoupleEnrollmentController extends Controller
     public function edit(CoupleEnrollment $coupleEnrollment)
     {
         $courses = Course::orderBy('name')->get();
-        return view('couple_enrollments.edit', compact('coupleEnrollment', 'courses'));
+        $zones = Zone::orderBy('name')->get();
+        return view('couple_enrollments.edit', compact('coupleEnrollment', 'courses', 'zones'));
     }
 
     public function update(Request $request, CoupleEnrollment $coupleEnrollment)
@@ -137,9 +152,11 @@ class CoupleEnrollmentController extends Controller
             'husband_name' => 'required|string|max:255',
             'wife_name' => 'required|string|max:255',
             'email' => 'nullable|email|max:255',
-            'phone' => 'nullable|string|max:20',
+            'husband_phone' => 'nullable|string|max:30',
+            'wife_phone' => 'nullable|string|max:30',
             'address' => 'required|string|max:255',
-            'contacts' => 'required|string|max:255',
+            'wife_address' => 'nullable|string|max:255',
+            'contacts' => 'nullable|string|max:255',
             'relationship_type' => 'required|in:namoro,noivos,vivendo_maritalmente,casados',
             'years_together' => 'required|integer|min:0',
             'cell_zone' => 'nullable|string|max:255',

@@ -56,11 +56,17 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
-                        @forelse($courseClass->courseEnrollments as $enrollment)
-                            @php $absences = $enrollment->absence_count; @endphp
+                        @forelse($allEnrollments as $enrollment)
+                            @php $absences = $enrollment instanceof \App\Models\CourseEnrollment ? $enrollment->absence_count : 0; @endphp
                             <tr>
                                 <td class="px-6 py-4">
-                                    @if($enrollment->malePartner && $enrollment->femalePartner)
+                                    @if($enrollment instanceof \App\Models\CoupleEnrollment)
+                                        <div class="font-bold text-gray-900">{{ $enrollment->husband_name }} & {{ $enrollment->wife_name }}</div>
+                                        <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">CASAL (INS. PÚBLICA)</div>
+                                    @elseif($enrollment instanceof \App\Models\MinisterialEnrollment)
+                                        <div class="font-bold text-gray-900">{{ $enrollment->full_name }}</div>
+                                        <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">INDIVIDUAL (INS. PÚBLICA)</div>
+                                    @elseif($enrollment->malePartner && $enrollment->femalePartner)
                                         <div class="font-bold text-gray-900">{{ $enrollment->malePartner->name }} & {{ $enrollment->femalePartner->name }}</div>
                                         <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">CASAL</div>
                                     @else
@@ -78,6 +84,8 @@
                                             'aprovado' => 'bg-green-100 text-green-800',
                                             'reprovado' => 'bg-red-100 text-red-800',
                                             'desistente' => 'bg-gray-100 text-gray-800',
+                                            'approved' => 'bg-green-100 text-green-800',
+                                            'pending' => 'bg-yellow-100 text-yellow-800',
                                         ];
                                     @endphp
                                     <span class="px-2 py-1 {{ $labelClasses[$enrollment->status] ?? 'bg-gray-100 text-gray-800' }} rounded-full text-[8px] font-black uppercase tracking-widest">

@@ -81,9 +81,27 @@
                                             <p class="text-sm font-black text-gray-900 dark:text-white leading-tight">
                                                 {{ $enrollment->husband_name }} & {{ $enrollment->wife_name }}
                                             </p>
-                                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">
-                                                {{ ucfirst($enrollment->relationship_type) }} • {{ $enrollment->years_together }} anos
-                                            </p>
+                                            <div class="flex flex-col mt-0.5">
+                                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">
+                                                    {{ ucfirst($enrollment->relationship_type) }} • {{ $enrollment->years_together }} anos
+                                                </p>
+                                                <div class="mt-1.5 space-y-0.5">
+                                                    <p class="text-[9px] font-medium text-gray-500 dark:text-gray-400 italic flex items-center gap-1">
+                                                        <i class="bi bi-geo-alt-fill text-[8px]"></i>
+                                                        {{ $enrollment->address }}
+                                                        @if($enrollment->wife_address)
+                                                            <span class="text-[8px] text-gray-400 not-italic ml-1">(Marido)</span>
+                                                        @endif
+                                                    </p>
+                                                    @if($enrollment->wife_address)
+                                                        <p class="text-[9px] font-medium text-gray-500 dark:text-gray-400 italic flex items-center gap-1">
+                                                            <i class="bi bi-geo-alt-fill text-[8px] text-pink-400"></i>
+                                                            {{ $enrollment->wife_address }}
+                                                            <span class="text-[8px] text-gray-400 not-italic ml-1">(Esposa)</span>
+                                                        </p>
+                                                    @endif
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
@@ -91,7 +109,15 @@
                                     <span class="text-xs font-bold text-gray-600 dark:text-gray-400">{{ $enrollment->course->name }}</span>
                                 </td>
                                 <td class="px-8 py-6">
-                                    <p class="text-xs font-bold text-gray-700 dark:text-gray-300">{{ $enrollment->contacts }}</p>
+                                    @if($enrollment->husband_phone)
+                                        <p class="text-xs font-bold text-gray-700 dark:text-gray-300"><i class="bi bi-person text-blue-500 mr-1"></i>{{ $enrollment->husband_phone }}</p>
+                                    @endif
+                                    @if($enrollment->wife_phone)
+                                        <p class="text-xs font-bold text-gray-700 dark:text-gray-300"><i class="bi bi-person-heart text-pink-500 mr-1"></i>{{ $enrollment->wife_phone }}</p>
+                                    @endif
+                                    @if(!$enrollment->husband_phone && !$enrollment->wife_phone && $enrollment->contacts)
+                                        <p class="text-xs font-bold text-gray-700 dark:text-gray-300">{{ $enrollment->contacts }}</p>
+                                    @endif
                                     <p class="text-[9px] font-medium text-gray-400 uppercase mt-0.5">{{ $enrollment->cell_zone ?? 'Zona não inf.' }}</p>
                                 </td>
                                 <td class="px-8 py-6">
@@ -128,15 +154,21 @@
                                                         @csrf
                                                         <select name="course_class_id" required class="w-full bg-gray-50 dark:bg-gray-900 border-none rounded-xl text-xs font-bold mb-3 focus:ring-orange-500">
                                                             <option value="">Escolha uma turma...</option>
-                                                            @foreach($classes->where('course_id', $enrollment->course_id) as $class)
-                                                                <option value="{{ $class->id }}">{{ $class->name }}</option>
-                                                            @endforeach
+                                                            @if(is_object($classes) && method_exists($classes, 'where'))
+                                                                @foreach($classes->where('course_id', $enrollment->course_id) as $class)
+                                                                    <option value="{{ $class->id }}">{{ $class->name }}</option>
+                                                                @endforeach
+                                                            @endif
                                                         </select>
                                                         <button type="submit" class="w-full bg-orange-600 text-white py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-orange-700">Confirmar</button>
                                                     </form>
                                                 </div>
                                             </div>
                                         @endif
+
+                                        <a href="{{ route('couple-enrollments.show', $enrollment) }}" class="p-2 text-gray-400 hover:text-purple-500 transition-colors" title="Ver Detalhes">
+                                            <i class="bi bi-eye-fill"></i>
+                                        </a>
 
                                         <a href="{{ route('couple-enrollments.edit', $enrollment) }}" class="p-2 text-gray-400 hover:text-blue-500 transition-colors">
                                             <i class="bi bi-pencil-fill"></i>

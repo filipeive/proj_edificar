@@ -14,6 +14,7 @@ class Course extends Model
         'duration',
         'is_active',
         'registration_open',
+        'registration_deadline',
         'target_role',
     ];
 
@@ -35,5 +36,18 @@ class Course extends Model
     public function coupleEnrollments()
     {
         return $this->hasMany(CoupleEnrollment::class);
+    }
+
+    public function isRegistrationOpen()
+    {
+        if (!$this->registration_open) {
+            return false;
+        }
+
+        if ($this->registration_deadline && now()->gt($this->registration_deadline)) {
+            return false;
+        }
+
+        return true;
     }
 }

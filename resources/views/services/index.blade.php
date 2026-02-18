@@ -139,7 +139,7 @@
                             <span>Listagem</span>
                         </button>
                     </div>
-
+                            <!-- deve estar escondido no modo mobile-->
                     <div class="flex items-center gap-3">
                         <a href="{{ route('services.report') }}"
                             class="group relative flex items-center px-6 py-4 bg-gray-900 dark:bg-gray-800 text-white rounded-2xl hover:scale-105 transition-all duration-300 shadow-xl shadow-gray-900/10">

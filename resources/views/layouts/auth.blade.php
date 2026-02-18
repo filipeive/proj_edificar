@@ -16,29 +16,38 @@
 
     <style>
         .auth-bg {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #020617 100%);
+            background: #020617;
+            min-height: 100vh;
+            color: white;
             position: relative;
-            overflow-x: hidden;
         }
 
-        .auth-bg::before {
+        .auth-overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #020617 100%);
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .auth-overlay::before {
             content: '';
             position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 100%;
+            top: -20%;
+            right: -20%;
+            width: 80%;
+            height: 80%;
             background: radial-gradient(circle, rgba(249, 115, 22, 0.1) 0%, transparent 70%);
             animation: pulse 8s ease-in-out infinite;
         }
 
-        .auth-bg::after {
+        .auth-overlay::after {
             content: '';
             position: absolute;
-            bottom: -50%;
-            left: -50%;
-            width: 100%;
-            height: 100%;
+            bottom: -20%;
+            left: -20%;
+            width: 80%;
+            height: 80%;
             background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
             animation: pulse 8s ease-in-out infinite reverse;
         }
@@ -58,9 +67,10 @@
         }
 
         .floating-shapes {
-            position: absolute;
-            width: 100%;
-            height: 100%;
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
             overflow: hidden;
         }
 
@@ -119,13 +129,16 @@
 </head>
 
 <body class="auth-bg">
+    <div class="auth-overlay"></div>
     <div class="floating-shapes">
         <div class="shape"></div>
         <div class="shape"></div>
         <div class="shape"></div>
     </div>
 
-    @yield('content')
+    <div class="relative z-10 w-full">
+        @yield('content')
+    </div>
 </body>
 
 </html>

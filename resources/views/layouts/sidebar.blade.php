@@ -68,7 +68,7 @@
         @if($authUser && ($authUser->isLider() || $authUser->isResponsavelPacote() || $authUser->isAdmin() || $authUser->isComissaoObra()))
             <div class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-2 mt-2">Atalhos Rápidos</div>
             <div class="grid grid-cols-2 gap-2 px-2 py-2">
-                @if($authUser->isSecretaria() || $authUser->isAdmin())
+                @if($authUser->isSecretaria() || $authUser->isAdmin() || $authUser->isAdministracao())
                     <a href="{{ route('services.create') }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-orange-600/20 hover:border-orange-500/50 transition-all group">
                         <i class="bi bi-plus-circle text-orange-500 mb-1 group-hover:scale-110 transition-transform text-2xl"></i>
                         <span class="hidden md:block text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Registar Culto</span>
@@ -87,7 +87,7 @@
                         <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Registar Contribuição</span>
                     </a>
                 @endif
-                @if($authUser->isAdmin() || $authUser->isSecretaria() || $authUser->isPastorZona())
+                @if($authUser->isAdmin() || $authUser->isSecretaria() || $authUser->isPastorZona() || $authUser->isAdministracao())
                     <a href="{{ route('visitors.create') }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-green-600/20 hover:border-green-500/50 transition-all group">
                         <i class="bi bi-person-plus text-green-500 mb-1 group-hover:scale-110 transition-transform"></i>
                         <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Registar Visitante</span>
@@ -121,7 +121,7 @@
 
         @foreach($order as $sectionName)
             @if($sectionName === 'operacao')
-                @if ($authUser && ($authUser->isAdmin() || $authUser->isSecretaria() || $authUser->isPastor() || $authUser->isPastorZona() || $authUser->isSupervisor()))
+                @if ($authUser && ($authUser->isAdmin() || $authUser->isSecretaria() || $authUser->isPastor() || $authUser->isPastorZona() || $authUser->isSupervisor() || $authUser->isAdministracao()))
                     <!-- OPERAÇÃO ECLESIÁSTICA -->
                     <div class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-2">Operação Eclesiástica</div>
 
@@ -164,10 +164,14 @@
                                 <div class="ml-12 mt-2 space-y-1 border-l border-white/10 pl-4">
                                     <a href="{{ route('courses.index') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('courses.index') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Cursos</a>
                                     @if ($authUser && $authUser->hasPermission('menu_public_enrollments'))
-                                        <a href="{{ route('couple-enrollments.index') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('couple-enrollments.*') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Inscrições Públicas</a>
+                                        <a href="{{ route('couple-enrollments.index') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('couple-enrollments.*') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Inscrições de Casais</a>
+                                        <a href="{{ route('ministerial-enrollments.index') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('ministerial-enrollments.*') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Inscrições Individuais</a>
                                     @endif
                                     @if ($authUser && ((!$authUser->isSupervisor() && !$authUser->isSecretaria() && !$authUser->isPastorZona()) || (($authUser->isSupervisor() || $authUser->isSecretaria() || $authUser->isPastorZona()) && $authUser->hasAnyCourseEnrollment())))
                                         <a href="{{ route('course-classes.index') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('course-classes.*') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Turmas</a>
+                                    @endif
+                                    @if ($authUser && $authUser->isAdmin())
+                                        <a href="{{ route('settings.public-forms') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('settings.public-forms') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Config. Formulários</a>
                                     @endif
                                 </div>
                             </div>
@@ -370,6 +374,7 @@
         </a>
 
         <!-- FORMULÁRIOS PÚBLICOS -->
+        @if($authUser && !$authUser->isAdministracao())
         <div class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-2 mt-4">Formulários Públicos</div>
         <div class="space-y-1">
             <a href="{{ route('public.forms.pre-marital') }}"
@@ -383,6 +388,7 @@
                 <span class="sidebar-text ml-4 font-bold tracking-tight">Relatório Trimestral</span>
             </a>
         </div>
+        @endif
     </nav>
 
     <!-- User Profile Footer -->
