@@ -124,7 +124,7 @@ class CoupleEnrollmentController extends Controller
                     $enrollment->cell_zone,
                     $enrollment->years_together,
                     $enrollment->leader_name,
-                    $enrollment->is_church_member ? 'Sim' : 'Não',
+                    $enrollment->is_church_member === 'both' ? 'Ambos' : ($enrollment->is_church_member === 'one' ? '1 de nós' : 'Não'),
                     $enrollment->courseClass->name ?? 'Não alocado',
                     $enrollment->status,
                     $enrollment->created_at->format('d/m/Y H:i')
@@ -161,7 +161,7 @@ class CoupleEnrollmentController extends Controller
             'years_together' => 'required|integer|min:0',
             'cell_zone' => 'nullable|string|max:255',
             'leader_name' => 'nullable|string|max:255',
-            'is_church_member' => 'required|boolean',
+            'is_church_member' => 'required|in:both,one,none',
             'has_pastoral_recommendation' => 'required|boolean',
             'observations' => 'nullable|string',
             'course_id' => 'required|exists:courses,id',

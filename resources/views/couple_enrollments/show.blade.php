@@ -125,12 +125,14 @@
 
                         <div class="space-y-6">
                             <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 rounded-2xl {{ $coupleEnrollment->is_church_member ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400' }} flex items-center justify-center shadow-sm">
-                                    <i class="bi {{ $coupleEnrollment->is_church_member ? 'bi-patch-check-fill' : 'bi-x-circle' }} text-xl"></i>
+                                <div class="w-12 h-12 rounded-2xl {{ in_array($coupleEnrollment->is_church_member, ['both', 'one']) ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400' }} flex items-center justify-center shadow-sm">
+                                    <i class="bi {{ in_array($coupleEnrollment->is_church_member, ['both', 'one']) ? ($coupleEnrollment->is_church_member === 'both' ? 'bi-patch-check-fill' : 'bi-person-check') : 'bi-x-circle' }} text-xl"></i>
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Membro da Igreja?</label>
-                                    <p class="text-gray-900 dark:text-white font-black uppercase text-xs">{{ $coupleEnrollment->is_church_member ? 'Sim, é membro' : 'Não, é visitante' }}</p>
+                                    <p class="text-gray-900 dark:text-white font-black uppercase text-xs">
+                                        {{ $coupleEnrollment->is_church_member === 'both' ? 'Ambos são membros' : ($coupleEnrollment->is_church_member === 'one' ? '1 de nós é membro' : 'Não, são visitantes') }}
+                                    </p>
                                 </div>
                             </div>
 

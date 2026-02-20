@@ -52,10 +52,10 @@
             </div>
 
             <div x-data="{ 
-                    relType: '{{ old('relationship_type', $coupleEnrollment->relationship_type) }}', 
-                    isMember: '{{ old('is_church_member', $coupleEnrollment->is_church_member) }}',
-                    zoneId: '{{ old('zone_id', $coupleEnrollment->zone_id) }}' || ( '{{ $coupleEnrollment->cell_zone }}' ? 'other' : '' )
-                }" class="space-y-8 mt-6">
+                            relType: '{{ old('relationship_type', $coupleEnrollment->relationship_type) }}', 
+                            isMember: '{{ old('is_church_member', $coupleEnrollment->is_church_member) }}',
+                            zoneId: '{{ old('zone_id', $coupleEnrollment->zone_id) }}' || ( '{{ $coupleEnrollment->cell_zone }}' ? 'other' : '' )
+                        }" class="space-y-8 mt-6">
                 {{-- Address Section --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div
@@ -132,27 +132,38 @@
                         Pertença à Igreja
                     </h3>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="flex items-center gap-3 p-5 bg-gray-50 dark:bg-gray-900/50 rounded-2xl cursor-pointer border-2 transition-all"
-                            :class="isMember == '1' ? 'border-orange-500 bg-orange-50/10' : 'border-transparent opacity-60'"
-                            @click="isMember = '1'">
-                            <input type="radio" name="is_church_member" value="1" x-model="isMember"
+                            :class="isMember == 'both' ? 'border-orange-500 bg-orange-50/10' : 'border-transparent opacity-60'"
+                            @click="isMember = 'both'">
+                            <input type="radio" name="is_church_member" value="both" x-model="isMember"
                                 class="w-5 h-5 text-orange-600 rounded-full focus:ring-orange-500 border-gray-300">
-                            <span class="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-widest">Sim,
-                                Membro</span>
+                            <span
+                                class="text-[10px] font-black text-gray-700 dark:text-gray-300 uppercase tracking-widest">Ambos
+                                Membros</span>
                         </div>
 
                         <div class="flex items-center gap-3 p-5 bg-gray-50 dark:bg-gray-900/50 rounded-2xl cursor-pointer border-2 transition-all"
-                            :class="isMember == '0' ? 'border-gray-400 bg-gray-50/50' : 'border-transparent opacity-60'"
-                            @click="isMember = '0'">
-                            <input type="radio" name="is_church_member" value="0" x-model="isMember"
+                            :class="isMember == 'one' ? 'border-orange-500 bg-orange-50/10' : 'border-transparent opacity-60'"
+                            @click="isMember = 'one'">
+                            <input type="radio" name="is_church_member" value="one" x-model="isMember"
                                 class="w-5 h-5 text-orange-600 rounded-full focus:ring-orange-500 border-gray-300">
-                            <span class="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-widest">Não é
-                                Membro</span>
+                            <span
+                                class="text-[10px] font-black text-gray-700 dark:text-gray-300 uppercase tracking-widest">1
+                                de nós</span>
+                        </div>
+
+                        <div class="flex items-center gap-3 p-5 bg-gray-50 dark:bg-gray-900/50 rounded-2xl cursor-pointer border-2 transition-all"
+                            :class="isMember == 'none' ? 'border-gray-400 bg-gray-50/50' : 'border-transparent opacity-60'"
+                            @click="isMember = 'none'">
+                            <input type="radio" name="is_church_member" value="none" x-model="isMember"
+                                class="w-5 h-5 text-orange-600 rounded-full focus:ring-orange-500 border-gray-300">
+                            <span
+                                class="text-[10px] font-black text-gray-700 dark:text-gray-300 uppercase tracking-widest">Visitantes</span>
                         </div>
                     </div>
 
-                    <div x-show="isMember == '1'" x-transition
+                    <div x-show="isMember == 'both' || isMember == 'one'" x-transition
                         class="space-y-6 bg-orange-50/5 p-6 rounded-[2rem] border border-orange-500/10">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2">

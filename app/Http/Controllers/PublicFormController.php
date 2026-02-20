@@ -82,7 +82,7 @@ class PublicFormController extends Controller
             'years_together_text' => 'nullable|string|max:255',
             'leader_name' => 'nullable|string|max:255',
             'has_pastoral_recommendation' => 'required|boolean',
-            'is_church_member' => 'required|boolean',
+            'is_church_member' => 'required|in:both,one,none',
             'observations' => 'nullable|string',
             'course_class_id' => 'nullable|exists:course_classes,id',
         ]);
@@ -284,7 +284,7 @@ class PublicFormController extends Controller
             'full_name' => 'required|string|max:255',
             'email' => 'nullable|email|max:255',
             'phone' => 'required|string|max:30',
-            'is_church_member' => 'required|boolean',
+            'is_church_member' => 'required|in:1,0,both,one,none',
             'zone_id' => 'nullable|exists:zones,id',
             'cell_name' => 'nullable|string|max:255',
             'observations' => 'nullable|string',

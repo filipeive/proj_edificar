@@ -975,15 +975,21 @@
                         </label>
                         <div class="radio-group">
                             <div class="radio-pill">
-                                <input type="radio" id="member_yes" name="is_church_member" value="1" {{ old('is_church_member') == '1' ? 'checked' : '' }}>
-                                <label for="member_yes">
-                                    <i class="bi bi-check-circle-fill"></i> Sim, somos membros
+                                <input type="radio" id="member_both" name="is_church_member" value="both" {{ old('is_church_member') == 'both' ? 'checked' : '' }}>
+                                <label for="member_both">
+                                    <i class="bi bi-check-circle-fill"></i> Sim, ambos somos membros
                                 </label>
                             </div>
                             <div class="radio-pill">
-                                <input type="radio" id="member_no" name="is_church_member" value="0" {{ old('is_church_member') == '0' ? 'checked' : '' }}>
-                                <label for="member_no">
-                                    <i class="bi bi-x-circle-fill"></i> Não somos membros
+                                <input type="radio" id="member_one" name="is_church_member" value="one" {{ old('is_church_member') == 'one' ? 'checked' : '' }}>
+                                <label for="member_one">
+                                    <i class="bi bi-person-check"></i> 1 de nós é membro
+                                </label>
+                            </div>
+                            <div class="radio-pill">
+                                <input type="radio" id="member_none" name="is_church_member" value="none" {{ old('is_church_member') == 'none' ? 'checked' : '' }}>
+                                <label for="member_none">
+                                    <i class="bi bi-x-circle-fill"></i> Nenhum é membro
                                 </label>
                             </div>
                         </div>
@@ -1211,7 +1217,8 @@
 
             function applyMemberLogic() {
                 var checked = document.querySelector('[name="is_church_member"]:checked');
-                if (checked && checked.value === '1') {
+                var val = checked ? checked.value : '';
+                if (val === 'both' || val === 'one' || val === '1') {
                     openBlock(memberInfo);
                 } else {
                     closeBlock(memberInfo);

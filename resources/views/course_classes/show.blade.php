@@ -59,9 +59,9 @@
     @endphp
 
     <div x-data="{ 
-                    activeTab: 'students',
-                    view: localStorage.getItem('class_details_view') || 'list'
-                }" x-init="$watch('view', val => localStorage.setItem('class_details_view', val))"
+                            activeTab: 'students',
+                            view: localStorage.getItem('class_details_view') || 'list'
+                        }" x-init="$watch('view', val => localStorage.setItem('class_details_view', val))"
         class="w-full space-y-8">
 
         <!-- Breadcrumbs & Actions -->
@@ -566,7 +566,12 @@
                                                 <span
                                                     class="px-2 py-0.5 bg-white/50 dark:bg-gray-800 rounded-lg text-[9px] font-black uppercase tracking-widest text-purple-600 dark:text-purple-400 border border-purple-100">{{ $enrollment->relationship_type }}</span>
                                                 <span
-                                                    class="px-2 py-0.5 bg-white/50 dark:bg-gray-800 rounded-lg text-[9px] font-black uppercase tracking-widest text-purple-600 dark:text-purple-400 border border-purple-100">{{ $enrollment->is_church_member ? 'Membro' : 'Visitante' }}</span>
+                                                    class="px-2 py-0.5 bg-white/50 dark:bg-gray-800 rounded-lg text-[9px] font-black uppercase tracking-widest text-purple-600 dark:text-purple-400 border border-purple-100">
+                                                                @if($enrollment instanceof \App\Models\CoupleEnrollment){{ $enrollment->is_church_member === 'both' ? 'Ambos Membros' : ($enrollment->is_church_member === 'one' ? '1 Membro' : 'Visitantes') }}
+                                                                @else
+                                                                    {{ $enrollment->is_church_member ? 'Membro' : 'Visitante' }}
+                                                                @endif
+                                                            </span>
                                             </div>
                                         </div>
                                     </div>
