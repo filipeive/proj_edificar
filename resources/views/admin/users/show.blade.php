@@ -59,7 +59,7 @@
                             <h1 class="text-5xl font-black text-gray-900 tracking-tighter">{{ $user->name }}</h1>
                             <span
                                 class="px-4 py-2 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-blue-200">
-                                {{ str_replace('_', ' ', $user->role) }}
+                                {{ $user->role === 'administracao' ? 'Administração' : str_replace('_', ' ', $user->role) }}
                             </span>
                         </div>
                         <p class="text-xl font-bold text-gray-400 max-w-2xl">
@@ -226,10 +226,11 @@
                                                                 </p>
                                                             </td>
                                                             <td class="px-10 py-6 text-center">
-                                                                <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest {{ 
-                                                                                                                                    $contribution->status == 'verificada' ? 'bg-green-50 text-green-600' :
+                                                                <span
+                                                                    class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest {{ 
+                                                                                                                                                                $contribution->status == 'verificada' ? 'bg-green-50 text-green-600' :
                                     ($contribution->status == 'pendente' ? 'bg-yellow-50 text-yellow-600' : 'bg-red-50 text-red-600') 
-                                                                                                                                }}">
+                                                                                                                                                            }}">
                                                                     {{ $contribution->status }}
                                                                 </span>
                                                             </td>

@@ -220,6 +220,8 @@
                                         class="bg-gray-900">Pastor</option>
                                     <option value="pastor_senior" {{ old('role') == 'pastor_senior' ? 'selected' : '' }}
                                         class="bg-gray-900">Pastor Senior</option>
+                                    <option value="administracao" {{ old('role') == 'administracao' ? 'selected' : '' }}
+                                        class="bg-gray-900">Administração</option>
                                     <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }} class="bg-gray-900">
                                         Administrador</option>
                                 </select>

@@ -170,6 +170,7 @@
                                                     <option value="tesouraria" {{ old('role', $user->role) == 'tesouraria' ? 'selected' : '' }}>Tesouraria</option>
                                                     <option value="pastor" {{ old('role', $user->role) == 'pastor' ? 'selected' : '' }}>Pastor</option>
                                                     <option value="pastor_senior" {{ old('role', $user->role) == 'pastor_senior' ? 'selected' : '' }}>Pastor Senior</option>
+                                                    <option value="administracao" {{ old('role', $user->role) == 'administracao' ? 'selected' : '' }}>Administração</option>
                                                     <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>
                                                         Administrador</option>
                                                 </select>

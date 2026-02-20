@@ -66,6 +66,7 @@ class UserController
         $totalUsers = User::count();
         $totalMembers = User::where('role', 'membro')->count();
         $totalLeaders = User::where('role', 'lider_celula')->count();
+        $totalAdministracao = User::where('role', 'administracao')->count();
         $totalActive = User::where('is_active', true)->count();
 
         return view('admin.users.index', [
@@ -74,6 +75,7 @@ class UserController
             'totalUsers' => $totalUsers,
             'totalMembers' => $totalMembers,
             'totalLeaders' => $totalLeaders,
+            'totalAdministracao' => $totalAdministracao,
             'totalActive' => $totalActive,
         ]);
     }
@@ -81,7 +83,7 @@ class UserController
     public function create(): View
     {
         $cells = Cell::all();
-        $roles = ['membro', 'lider_celula', 'supervisor', 'pastor_zona', 'admin'];
+        $roles = ['membro', 'lider_celula', 'supervisor', 'pastor_zona', 'administracao', 'admin'];
         return view('admin.users.create', ['cells' => $cells, 'roles' => $roles]);
     }
 
@@ -92,7 +94,7 @@ class UserController
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6|confirmed',
             'phone' => 'nullable|moz_phone',
-            'role' => 'required|in:membro,lider_celula,supervisor,pastor_zona,secretaria,admin,comissao_obra,responsavel_pacote,tesouraria,pastor,pastor_senior',
+            'role' => 'required|in:membro,lider_celula,supervisor,pastor_zona,secretaria,admin,comissao_obra,responsavel_pacote,tesouraria,pastor,pastor_senior,administracao',
             'cell_id' => 'nullable|exists:cells,id',
             'is_active' => 'boolean',
         ]);
@@ -123,7 +125,7 @@ class UserController
     {
         $this->authorize('update', $user);
         $cells = Cell::all();
-        $roles = ['membro', 'lider_celula', 'supervisor', 'pastor_zona', 'admin'];
+        $roles = ['membro', 'lider_celula', 'supervisor', 'pastor_zona', 'administracao', 'admin'];
         return view('admin.users.edit', [
             'user' => $user,
             'cells' => $cells,
@@ -137,7 +139,7 @@ class UserController
             'name' => 'required|string|max:255',
             'email' => "required|email|unique:users,email,{$user->id}",
             'phone' => 'nullable|moz_phone',
-            'role' => 'required|in:membro,lider_celula,supervisor,pastor_zona,secretaria,admin,comissao_obra,responsavel_pacote,tesouraria,pastor,pastor_senior',
+            'role' => 'required|in:membro,lider_celula,supervisor,pastor_zona,secretaria,admin,comissao_obra,responsavel_pacote,tesouraria,pastor,pastor_senior,administracao',
             'cell_id' => 'nullable|exists:cells,id',
             'is_active' => 'boolean',
             'menu_permissions' => 'nullable|array',

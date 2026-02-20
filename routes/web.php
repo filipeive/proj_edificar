@@ -411,7 +411,7 @@ Route::middleware('auth')->group(function () {
     // Quarterly Reports management handled by resource route at 392
     // Edificar Dashboard
     Route::get('project-edificar/dashboard', [\App\Http\Controllers\Admin\EdificarDashboardController::class, 'index'])
-        ->middleware('role:admin,comissao_obra,pastor_senior')
+        ->middleware('role:admin,comissao_obra,pastor_senior,administracao')
         ->name('edificar.dashboard');
 
     // ===== EVENTOS E CERIMÓNIAS (EVENTS) ROUTES =====

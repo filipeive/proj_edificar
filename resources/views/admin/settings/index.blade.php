@@ -300,6 +300,7 @@
                             <option value="tesouraria">Tesouraria</option>
                             <option value="pastor">Pastor</option>
                             <option value="pastor_senior">Pastor Senior</option>
+                            <option value="administracao">Administração</option>
                         </select>
                     </div>
                 </div>
@@ -338,7 +339,7 @@
                         ],
                     ];
 
-                    $roles = ['membro', 'lider_celula', 'supervisor', 'pastor_zona', 'secretaria', 'comissao_obra', 'responsavel_pacote', 'tesouraria', 'pastor', 'pastor_senior'];
+                    $roles = ['membro', 'lider_celula', 'supervisor', 'pastor_zona', 'secretaria', 'comissao_obra', 'responsavel_pacote', 'tesouraria', 'pastor', 'pastor_senior', 'administracao'];
                 @endphp
 
                 <div class="space-y-8">

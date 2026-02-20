@@ -98,7 +98,7 @@
         </div>
 
         <!-- Global Stats Row -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 hidden md:flex" x-show="view === 'list'">
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 hidden md:flex" x-show="view === 'list'">
             <div class="flex bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 items-center justify-between group hover:shadow-xl transition-all">
                 <div class="space-y-1">
                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Geral</p>
@@ -124,6 +124,15 @@
                 </div>
                 <div class="w-16 h-16 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-2xl group-hover:bg-purple-600 group-hover:text-white transition-all">
                     <i class="bi bi-person-badge-fill"></i>
+                </div>
+            </div>
+            <div class="flex bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 items-center justify-between group hover:shadow-xl transition-all">
+                <div class="space-y-1">
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Administração</p>
+                    <p class="text-3xl font-black text-blue-700">{{ $totalAdministracao }}</p>
+                </div>
+                <div class="w-16 h-16 rounded-2xl bg-blue-50 text-blue-700 flex items-center justify-center text-2xl group-hover:bg-blue-600 group-hover:text-white transition-all">
+                    <i class="bi bi-shield-check"></i>
                 </div>
             </div>
             <div class="flex bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 items-center justify-between group hover:shadow-xl transition-all">
@@ -160,6 +169,7 @@
                         <select name="role" class="w-full px-6 py-3 bg-white border-transparent focus:ring-4 focus:ring-blue-100 rounded-xl font-bold text-sm appearance-none transition-all custom-select">
                             <option value="">Todos os Papéis</option>
                             <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Administrador</option>
+                            <option value="administracao" {{ request('role') == 'administracao' ? 'selected' : '' }}>Administração</option>
                             <option value="pastor_senior" {{ request('role') == 'pastor_senior' ? 'selected' : '' }}>Pastor Senior</option>
                             <option value="pastor" {{ request('role') == 'pastor' ? 'selected' : '' }}>Pastor</option>
                             <option value="pastor_zona" {{ request('role') == 'pastor_zona' ? 'selected' : '' }}>Pastor de Zona</option>
@@ -248,6 +258,9 @@
                                     @switch($user->role)
                                         @case('admin')
                                             <span class="px-4 py-1.5 bg-red-50 text-red-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-red-100 flex items-center justify-center gap-2">Admin</span>
+                                            @break
+                                        @case('administracao')
+                                            <span class="px-4 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-[10px] font-black uppercase tracking-widest border border-blue-200 flex items-center justify-center gap-2">Administração</span>
                                             @break
                                         @case('pastor_senior')
                                             <span class="px-4 py-1.5 bg-red-50 text-red-700 rounded-lg text-[10px] font-black uppercase tracking-widest border border-red-200 flex items-center justify-center gap-2">Pastor Senior</span>
@@ -367,6 +380,9 @@
                             @switch($user->role)
                                 @case('admin')
                                     <span class="px-3 py-1 bg-red-50 text-red-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-red-100">Admin</span>
+                                    @break
+                                @case('administracao')
+                                    <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-200">Administração</span>
                                     @break
                                 @case('pastor_senior')
                                     <span class="px-3 py-1 bg-red-50 text-red-700 rounded-full text-[10px] font-black uppercase tracking-widest border border-red-200">Pastor Senior</span>

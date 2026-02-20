@@ -63,12 +63,9 @@ class CommitmentPackage extends Model
     }
     public function getTotalContributionsThisMonth()
     {
-        $now = now();
-        $monthStart = $now->copy()->startOfMonth()->addDays(19);
-        $monthEnd = $now->copy()->addMonth()->startOfMonth()->addDays(4);
-
         return $this->contributions()
-            ->whereBetween('contribution_date', [$monthStart, $monthEnd])
+            ->whereMonth('contribution_date', now()->month)
+            ->whereYear('contribution_date', now()->year)
             ->where('status', 'verificada')
             ->sum('amount');
     }

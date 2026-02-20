@@ -14,20 +14,22 @@ class EdificarDashboardController extends Controller
 {
     public function index()
     {
-        // 1. Estatísticas Gerais de Arrecadação
-        $totalArrecadado = Contribution::verified()
-            ->whereNotNull('package_id')
-            ->sum('amount');
+        $now = now();
+        $month = $now->month;
+        $year = $now->year;
 
-        $arrecadadoMes = Contribution::verified()
-            ->whereNotNull('package_id')
-            ->whereMonth('contribution_date', now()->month)
-            ->whereYear('contribution_date', now()->year)
+        // 1. Estatísticas Gerais de Arrecadação
+        $contributionsQuery = Contribution::verified()->whereNotNull('package_id');
+
+        $totalArrecadado = (clone $contributionsQuery)->sum('amount');
+
+        $arrecadadoMes = (clone $contributionsQuery)
+            ->whereMonth('contribution_date', $month)
+            ->whereYear('contribution_date', $year)
             ->sum('amount');
 
         // 2. Evolução Mensal (Últimos 6 meses)
-        $evolucaoMensal = Contribution::verified()
-            ->whereNotNull('package_id')
+        $evolucaoMensal = $contributionsQuery
             ->select(
                 DB::raw('DATE_FORMAT(contribution_date, "%Y-%m") as mes'),
                 DB::raw('SUM(amount) as total')
@@ -41,15 +43,15 @@ class EdificarDashboardController extends Controller
         // 3. Performance por Pacote
         $pacotes = CommitmentPackage::active()
             ->withCount([
-                'userCommitments as membros_ativos' => function ($q) {
-                    $q->whereNull('end_date')->orWhere('end_date', '>', now());
+                'userCommitments as membros_ativos' => function ($q) use ($now) {
+                    $q->whereNull('end_date')->orWhere('end_date', '>', $now);
                 }
             ])
             ->get()
-            ->map(function ($package) {
+            ->map(function ($package) use ($month, $year) {
                 $arrecadado = $package->getTotalContributionsThisMonth();
                 $esperado = $package->userCommitments()
-                    ->where(function ($q) {
+                    ->where(function ($q) use (&$now) {
                         $q->whereNull('end_date')->orWhere('end_date', '>', now());
                     })
                     ->sum('committed_amount');
@@ -57,54 +59,45 @@ class EdificarDashboardController extends Controller
                 return [
                     'name' => $package->name,
                     'membros' => $package->membros_ativos,
-                    'arrecadado' => $arrecadado,
-                    'esperado' => $esperado,
+                    'arrecadado' => (float) $arrecadado,
+                    'esperado' => (float) $esperado,
                     'percentual' => $esperado > 0 ? round(($arrecadado / $esperado) * 100, 1) : 0
                 ];
             });
 
-        // 4. Top Células (EDIFICAR ONLY)
-        $topCells = Cell::with('supervision')
+        // 4. Top Células (EDIFICAR ONLY) - Optimized to single query
+        $topCells = Contribution::verified()
+            ->whereNotNull('package_id')
+            ->whereMonth('contribution_date', $month)
+            ->whereYear('contribution_date', $year)
+            ->select('cell_id', DB::raw('SUM(amount) as total'))
+            ->groupBy('cell_id')
+            ->orderByDesc('total')
+            ->limit(10)
             ->get()
-            ->map(function ($cell) {
-                // Sum ONLY Edificar Contributions
-                $totalCell = Contribution::verified()
-                    ->whereNotNull('package_id')
-                    ->where('cell_id', $cell->id)
-                    ->whereMonth('contribution_date', now()->month)
-                    ->whereYear('contribution_date', now()->year)
-                    ->sum('amount');
-
+            ->map(function ($contribution) {
+                $cell = Cell::find($contribution->cell_id);
                 return [
-                    'name' => $cell->name,
-                    'total' => $totalCell,
+                    'name' => $cell ? $cell->name : 'N/A',
+                    'total' => (float) $contribution->total,
                 ];
-            })
-            ->filter(function ($item) {
-                return $item['total'] > 0;
-            })
-            ->sortByDesc('total')
-            ->take(10)
-            ->values();
+            });
 
-        // 5. Zone Stats (EDIFICAR ONLY)
-        $zones = Zone::with('supervisions')->get();
-        $zoneStats = [];
-        foreach ($zones as $zone) {
-            // Sum ONLY Edificar Contributions
-            $totalZone = Contribution::verified()
-                ->whereNotNull('package_id')
-                ->where('zone_id', $zone->id)
-                ->whereMonth('contribution_date', now()->month)
-                ->whereYear('contribution_date', now()->year)
-                ->sum('amount');
-
-            $zoneStats[] = [
-                'name' => $zone->name,
-                'total' => $totalZone,
-            ];
-        }
-        $zoneStats = collect($zoneStats);
+        // 5. Zone Stats (EDIFICAR ONLY) - Optimized to single query
+        $zoneStats = Contribution::verified()
+            ->whereNotNull('package_id')
+            ->whereMonth('contribution_date', $month)
+            ->whereYear('contribution_date', $year)
+            ->select('zone_id', DB::raw('SUM(amount) as total'))
+            ->groupBy('zone_id')
+            ->get()
+            ->map(function ($contribution) {
+                $zone = Zone::find($contribution->zone_id);
+                return [
+                    'name' => $zone ? $zone->name : 'N/A',
+                    'total' => (float) $contribution->total,
+                ];
+            });
 
         $pendingContributions = Contribution::where('status', 'pendente')
             ->whereNotNull('package_id')
