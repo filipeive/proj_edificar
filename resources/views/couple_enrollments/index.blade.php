@@ -16,13 +16,46 @@
 
 @section('content')
     <div class="w-full space-y-6">
+        <!-- Quick Access -->
+        <div class="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/10 dark:to-amber-900/10 border border-orange-100 dark:border-orange-800/40 rounded-[2rem] p-6">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div>
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500">Acesso Rápido</p>
+                    <h3 class="text-lg font-black text-gray-900 dark:text-white">Navegação de Cursos e Turmas</h3>
+                    <p class="text-xs font-medium text-gray-500 mt-1">Atalhos para gestão de curso e alocação de inscritos.</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <a href="{{ route('courses.index') }}"
+                        class="px-4 py-2.5 bg-white dark:bg-gray-800 border border-orange-100 dark:border-orange-800/40 text-orange-700 dark:text-orange-300 rounded-xl hover:bg-orange-100/60 dark:hover:bg-orange-900/20 transition-all text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                        <i class="bi bi-journal-bookmark-fill"></i>
+                        Cursos
+                    </a>
+                    <a href="{{ route('course-classes.index') }}"
+                        class="px-4 py-2.5 bg-white dark:bg-gray-800 border border-orange-100 dark:border-orange-800/40 text-orange-700 dark:text-orange-300 rounded-xl hover:bg-orange-100/60 dark:hover:bg-orange-900/20 transition-all text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                        <i class="bi bi-mortarboard-fill"></i>
+                        Turmas
+                    </a>
+                </div>
+            </div>
+        </div>
+
         <!-- Filters Card -->
         <div class="bg-white dark:bg-gray-800 p-6 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+                <div>
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Filtros</p>
+                    <h4 class="text-sm font-black text-gray-900 dark:text-white">Refinar inscrições públicas</h4>
+                </div>
+                <span class="inline-flex items-center px-3 py-1 rounded-full bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-[10px] font-black uppercase tracking-widest border border-gray-100 dark:border-gray-600">
+                    {{ $enrollments->total() }} registos
+                </span>
+            </div>
             <form action="{{ route('couple-enrollments.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div class="relative group">
+                    <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
                     <input type="text" name="search" value="{{ request('search') }}"
                         placeholder="Buscar por nome ou contato..."
-                        class="w-full pl-4 pr-10 py-3 bg-gray-50 dark:bg-gray-700 border-none rounded-xl focus:ring-2 focus:ring-orange-500 font-bold text-xs text-gray-600 dark:text-gray-300">
+                        class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border-none rounded-xl focus:ring-2 focus:ring-orange-500 font-bold text-xs text-gray-600 dark:text-gray-300">
                 </div>
 
                 <div class="relative group">
@@ -57,6 +90,15 @@
 
         <!-- Table Card -->
         <div class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+            <div class="px-8 py-5 border-b border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div>
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Lista</p>
+                    <h4 class="text-sm font-black text-gray-900 dark:text-white">Inscrições recebidas pelo formulário público</h4>
+                </div>
+                <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                    Página {{ $enrollments->currentPage() }} de {{ $enrollments->lastPage() }}
+                </p>
+            </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
@@ -143,8 +185,8 @@
                                     <div class="flex items-center justify-end gap-2">
                                         @if(!$enrollment->course_class_id)
                                             <div x-data="{ open: false }" class="relative inline-block text-left">
-                                                <button @click="open = !open" type="button" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-md shadow-blue-600/20">
-                                                    Alocar Turma
+                                                <button @click="open = !open" type="button" class="h-10 px-4 bg-blue-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-md shadow-blue-600/20">
+                                                    Alocar
                                                 </button>
                                                 
                                                 <div x-show="open" @click.away="open = false" 
@@ -166,11 +208,15 @@
                                             </div>
                                         @endif
 
-                                        <a href="{{ route('couple-enrollments.show', $enrollment) }}" class="p-2 text-gray-400 hover:text-purple-500 transition-colors" title="Ver Detalhes">
+                                        <a href="{{ route('couple-enrollments.show', $enrollment) }}"
+                                            class="w-10 h-10 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-400 hover:text-purple-500 hover:border-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all flex items-center justify-center"
+                                            title="Ver Detalhes">
                                             <i class="bi bi-eye-fill"></i>
                                         </a>
 
-                                        <a href="{{ route('couple-enrollments.edit', $enrollment) }}" class="p-2 text-gray-400 hover:text-blue-500 transition-colors">
+                                        <a href="{{ route('couple-enrollments.edit', $enrollment) }}"
+                                            class="w-10 h-10 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-400 hover:text-blue-500 hover:border-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all flex items-center justify-center"
+                                            title="Editar inscrição">
                                             <i class="bi bi-pencil-fill"></i>
                                         </a>
 
@@ -178,7 +224,9 @@
                                               onsubmit="return confirm('Tem certeza que deseja excluir esta inscrição?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="p-2 text-gray-400 hover:text-red-500 transition-colors">
+                                            <button type="submit"
+                                                class="w-10 h-10 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-400 hover:text-red-500 hover:border-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all flex items-center justify-center"
+                                                title="Excluir inscrição">
                                                 <i class="bi bi-trash-fill"></i>
                                             </button>
                                         </form>

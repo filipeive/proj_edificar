@@ -290,6 +290,8 @@
                     <div class="flex items-center gap-3">
                         <label class="text-sm font-bold text-gray-700">Editar Papel:</label>
                         <select x-model="activeRole" class="px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-blue-500 outline-none font-bold text-sm bg-gray-50">
+                            <option value="super_admin">Super Admin</option>
+                            <option value="admin">Administrador</option>
                             <option value="membro">Membro</option>
                             <option value="lider_celula">Líder de Célula</option>
                             <option value="supervisor">Supervisor</option>
@@ -339,7 +341,7 @@
                         ],
                     ];
 
-                    $roles = ['membro', 'lider_celula', 'supervisor', 'pastor_zona', 'secretaria', 'comissao_obra', 'responsavel_pacote', 'tesouraria', 'pastor', 'pastor_senior', 'administracao'];
+                    $roles = ['super_admin', 'admin', 'membro', 'lider_celula', 'supervisor', 'pastor_zona', 'secretaria', 'comissao_obra', 'responsavel_pacote', 'tesouraria', 'pastor', 'pastor_senior', 'administracao'];
                 @endphp
 
                 <div class="space-y-8">
@@ -370,6 +372,8 @@
                                                         if (!isset($settings[$settingKey])) {
                                                             // Simple default logic to WOW the user with pre-filled state
                                                             $isChecked = match($roleKey) {
+                                                                'super_admin' => true,
+                                                                'admin' => true,
                                                                 'pastor_senior' => true,
                                                                 'pastor' => !in_array($key, ['menu_users', 'menu_settings']),
                                                                 'secretaria' => in_array($key, ['menu_services', 'menu_weddings', 'menu_visitors', 'menu_members', 'menu_inventory']),
@@ -549,4 +553,3 @@
         </form>
     </div>
 @endsection
-

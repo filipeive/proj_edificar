@@ -261,11 +261,14 @@ class ContributionController
             }
         }
 
-        $canManage = $user->role === 'admin' || $user->role === 'pastor_zona';
+        $canManage = in_array($user->role, ['admin', 'pastor_zona', 'comissao_obra'], true);
+        $canDelete = in_array($user->role, ['admin', 'comissao_obra'], true)
+            && in_array($contribution->status, ['pendente', 'cancelada', 'rejeitada'], true);
 
         return view('contributions.show', [
             'contribution' => $contribution,
             'canManage' => $canManage,
+            'canDelete' => $canDelete,
         ]);
     }
 
@@ -496,6 +499,51 @@ class ContributionController
 
         return back()->with('success', 'Contribuição cancelada com sucesso!');
     }
+
+    public function destroy(Request $request, Contribution $contribution)
+    {
+        $user = auth()->user();
+
+        if ($user->role !== 'admin' && $user->role !== 'comissao_obra') {
+            abort(403, 'Apenas admin ou comissão de obra pode eliminar contribuições.');
+        }
+
+        $deletableStatuses = ['pendente', 'cancelada', 'rejeitada'];
+        if (!in_array($contribution->status, $deletableStatuses, true)) {
+            return back()->with('error', 'Apenas contribuições pendentes, canceladas ou rejeitadas podem ser eliminadas.');
+        }
+
+        $validated = $request->validate([
+            'notes' => 'required|string|min:5',
+        ]);
+
+        $details = [
+            "Contribuição #{$contribution->id}",
+            "Membro: {$contribution->user->name}",
+            "Valor: " . number_format($contribution->amount, 2, ',', '.') . " MT",
+            "Data: " . $contribution->contribution_date->format('d/m/Y'),
+            "Status: {$contribution->status}",
+        ];
+
+        if ($contribution->cell?->name) {
+            $details[] = "Célula: {$contribution->cell->name}";
+        }
+
+        if ($contribution->package?->name) {
+            $details[] = "Pacote: {$contribution->package->name}";
+        }
+
+        $description = 'Eliminou contribuição | ' . implode(' | ', $details) . ' | Motivo: ' . $validated['notes'];
+        $user->logActivity('delete', $description, $contribution);
+
+        if ($contribution->proof_path) {
+            \Storage::disk('public')->delete($contribution->proof_path);
+        }
+
+        $contribution->delete();
+        //volta para o index
+        return redirect()->route('contributions.index')->with('success', 'Contribuição eliminada com sucesso!');
+    }
     public function downloadReceipt(Contribution $contribution)
     {
         $user = auth()->user();
@@ -539,9 +587,13 @@ class ContributionController
             abort(403, 'Acesso negado.');
         }
 
-        return view('admin.contributions.details', [
+        $canDelete = in_array($user->role, ['admin', 'comissao_obra'], true)
+            && in_array($contribution->status, ['pendente', 'cancelada', 'rejeitada'], true);
+
+        return view('contributions.show', [
             'contribution' => $contribution,
             'canManage' => true,
+            'canDelete' => $canDelete,
         ]);
     }
 

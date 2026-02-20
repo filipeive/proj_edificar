@@ -41,6 +41,7 @@ class UserPromotedNotification extends Notification
     private function getRoleLabel($role)
     {
         $labels = [
+            'super_admin' => 'Super Admin',
             'membro' => 'Membro',
             'lider_celula' => 'Líder de Célula',
             'supervisor' => 'Supervisor',

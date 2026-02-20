@@ -8,7 +8,7 @@ class UserPolicy
 {
     public function viewAny(User $user): bool
     {
-        return in_array($user->role, ['admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'lider_celula', 'secretaria', 'tesouraria']);
+        return in_array($user->role, ['super_admin', 'admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'lider_celula', 'secretaria', 'tesouraria']);
     }
 
     public function view(User $user, User $model): bool
@@ -50,7 +50,7 @@ class UserPolicy
 
     public function create(User $user): bool
     {
-        return in_array($user->role, ['admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'lider_celula', 'secretaria', 'tesouraria']);
+        return in_array($user->role, ['super_admin', 'admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'lider_celula', 'secretaria', 'tesouraria']);
     }
 
     public function update(User $user, User $model): bool

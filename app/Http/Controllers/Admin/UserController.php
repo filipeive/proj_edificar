@@ -83,8 +83,12 @@ class UserController
     public function create(): View
     {
         $cells = Cell::all();
-        $roles = ['membro', 'lider_celula', 'supervisor', 'pastor_zona', 'administracao', 'admin'];
-        return view('admin.users.create', ['cells' => $cells, 'roles' => $roles]);
+        $roles = ['membro', 'lider_celula', 'supervisor', 'pastor_zona', 'administracao', 'admin', 'super_admin'];
+        return view('admin.users.create', [
+            'cells' => $cells,
+            'roles' => $roles,
+            'canManageAdminRoles' => auth()->user()->isSuperAdmin(),
+        ]);
     }
 
     public function store(Request $request)
@@ -94,10 +98,12 @@ class UserController
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6|confirmed',
             'phone' => 'nullable|moz_phone',
-            'role' => 'required|in:membro,lider_celula,supervisor,pastor_zona,secretaria,admin,comissao_obra,responsavel_pacote,tesouraria,pastor,pastor_senior,administracao',
+            'role' => 'required|in:membro,lider_celula,supervisor,pastor_zona,secretaria,admin,super_admin,comissao_obra,responsavel_pacote,tesouraria,pastor,pastor_senior,administracao',
             'cell_id' => 'nullable|exists:cells,id',
             'is_active' => 'boolean',
         ]);
+
+        $this->validateRoleAssignment($validated['role']);
 
         $plainPassword = $validated['password'];
         $validated['password'] = bcrypt($plainPassword);
@@ -124,26 +130,38 @@ class UserController
     public function edit(User $user): View
     {
         $this->authorize('update', $user);
+
+        if (!$this->canManagePrivilegedUser($user)) {
+            abort(403, 'Apenas super admin pode gerir contas admin/super admin.');
+        }
+
         $cells = Cell::all();
-        $roles = ['membro', 'lider_celula', 'supervisor', 'pastor_zona', 'administracao', 'admin'];
+        $roles = ['membro', 'lider_celula', 'supervisor', 'pastor_zona', 'administracao', 'admin', 'super_admin'];
         return view('admin.users.edit', [
             'user' => $user,
             'cells' => $cells,
             'roles' => $roles,
+            'canManageAdminRoles' => auth()->user()->isSuperAdmin(),
         ]);
     }
 
     public function update(Request $request, User $user)
     {
+        if (!$this->canManagePrivilegedUser($user)) {
+            return back()->with('error', 'Apenas super admin pode gerir contas admin/super admin.');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => "required|email|unique:users,email,{$user->id}",
             'phone' => 'nullable|moz_phone',
-            'role' => 'required|in:membro,lider_celula,supervisor,pastor_zona,secretaria,admin,comissao_obra,responsavel_pacote,tesouraria,pastor,pastor_senior,administracao',
+            'role' => 'required|in:membro,lider_celula,supervisor,pastor_zona,secretaria,admin,super_admin,comissao_obra,responsavel_pacote,tesouraria,pastor,pastor_senior,administracao',
             'cell_id' => 'nullable|exists:cells,id',
             'is_active' => 'boolean',
             'menu_permissions' => 'nullable|array',
         ]);
+
+        $this->validateRoleAssignment($validated['role']);
 
         $oldRole = $user->role;
         $user->update($validated);
@@ -164,8 +182,12 @@ class UserController
 
     public function destroy(User $user)
     {
-        if ($user->role === 'admin') {
-            return back()->with('error', 'Não pode deletar admin!');
+        if ($user->isSuperAdmin()) {
+            return back()->with('error', 'Conta super admin não pode ser deletada.');
+        }
+
+        if (!$this->canManagePrivilegedUser($user)) {
+            return back()->with('error', 'Apenas super admin pode deletar contas admin.');
         }
 
         // Log activity before deletion
@@ -179,13 +201,30 @@ class UserController
     /**
      * Ver histórico de atividades do utilizador
      */
-    public function activity(User $user): View
+    public function activity(Request $request, User $user): View
     {
-        $activities = $user->activities()->paginate(20);
+        $search = trim((string) $request->query('q', ''));
+
+        $activitiesQuery = $user->activities();
+        if ($search !== '') {
+            $activitiesQuery->where(function ($query) use ($search) {
+                $query->where('action', 'like', '%' . $search . '%')
+                    ->orWhere('description', 'like', '%' . $search . '%')
+                    ->orWhere('model_type', 'like', '%' . $search . '%')
+                    ->orWhere('ip_address', 'like', '%' . $search . '%');
+
+                if (is_numeric($search)) {
+                    $query->orWhere('model_id', (int) $search);
+                }
+            });
+        }
+
+        $activities = $activitiesQuery->paginate(20)->withQueryString();
 
         return view('admin.users.activity', [
             'user' => $user,
             'activities' => $activities,
+            'search' => $search,
         ]);
     }
 
@@ -211,8 +250,12 @@ class UserController
      */
     public function resetPassword(User $user)
     {
-        if ($user->role === 'admin') {
-            return back()->with('error', 'Não pode redefinir senha de admin!');
+        if ($user->isSuperAdmin()) {
+            return back()->with('error', 'Senha de super admin não pode ser redefinida por esta rota.');
+        }
+
+        if (!$this->canManagePrivilegedUser($user)) {
+            return back()->with('error', 'Apenas super admin pode redefinir senha de admin.');
         }
 
         $user->update([
@@ -234,10 +277,12 @@ class UserController
 
         $userIds = $validated['user_ids'];
 
-        // Prevent deleting admins
-        $deletedCount = User::whereIn('id', $userIds)
-            ->where('role', '!=', 'admin')
-            ->delete();
+        $query = User::whereIn('id', $userIds)->where('role', '!=', 'super_admin');
+        if (!auth()->user()->isSuperAdmin()) {
+            $query->where('role', '!=', 'admin');
+        }
+
+        $deletedCount = $query->delete();
 
         return redirect()->route('users.index')
             ->with('success', "{$deletedCount} utilizador(es) deletado(s) com sucesso!");
@@ -574,6 +619,7 @@ class UserController
                 break;
 
             case 'admin':
+            case 'super_admin':
             case 'pastor_senior':
             case 'secretaria':
             case 'tesouraria':
@@ -617,6 +663,7 @@ class UserController
                 break;
 
             case 'admin':
+            case 'super_admin':
             case 'pastor_senior':
             case 'secretaria':
             case 'tesouraria':
@@ -721,5 +768,21 @@ class UserController
                 abort(403, 'Você só pode criar membros na sua zona');
             }
         }
+    }
+
+    private function validateRoleAssignment(string $targetRole): void
+    {
+        if (in_array($targetRole, ['admin', 'super_admin'], true) && !auth()->user()->isSuperAdmin()) {
+            abort(403, 'Apenas super admin pode atribuir papéis admin/super admin.');
+        }
+    }
+
+    private function canManagePrivilegedUser(User $target): bool
+    {
+        if (!in_array($target->role, ['admin', 'super_admin'], true)) {
+            return true;
+        }
+
+        return auth()->user()->isSuperAdmin();
     }
 }

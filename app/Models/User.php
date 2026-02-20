@@ -180,7 +180,12 @@ class User extends Authenticatable
     // Helpers
     public function isAdmin()
     {
-        return $this->role === 'admin';
+        return in_array($this->role, ['admin', 'super_admin'], true);
+    }
+
+    public function isSuperAdmin()
+    {
+        return $this->role === 'super_admin';
     }
 
     public function isPastorSenior()
@@ -255,8 +260,8 @@ class User extends Authenticatable
 
     public function hasRole($role)
     {
-        // Admin e Pastor Senior - acesso total
-        if ($this->role === 'admin' || $this->role === 'pastor_senior') {
+        // Super Admin, Admin e Pastor Senior - acesso total
+        if (in_array($this->role, ['super_admin', 'admin', 'pastor_senior'], true)) {
             return true;
         }
 

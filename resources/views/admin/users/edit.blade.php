@@ -157,7 +157,7 @@
                                             <div class="relative">
                                                 <select name="role" id="role" required
                                                     class="w-full px-4 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 appearance-none custom-select @error('role') border-red-500 ring-red-500/10 @enderror"
-                                                    {{ $user->role === 'admin' ? 'disabled' : '' }}>
+                                                    {{ (in_array($user->role, ['admin', 'super_admin'], true) && !($canManageAdminRoles ?? false)) ? 'disabled' : '' }}>
                                                     <option value="">Selecione o papel</option>
                                                     <option value="membro" {{ old('role', $user->role) == 'membro' ? 'selected' : '' }}>Membro</option>
                                                     <option value="lider_celula" {{ old('role', $user->role) == 'lider_celula' ? 'selected' : '' }}>Líder de Célula</option>
@@ -171,18 +171,21 @@
                                                     <option value="pastor" {{ old('role', $user->role) == 'pastor' ? 'selected' : '' }}>Pastor</option>
                                                     <option value="pastor_senior" {{ old('role', $user->role) == 'pastor_senior' ? 'selected' : '' }}>Pastor Senior</option>
                                                     <option value="administracao" {{ old('role', $user->role) == 'administracao' ? 'selected' : '' }}>Administração</option>
-                                                    <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>
-                                                        Administrador</option>
+                                                    @if($canManageAdminRoles ?? false)
+                                                        <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>
+                                                            Administrador</option>
+                                                        <option value="super_admin" {{ old('role', $user->role) == 'super_admin' ? 'selected' : '' }}>
+                                                            Super Admin</option>
+                                                    @endif
                                                 </select>
                                                 <div
                                                     class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
                                                     <i class="bi bi-chevron-down"></i>
                                                 </div>
                                             </div>
-                                            @if($user->role === 'admin')
-                                                <input type="hidden" name="role" value="admin">
-                                                <p class="mt-1 text-xs text-amber-600 font-medium">O papel de administrador não pode ser
-                                                    alterado por segurança.</p>
+                                            @if(in_array($user->role, ['admin', 'super_admin'], true) && !($canManageAdminRoles ?? false))
+                                                <input type="hidden" name="role" value="{{ $user->role }}">
+                                                <p class="mt-1 text-xs text-amber-600 font-medium">Conta privilegiada: apenas super admin pode alterar este papel.</p>
                                             @endif
                                             @error('role')
                                                 <p class="mt-1 text-xs text-red-500 font-medium">{{ $message }}</p>

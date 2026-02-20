@@ -1170,6 +1170,7 @@
                 el.classList.add('open');
                 el.querySelectorAll('input, select, textarea').forEach(function (f) {
                     f.removeAttribute('tabindex');
+                    f.removeAttribute('disabled');
                 });
             }
 
@@ -1178,6 +1179,7 @@
                 el.classList.remove('open');
                 el.querySelectorAll('input, select, textarea').forEach(function (f) {
                     f.setAttribute('tabindex', '-1');
+                    f.setAttribute('disabled', 'disabled');
                 });
             }
 

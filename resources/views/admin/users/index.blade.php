@@ -14,7 +14,7 @@
 @endsection
 
 @section('content')
-    <div class="space-y-8" x-data="{
+    <div class="space-y-6" x-data="{
         view: window.innerWidth < 768 ? 'grid' : 'list',
         selectedUsers: [],
         selectAll: false,
@@ -53,30 +53,30 @@
     @resize.window.debounce.500ms="updateView()">
 
         <!-- Header -->
-        <div class="bg-white p-6 md:p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 transition-all">
+        <div class="bg-white p-6 md:p-7 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-5">
             <div class="space-y-1">
-                <div class="flex items-center gap-2 text-xs font-bold text-blue-600 uppercase tracking-widest mb-1">
-                    <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                <div class="flex items-center gap-2 text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] mb-1">
+                    <div class="w-8 h-8 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center">
                         <i class="bi bi-people-fill"></i>
                     </div>
                     <span>Administração</span>
                 </div>
-                <h1 class="text-3xl font-black text-gray-900 tracking-tight uppercase">Utilizadores</h1>
-                <p class="text-gray-500 font-medium">Gestão de membros, líderes e permissões de acesso</p>
+                <h1 class="text-2xl md:text-3xl font-black text-gray-900 tracking-tight">Utilizadores</h1>
+                <p class="text-gray-500 text-sm font-medium">Gestão de membros, liderança e permissões de acesso</p>
             </div>
 
-            <div class="flex flex-wrap items-center gap-4">
+            <div class="flex flex-wrap items-center gap-3">
                 {{-- View Switcher --}}
-                <div class="hidden md:flex bg-gray-100/50 p-1.5 rounded-2xl border border-gray-100">
+                <div class="hidden md:flex bg-gray-100 p-1 rounded-xl border border-gray-200">
                     <button @click="view = 'list'" 
-                        :class="view === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
-                        class="px-4 py-2 rounded-xl transition-all duration-300 flex items-center gap-2">
+                        :class="view === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+                        class="px-3 py-1.5 rounded-lg transition-all duration-300 flex items-center gap-2">
                         <i class="bi bi-list-ul text-sm"></i>
                         <span class="text-[10px] font-black uppercase tracking-widest leading-none">Lista</span>
                     </button>
                     <button @click="view = 'grid'" 
-                        :class="view === 'grid' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
-                        class="px-4 py-2 rounded-xl transition-all duration-300 flex items-center gap-2">
+                        :class="view === 'grid' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+                        class="px-3 py-1.5 rounded-lg transition-all duration-300 flex items-center gap-2">
                         <i class="bi bi-grid-fill text-sm"></i>
                         <span class="text-[10px] font-black uppercase tracking-widest leading-none">Cards</span>
                     </button>
@@ -89,7 +89,7 @@
                         Deletar (<span x-text="selectedUsers.length"></span>)
                     </button>
 
-                    <a href="{{ route('users.create') }}" class="group flex items-center bg-blue-600 text-white px-8 py-4 rounded-2xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-200">
+                    <a href="{{ route('users.create') }}" class="group flex items-center bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest shadow-md shadow-blue-200">
                         <i class="bi bi-person-plus-fill text-lg mr-2 group-hover:scale-110 transition-transform"></i>
                         Novo Utilizador
                     </a>
@@ -98,7 +98,7 @@
         </div>
 
         <!-- Global Stats Row -->
-        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 hidden md:flex" x-show="view === 'list'">
+        <div class="hidden md:grid grid-cols-2 lg:grid-cols-5 gap-4" x-show="view === 'list'">
             <div class="flex bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 items-center justify-between group hover:shadow-xl transition-all">
                 <div class="space-y-1">
                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Geral</p>
@@ -147,7 +147,7 @@
         </div>
 
         <!-- Filter & Search Bar -->
-        <div class="bg-gray-50/50 p-6 rounded-[2rem] shadow-sm border border-gray-100">
+        <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100">
             <form action="{{ route('users.index') }}" method="GET" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                     <div class="md:col-span-5 space-y-2">
@@ -155,7 +155,7 @@
                         <div class="relative group">
                             <i class="bi bi-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors"></i>
                             <input type="text" name="search" id="liveSearch" data-live-search="manual" value="{{ request('search') }}" placeholder="Pesquisar por nome, email ou telefone..." 
-                                class="w-full pl-12 pr-6 py-3 bg-white border-transparent focus:ring-4 focus:ring-blue-100 rounded-xl font-bold text-sm transition-all">
+                                class="w-full pl-12 pr-6 py-3 bg-gray-50 border-transparent focus:ring-4 focus:ring-blue-100 rounded-xl font-bold text-sm transition-all">
                             <div id="searchSpinner" class="hidden absolute right-5 top-1/2 -translate-y-1/2">
                                 <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -166,9 +166,10 @@
                     </div>
                     <div class="md:col-span-3 space-y-2">
                         <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nível</label>
-                        <select name="role" class="w-full px-6 py-3 bg-white border-transparent focus:ring-4 focus:ring-blue-100 rounded-xl font-bold text-sm appearance-none transition-all custom-select">
+                        <select name="role" class="w-full px-6 py-3 bg-gray-50 border-transparent focus:ring-4 focus:ring-blue-100 rounded-xl font-bold text-sm appearance-none transition-all custom-select">
                             <option value="">Todos os Papéis</option>
                             <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Administrador</option>
+                            <option value="super_admin" {{ request('role') == 'super_admin' ? 'selected' : '' }}>Super Admin</option>
                             <option value="administracao" {{ request('role') == 'administracao' ? 'selected' : '' }}>Administração</option>
                             <option value="pastor_senior" {{ request('role') == 'pastor_senior' ? 'selected' : '' }}>Pastor Senior</option>
                             <option value="pastor" {{ request('role') == 'pastor' ? 'selected' : '' }}>Pastor</option>
@@ -184,14 +185,14 @@
                     </div>
                     <div class="md:col-span-2 space-y-2">
                         <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Status</label>
-                        <select name="status" class="w-full px-6 py-3 bg-white border-transparent focus:ring-4 focus:ring-blue-100 rounded-xl font-bold text-sm appearance-none transition-all custom-select">
+                        <select name="status" class="w-full px-6 py-3 bg-gray-50 border-transparent focus:ring-4 focus:ring-blue-100 rounded-xl font-bold text-sm appearance-none transition-all custom-select">
                             <option value="">Qualquer Status</option>
                             <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Ativos</option>
                             <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inativos</option>
                         </select>
                     </div>
                     <div class="md:col-span-2 flex gap-2">
-                        <button type="submit" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all">
+                        <button id="filterBtn" type="submit" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-md shadow-blue-100 hover:bg-blue-700 transition-all">
                             Filtrar
                         </button>
                         @if(request()->hasAny(['search', 'role', 'status']))
@@ -208,6 +209,13 @@
         <!-- List View -->
         <div x-show="view === 'list'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
             class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-8 py-5 border-b border-gray-100 flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Lista de Utilizadores</p>
+                    <p class="text-sm font-bold text-gray-900">{{ $users->total() }} registos encontrados</p>
+                </div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Página {{ $users->currentPage() }} de {{ $users->lastPage() }}</span>
+            </div>
             <div class="overflow-x-auto">
                 <table class="w-full table-compact">
                     <thead>
@@ -228,7 +236,7 @@
                         @forelse($users as $user)
                             <tr class="hover:bg-gray-50/70 transition-colors group">
                                 <td class="px-6 py-6 text-center">
-                                    @if($user->role !== 'admin')
+                                    @if($user->role !== 'super_admin' && ($user->role !== 'admin' || auth()->user()->isSuperAdmin()))
                                         <input type="checkbox" value="{{ $user->id }}" 
                                             class="user-checkbox w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                                             :checked="selectedUsers.includes({{ $user->id }})" 
@@ -258,6 +266,9 @@
                                     @switch($user->role)
                                         @case('admin')
                                             <span class="px-4 py-1.5 bg-red-50 text-red-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-red-100 flex items-center justify-center gap-2">Admin</span>
+                                            @break
+                                        @case('super_admin')
+                                            <span class="px-4 py-1.5 bg-red-100 text-red-700 rounded-lg text-[10px] font-black uppercase tracking-widest border border-red-200 flex items-center justify-center gap-2">Super Admin</span>
                                             @break
                                         @case('administracao')
                                             <span class="px-4 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-[10px] font-black uppercase tracking-widest border border-blue-200 flex items-center justify-center gap-2">Administração</span>
@@ -319,7 +330,7 @@
                                             class="action-icon bg-gray-50 text-gray-400 hover:bg-orange-500 hover:text-white shadow-sm">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
-                                        @if($user->role !== 'admin')
+                                        @if($user->role !== 'super_admin' && ($user->role !== 'admin' || auth()->user()->isSuperAdmin()))
                                             <form action="{{ route('users.reset-password', $user) }}" method="POST" id="reset-password-{{ $user->id }}" class="inline">
                                                 @csrf
                                                 <button type="button" onclick="confirmAction('Redefinir Senha', 'Redefinir senha de {{ $user->name }} para mudar123?', 'question', 'Sim, redefinir', 'reset-password-{{ $user->id }}')" 
@@ -380,6 +391,9 @@
                             @switch($user->role)
                                 @case('admin')
                                     <span class="px-3 py-1 bg-red-50 text-red-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-red-100">Admin</span>
+                                    @break
+                                @case('super_admin')
+                                    <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-[10px] font-black uppercase tracking-widest border border-red-200">Super Admin</span>
                                     @break
                                 @case('administracao')
                                     <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-200">Administração</span>
@@ -449,25 +463,25 @@
                         </div>
                     </div>
 
-                    <div class="mt-auto grid grid-cols-4 gap-2">
-                        <a href="{{ route('users.show', $user) }}" class="bg-gray-900 text-white text-center py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition-all shadow-lg hover:shadow-blue-200 active:scale-95">
-                            Ver
+                    <div class="mt-auto flex items-center gap-2">
+                        <a href="{{ route('users.show', $user) }}" class="flex-1 h-11 bg-gray-900 text-white text-center rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 transition-all shadow-md hover:shadow-blue-200 flex items-center justify-center">
+                            Ver Perfil
                         </a>
-                        <a href="{{ route('users.edit', $user) }}" class="bg-gray-50 text-gray-400 text-center py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all active:scale-95">
-                            Editar
+                        <a href="{{ route('users.edit', $user) }}" class="w-11 h-11 bg-gray-50 text-gray-500 rounded-xl hover:bg-orange-500 hover:text-white transition-all flex items-center justify-center" title="Editar">
+                            <i class="bi bi-pencil-square"></i>
                         </a>
-                        @if($user->role !== 'admin')
+                        @if($user->role !== 'super_admin' && ($user->role !== 'admin' || auth()->user()->isSuperAdmin()))
                             <form action="{{ route('users.reset-password', $user) }}" method="POST">
                                 @csrf
                                 <button type="button" onclick="confirmAction('Redefinir senha para mudar123?', 'Redefinir Senha').then(result => { if(result.isConfirmed) this.closest('form').submit(); })" 
-                                    class="w-full bg-purple-50 text-purple-600 text-center py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-purple-600 hover:text-white transition-all active:scale-95" title="Redefinir Senha">
+                                    class="w-11 h-11 bg-purple-50 text-purple-600 rounded-xl hover:bg-purple-600 hover:text-white transition-all flex items-center justify-center" title="Redefinir Senha">
                                     <i class="bi bi-key-fill"></i>
                                 </button>
                             </form>
                             <form action="{{ route('users.destroy', $user) }}" method="POST" id="grid-delete-user-{{ $user->id }}">
                                 @csrf @method('DELETE')
                                 <button type="button" onclick="confirmDelete('grid-delete-user-{{ $user->id }}', 'Deletar {{ $user->name }}?')" 
-                                    class="w-full bg-red-50 text-red-600 text-center py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all active:scale-95">
+                                    class="w-11 h-11 bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all flex items-center justify-center" title="Excluir">
                                     <i class="bi bi-trash-fill"></i>
                                 </button>
                             </form>
@@ -496,7 +510,6 @@
         // Live search with debouncing
         const liveSearchInput = document.getElementById('liveSearch');
         const searchSpinner = document.getElementById('searchSpinner');
-        const filterBtn = document.getElementById('filterBtn');
         let searchTimeout;
 
         if (liveSearchInput) {

@@ -329,54 +329,98 @@
             <div x-show="activeTab === 'public'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
                 class="space-y-6">
                 @if(isset($publicCoupleEnrollments) && $publicCoupleEnrollments->count() > 0)
-                    <div class="grid grid-cols-1 gap-4">
+                    <div class="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/10 dark:to-indigo-900/10 border border-purple-100/80 dark:border-purple-800/40 rounded-3xl p-6">
+                        <div class="flex items-center justify-between gap-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-2xl bg-white/80 dark:bg-gray-800/70 text-purple-600 flex items-center justify-center">
+                                    <i class="bi bi-inboxes-fill text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-purple-500">Caixa de Entrada</p>
+                                    <h3 class="text-lg font-black text-gray-900 dark:text-white">Inscrições Públicas Pendentes</h3>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 rounded-full bg-white/80 dark:bg-gray-800/70 border border-purple-100 dark:border-purple-700 text-purple-700 dark:text-purple-300 text-[10px] font-black uppercase tracking-widest">
+                                {{ $publicCoupleEnrollments->count() }} registos
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-5">
                         @foreach($publicCoupleEnrollments as $enrollment)
-                            <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all flex flex-col lg:flex-row items-center justify-between gap-8 group">
-                                <div class="flex items-start gap-6 w-full md:w-auto">
-                                    <div class="w-16 h-16 rounded-[1.5rem] bg-purple-50 dark:bg-purple-900/20 text-purple-600 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                            <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 md:p-8 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-lg hover:border-purple-200 dark:hover:border-purple-700/40 transition-all group">
+                                <div class="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-6">
+                                    <div class="flex items-start gap-5 w-full">
+                                    <div class="w-14 h-14 rounded-2xl bg-purple-50 dark:bg-purple-900/20 text-purple-600 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
                                         <i class="bi bi-heart-pulse-fill"></i>
                                     </div>
-                                    <div>
-                                        <div class="flex items-center gap-3 mb-2">
-                                            <h4 class="text-xl font-black text-gray-900 dark:text-white leading-none">{{ $enrollment->husband_name }} & {{ $enrollment->wife_name }}</h4>
-                                            <span class="px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 text-[8px] font-black uppercase rounded-full">Novo</span>
+                                        <div class="min-w-0">
+                                            <div class="flex flex-wrap items-center gap-2 mb-2">
+                                                <h4 class="text-xl font-black text-gray-900 dark:text-white leading-tight">{{ $enrollment->husband_name }} & {{ $enrollment->wife_name }}</h4>
+                                                <span class="px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 text-[8px] font-black uppercase rounded-full">Novo</span>
+                                            </div>
+                                            <p class="text-sm font-medium text-gray-500 mb-4 leading-relaxed">
+                                                {{ $enrollment->contacts }} <span class="text-gray-300 px-1">•</span> {{ $enrollment->address }}
+                                            </p>
+                                            <div class="flex flex-wrap gap-2">
+                                                <span class="px-3 py-1 bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 text-[9px] font-black uppercase rounded-full border border-gray-100 dark:border-gray-600">
+                                                    <i class="bi bi-link-45deg mr-1"></i> {{ $enrollment->relationship_type }}
+                                                </span>
+                                                <span class="px-3 py-1 bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 text-[9px] font-black uppercase rounded-full border border-gray-100 dark:border-gray-600">
+                                                    <i class="bi bi-geo-alt mr-1"></i> {{ $enrollment->is_church_member ? 'Membro' : 'Visitante' }}
+                                                </span>
+                                                <span class="px-3 py-1 bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 text-[9px] font-black uppercase rounded-full border border-gray-100 dark:border-gray-600">
+                                                    <i class="bi bi-calendar3 mr-1"></i> {{ $enrollment->created_at?->format('d/m/Y') }}
+                                                </span>
+                                            </div>
                                         </div>
-                                        <p class="text-sm font-medium text-gray-500 mb-4">{{ $enrollment->contacts }} · {{ $enrollment->address }}</p>
-                                        <div class="flex flex-wrap gap-2">
-                                            <span class="px-3 py-1 bg-gray-50 dark:bg-gray-700/50 text-gray-400 dark:text-gray-500 text-[9px] font-black uppercase rounded-full border border-gray-100 dark:border-gray-600">
-                                                <i class="bi bi-link-45deg mr-1"></i> {{ $enrollment->relationship_type }}
-                                            </span>
-                                            <span class="px-3 py-1 bg-gray-50 dark:bg-gray-700/50 text-gray-400 dark:text-gray-500 text-[9px] font-black uppercase rounded-full border border-gray-100 dark:border-gray-600">
-                                                <i class="bi bi-geo-alt mr-1"></i> {{ $enrollment->is_church_member ? 'Membro' : 'Visitante' }}
-                                            </span>
+                                    </div>
+
+                                    <div class="xl:w-[28rem] w-full space-y-4">
+                                        @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
+                                            <form action="{{ route('courses.assign-public-enrollment', $course) }}" method="POST" class="flex flex-col sm:flex-row items-stretch gap-3">
+                                                @csrf
+                                                <input type="hidden" name="couple_enrollment_id" value="{{ $enrollment->id }}">
+                                                <select name="course_class_id" required
+                                                    class="w-full sm:flex-1 px-4 py-3 rounded-2xl bg-gray-50 dark:bg-gray-900 border-transparent focus:bg-white focus:ring-4 focus:ring-purple-100 dark:focus:ring-purple-900/20 transition-all text-sm font-bold text-gray-900 dark:text-white">
+                                                    <option value="">Selecionar turma...</option>
+                                                    @foreach($course->classes as $class)
+                                                        <option value="{{ $class->id }}">{{ $class->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <button type="submit"
+                                                    class="w-full sm:w-auto px-6 py-3.5 bg-purple-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-purple-700 transition-all shadow-lg shadow-purple-600/20">
+                                                    Atribuir
+                                                </button>
+                                            </form>
+                                        @endif
+
+                                        <div class="flex items-center justify-between gap-3 pt-1">
+                                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Ações do Registo</p>
+                                            <div class="flex items-center gap-2">
+                                                <a href="{{ route('couple-enrollments.show', $enrollment) }}"
+                                                    class="w-11 h-11 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-300 hover:text-purple-600 hover:border-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all flex items-center justify-center"
+                                                    title="Ver detalhes" aria-label="Ver detalhes">
+                                                    <i class="bi bi-eye-fill"></i>
+                                                </a>
+                                                <a href="{{ route('couple-enrollments.edit', $enrollment) }}"
+                                                    class="w-11 h-11 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-300 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all flex items-center justify-center"
+                                                    title="Editar inscrição" aria-label="Editar inscrição">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </a>
+                                                <form action="{{ route('couple-enrollments.destroy', $enrollment) }}" method="POST" onsubmit="return confirm('Excluir esta inscrição?')" class="m-0">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit"
+                                                        class="w-11 h-11 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-300 hover:text-red-600 hover:border-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all flex items-center justify-center"
+                                                        title="Excluir inscrição" aria-label="Excluir inscrição">
+                                                        <i class="bi bi-trash3"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-
-                                @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
-                                    <form action="{{ route('courses.assign-public-enrollment', $course) }}" method="POST" class="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
-                                        @csrf
-                                        <input type="hidden" name="couple_enrollment_id" value="{{ $enrollment->id }}">
-                                        <select name="course_class_id" required
-                                            class="w-full sm:w-56 px-4 py-3 rounded-2xl bg-gray-50 dark:bg-gray-900 border-transparent focus:bg-white focus:ring-4 focus:ring-purple-100 dark:focus:ring-purple-900/20 transition-all text-sm font-bold text-gray-900 dark:text-white">
-                                            <option value="">Selecionar turma...</option>
-                                            @foreach($course->classes as $class)
-                                                <option value="{{ $class->id }}">{{ $class->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        <button type="submit"
-                                            class="w-full sm:w-auto px-8 py-4 bg-purple-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-purple-700 transition-all shadow-xl shadow-purple-600/20">
-                                            Atribuir à Turma
-                                        </button>
-                                    </form>
-                                @endif
-                                <form action="{{ route('couple-enrollments.destroy', $enrollment) }}" method="POST" onsubmit="return confirm('Excluir esta inscrição?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="p-2 text-gray-400 hover:text-red-500 transition-colors">
-                                        <i class="bi bi-trash3"></i>
-                                    </button>
-                                </form>
                             </div>
                         @endforeach
                     </div>

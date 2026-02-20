@@ -94,6 +94,14 @@
                                             onclick="showRejectForm({{ $contribution->id }})">
                                             <i class="bi bi-x-lg"></i>
                                         </button>
+                                        @if(auth()->user()->role === 'admin' || auth()->user()->role === 'comissao_obra')
+                                            <button type="button"
+                                                class="action-icon bg-gray-50 text-gray-600 hover:bg-gray-800 hover:text-white shadow-sm"
+                                                title="Eliminar"
+                                                onclick="showDeleteForm({{ $contribution->id }})">
+                                                <i class="bi bi-trash-fill"></i>
+                                            </button>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
@@ -114,6 +122,54 @@
                 {{ $contributions->links() }}
             </div>
         @endif
+    </div>
+
+    <!-- Modal Eliminar -->
+    <div id="deleteModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
+        <div class="bg-white rounded-[2rem] p-6 max-w-md w-full mx-4 shadow-2xl border border-gray-100">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-gray-800 flex items-center space-x-2">
+                    <svg class="w-5 h-5 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    <span>Eliminar Contribuição</span>
+                </h3>
+                <button type="button" onclick="closeDeleteForm()" class="text-gray-400 hover:text-gray-600"
+                    aria-label="Fechar">
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <form id="deleteForm" method="POST">
+                @csrf
+                @method('DELETE')
+                <div class="mb-4">
+                    <label for="delete_notes" class="block text-sm font-medium text-gray-700 mb-2">Motivo da Eliminação</label>
+                    <textarea name="notes" id="delete_notes" rows="4" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-600"></textarea>
+                </div>
+                <div class="flex space-x-4">
+                    <button type="submit"
+                        class="flex-1 inline-flex items-center justify-center bg-gray-800 text-white px-4 py-2 rounded-xl hover:bg-gray-900 space-x-2">
+                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        <span>Eliminar</span>
+                    </button>
+                    <button type="button" onclick="closeDeleteForm()"
+                        class="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-xl hover:bg-gray-200">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Modal Rejeitar -->
@@ -172,6 +228,16 @@
 
         function closeRejectForm() {
             document.getElementById('rejectModal').classList.add('hidden');
+        }
+
+        function showDeleteForm(contributionId) {
+            const form = document.getElementById('deleteForm');
+            form.action = `/admin/contributions/${contributionId}`;
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        function closeDeleteForm() {
+            document.getElementById('deleteModal').classList.add('hidden');
         }
     </script>
 @endsection

@@ -5,7 +5,6 @@
 @section('page-subtitle', 'Gerencie as contribuições e dízimos da igreja')
 
 
-@section('content')
 @section('header-actions')
     @if (in_array(auth()->user()->role, ['membro', 'lider_celula', 'supervisor', 'pastor_zona', 'admin']))
         <div class="md:hidden">
@@ -109,6 +108,28 @@
             </form>
         </div>
 
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="bg-white border border-gray-100 rounded-2xl p-4">
+                <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">Total</p>
+                <p class="text-2xl font-black text-gray-900">{{ $contributions->total() }}</p>
+            </div>
+            <div class="bg-white border border-yellow-100 rounded-2xl p-4">
+                <p class="text-[10px] font-black uppercase tracking-widest text-yellow-500">Pendentes</p>
+                <p class="text-2xl font-black text-yellow-600">{{ $contributions->getCollection()->where('status', 'pendente')->count() }}</p>
+            </div>
+            <div class="bg-white border border-green-100 rounded-2xl p-4">
+                <p class="text-[10px] font-black uppercase tracking-widest text-green-500">Verificadas</p>
+                <p class="text-2xl font-black text-green-600">{{ $contributions->getCollection()->where('status', 'verificada')->count() }}</p>
+            </div>
+            <div class="bg-white border border-red-100 rounded-2xl p-4">
+                <p class="text-[10px] font-black uppercase tracking-widest text-red-500">Rejeit./Cancel.</p>
+                <p class="text-2xl font-black text-red-600">
+                    {{ $contributions->getCollection()->whereIn('status', ['rejeitada', 'cancelada'])->count() }}
+                </p>
+            </div>
+        </div>
+
         <div x-show="view === 'list'" x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
             class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
@@ -190,6 +211,10 @@
                                 </td>
 
                                 <td class="px-10 py-6 text-right">
+                                    @php
+                                        $canCancel = auth()->user()->isAdmin() && $contribution->status !== 'cancelada';
+                                        $canDelete = (auth()->user()->isAdmin() || auth()->user()->isComissaoObra()) && in_array($contribution->status, ['pendente', 'cancelada', 'rejeitada'], true);
+                                    @endphp
                                     <div class="flex items-center justify-end gap-2 text-sm">
                                         <a href="{{ route('contributions.show', $contribution) }}" title="Detalhes"
                                             class="action-icon bg-gray-50 text-gray-400 hover:bg-blue-600 hover:text-white">
@@ -215,10 +240,16 @@
                                             @endif
                                         @endif
 
-                                        @if(auth()->user()->isAdmin() && $contribution->status !== 'cancelada')
+                                        @if($canCancel)
                                             <button onclick="document.getElementById('cancel-form-{{ $contribution->id }}').classList.toggle('hidden')" 
                                                 class="action-icon bg-gray-100 text-gray-500 hover:bg-gray-800 hover:text-white" title="Cancelar Lançamento">
                                                 <i class="bi bi-slash-circle"></i>
+                                            </button>
+                                        @endif
+                                        @if($canDelete)
+                                            <button onclick="document.getElementById('delete-form-{{ $contribution->id }}').classList.toggle('hidden')"
+                                                class="action-icon bg-red-50 text-red-600 hover:bg-red-600 hover:text-white" title="Eliminar Registo">
+                                                <i class="bi bi-trash3"></i>
                                             </button>
                                         @endif
                                     </div>
@@ -232,14 +263,27 @@
                                         </form>
                                     </div>
 
-                                    <div id="cancel-form-{{ $contribution->id }}" class="hidden mt-2 p-4 bg-gray-50 rounded-2xl border border-gray-100 text-left">
-                                        <form action="{{ route('contributions.cancel', $contribution) }}" method="POST">
-                                            @csrf
-                                            <label class="text-[10px] font-black uppercase text-gray-400 block mb-2">Motivo do Cancelamento (Histórico)</label>
-                                            <textarea name="notes" required class="w-full p-3 rounded-xl border-gray-200 text-sm mb-2" placeholder="Explique porque está cancelando este lançamento..."></textarea>
-                                            <button type="submit" class="w-full py-2 bg-gray-800 text-white rounded-xl font-black text-[10px] uppercase tracking-widest">Confirmar Cancelamento</button>
-                                        </form>
-                                    </div>
+                                    @if($canCancel)
+                                        <div id="cancel-form-{{ $contribution->id }}" class="hidden mt-2 p-4 bg-gray-50 rounded-2xl border border-gray-100 text-left">
+                                            <form action="{{ route('contributions.cancel', $contribution) }}" method="POST">
+                                                @csrf
+                                                <label class="text-[10px] font-black uppercase text-gray-400 block mb-2">Motivo do Cancelamento (Histórico)</label>
+                                                <textarea name="notes" required class="w-full p-3 rounded-xl border-gray-200 text-sm mb-2" placeholder="Explique porque está cancelando este lançamento..."></textarea>
+                                                <button type="submit" class="w-full py-2 bg-gray-800 text-white rounded-xl font-black text-[10px] uppercase tracking-widest">Confirmar Cancelamento</button>
+                                            </form>
+                                        </div>
+                                    @endif
+                                    @if($canDelete)
+                                        <div id="delete-form-{{ $contribution->id }}" class="hidden mt-2 p-4 bg-red-50 rounded-2xl border border-red-100 text-left">
+                                            <form action="{{ route('contributions.destroy', $contribution) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <label class="text-[10px] font-black uppercase text-red-500 block mb-2">Motivo da Eliminação</label>
+                                                <textarea name="notes" required class="w-full p-3 rounded-xl border-red-200 text-sm mb-2" placeholder="Explique porque está eliminando este registo..."></textarea>
+                                                <button type="submit" class="w-full py-2 bg-red-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest">Confirmar Eliminação</button>
+                                            </form>
+                                        </div>
+                                    @endif
                                     @endif
                                 </td>
                             </tr>
@@ -266,6 +310,10 @@
             x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
             class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             @foreach($contributions as $contribution)
+                @php
+                    $canCancel = auth()->user()->isAdmin() && $contribution->status !== 'cancelada';
+                    $canDelete = (auth()->user()->isAdmin() || auth()->user()->isComissaoObra()) && in_array($contribution->status, ['pendente', 'cancelada', 'rejeitada'], true);
+                @endphp
                 <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 relative compact-card {{ $contribution->status === 'cancelada' ? 'opacity-60 grayscale bg-gray-50' : '' }}">
                     <div class="absolute top-6 right-6">
                         @if ($contribution->status === 'verificada')
@@ -324,14 +372,21 @@
                             @endif
                         @endif
 
-                        @if(auth()->user()->isAdmin() && $contribution->status !== 'cancelada')
+                        @if($canCancel)
                             <button onclick="document.getElementById('cancel-form-grid-{{ $contribution->id }}').classList.toggle('hidden')" 
                                 class="w-10 h-10 bg-gray-100 text-gray-500 flex items-center justify-center rounded-xl hover:bg-gray-800 hover:text-white transition-all" title="Cancelar Lançamento">
                                 <i class="bi bi-slash-circle"></i>
                             </button>
                         @endif
+                        @if($canDelete)
+                            <button onclick="document.getElementById('delete-form-grid-{{ $contribution->id }}').classList.toggle('hidden')"
+                                class="w-10 h-10 bg-red-50 text-red-600 flex items-center justify-center rounded-xl hover:bg-red-600 hover:text-white transition-all"
+                                title="Eliminar Registo">
+                                <i class="bi bi-trash3"></i>
+                            </button>
+                        @endif
                     </div>
-                    @if(auth()->user()->isAdmin() && $contribution->status !== 'cancelada')
+                    @if($canCancel)
                         <div id="cancel-form-grid-{{ $contribution->id }}" class="hidden absolute left-0 bottom-16 mb-2 w-full p-6 bg-white shadow-2xl rounded-2xl border border-gray-100 z-10">
                             <form action="{{ route('contributions.cancel', $contribution) }}" method="POST">
                                 @csrf
@@ -340,6 +395,20 @@
                                 <div class="flex gap-2">
                                      <button type="button" onclick="document.getElementById('cancel-form-grid-{{ $contribution->id }}').classList.add('hidden')" class="flex-1 py-2 bg-gray-100 text-gray-500 rounded-lg text-[10px] font-black uppercase">Cancelar</button>
                                      <button type="submit" class="flex-1 py-2 bg-gray-900 text-white rounded-lg text-[10px] font-black uppercase">Confirmar</button>
+                                </div>
+                            </form>
+                        </div>
+                    @endif
+                    @if($canDelete)
+                        <div id="delete-form-grid-{{ $contribution->id }}" class="hidden absolute left-0 bottom-16 mb-2 w-full p-6 bg-white shadow-2xl rounded-2xl border border-red-100 z-10">
+                            <form action="{{ route('contributions.destroy', $contribution) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <label class="text-[10px] font-black uppercase text-red-500 block mb-2">Motivo da Eliminação</label>
+                                <textarea name="notes" required class="w-full p-3 rounded-xl bg-red-50 border border-red-100 text-sm mb-4" rows="3" placeholder="Explique..."></textarea>
+                                <div class="flex gap-2">
+                                     <button type="button" onclick="document.getElementById('delete-form-grid-{{ $contribution->id }}').classList.add('hidden')" class="flex-1 py-2 bg-gray-100 text-gray-500 rounded-lg text-[10px] font-black uppercase">Cancelar</button>
+                                     <button type="submit" class="flex-1 py-2 bg-red-600 text-white rounded-lg text-[10px] font-black uppercase">Eliminar</button>
                                 </div>
                             </form>
                         </div>

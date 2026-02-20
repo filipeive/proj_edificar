@@ -222,8 +222,12 @@
                                         class="bg-gray-900">Pastor Senior</option>
                                     <option value="administracao" {{ old('role') == 'administracao' ? 'selected' : '' }}
                                         class="bg-gray-900">Administração</option>
-                                    <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }} class="bg-gray-900">
-                                        Administrador</option>
+                                    @if($canManageAdminRoles ?? false)
+                                        <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }} class="bg-gray-900">
+                                            Administrador</option>
+                                        <option value="super_admin" {{ old('role') == 'super_admin' ? 'selected' : '' }} class="bg-gray-900">
+                                            Super Admin</option>
+                                    @endif
                                 </select>
                             </div>
 

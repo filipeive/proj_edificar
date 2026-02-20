@@ -5,13 +5,24 @@
 @section('page-subtitle', 'Visão consolidada do perfil e atividade de ' . $user->name)
 
 @section('header-actions')
+    @php
+        $canManagePrivileged = auth()->user()->isSuperAdmin() || !in_array($user->role, ['admin', 'super_admin'], true);
+        $canDeleteUser = $user->role !== 'super_admin' && ($user->role !== 'admin' || auth()->user()->isSuperAdmin());
+        $roleLabel = match ($user->role) {
+            'super_admin' => 'Super Admin',
+            'administracao' => 'Administração',
+            default => ucwords(str_replace('_', ' ', $user->role)),
+        };
+    @endphp
     <div class="flex items-center gap-2">
-        <a href="{{ route('users.edit', $user) }}"
-            class="px-6 py-3 bg-white text-blue-600 rounded-2xl font-black text-xs uppercase tracking-widest border border-blue-100 hover:bg-blue-50 transition-all flex items-center gap-2 shadow-sm">
-            <i class="bi bi-pencil-square"></i>
-            <span class="hidden md:inline">Editar Perfil</span>
-        </a>
-        @if($user->role !== 'admin')
+        @if($canManagePrivileged)
+            <a href="{{ route('users.edit', $user) }}"
+                class="px-6 py-3 bg-white text-blue-600 rounded-2xl font-black text-xs uppercase tracking-widest border border-blue-100 hover:bg-blue-50 transition-all flex items-center gap-2 shadow-sm">
+                <i class="bi bi-pencil-square"></i>
+                <span class="hidden md:inline">Editar Perfil</span>
+            </a>
+        @endif
+        @if($canDeleteUser)
             <form action="{{ route('users.destroy', $user) }}" method="POST" id="delete-user-form-header" class="inline">
                 @csrf @method('DELETE')
                 <button type="button" onclick="confirmDelete('delete-user-form-header', 'Deletar {{ $user->name }}?')"
@@ -59,7 +70,7 @@
                             <h1 class="text-5xl font-black text-gray-900 tracking-tighter">{{ $user->name }}</h1>
                             <span
                                 class="px-4 py-2 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-blue-200">
-                                {{ $user->role === 'administracao' ? 'Administração' : str_replace('_', ' ', $user->role) }}
+                                {{ $roleLabel }}
                             </span>
                         </div>
                         <p class="text-xl font-bold text-gray-400 max-w-2xl">
@@ -299,15 +310,17 @@
                 <div class="bg-gray-900 rounded-[3rem] shadow-2xl p-10 space-y-8">
                     <h3 class="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">Centro de Segurança</h3>
                     <div class="space-y-4">
-                        <form action="{{ route('users.reset-password', $user) }}" method="POST" id="reset-password-sidebar">
-                            @csrf
-                            <button type="button"
-                                onclick="confirmAction('Redefinir Senha', 'Redefinir senha de {{ $user->name }} para mudar123?', 'question', 'Sim, redefinir', 'reset-password-sidebar')"
-                                class="w-full py-5 bg-white/5 border border-white/10 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all flex items-center justify-between px-6">
-                                <span>Resetar Senha</span>
-                                <i class="bi bi-key-fill text-orange-400"></i>
-                            </button>
-                        </form>
+                        @if($canDeleteUser)
+                            <form action="{{ route('users.reset-password', $user) }}" method="POST" id="reset-password-sidebar">
+                                @csrf
+                                <button type="button"
+                                    onclick="confirmAction('Redefinir Senha', 'Redefinir senha de {{ $user->name }} para mudar123?', 'question', 'Sim, redefinir', 'reset-password-sidebar')"
+                                    class="w-full py-5 bg-white/5 border border-white/10 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all flex items-center justify-between px-6">
+                                    <span>Resetar Senha</span>
+                                    <i class="bi bi-key-fill text-orange-400"></i>
+                                </button>
+                            </form>
+                        @endif
 
                         <form action="{{ route('users.toggle-status', $user) }}" method="POST">
                             @csrf

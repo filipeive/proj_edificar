@@ -28,34 +28,12 @@
                 <i class="bi bi-x-circle"></i>
             </button>
         @endif
-    </div>
-    <!-- Cancel Modal -->
-    <div id="cancelModal"
-        class="fixed inset-0 bg-gray-900/90 backdrop-blur-sm hidden flex items-center justify-center z-[100] p-6">
-        <div class="bg-white rounded-[3rem] shadow-2xl p-10 w-full max-w-xl border border-gray-100">
-            <h3 class="text-2xl font-black text-gray-900 tracking-tighter mb-2">Cancelar Contribuição (Histórico)</h3>
-            <p class="text-sm text-gray-400 font-medium mb-8">Esta ação irá anular o valor financeiro do registro, mas
-                manterá os dados salvos para auditoria futura.</p>
-
-            <form action="{{ route('contributions.cancel', $contribution) }}" method="POST">
-                @csrf
-                <div class="mb-8">
-                    <textarea name="notes" rows="6" required
-                        class="w-full p-6 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-gray-800 font-medium text-sm text-gray-700"
-                        placeholder="Descreva obrigatoriamente o motivo do cancelamento deste registro..."></textarea>
-                </div>
-                <div class="flex gap-4">
-                    <button type="button" onclick="document.getElementById('cancelModal').classList.add('hidden')"
-                        class="flex-1 py-5 bg-gray-100 text-gray-500 rounded-2xl font-black text-xs uppercase tracking-widest">
-                        Voltar
-                    </button>
-                    <button type="submit"
-                        class="flex-1 py-5 bg-gray-900 text-white rounded-2xl hover:bg-black transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-gray-100">
-                        Confirmar Cancelamento
-                    </button>
-                </div>
-            </form>
-        </div>
+        @if(($canDelete ?? false))
+            <button onclick="document.getElementById('deleteModal').classList.remove('hidden')"
+                class="action-icon text-gray-600 hover:text-red-700 hover:bg-red-50" title="Eliminar registo">
+                <i class="bi bi-trash3"></i>
+            </button>
+        @endif
     </div>
 @endsection
 
@@ -81,15 +59,13 @@
                             Célula: {{ $contribution->cell->name }}
                         </div>
                         @if($contribution->status === 'verificada')
-                            <span
-                                class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-black uppercase tracking-widest">Validado</span>
+                            <span class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-black uppercase tracking-widest">Validado</span>
                         @elseif($contribution->status === 'pendente')
-                            <span
-                                class="px-3 py-1 bg-yellow-50 text-yellow-600 rounded-full text-[10px] font-black uppercase tracking-widest">Em
-                                Análise</span>
+                            <span class="px-3 py-1 bg-yellow-50 text-yellow-600 rounded-full text-[10px] font-black uppercase tracking-widest">Em Análise</span>
+                        @elseif($contribution->status === 'cancelada')
+                            <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-[10px] font-black uppercase tracking-widest">Cancelada</span>
                         @else
-                            <span
-                                class="px-3 py-1 bg-red-50 text-red-600 rounded-full text-[10px] font-black uppercase tracking-widest">Rejeitado</span>
+                            <span class="px-3 py-1 bg-red-50 text-red-600 rounded-full text-[10px] font-black uppercase tracking-widest">Rejeitada</span>
                         @endif
                     </div>
                 </div>
@@ -212,9 +188,8 @@
                     <div
                         class="{{ $contribution->status === 'cancelada' ? 'bg-red-50 border border-red-100' : 'bg-gray-900 text-white shadow-xl' }} rounded-[2.5rem] p-10 relative overflow-hidden">
                         <div class="relative z-10 space-y-4">
-                            <p
-                                class="text-[10px] font-black {{ $contribution->status === 'cancelada' ? 'text-red-400' : 'text-blue-300' }} uppercase tracking-[0.2em]">
-                                {{ $contribution->status === 'cancelada' ? 'Motivo do Cancelamento' : 'Notas de Verificação' }}
+                            <p class="text-[10px] font-black {{ $contribution->status === 'cancelada' ? 'text-red-400' : 'text-blue-300' }} uppercase tracking-[0.2em]">
+                                {{ $contribution->status === 'cancelada' ? 'Motivo do Cancelamento' : ($contribution->status === 'rejeitada' ? 'Motivo da Rejeição' : 'Notas de Verificação') }}
                             </p>
                             <p
                                 class="text-sm font-medium leading-relaxed {{ $contribution->status === 'cancelada' ? 'text-red-900' : 'text-gray-300' }} italic">
@@ -236,6 +211,19 @@
                             </button>
                             <p class="text-[9px] text-gray-400 text-center italic">Isso manterá o registro para conferência, mas
                                 removerá o valor dos totais.</p>
+                        </div>
+                    </div>
+                @endif
+
+                @if(($canDelete ?? false))
+                    <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 space-y-6">
+                        <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Eliminação de Registo</h3>
+                        <div class="space-y-3">
+                            <button onclick="document.getElementById('deleteModal').classList.remove('hidden')"
+                                class="w-full py-5 bg-red-600 text-white rounded-2xl hover:bg-red-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-red-100">
+                                <i class="bi bi-trash3 mr-2"></i> Eliminar Registo
+                            </button>
+                            <p class="text-[9px] text-gray-400 text-center italic">Esta ação remove o registo de forma permanente e guarda o motivo no histórico de atividades.</p>
                         </div>
                     </div>
                 @endif
@@ -299,6 +287,35 @@
         </div>
     </div>
 
+
+    <!-- Delete Modal -->
+    <div id="deleteModal"
+        class="fixed inset-0 bg-gray-900/90 backdrop-blur-sm hidden flex items-center justify-center z-[100] p-6">
+        <div class="bg-white rounded-[3rem] shadow-2xl p-10 w-full max-w-xl border border-gray-100">
+            <h3 class="text-2xl font-black text-gray-900 tracking-tighter mb-2">Eliminar Contribuição</h3>
+            <p class="text-sm text-gray-400 font-medium mb-8">Esta ação remove definitivamente o registo. O motivo e os detalhes serão guardados no histórico de atividades para auditoria.</p>
+
+            <form action="{{ route('contributions.destroy', $contribution) }}" method="POST">
+                @csrf
+                @method('DELETE')
+                <div class="mb-8">
+                    <textarea name="notes" rows="6" required
+                        class="w-full p-6 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-red-500 font-medium text-sm text-gray-700"
+                        placeholder="Descreva obrigatoriamente o motivo da eliminação deste registo..."></textarea>
+                </div>
+                <div class="flex gap-4">
+                    <button type="button" onclick="document.getElementById('deleteModal').classList.add('hidden')"
+                        class="flex-1 py-5 bg-gray-100 text-gray-500 rounded-2xl font-black text-xs uppercase tracking-widest">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                        class="flex-1 py-5 bg-red-600 text-white rounded-2xl hover:bg-red-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-red-100">
+                        Confirmar Eliminação
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Cancel Modal -->
     <div id="cancelModal"

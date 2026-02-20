@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CheckNotAdmin {
     public function handle(Request $request, Closure $next): Response {
-        if (auth()->check() && auth()->user()->role === 'admin') {
+        if (auth()->check() && in_array(auth()->user()->role, ['super_admin', 'admin'], true)) {
             abort(403, 'Admins não podem acessar esta área');
         }
 

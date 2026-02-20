@@ -20,6 +20,16 @@
             <div class="absolute top-0 right-0 w-64 h-64 bg-purple-500/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-purple-500/10 transition-all duration-700"></div>
             
             <div class="flex flex-col md:flex-row items-center gap-10 relative z-10">
+                <!--voltar a turma ou a lista de inscricoes-->
+                @if($coupleEnrollment->course_class_id)
+                    <a href="{{ route('course-classes.show', $coupleEnrollment->course_class_id) }}" class="p-2.5 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 rounded-xl hover:bg-gray-200 transition-all">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+                @else
+                    <a href="{{ route('couple-enrollments.index') }}" class="p-2.5 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 rounded-xl hover:bg-gray-200 transition-all">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+                @endif
                 <div class="w-32 h-32 rounded-[2.5rem] bg-purple-100 dark:bg-purple-900/30 text-purple-600 flex items-center justify-center text-5xl shadow-inner group-hover:scale-110 transition-all duration-500">
                     <i class="bi bi-heart-pulse-fill"></i>
                 </div>

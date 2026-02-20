@@ -11,6 +11,7 @@ class RedirectBasedOnRole {
             $role = auth()->user()->role;
 
             return match($role) {
+                'super_admin',
                 'admin' => redirect()->route('dashboard.admin'),
                 'pastor_zona' => redirect()->route('dashboard.pastor'),
                 'supervisor' => redirect()->route('dashboard.supervisor'),
