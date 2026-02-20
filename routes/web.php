@@ -261,9 +261,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/users/{user}/reassign-cell', [UserController::class, 'reassignCell'])->name('users.reassign-cell');
             Route::post('/users/{user}/remove-from-cell', [UserController::class, 'removeFromCell'])->name('users.remove-from-cell');
             Route::post('/users/{user}/update-observations', [UserController::class, 'updateObservations'])->name('users.update-observations');
-            Route::post('users/{user}/reassign-cell', [UserController::class, 'reassignCell'])->name('users.reassign-cell');
             Route::post('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
-            Route::post('users/{user}/observations', [UserController::class, 'updateObservations'])->name('users.update-observations');
             Route::get('users/{user}/activity', [UserController::class, 'activity'])->name('users.activity');
             Route::resource('users', UserController::class);
 
