@@ -30,6 +30,9 @@ class ContributionController
     {
         $user = auth()->user();
         $isMine = $request->query('mine');
+        $scope = $request->query('scope');
+        $isMyCellScope = $scope === 'my_cell';
+        $cellScopeUnavailable = false;
 
         $contributions = Contribution::query()
             ->with('user', 'cell');
@@ -37,6 +40,13 @@ class ContributionController
         // Lógica para "Minhas Contribuições" vs. Visualização Hierárquica
         if ($isMine) {
             $contributions->where('user_id', $user->id);
+        } elseif ($isMyCellScope) {
+            if ($user->cell_id) {
+                $contributions->where('cell_id', $user->cell_id);
+            } else {
+                $cellScopeUnavailable = true;
+                $contributions->where('id', 0);
+            }
         } else {
             switch ($user->role) {
                 case 'membro':
@@ -64,6 +74,7 @@ class ContributionController
                         $contributions->where('id', 0);
                     }
                     break;
+                case 'super_admin':
                 case 'admin':
                 case 'comissao_obra':
                     break;
@@ -105,27 +116,31 @@ class ContributionController
             ->orderBy('contribution_date', 'desc')
             ->paginate(15);
 
-        $pageTitle = $this->getPageTitle($user->role, $isMine);
+        $pageTitle = $this->getPageTitle($user->role, $isMine, $scope);
 
         $packages = CommitmentPackage::where('is_active', true)->orderBy('order')->get();
 
         return view('contributions.index', [
             'contributions' => $contributions,
             'pageTitle' => $pageTitle,
-            'showUserColumn' => !$isMine && $user->role !== 'membro',
+            'showUserColumn' => (!$isMine || $isMyCellScope) && $user->role !== 'membro',
             'packages' => $packages,
             'filters' => $request->all(),
+            'cellScopeUnavailable' => $cellScopeUnavailable,
         ]);
     }
 
-    private function getPageTitle($role, $isMine)
+    private function getPageTitle($role, $isMine, $scope = null)
     {
         if ($isMine) {
             return 'Minhas Contribuições';
         }
+        if ($scope === 'my_cell') {
+            return 'Minha Célula (Financeiro)';
+        }
 
         return match ($role) {
-            'admin', 'comissao_obra' => 'Todas as Contribuições',
+            'super_admin', 'admin', 'comissao_obra' => 'Todas as Contribuições',
             'pastor_zona' => 'Contribuições da Zona',
             'supervisor' => 'Contribuições da Supervisão',
             'lider_celula' => 'Contribuições da Célula',
@@ -171,7 +186,7 @@ class ContributionController
                 ->where('is_active', true)
                 ->orderBy('name')
                 ->get();
-        } elseif ($user->role === 'admin' || $user->role === 'comissao_obra') {
+        } elseif ($user->isAdmin() || $user->role === 'comissao_obra') {
             $members = User::where('is_active', true)
                 ->whereIn('role', ['membro', 'lider_celula', 'supervisor', 'pastor_zona', 'pastor_senior', 'responsavel_pacote'])
                 ->orderBy('name')
@@ -216,7 +231,7 @@ class ContributionController
         }
 
         // 3. Variável de Controle para alternar membro na view
-        $canRegisterForOthers = in_array($user->role, ['lider_celula', 'supervisor', 'pastor_zona', 'admin', 'comissao_obra', 'responsavel_pacote']);
+        $canRegisterForOthers = $user->isAdmin() || in_array($user->role, ['lider_celula', 'supervisor', 'pastor_zona', 'comissao_obra', 'responsavel_pacote'], true);
 
         // IDs dos pacotes gerenciados para filtro via JS
         $managedPackageIds = ($user->role === 'responsavel_pacote') ? $user->managedPackages->pluck('id')->toArray() : [];
@@ -261,8 +276,8 @@ class ContributionController
             }
         }
 
-        $canManage = in_array($user->role, ['admin', 'pastor_zona', 'comissao_obra'], true);
-        $canDelete = in_array($user->role, ['admin', 'comissao_obra'], true)
+        $canManage = $user->isAdmin() || in_array($user->role, ['pastor_zona', 'comissao_obra'], true);
+        $canDelete = ($user->isAdmin() || $user->role === 'comissao_obra')
             && in_array($contribution->status, ['pendente', 'cancelada', 'rejeitada'], true);
 
         return view('contributions.show', [
@@ -274,7 +289,7 @@ class ContributionController
 
     public function edit(Contribution $contribution): View|\Illuminate\Http\RedirectResponse
     {
-        if (auth()->id() !== $contribution->user_id && auth()->user()->role !== 'admin') {
+        if (auth()->id() !== $contribution->user_id && !auth()->user()->isAdmin()) {
             abort(403, 'Você não tem permissão para editar esta contribuição');
         }
         if ($contribution->status !== 'pendente') {
@@ -337,7 +352,7 @@ class ContributionController
         }
 
         // 2. Notificar Admins e Comissão da Obra (batch por pacote)
-        $admins = User::where('role', 'admin')->get();
+        $admins = User::whereIn('role', ['admin', 'super_admin'])->get();
         foreach ($admins as $admin) {
             $this->notifyPendingBatch($admin, $contribution);
         }
@@ -384,7 +399,7 @@ class ContributionController
 
     public function update(Request $request, Contribution $contribution)
     {
-        if (auth()->id() !== $contribution->user_id && auth()->user()->role !== 'admin') {
+        if (auth()->id() !== $contribution->user_id && !auth()->user()->isAdmin()) {
             abort(403, 'Você não tem permissão para atualizar esta contribuição');
         }
         if ($contribution->status !== 'pendente') {
@@ -415,7 +430,7 @@ class ContributionController
     {
         $user = auth()->user();
 
-        if ($user->role !== 'admin' && $user->role !== 'pastor_zona' && $user->role !== 'comissao_obra') {
+        if (!$user->isAdmin() && $user->role !== 'pastor_zona' && $user->role !== 'comissao_obra') {
             abort(403, 'Apenas admin, comissão de obra e pastor_zona pode verificar contribuições');
         }
 
@@ -445,7 +460,7 @@ class ContributionController
     {
         $user = auth()->user();
 
-        if ($user->role !== 'admin' && $user->role !== 'pastor_zona' && $user->role !== 'comissao_obra') {
+        if (!$user->isAdmin() && $user->role !== 'pastor_zona' && $user->role !== 'comissao_obra') {
             abort(403, 'Apenas admin, comissão de obra ou pastor_zona pode rejeitar contribuições');
         }
 
@@ -481,7 +496,7 @@ class ContributionController
     {
         $user = auth()->user();
 
-        if ($user->role !== 'admin') {
+        if (!$user->isAdmin()) {
             abort(403, 'Apenas o administrador pode cancelar contribuições.');
         }
 
@@ -504,7 +519,7 @@ class ContributionController
     {
         $user = auth()->user();
 
-        if ($user->role !== 'admin' && $user->role !== 'comissao_obra') {
+        if (!$user->isAdmin() && $user->role !== 'comissao_obra') {
             abort(403, 'Apenas admin ou comissão de obra pode eliminar contribuições.');
         }
 
@@ -583,11 +598,11 @@ class ContributionController
 
         // Apenas admin, comissão de obra e pastor_zona podem ver esta view de administração
         $user = auth()->user();
-        if (!in_array($user->role, ['admin', 'comissao_obra', 'pastor_zona'], true)) {
+        if (!$user->isAdmin() && !in_array($user->role, ['comissao_obra', 'pastor_zona'], true)) {
             abort(403, 'Acesso negado.');
         }
 
-        $canDelete = in_array($user->role, ['admin', 'comissao_obra'], true)
+        $canDelete = ($user->isAdmin() || $user->role === 'comissao_obra')
             && in_array($contribution->status, ['pendente', 'cancelada', 'rejeitada'], true);
 
         return view('contributions.show', [
@@ -609,7 +624,7 @@ class ContributionController
     public function notifyCommission(Request $request, CommitmentPackage $package)
     {
         $user = auth()->user();
-        if ($user->role !== 'responsavel_pacote' && $user->role !== 'admin') {
+        if ($user->role !== 'responsavel_pacote' && !$user->isAdmin()) {
             abort(403);
         }
 
@@ -717,7 +732,7 @@ class ContributionController
         }
 
         // Admin, Comissão de Obra e Responsável de Pacote pode registar para qualquer membro
-        if ($user->role === 'admin' || $user->role === 'comissao_obra' || $user->role === 'responsavel_pacote') {
+        if ($user->isAdmin() || $user->role === 'comissao_obra' || $user->role === 'responsavel_pacote') {
             return;
         }
 

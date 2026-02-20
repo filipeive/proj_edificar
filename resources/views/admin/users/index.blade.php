@@ -5,7 +5,11 @@
 @section('page-subtitle', 'Gestão de membros e líderes da igreja')
 
 @section('header-actions')
-    <div class="md:hidden">
+    <div class="md:hidden flex items-center gap-2">
+        <a href="#users-filters"
+            class="text-gray-600 hover:text-gray-800 p-2.5 hover:bg-gray-50 rounded-xl transition-all duration-300 border border-gray-200">
+            <i class="bi bi-funnel-fill text-lg"></i>
+        </a>
         <a href="{{ route('users.create') }}"
             class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100">
             <i class="bi bi-person-plus-fill text-2xl"></i>
@@ -53,7 +57,7 @@
     @resize.window.debounce.500ms="updateView()">
 
         <!-- Header -->
-        <div class="bg-white p-6 md:p-7 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-5">
+        <div class="bg-white p-5 md:p-6 rounded-3xl shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div class="space-y-1">
                 <div class="flex items-center gap-2 text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] mb-1">
                     <div class="w-8 h-8 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center">
@@ -62,7 +66,7 @@
                     <span>Administração</span>
                 </div>
                 <h1 class="text-2xl md:text-3xl font-black text-gray-900 tracking-tight">Utilizadores</h1>
-                <p class="text-gray-500 text-sm font-medium">Gestão de membros, liderança e permissões de acesso</p>
+                <p class="text-gray-500 text-sm font-medium leading-relaxed">Gestão de membros, liderança e permissões de acesso</p>
             </div>
 
             <div class="flex flex-wrap items-center gap-3">
@@ -84,12 +88,12 @@
 
                 <div class="hidden md:flex gap-3">
                     <button type="button" x-show="selectedUsers.length > 0" x-cloak @click="bulkDelete()"
-                        class="group flex items-center bg-red-600 text-white px-8 py-4 rounded-2xl hover:bg-red-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-red-200">
+                        class="group flex items-center bg-red-600 text-white px-6 py-3 rounded-xl hover:bg-red-700 transition-all font-black text-xs uppercase tracking-widest shadow-sm">
                         <i class="bi bi-trash-fill text-lg mr-2 group-hover:scale-110 transition-transform"></i>
                         Deletar (<span x-text="selectedUsers.length"></span>)
                     </button>
 
-                    <a href="{{ route('users.create') }}" class="group flex items-center bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest shadow-md shadow-blue-200">
+                    <a href="{{ route('users.create') }}" class="group flex items-center bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest shadow-sm">
                         <i class="bi bi-person-plus-fill text-lg mr-2 group-hover:scale-110 transition-transform"></i>
                         Novo Utilizador
                     </a>
@@ -99,59 +103,59 @@
 
         <!-- Global Stats Row -->
         <div class="hidden md:grid grid-cols-2 lg:grid-cols-5 gap-4" x-show="view === 'list'">
-            <div class="flex bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 items-center justify-between group hover:shadow-xl transition-all">
+            <div class="flex bg-white p-5 rounded-2xl shadow-sm border border-gray-200 items-center justify-between">
                 <div class="space-y-1">
                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Geral</p>
                     <p class="text-3xl font-black text-gray-900">{{ $totalUsers }}</p>
                 </div>
-                <div class="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl group-hover:bg-blue-600 group-hover:text-white transition-all">
+                <div class="w-14 h-14 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl">
                     <i class="bi bi-people-fill"></i>
                 </div>
             </div>
-            <div class="flex bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 items-center justify-between group hover:shadow-xl transition-all">
+            <div class="flex bg-white p-5 rounded-2xl shadow-sm border border-gray-200 items-center justify-between">
                 <div class="space-y-1">
                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Membros</p>
                     <p class="text-3xl font-black text-green-600">{{ $totalMembers }}</p>
                 </div>
-                <div class="w-16 h-16 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center text-2xl group-hover:bg-green-600 group-hover:text-white transition-all">
+                <div class="w-14 h-14 rounded-xl bg-green-50 text-green-600 flex items-center justify-center text-xl">
                     <i class="bi bi-person-check-fill"></i>
                 </div>
             </div>
-            <div class="flex bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 items-center justify-between group hover:shadow-xl transition-all">
+            <div class="flex bg-white p-5 rounded-2xl shadow-sm border border-gray-200 items-center justify-between">
                 <div class="space-y-1">
                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Liderança</p>
                     <p class="text-3xl font-black text-purple-600">{{ $totalLeaders }}</p>
                 </div>
-                <div class="w-16 h-16 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-2xl group-hover:bg-purple-600 group-hover:text-white transition-all">
+                <div class="w-14 h-14 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl">
                     <i class="bi bi-person-badge-fill"></i>
                 </div>
             </div>
-            <div class="flex bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 items-center justify-between group hover:shadow-xl transition-all">
+            <div class="flex bg-white p-5 rounded-2xl shadow-sm border border-gray-200 items-center justify-between">
                 <div class="space-y-1">
                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Administração</p>
                     <p class="text-3xl font-black text-blue-700">{{ $totalAdministracao }}</p>
                 </div>
-                <div class="w-16 h-16 rounded-2xl bg-blue-50 text-blue-700 flex items-center justify-center text-2xl group-hover:bg-blue-600 group-hover:text-white transition-all">
+                <div class="w-14 h-14 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center text-xl">
                     <i class="bi bi-shield-check"></i>
                 </div>
             </div>
-            <div class="flex bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 items-center justify-between group hover:shadow-xl transition-all">
+            <div class="flex bg-white p-5 rounded-2xl shadow-sm border border-gray-200 items-center justify-between">
                 <div class="space-y-1">
                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Ativos</p>
                     <p class="text-3xl font-black text-orange-600">{{ $totalActive }}</p>
                 </div>
-                <div class="w-16 h-16 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center text-2xl group-hover:bg-orange-600 group-hover:text-white transition-all">
+                <div class="w-14 h-14 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center text-xl">
                     <i class="bi bi-lightning-fill"></i>
                 </div>
             </div>
         </div>
 
         <!-- Filter & Search Bar -->
-        <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100">
+        <div id="users-filters" class="bg-white p-5 md:p-6 rounded-3xl shadow-sm border border-gray-200">
             <form action="{{ route('users.index') }}" method="GET" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                     <div class="md:col-span-5 space-y-2">
-                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Pesquisar</label>
+                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-wider ml-1">Pesquisar</label>
                         <div class="relative group">
                             <i class="bi bi-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors"></i>
                             <input type="text" name="search" id="liveSearch" data-live-search="manual" value="{{ request('search') }}" placeholder="Pesquisar por nome, email ou telefone..." 
@@ -165,7 +169,7 @@
                         </div>
                     </div>
                     <div class="md:col-span-3 space-y-2">
-                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nível</label>
+                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-wider ml-1">Nível</label>
                         <select name="role" class="w-full px-6 py-3 bg-gray-50 border-transparent focus:ring-4 focus:ring-blue-100 rounded-xl font-bold text-sm appearance-none transition-all custom-select">
                             <option value="">Todos os Papéis</option>
                             <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Administrador</option>
@@ -184,7 +188,7 @@
                         </select>
                     </div>
                     <div class="md:col-span-2 space-y-2">
-                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Status</label>
+                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-wider ml-1">Status</label>
                         <select name="status" class="w-full px-6 py-3 bg-gray-50 border-transparent focus:ring-4 focus:ring-blue-100 rounded-xl font-bold text-sm appearance-none transition-all custom-select">
                             <option value="">Qualquer Status</option>
                             <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Ativos</option>
@@ -208,34 +212,34 @@
 
         <!-- List View -->
         <div x-show="view === 'list'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-            class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-            <div class="px-8 py-5 border-b border-gray-100 flex items-center justify-between">
+            class="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                 <div>
-                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Lista de Utilizadores</p>
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-wider">Lista de Utilizadores</p>
                     <p class="text-sm font-bold text-gray-900">{{ $users->total() }} registos encontrados</p>
                 </div>
-                <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Página {{ $users->currentPage() }} de {{ $users->lastPage() }}</span>
+                <span class="text-[10px] font-black uppercase tracking-wider text-gray-400">Página {{ $users->currentPage() }} de {{ $users->lastPage() }}</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full table-compact">
                     <thead>
                         <tr class="bg-gray-50/50">
-                            <th class="px-6 py-6 text-center">
+                            <th class="px-6 py-5 text-center">
                                 <input type="checkbox" x-model="selectAll" @change="toggleAll()" 
                                     class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
                             </th>
-                            <th class="px-10 py-6 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Perfil & Identificação</th>
-                            <th class="px-10 py-6 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Comunicação</th>
-                            <th class="px-10 py-6 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Nível de Acesso</th>
-                            <th class="px-10 py-6 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Célula</th>
-                            <th class="px-10 py-6 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Status</th>
-                            <th class="px-10 py-6 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">Menu</th>
+                            <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-wider">Perfil & Identificação</th>
+                            <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-wider">Comunicação</th>
+                            <th class="px-10 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-wider">Nível de Acesso</th>
+                            <th class="px-10 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-wider">Célula</th>
+                            <th class="px-10 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-wider">Status</th>
+                            <th class="px-10 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-wider">Menu</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50">
                         @forelse($users as $user)
                             <tr class="hover:bg-gray-50/70 transition-colors group">
-                                <td class="px-6 py-6 text-center">
+                                <td class="px-6 py-5 text-center">
                                     @if($user->role !== 'super_admin' && ($user->role !== 'admin' || auth()->user()->isSuperAdmin()))
                                         <input type="checkbox" value="{{ $user->id }}" 
                                             class="user-checkbox w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
@@ -245,7 +249,7 @@
                                         <input type="checkbox" disabled class="w-5 h-5 rounded border-gray-200 cursor-not-allowed opacity-50">
                                     @endif
                                 </td>
-                                <td class="px-10 py-6">
+                                <td class="px-10 py-5">
                                     <div class="flex items-center gap-4">
                                         <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 text-white flex items-center justify-center font-black text-xl shadow-lg shadow-blue-100 group-hover:scale-110 transition-transform">
                                             {{ strtoupper(substr($user->name, 0, 1)) }}
@@ -256,13 +260,13 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-10 py-6">
+                                <td class="px-10 py-5">
                                     <div class="flex flex-col">
                                         <span class="text-xs font-bold text-gray-800">{{ $user->email }}</span>
                                         <span class="text-[10px] text-gray-400 font-medium">{{ $user->phone ?? 'Sem Telefone' }}</span>
                                     </div>
                                 </td>
-                                <td class="px-10 py-6 text-center">
+                                <td class="px-10 py-5 text-center">
                                     @switch($user->role)
                                         @case('admin')
                                             <span class="px-4 py-1.5 bg-red-50 text-red-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-red-100 flex items-center justify-center gap-2">Admin</span>
@@ -304,14 +308,14 @@
                                             <span class="px-4 py-1.5 bg-gray-50 text-gray-500 rounded-lg text-[10px] font-black uppercase tracking-widest border border-gray-100 flex items-center justify-center gap-2">Membro</span>
                                     @endswitch
                                 </td>
-                                <td class="px-10 py-6 text-center">
+                                <td class="px-10 py-5 text-center">
                                     @if($user->cell)
                                         <span class="text-[10px] font-black text-gray-900 bg-gray-50 px-3 py-1.5 rounded-xl border border-gray-100 uppercase tracking-widest">{{ $user->cell->name }}</span>
                                     @else
                                         <span class="text-[10px] font-bold text-gray-300 uppercase">N/A</span>
                                     @endif
                                 </td>
-                                <td class="px-10 py-6 text-center">
+                                <td class="px-10 py-5 text-center">
                                     <div class="flex justify-center">
                                         @if($user->is_active)
                                             <span class="w-3 h-3 bg-green-500 rounded-full shadow-[0_0_10px_rgba(34,197,94,0.5)] animate-pulse"></span>
@@ -320,7 +324,7 @@
                                         @endif
                                     </div>
                                 </td>
-                                <td class="px-10 py-6 text-right">
+                                <td class="px-10 py-5 text-right">
                                     <div class="flex items-center justify-end gap-2 text-right">
                                         <a href="{{ route('users.show', $user) }}" title="Detalhes"
                                             class="action-icon bg-gray-50 text-gray-400 hover:bg-blue-600 hover:text-white shadow-sm">
@@ -364,7 +368,7 @@
             </div>
 
             @if($users->hasPages())
-                <div class="p-8 bg-gray-50/50 border-t border-gray-50">
+                <div class="p-5 bg-gray-50/50 border-t border-gray-100">
                     {{ $users->appends(request()->query())->links() }}
                 </div>
             @endif
@@ -374,7 +378,7 @@
         <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
             class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             @forelse($users as $user)
-                <div class="bg-white p-5 md:p-8 rounded-[2rem] md:rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 compact-card">
+                <div class="bg-white p-5 md:p-6 rounded-3xl shadow-sm border border-gray-200 flex flex-col group hover:shadow-md transition-all duration-300 compact-card">
                     <div class="flex justify-between items-start mb-4">
                         <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 text-white flex items-center justify-center font-black text-2xl group-hover:scale-110 transition-all duration-500 shadow-lg shadow-blue-100">
                             {{ strtoupper(substr($user->name, 0, 1)) }}
@@ -489,7 +493,7 @@
                     </div>
                 </div>
             @empty
-                <div class="col-span-full py-20 bg-white rounded-[2.5rem] border border-dashed border-gray-200 flex flex-col items-center gap-4 text-gray-300">
+                <div class="col-span-full py-20 bg-white rounded-3xl border border-dashed border-gray-200 flex flex-col items-center gap-4 text-gray-300">
                     <i class="bi bi-people text-7xl"></i>
                     <p class="font-bold text-lg text-center uppercase tracking-tighter font-black">Nenhum utilizador encontrado no sistema</p>
                 </div>

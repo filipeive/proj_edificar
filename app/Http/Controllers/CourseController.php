@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\CourseClass;
 use App\Models\CoupleEnrollment;
 use App\Models\CourseEnrollment;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
@@ -31,7 +32,7 @@ class CourseController extends Controller
             ->where(function ($q) use ($user) {
                 // Eligible if no role restriction OR if user role matches the target role
                 // Admin/Pastor always see everything
-                if ($user->role === 'admin' || $user->role === 'pastor') {
+                if ($user->isAdmin() || $user->role === 'pastor') {
                     return;
                 }
                 $q->whereNull('target_role')
@@ -40,9 +41,16 @@ class CourseController extends Controller
             ->withCount(['enrollments', 'coupleEnrollments'])
             ->get();
 
+        if ($user->isSupervisor()) {
+            $preMaritalCourseId = (int) Setting::get('pre_marital_course_id');
+            if ($preMaritalCourseId > 0) {
+                $availableCourses = $availableCourses->where('id', '!=', $preMaritalCourseId)->values();
+            }
+        }
+
         // 3. For admins/pastors, list all courses separately if needed (optional)
         $allCourses = collect();
-        if ($user->role === 'admin' || $user->role === 'pastor') {
+        if ($user->isAdmin() || $user->role === 'pastor') {
             $allCourses = Course::withCount(['enrollments', 'coupleEnrollments'])->get();
         }
 
@@ -51,11 +59,14 @@ class CourseController extends Controller
 
     public function create()
     {
+        $this->ensureCourseManagementAccess();
         return view('courses.create');
     }
 
     public function store(Request $request)
     {
+        $this->ensureCourseManagementAccess();
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -76,11 +87,34 @@ class CourseController extends Controller
 
     public function show(Request $request, Course $course)
     {
+        $user = auth()->user();
+
         $course->load([
             'classes' => function ($q) {
                 $q->withCount(['courseEnrollments', 'coupleEnrollments'])->latest();
             }
         ]);
+
+        if ($user->isSupervisor()) {
+            $hasEnrollmentInCourse = CourseEnrollment::where('course_id', $course->id)
+                ->where('user_id', $user->id)
+                ->exists();
+
+            if (!$hasEnrollmentInCourse) {
+                abort(403, 'Supervisor só pode ver cursos em que está matriculado.');
+            }
+
+            $enrolledClassIds = CourseEnrollment::where('course_id', $course->id)
+                ->where('user_id', $user->id)
+                ->whereNotNull('course_class_id')
+                ->pluck('course_class_id')
+                ->unique();
+
+            $course->setRelation(
+                'classes',
+                $course->classes->whereIn('id', $enrolledClassIds)->values()
+            );
+        }
 
         // Public Inbox (Pending Couple Enrollments)
         $publicCoupleEnrollments = CoupleEnrollment::where('course_id', $course->id)
@@ -91,6 +125,9 @@ class CourseController extends Controller
         $coupleEnrollments = CoupleEnrollment::with(['courseClass'])
             ->where('course_id', $course->id)
             ->whereNotNull('course_class_id')
+            ->when($user->isSupervisor(), function ($q) use ($course) {
+                $q->whereIn('course_class_id', $course->classes->pluck('id'));
+            })
             ->get();
 
         $statusLabels = [
@@ -117,16 +154,21 @@ class CourseController extends Controller
 
         $stats = [
             'total_students' => $course->enrollments()->count() + CoupleEnrollment::where('course_id', $course->id)->whereNotNull('course_class_id')->count(),
-            'active_classes' => $course->classes()->whereIn('status', ['active', 'em_andamento'])->count(),
+            'active_classes' => $user->isSupervisor()
+                ? $course->classes->whereIn('status', ['active', 'em_andamento'])->count()
+                : $course->classes()->whereIn('status', ['active', 'em_andamento'])->count(),
             'pending_public' => $publicCoupleEnrollments->count(),
         ];
 
         $courseEnrollments = CourseEnrollment::with(['user', 'courseClass', 'malePartner', 'femalePartner'])
             ->where('course_id', $course->id)
+            ->when($user->isSupervisor(), function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })
             ->get();
 
         $allCourses = collect();
-        if (auth()->user()->role === 'admin' || auth()->user()->role === 'pastor' || auth()->user()->role === 'pastor_senior') {
+        if (auth()->user()->isAdmin() || auth()->user()->role === 'pastor' || auth()->user()->role === 'pastor_senior') {
             $allCourses = Course::where('id', '!=', $course->id)->orderBy('name')->get();
         }
 
@@ -144,10 +186,7 @@ class CourseController extends Controller
 
     public function assignPublicEnrollment(Request $request, Course $course)
     {
-        $user = auth()->user();
-        if (!$user || !in_array($user->role, ['admin', 'pastor'])) {
-            abort(403, 'Sem permissão.');
-        }
+        $this->ensureCourseManagementAccess();
 
         $validated = $request->validate([
             'couple_enrollment_id' => 'required|exists:couple_enrollments,id',
@@ -174,11 +213,14 @@ class CourseController extends Controller
 
     public function edit(Course $course)
     {
+        $this->ensureCourseManagementAccess();
         return view('courses.edit', compact('course'));
     }
 
     public function update(Request $request, Course $course)
     {
+        $this->ensureCourseManagementAccess();
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -201,12 +243,14 @@ class CourseController extends Controller
 
     public function destroy(Course $course)
     {
+        $this->ensureCourseManagementAccess();
         $course->delete();
         return redirect()->route('courses.index')->with('success', 'Curso excluído com sucesso!');
     }
 
     public function exportGlobalReport(Request $request)
     {
+        $this->ensureCourseManagementAccess();
         $classIds = $request->input('class_ids', []);
         return Excel::download(new GlobalCourseReportExport($classIds), 'relatorio_geral_cursos.xlsx');
     }
@@ -216,9 +260,7 @@ class CourseController extends Controller
      */
     public function bulkDestroy(Request $request)
     {
-        if (auth()->user()->role !== 'admin') {
-            return redirect()->back()->with('error', 'Apenas administradores podem realizar esta ação.');
-        }
+        $this->ensureCourseManagementAccess();
 
         $validated = $request->validate([
             'course_ids' => 'required|array',
@@ -229,5 +271,14 @@ class CourseController extends Controller
 
         return redirect()->route('courses.index')
             ->with('success', "{$deletedCount} curso(s) excluído(s) com sucesso!");
+    }
+
+    private function ensureCourseManagementAccess(): void
+    {
+        $user = auth()->user();
+
+        if (!$user || (!($user->isAdmin() || $user->role === 'pastor' || $user->role === 'pastor_senior'))) {
+            abort(403, 'Sem permissão para gerir cursos.');
+        }
     }
 }

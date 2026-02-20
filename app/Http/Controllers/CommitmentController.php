@@ -98,7 +98,7 @@ class CommitmentController
         }
 
         // Notificar todos os admins (pode ajustar para notificar supervisores/pastores conforme necessidade)
-        User::where('role', 'admin')->get()->each(function (User $admin) use ($userCommitment) {
+        User::whereIn('role', ['admin', 'super_admin'])->get()->each(function (User $admin) use ($userCommitment) {
             if ($admin->wantsNotification('commitment_chosen')) {
                 $admin->notify(new CommitmentChosenNotification($userCommitment));
             }

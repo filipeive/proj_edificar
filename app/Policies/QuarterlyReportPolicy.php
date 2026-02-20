@@ -10,17 +10,17 @@ class QuarterlyReportPolicy
 {
     public function viewAny(User $user): bool
     {
-        return in_array($user->role, ['admin', 'pastor', 'pastor_zona', 'supervisor']);
+        return $user->isAdmin() || in_array($user->role, ['pastor', 'pastor_zona', 'supervisor'], true);
     }
 
     public function deleteAny(User $user): bool
     {
-        return $user->role === 'admin';
+        return $user->isAdmin();
     }
 
     public function view(User $user, QuarterlyReport $report): bool
     {
-        if (in_array($user->role, ['admin', 'pastor'])) {
+        if ($user->isAdmin() || $user->role === 'pastor') {
             return true;
         }
 
@@ -37,12 +37,12 @@ class QuarterlyReportPolicy
 
     public function create(User $user): bool
     {
-        return in_array($user->role, ['admin', 'pastor', 'pastor_zona', 'supervisor']);
+        return $user->isAdmin() || in_array($user->role, ['pastor', 'pastor_zona', 'supervisor'], true);
     }
 
     public function update(User $user, QuarterlyReport $report): bool
     {
-        if ($user->role === 'admin') {
+        if ($user->isAdmin()) {
             return true;
         }
 
@@ -55,11 +55,11 @@ class QuarterlyReportPolicy
 
     public function delete(User $user, QuarterlyReport $report): bool
     {
-        return $user->role === 'admin';
+        return $user->isAdmin();
     }
 
     public function approve(User $user, QuarterlyReport $report): bool
     {
-        return in_array($user->role, ['admin', 'pastor']);
+        return $user->isAdmin() || $user->role === 'pastor';
     }
 }

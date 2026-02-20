@@ -10,12 +10,12 @@ class CellMeetingPolicy
 {
     public function viewAny(User $user): bool
     {
-        return in_array($user->role, ['admin', 'pastor', 'pastor_zona', 'supervisor', 'lider_celula', 'timoteo']);
+        return $user->isAdmin() || in_array($user->role, ['pastor', 'pastor_zona', 'supervisor', 'lider_celula', 'timoteo'], true);
     }
 
     public function view(User $user, CellMeeting $cellMeeting): bool
     {
-        if (in_array($user->role, ['admin', 'pastor'])) {
+        if ($user->isAdmin() || $user->role === 'pastor') {
             return true;
         }
 
@@ -36,12 +36,12 @@ class CellMeetingPolicy
 
     public function create(User $user): bool
     {
-        return in_array($user->role, ['admin', 'pastor', 'pastor_zona', 'supervisor', 'lider_celula', 'timoteo']);
+        return $user->isAdmin() || in_array($user->role, ['pastor', 'pastor_zona', 'supervisor', 'lider_celula', 'timoteo'], true);
     }
 
     public function update(User $user, CellMeeting $cellMeeting): bool
     {
-        if ($user->role === 'admin') {
+        if ($user->isAdmin()) {
             return true;
         }
 
@@ -50,11 +50,11 @@ class CellMeetingPolicy
 
     public function delete(User $user, CellMeeting $cellMeeting): bool
     {
-        return $user->role === 'admin' || ($cellMeeting->leader_id === $user->id || ($user->role === 'timoteo' && $user->cell_id === $cellMeeting->cell_id)) && $cellMeeting->created_at->diffInHours(now()) < 24;
+        return $user->isAdmin() || ($cellMeeting->leader_id === $user->id || ($user->role === 'timoteo' && $user->cell_id === $cellMeeting->cell_id)) && $cellMeeting->created_at->diffInHours(now()) < 24;
     }
 
     public function deleteAny(User $user): bool
     {
-        return in_array($user->role, ['admin', 'pastor', 'pastor_zona', 'supervisor', 'lider_celula', 'timoteo']);
+        return $user->isAdmin() || in_array($user->role, ['pastor', 'pastor_zona', 'supervisor', 'lider_celula', 'timoteo'], true);
     }
 }

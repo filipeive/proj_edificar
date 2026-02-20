@@ -207,7 +207,7 @@ class PublicFormController extends Controller
         $zone = Zone::find($validated['zone_id']);
         $supervisorId = $supervision->supervisor_id
             ?? $zone->pastor_id
-            ?? optional(User::where('role', 'admin')->first())->id;
+            ?? optional(User::whereIn('role', ['super_admin', 'admin'])->first())->id;
 
         if (!$supervisorId) {
             return back()->withErrors(['supervision_id' => 'Supervisor não encontrado para esta supervisão.'])->withInput();

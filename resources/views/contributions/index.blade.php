@@ -68,6 +68,9 @@
                 @if(request()->filled('mine'))
                     <input type="hidden" name="mine" value="1">
                 @endif
+                @if(request()->filled('scope'))
+                    <input type="hidden" name="scope" value="{{ request('scope') }}">
+                @endif
                 
                 <div class="space-y-1">
                     <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 px-2">Pesquisar Membro</label>
@@ -101,12 +104,18 @@
 
                 <div class="flex gap-2">
                     <button type="submit" class="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">Filtrar</button>
-                    <a href="{{ route('contributions.index', request()->only('mine')) }}" class="p-3 bg-gray-50 text-gray-400 rounded-2xl hover:bg-gray-100 transition-all">
+                    <a href="{{ route('contributions.index', request()->only('mine', 'scope')) }}" class="p-3 bg-gray-50 text-gray-400 rounded-2xl hover:bg-gray-100 transition-all">
                         <i class="bi bi-arrow-counterclockwise"></i>
                     </a>
                 </div>
             </form>
         </div>
+
+        @if(!empty($cellScopeUnavailable))
+            <div class="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">
+                Você não pertence a nenhuma célula no momento. Peça ao líder ou à administração para associar sua conta.
+            </div>
+        @endif
 
         <!-- Quick Stats -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3">

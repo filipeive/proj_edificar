@@ -10,6 +10,49 @@ use Illuminate\Support\Facades\Auth;
 
 class VisitorController extends Controller
 {
+    private function shouldScopeByManagedZones($user): bool
+    {
+        return ($user->isPastorZona() || $user->isSupervisor()) && !$user->isAdmin();
+    }
+
+    private function getScopedZoneAndCellIds($user): array
+    {
+        $managedZoneIds = $user->getManagedZoneIds();
+        $cellIds = Cell::whereHas('supervision', function ($q) use ($managedZoneIds) {
+            $q->whereIn('zone_id', $managedZoneIds);
+        })->pluck('id');
+
+        return [$managedZoneIds, $cellIds];
+    }
+
+    private function applyManagedZoneScope($query, $user): void
+    {
+        if (!$this->shouldScopeByManagedZones($user)) {
+            return;
+        }
+
+        [$managedZoneIds, $cellIds] = $this->getScopedZoneAndCellIds($user);
+        $query->where(function ($q) use ($managedZoneIds, $cellIds) {
+            $q->whereIn('zone_id', $managedZoneIds)
+                ->orWhereIn('cell_id', $cellIds);
+        });
+    }
+
+    private function ensureCanAccessVisitor($user, Visitor $visitor): void
+    {
+        if (!$this->shouldScopeByManagedZones($user)) {
+            return;
+        }
+
+        [$managedZoneIds, $cellIds] = $this->getScopedZoneAndCellIds($user);
+        $allowed = ($visitor->zone_id && $managedZoneIds->contains($visitor->zone_id))
+            || ($visitor->cell_id && $cellIds->contains($visitor->cell_id));
+
+        if (!$allowed) {
+            abort(403, 'Você não tem permissão para aceder a este visitante.');
+        }
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -46,20 +89,7 @@ class VisitorController extends Controller
 
         // Permissões por papel
         $user = Auth::user();
-        if ($user->isPastorZona() && !$user->isAdmin()) {
-            // Get zones where user is pastor
-            $managedZoneIds = $user->getManagedZoneIds();
-            // Get cells that belong to those zones
-            $cellIds = Cell::whereHas('supervision', function ($q) use ($managedZoneIds) {
-                $q->whereIn('zone_id', $managedZoneIds);
-            })->pluck('id');
-
-            // Filter visitors: in managed zones OR in cells of those zones
-            $query->where(function ($q) use ($managedZoneIds, $cellIds) {
-                $q->whereIn('zone_id', $managedZoneIds)
-                    ->orWhereIn('cell_id', $cellIds);
-            });
-        }
+        $this->applyManagedZoneScope($query, $user);
 
         $visitors = $query->paginate(20);
 
@@ -84,7 +114,7 @@ class VisitorController extends Controller
         $user = Auth::user();
         $zonesQuery = Zone::orderBy('name');
 
-        if ($user->role === 'pastor_zona' && !$user->isAdmin()) {
+        if (($user->isPastorZona() || $user->isSupervisor()) && !$user->isAdmin()) {
             $zonesQuery->whereIn('id', $user->getManagedZoneIds());
         }
 
@@ -129,10 +159,19 @@ class VisitorController extends Controller
      */
     public function show(Visitor $visitor)
     {
+        $user = Auth::user();
+        $this->ensureCanAccessVisitor($user, $visitor);
         $visitor->load(['zone', 'cell', 'creator', 'contactedBy']);
         $cells = $visitor->zone ? $visitor->zone->cells : collect();
+        $zonesQuery = Zone::orderBy('name');
 
-        return view('visitors.show', compact('visitor', 'cells'));
+        if (($user->isPastorZona() || $user->isSupervisor()) && !$user->isAdmin()) {
+            $zonesQuery->whereIn('id', $user->getManagedZoneIds());
+        }
+
+        $zones = $zonesQuery->get();
+
+        return view('visitors.show', compact('visitor', 'cells', 'zones'));
     }
 
     /**
@@ -141,16 +180,17 @@ class VisitorController extends Controller
     public function edit(Visitor $visitor)
     {
         $user = Auth::user();
+        if ($user->isSupervisor() && !$user->isAdmin()) {
+            abort(403, 'Supervisores não podem editar visitantes.');
+        }
+
         $zonesQuery = Zone::orderBy('name');
 
-        if ($user->role === 'pastor_zona' && !$user->isAdmin()) {
+        if (($user->isPastorZona() || $user->isSupervisor()) && !$user->isAdmin()) {
             $managedZoneIds = $user->getManagedZoneIds();
             $zonesQuery->whereIn('id', $managedZoneIds);
 
-            // Security check for Pastor de Zona
-            if ($visitor->zone_id && !in_array($visitor->zone_id, $managedZoneIds->toArray())) {
-                abort(403, 'Você não tem permissão para editar este visitante.');
-            }
+            $this->ensureCanAccessVisitor($user, $visitor);
         }
 
         $zones = $zonesQuery->get();
@@ -165,6 +205,12 @@ class VisitorController extends Controller
      */
     public function update(Request $request, Visitor $visitor)
     {
+        $user = Auth::user();
+        $this->ensureCanAccessVisitor($user, $visitor);
+        if ($user->isSupervisor() && !$user->isAdmin()) {
+            abort(403, 'Supervisores não podem editar visitantes.');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'age' => 'nullable|integer|min:1|max:150',
@@ -193,6 +239,11 @@ class VisitorController extends Controller
      */
     public function destroy(Visitor $visitor)
     {
+        $user = Auth::user();
+        $this->ensureCanAccessVisitor($user, $visitor);
+        if ($user->isSupervisor() && !$user->isAdmin()) {
+            abort(403, 'Supervisores não podem eliminar visitantes.');
+        }
         $visitor->delete();
 
         return redirect()->route('visitors.index')
@@ -204,9 +255,16 @@ class VisitorController extends Controller
      */
     public function assignToZone(Request $request, Visitor $visitor)
     {
+        $user = Auth::user();
+        $this->ensureCanAccessVisitor($user, $visitor);
+
         $request->validate([
             'zone_id' => 'required|exists:zones,id',
         ]);
+
+        if ($this->shouldScopeByManagedZones($user) && !$user->getManagedZoneIds()->contains((int) $request->zone_id)) {
+            abort(403, 'Você não tem permissão para atribuir esta zona.');
+        }
 
         $visitor->update([
             'zone_id' => $request->zone_id,
@@ -220,9 +278,19 @@ class VisitorController extends Controller
      */
     public function assignToCell(Request $request, Visitor $visitor)
     {
+        $user = Auth::user();
+        $this->ensureCanAccessVisitor($user, $visitor);
+
         $request->validate([
             'cell_id' => 'required|exists:cells,id',
         ]);
+
+        if ($this->shouldScopeByManagedZones($user)) {
+            [, $managedCellIds] = $this->getScopedZoneAndCellIds($user);
+            if (!$managedCellIds->contains((int) $request->cell_id)) {
+                abort(403, 'Você não tem permissão para atribuir esta célula.');
+            }
+        }
 
         $visitor->update([
             'cell_id' => $request->cell_id,
@@ -236,6 +304,7 @@ class VisitorController extends Controller
      */
     public function markAsContacted(Visitor $visitor)
     {
+        $this->ensureCanAccessVisitor(Auth::user(), $visitor);
         $visitor->markAsContacted(Auth::user());
 
         return back()->with('success', 'Visitante marcado como contatado!');
@@ -277,20 +346,7 @@ class VisitorController extends Controller
 
         // Permissões por papel
         $user = Auth::user();
-        if ($user->isPastorZona() && !$user->isAdmin()) {
-            // Get zones where user is pastor
-            $managedZoneIds = $user->getManagedZoneIds();
-            // Get cells that belong to those zones
-            $cellIds = Cell::whereHas('supervision', function ($q) use ($managedZoneIds) {
-                $q->whereIn('zone_id', $managedZoneIds);
-            })->pluck('id');
-
-            // Filter visitors: in managed zones OR in cells of those zones
-            $query->where(function ($q) use ($managedZoneIds, $cellIds) {
-                $q->whereIn('zone_id', $managedZoneIds)
-                    ->orWhereIn('cell_id', $cellIds);
-            });
-        }
+        $this->applyManagedZoneScope($query, $user);
 
         $filename = 'visitantes_' . date('Y-m-d_His') . '.xlsx';
 
@@ -330,9 +386,14 @@ class VisitorController extends Controller
     public function getCellsByZone(Request $request)
     {
         $zoneId = $request->zone_id;
+        $user = Auth::user();
 
         if (!$zoneId) {
             return response()->json([]);
+        }
+
+        if ($this->shouldScopeByManagedZones($user) && !$user->getManagedZoneIds()->contains((int) $zoneId)) {
+            return response()->json([], 403);
         }
 
         $cells = Cell::whereHas('supervision', function ($q) use ($zoneId) {

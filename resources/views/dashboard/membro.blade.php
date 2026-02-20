@@ -283,7 +283,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             @if(isset($myCell) && $myCell)
-                <!-- Minha Célula -->
+                <!-- Minha Célula (Gestão Eclesiástica) -->
                 <div id="minha-celula"
                     class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-xl p-8 border border-gray-100 dark:border-gray-700 relative overflow-hidden flex flex-col justify-between group h-full">
                     <div
@@ -292,7 +292,7 @@
 
                     <div class="relative z-10">
                         <div class="flex items-center justify-between mb-8">
-                            <h3 class="text-2xl font-black tracking-tight text-gray-900 dark:text-white">Minha Célula</h3>
+                            <h3 class="text-2xl font-black tracking-tight text-gray-900 dark:text-white">Minha Célula (Gestão)</h3>
                             <div
                                 class="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 transform group-hover:rotate-12 transition-transform duration-500">
                                 <i class="bi bi-people-fill text-2xl"></i>
@@ -305,6 +305,10 @@
                             <p class="text-sm font-bold text-gray-400 dark:text-gray-500 flex items-center gap-2">
                                 <i class="bi bi-person-badge"></i> Líder: {{ $myCell->leader->name ?? 'N/A' }}
                             </p>
+                            <div class="mt-3 inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-blue-700">
+                                <span class="h-2 w-2 rounded-full bg-blue-500"></span>
+                                Gestão Eclesiástica Ativa
+                            </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-4 mb-8">
@@ -334,21 +338,42 @@
                                 Última presença: {{ \Carbon\Carbon::parse($attendanceStats['last_attendance'])->format('d/m/Y') }}
                             </div>
                         @endif
+
+                        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            @php
+                                $cellDetailsLink = ($authUser->isLider() || $authUser->isSupervisor() || $authUser->isPastorZona() || $authUser->isAdmin())
+                                    ? route('cells.show', $myCell)
+                                    : route('dashboard.membro') . '#minha-celula';
+                            @endphp
+                            <a href="{{ $cellDetailsLink }}"
+                                class="inline-flex items-center justify-center gap-2 px-4 py-3 bg-gray-900 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-800 transition-all">
+                                <i class="bi bi-diagram-3-fill"></i>
+                                Ver Detalhes da Célula
+                            </a>
+
+                            @if($authUser->isLider() || $authUser->isSupervisor() || $authUser->isPastorZona() || $authUser->isAdmin())
+                                <a href="{{ route('members.index', ['cell_id' => $myCell->id]) }}"
+                                    class="inline-flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all">
+                                    <i class="bi bi-person-lines-fill"></i>
+                                    Gerir Membros
+                                </a>
+                            @endif
+                        </div>
                     </div>
                 </div>
             @else
-                <!-- Card Informativo (Fallback se não tiver célula) -->
+                <!-- Sem célula vinculada -->
                 <div
                     class="bg-gray-900 rounded-[2.5rem] shadow-xl p-8 text-white relative overflow-hidden flex flex-col justify-center">
                     <div class="absolute top-0 right-0 w-64 h-64 bg-orange-600/20 rounded-full -mr-32 -mt-32 blur-3xl"></div>
                     <div class="relative z-10">
-                        <h3 class="text-2xl font-black tracking-tight mb-4">Comunidade Life Church</h3>
-                        <p class="text-gray-400 leading-relaxed mb-8">
-                            Ainda não participa de uma célula? Junte-se a nós e faça parte desta família!
+                        <h3 class="text-2xl font-black tracking-tight mb-4">Minha Célula (Gestão)</h3>
+                        <p class="text-gray-300 leading-relaxed mb-8">
+                            Você não pertence a nenhuma célula neste momento. Contacte o seu líder, supervisor ou administração para ser vinculado a uma célula.
                         </p>
-                        <a href="#"
+                        <a href="{{ route('members.index') }}"
                             class="inline-flex items-center px-6 py-3 bg-white text-gray-900 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-gray-100 transition-all">
-                            Encontrar uma Célula
+                            Ver Estrutura de Membros
                         </a>
                     </div>
                 </div>

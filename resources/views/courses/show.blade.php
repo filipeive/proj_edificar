@@ -6,7 +6,7 @@
 
 @section('header-actions')
     <div class="flex items-center gap-2 md:hidden">
-        @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
+        @if(auth()->user()->isAdmin() || in_array(auth()->user()->role, ['pastor', 'pastor_senior'], true))
             <a href="{{ route('courses.edit', $course) }}"
                 class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
                 title="Editar">
@@ -33,6 +33,11 @@
 
 @section('content')
     @php
+        $canManageCourse = auth()->user()->isAdmin() || in_array(auth()->user()->role, ['pastor', 'pastor_senior'], true);
+        $isSupervisorView = auth()->user()->isSupervisor();
+        $showCoupleSections = !$isSupervisorView;
+        $manageTotalCount = $courseEnrollments->count() + ($showCoupleSections ? $coupleEnrollments->count() : 0);
+
         $statusStyles = [
             'completed' => 'bg-green-100 text-green-700 border-green-200',
             'approved' => 'bg-green-100 text-green-700 border-green-200',
@@ -88,7 +93,7 @@
             </nav>
 
             <div class="flex items-center gap-3">
-                @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
+                @if($canManageCourse)
                     <a href="{{ route('courses.edit', $course) }}"
                         class="px-4 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-xl font-bold text-xs uppercase tracking-widest hover:border-orange-500 hover:text-orange-600 transition-all flex items-center gap-2 shadow-sm">
                         <i class="bi bi-pencil-square"></i> Editar Curso
@@ -163,6 +168,7 @@
                 </div>
             </div>
 
+            @if(!$isSupervisorView)
             <!-- Stats Card 1: Total Alunos -->
             <div class="bg-gradient-to-br from-blue-600 to-blue-800 rounded-[2.5rem] p-8 text-white shadow-xl shadow-blue-200 dark:shadow-none relative overflow-hidden group">
                 <i class="bi bi-person-video3 absolute -right-4 -bottom-4 text-8xl text-white/10 group-hover:scale-110 transition-transform duration-500"></i>
@@ -212,6 +218,7 @@
                     </div>
                 </div>
             </div>
+            @endif
         </div>
 
         <!-- Tabs Navigation -->
@@ -221,7 +228,7 @@
                 class="pb-4 border-b-2 font-black text-xs uppercase tracking-[0.2em] transition-all">
                 Turmas
             </button>
-            @if(isset($publicCoupleEnrollments) && $publicCoupleEnrollments->count() > 0)
+            @if($showCoupleSections && isset($publicCoupleEnrollments) && $publicCoupleEnrollments->count() > 0)
                 <button @click="activeTab = 'public'" 
                     :class="activeTab === 'public' ? 'text-purple-600 border-purple-600' : 'text-gray-400 border-transparent hover:text-gray-600 dark:hover:text-gray-200'"
                     class="pb-4 border-b-2 font-black text-xs uppercase tracking-[0.2em] transition-all flex items-center gap-2">
@@ -231,14 +238,16 @@
                     </span>
                 </button>
             @endif
-            <button @click="activeTab = 'manage'" 
-                :class="activeTab === 'manage' ? 'text-blue-600 border-blue-600' : 'text-gray-400 border-transparent hover:text-gray-600 dark:hover:text-gray-200'"
-                class="pb-4 border-b-2 font-black text-xs uppercase tracking-[0.2em] transition-all flex items-center gap-2">
-                Matrículas
-                <span class="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full text-[8px]">
-                    {{ $courseEnrollments->count() + $coupleEnrollments->count() }}
-                </span>
-            </button>
+            @if(!$isSupervisorView)
+                <button @click="activeTab = 'manage'" 
+                    :class="activeTab === 'manage' ? 'text-blue-600 border-blue-600' : 'text-gray-400 border-transparent hover:text-gray-600 dark:hover:text-gray-200'"
+                    class="pb-4 border-b-2 font-black text-xs uppercase tracking-[0.2em] transition-all flex items-center gap-2">
+                    Matrículas
+                    <span class="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full text-[8px]">
+                        {{ $manageTotalCount }}
+                    </span>
+                </button>
+            @endif
         </div>
 
         <div class="w-full">
@@ -248,7 +257,7 @@
                 
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-black text-gray-900 dark:text-white">Lista de Turmas</h3>
-                    @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
+                    @if($canManageCourse)
                         <a href="{{ route('course-classes.create', ['course_id' => $course->id]) }}" 
                            class="px-4 py-2 bg-zinc-900 dark:bg-zinc-700 text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-zinc-800 transition-all flex items-center gap-2">
                             <i class="bi bi-plus-lg"></i> Nova Turma
@@ -294,7 +303,7 @@
                                    class="flex-1 h-11 flex items-center justify-center bg-zinc-900 dark:bg-zinc-700 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all shadow-md">
                                     Detalhes
                                 </a>
-                                @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
+                                @if($canManageCourse)
                                     <div class="flex items-center gap-1 h-11">
                                         <button @click="showMoveModal = true; movingClass = {{ \Illuminate\Support\Js::from(['id' => $class->id, 'name' => $class->name]) }}"
                                                 class="w-10 h-11 flex items-center justify-center text-gray-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-xl transition-all"
@@ -319,16 +328,19 @@
                     @empty
                         <div class="col-span-full py-12 text-center bg-gray-50 dark:bg-gray-900/50 rounded-[2rem] border border-dashed border-gray-200 dark:border-gray-700">
                             <i class="bi bi-mortarboard text-4xl text-gray-200"></i>
-                            <p class="text-sm font-black text-gray-400 uppercase tracking-widest mt-4">Nenhuma turma cadastrada</p>
+                            <p class="text-sm font-black text-gray-400 uppercase tracking-widest mt-4">
+                                {{ $isSupervisorView ? 'Você ainda não foi alocado a uma turma neste curso' : 'Nenhuma turma cadastrada' }}
+                            </p>
                         </div>
                     @endforelse
                 </div>
             </div>
 
             <!-- TAB: PUBLIC INBOX -->
+            @if($showCoupleSections)
             <div x-show="activeTab === 'public'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
                 class="space-y-6">
-                @if(isset($publicCoupleEnrollments) && $publicCoupleEnrollments->count() > 0)
+                @if($showCoupleSections && isset($publicCoupleEnrollments) && $publicCoupleEnrollments->count() > 0)
                     <div class="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/10 dark:to-indigo-900/10 border border-purple-100/80 dark:border-purple-800/40 rounded-3xl p-6">
                         <div class="flex items-center justify-between gap-4">
                             <div class="flex items-center gap-3">
@@ -377,7 +389,7 @@
                                     </div>
 
                                     <div class="xl:w-[28rem] w-full space-y-4">
-                                        @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
+                                        @if($canManageCourse)
                                             <form action="{{ route('courses.assign-public-enrollment', $course) }}" method="POST" class="flex flex-col sm:flex-row items-stretch gap-3">
                                                 @csrf
                                                 <input type="hidden" name="couple_enrollment_id" value="{{ $enrollment->id }}">
@@ -403,20 +415,22 @@
                                                     title="Ver detalhes" aria-label="Ver detalhes">
                                                     <i class="bi bi-eye-fill"></i>
                                                 </a>
-                                                <a href="{{ route('couple-enrollments.edit', $enrollment) }}"
-                                                    class="w-11 h-11 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-300 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all flex items-center justify-center"
-                                                    title="Editar inscrição" aria-label="Editar inscrição">
-                                                    <i class="bi bi-pencil-square"></i>
-                                                </a>
-                                                <form action="{{ route('couple-enrollments.destroy', $enrollment) }}" method="POST" onsubmit="return confirm('Excluir esta inscrição?')" class="m-0">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit"
-                                                        class="w-11 h-11 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-300 hover:text-red-600 hover:border-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all flex items-center justify-center"
-                                                        title="Excluir inscrição" aria-label="Excluir inscrição">
-                                                        <i class="bi bi-trash3"></i>
-                                                    </button>
-                                                </form>
+                                                @if($canManageCourse)
+                                                    <a href="{{ route('couple-enrollments.edit', $enrollment) }}"
+                                                        class="w-11 h-11 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-300 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all flex items-center justify-center"
+                                                        title="Editar inscrição" aria-label="Editar inscrição">
+                                                        <i class="bi bi-pencil-square"></i>
+                                                    </a>
+                                                    <form action="{{ route('couple-enrollments.destroy', $enrollment) }}" method="POST" onsubmit="return confirm('Excluir esta inscrição?')" class="m-0">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit"
+                                                            class="w-11 h-11 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-300 hover:text-red-600 hover:border-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all flex items-center justify-center"
+                                                            title="Excluir inscrição" aria-label="Excluir inscrição">
+                                                            <i class="bi bi-trash3"></i>
+                                                        </button>
+                                                    </form>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
@@ -431,8 +445,10 @@
                     </div>
                 @endif
             </div>
+            @endif
 
             <!-- TAB: MANAGE ENROLLMENTS -->
+            @if(!$isSupervisorView)
             <div x-show="activeTab === 'manage'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
                 class="space-y-6">
                 
@@ -521,22 +537,25 @@
                                             </span>
                                         </td>
                                         <td class="px-8 py-6 text-right">
-                                            <div class="flex items-center justify-end gap-2">
-                                                <a href="{{ route('course-enrollments.edit', $enrollment) }}" class="p-2 text-gray-400 hover:text-blue-600 transition-colors" title="Editar Matrícula">
-                                                    <i class="bi bi-pencil-square"></i>
-                                                </a>
-                                                <form action="{{ route('course-enrollments.destroy', $enrollment) }}" method="POST" onsubmit="return confirm('Remover matrícula?')" class="m-0 flex">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="p-2 text-gray-400 hover:text-red-500 transition-colors" title="Remover">
-                                                        <i class="bi bi-trash3"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
+                                            @if($canManageCourse)
+                                                <div class="flex items-center justify-end gap-2">
+                                                    <a href="{{ route('course-enrollments.edit', $enrollment) }}" class="p-2 text-gray-400 hover:text-blue-600 transition-colors" title="Editar Matrícula">
+                                                        <i class="bi bi-pencil-square"></i>
+                                                    </a>
+                                                    <form action="{{ route('course-enrollments.destroy', $enrollment) }}" method="POST" onsubmit="return confirm('Remover matrícula?')" class="m-0 flex">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="p-2 text-gray-400 hover:text-red-500 transition-colors" title="Remover">
+                                                            <i class="bi bi-trash3"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
 
+                                @if($showCoupleSections)
                                 @foreach($coupleEnrollments as $enrollment)
                                     <tr x-show="(manageSearch === '' || '{{ strtolower($enrollment->husband_name . ' ' . $enrollment->wife_name) }}'.includes(manageSearch.toLowerCase())) && 
                                                (manageClassFilter === '' || '{{ $enrollment->courseClass->name ?? '' }}' === manageClassFilter) &&
@@ -564,26 +583,30 @@
                                             </span>
                                         </td>
                                         <td class="px-8 py-6 text-right">
-                                            <div class="flex items-center justify-end gap-2">
-                                                <a href="{{ route('couple-enrollments.edit', $enrollment) }}" class="p-2 text-gray-400 hover:text-blue-600 transition-colors" title="Editar Matrícula">
-                                                    <i class="bi bi-pencil-square"></i>
-                                                </a>
-                                                <form action="{{ route('couple-enrollments.destroy', $enrollment) }}" method="POST" onsubmit="return confirm('Remover matrícula?')" class="m-0 flex">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="p-2 text-gray-400 hover:text-red-500 transition-colors" title="Remover">
-                                                        <i class="bi bi-trash3"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
+                                            @if($canManageCourse)
+                                                <div class="flex items-center justify-end gap-2">
+                                                    <a href="{{ route('couple-enrollments.edit', $enrollment) }}" class="p-2 text-gray-400 hover:text-blue-600 transition-colors" title="Editar Matrícula">
+                                                        <i class="bi bi-pencil-square"></i>
+                                                    </a>
+                                                    <form action="{{ route('couple-enrollments.destroy', $enrollment) }}" method="POST" onsubmit="return confirm('Remover matrícula?')" class="m-0 flex">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="p-2 text-gray-400 hover:text-red-500 transition-colors" title="Remover">
+                                                            <i class="bi bi-trash3"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
+                                @endif
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
+            @endif
         </div>
 
 
@@ -660,7 +683,7 @@
 </div>
 @endsection
 
-@if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
+@if(auth()->user()->isAdmin() || in_array(auth()->user()->role, ['pastor', 'pastor_senior'], true))
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const selectAll = document.getElementById('selectAllCheckbox');

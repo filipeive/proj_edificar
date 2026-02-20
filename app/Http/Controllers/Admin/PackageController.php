@@ -33,7 +33,7 @@ class PackageController
 
     public function create(): View
     {
-        $users = \App\Models\User::whereIn('role', ['admin', 'comissao_obra', 'responsavel_pacote', 'secretaria', 'tesouraria', 'pastor_senior'])
+        $users = \App\Models\User::whereIn('role', ['super_admin', 'admin', 'comissao_obra', 'responsavel_pacote', 'secretaria', 'tesouraria', 'pastor_senior'])
             ->orderBy('name')
             ->get();
         return view('admin.packages.create', compact('users'));
@@ -111,7 +111,7 @@ class PackageController
             abort(403, 'Acesso negado a este pacote.');
         }
 
-        $users = \App\Models\User::whereIn('role', ['admin', 'comissao_obra', 'responsavel_pacote', 'secretaria', 'tesouraria', 'pastor_senior'])
+        $users = \App\Models\User::whereIn('role', ['super_admin', 'admin', 'comissao_obra', 'responsavel_pacote', 'secretaria', 'tesouraria', 'pastor_senior'])
             ->orderBy('name')
             ->get();
         return view('admin.packages.edit', ['package' => $package, 'users' => $users]);

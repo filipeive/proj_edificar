@@ -9,7 +9,7 @@ class ZonePolicy
 {
     public function viewAny(User $user): bool
     {
-        return in_array($user->role, ['admin', 'pastor_senior', 'pastor', 'pastor_zona', 'secretaria', 'tesouraria']);
+        return $user->isAdmin() || in_array($user->role, ['pastor_senior', 'pastor', 'pastor_zona', 'secretaria', 'tesouraria'], true);
     }
 
     public function view(User $user, Zone $zone): bool

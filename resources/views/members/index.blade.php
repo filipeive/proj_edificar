@@ -18,9 +18,9 @@
 @section('header-actions')
     @if($userRole !== 'secretaria')
         <a href="{{ route('members.create') }}"
-            class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white transition hover:bg-blue-700">
+            class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-3 py-2 text-xs font-black uppercase tracking-wider text-white transition hover:bg-blue-700 md:hidden">
             <i class="bi bi-person-plus-fill"></i>
-            <span>Novo Membro</span>
+            <span>Novo</span>
         </a>
     @endif
 @endsection
@@ -36,6 +36,16 @@
             }
         }"
         x-init="$watch('view', value => localStorage.setItem('members_view', value))">
+
+        @if($userRole !== 'secretaria')
+            <div class="hidden md:flex justify-end">
+                <a href="{{ route('members.create') }}"
+                    class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white transition hover:bg-blue-700">
+                    <i class="bi bi-person-plus-fill"></i>
+                    <span>Novo Membro</span>
+                </a>
+            </div>
+        @endif
 
         <div x-show="selected.length > 0" x-transition class="sticky top-20 z-20">
             <div class="rounded-2xl border border-gray-200 bg-white p-4 shadow-lg">
@@ -278,5 +288,6 @@
                 {{ $members->appends(request()->query())->links() }}
             </div>
         @endif
+
     </div>
 @endsection

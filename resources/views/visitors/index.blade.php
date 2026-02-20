@@ -30,7 +30,7 @@
                         }
                     }"
         x-init="$watch('view', value => localStorage.setItem('visitors_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('visitors_view') || 'list')"
-        @resize.window.debounce.500ms="updateView()" x-cloak class="space-y-8">
+        @resize.window.debounce.500ms="updateView()" x-cloak class="space-y-6">
 
         <!-- Bulk Action Bar -->
         <div x-show="selected.length > 0" x-transition:enter="transition ease-out duration-300"
@@ -39,7 +39,7 @@
             x-transition:leave-end="opacity-0 -translate-y-4"
             class="fixed top-24 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
             <div
-                class="bg-gray-900 text-white rounded-2xl shadow-2xl p-4 flex items-center gap-6 pointer-events-auto border border-gray-700/50 backdrop-blur-md bg-opacity-90">
+                class="bg-gray-900 text-white rounded-xl shadow-xl p-3.5 flex items-center gap-4 pointer-events-auto border border-gray-700/50 backdrop-blur-md bg-opacity-90">
                 <div class="flex items-center gap-3 pl-2">
                     <span class="bg-blue-600 text-xs font-black px-2.5 py-1 rounded-lg" x-text="selected.length"></span>
                     <span class="text-sm font-medium">selecionados</span>
@@ -74,7 +74,7 @@
                                 <input type="hidden" name="visitor_ids[]" :value="id">
                             </template>
                             <button type="submit"
-                                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-red-600/20 flex items-center gap-2">
+                                class="bg-red-600 hover:bg-red-700 text-white px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-red-600/20 flex items-center gap-2">
                                 <i class="bi bi-trash-fill"></i> Excluir
                             </button>
                         </form>
@@ -93,9 +93,9 @@
         @endsection
 
         <!-- Estatísticas -->
-        <div class="hidden md:grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="hidden md:grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
             <div
-                class="bg-white dark:bg-gray-800 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 p-6 transition-colors">
+                class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 transition-colors">
                 <div class="flex items-center justify-between mb-4">
                     <div class="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-xl">
                         <i class="bi bi-people-fill text-blue-600 dark:text-blue-400 text-2xl"></i>
@@ -103,12 +103,12 @@
                     <span
                         class="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Total</span>
                 </div>
-                <p class="text-3xl font-black text-gray-900 dark:text-white">{{ $stats['total'] }}</p>
+                <p class="text-2xl font-black text-gray-900 dark:text-white">{{ $stats['total'] }}</p>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Visitantes cadastrados</p>
             </div>
 
             <div
-                class="bg-white dark:bg-gray-800 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 p-6 transition-colors">
+                class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 transition-colors">
                 <div class="flex items-center justify-between mb-4">
                     <div class="bg-yellow-50 dark:bg-yellow-900/30 p-3 rounded-xl">
                         <i class="bi bi-clock-history text-yellow-600 dark:text-yellow-400 text-2xl"></i>
@@ -116,12 +116,12 @@
                     <span
                         class="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Pendentes</span>
                 </div>
-                <p class="text-3xl font-black text-yellow-600 dark:text-yellow-400">{{ $stats['pending'] }}</p>
+                <p class="text-2xl font-black text-yellow-600 dark:text-yellow-400">{{ $stats['pending'] }}</p>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Aguardando contato</p>
             </div>
 
             <div
-                class="bg-white dark:bg-gray-800 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 p-6 transition-colors">
+                class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 transition-colors">
                 <div class="flex items-center justify-between mb-4">
                     <div class="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-xl">
                         <i class="bi bi-telephone-fill text-blue-600 dark:text-blue-400 text-2xl"></i>
@@ -129,12 +129,12 @@
                     <span
                         class="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Contatados</span>
                 </div>
-                <p class="text-3xl font-black text-blue-600 dark:text-blue-400">{{ $stats['contacted'] }}</p>
+                <p class="text-2xl font-black text-blue-600 dark:text-blue-400">{{ $stats['contacted'] }}</p>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Já foram contatados</p>
             </div>
 
             <div
-                class="bg-white dark:bg-gray-800 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 p-6 transition-colors">
+                class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 transition-colors">
                 <div class="flex items-center justify-between mb-4">
                     <div class="bg-green-50 dark:bg-green-900/30 p-3 rounded-xl">
                         <i class="bi bi-check-circle-fill text-green-600 dark:text-green-400 text-2xl"></i>
@@ -142,61 +142,61 @@
                     <span
                         class="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Integrados</span>
                 </div>
-                <p class="text-3xl font-black text-green-600 dark:text-green-400">{{ $stats['integrated'] }}</p>
+                <p class="text-2xl font-black text-green-600 dark:text-green-400">{{ $stats['integrated'] }}</p>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Integrados em células</p>
             </div>
         </div>
 
         <!-- Filtros e Ações -->
         <div
-            class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 p-8 mb-8 transition-colors">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-                <h3 class="text-xl font-black text-gray-900 dark:text-white">Filtros</h3>
+            class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 mb-6 transition-colors">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-4">
+                <h3 class="text-lg font-black text-gray-900 dark:text-white">Filtros</h3>
                 <div class="flex gap-3">
                     <div
                         class="hidden md:flex bg-gray-50 dark:bg-gray-700 p-1 rounded-2xl border border-gray-100 dark:border-gray-600 mr-2">
                         <button @click="view = 'list'"
                             :class="view === 'list' ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-400 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'"
-                            class="px-4 py-2 rounded-xl transition-all duration-300 flex items-center gap-2 text-xs font-black uppercase tracking-widest">
+                            class="px-3.5 py-2 rounded-xl transition-all duration-300 flex items-center gap-2 text-xs font-black uppercase tracking-widest">
                             <i class="bi bi-list-ul text-sm"></i>
                             <span>Lista</span>
                         </button>
                         <button @click="view = 'grid'"
                             :class="view === 'grid' ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-400 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'"
-                            class="px-4 py-2 rounded-xl transition-all duration-300 flex items-center gap-2 text-xs font-black uppercase tracking-widest">
+                            class="px-3.5 py-2 rounded-xl transition-all duration-300 flex items-center gap-2 text-xs font-black uppercase tracking-widest">
                             <i class="bi bi-grid-fill text-sm"></i>
                             <span>Grelha</span>
                         </button>
                     </div>
                     <div class="flex gap-1 btn-group">
                         <a href="https://chat.whatsapp.com/DxAf8sMvMDYDDhrIV1wRxC" target="_blank"
-                            class="bg-[#25D366] text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#128C7E] transition-all flex items-center">
+                            class="bg-[#25D366] text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#128C7E] transition-all flex items-center">
                             <i class="bi bi-whatsapp mr-2"></i>Grupo Supervisores
                         </a>
                         <a href="{{ route('visitors.export', request()->all()) }}"
-                            class="bg-green-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-green-700 transition-all">
+                            class="bg-green-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-green-700 transition-all">
                             <i class="bi bi-file-earmark-excel mr-2"></i>Exportar Excel
                         </a>
                         <a href="{{ route('visitors.create') }}"
-                            class="hidden md:flex bg-blue-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-all items-center">
+                            class="hidden md:flex bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all items-center">
                             <i class="bi bi-plus-lg mr-2"></i>Novo
                         </a>
                     </div>
                 </div>
             </div>
 
-            <form method="GET" action="{{ route('visitors.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <form method="GET" action="{{ route('visitors.index') }}" class="grid grid-cols-1 md:grid-cols-5 gap-3">
                 <div>
                     <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Buscar</label>
                     <input type="text" name="search" data-live-search="ajax" value="{{ request('search') }}"
-                        class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                        class="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                         placeholder="Nome, telefone, bairro...">
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Status</label>
                     <select name="status"
-                        class="searchable-select w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white custom-select" data-label="Status">
+                        class="searchable-select w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white custom-select" data-label="Status">
                         <option value="">Todos</option>
                         <option value="pendente" {{ request('status') == 'pendente' ? 'selected' : '' }}>Pendente</option>
                         <option value="contatado" {{ request('status') == 'contatado' ? 'selected' : '' }}>Contatado</option>
@@ -208,7 +208,7 @@
                 <div>
                     <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Zona</label>
                     <select name="zone_id"
-                        class="searchable-select w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white custom-select" data-label="Zona">
+                        class="searchable-select w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white custom-select" data-label="Zona">
                         <option value="">Todas</option>
                         @foreach($zones as $zone)
                             <option value="{{ $zone->id }}" {{ request('zone_id') == $zone->id ? 'selected' : '' }}>
@@ -221,16 +221,16 @@
                 <div>
                     <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Data Início</label>
                     <input type="date" name="date_from" value="{{ request('date_from') }}"
-                        class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        class="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                 </div>
 
                 <div class="flex items-end gap-2">
                     <button type="submit"
-                        class="flex-1 bg-orange-600 text-white px-6 py-2 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-orange-700 transition-all">
+                        class="flex-1 bg-orange-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-orange-700 transition-all">
                         <i class="bi bi-search mr-2"></i>Filtrar
                     </button>
                     <a href="{{ route('visitors.index') }}"
-                        class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-4 py-2 rounded-xl font-bold text-xs hover:bg-gray-200 dark:hover:bg-gray-600 transition-all">
+                        class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-3.5 py-2 rounded-xl font-bold text-xs hover:bg-gray-200 dark:hover:bg-gray-600 transition-all">
                         <i class="bi bi-x-lg"></i>
                     </a>
                 </div>
@@ -244,7 +244,7 @@
                 x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
                 class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 @forelse($visitors as $visitor)
-                    <div class="bg-white dark:bg-gray-800 p-4 md:p-8 rounded-2xl md:rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col group hover:shadow-xl transition-all duration-300 relative compact-card"
+                    <div class="bg-white dark:bg-gray-800 p-4 md:p-5 rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col group hover:shadow-lg transition-all duration-300 relative compact-card"
                         :class="{'ring-2 ring-blue-500 bg-blue-50/10 dark:bg-blue-900/10': selected.includes({{ $visitor->id }})}">
 
                         <div class="absolute top-4 left-4 z-10">
@@ -259,7 +259,7 @@
                         </div>
 
                         <div
-                            class="w-10 h-10 md:w-14 md:h-14 rounded-2xl bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center font-black text-lg md:text-2xl group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 mb-4 md:mb-6 mt-2 ml-4">
+                            class="w-10 h-10 md:w-14 md:h-14 rounded-2xl bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center font-black text-lg md:text-2xl group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 mb-3 md:mb-4 mt-2 ml-4">
                             {{ strtoupper(substr($visitor->name, 0, 1)) }}
                         </div>
 
@@ -274,7 +274,7 @@
                             </p>
                         </div>
 
-                        <div class="space-y-4 mb-8 flex-1">
+                        <div class="space-y-3 mb-5 flex-1">
                             @if($visitor->phone)
                                 <div class="flex items-center gap-3 text-gray-500 dark:text-gray-400">
                                     <div
@@ -320,19 +320,21 @@
 
                         <div class="flex gap-2">
                             <a href="{{ route('visitors.show', $visitor) }}"
-                                class="flex-1 bg-gray-900 dark:bg-black text-white text-center py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition-all shadow-lg hover:shadow-blue-200 active:scale-95 flex items-center justify-center gap-2">
+                                class="flex-1 bg-gray-900 dark:bg-black text-white text-center py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition-all shadow-lg hover:shadow-blue-200 active:scale-95 flex items-center justify-center gap-2">
                                 <i class="bi bi-eye"></i> Ver
                             </a>
-                            <a href="{{ route('visitors.edit', $visitor) }}"
-                                class="flex-1 bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-300 text-center py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2">
-                                <i class="bi bi-pencil"></i> Editar
-                            </a>
+                            @if(!auth()->user()->isSupervisor())
+                                <a href="{{ route('visitors.edit', $visitor) }}"
+                                    class="flex-1 bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-300 text-center py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </a>
+                            @endif
                         </div>
                     </div>
                 @empty
                     <div
-                        class="col-span-full py-20 bg-white dark:bg-gray-800 rounded-[2.5rem] border border-dashed border-gray-200 dark:border-gray-700 flex flex-col items-center gap-4 text-gray-300 dark:text-gray-600">
-                        <i class="bi bi-inbox text-7xl"></i>
+                        class="col-span-full py-14 bg-white dark:bg-gray-800 rounded-3xl border border-dashed border-gray-200 dark:border-gray-700 flex flex-col items-center gap-4 text-gray-300 dark:text-gray-600">
+                        <i class="bi bi-inbox text-6xl"></i>
                         <p class="font-bold text-lg">Nenhum visitante encontrado</p>
                     </div>
                 @endforelse
@@ -341,7 +343,7 @@
             <!-- List View -->
             <div x-show="view === 'list'" x-transition:enter="transition ease-out duration-300"
                 x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-                class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+                class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full table-compact">
                         <thead>
@@ -432,11 +434,13 @@
                                                 title="Ver detalhes">
                                                 <i class="bi bi-eye-fill"></i>
                                             </a>
-                                            <a href="{{ route('visitors.edit', $visitor) }}"
-                                                class="action-icon text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 hover:bg-orange-50 dark:hover:bg-gray-700"
-                                                title="Editar">
-                                                <i class="bi bi-pencil-fill"></i>
-                                            </a>
+                                            @if(!auth()->user()->isSupervisor())
+                                                <a href="{{ route('visitors.edit', $visitor) }}"
+                                                    class="action-icon text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 hover:bg-orange-50 dark:hover:bg-gray-700"
+                                                    title="Editar">
+                                                    <i class="bi bi-pencil-fill"></i>
+                                                </a>
+                                            @endif
                                             @if(auth()->user()->role === 'admin')
                                                 <form id="list-delete-visitor-{{ $visitor->id }}"
                                                     action="{{ route('visitors.destroy', $visitor) }}" method="POST" class="inline">
@@ -470,7 +474,7 @@
         </div>
 
         @if($visitors->hasPages())
-            <div class="mt-6">
+            <div class="mt-4">
                 {{ $visitors->links() }}
             </div>
         @endif

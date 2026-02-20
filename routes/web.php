@@ -105,7 +105,7 @@ Route::middleware('auth')->group(function () {
 
     // Dashboard Admin
     Route::get('/admin/dashboard', AdminDashboardController::class)
-        ->middleware('role:admin,pastor_senior')
+        ->middleware('role:super_admin,admin,pastor_senior')
         ->name('dashboard.admin');
 
     // Dashboard Pastor de Zona
@@ -141,10 +141,10 @@ Route::middleware('auth')->group(function () {
     // Criar Membros contexto das rotas abaixo
     // Criar Membros contexto das rotas abaixo
     Route::match(['get', 'post'], '/admin/visitors/batch-destroy', [\App\Http\Controllers\VisitorController::class, 'bulkDestroy'])
-        ->middleware('role:admin,secretaria,pastor_zona')
+        ->middleware('role:super_admin,admin,secretaria,pastor_zona')
         ->name('visitors.bulk-delete');
 
-    Route::prefix('members')->middleware('role:lider_celula,supervisor,pastor_zona,admin,secretaria')->group(function () {
+    Route::prefix('members')->middleware('role:lider_celula,supervisor,pastor_zona,super_admin,admin,secretaria')->group(function () {
         Route::get('/', [UserController::class, 'members'])->name('members.index');
         Route::get('/create', [UserController::class, 'createFromContext'])->name('members.create');
         Route::post('/', [UserController::class, 'storeFromContext'])->name('members.store');
@@ -157,8 +157,8 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{member}', [UserController::class, 'destroyFromContext'])->name('members.destroy');
     });
 
-    // Visitantes (Admin, Secretaria, Pastor de Zona)
-    Route::middleware('role:admin,secretaria,pastor_zona,administracao')->prefix('visitors')->name('visitors.')->group(function () {
+    // Visitantes (Admin, Secretaria, Pastor de Zona, Supervisor)
+    Route::middleware('role:super_admin,admin,secretaria,pastor_zona,supervisor,administracao')->prefix('visitors')->name('visitors.')->group(function () {
         Route::get('/', [\App\Http\Controllers\VisitorController::class, 'index'])->name('index');
 
         Route::get('/export', [\App\Http\Controllers\VisitorController::class, 'export'])->name('export');
@@ -180,7 +180,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('admin')->group(function () {
 
         // Settings Routes (Admin only)
-        Route::middleware('role:admin')->prefix('settings')->name('settings.')->group(function () {
+        Route::middleware('role:super_admin,admin')->prefix('settings')->name('settings.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('index');
             Route::post('/update', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('update');
             Route::post('/upload-logo', [\App\Http\Controllers\Admin\SettingController::class, 'uploadLogo'])->name('upload-logo');
@@ -194,7 +194,7 @@ Route::middleware('auth')->group(function () {
         });
 
         // Intermediate Restricted (Admin, Pastor Zona, Supervisor, Secretaria, Lider Celula)
-        Route::middleware('role:admin,pastor_zona,supervisor,secretaria,pastor,lider_celula,administracao')->group(function () {
+        Route::middleware('role:super_admin,admin,pastor_zona,supervisor,secretaria,pastor,lider_celula,administracao')->group(function () {
             // Centralized Zones Management
             Route::prefix('zones')->name('zones.')->group(function () {
                 // Read Access (Pastors, Admins, etc.)
@@ -202,7 +202,7 @@ Route::middleware('auth')->group(function () {
                 Route::get('{zone}', [ZoneController::class, 'show'])->name('show')->where('zone', '[0-9]+');
 
                 // Management Access (Admin/Secretaria only)
-                Route::middleware('role:admin,secretaria')->group(function () {
+                Route::middleware('role:super_admin,admin,secretaria')->group(function () {
                     Route::get('create', [ZoneController::class, 'create'])->name('create');
                     Route::post('/', [ZoneController::class, 'store'])->name('store');
                     Route::get('{zone}/edit', [ZoneController::class, 'edit'])->name('edit')->where('zone', '[0-9]+');
@@ -254,7 +254,7 @@ Route::middleware('auth')->group(function () {
         });
 
         // Highly Restricted (Admin & Secretaria Only)
-        Route::middleware('role:admin,secretaria,pastor_senior')->group(function () {
+        Route::middleware('role:super_admin,admin,secretaria,pastor_senior')->group(function () {
             // Gestão de Utilizadores
             Route::delete('/users/bulk-destroy', [UserController::class, 'bulkDestroy'])->name('users.bulk-destroy');
             Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
@@ -271,7 +271,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // Gestão de Pacotes (Acesso Expandido)
-    Route::prefix('admin')->middleware('role:admin,secretaria,comissao_obra,responsavel_pacote,pastor_senior')->group(function () {
+    Route::prefix('admin')->middleware('role:super_admin,admin,secretaria,comissao_obra,responsavel_pacote,pastor_senior')->group(function () {
         Route::post('packages/{package}/assign', [PackageController::class, 'assignMember'])->name('packages.assign');
         Route::post('packages/{package}/update-member', [PackageController::class, 'updateMember'])->name('packages.update-member');
         Route::post('packages/{package}/bulk-sms', [PackageController::class, 'sendBulkSms'])->name('packages.send-bulk-sms');
@@ -293,15 +293,15 @@ Route::middleware('auth')->group(function () {
 
     // Rota de FORMULÁRIO GET para atribuir/modificar o compromisso de OUTRO usuário
     Route::get('users/{user}/commitment/set', [\App\Http\Controllers\CommitmentController::class, 'showSetCommitmentForm'])
-        ->middleware('role:admin,pastor_zona,supervisor') // Apenas quem pode gerir
+        ->middleware('role:super_admin,admin,pastor_zona,supervisor') // Apenas quem pode gerir
         ->name('users.commitment.set');
 
     // Rota de PROCESSAMENTO POST para salvar a atribuição de compromisso
     Route::post('users/{user}/commitment/assign', [\App\Http\Controllers\CommitmentController::class, 'assignCommitment'])
-        ->middleware('role:admin,pastor_zona,supervisor')
+        ->middleware('role:super_admin,admin,pastor_zona,supervisor')
         ->name('users.commitment.assign');
     // Validar contribuições
-    Route::prefix('contributions')->middleware('role:admin,pastor_zona,comissao_obra')->group(function () {
+    Route::prefix('contributions')->middleware('role:super_admin,admin,pastor_zona,comissao_obra')->group(function () {
         Route::get('/pending', [ContributionController::class, 'pendingAdmin'])
             ->name('contributions.pending');
         Route::post('/{contribution}/verify', [ContributionController::class, 'verify'])
@@ -326,11 +326,11 @@ Route::middleware('auth')->group(function () {
 
         // Criar contribuição (membro, líder, supervisor, pastor, admin)
         Route::get('/create', [ContributionController::class, 'create'])
-            ->middleware('role:membro,lider_celula,supervisor,pastor_zona,admin,responsavel_pacote,comissao_obra')
+            ->middleware('role:membro,lider_celula,supervisor,pastor_zona,super_admin,admin,responsavel_pacote,comissao_obra')
             ->name('contributions.create');
 
         Route::post('/', [ContributionController::class, 'store'])
-            ->middleware('role:membro,lider_celula,supervisor,pastor_zona,admin,responsavel_pacote,comissao_obra')
+            ->middleware('role:membro,lider_celula,supervisor,pastor_zona,super_admin,admin,responsavel_pacote,comissao_obra')
             ->name('contributions.store');
         // Editar contribuição pendente
         Route::get('/{contribution}/edit', [ContributionController::class, 'edit'])
@@ -366,26 +366,26 @@ Route::middleware('auth')->group(function () {
     });
 
     // ===== RELATÓRIOS ROUTES =====
-    Route::prefix('reports')->middleware('role:lider_celula,supervisor,pastor_zona,admin,comissao_obra')->group(function () {
+    Route::prefix('reports')->middleware('role:lider_celula,supervisor,pastor_zona,super_admin,admin,comissao_obra')->group(function () {
 
         // Relatório da célula (líder)
         Route::get('/cell', [ReportController::class, 'cellReport'])
-            ->middleware('role:lider_celula,supervisor,pastor_zona,admin')
+            ->middleware('role:lider_celula,supervisor,pastor_zona,super_admin,admin')
             ->name('reports.cell');
 
         // Relatório da supervisão
         Route::get('/supervision', [ReportController::class, 'supervisionReport'])
-            ->middleware('role:supervisor,pastor_zona,admin')
+            ->middleware('role:supervisor,pastor_zona,super_admin,admin')
             ->name('reports.supervision');
 
         // Relatório da zona
         Route::get('/zone', [ReportController::class, 'zoneReport'])
-            ->middleware('role:pastor_zona,admin')
+            ->middleware('role:pastor_zona,super_admin,admin')
             ->name('reports.zone');
 
         // Relatório global (admin e comissao_obra)
         Route::get('/global', [ReportController::class, 'globalReport'])
-            ->middleware('role:admin,comissao_obra')
+            ->middleware('role:super_admin,admin,comissao_obra')
             ->name('reports.global');
 
         // Exportar PDF
@@ -413,7 +413,7 @@ Route::middleware('auth')->group(function () {
     // Quarterly Reports management handled by resource route at 392
     // Edificar Dashboard
     Route::get('project-edificar/dashboard', [\App\Http\Controllers\Admin\EdificarDashboardController::class, 'index'])
-        ->middleware('role:admin,comissao_obra,pastor_senior,administracao')
+        ->middleware('role:super_admin,admin,comissao_obra,pastor_senior,administracao')
         ->name('edificar.dashboard');
 
     // ===== EVENTOS E CERIMÓNIAS (EVENTS) ROUTES =====
@@ -425,7 +425,7 @@ Route::middleware('auth')->group(function () {
 
     // Manage Event Types
     Route::resource('event-types', \App\Http\Controllers\Admin\EventTypeController::class)
-        ->middleware('role:admin,secretaria,pastor_zona');
+        ->middleware('role:super_admin,admin,secretaria,pastor_zona');
 
     // ===== PAINEL FINANCEIRO (FINANCIAL DASHBOARD) ROUTES =====
     // ===== PAINEL FINANCEIRO (FINANCIAL DASHBOARD) ROUTES =====
@@ -469,7 +469,7 @@ Route::middleware('auth')->group(function () {
     Route::post('enrollments/{course_enrollment}/status', [\App\Http\Controllers\CourseEnrollmentController::class, 'updateStatus'])->name('enrollments.status');
     Route::post('couple-enrollments/{couple_enrollment}/status', [\App\Http\Controllers\CoupleEnrollmentController::class, 'updateStatus'])->name('couple-enrollments.status');
 
-    Route::middleware('role:admin,pastor,secretaria,pastor_senior')->group(function () {
+    Route::middleware('role:super_admin,admin,pastor,secretaria,pastor_senior')->group(function () {
         // Couple Enrollments
         Route::get('couple-enrollments', [\App\Http\Controllers\CoupleEnrollmentController::class, 'index'])->name('couple-enrollments.index');
         Route::get('couple-enrollments/{couple_enrollment}', [\App\Http\Controllers\CoupleEnrollmentController::class, 'show'])->name('couple-enrollments.show');

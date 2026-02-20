@@ -16,7 +16,7 @@ class SettingController extends Controller
      */
     public function index(Request $request)
     {
-        $group = $request->get('group', 'general');
+        $group = (string) $request->get('group', 'general');
 
         $settings = Setting::all()->mapWithKeys(function ($setting) {
             return [
@@ -27,9 +27,12 @@ class SettingController extends Controller
             ];
         });
 
-        $groups = Setting::select('group')->distinct()->pluck('group');
-        if ($groups->isEmpty()) {
-            $groups = collect(['general', 'branding', 'regional', 'email', 'system']);
+        $defaultGroups = collect(['general', 'branding', 'regional', 'email', 'system', 'permissions']);
+        $dbGroups = Setting::select('group')->distinct()->pluck('group')->filter()->values();
+        $groups = $defaultGroups->merge($dbGroups)->unique()->values();
+
+        if (!$groups->contains($group)) {
+            $group = 'general';
         }
 
         $backups = [];

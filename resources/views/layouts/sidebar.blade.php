@@ -164,7 +164,9 @@
                                 <div class="ml-12 mt-2 space-y-1 border-l border-white/10 pl-4">
                                     <a href="{{ route('courses.index') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('courses.index') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Cursos</a>
                                     @if ($authUser && $authUser->hasPermission('menu_public_enrollments'))
-                                        <a href="{{ route('couple-enrollments.index') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('couple-enrollments.*') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Inscrições de Casais</a>
+                                        @if(!$authUser->isSupervisor())
+                                            <a href="{{ route('couple-enrollments.index') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('couple-enrollments.*') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Inscrições de Casais</a>
+                                        @endif
                                         <a href="{{ route('ministerial-enrollments.index') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('ministerial-enrollments.*') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Inscrições Individuais</a>
                                     @endif
                                     @if ($authUser && ((!$authUser->isSupervisor() && !$authUser->isSecretaria() && !$authUser->isPastorZona()) || (($authUser->isSupervisor() || $authUser->isSecretaria() || $authUser->isPastorZona()) && $authUser->hasAnyCourseEnrollment())))
@@ -197,10 +199,16 @@
                     <!-- CÉLULAS & DISCIPULADO -->
                     <div class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-4">Células & Discipulado</div>
 
-                    @if ($authUser->hasRole('membro') || ($authUser->isSupervisor() && $authUser->cell_id))
-                        <a href="{{ route('dashboard.membro') }}#minha-celula" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('dashboard.membro') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                    @if ($authUser && ($authUser->hasRole('membro') || $authUser->isLider() || $authUser->isTimoteo()))
+                        @php
+                            $myCellLink = route('dashboard.membro') . '#minha-celula';
+                            if ($authUser->isLider() && $authUser->ledCells()->exists()) {
+                                $myCellLink = route('cells.show', $authUser->ledCells()->first());
+                            }
+                        @endphp
+                        <a href="{{ $myCellLink }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('dashboard.membro') || request()->routeIs('cells.show') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                             <i class="bi bi-people-fill text-xl flex-shrink-0"></i>
-                            <span class="sidebar-text ml-4 font-bold tracking-tight">Minha Célula</span>
+                            <span class="sidebar-text ml-4 font-bold tracking-tight">Minha Célula (Gestão)</span>
                         </a>
                     @endif
 
@@ -268,6 +276,11 @@
                             <a href="{{ route('commitments.index') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('commitments.*') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Meu Compromisso</a>
                             @if ($authUser && !$authUser->isAdmin())
                                 <a href="{{ route('contributions.index', ['mine' => 1]) }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('contributions.index') && request()->query('mine') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Minhas Contribuições</a>
+                            @endif
+                            @if ($authUser && ($authUser->hasRole('membro') || $authUser->isLider() || $authUser->isSupervisor() || $authUser->isTimoteo()))
+                                <a href="{{ route('contributions.index', ['scope' => 'my_cell']) }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('contributions.index') && request()->query('scope') === 'my_cell' ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">
+                                    Minha Célula (Financeiro)
+                                </a>
                             @endif
                             @if ($authUser && $authUser->hasPermission('menu_contributions_all'))
                                 <a href="{{ route('contributions.index') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('contributions.index') && !request()->query('mine') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">
@@ -374,7 +387,7 @@
         </a>
 
         <!-- FORMULÁRIOS PÚBLICOS -->
-        @if($authUser && !$authUser->isAdministracao())
+        @if($authUser && !$authUser->isAdministracao() && !$authUser->isSupervisor())
         <div class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-2 mt-4">Formulários Públicos</div>
         <div class="space-y-1">
             <a href="{{ route('public.forms.pre-marital') }}"

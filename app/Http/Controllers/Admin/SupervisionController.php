@@ -110,7 +110,7 @@ class SupervisionController
         $zones = $zonesQuery->orderBy('name')->get();
         $supervisors = \App\Models\User::where('role', 'supervisor')
             ->orWhere(function ($query) {
-                $query->where('role', 'admin') // Allow admins for testing/fallback
+                $query->whereIn('role', ['super_admin', 'admin']) // Allow admins for testing/fallback
                     ->orWhere('role', 'pastor_zona');
             })->orderBy('name')->get();
 
@@ -183,7 +183,7 @@ class SupervisionController
         $zones = $zonesQuery->orderBy('name')->get();
         $supervisors = \App\Models\User::where('role', 'supervisor')
             ->orWhere(function ($query) {
-                $query->where('role', 'admin')
+                $query->whereIn('role', ['super_admin', 'admin'])
                     ->orWhere('role', 'pastor_zona');
             })->orderBy('name')->get();
 

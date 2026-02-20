@@ -29,7 +29,7 @@ class ReportController
         $selectedCell = null;
 
         // Se for admin, pode ver todas as células. Se não, só a sua.
-        if ($user->role === 'admin') {
+        if ($user->isAdmin()) {
             $cells = Cell::orderBy('name')->get();
             if ($request->filled('cell_id')) {
                 $selectedCell = Cell::findOrFail($request->cell_id);
@@ -75,7 +75,7 @@ class ReportController
         //$this->authorize('viewSupervisionReport', Contribution::class);
 
         // 2. Obter o escopo disponível
-        if ($user->role === 'admin') {
+        if ($user->isAdmin()) {
             $allSupervisions = Supervision::with('zone')->orderBy('name')->get();
             if ($request->filled('supervision_id')) {
                 $selectedSupervision = Supervision::findOrFail($request->supervision_id);
@@ -184,7 +184,7 @@ class ReportController
         //$this->authorize('viewZoneReport', Contribution::class);
 
         // 2. Obter a zona selecionada com base no perfil e no request
-        if ($user->role === 'admin') {
+        if ($user->isAdmin()) {
             $zones = Zone::orderBy('name')->get();
             if ($request->filled('zone_id')) {
                 $selectedZone = Zone::findOrFail($request->zone_id);

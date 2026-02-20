@@ -31,7 +31,7 @@ class CourseClassController extends Controller
         $query = CourseClass::with(['course', 'teacherMale', 'teacherFemale', 'assistantMale', 'assistantFemale'])
             ->withCount(['courseEnrollments', 'coupleEnrollments']);
 
-        if ($user->isPastorZona()) {
+        if ($user->isPastorZona() || $user->isSupervisor()) {
             $query->whereHas('courseEnrollments', function ($q) use ($user) {
                 $q->where('user_id', $user->id)
                     ->orWhere('male_partner_id', $user->id)
@@ -64,7 +64,7 @@ class CourseClassController extends Controller
         $this->abortIfPastorZonaCannotManage();
 
         $courses = Course::all();
-        $teachers = User::whereIn('role', ['pastor', 'supervisor', 'membro', 'admin', 'secretaria'])->orderBy('name')->get();
+        $teachers = User::whereIn('role', ['pastor', 'supervisor', 'membro', 'super_admin', 'admin', 'secretaria'])->orderBy('name')->get();
         $selectedCourseId = $request->query('course_id');
 
         return view('course_classes.create', compact('courses', 'teachers', 'selectedCourseId'));
@@ -141,7 +141,7 @@ class CourseClassController extends Controller
         $this->abortIfPastorZonaCannotManage();
 
         $courses = Course::where('is_active', true)->get();
-        $teachers = User::whereIn('role', ['pastor', 'supervisor', 'membro', 'admin', 'secretaria', 'pastor_zona'])->get();
+        $teachers = User::whereIn('role', ['pastor', 'supervisor', 'membro', 'super_admin', 'admin', 'secretaria', 'pastor_zona'])->get();
 
         return view('course_classes.edit', compact('courseClass', 'courses', 'teachers'));
     }
@@ -441,7 +441,7 @@ class CourseClassController extends Controller
     {
         $this->abortIfPastorZonaCannotManage();
 
-        if (auth()->user()->role !== 'admin') {
+        if (!auth()->user()->isAdmin()) {
             return redirect()->back()->with('error', 'Apenas administradores podem realizar esta ação.');
         }
 
@@ -458,15 +458,16 @@ class CourseClassController extends Controller
 
     private function abortIfPastorZonaCannotManage(): void
     {
-        if (auth()->user()->isPastorZona()) {
-            abort(403, 'Pastor de zona não tem permissão para gerir turmas.');
+        $user = auth()->user();
+        if ($user->isPastorZona() || $user->isSupervisor()) {
+            abort(403, 'Sem permissão para gerir turmas.');
         }
     }
 
     private function abortIfPastorZonaNotEnrolled(CourseClass $courseClass): void
     {
         $user = auth()->user();
-        if ($user->isPastorZona() && !$user->isEnrolledInClass($courseClass->id)) {
+        if (($user->isPastorZona() || $user->isSupervisor()) && !$user->isEnrolledInClass($courseClass->id)) {
             abort(403, 'Você não está matriculado nesta turma.');
         }
     }

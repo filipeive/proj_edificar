@@ -1,11 +1,13 @@
 @extends('layouts.app')
 
 @section('title', 'Configuração de Formulários Públicos')
+@section('page-title', 'Formulários Públicos')
+@section('page-subtitle', 'Defina os cursos de destino para inscrições externas')
 
 @section('content')
-    <div class="px-8 py-10 max-w-4xl mx-auto">
+    <div class="max-w-5xl mx-auto space-y-6">
         <!-- Header -->
-        <div class="mb-12">
+        <div class="bg-white rounded-3xl border border-gray-200 shadow-sm p-6">
             <h1 class="text-3xl font-black text-gray-900 dark:text-white mb-2">Configuração de Formulários</h1>
             <p class="text-gray-500 dark:text-gray-400 font-bold uppercase text-[10px] tracking-widest">Gerencie para onde
                 as inscrições externas são enviadas</p>

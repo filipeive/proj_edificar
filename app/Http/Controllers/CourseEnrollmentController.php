@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\CourseEnrollment;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -12,6 +13,14 @@ class CourseEnrollmentController extends Controller
     public function enroll(Course $course)
     {
         $user = auth()->user();
+
+        // Supervisor can only self-enroll in individual/ministerial courses.
+        if ($user->isSupervisor()) {
+            $preMaritalCourseId = (int) Setting::get('pre_marital_course_id');
+            if ($preMaritalCourseId > 0 && $course->id === $preMaritalCourseId) {
+                return back()->with('error', 'Supervisor não pode se inscrever em curso de casais.');
+            }
+        }
 
         // Check if already enrolled
         $exists = CourseEnrollment::where('course_id', $course->id)
@@ -43,6 +52,8 @@ class CourseEnrollmentController extends Controller
 
     public function edit(CourseEnrollment $courseEnrollment)
     {
+        $this->abortIfSupervisorCannotManage();
+
         $courseEnrollment->load(['course', 'courseClass', 'malePartner', 'femalePartner', 'user']);
         $users = User::orderBy('name')->get();
         // Get classes for the same course to allow reassignment/initial assignment
@@ -60,6 +71,8 @@ class CourseEnrollmentController extends Controller
 
     public function update(Request $request, CourseEnrollment $courseEnrollment)
     {
+        $this->abortIfSupervisorCannotManage();
+
         $validated = $request->validate([
             'course_class_id' => 'nullable|exists:course_classes,id',
             'status' => 'required|in:cursando,aprovado,reprovado,desistente',
@@ -113,6 +126,8 @@ class CourseEnrollmentController extends Controller
 
     public function destroy(CourseEnrollment $courseEnrollment)
     {
+        $this->abortIfSupervisorCannotManage();
+
         $courseClassId = $courseEnrollment->course_class_id;
         $courseEnrollment->delete();
 
@@ -126,6 +141,8 @@ class CourseEnrollmentController extends Controller
 
     public function updateStatus(Request $request, CourseEnrollment $courseEnrollment)
     {
+        $this->abortIfSupervisorCannotManage();
+
         $validated = $request->validate([
             'status' => 'required|in:cursando,aprovado,reprovado,desistente',
         ]);
@@ -137,7 +154,7 @@ class CourseEnrollmentController extends Controller
 
     public function bulkDestroy(Request $request)
     {
-        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'pastor') {
+        if (!auth()->user()->isAdmin() && auth()->user()->role !== 'pastor') {
             return redirect()->back()->with('error', 'Acesso negado.');
         }
 
@@ -153,7 +170,7 @@ class CourseEnrollmentController extends Controller
 
     public function assignClass(Request $request, CourseEnrollment $courseEnrollment)
     {
-        if (auth()->user()->role !== 'admin' && auth()->user()->role !== 'pastor' && auth()->user()->role !== 'secretaria') {
+        if (!auth()->user()->isAdmin() && auth()->user()->role !== 'pastor' && auth()->user()->role !== 'secretaria') {
             return redirect()->back()->with('error', 'Acesso negado.');
         }
 
@@ -173,5 +190,12 @@ class CourseEnrollmentController extends Controller
         ]);
 
         return back()->with('success', 'Aluno atribuído à turma com sucesso!');
+    }
+
+    private function abortIfSupervisorCannotManage(): void
+    {
+        if (auth()->user()->isSupervisor()) {
+            abort(403, 'Supervisor tem acesso apenas para visualização e autoinscrição.');
+        }
     }
 }

@@ -9,7 +9,7 @@ class SupervisionPolicy
 {
     public function viewAny(User $user): bool
     {
-        return in_array($user->role, ['admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'secretaria', 'tesouraria']);
+        return $user->isAdmin() || in_array($user->role, ['pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'secretaria', 'tesouraria'], true);
     }
 
     public function view(User $user, Supervision $supervision): bool

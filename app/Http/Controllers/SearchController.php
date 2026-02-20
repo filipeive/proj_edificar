@@ -33,7 +33,7 @@ class SearchController extends Controller
             ->limit(5);
 
         // Aplicar filtros de hierarquia
-        if ($user->role === 'admin') {
+        if ($user->isAdmin()) {
             // Admin vê todos
             $membersQuery = $membersQuery;
         } elseif ($user->role === 'pastor_zona') {
@@ -68,7 +68,7 @@ class SearchController extends Controller
         });
 
         // Aplicar filtros de hierarquia
-        if ($user->role === 'admin') {
+        if ($user->isAdmin()) {
             // Admin vê tudo
             $contributionsQuery = $contributionsQuery;
         } elseif ($user->role === 'pastor_zona') {

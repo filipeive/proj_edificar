@@ -4,17 +4,32 @@
 @section('page-title', 'Editar Utilizador')
 @section('page-subtitle', 'Atualize as informações do membro ou líder do sistema')
 
+@section('header-actions')
+    <div class="flex items-center gap-2 md:hidden">
+        <a href="{{ route('users.show', $user) }}"
+            class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-700 transition hover:bg-gray-50"
+            title="Voltar">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <button type="submit" form="user-edit-form"
+            class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-3 py-2 text-[10px] font-black uppercase tracking-wider text-white">
+            <i class="bi bi-check2-circle"></i>
+            Guardar
+        </button>
+    </div>
+@endsection
+
 @section('content')
     <div class="w-full">
         <!-- Header with Back Button and Quick Stats -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div class="flex items-center gap-4">
                 <a href="{{ route('users.index') }}"
                     class="group w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 transition-all duration-300 shadow-sm">
                     <i class="bi bi-arrow-left transition-transform group-hover:-translate-x-1"></i>
                 </a>
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900">Editar Utilizador</h1>
+                    <h1 class="text-2xl font-black tracking-tight text-gray-900">Editar Utilizador</h1>
                     <p class="text-sm text-gray-500">Atualize as informações de <span
                             class="font-semibold text-blue-600">{{ $user->name }}</span></p>
                 </div>
@@ -31,12 +46,12 @@
             </div>
         </div>
 
-        <form action="{{ route('users.update', $user) }}" method="POST" class="space-y-8">
+        <form id="user-edit-form" action="{{ route('users.update', $user) }}" method="POST" class="space-y-8">
             @csrf
             @method('PUT')
 
             <!-- Tabs Navigation -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 mb-8 flex gap-2" x-data="{ activeTab: 'general' }">
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-200 p-2 mb-6 flex gap-2" x-data="{ activeTab: 'general' }">
                 <button type="button" @click="activeTab = 'general'; $dispatch('tab-change', 'general')" 
                     :class="activeTab === 'general' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-gray-500 hover:bg-gray-50'"
                     class="flex-1 px-6 py-3 rounded-xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2">
@@ -52,20 +67,20 @@
             </div>
 
             <div x-data="{ activeTab: 'general' }" @tab-change.window="activeTab = $event.detail">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Main Content Area -->
                     <div class="lg:col-span-2 space-y-6">
                         <!-- Profile Section -->
                         <div x-show="activeTab === 'general'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6">
-                            <div class="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
-                                <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-6">
-                                    <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                            <div class="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
+                                <div class="bg-gray-50 border-b border-gray-100 p-4">
+                                    <h2 class="text-base font-black text-gray-800 flex items-center gap-2">
                                         <i class="bi bi-person-badge"></i>
                                         Informações Pessoais
                                     </h2>
                                 </div>
 
-                                <div class="p-6 md:p-8 space-y-6">
+                                <div class="p-5 md:p-6 space-y-6">
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <!-- Nome -->
                                         <div class="space-y-2">
@@ -138,15 +153,15 @@
                             </div>
 
                             <!-- Role and Cell Assignment Section -->
-                            <div class="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
-                                <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-6">
-                                    <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                            <div class="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
+                                <div class="bg-gray-50 border-b border-gray-100 p-4">
+                                    <h2 class="text-base font-black text-gray-800 flex items-center gap-2">
                                         <i class="bi bi-diagram-3"></i>
                                         Atribuição de Papel e Localização
                                     </h2>
                                 </div>
 
-                                <div class="p-6 md:p-8 space-y-6">
+                                <div class="p-5 md:p-6 space-y-6">
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <!-- Role Selection -->
                                         <div class="space-y-2">
@@ -279,7 +294,7 @@
 
                             <div class="space-y-6">
                                 @foreach($categories as $category => $permissions)
-                                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                                    <div class="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
                                         <div class="bg-gray-50 px-6 py-4 border-b border-gray-100">
                                             <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest">{{ $category }}</h3>
                                         </div>
@@ -310,7 +325,7 @@
                 <!-- Sidebar Info/Actions -->
                 <div class="lg:col-span-1 space-y-6">
                     <!-- System Info Card -->
-                    <div class="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 p-6 space-y-6">
+                    <div class="bg-white rounded-3xl shadow-sm border border-gray-200 p-5 space-y-5">
                         <h3 class="text-lg font-bold text-gray-900 border-b border-gray-50 pb-4">Informações do Sistema</h3>
 
                         <div class="space-y-4">
@@ -366,17 +381,17 @@
                     </div>
 
                     <!-- Submit Button Area -->
-                    <div class="bg-blue-600 rounded-3xl p-6 shadow-xl shadow-blue-500/30 text-white space-y-4">
-                        <p class="text-sm text-blue-100 font-medium">
+                    <div class="bg-white rounded-3xl border border-gray-200 p-5 shadow-sm space-y-4">
+                        <p class="text-sm text-gray-500 font-medium">
                             Certifique-se de que os dados estão corretos antes de guardar as alterações.
                         </p>
                         <button type="submit"
-                            class="w-full flex items-center justify-center gap-2 px-6 py-4 bg-white text-blue-600 font-bold rounded-2xl hover:bg-blue-50 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]">
+                            class="w-full flex items-center justify-center gap-2 px-6 py-4 bg-blue-600 text-white font-black rounded-2xl hover:bg-blue-700 transition-all duration-300">
                             <i class="bi bi-check2-circle text-xl"></i>
                             Guardar Alterações
                         </button>
                         <a href="{{ route('users.show', $user) }}"
-                            class="w-full flex items-center justify-center gap-2 px-6 py-3 bg-blue-700/50 text-white font-semibold rounded-2xl hover:bg-blue-700 transition-all duration-300">
+                            class="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 font-black rounded-2xl hover:bg-gray-200 transition-all duration-300">
                             <i class="bi bi-eye"></i>
                             Ver Detalhes
                         </a>

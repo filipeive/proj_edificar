@@ -10,12 +10,12 @@ class ServicePolicy
 {
     public function viewAny(User $user): bool
     {
-        return in_array($user->role, ['admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'secretaria', 'tesouraria', 'administracao']);
+        return $user->isAdmin() || in_array($user->role, ['pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'secretaria', 'tesouraria', 'administracao'], true);
     }
 
     public function view(User $user, Service $service): bool
     {
-        return in_array($user->role, ['admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'secretaria', 'tesouraria', 'administracao']);
+        return $user->isAdmin() || in_array($user->role, ['pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'secretaria', 'tesouraria', 'administracao'], true);
     }
 
     public function create(User $user): bool

@@ -122,7 +122,7 @@ class QuarterlyReportController extends Controller
         $supervisions = collect();
 
         // Lógica de seleção baseada no cargo
-        if ($user->role === 'admin' || $user->role === 'pastor' || $user->role === 'secretaria') {
+        if ($user->isAdmin() || $user->role === 'pastor' || $user->role === 'secretaria') {
             $zones = Zone::with('supervisions')->get();
             $supervisions = Supervision::all();
         } elseif ($user->role === 'pastor_zona') {
@@ -241,7 +241,7 @@ class QuarterlyReportController extends Controller
         $zones = collect();
         $supervisions = collect();
 
-        if ($user->role === 'admin' || $user->role === 'pastor' || $user->role === 'secretaria') {
+        if ($user->isAdmin() || $user->role === 'pastor' || $user->role === 'secretaria') {
             $zones = Zone::with('supervisions')->get();
             $supervisions = Supervision::all();
         } elseif ($user->role === 'pastor_zona') {

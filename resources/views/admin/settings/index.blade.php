@@ -5,11 +5,11 @@
 @section('page-subtitle', 'Gerir configurações gerais do sistema')
 
 @section('content')
-    <div class="space-y-8" x-data="{ activeTab: '{{ $group }}' }">
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div class="space-y-6" x-data="{ activeTab: '{{ $group }}' }">
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-200 p-5 md:p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-                <h2 class="text-2xl font-black text-gray-900">Centro de Configurações</h2>
-                <p class="text-sm text-gray-500">Ajuste branding, região, email e opções do sistema.</p>
+                <h2 class="text-2xl font-black tracking-tight text-gray-900">Centro de Configurações</h2>
+                <p class="text-sm text-gray-500">Branding, região, email, permissões e sistema.</p>
             </div>
             <div class="flex flex-wrap gap-3">
                 <a href="{{ route('settings.backup') }}"
@@ -26,32 +26,25 @@
             </div>
         </div>
         <!-- Tabs -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-2">
-            <div class="flex flex-wrap gap-2">
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-200 p-2">
+            <div class="flex gap-2 overflow-x-auto whitespace-nowrap custom-scrollbar">
                 @foreach($groups as $groupName)
                     <button @click="activeTab = '{{ $groupName }}'" type="button"
                         :class="activeTab === '{{ $groupName }}' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-gray-600 hover:bg-gray-100'"
-                        class="px-6 py-3 rounded-xl font-bold text-sm transition-all duration-300">
+                        class="px-5 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 shrink-0">
                         {{ ucfirst($groupName === 'branding' ? 'Marca e Design' : ($groupName === 'permissions' ? 'Acessos & Permissões' : $groupName)) }}
                     </button>
                 @endforeach
-                @if(!$groups->contains('permissions'))
-                    <button @click="activeTab = 'permissions'" type="button"
-                        :class="activeTab === 'permissions' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-gray-600 hover:bg-gray-100'"
-                        class="px-6 py-3 rounded-xl font-bold text-sm transition-all duration-300">
-                        Acessos & Permissões
-                    </button>
-                @endif
                 <button @click="activeTab = 'backup'" type="button"
                     :class="activeTab === 'backup' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'"
-                    class="px-6 py-3 rounded-xl font-bold text-sm transition-all">
+                    class="px-5 py-2.5 rounded-xl font-bold text-sm transition-all shrink-0">
                     Backup
                 </button>
             </div>
         </div>
 
         <form action="{{ route('settings.update') }}" method="POST"
-            class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+            class="bg-white rounded-3xl shadow-sm border border-gray-200 p-6 md:p-8">
             @csrf
             <input type="hidden" name="active_tab" x-model="activeTab">
 

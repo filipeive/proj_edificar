@@ -147,7 +147,7 @@ class EventController extends Controller
         $zones = collect();
         $cells = collect();
 
-        if ($user->role === 'admin' || $user->role === 'pastor' || $user->role === 'secretaria') {
+        if ($user->isAdmin() || $user->role === 'pastor' || $user->role === 'secretaria') {
             $zones = Zone::all();
             $cells = Cell::all();
         } elseif ($user->role === 'pastor_zona') {
@@ -209,7 +209,7 @@ class EventController extends Controller
         $zones = collect();
         $cells = collect();
 
-        if ($user->role === 'admin' || $user->role === 'pastor' || $user->role === 'secretaria') {
+        if ($user->isAdmin() || $user->role === 'pastor' || $user->role === 'secretaria') {
             $zones = Zone::all();
             $cells = Cell::all();
         } elseif ($user->role === 'pastor_zona') {
@@ -266,7 +266,7 @@ class EventController extends Controller
      */
     public function bulkDestroy(Request $request)
     {
-        if (auth()->user()->role !== 'admin') {
+        if (!auth()->user()->isAdmin()) {
             return redirect()->back()->with('error', 'Apenas administradores podem realizar esta ação.');
         }
 

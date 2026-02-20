@@ -233,7 +233,7 @@ class UserController
      */
     public function toggleStatus(User $user)
     {
-        if ($user->role === 'admin' && $user->id === auth()->id()) {
+        if ($user->isAdmin() && $user->id === auth()->id()) {
             return back()->with('error', 'Você não pode desativar sua própria conta de admin!');
         }
 

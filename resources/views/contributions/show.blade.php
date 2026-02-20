@@ -2,35 +2,50 @@
 
 @section('title', 'Detalhes da Contribuição - Portal Life Church')
 @section('page-title', 'Detalhes da Contribuição')
+@section('page-subtitle', 'Visão consolidada do registo financeiro e histórico de validação')
 
 @section('header-actions')
+    @php
+        $isAdminDetails = request()->routeIs('admin.contributions.show');
+        $backRoute = $isAdminDetails ? route('contributions.pending') : route('contributions.index');
+    @endphp
+
     <div class="flex items-center gap-2 md:hidden">
-        <a href="{{ route('contributions.index') }}" class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
-            title="Voltar à lista">
+        <a href="{{ $backRoute }}"
+            class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-700 transition hover:bg-gray-50"
+            title="Voltar">
             <i class="bi bi-arrow-left"></i>
         </a>
+
         @if($contribution->status === 'pendente' && auth()->id() === $contribution->user_id)
             <a href="{{ route('contributions.edit', $contribution) }}"
-                class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50" title="Corrigir registro">
+                class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-orange-200 bg-orange-50 text-orange-600 transition hover:bg-orange-100"
+                title="Corrigir registo">
                 <i class="bi bi-pencil-square"></i>
             </a>
         @endif
+
         @if($canManage && $contribution->status === 'pendente')
             <form action="{{ route('contributions.verify', $contribution) }}" method="POST" class="inline">
                 @csrf
-                <button type="submit" class="action-icon text-gray-600 hover:text-green-600 hover:bg-green-50"
+                <button type="submit"
+                    class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-600 transition hover:bg-emerald-100"
                     title="Validar oferta">
                     <i class="bi bi-patch-check"></i>
                 </button>
             </form>
+
             <button onclick="document.getElementById('rejectModal').classList.remove('hidden')"
-                class="action-icon text-gray-600 hover:text-red-600 hover:bg-red-50" title="Rejeitar">
+                class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-red-200 bg-red-50 text-red-600 transition hover:bg-red-100"
+                title="Rejeitar">
                 <i class="bi bi-x-circle"></i>
             </button>
         @endif
+
         @if(($canDelete ?? false))
             <button onclick="document.getElementById('deleteModal').classList.remove('hidden')"
-                class="action-icon text-gray-600 hover:text-red-700 hover:bg-red-50" title="Eliminar registo">
+                class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-red-200 bg-red-50 text-red-600 transition hover:bg-red-100"
+                title="Eliminar registo">
                 <i class="bi bi-trash3"></i>
             </button>
         @endif
@@ -38,248 +53,227 @@
 @endsection
 
 @section('content')
-    <div class="space-y-8">
-        <!-- Header & Primary Info -->
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <!-- Member & Cell Card -->
-            <div
-                class="lg:col-span-2 bg-white rounded-[2rem] shadow-sm border border-gray-100 p-10 flex items-center gap-8">
-                <div
-                    class="w-32 h-32 rounded-[2.5rem] bg-blue-50 text-blue-600 flex items-center justify-center font-black text-5xl shadow-lg shadow-blue-50">
-                    {{ strtoupper(substr($contribution->user->name, 0, 1)) }}
-                </div>
-                <div class="space-y-2">
-                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] leading-tight">Membro
-                        Contribuinte</p>
-                    <h1 class="text-3xl font-black text-gray-900 tracking-tighter">{{ $contribution->user->name }}</h1>
-                    <div class="flex items-center gap-4 pt-2">
-                        <div
-                            class="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl text-xs font-bold text-gray-700">
-                            <i class="bi bi-people-fill text-blue-500"></i>
-                            Célula: {{ $contribution->cell->name }}
+    @php
+        $isAdminDetails = request()->routeIs('admin.contributions.show');
+        $backRoute = $isAdminDetails ? route('contributions.pending') : route('contributions.index');
+
+        $statusMeta = match ($contribution->status) {
+            'verificada' => ['label' => 'Validada', 'class' => 'bg-emerald-100 text-emerald-700 border-emerald-200'],
+            'pendente' => ['label' => 'Pendente', 'class' => 'bg-amber-100 text-amber-700 border-amber-200'],
+            'rejeitada' => ['label' => 'Rejeitada', 'class' => 'bg-red-100 text-red-700 border-red-200'],
+            'cancelada' => ['label' => 'Cancelada', 'class' => 'bg-gray-100 text-gray-700 border-gray-200'],
+            default => ['label' => ucfirst($contribution->status), 'class' => 'bg-gray-100 text-gray-700 border-gray-200'],
+        };
+    @endphp
+
+    <div class="space-y-6 pb-8">
+        <section class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm md:p-7">
+            <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                <div class="flex items-center gap-4">
+                    <div
+                        class="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-2xl font-black text-white shadow-lg shadow-blue-200 md:h-20 md:w-20 md:text-3xl">
+                        {{ strtoupper(substr($contribution->user->name, 0, 1)) }}
+                    </div>
+
+                    <div class="space-y-1">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <h1 class="text-xl font-black tracking-tight text-gray-900 md:text-2xl">{{ $contribution->user->name }}</h1>
+                            <span class="rounded-lg border px-2.5 py-1 text-[10px] font-black uppercase tracking-wider {{ $statusMeta['class'] }}">
+                                {{ $statusMeta['label'] }}
+                            </span>
+                            @if($isAdminDetails)
+                                <span class="rounded-lg bg-blue-600 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-white">
+                                    Visão Administrativa
+                                </span>
+                            @endif
                         </div>
-                        @if($contribution->status === 'verificada')
-                            <span class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-black uppercase tracking-widest">Validado</span>
-                        @elseif($contribution->status === 'pendente')
-                            <span class="px-3 py-1 bg-yellow-50 text-yellow-600 rounded-full text-[10px] font-black uppercase tracking-widest">Em Análise</span>
-                        @elseif($contribution->status === 'cancelada')
-                            <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-[10px] font-black uppercase tracking-widest">Cancelada</span>
-                        @else
-                            <span class="px-3 py-1 bg-red-50 text-red-600 rounded-full text-[10px] font-black uppercase tracking-widest">Rejeitada</span>
-                        @endif
+
+                        <p class="text-sm font-semibold text-gray-600">{{ $contribution->user->email }}</p>
+                        <div class="flex flex-wrap items-center gap-4 text-xs font-semibold text-gray-500">
+                            <span><i class="bi bi-geo-alt mr-1"></i>{{ $contribution->cell->name ?? 'Sem célula' }}</span>
+                            <span><i class="bi bi-calendar3 mr-1"></i>{{ $contribution->contribution_date->format('d/m/Y') }}</span>
+                            <span><i class="bi bi-hash mr-1"></i>REF {{ str_pad($contribution->id, 6, '0', STR_PAD_LEFT) }}</span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Money Card -->
-            <div
-                class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col justify-center text-center group hover:bg-green-50 transition-colors">
-                <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 group-hover:text-green-400">
-                    Valor da Oferta</p>
-                <p class="text-5xl font-black text-green-600 tracking-tighter">
-                    {{ number_format($contribution->amount, 0, ',', '.') }}<span class="text-sm ml-1 uppercase">MT</span>
-                </p>
-                <p class="text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-widest">
-                    {{ $contribution->contribution_date->format('d/m/Y') }}
-                </p>
-            </div>
-
-            <!-- Global Action (Hidden on Mobile) -->
-            <div
-                class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col justify-center gap-3 hidden md:flex">
-                <a href="{{ route('contributions.index') }}"
-                    class="w-full py-4 bg-gray-50 text-gray-500 rounded-2xl hover:bg-gray-100 transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2">
-                    <i class="bi bi-arrow-left"></i> Voltar à Lista
-                </a>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            <div class="lg:col-span-2 space-y-8">
-                <!-- Data Detail Card -->
-                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="p-8 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
-                        <h2 class="text-xl font-black text-gray-900 flex items-center gap-3">
-                            <i class="bi bi-info-circle text-blue-600"></i>
-                            Rastreabilidade do Registro
-                        </h2>
+                <div class="grid grid-cols-1 gap-2 md:min-w-[260px]">
+                    <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-center">
+                        <p class="text-[10px] font-black uppercase tracking-wider text-emerald-700">Valor da Oferta</p>
+                        <p class="mt-1 text-3xl font-black tracking-tight text-emerald-700">{{ number_format($contribution->amount, 0, ',', '.') }} <span class="text-sm">MT</span></p>
                     </div>
-                    <div class="p-10 grid grid-cols-2 gap-10">
-                        <div class="space-y-1">
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Registrado em</p>
-                            <p class="text-lg font-black text-gray-900">{{ $contribution->created_at->format('d/m/Y H:i') }}
-                            </p>
+
+                    <a href="{{ $backRoute }}"
+                        class="hidden items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-3 text-xs font-black uppercase tracking-wider text-gray-700 transition hover:bg-gray-50 md:inline-flex">
+                        <i class="bi bi-arrow-left"></i>
+                        Voltar
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+            <div class="space-y-6 xl:col-span-2">
+                <article class="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
+                    <div class="border-b border-gray-100 bg-gray-50 px-6 py-4">
+                        <h2 class="text-sm font-black uppercase tracking-wider text-gray-700">Rastreabilidade</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-5 p-6 md:grid-cols-2">
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-wider text-gray-400">Registado em</p>
+                            <p class="mt-1 text-sm font-bold text-gray-900">{{ $contribution->created_at->format('d/m/Y H:i') }}</p>
                         </div>
-                        <div class="space-y-1">
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Operador Responsável
-                            </p>
-                            <p class="text-lg font-black text-gray-900">
-                                {{ $contribution->registeredBy->name ?? 'Sistema Automático' }}
-                            </p>
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-wider text-gray-400">Operador</p>
+                            <p class="mt-1 text-sm font-bold text-gray-900">{{ $contribution->registeredBy->name ?? 'Sistema Automático' }}</p>
                         </div>
+
                         @if($contribution->status !== 'pendente')
-                            <div class="space-y-1">
-                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Validado em</p>
-                                <p class="text-lg font-black text-gray-900">{{ $contribution->updated_at->format('d/m/Y H:i') }}
-                                </p>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-wider text-gray-400">Atualizado/validado em</p>
+                                <p class="mt-1 text-sm font-bold text-gray-900">{{ $contribution->updated_at->format('d/m/Y H:i') }}</p>
                             </div>
-                            <div class="space-y-1">
-                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Validador /
-                                    Autorizador</p>
-                                <p class="text-lg font-black text-gray-900 italic text-blue-600">
-                                    {{ $contribution->verifiedBy->name ?? 'N/A' }}
-                                </p>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-wider text-gray-400">Validador</p>
+                                <p class="mt-1 text-sm font-bold text-gray-900">{{ $contribution->verifiedBy->name ?? 'N/A' }}</p>
                             </div>
                         @endif
                     </div>
-                </div>
+                </article>
 
-                <!-- Proof Document -->
                 @if($contribution->proof_path)
-                    <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                        <div class="p-8 border-b border-gray-50 flex items-center justify-between">
-                            <h2 class="text-xl font-black text-gray-900 flex items-center gap-3">
-                                <i class="bi bi-file-earmark-medical text-purple-600"></i>
-                                Comprovativo Bancário / Digital
-                            </h2>
+                    <article class="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
+                        <div class="border-b border-gray-100 px-6 py-4">
+                            <h2 class="text-sm font-black uppercase tracking-wider text-gray-700">Comprovativo</h2>
                         </div>
-                        <div class="p-10 flex flex-col items-center gap-6">
-                            <div
-                                class="w-20 h-20 rounded-3xl bg-purple-50 text-purple-600 flex items-center justify-center text-3xl">
-                                <i class="bi bi-file-earmark-pdf-fill"></i>
+
+                        <div class="p-6">
+                            <div class="flex flex-col items-start gap-4 rounded-2xl border border-blue-100 bg-blue-50 p-4 md:flex-row md:items-center md:justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-blue-600">
+                                        <i class="bi bi-file-earmark-pdf-fill"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-black text-gray-900">Documento anexado</p>
+                                        <p class="text-xs font-semibold text-gray-500">PDF/Imagem</p>
+                                    </div>
+                                </div>
+
+                                <a href="{{ route('contributions.receipt', $contribution) }}" target="_blank"
+                                    class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-[10px] font-black uppercase tracking-wider text-white transition hover:bg-blue-700">
+                                    <i class="bi bi-eye"></i>
+                                    Visualizar
+                                </a>
                             </div>
-                            <div class="text-center">
-                                <p class="text-lg font-black text-gray-900 leading-tight">Documento Digital Anexado</p>
-                                <p class="text-xs font-medium text-gray-400 mt-1 uppercase tracking-widest">Formato: PDF/Imagem
-                                </p>
-                            </div>
-                            <a href="{{ route('contributions.receipt', $contribution) }}" target="_blank"
-                                class="px-10 py-5 bg-purple-600 text-white rounded-2xl hover:bg-purple-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-purple-100">
-                                Visualizar Documento
-                            </a>
                         </div>
-                    </div>
+                    </article>
                 @endif
 
                 @if($contribution->proof_message)
-                    <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                        <div class="p-8 border-b border-gray-50">
-                            <h2 class="text-xl font-black text-gray-900 flex items-center gap-3">
-                                <i class="bi bi-chat-left-dots text-blue-600"></i>
-                                Mensagem de Confirmação
-                            </h2>
+                    <article class="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
+                        <div class="border-b border-gray-100 px-6 py-4">
+                            <h2 class="text-sm font-black uppercase tracking-wider text-gray-700">Mensagem de Confirmação</h2>
                         </div>
-                        <div class="p-10">
-                            <div class="p-6 bg-blue-50 border border-blue-100 rounded-3xl">
-                                <p class="text-sm font-medium text-blue-900 leading-relaxed whitespace-pre-line">
-                                    {{ $contribution->proof_message }}
-                                </p>
+
+                        <div class="p-6">
+                            <div class="rounded-2xl border border-blue-100 bg-blue-50 p-4">
+                                <p class="whitespace-pre-line text-sm font-medium leading-relaxed text-blue-900">{{ $contribution->proof_message }}</p>
                             </div>
-                            <p class="text-[10px] text-gray-400 mt-4 uppercase font-bold tracking-widest text-center">Texto
-                                extraído da operadora</p>
                         </div>
-                    </div>
+                    </article>
                 @endif
             </div>
 
-            <!-- Management & Notes -->
-            <div class="space-y-8">
+            <div class="space-y-6">
                 @if($contribution->notes)
-                    <div
-                        class="{{ $contribution->status === 'cancelada' ? 'bg-red-50 border border-red-100' : 'bg-gray-900 text-white shadow-xl' }} rounded-[2.5rem] p-10 relative overflow-hidden">
-                        <div class="relative z-10 space-y-4">
-                            <p class="text-[10px] font-black {{ $contribution->status === 'cancelada' ? 'text-red-400' : 'text-blue-300' }} uppercase tracking-[0.2em]">
-                                {{ $contribution->status === 'cancelada' ? 'Motivo do Cancelamento' : ($contribution->status === 'rejeitada' ? 'Motivo da Rejeição' : 'Notas de Verificação') }}
-                            </p>
-                            <p
-                                class="text-sm font-medium leading-relaxed {{ $contribution->status === 'cancelada' ? 'text-red-900' : 'text-gray-300' }} italic">
-                                "{{ $contribution->notes }}"</p>
-                        </div>
-                        <i
-                            class="bi bi-quote absolute -right-4 -bottom-4 text-9xl {{ $contribution->status === 'cancelada' ? 'text-red-600 opacity-5' : 'text-white opacity-5' }}"></i>
-                    </div>
-                @endif
-
-                @if(auth()->user()->isAdmin() && $contribution->status !== 'cancelada')
-                    <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 space-y-6">
-                        <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Gestão de Histórico (Admin)
+                    <article class="rounded-3xl border {{ $contribution->status === 'cancelada' ? 'border-red-200 bg-red-50' : 'border-gray-200 bg-white' }} p-6 shadow-sm">
+                        <h3 class="text-[10px] font-black uppercase tracking-wider {{ $contribution->status === 'cancelada' ? 'text-red-500' : 'text-gray-500' }}">
+                            {{ $contribution->status === 'cancelada' ? 'Motivo do Cancelamento' : ($contribution->status === 'rejeitada' ? 'Motivo da Rejeição' : 'Notas') }}
                         </h3>
-                        <div class="space-y-3">
-                            <button onclick="document.getElementById('cancelModal').classList.remove('hidden')"
-                                class="w-full py-5 bg-gray-900 text-white rounded-2xl hover:bg-black transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-gray-100">
-                                <i class="bi bi-slash-circle mr-2"></i> Cancelar Lançamento
-                            </button>
-                            <p class="text-[9px] text-gray-400 text-center italic">Isso manterá o registro para conferência, mas
-                                removerá o valor dos totais.</p>
-                        </div>
-                    </div>
-                @endif
-
-                @if(($canDelete ?? false))
-                    <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 space-y-6">
-                        <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Eliminação de Registo</h3>
-                        <div class="space-y-3">
-                            <button onclick="document.getElementById('deleteModal').classList.remove('hidden')"
-                                class="w-full py-5 bg-red-600 text-white rounded-2xl hover:bg-red-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-red-100">
-                                <i class="bi bi-trash3 mr-2"></i> Eliminar Registo
-                            </button>
-                            <p class="text-[9px] text-gray-400 text-center italic">Esta ação remove o registo de forma permanente e guarda o motivo no histórico de atividades.</p>
-                        </div>
-                    </div>
+                        <p class="mt-3 text-sm font-semibold italic leading-relaxed {{ $contribution->status === 'cancelada' ? 'text-red-900' : 'text-gray-700' }}">
+                            "{{ $contribution->notes }}"
+                        </p>
+                    </article>
                 @endif
 
                 @if($canManage && $contribution->status === 'pendente')
-                    <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 space-y-6">
-                        <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Controlo Administrativo</h3>
-                        <div class="space-y-3">
+                    <article class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+                        <h3 class="text-[10px] font-black uppercase tracking-wider text-gray-500">Validação</h3>
+                        <div class="mt-4 space-y-3">
                             <form action="{{ route('contributions.verify', $contribution) }}" method="POST">
                                 @csrf
                                 <button type="button"
                                     onclick="confirmAction('Deseja validar esta oferta?', 'Validar Oferta').then(result => { if(result.isConfirmed) this.closest('form').submit(); })"
-                                    class="w-full py-5 bg-green-600 text-white rounded-2xl hover:bg-green-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-green-100">
-                                    <i class="bi bi-patch-check mr-2"></i> Validar Oferta
+                                    class="flex w-full items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-[10px] font-black uppercase tracking-wider text-emerald-700 transition hover:bg-emerald-100">
+                                    <span>Validar Oferta</span>
+                                    <i class="bi bi-patch-check"></i>
                                 </button>
                             </form>
+
                             <button onclick="document.getElementById('rejectModal').classList.remove('hidden')"
-                                class="w-full py-5 bg-red-50 text-red-600 rounded-2xl hover:bg-red-100 transition-all font-black text-xs uppercase tracking-widest">
-                                <i class="bi bi-x-circle mr-2"></i> Rejeitar
+                                class="flex w-full items-center justify-between rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[10px] font-black uppercase tracking-wider text-red-700 transition hover:bg-red-100">
+                                <span>Rejeitar</span>
+                                <i class="bi bi-x-circle"></i>
                             </button>
                         </div>
-                    </div>
+                    </article>
+                @endif
+
+                @if(auth()->user()->isAdmin() && $contribution->status !== 'cancelada')
+                    <article class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+                        <h3 class="text-[10px] font-black uppercase tracking-wider text-gray-500">Gestão de Histórico</h3>
+                        <p class="mt-2 text-xs font-semibold text-gray-500">Mantém o registo para auditoria e retira o impacto dos totais.</p>
+                        <button onclick="document.getElementById('cancelModal').classList.remove('hidden')"
+                            class="mt-4 flex w-full items-center justify-between rounded-xl border border-gray-300 bg-gray-50 px-4 py-3 text-[10px] font-black uppercase tracking-wider text-gray-700 transition hover:bg-gray-100">
+                            <span>Cancelar Lançamento</span>
+                            <i class="bi bi-slash-circle"></i>
+                        </button>
+                    </article>
+                @endif
+
+                @if(($canDelete ?? false))
+                    <article class="rounded-3xl border border-red-200 bg-red-50 p-6 shadow-sm">
+                        <h3 class="text-[10px] font-black uppercase tracking-wider text-red-600">Eliminação de Registo</h3>
+                        <p class="mt-2 text-xs font-semibold text-red-700">Disponível apenas para estado pendente, cancelado ou rejeitado.</p>
+                        <button onclick="document.getElementById('deleteModal').classList.remove('hidden')"
+                            class="mt-4 flex w-full items-center justify-between rounded-xl border border-red-300 bg-white px-4 py-3 text-[10px] font-black uppercase tracking-wider text-red-700 transition hover:bg-red-100">
+                            <span>Eliminar Registo</span>
+                            <i class="bi bi-trash3"></i>
+                        </button>
+                    </article>
                 @endif
 
                 @if($contribution->status === 'pendente' && auth()->id() === $contribution->user_id)
                     <a href="{{ route('contributions.edit', $contribution) }}"
-                        class="block w-full py-5 bg-orange-600 text-white rounded-2xl hover:bg-orange-700 transition-all font-black text-xs uppercase tracking-widest text-center shadow-lg shadow-orange-100">
-                        <i class="bi bi-pencil-square mr-2"></i> Corrigir Registro
+                        class="flex w-full items-center justify-between rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-[10px] font-black uppercase tracking-wider text-orange-700 transition hover:bg-orange-100">
+                        <span>Corrigir Registo</span>
+                        <i class="bi bi-pencil-square"></i>
                     </a>
                 @endif
             </div>
-        </div>
+        </section>
     </div>
 
-    <!-- Reject Modal Refactored -->
     <div id="rejectModal"
-        class="fixed inset-0 bg-gray-900/90 backdrop-blur-sm hidden flex items-center justify-center z-[100] p-6">
-        <div class="bg-white rounded-[3rem] shadow-2xl p-10 w-full max-w-xl border border-gray-100">
-            <h3 class="text-2xl font-black text-gray-900 tracking-tighter mb-2">Rejeitar Contribuição</h3>
-            <p class="text-sm text-gray-400 font-medium mb-8">Por favor, descreva detalhadamente o motivo da não validação
-                deste registro financeiro.</p>
+        class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-gray-900/80 p-5 backdrop-blur-sm">
+        <div class="w-full max-w-xl rounded-3xl border border-gray-200 bg-white p-6 shadow-2xl">
+            <h3 class="text-xl font-black tracking-tight text-gray-900">Rejeitar Contribuição</h3>
+            <p class="mt-1 text-sm text-gray-500">Informe o motivo de rejeição para histórico.</p>
 
-            <form action="{{ route('contributions.reject', $contribution) }}" method="POST">
+            <form action="{{ route('contributions.reject', $contribution) }}" method="POST" class="mt-5 space-y-4">
                 @csrf
-                <div class="mb-8">
-                    <textarea name="notes" rows="6" required
-                        class="w-full p-6 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-red-500 font-medium text-sm text-gray-700"
-                        placeholder="Ex: Valor não identificado no extrato, comprovativo ilegível..."></textarea>
-                </div>
-                <div class="flex gap-4">
+                <textarea name="notes" rows="5" required
+                    class="w-full rounded-2xl border border-gray-200 bg-gray-50 p-4 text-sm font-medium text-gray-700 focus:border-red-400 focus:ring-red-200"
+                    placeholder="Ex: comprovativo ilegível, valor não identificado no extrato..."></textarea>
+
+                <div class="grid grid-cols-2 gap-3">
                     <button type="button" onclick="document.getElementById('rejectModal').classList.add('hidden')"
-                        class="flex-1 py-5 bg-gray-100 text-gray-500 rounded-2xl font-black text-xs uppercase tracking-widest">
+                        class="rounded-xl border border-gray-300 bg-white px-4 py-3 text-[10px] font-black uppercase tracking-wider text-gray-700">
                         Cancelar
                     </button>
                     <button type="submit"
-                        class="flex-1 py-5 bg-red-600 text-white rounded-2xl hover:bg-red-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-red-100">
+                        class="rounded-xl bg-red-600 px-4 py-3 text-[10px] font-black uppercase tracking-wider text-white hover:bg-red-700">
                         Confirmar Rejeição
                     </button>
                 </div>
@@ -287,29 +281,26 @@
         </div>
     </div>
 
-
-    <!-- Delete Modal -->
     <div id="deleteModal"
-        class="fixed inset-0 bg-gray-900/90 backdrop-blur-sm hidden flex items-center justify-center z-[100] p-6">
-        <div class="bg-white rounded-[3rem] shadow-2xl p-10 w-full max-w-xl border border-gray-100">
-            <h3 class="text-2xl font-black text-gray-900 tracking-tighter mb-2">Eliminar Contribuição</h3>
-            <p class="text-sm text-gray-400 font-medium mb-8">Esta ação remove definitivamente o registo. O motivo e os detalhes serão guardados no histórico de atividades para auditoria.</p>
+        class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-gray-900/80 p-5 backdrop-blur-sm">
+        <div class="w-full max-w-xl rounded-3xl border border-gray-200 bg-white p-6 shadow-2xl">
+            <h3 class="text-xl font-black tracking-tight text-gray-900">Eliminar Contribuição</h3>
+            <p class="mt-1 text-sm text-gray-500">O sistema vai guardar o motivo no histórico de atividades para auditoria.</p>
 
-            <form action="{{ route('contributions.destroy', $contribution) }}" method="POST">
+            <form action="{{ route('contributions.destroy', $contribution) }}" method="POST" class="mt-5 space-y-4">
                 @csrf
                 @method('DELETE')
-                <div class="mb-8">
-                    <textarea name="notes" rows="6" required
-                        class="w-full p-6 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-red-500 font-medium text-sm text-gray-700"
-                        placeholder="Descreva obrigatoriamente o motivo da eliminação deste registo..."></textarea>
-                </div>
-                <div class="flex gap-4">
+                <textarea name="notes" rows="5" required
+                    class="w-full rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-gray-700 focus:border-red-400 focus:ring-red-200"
+                    placeholder="Explique o motivo da eliminação deste registo..."></textarea>
+
+                <div class="grid grid-cols-2 gap-3">
                     <button type="button" onclick="document.getElementById('deleteModal').classList.add('hidden')"
-                        class="flex-1 py-5 bg-gray-100 text-gray-500 rounded-2xl font-black text-xs uppercase tracking-widest">
+                        class="rounded-xl border border-gray-300 bg-white px-4 py-3 text-[10px] font-black uppercase tracking-wider text-gray-700">
                         Cancelar
                     </button>
                     <button type="submit"
-                        class="flex-1 py-5 bg-red-600 text-white rounded-2xl hover:bg-red-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-red-100">
+                        class="rounded-xl bg-red-600 px-4 py-3 text-[10px] font-black uppercase tracking-wider text-white hover:bg-red-700">
                         Confirmar Eliminação
                     </button>
                 </div>
@@ -317,28 +308,25 @@
         </div>
     </div>
 
-    <!-- Cancel Modal -->
     <div id="cancelModal"
-        class="fixed inset-0 bg-gray-900/90 backdrop-blur-sm hidden flex items-center justify-center z-[100] p-6">
-        <div class="bg-white rounded-[3rem] shadow-2xl p-10 w-full max-w-xl border border-gray-100">
-            <h3 class="text-2xl font-black text-gray-900 tracking-tighter mb-2">Cancelar Contribuição (Histórico)</h3>
-            <p class="text-sm text-gray-400 font-medium mb-8">Esta ação irá anular o valor financeiro do registro, mas
-                manterá os dados salvos para auditoria futura.</p>
+        class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-gray-900/80 p-5 backdrop-blur-sm">
+        <div class="w-full max-w-xl rounded-3xl border border-gray-200 bg-white p-6 shadow-2xl">
+            <h3 class="text-xl font-black tracking-tight text-gray-900">Cancelar Contribuição (Histórico)</h3>
+            <p class="mt-1 text-sm text-gray-500">O valor deixa de impactar totais, mas o registo permanece para auditoria.</p>
 
-            <form action="{{ route('contributions.cancel', $contribution) }}" method="POST">
+            <form action="{{ route('contributions.cancel', $contribution) }}" method="POST" class="mt-5 space-y-4">
                 @csrf
-                <div class="mb-8">
-                    <textarea name="notes" rows="6" required
-                        class="w-full p-6 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-gray-800 font-medium text-sm text-gray-700"
-                        placeholder="Descreva obrigatoriamente o motivo do cancelamento deste registro..."></textarea>
-                </div>
-                <div class="flex gap-4">
+                <textarea name="notes" rows="5" required
+                    class="w-full rounded-2xl border border-gray-200 bg-gray-50 p-4 text-sm font-medium text-gray-700 focus:border-gray-400 focus:ring-gray-200"
+                    placeholder="Explique o motivo do cancelamento deste registo..."></textarea>
+
+                <div class="grid grid-cols-2 gap-3">
                     <button type="button" onclick="document.getElementById('cancelModal').classList.add('hidden')"
-                        class="flex-1 py-5 bg-gray-100 text-gray-500 rounded-2xl font-black text-xs uppercase tracking-widest">
+                        class="rounded-xl border border-gray-300 bg-white px-4 py-3 text-[10px] font-black uppercase tracking-wider text-gray-700">
                         Voltar
                     </button>
                     <button type="submit"
-                        class="flex-1 py-5 bg-gray-900 text-white rounded-2xl hover:bg-black transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-gray-100">
+                        class="rounded-xl bg-gray-900 px-4 py-3 text-[10px] font-black uppercase tracking-wider text-white hover:bg-black">
                         Confirmar Cancelamento
                     </button>
                 </div>

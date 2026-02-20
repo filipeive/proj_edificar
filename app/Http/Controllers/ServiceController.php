@@ -51,7 +51,7 @@ class ServiceController extends Controller
     {
         Gate::authorize('create', Service::class);
 
-        $preachers = User::whereIn('role', ['admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor'])->get();
+        $preachers = User::whereIn('role', ['super_admin', 'admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor'])->get();
         $offeringTypes = OfferingType::where('is_active', true)->orderBy('order')->get();
         $zones = \App\Models\Zone::orderBy('name')->get();
 
@@ -62,7 +62,7 @@ class ServiceController extends Controller
     {
         Gate::authorize('create', Service::class);
 
-        $preachers = User::whereIn('role', ['admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor'])->get();
+        $preachers = User::whereIn('role', ['super_admin', 'admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor'])->get();
         $offeringTypes = OfferingType::where('is_active', true)->orderBy('order')->get();
         $zones = \App\Models\Zone::forTeachingServices()->orderBy('name')->get();
 
@@ -218,7 +218,7 @@ class ServiceController extends Controller
             return redirect()->route('services.edit-teaching', $service);
         }
 
-        $preachers = User::whereIn('role', ['admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor'])->get();
+        $preachers = User::whereIn('role', ['super_admin', 'admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor'])->get();
         $offeringTypes = OfferingType::where('is_active', true)->orderBy('order')->get();
         $zones = \App\Models\Zone::orderBy('name')->get();
         $service->load(['offerings', 'tithes', 'individualOfferings', 'zoneParticipations']);
@@ -230,7 +230,7 @@ class ServiceController extends Controller
     {
         Gate::authorize('update', $service);
 
-        $preachers = User::whereIn('role', ['admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor'])->get();
+        $preachers = User::whereIn('role', ['super_admin', 'admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor'])->get();
         $offeringTypes = OfferingType::where('is_active', true)->orderBy('order')->get();
         $zones = \App\Models\Zone::forTeachingServices()->orderBy('name')->get();
         $service->load(['offerings', 'tithes', 'individualOfferings', 'zoneParticipations']);
@@ -786,7 +786,7 @@ class ServiceController extends Controller
      */
     public function bulkDestroy(Request $request)
     {
-        if (auth()->user()->role !== 'admin') {
+        if (!auth()->user()->isAdmin()) {
             return redirect()->back()->with('error', 'Apenas administradores podem realizar esta ação.');
         }
 

@@ -10,7 +10,7 @@ class EventPolicy
 {
     public function viewAny(User $user): bool
     {
-        return in_array($user->role, ['admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'secretaria', 'tesouraria', 'lider_celula', 'membro', 'administracao']);
+        return $user->isAdmin() || in_array($user->role, ['pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'secretaria', 'tesouraria', 'lider_celula', 'membro', 'administracao'], true);
     }
 
     public function view(User $user, Event $event): bool
@@ -37,7 +37,7 @@ class EventPolicy
 
     public function create(User $user): bool
     {
-        return in_array($user->role, ['admin', 'pastor_senior', 'pastor', 'pastor_zona', 'secretaria', 'tesouraria']);
+        return $user->isAdmin() || in_array($user->role, ['pastor_senior', 'pastor', 'pastor_zona', 'secretaria', 'tesouraria'], true);
     }
 
     public function update(User $user, Event $event): bool
