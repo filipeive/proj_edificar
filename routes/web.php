@@ -501,7 +501,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/test-email', [App\Http\Controllers\Admin\WeddingController::class, 'testEmail'])->name('test.email');
 
     // Inventário (Ecclesiastical)
-    Route::resource('inventory-items', App\Http\Controllers\InventoryItemController::class);
+    Route::resource('inventory-items', App\Http\Controllers\InventoryItemController::class)
+        ->middleware('role:super_admin,admin,secretaria,tesouraria,pastor,pastor_senior,comissao_obra');
 });
 # ============================================
 # ROTA DE REGISTRO (PÚBLICA MAS CONTROLADA)

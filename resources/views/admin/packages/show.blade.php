@@ -14,10 +14,12 @@
             class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50" title="Exportar">
             <i class="bi bi-file-earmark-excel"></i>
         </a>
-        <a href="{{ route('packages.edit', $package) }}"
-            class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50" title="Editar">
-            <i class="bi bi-pencil-square"></i>
-        </a>
+        @if(!auth()->user()->isResponsavelPacote())
+            <a href="{{ route('packages.edit', $package) }}"
+                class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50" title="Editar">
+                <i class="bi bi-pencil-square"></i>
+            </a>
+        @endif
     </div>
 @endsection
 
@@ -68,10 +70,12 @@
                     class="px-4 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-all text-xs font-bold uppercase tracking-widest flex items-center gap-2">
                     <i class="bi bi-file-earmark-pdf"></i> PDF
                 </a>
-                <a href="{{ route('packages.edit', $package) }}"
-                    class="px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all text-xs font-bold uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-gray-200">
-                    <i class="bi bi-pencil-square"></i> Editar
-                </a>
+                @if(!auth()->user()->isResponsavelPacote())
+                    <a href="{{ route('packages.edit', $package) }}"
+                        class="px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all text-xs font-bold uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-gray-200">
+                        <i class="bi bi-pencil-square"></i> Editar
+                    </a>
+                @endif
             </div>
         </div>
 

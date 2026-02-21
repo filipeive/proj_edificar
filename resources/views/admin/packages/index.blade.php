@@ -15,19 +15,21 @@
         x-init="$watch('view', value => localStorage.setItem('packages_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('packages_view') || 'list')"
         @resize.window.debounce.500ms="updateView()">
         @section('header-actions')
-            <div class="md:hidden">
-                <a href="{{ route('packages.create') }}"
-                    class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
-                    <i class="bi bi-plus-circle text-2xl"></i>
-                </a>
-            </div>
+            @if(!auth()->user()->isResponsavelPacote())
+                <div class="md:hidden">
+                    <a href="{{ route('packages.create') }}"
+                        class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
+                        <i class="bi bi-plus-circle text-2xl"></i>
+                    </a>
+                </div>
+            @endif
         @endsection
         <div class="space-y-8">
             <!-- Header & Top Actions -->
             <div
-                class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
+                class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div>
-                    <h1 class="text-3xl font-black text-gray-900 tracking-tight">Pacotes de Compromisso</h1>
+                    <h1 class="text-2xl font-black text-gray-900 tracking-tight">Pacotes de Compromisso</h1>
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Gestão de Planos de
                         Contribuição
                     </p>
@@ -45,10 +47,12 @@
                             <i class="bi bi-grid-fill"></i>
                         </button>
                     </div>
-                    <a href="{{ route('packages.create') }}"
-                        class="hidden md:flex bg-blue-600 text-white px-8 py-4 rounded-2xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest items-center shadow-lg shadow-blue-100">
-                        <i class="bi bi-plus-lg mr-2"></i> Novo Pacote
-                    </a>
+                    @if(!auth()->user()->isResponsavelPacote())
+                        <a href="{{ route('packages.create') }}"
+                            class="hidden md:flex bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest items-center shadow-lg shadow-blue-100">
+                            <i class="bi bi-plus-lg mr-2"></i> Novo Pacote
+                        </a>
+                    @endif
                 </div>
             </div>
 
@@ -65,7 +69,7 @@
             <!-- Packages List -->
             <div x-show="view === 'list'" x-transition:enter="transition ease-out duration-300"
                 x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-                class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+                class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full table-compact">
                         <thead>
@@ -156,25 +160,29 @@
                                                 class="action-icon bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white shadow-sm">
                                                 <i class="bi bi-eye-fill"></i>
                                             </a>
-                                            <a href="{{ route('packages.edit', $package) }}" title="Editar"
-                                                class="action-icon bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white shadow-sm">
-                                                <i class="bi bi-pencil-square"></i>
-                                            </a>
+                                            @if(!auth()->user()->isResponsavelPacote())
+                                                <a href="{{ route('packages.edit', $package) }}" title="Editar"
+                                                    class="action-icon bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white shadow-sm">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </a>
+                                            @endif
                                             <a href="{{ route('contributions.create') }}?package_id={{ $package->id }}"
                                                 class="action-icon bg-green-50 text-green-600 hover:bg-green-600 hover:text-white shadow-sm"
                                                 title="Nova Contribuição">
                                                 <i class="bi bi-plus-lg"></i>
                                             </a>
-                                            <form action="{{ route('packages.destroy', $package) }}" method="POST">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="button"
-                                                    onclick="confirmDelete('Tem certeza que deseja excluir o pacote {{ $package->name }}?').then(result => { if(result.isConfirmed) this.closest('form').submit(); })"
-                                                    class="action-icon bg-red-50 text-red-600 hover:bg-red-600 hover:text-white shadow-sm font-black"
-                                                    title="Excluir">
-                                                    <i class="bi bi-trash-fill"></i>
-                                                </button>
-                                            </form>
+                                            @if(!auth()->user()->isResponsavelPacote())
+                                                <form action="{{ route('packages.destroy', $package) }}" method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="button"
+                                                        onclick="confirmDelete('Tem certeza que deseja excluir o pacote {{ $package->name }}?').then(result => { if(result.isConfirmed) this.closest('form').submit(); })"
+                                                        class="action-icon bg-red-50 text-red-600 hover:bg-red-600 hover:text-white shadow-sm font-black"
+                                                        title="Excluir">
+                                                        <i class="bi bi-trash-fill"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
@@ -190,7 +198,7 @@
                 class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 @foreach($packages as $package)
                     <div
-                        class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 relative compact-card">
+                        class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex flex-col group hover:shadow-xl transition-all duration-300 relative compact-card">
                         <div class="absolute top-6 right-6">
                             <span
                                 class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border 
@@ -244,10 +252,12 @@
                                 class="flex-1 bg-gray-900 text-white text-center py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 transition-all flex items-center justify-center gap-2">
                                 <i class="bi bi-eye"></i> Detalhes
                             </a>
-                            <a href="{{ route('packages.edit', $package) }}"
-                                class="w-10 h-10 bg-gray-50 text-gray-400 flex items-center justify-center rounded-xl hover:bg-orange-600 hover:text-white transition-all">
-                                <i class="bi bi-pencil"></i>
-                            </a>
+                            @if(!auth()->user()->isResponsavelPacote())
+                                <a href="{{ route('packages.edit', $package) }}"
+                                    class="w-10 h-10 bg-gray-50 text-gray-400 flex items-center justify-center rounded-xl hover:bg-orange-600 hover:text-white transition-all">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            @endif
                         </div>
                     </div>
                 @endforeach

@@ -5,7 +5,7 @@
 @section('page-subtitle', 'Visão consolidada dos seus pacotes atribuídos')
 
 @section('header-actions')
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-3 md:hidden">
         @if($packages->isNotEmpty())
             <a href="{{ route('contributions.create') }}?package_id={{ $packages->first()->id }}" 
                class="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-all font-bold text-sm flex items-center gap-2 shadow-lg shadow-blue-100">

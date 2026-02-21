@@ -15,7 +15,7 @@
     $logoPrimary = \App\Models\Setting::get('branding.logo_primary');
     $logoPrimary = $logoPrimary ? asset($logoPrimary) : asset('images/logo.png');
     $showInventoryOperacao = $authUser && ($authUser->isAdmin() || $authUser->isSecretaria());
-    $showInventoryFinanceira = $authUser && ($authUser->isAdmin() || $authUser->isEdificarManager() || $authUser->isResponsavelPacote() || $authUser->isComissaoObra() || $authUser->isTesouraria() || $authUser->isPastor());
+    $showInventoryFinanceira = $authUser && ($authUser->isAdmin() || $authUser->isEdificarManager() || $authUser->isComissaoObra() || $authUser->isTesouraria() || $authUser->isPastor());
 @endphp
 <aside id="{{ $sidebarId ?? 'sidebar' }}" data-sidebar-id="{{ $sidebarId ?? 'sidebar' }}"
     class="app-sidebar sidebar-expanded bg-black text-white flex flex-col h-full min-h-0 overflow-hidden shadow-2xl transition-all duration-300 ease-in-out border-r border-white/5">

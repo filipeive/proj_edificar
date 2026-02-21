@@ -33,6 +33,8 @@ class ContributionController
         $scope = $request->query('scope');
         $isMyCellScope = $scope === 'my_cell';
         $cellScopeUnavailable = false;
+        $defaultPackageId = null;
+        $managedPackages = collect();
 
         $contributions = Contribution::query()
             ->with('user', 'cell');
@@ -79,7 +81,12 @@ class ContributionController
                 case 'comissao_obra':
                     break;
                 case 'responsavel_pacote':
-                    $packageIds = $user->managedPackages->pluck('id');
+                    $managedPackages = $user->managedPackages()->where('is_active', true)->orderBy('order')->get();
+                    $packageIds = $managedPackages->pluck('id');
+                    $defaultPackageId = $request->query('package_id') ?: $packageIds->first();
+                    if ($defaultPackageId) {
+                        $request->merge(['package_id' => $defaultPackageId]);
+                    }
                     $contributions->whereIn('package_id', $packageIds);
                     break;
                 default:
@@ -118,7 +125,9 @@ class ContributionController
 
         $pageTitle = $this->getPageTitle($user->role, $isMine, $scope);
 
-        $packages = CommitmentPackage::where('is_active', true)->orderBy('order')->get();
+        $packages = $user->role === 'responsavel_pacote'
+            ? $managedPackages
+            : CommitmentPackage::where('is_active', true)->orderBy('order')->get();
 
         return view('contributions.index', [
             'contributions' => $contributions,

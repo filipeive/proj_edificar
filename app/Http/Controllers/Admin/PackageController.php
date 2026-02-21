@@ -34,6 +34,10 @@ class PackageController
 
     public function create(): View
     {
+        if (auth()->user()->isResponsavelPacote()) {
+            abort(403, 'Responsável de pacote não pode criar novos pacotes.');
+        }
+
         $users = \App\Models\User::whereIn('role', ['super_admin', 'admin', 'comissao_obra', 'responsavel_pacote', 'secretaria', 'tesouraria', 'pastor_senior'])
             ->orderBy('name')
             ->get();
@@ -42,6 +46,10 @@ class PackageController
 
     public function store(Request $request)
     {
+        if (auth()->user()->isResponsavelPacote()) {
+            abort(403, 'Responsável de pacote não pode criar novos pacotes.');
+        }
+
         $validated = $request->validate([
             'name' => 'required|unique:commitment_packages|string|max:255',
             'min_amount' => 'required|numeric|min:0',
@@ -130,6 +138,10 @@ class PackageController
 
     public function edit(CommitmentPackage $package): View
     {
+        if (auth()->user()->isResponsavelPacote()) {
+            abort(403, 'Responsável de pacote não pode editar pacotes.');
+        }
+
         $user = auth()->user();
         if ($user->isResponsavelPacote() && $package->responsible_id !== $user->id) {
             abort(403, 'Acesso negado a este pacote.');
@@ -143,6 +155,10 @@ class PackageController
 
     public function update(Request $request, CommitmentPackage $package)
     {
+        if (auth()->user()->isResponsavelPacote()) {
+            abort(403, 'Responsável de pacote não pode editar pacotes.');
+        }
+
         $user = auth()->user();
         if ($user->isResponsavelPacote() && $package->responsible_id !== $user->id) {
             abort(403, 'Acesso negado a este pacote.');
@@ -169,6 +185,10 @@ class PackageController
 
     public function destroy(CommitmentPackage $package)
     {
+        if (auth()->user()->isResponsavelPacote()) {
+            abort(403, 'Responsável de pacote não pode excluir pacotes.');
+        }
+
         $user = auth()->user();
         if ($user->isResponsavelPacote() && $package->responsible_id !== $user->id) {
             abort(403, 'Acesso negado a este pacote.');

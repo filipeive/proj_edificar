@@ -370,6 +370,11 @@ class User extends Authenticatable
      */
     public function hasPermission(string $permission): bool
     {
+        // Hard deny: responsável de pacote não deve aceder ao inventário
+        if ($permission === 'menu_inventory' && $this->isResponsavelPacote()) {
+            return false;
+        }
+
         // Admin and Pastor Senior have all permissions
         if ($this->isAdmin() || $this->isPastorSenior()) {
             return true;
