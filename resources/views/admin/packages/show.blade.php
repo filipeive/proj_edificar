@@ -139,11 +139,30 @@
                 <!-- Toolbar -->
                 <div
                     class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <form action="{{ route('packages.show', $package) }}" method="GET" class="relative w-full sm:w-64">
-                        <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Pesquisar membro..."
-                            class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-blue-500 rounded-xl text-sm font-bold transition-all"
+                    <form action="{{ route('packages.show', $package) }}" method="GET"
+                        class="w-full sm:w-auto flex flex-col sm:flex-row gap-2">
+                        <div class="relative w-full sm:w-64">
+                            <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" name="search" value="{{ request('search') }}"
+                                placeholder="Pesquisar membro..."
+                                class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-blue-500 rounded-xl text-sm font-bold transition-all"
+                                onchange="this.form.submit()">
+                        </div>
+                        <select name="campaign_status"
+                            class="w-full sm:w-44 px-3.5 py-2.5 bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-blue-500 rounded-xl text-xs font-black uppercase tracking-widest custom-select"
                             onchange="this.form.submit()">
+                            <option value="">Todos Estados</option>
+                            <option value="pending" @selected(request('campaign_status') === 'pending')>Pendente</option>
+                            <option value="partial" @selected(request('campaign_status') === 'partial')>Parcial</option>
+                            <option value="paid" @selected(request('campaign_status') === 'paid')>Pago</option>
+                            <option value="surplus" @selected(request('campaign_status') === 'surplus')>Acréscimo</option>
+                        </select>
+                        @if(request()->filled('search') || request()->filled('campaign_status'))
+                            <a href="{{ route('packages.show', $package) }}"
+                                class="inline-flex items-center justify-center px-3.5 py-2.5 rounded-xl bg-gray-100 text-gray-500 hover:bg-gray-200 transition-all text-xs font-black uppercase tracking-widest">
+                                Limpar
+                            </a>
+                        @endif
                     </form>
 
                     <div class="flex items-center gap-2 w-full sm:w-auto">

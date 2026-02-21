@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Cell;
 use App\Models\CommitmentPackage;
+use App\Models\Contribution;
 use App\Models\User;
 use App\Models\UserCommitment;
 use App\Notifications\MemberCreatedNotification;
@@ -72,11 +73,34 @@ class PackageController
                 'package' => $package->load('userCommitments.user.cell.supervision.zone'),
                 'commitments' => $package->userCommitments()
                     ->active()
+                    ->leftJoinSub(
+                        Contribution::selectRaw('user_id, package_id, SUM(amount) as total_verified')
+                            ->where('status', 'verificada')
+                            ->groupBy('user_id', 'package_id'),
+                        'verified_totals',
+                        function ($join) {
+                            $join->on('verified_totals.user_id', '=', 'user_commitments.user_id')
+                                ->on('verified_totals.package_id', '=', 'user_commitments.package_id');
+                        }
+                    )
+                    ->select('user_commitments.*')
                     ->when(request('search'), function ($query, $search) {
                         $query->whereHas('user', function ($q) use ($search) {
                             $q->where('name', 'like', "%{$search}%")
                                 ->orWhere('phone', 'like', "%{$search}%");
                         });
+                    })
+                    ->when(request('campaign_status'), function ($query, $status) {
+                        if ($status === 'pending') {
+                            $query->whereRaw('COALESCE(verified_totals.total_verified, 0) = 0');
+                        } elseif ($status === 'partial') {
+                            $query->whereRaw('COALESCE(verified_totals.total_verified, 0) > 0')
+                                ->whereRaw('COALESCE(verified_totals.total_verified, 0) < user_commitments.committed_amount');
+                        } elseif ($status === 'paid') {
+                            $query->whereRaw('COALESCE(verified_totals.total_verified, 0) = user_commitments.committed_amount');
+                        } elseif ($status === 'surplus') {
+                            $query->whereRaw('COALESCE(verified_totals.total_verified, 0) > user_commitments.committed_amount');
+                        }
                     })
                     ->with('user.cell.supervision.zone')
                     ->paginate(24)

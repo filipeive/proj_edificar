@@ -25,7 +25,7 @@
 @endsection
 
 @section('content')
-    <div class="space-y-8" 
+    <div class="space-y-6" 
         x-data="{ 
             view: window.innerWidth < 768 ? 'grid' : 'list',
             selectedIds: [],
@@ -59,46 +59,46 @@
         @resize.window.debounce.500ms="updateView()">
          <!-- Stats Overview -->
         @if(isset($stats))
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 hidden md:flex">
-            <div class="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-lg group">
+        <div class="hidden md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-lg group">
                 <div class="flex items-center gap-5">
-                    <div class="w-14 h-14 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center text-2xl group-hover:bg-blue-600 group-hover:text-white transition-all">
+                    <div class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center text-xl group-hover:bg-blue-600 group-hover:text-white transition-all">
                         <i class="bi bi-calendar-check"></i>
                     </div>
                     <div>
                         <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Encontros</p>
-                        <p class="text-3xl font-black text-gray-900 dark:text-white tracking-tighter">{{ $stats['total_meetings'] }}</p>
+                        <p class="text-2xl font-black text-gray-900 dark:text-white tracking-tighter">{{ $stats['total_meetings'] }}</p>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-lg group">
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-lg group">
                 <div class="flex items-center gap-5">
-                    <div class="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center text-2xl group-hover:bg-emerald-600 group-hover:text-white transition-all">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center text-xl group-hover:bg-emerald-600 group-hover:text-white transition-all">
                         <i class="bi bi-people"></i>
                     </div>
                     <div>
                         <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Participação Total</p>
-                        <p class="text-3xl font-black text-gray-900 dark:text-white tracking-tighter">{{ number_format($stats['total_attendance'], 0, ',', '.') }}</p>
+                        <p class="text-2xl font-black text-gray-900 dark:text-white tracking-tighter">{{ number_format($stats['total_attendance'], 0, ',', '.') }}</p>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-lg group">
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-lg group">
                 <div class="flex items-center gap-5">
-                    <div class="w-14 h-14 rounded-2xl bg-purple-50 dark:bg-purple-900/30 text-purple-600 flex items-center justify-center text-2xl group-hover:bg-purple-600 group-hover:text-white transition-all">
+                    <div class="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-900/30 text-purple-600 flex items-center justify-center text-xl group-hover:bg-purple-600 group-hover:text-white transition-all">
                         <i class="bi bi-graph-up-arrow"></i>
                     </div>
                     <div>
                         <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Média / Encontro</p>
-                        <p class="text-3xl font-black text-gray-900 dark:text-white tracking-tighter">{{ $stats['avg_attendance'] }}</p>
+                        <p class="text-2xl font-black text-gray-900 dark:text-white tracking-tighter">{{ $stats['avg_attendance'] }}</p>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-lg group flex flex-col justify-between">
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-lg group flex flex-col justify-between">
                 <div class="flex items-center gap-5 mb-4">
-                    <div class="w-14 h-14 rounded-2xl bg-orange-50 dark:bg-orange-900/30 text-orange-600 flex items-center justify-center text-2xl group-hover:bg-orange-600 group-hover:text-white transition-all">
+                    <div class="w-12 h-12 rounded-xl bg-orange-50 dark:bg-orange-900/30 text-orange-600 flex items-center justify-center text-xl group-hover:bg-orange-600 group-hover:text-white transition-all">
                         <i class="bi bi-file-earmark-excel"></i>
                     </div>
                     <div>
@@ -114,21 +114,21 @@
         </div>
         @endif
         <!-- Filter Bar -->
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
             <form action="{{ route('cell-meetings.index') }}" method="GET" class="flex flex-col xl:flex-row xl:items-end gap-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4 flex-1">
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-8 gap-3 flex-1">
                     <div class="text-black dark:text-white">
                         <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Pesquisar</label>
                         <div class="relative group">
                             <i class="bi bi-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors"></i>
                             <input type="text" name="search" value="{{ request('search') }}" placeholder="Tema, líder..."
-                                class="w-full pl-14 pr-6 py-4 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white">
+                                class="w-full pl-14 pr-6 py-3 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white">
                         </div>
                     </div>
 
                     <div class="text-black dark:text-white">
                         <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Célula</label>
-                        <select name="cell_id" class="searchable-select w-full py-4 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white" data-label="Célula">
+                        <select name="cell_id" class="searchable-select w-full py-3 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white" data-label="Célula">
                             <option value="">Todas</option>
                             @foreach($cells as $cell)
                                 <option value="{{ $cell->id }}" {{ request('cell_id') == $cell->id ? 'selected' : '' }}>{{ $cell->name }}</option>
@@ -138,7 +138,7 @@
 
                     <div class="text-black dark:text-white">
                         <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Supervisão</label>
-                        <select name="supervision_id" class="searchable-select w-full py-4 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white" data-label="Supervisão">
+                        <select name="supervision_id" class="searchable-select w-full py-3 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white" data-label="Supervisão">
                             <option value="">Todas</option>
                             @foreach($supervisions as $sup)
                                 <option value="{{ $sup->id }}" {{ request('supervision_id') == $sup->id ? 'selected' : '' }}>{{ $sup->name }}</option>
@@ -148,7 +148,7 @@
 
                     <div class="text-black dark:text-white">
                         <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Zona</label>
-                        <select name="zone_id" class="searchable-select w-full py-4 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white" data-label="Zona">
+                        <select name="zone_id" class="searchable-select w-full py-3 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white" data-label="Zona">
                             <option value="">Todas</option>
                             @foreach($zones as $zone)
                                 <option value="{{ $zone->id }}" {{ request('zone_id') == $zone->id ? 'selected' : '' }}>{{ $zone->name }}</option>
@@ -158,7 +158,7 @@
 
                     <div class="text-black dark:text-white">
                         <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Tipo</label>
-                        <select name="meeting_type" class="w-full py-4 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white">
+                        <select name="meeting_type" class="w-full py-3 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white">
                             <option value="">Todos</option>
                             <option value="normal" {{ request('meeting_type') == 'normal' ? 'selected' : '' }}>Célula</option>
                             <option value="leadership" {{ request('meeting_type') == 'leadership' ? 'selected' : '' }}>Liderança</option>
@@ -168,12 +168,24 @@
                         </select>
                     </div>
 
+                    <div class="text-black dark:text-white">
+                        <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Data Início</label>
+                        <input type="date" name="date_start" value="{{ request('date_start') }}"
+                            class="w-full py-3 px-4 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white">
+                    </div>
+
+                    <div class="text-black dark:text-white">
+                        <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Data Fim</label>
+                        <input type="date" name="date_end" value="{{ request('date_end') }}"
+                            class="w-full py-3 px-4 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white">
+                    </div>
+
                     <div class="flex gap-2 text-black dark:text-white items-end">
-                        <button type="submit" class="flex-1 bg-gray-900 dark:bg-black text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 transition-all flex items-center justify-center gap-2 py-4">
+                        <button type="submit" class="flex-1 bg-gray-900 dark:bg-black text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 transition-all flex items-center justify-center gap-2 py-3">
                             <i class="bi bi-filter"></i> Filtrar
                         </button>
                         @if(request()->anyFilled(['search', 'cell_id', 'supervision_id', 'zone_id', 'meeting_type', 'date_start', 'date_end']))
-                            <a href="{{ route('cell-meetings.index') }}" class="w-14 h-14 bg-gray-100 dark:bg-gray-700 text-gray-500 rounded-2xl hover:bg-red-50 hover:text-red-600 transition-all flex items-center justify-center">
+                            <a href="{{ route('cell-meetings.index') }}" class="w-12 h-12 bg-gray-100 dark:bg-gray-700 text-gray-500 rounded-2xl hover:bg-red-50 hover:text-red-600 transition-all flex items-center justify-center">
                                 <i class="bi bi-x-lg"></i>
                             </a>
                         @endif
@@ -223,34 +235,34 @@
         <!-- List View -->
         <div x-show="view === 'list'" x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-            class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+            class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full table-compact">
                     <thead>
                         <tr class="bg-gray-50/50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
-                            <th class="px-8 py-6 text-left">
+                            <th class="px-6 py-4 text-left">
                                 <label class="flex items-center cursor-pointer">
                                     <input type="checkbox" @click="toggleSelectAll()" :checked="allSelected"
                                         class="w-5 h-5 text-blue-600 border-gray-200 rounded-lg focus:ring-blue-500/20 transition-all">
                                 </label>
                             </th>
-                            <th class="px-8 py-5 text-left text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Data / Local</th>
-                            <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Responsável / Tema</th>
-                            <th class="px-10 py-5 text-center text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Participação</th>
-                            <th class="px-10 py-5 text-center text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Tipo</th>
-                            <th class="px-10 py-5 text-right text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Ações</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Data / Local</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Responsável / Tema</th>
+                            <th class="px-6 py-4 text-center text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Participação</th>
+                            <th class="px-6 py-4 text-center text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Tipo</th>
+                            <th class="px-6 py-4 text-right text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Ações</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50 dark:divide-gray-700">
                         @forelse($meetings as $meeting)
                             <tr class="group hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-colors duration-200">
-                                <td class="px-8 py-6">
+                                <td class="px-6 py-5">
                                     <label class="flex items-center cursor-pointer">
                                         <input type="checkbox" value="{{ $meeting->id }}" x-model="selectedIds"
                                             class="item-checkbox w-5 h-5 text-blue-600 border-gray-200 rounded-lg focus:ring-blue-500/20 transition-all">
                                     </label>
                                 </td>
-                                <td class="px-8 py-6">
+                                <td class="px-6 py-5">
                                     <div class="flex flex-col">
                                         <span class="text-sm font-black text-gray-900 dark:text-white leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors tooltip" title="Ver Detalhes">
                                             <a href="{{ route('cell-meetings.show', $meeting) }}">{{ $meeting->meeting_date->format('d/m/Y') }}</a>
@@ -260,7 +272,7 @@
                                         </span>
                                     </div>
                                 </td>
-                                <td class="px-10 py-6">
+                                <td class="px-6 py-5">
                                     <div class="flex flex-col">
                                         <div class="flex items-center gap-2">
                                             @if($meeting->leader)
@@ -277,7 +289,7 @@
                                         </span>
                                     </div>
                                 </td>
-                                <td class="px-10 py-6 text-center">
+                                <td class="px-6 py-5 text-center">
                                     <div class="inline-flex flex-col items-center bg-gray-50 dark:bg-gray-900 px-4 py-2 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-inner group-hover:bg-white dark:group-hover:bg-gray-800 transition-all">
                                         <span class="text-lg font-black text-gray-900 dark:text-white tracking-tighter">
                                             {{ $meeting->adults_count + $meeting->children_count + $meeting->visitors_count }}
@@ -285,7 +297,7 @@
                                         <span class="text-[8px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-[0.15em]">Total</span>
                                     </div>
                                 </td>
-                                <td class="px-10 py-6 text-center">
+                                <td class="px-6 py-5 text-center">
                                         @php
                                             $typeStyles = [
                                                 'normal' => 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800',
@@ -308,7 +320,7 @@
                                             @endswitch
                                         </span>
                                 </td>
-                                <td class="px-10 py-6 text-right">
+                                <td class="px-6 py-5 text-right">
                                     <div class="flex items-center justify-end gap-2">
                                         <a href="{{ route('cell-meetings.show', $meeting) }}" title="Detalhes"
                                             class="action-icon bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white dark:hover:text-white shadow-sm">
@@ -357,11 +369,11 @@
             x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
             class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             @foreach($meetings as $meeting)
-                <div class="bg-white dark:bg-gray-800 p-8 rounded-[3rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col group hover:shadow-2xl hover:shadow-blue-600/5 transition-all duration-500 relative overflow-hidden active:scale-95 compact-card">
-                    <div class="absolute top-8 right-8 flex flex-col items-end gap-3 z-10">
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col group hover:shadow-lg hover:shadow-blue-600/5 transition-all duration-300 relative overflow-hidden active:scale-95 compact-card">
+                    <div class="absolute top-6 right-6 flex flex-col items-end gap-2 z-10">
                         <label class="flex items-center cursor-pointer mb-2">
                             <input type="checkbox" value="{{ $meeting->id }}" x-model="selectedIds"
-                                class="item-checkbox w-6 h-6 text-blue-600 border-gray-100 dark:border-gray-700 rounded-xl focus:ring-blue-500/20 transition-all bg-gray-50 dark:bg-gray-900 shadow-inner">
+                                class="item-checkbox w-5 h-5 text-blue-600 border-gray-100 dark:border-gray-700 rounded-lg focus:ring-blue-500/20 transition-all bg-gray-50 dark:bg-gray-900 shadow-inner">
                         </label>
                         @php
                             $typeStyles = [
@@ -382,7 +394,7 @@
                         </span>
                     </div>
 
-                    <div class="w-20 h-20 rounded-[2.2rem] bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-black text-3xl group-hover:from-blue-600 group-hover:to-blue-700 group-hover:text-white transition-all duration-700 mb-8 shadow-inner">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-black text-2xl group-hover:from-blue-600 group-hover:to-blue-700 group-hover:text-white transition-all duration-500 mb-5 shadow-inner">
                         <i class="bi bi-calendar-week"></i>
                     </div>
 
@@ -393,25 +405,25 @@
                         <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] line-clamp-1">{{ $meeting->cell?->name ?? $meeting->zone?->name ?? $meeting->supervision?->name ?? $meeting->meeting_type_label }}</p>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4 mb-8">
-                        <div class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-inner">
+                    <div class="grid grid-cols-2 gap-3 mb-5">
+                        <div class="bg-gray-50 dark:bg-gray-900/50 p-3 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-inner">
                             <span class="block text-[8px] font-black uppercase text-gray-400 dark:text-gray-500 tracking-widest mb-1">Participação</span>
-                            <span class="text-2xl font-black text-gray-900 dark:text-white tracking-tighter">{{ $meeting->adults_count + $meeting->children_count + $meeting->visitors_count }}</span>
+                            <span class="text-xl font-black text-gray-900 dark:text-white tracking-tighter">{{ $meeting->adults_count + $meeting->children_count + $meeting->visitors_count }}</span>
                         </div>
-                        <div class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-inner">
+                        <div class="bg-gray-50 dark:bg-gray-900/50 p-3 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-inner">
                             <span class="block text-[8px] font-black uppercase text-gray-400 dark:text-gray-500 tracking-widest mb-1">Decisões</span>
-                            <span class="text-2xl font-black text-emerald-600 dark:text-emerald-400 tracking-tighter">{{ $meeting->decisions ? 'SIM' : 'NÃO' }}</span>
+                            <span class="text-xl font-black text-emerald-600 dark:text-emerald-400 tracking-tighter">{{ $meeting->decisions ? 'SIM' : 'NÃO' }}</span>
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-2 mt-auto pt-6 border-t border-gray-50 dark:border-gray-700/50">
+                    <div class="flex items-center gap-2 mt-auto pt-4 border-t border-gray-50 dark:border-gray-700/50">
                         <a href="{{ route('cell-meetings.show', $meeting) }}"
-                            class="flex-1 bg-gray-900 dark:bg-black text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 dark:hover:bg-blue-600 transition-all flex items-center justify-center gap-3 active:scale-95 shadow-lg shadow-gray-200 dark:shadow-none">
+                            class="flex-1 bg-gray-900 dark:bg-black text-white py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 dark:hover:bg-blue-600 transition-all flex items-center justify-center gap-2 active:scale-95 shadow-lg shadow-gray-200 dark:shadow-none">
                             <i class="bi bi-eye text-base"></i> Abrir
                         </a>
                         @can('update', $meeting)
                             <a href="{{ route('cell-meetings.edit', $meeting) }}"
-                                class="w-14 h-14 bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 flex items-center justify-center rounded-2xl hover:bg-orange-500 hover:text-white dark:hover:bg-orange-500 dark:hover:text-white transition-all shadow-sm active:scale-95">
+                                class="w-12 h-12 bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 flex items-center justify-center rounded-xl hover:bg-orange-500 hover:text-white dark:hover:bg-orange-500 dark:hover:text-white transition-all shadow-sm active:scale-95">
                                 <i class="bi bi-pencil-square text-lg"></i>
                             </a>
                         @endcan
@@ -420,7 +432,7 @@
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit"
-                                    class="w-14 h-14 bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 flex items-center justify-center rounded-2xl hover:bg-red-500 hover:text-white dark:hover:bg-red-500 dark:hover:text-white transition-all shadow-sm active:scale-95">
+                                    class="w-12 h-12 bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 flex items-center justify-center rounded-xl hover:bg-red-500 hover:text-white dark:hover:bg-red-500 dark:hover:text-white transition-all shadow-sm active:scale-95">
                                     <i class="bi bi-trash text-lg"></i>
                                 </button>
                             </form>
@@ -443,10 +455,10 @@
             x-transition:leave="transition-all ease-in duration-300" x-transition:leave-start="opacity-100 translate-y-0"
             x-transition:leave-end="opacity-0 translate-y-24"
             class="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-6">
-            <div class="bg-gray-900 dark:bg-black p-5 rounded-[2.5rem] shadow-2xl border border-white/10 backdrop-blur-xl flex items-center justify-between gap-6 overflow-hidden relative">
+            <div class="bg-gray-900 dark:bg-black p-4 rounded-3xl shadow-xl border border-white/10 backdrop-blur-xl flex items-center justify-between gap-4 overflow-hidden relative">
                 <div class="absolute inset-0 bg-blue-600/5 -skew-x-12 translate-x-1/2"></div>
                 <div class="relative flex items-center gap-6">
-                    <div class="w-14 h-14 bg-blue-600 text-white rounded-[1.5rem] flex items-center justify-center font-black text-xl shadow-lg shadow-blue-600/20">
+                    <div class="w-12 h-12 bg-blue-600 text-white rounded-xl flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/20">
                         <span x-text="selectedIds.length"></span>
                     </div>
                     <div>
@@ -457,7 +469,7 @@
                 <div class="relative flex items-center gap-3">
                     @can('deleteAny', App\Models\CellMeeting::class)
                         <button type="button" @click="confirmAction('Eliminar Registos', 'Tem certeza que deseja eliminar ' + selectedIds.length + ' encontros selecionados?', 'warning', 'Sim, Eliminar', 'bulk-delete-form')"
-                            class="px-8 py-4 bg-red-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-red-700 transition-all flex items-center gap-3 active:scale-95 shadow-lg shadow-red-600/20">
+                            class="px-6 py-3 bg-red-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-red-700 transition-all flex items-center gap-2 active:scale-95 shadow-lg shadow-red-600/20">
                             <i class="bi bi-trash3-fill"></i> Eliminar
                         </button>
                     @endcan

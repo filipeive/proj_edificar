@@ -25,6 +25,7 @@ class CellMeetingController extends Controller
 
         $user = auth()->user();
         $query = CellMeeting::with(['cell', 'leader', 'zone', 'supervision']);
+        $leaderDefaultCellId = null;
 
         // Base Hierarchical Filter
         if ($user->role === 'pastor_zona') {
@@ -42,6 +43,13 @@ class CellMeetingController extends Controller
                 })->orWhereIn('supervision_id', $supervisionIds);
             });
         } elseif ($user->role === 'lider_celula' || $user->role === 'timoteo') {
+            $primaryLeaderCell = Cell::where('leader_id', $user->id)->orderBy('id')->first();
+            $leaderDefaultCellId = $primaryLeaderCell?->id ?? $user->cell_id;
+
+            if (!$request->filled('cell_id') && $leaderDefaultCellId) {
+                $request->merge(['cell_id' => $leaderDefaultCellId]);
+            }
+
             $query->whereHas('cell', function ($q) use ($user) {
                 $q->where('leader_id', $user->id)
                     ->orWhere('id', $user->cell_id);
@@ -97,8 +105,12 @@ class CellMeetingController extends Controller
             $cells = Cell::whereHas('supervision', function ($q) use ($user) {
                 $q->where('zone_id', $user->getZoneId());
             })->orderBy('name')->get();
-        } elseif ($user->role === 'supervisor') {
+        } elseif ($user->role === 'supervisor' || $user->role === 'sub_supervisor') {
             $cells = Cell::whereIn('supervision_id', $user->getManagedSupervisionIds())->orderBy('name')->get();
+        } elseif ($user->role === 'lider_celula' || $user->role === 'timoteo') {
+            $cells = $leaderDefaultCellId
+                ? Cell::where('id', $leaderDefaultCellId)->orderBy('name')->get()
+                : collect();
         }
 
         $statsQuery = clone $query;
@@ -213,6 +225,8 @@ class CellMeetingController extends Controller
 
         $user = auth()->user();
         $cells = collect();
+        $isCellRestricted = false;
+        $restrictedCellId = null;
 
         if ($user->isAdmin() || $user->role === 'pastor') {
             $cells = Cell::all();
@@ -224,9 +238,10 @@ class CellMeetingController extends Controller
         } elseif ($user->role === 'supervisor') {
             $cells = Cell::whereIn('supervision_id', $user->getManagedSupervisionIds())->get();
         } elseif ($user->role === 'lider_celula' || $user->role === 'timoteo') {
-            $cells = Cell::where('leader_id', $user->id)
-                ->orWhere('id', $user->cell_id)
-                ->orderBy('name')->get();
+            $isCellRestricted = true;
+            $primaryLeaderCell = Cell::where('leader_id', $user->id)->orderBy('id')->first();
+            $restrictedCellId = $primaryLeaderCell?->id ?? $user->cell_id;
+            $cells = $restrictedCellId ? Cell::where('id', $restrictedCellId)->orderBy('name')->get() : collect();
         } else {
             $cells = collect();
         }
@@ -262,7 +277,7 @@ class CellMeetingController extends Controller
 
         $leaders = $leadersQuery->orderBy('name')->get();
 
-        $selectedCellId = request('cell_id');
+        $selectedCellId = $isCellRestricted ? $restrictedCellId : request('cell_id');
         $members = collect();
         if ($selectedCellId) {
             $members = User::where('cell_id', $selectedCellId)->where('is_active', true)->orderBy('name')->get();
@@ -278,12 +293,22 @@ class CellMeetingController extends Controller
 
         $allLeaders = User::whereIn('role', ['super_admin', 'admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'sub_supervisor', 'lider_celula', 'timoteo'])->orderBy('name')->get();
 
-        return view('cell_meetings.create', compact('cells', 'leaders', 'members', 'zones', 'supervisions', 'allLeaders'));
+        return view('cell_meetings.create', compact(
+            'cells',
+            'leaders',
+            'members',
+            'zones',
+            'supervisions',
+            'allLeaders',
+            'isCellRestricted',
+            'restrictedCellId'
+        ));
     }
 
     public function store(Request $request)
     {
         Gate::authorize('create', CellMeeting::class);
+        $user = auth()->user();
 
         $validated = $request->validate([
             'cell_id' => 'required_if:meeting_type,normal|nullable|exists:cells,id',
@@ -307,6 +332,24 @@ class CellMeetingController extends Controller
             'reasons' => 'nullable|array',
             'reasons.*' => 'nullable|string|max:255',
         ]);
+
+        // Líder/Timóteo: só pode registrar encontro normal da própria célula
+        if ($user->role === 'lider_celula' || $user->role === 'timoteo') {
+            $primaryLeaderCell = Cell::where('leader_id', $user->id)->orderBy('id')->first();
+            $allowedCellIds = collect([$primaryLeaderCell?->id ?? $user->cell_id])->filter()->values();
+
+            if (($validated['meeting_type'] ?? null) !== 'normal') {
+                return back()
+                    ->withErrors(['meeting_type' => 'Você só pode registrar encontro da sua célula.'])
+                    ->withInput();
+            }
+
+            if (empty($validated['cell_id']) || !$allowedCellIds->contains((int) $validated['cell_id'])) {
+                return back()
+                    ->withErrors(['cell_id' => 'Você só pode registrar encontro da sua célula.'])
+                    ->withInput();
+            }
+        }
 
         // Set correct associations based on meeting type
         $validated['cell_id'] = $validated['meeting_type'] === 'normal' ? ($validated['cell_id'] ?? null) : null;

@@ -6,7 +6,7 @@
 
 @section('content')
     <div class="space-y-8" x-data="{ 
-        meetingType: '{{ old('meeting_type', 'normal') }}',
+        meetingType: '{{ old('meeting_type', ($isCellRestricted ?? false) ? 'normal' : 'normal') }}',
         selectedRoles: ['admin', 'pastor', 'pastor_senior', 'pastor_zona', 'supervisor', 'sub_supervisor', 'lider_celula', 'timoteo']
     }">
         <div class="mb-6">
@@ -35,31 +35,47 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div>
                         <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Tipo de Encontro *</label>
-                        <select name="meeting_type" x-model="meetingType" required
-                            class="w-full rounded-2xl border-gray-100 bg-gray-50/50 focus:ring-blue-500 focus:border-blue-500 font-bold py-3">
-                            <option value="normal">Reunião de Célula</option>
-                            <option value="leadership">Reunião de Liderança</option>
-                            <option value="supervision">Reunião de Supervisão</option>
-                            <option value="zone">Reunião de Zona</option>
-                            <option value="general">Reunião Geral</option>
-                            <option value="other">Outro / Especial</option>
-                        </select>
+                        @if($isCellRestricted ?? false)
+                            <input type="hidden" name="meeting_type" value="normal">
+                            <div
+                                class="w-full rounded-2xl border border-gray-100 bg-gray-50/70 text-gray-700 font-bold py-3 px-4">
+                                Reunião de Célula
+                            </div>
+                        @else
+                            <select name="meeting_type" x-model="meetingType" required
+                                class="w-full rounded-2xl border-gray-100 bg-gray-50/50 focus:ring-blue-500 focus:border-blue-500 font-bold py-3">
+                                <option value="normal">Reunião de Célula</option>
+                                <option value="leadership">Reunião de Liderança</option>
+                                <option value="supervision">Reunião de Supervisão</option>
+                                <option value="zone">Reunião de Zona</option>
+                                <option value="general">Reunião Geral</option>
+                                <option value="other">Outro / Especial</option>
+                            </select>
+                        @endif
                         @error('meeting_type') <p class="text-red-500 text-[10px] font-bold mt-2 uppercase tracking-tighter">{{ $message }}</p> @enderror
                     </div>
 
                     <div x-show="meetingType === 'normal'" x-transition>
                         <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Célula *</label>
-                        <select name="cell_id"
-                            onchange="window.location.href='{{ route('cell-meetings.create') }}?cell_id=' + this.value + '&meeting_type=' + document.querySelector('[name=meeting_type]').value"
-                            class="w-full rounded-2xl border-gray-100 bg-gray-50/50 focus:ring-blue-500 focus:border-blue-500 font-bold py-3"
-                            :required="meetingType === 'normal'">
-                            <option value="">Selecione a célula</option>
-                            @foreach($cells as $cell)
-                                <option value="{{ $cell->id }}" {{ old('cell_id', request('cell_id')) == $cell->id ? 'selected' : '' }}>
-                                    {{ $cell->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        @if($isCellRestricted ?? false)
+                            <input type="hidden" name="cell_id" value="{{ $restrictedCellId }}">
+                            <div
+                                class="w-full rounded-2xl border border-gray-100 bg-gray-50/70 text-gray-700 font-bold py-3 px-4">
+                                {{ optional($cells->first())->name ?? 'Célula não definida' }}
+                            </div>
+                        @else
+                            <select name="cell_id"
+                                onchange="window.location.href='{{ route('cell-meetings.create') }}?cell_id=' + this.value + '&meeting_type=' + document.querySelector('[name=meeting_type]').value"
+                                class="w-full rounded-2xl border-gray-100 bg-gray-50/50 focus:ring-blue-500 focus:border-blue-500 font-bold py-3"
+                                :required="meetingType === 'normal'">
+                                <option value="">Selecione a célula</option>
+                                @foreach($cells as $cell)
+                                    <option value="{{ $cell->id }}" {{ old('cell_id', request('cell_id')) == $cell->id ? 'selected' : '' }}>
+                                        {{ $cell->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        @endif
                         @error('cell_id') <p class="text-red-500 text-[10px] font-bold mt-2 uppercase tracking-tighter">{{ $message }}</p> @enderror
                     </div>
 
