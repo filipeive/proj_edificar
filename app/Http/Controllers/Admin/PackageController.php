@@ -290,8 +290,13 @@ class PackageController
         return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\PackageMembersExport($package), $filename);
     }
 
-    public function exportPdf(CommitmentPackage $package)
+    public function exportPdf(Request $request, CommitmentPackage $package)
     {
+        $user = auth()->user();
+        if ($user->isResponsavelPacote() && $package->responsible_id !== $user->id) {
+            abort(403, 'Acesso negado a este pacote.');
+        }
+
         $now = now();
         if ($now->day <= 5) {
             $startDate = $now->copy()->subMonth()->startOfMonth()->addDays(19);
@@ -301,21 +306,44 @@ class PackageController
             $endDate = $now->copy()->addMonth()->startOfMonth()->addDays(4);
         }
 
+        $statusFilter = $request->query('export_status', 'all');
+        $sortBy = $request->query('sort_by', 'name_asc');
+
+        $paidByUser = \App\Models\Contribution::verified()
+            ->where('package_id', $package->id)
+            ->whereBetween('contribution_date', [$startDate, $endDate])
+            ->selectRaw('user_id, SUM(amount) as total_paid, MAX(contribution_date) as last_paid_date')
+            ->groupBy('user_id')
+            ->get()
+            ->keyBy('user_id');
+
         $rows = $package->userCommitments()
             ->with(['user.cell.supervision.zone', 'user.cell.supervision.zone.pastor'])
             ->get()
-            ->map(function ($commitment) use ($startDate, $endDate, $package) {
+            ->map(function ($commitment) use ($paidByUser) {
                 $user = $commitment->user;
                 $cell = $user->cell;
                 $supervision = $cell?->supervision;
                 $zone = $supervision?->zone;
 
-                $contribution = \App\Models\Contribution::verified()
-                    ->where('user_id', $user->id)
-                    ->where('package_id', $package->id)
-                    ->whereBetween('contribution_date', [$startDate, $endDate])
-                    ->orderBy('contribution_date', 'desc')
-                    ->first();
+                $paidInfo = $paidByUser->get($user->id);
+                $committed = (float) $commitment->committed_amount;
+                $paid = (float) ($paidInfo->total_paid ?? 0);
+                $progress = $committed > 0 ? round(($paid / $committed) * 100, 1) : 0;
+
+                if ($paid <= 0) {
+                    $status = 'pending';
+                    $statusLabel = 'Pendente';
+                } elseif ($paid < $committed) {
+                    $status = 'partial';
+                    $statusLabel = 'Parcial';
+                } elseif ($paid > $committed) {
+                    $status = 'surplus';
+                    $statusLabel = 'Pago c/ Acréscimo';
+                } else {
+                    $status = 'paid';
+                    $statusLabel = 'Pago';
+                }
 
                 return [
                     'id' => $user->id,
@@ -325,18 +353,52 @@ class PackageController
                     'supervision' => $supervision->name ?? 'N/A',
                     'zone' => $zone->name ?? 'N/A',
                     'pastor' => $zone?->pastor?->name ?? 'N/A',
-                    'committed' => number_format((float) $commitment->committed_amount, 2, ',', '.') . ' MT',
-                    'contributed' => $contribution ? 'SIM' : 'NÃO',
-                    'paid' => $contribution ? number_format((float) $contribution->amount, 2, ',', '.') . ' MT' : '0,00 MT',
-                    'paid_date' => $contribution ? $contribution->contribution_date->format('d/m/Y') : '-',
+                    'committed_value' => $committed,
+                    'paid_value' => $paid,
+                    'progress' => max(0, $progress),
+                    'status' => $status,
+                    'status_label' => $statusLabel,
+                    'committed' => number_format($committed, 2, ',', '.') . ' MT',
+                    'paid' => number_format($paid, 2, ',', '.') . ' MT',
+                    'paid_date' => !empty($paidInfo?->last_paid_date)
+                        ? \Illuminate\Support\Carbon::parse($paidInfo->last_paid_date)->format('d/m/Y')
+                        : '-',
                 ];
             });
+
+        if ($statusFilter !== 'all') {
+            $rows = $rows->where('status', $statusFilter)->values();
+        }
+
+        $rows = match ($sortBy) {
+            'name_desc' => $rows->sortByDesc('name', SORT_NATURAL | SORT_FLAG_CASE)->values(),
+            'committed_desc' => $rows->sortByDesc('committed_value')->values(),
+            'paid_desc' => $rows->sortByDesc('paid_value')->values(),
+            'progress_desc' => $rows->sortByDesc('progress')->values(),
+            default => $rows->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)->values(),
+        };
+
+        $summary = [
+            'members' => $rows->count(),
+            'committed_total' => (float) $rows->sum('committed_value'),
+            'paid_total' => (float) $rows->sum('paid_value'),
+            'pending_total' => (float) $rows->sum(fn($row) => max(0, $row['committed_value'] - $row['paid_value'])),
+            'by_status' => [
+                'pending' => $rows->where('status', 'pending')->count(),
+                'partial' => $rows->where('status', 'partial')->count(),
+                'paid' => $rows->where('status', 'paid')->count(),
+                'surplus' => $rows->where('status', 'surplus')->count(),
+            ],
+            'applied_status' => $statusFilter,
+            'sort_by' => $sortBy,
+        ];
 
         $pdf = Pdf::loadView('admin.packages.export-pdf', [
             'package' => $package,
             'rows' => $rows,
             'startDate' => $startDate,
             'endDate' => $endDate,
+            'summary' => $summary,
         ])->setPaper('a4', 'landscape');
 
         $filename = 'membros_' . \Illuminate\Support\Str::slug($package->name) . '_' . now()->format('Y_m_d') . '.pdf';

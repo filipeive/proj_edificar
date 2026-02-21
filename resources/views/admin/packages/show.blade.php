@@ -66,10 +66,28 @@
                     class="px-4 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-all text-xs font-bold uppercase tracking-widest flex items-center gap-2">
                     <i class="bi bi-file-earmark-excel"></i> Excel
                 </a>
-                <a href="{{ route('packages.export-pdf', $package) }}"
-                    class="px-4 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-all text-xs font-bold uppercase tracking-widest flex items-center gap-2">
-                    <i class="bi bi-file-earmark-pdf"></i> PDF
-                </a>
+                <form action="{{ route('packages.export-pdf', $package) }}" method="GET" class="flex items-center gap-2">
+                    <select name="export_status"
+                        class="px-2.5 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg text-[10px] font-black uppercase tracking-widest">
+                        <option value="all">Todos</option>
+                        <option value="pending">Pendentes</option>
+                        <option value="partial">Parciais</option>
+                        <option value="paid">Pagos</option>
+                        <option value="surplus">Acréscimo</option>
+                    </select>
+                    <select name="sort_by"
+                        class="px-2.5 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg text-[10px] font-black uppercase tracking-widest">
+                        <option value="name_asc">Nome A-Z</option>
+                        <option value="name_desc">Nome Z-A</option>
+                        <option value="committed_desc">Compromisso</option>
+                        <option value="paid_desc">Contribuído</option>
+                        <option value="progress_desc">Progresso</option>
+                    </select>
+                    <button type="submit"
+                        class="px-4 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-all text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                        <i class="bi bi-file-earmark-pdf"></i> PDF
+                    </button>
+                </form>
                 @if(!auth()->user()->isResponsavelPacote())
                     <a href="{{ route('packages.edit', $package) }}"
                         class="px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all text-xs font-bold uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-gray-200">

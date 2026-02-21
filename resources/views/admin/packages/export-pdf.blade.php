@@ -7,7 +7,12 @@
         body { font-family: DejaVu Sans, sans-serif; font-size: 11px; color: #111827; }
         .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
         .title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-        .subtitle { font-size: 12px; color: #6b7280; margin-bottom: 16px; }
+        .subtitle { font-size: 12px; color: #6b7280; margin-bottom: 10px; }
+        .summary { margin-bottom: 12px; font-size: 10px; color: #374151; }
+        .summary-grid { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+        .summary-grid td { border: 1px solid #e5e7eb; padding: 6px 8px; }
+        .summary-grid .label { font-size: 9px; text-transform: uppercase; color: #6b7280; font-weight: 700; }
+        .summary-grid .value { font-size: 12px; font-weight: 700; color: #111827; margin-top: 2px; display: block; }
         table { width: 100%; border-collapse: collapse; }
         th, td { border: 1px solid #e5e7eb; padding: 6px 8px; vertical-align: middle; }
         th { background: #f97316; color: #ffffff; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; }
@@ -45,6 +50,59 @@
     </div>
 
     <div class="subtitle">Período: {{ $startDate->format('d/m/Y') }} a {{ $endDate->format('d/m/Y') }}</div>
+    <div class="summary">
+        Filtro aplicado: 
+        @if(($summary['applied_status'] ?? 'all') === 'all')
+            Todos os estados
+        @elseif(($summary['applied_status'] ?? 'all') === 'pending')
+            Pendentes
+        @elseif(($summary['applied_status'] ?? 'all') === 'partial')
+            Parciais
+        @elseif(($summary['applied_status'] ?? 'all') === 'paid')
+            Pagos
+        @else
+            Pagos com acréscimo
+        @endif
+    </div>
+
+    <table class="summary-grid">
+        <tr>
+            <td>
+                <span class="label">Membros</span>
+                <span class="value">{{ $summary['members'] ?? 0 }}</span>
+            </td>
+            <td>
+                <span class="label">Comprometido</span>
+                <span class="value">{{ number_format($summary['committed_total'] ?? 0, 2, ',', '.') }} MT</span>
+            </td>
+            <td>
+                <span class="label">Contribuído</span>
+                <span class="value">{{ number_format($summary['paid_total'] ?? 0, 2, ',', '.') }} MT</span>
+            </td>
+            <td>
+                <span class="label">Em Falta</span>
+                <span class="value">{{ number_format($summary['pending_total'] ?? 0, 2, ',', '.') }} MT</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span class="label">Pendentes</span>
+                <span class="value">{{ $summary['by_status']['pending'] ?? 0 }}</span>
+            </td>
+            <td>
+                <span class="label">Parciais</span>
+                <span class="value">{{ $summary['by_status']['partial'] ?? 0 }}</span>
+            </td>
+            <td>
+                <span class="label">Pagos</span>
+                <span class="value">{{ $summary['by_status']['paid'] ?? 0 }}</span>
+            </td>
+            <td>
+                <span class="label">Acréscimo</span>
+                <span class="value">{{ $summary['by_status']['surplus'] ?? 0 }}</span>
+            </td>
+        </tr>
+    </table>
 
     <table>
         <thead>
@@ -57,8 +115,9 @@
                 <th>Zona</th>
                 <th>Pastor Zona</th>
                 <th>Compromisso</th>
-                <th>Contribuiu?</th>
+                <th>Status</th>
                 <th>Valor Pago</th>
+                <th>Progresso</th>
                 <th>Data</th>
             </tr>
         </thead>
@@ -73,8 +132,9 @@
                     <td>{{ $row['zone'] }}</td>
                     <td>{{ $row['pastor'] }}</td>
                     <td>{{ $row['committed'] }}</td>
-                    <td class="badge">{{ $row['contributed'] }}</td>
+                    <td class="badge">{{ $row['status_label'] }}</td>
                     <td>{{ $row['paid'] }}</td>
+                    <td>{{ number_format($row['progress'], 1, ',', '.') }}%</td>
                     <td>{{ $row['paid_date'] }}</td>
                 </tr>
             @endforeach
