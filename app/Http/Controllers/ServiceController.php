@@ -89,6 +89,18 @@ class ServiceController extends Controller
             'special_offerings_total'
         ];
 
+        if ($request->has('zone_participations')) {
+            $zp = $request->input('zone_participations');
+            foreach ($zp as $key => $values) {
+                foreach ($values as $f => $v) {
+                    if (!in_array($f, ['zone_id', 'name'])) {
+                        $zp[$key][$f] = (int) ($v ?: 0);
+                    }
+                }
+            }
+            $request->merge(['zone_participations' => $zp]);
+        }
+
         foreach ($numericFields as $field) {
             if ($request->has($field)) {
                 $val = $request->input($field);
@@ -265,6 +277,18 @@ class ServiceController extends Controller
                     $request->merge([$field => $field === 'special_offerings_total' ? (float) $val : (int) $val]);
                 }
             }
+        }
+
+        if ($request->has('zone_participations')) {
+            $zp = $request->input('zone_participations');
+            foreach ($zp as $key => $values) {
+                foreach ($values as $f => $v) {
+                    if (!in_array($f, ['zone_id', 'name'])) {
+                        $zp[$key][$f] = (int) ($v ?: 0);
+                    }
+                }
+            }
+            $request->merge(['zone_participations' => $zp]);
         }
 
         $validated = $request->validate([

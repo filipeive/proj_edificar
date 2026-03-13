@@ -6,9 +6,9 @@
 
 @section('content')
     <div class="space-y-8" x-data="{ 
-                                                                    guestPreacher: {{ old('preacher_name') ? 'true' : 'false' }},
-                                                                    serviceType: 'teaching'
-                                                                }">
+                                                                            guestPreacher: {{ old('preacher_name') ? 'true' : 'false' }},
+                                                                            serviceType: 'teaching'
+                                                                        }">
         <!-- Header -->
         <div
             class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -117,32 +117,36 @@
 
             <!-- Section: Participação por Zona (Novo Fluxo Wizard) -->
             <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden" x-data="{ 
-                                    selectedZone: 0,
-                                    zones: {{ Js::from($zones) }},
-                                    participations: [],
-                                    init() {
-                                        this.participations = this.zones.map(z => ({
-                                            zone_id: z.id,
-                                            name: z.name,
-                                            adults_members: 0,
-                                            adults_visitors: 0,
-                                            leaders: 0,
-                                            auxiliary_leaders: 0,
-                                            supervisors: 0,
-                                            zone_pastors: 0
-                                        }));
-                                    },
-                                    isFilled(index) {
-                                        const p = this.participations[index];
-                                        if (!p) return false;
-                                        return (p.adults_members > 0 || p.adults_visitors > 0 || p.leaders > 0 || p.auxiliary_leaders > 0 || p.supervisors > 0 || p.zone_pastors > 0);
-                                    },
-                                    getZoneTotal(index) {
-                                        const p = this.participations[index];
-                                        if (!p) return 0;
-                                        return Number(p.adults_members) + Number(p.adults_visitors) + Number(p.leaders) + Number(p.auxiliary_leaders) + Number(p.supervisors) + Number(p.zone_pastors);
-                                    }
-                                 }">
+                                            selectedZone: 0,
+                                            zones: {{ Js::from($zones) }},
+                                            participations: [],
+                                            init() {
+                                                const oldData = {{ Js::from(old('zone_participations')) }};
+                                                this.participations = this.zones.map((z, idx) => {
+                                                    const oldP = oldData && oldData[idx] ? oldData[idx] : null;
+                                                    return {
+                                                        zone_id: z.id,
+                                                        name: z.name,
+                                                        adults_members: oldP ? oldP.adults_members : 0,
+                                                        adults_visitors: oldP ? oldP.adults_visitors : 0,
+                                                        leaders: oldP ? oldP.leaders : 0,
+                                                        auxiliary_leaders: oldP ? oldP.auxiliary_leaders : 0,
+                                                        supervisors: oldP ? oldP.supervisors : 0,
+                                                        zone_pastors: oldP ? oldP.zone_pastors : 0
+                                                    };
+                                                });
+                                            },
+                                            isFilled(index) {
+                                                const p = this.participations[index];
+                                                if (!p) return false;
+                                                return (p.adults_members > 0 || p.adults_visitors > 0 || p.leaders > 0 || p.auxiliary_leaders > 0 || p.supervisors > 0 || p.zone_pastors > 0);
+                                            },
+                                            getZoneTotal(index) {
+                                                const p = this.participations[index];
+                                                if (!p) return 0;
+                                                return Number(p.adults_members) + Number(p.adults_visitors) + Number(p.leaders) + Number(p.auxiliary_leaders) + Number(p.supervisors) + Number(p.zone_pastors);
+                                            }
+                                         }">
                 <div class="p-8 border-b border-gray-50 bg-blue-50/30 flex items-center justify-between flex-wrap gap-4">
                     <div class="space-y-1">
                         <h2 class="text-lg font-black text-gray-900 flex items-center gap-2">
@@ -286,7 +290,7 @@
 
                     <!-- Hidden fields for all zones to ensure they are submitted -->
                     <template x-for="(p, idx) in participations" :key="idx">
-                        <div x-show="selectedZone !== idx">
+                        <div>
                             <input type="hidden" :name="'zone_participations['+idx+'][zone_id]'" :value="p.zone_id">
                             <input type="hidden" :name="'zone_participations['+idx+'][adults_members]'"
                                 :value="p.adults_members">
@@ -302,192 +306,193 @@
                             <input type="hidden" :name="'zone_participations['+idx+'][children_visitors]'" value="0">
                         </div>
                     </template>
+                    <input type="hidden" :name="'zone_participations['+idx+'][children_members]'" value="0">
+                    <input type="hidden" :name="'zone_participations['+idx+'][children_visitors]'" value="0">
                 </div>
+                </template>
+            </div>
 
-                <!-- Footer Totals Summary -->
-                <div class="p-8 bg-blue-600 text-white">
-                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-6">
-                        <div class="text-center">
-                            <p class="text-[8px] font-black uppercase tracking-widest opacity-60 mb-1">Membros</p>
-                            <p class="text-xl font-black tabular-nums"
-                                x-text="participations.reduce((acc, p) => acc + Number(p.adults_members), 0)"></p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-[8px] font-black uppercase tracking-widest opacity-60 mb-1">Visitantes</p>
-                            <p class="text-xl font-black tabular-nums"
-                                x-text="participations.reduce((acc, p) => acc + Number(p.adults_visitors), 0)"></p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-[8px] font-black uppercase tracking-widest opacity-60 mb-1 text-orange-200">
-                                Líderes</p>
-                            <p class="text-xl font-black tabular-nums text-orange-200"
-                                x-text="participations.reduce((acc, p) => acc + Number(p.leaders), 0)"></p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-[8px] font-black uppercase tracking-widest opacity-60 mb-1 text-orange-100">
-                                Timóteos</p>
-                            <p class="text-xl font-black tabular-nums text-orange-100"
-                                x-text="participations.reduce((acc, p) => acc + Number(p.auxiliary_leaders), 0)"></p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-[8px] font-black uppercase tracking-widest opacity-60 mb-1 text-purple-200">
-                                Superv.</p>
-                            <p class="text-xl font-black tabular-nums text-purple-200"
-                                x-text="participations.reduce((acc, p) => acc + Number(p.supervisors), 0)"></p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-[8px] font-black uppercase tracking-widest opacity-60 mb-1 text-red-200">Pastores
-                                Z.</p>
-                            <p class="text-xl font-black tabular-nums text-red-200"
-                                x-text="participations.reduce((acc, p) => acc + Number(p.zone_pastors), 0)"></p>
-                        </div>
-                        <div class="text-center bg-blue-700/50 rounded-2xl p-2 border border-blue-500/30">
-                            <p class="text-[8px] font-black uppercase tracking-widest opacity-60 mb-1">Geral Ensino</p>
-                            <p class="text-xl font-black tabular-nums"
-                                x-text="participations.reduce((acc, p) => acc + Number(p.adults_members) + Number(p.adults_visitors) + Number(p.leaders) + Number(p.auxiliary_leaders) + Number(p.supervisors) + Number(p.zone_pastors), 0)">
+            <!-- Footer Totals Summary -->
+            <div class="p-8 bg-blue-600 text-white">
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-6">
+                    <div class="text-center">
+                        <p class="text-[8px] font-black uppercase tracking-widest opacity-60 mb-1">Membros</p>
+                        <p class="text-xl font-black tabular-nums"
+                            x-text="participations.reduce((acc, p) => acc + Number(p.adults_members), 0)"></p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-[8px] font-black uppercase tracking-widest opacity-60 mb-1">Visitantes</p>
+                        <p class="text-xl font-black tabular-nums"
+                            x-text="participations.reduce((acc, p) => acc + Number(p.adults_visitors), 0)"></p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-[8px] font-black uppercase tracking-widest opacity-60 mb-1 text-orange-200">
+                            Líderes</p>
+                        <p class="text-xl font-black tabular-nums text-orange-200"
+                            x-text="participations.reduce((acc, p) => acc + Number(p.leaders), 0)"></p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-[8px] font-black uppercase tracking-widest opacity-60 mb-1 text-orange-100">
+                            Timóteos</p>
+                        <p class="text-xl font-black tabular-nums text-orange-100"
+                            x-text="participations.reduce((acc, p) => acc + Number(p.auxiliary_leaders), 0)"></p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-[8px] font-black uppercase tracking-widest opacity-60 mb-1 text-purple-200">
+                            Superv.</p>
+                        <p class="text-xl font-black tabular-nums text-purple-200"
+                            x-text="participations.reduce((acc, p) => acc + Number(p.supervisors), 0)"></p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-[8px] font-black uppercase tracking-widest opacity-60 mb-1 text-red-200">Pastores
+                            Z.</p>
+                        <p class="text-xl font-black tabular-nums text-red-200"
+                            x-text="participations.reduce((acc, p) => acc + Number(p.zone_pastors), 0)"></p>
+                    </div>
+                    <div class="text-center bg-blue-700/50 rounded-2xl p-2 border border-blue-500/30">
+                        <p class="text-[8px] font-black uppercase tracking-widest opacity-60 mb-1">Geral Ensino</p>
+                        <p class="text-xl font-black tabular-nums"
+                            x-text="participations.reduce((acc, p) => acc + Number(p.adults_members) + Number(p.adults_visitors) + Number(p.leaders) + Number(p.auxiliary_leaders) + Number(p.supervisors) + Number(p.zone_pastors), 0)">
+                        </p>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <!-- Offsets Sunday fields to 0 as they might be required in model but not used here -->
+    <!-- Offsets Sunday fields to 0 as they might be required in model but not used here -->
+    <input type="hidden" name="adults_members" value="0">
+    <input type="hidden" name="adults_salvations" value="0">
+    <input type="hidden" name="children_members" value="0">
+    <input type="hidden" name="children_salvations" value="0">
+
+    <!-- Section 3: Ofertas e Dízimos -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Ofertas -->
+        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-8 border-b border-gray-50 bg-gray-50/50 flex items-center justify-between">
+                <h2 class="text-lg font-black text-gray-900 flex items-center gap-2">
+                    <i class="bi bi-wallet2 text-green-600"></i>
+                    Ofertas
+                </h2>
+            </div>
+            <div class="p-8 space-y-4">
+                @foreach($offeringTypes as $index => $type)
+                    <div
+                        class="flex items-center gap-4 bg-gray-50 p-4 rounded-2xl transition-all hover:bg-white hover:shadow-md border border-transparent hover:border-green-100 group">
+                        <div class="flex-1">
+                            <p
+                                class="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-green-600 transition-colors">
+                                {{ $type->name }}
                             </p>
                         </div>
+                        <div class="relative w-40">
+                            <input type="hidden" name="offerings[{{ $index }}][offering_type_id]" value="{{ $type->id }}">
+                            <input type="number" step="0.01" name="offerings[{{ $index }}][amount]"
+                                class="offering-input w-full pl-8 pr-4 py-2 bg-white rounded-xl border-gray-200 focus:border-green-500 focus:ring-green-500/10 font-black text-right text-gray-700"
+                                value="{{ old("offerings.{$index}.amount", 0) }}">
+                            <span
+                                class="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-400">MT</span>
+                        </div>
+                    </div>
+                @endforeach
+
+                <div class="space-y-4 pt-4 mt-8 border-t border-gray-50">
+                    <div class="flex items-center gap-4 group">
+                        <div class="flex-1">
+                            <p class="text-[10px] font-black text-orange-600 uppercase tracking-widest">Ofert.
+                                Especial</p>
+                            <p class="text-[9px] text-gray-400 italic">Ex: Campanhas, Semeadeira, etc.</p>
+                        </div>
+                        <div class="relative w-40">
+                            <input type="number" step="0.01" name="special_offerings_total" id="special_offer_input"
+                                class="w-full pl-8 pr-4 py-2 bg-orange-50 border-transparent focus:bg-white focus:border-orange-500 focus:ring-orange-500/10 rounded-xl font-black text-right text-orange-700 transition-all"
+                                value="{{ old('special_offerings_total', 0) }}">
+                            <span
+                                class="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-orange-400">MT</span>
+                        </div>
+                    </div>
+                    <div
+                        class="p-6 bg-green-600 rounded-[1.5rem] flex items-center justify-between text-white shadow-lg shadow-green-100">
+                        <span class="text-xs font-black uppercase tracking-widest">Total de Ofertas</span>
+                        <span class="text-2xl font-black" id="total_offerings_display">0,00 MT</span>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Offsets Sunday fields to 0 as they might be required in model but not used here -->
-            <!-- Offsets Sunday fields to 0 as they might be required in model but not used here -->
-            <input type="hidden" name="adults_members" value="0">
-            <input type="hidden" name="adults_salvations" value="0">
-            <input type="hidden" name="children_members" value="0">
-            <input type="hidden" name="children_salvations" value="0">
-
-            <!-- Section 3: Ofertas e Dízimos -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Ofertas -->
-                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="p-8 border-b border-gray-50 bg-gray-50/50 flex items-center justify-between">
-                        <h2 class="text-lg font-black text-gray-900 flex items-center gap-2">
-                            <i class="bi bi-wallet2 text-green-600"></i>
-                            Ofertas
-                        </h2>
-                    </div>
-                    <div class="p-8 space-y-4">
-                        @foreach($offeringTypes as $index => $type)
-                            <div
-                                class="flex items-center gap-4 bg-gray-50 p-4 rounded-2xl transition-all hover:bg-white hover:shadow-md border border-transparent hover:border-green-100 group">
-                                <div class="flex-1">
-                                    <p
-                                        class="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-green-600 transition-colors">
-                                        {{ $type->name }}
-                                    </p>
-                                </div>
-                                <div class="relative w-40">
-                                    <input type="hidden" name="offerings[{{ $index }}][offering_type_id]"
-                                        value="{{ $type->id }}">
-                                    <input type="number" step="0.01" name="offerings[{{ $index }}][amount]"
-                                        class="offering-input w-full pl-8 pr-4 py-2 bg-white rounded-xl border-gray-200 focus:border-green-500 focus:ring-green-500/10 font-black text-right text-gray-700"
-                                        value="{{ old("offerings.{$index}.amount", 0) }}">
-                                    <span
-                                        class="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-400">MT</span>
-                                </div>
-                            </div>
-                        @endforeach
-
-                        <div class="space-y-4 pt-4 mt-8 border-t border-gray-50">
-                            <div class="flex items-center gap-4 group">
-                                <div class="flex-1">
-                                    <p class="text-[10px] font-black text-orange-600 uppercase tracking-widest">Ofert.
-                                        Especial</p>
-                                    <p class="text-[9px] text-gray-400 italic">Ex: Campanhas, Semeadeira, etc.</p>
-                                </div>
-                                <div class="relative w-40">
-                                    <input type="number" step="0.01" name="special_offerings_total" id="special_offer_input"
-                                        class="w-full pl-8 pr-4 py-2 bg-orange-50 border-transparent focus:bg-white focus:border-orange-500 focus:ring-orange-500/10 rounded-xl font-black text-right text-orange-700 transition-all"
-                                        value="{{ old('special_offerings_total', 0) }}">
-                                    <span
-                                        class="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-orange-400">MT</span>
-                                </div>
-                            </div>
-                            <div
-                                class="p-6 bg-green-600 rounded-[1.5rem] flex items-center justify-between text-white shadow-lg shadow-green-100">
-                                <span class="text-xs font-black uppercase tracking-widest">Total de Ofertas</span>
-                                <span class="text-2xl font-black" id="total_offerings_display">0,00 MT</span>
-                            </div>
-                        </div>
-                    </div>
+        <!-- Contribuições Individuais (Dízimos e Ofertas) -->
+        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+            <div class="p-8 border-b border-gray-50 bg-gray-50/50 flex items-center justify-between">
+                <h2 class="text-lg font-black text-gray-900 flex items-center gap-2">
+                    <i class="bi bi-people text-blue-600"></i>
+                    Contribuições Individuais
+                </h2>
+                <button type="button" @click="addContribution()" id="addContributionBtn"
+                    class="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl font-bold text-xs hover:bg-blue-600 hover:text-white transition-all flex items-center gap-2">
+                    <i class="bi bi-plus-lg"></i> Adicionar
+                </button>
+            </div>
+            <div class="p-8 flex-1 space-y-4 max-h-[500px] overflow-y-auto" id="contributionsContainer">
+            </div>
+            <div class="p-8 mt-auto bg-gray-50/50 border-t border-gray-50 space-y-3">
+                <div class="flex justify-between items-center text-xs font-bold text-gray-500">
+                    <span>Total Dízimos:</span>
+                    <span id="total_tithes_display" class="text-blue-600">0,00 MT</span>
                 </div>
+                <div class="flex justify-between items-center text-xs font-bold text-gray-500">
+                    <span>Total Ofertas:</span>
+                    <span id="total_ind_offerings_display" class="text-orange-600">0,00 MT</span>
+                </div>
+                <div class="p-4 bg-gray-900 rounded-2xl flex items-center justify-between text-white shadow-lg">
+                    <span class="text-xs font-black uppercase tracking-widest">Total Geral</span>
+                    <span class="text-xl font-black" id="total_contributions_display">0,00 MT</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                <!-- Contribuições Individuais (Dízimos e Ofertas) -->
-                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden flex flex-col">
-                    <div class="p-8 border-b border-gray-50 bg-gray-50/50 flex items-center justify-between">
-                        <h2 class="text-lg font-black text-gray-900 flex items-center gap-2">
-                            <i class="bi bi-people text-blue-600"></i>
-                            Contribuições Individuais
-                        </h2>
-                        <button type="button" @click="addContribution()" id="addContributionBtn"
-                            class="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl font-bold text-xs hover:bg-blue-600 hover:text-white transition-all flex items-center gap-2">
-                            <i class="bi bi-plus-lg"></i> Adicionar
-                        </button>
-                    </div>
-                    <div class="p-8 flex-1 space-y-4 max-h-[500px] overflow-y-auto" id="contributionsContainer">
-                    </div>
-                    <div class="p-8 mt-auto bg-gray-50/50 border-t border-gray-50 space-y-3">
-                        <div class="flex justify-between items-center text-xs font-bold text-gray-500">
-                            <span>Total Dízimos:</span>
-                            <span id="total_tithes_display" class="text-blue-600">0,00 MT</span>
-                        </div>
-                        <div class="flex justify-between items-center text-xs font-bold text-gray-500">
-                            <span>Total Ofertas:</span>
-                            <span id="total_ind_offerings_display" class="text-orange-600">0,00 MT</span>
-                        </div>
-                        <div class="p-4 bg-gray-900 rounded-2xl flex items-center justify-between text-white shadow-lg">
-                            <span class="text-xs font-black uppercase tracking-widest">Total Geral</span>
-                            <span class="text-xl font-black" id="total_contributions_display">0,00 MT</span>
-                        </div>
-                    </div>
+    <!-- Grand Financial Summary & Comments -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        <div class="lg:col-span-2 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
+            <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1 mb-4 block">Comentários e
+                Observações</label>
+            <textarea name="observations" rows="6" placeholder="Fale sobre o mover, testemunhos ou ocorrências do culto..."
+                class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-[2rem] transition-all font-medium text-gray-700 placeholder-gray-300 resize-none">{{ old('observations') }}</textarea>
+        </div>
+
+        <div class="bg-blue-600 p-8 rounded-[2.5rem] text-white space-y-6 shadow-xl shadow-blue-200">
+            <h3 class="text-lg font-black uppercase tracking-widest text-blue-200">Resumo Geral</h3>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center border-b border-blue-500/50 pb-4">
+                    <span class="text-sm font-bold opacity-80">Ofertas Gerais</span>
+                    <span class="text-sm font-black" id="summary_offerings">0,00 MT</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-blue-500/50 pb-4">
+                    <span class="text-sm font-bold opacity-80">Dízimos</span>
+                    <span class="text-sm font-black" id="summary_tithes">0,00 MT</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-blue-500/50 pb-4">
+                    <span class="text-sm font-bold opacity-80">Ofertas Individuais</span>
+                    <span class="text-sm font-black" id="summary_ind_offerings">0,00 MT</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-blue-500/50 pb-4">
+                    <span class="text-sm font-bold opacity-80">Especiais</span>
+                    <span class="text-sm font-black" id="summary_specials">0,00 MT</span>
+                </div>
+                <div class="flex justify-between items-center pt-2 border-t border-blue-400 mt-2 pt-4">
+                    <span class="text-lg font-black tracking-tighter uppercase">Total Final</span>
+                    <span class="text-3xl font-black tabular-nums" id="summary_grand_total">0,00 MT</span>
                 </div>
             </div>
 
-            <!-- Grand Financial Summary & Comments -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                <div class="lg:col-span-2 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
-                    <label
-                        class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1 mb-4 block">Comentários e
-                        Observações</label>
-                    <textarea name="observations" rows="6"
-                        placeholder="Fale sobre o mover, testemunhos ou ocorrências do culto..."
-                        class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-[2rem] transition-all font-medium text-gray-700 placeholder-gray-300 resize-none">{{ old('observations') }}</textarea>
-                </div>
-
-                <div class="bg-blue-600 p-8 rounded-[2.5rem] text-white space-y-6 shadow-xl shadow-blue-200">
-                    <h3 class="text-lg font-black uppercase tracking-widest text-blue-200">Resumo Geral</h3>
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center border-b border-blue-500/50 pb-4">
-                            <span class="text-sm font-bold opacity-80">Ofertas Gerais</span>
-                            <span class="text-sm font-black" id="summary_offerings">0,00 MT</span>
-                        </div>
-                        <div class="flex justify-between items-center border-b border-blue-500/50 pb-4">
-                            <span class="text-sm font-bold opacity-80">Dízimos</span>
-                            <span class="text-sm font-black" id="summary_tithes">0,00 MT</span>
-                        </div>
-                        <div class="flex justify-between items-center border-b border-blue-500/50 pb-4">
-                            <span class="text-sm font-bold opacity-80">Ofertas Individuais</span>
-                            <span class="text-sm font-black" id="summary_ind_offerings">0,00 MT</span>
-                        </div>
-                        <div class="flex justify-between items-center border-b border-blue-500/50 pb-4">
-                            <span class="text-sm font-bold opacity-80">Especiais</span>
-                            <span class="text-sm font-black" id="summary_specials">0,00 MT</span>
-                        </div>
-                        <div class="flex justify-between items-center pt-2 border-t border-blue-400 mt-2 pt-4">
-                            <span class="text-lg font-black tracking-tighter uppercase">Total Final</span>
-                            <span class="text-3xl font-black tabular-nums" id="summary_grand_total">0,00 MT</span>
-                        </div>
-                    </div>
-
-                    <button type="submit"
-                        class="w-full py-5 bg-white text-blue-600 rounded-[1.5rem] font-black text-lg hover:bg-blue-50 transition-all shadow-xl shadow-blue-800/10 mt-4">
-                        REGISTRAR NO SISTEMA
-                    </button>
-                </div>
-            </div>
-        </form>
+            <button type="submit"
+                class="w-full py-5 bg-white text-blue-600 rounded-[1.5rem] font-black text-lg hover:bg-blue-50 transition-all shadow-xl shadow-blue-800/10 mt-4">
+                REGISTRAR NO SISTEMA
+            </button>
+        </div>
+    </div>
+    </form>
     </div>
 
     <!-- Template Unificado -->

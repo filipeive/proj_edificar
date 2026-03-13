@@ -117,19 +117,38 @@
                  x-data="{ 
                     selectedZone: 0,
                     zones: {{ Js::from($zones) }},
-                    participations: {{ Js::from($zones->map(function($z) use ($service) {
-                        $p = $service->zoneParticipations->where('zone_id', $z->id)->first();
-                        return [
-                            'zone_id' => $z->id,
-                            'name' => $z->name,
-                            'adults_members' => $p ? $p->adults_members : 0,
-                            'adults_visitors' => $p ? $p->adults_visitors : 0,
-                            'leaders' => $p ? $p->leaders : 0,
-                            'auxiliary_leaders' => $p ? $p->auxiliary_leaders : 0,
-                            'supervisors' => $p ? $p->supervisors : 0,
-                            'zone_pastors' => $p ? $p->zone_pastors : 0
-                        ];
-                    })) }},
+                    participations: [],
+                    init() {
+                        const oldData = {{ Js::from(old('zone_participations')) }};
+                        const serviceData = {{ Js::from($zones->map(function($z) use ($service) {
+                            $p = $service->zoneParticipations->where('zone_id', $z->id)->first();
+                            return [
+                                'zone_id' => $z->id,
+                                'name' => $z->name,
+                                'adults_members' => $p ? $p->adults_members : 0,
+                                'adults_visitors' => $p ? $p->adults_visitors : 0,
+                                'leaders' => $p ? $p->leaders : 0,
+                                'auxiliary_leaders' => $p ? $p->auxiliary_leaders : 0,
+                                'supervisors' => $p ? $p->supervisors : 0,
+                                'zone_pastors' => $p ? $p->zone_pastors : 0
+                            ];
+                        })) }};
+
+                        this.participations = this.zones.map((z, idx) => {
+                            const oldP = oldData && oldData[idx] ? oldData[idx] : null;
+                            const sP = serviceData[idx];
+                            return {
+                                zone_id: z.id,
+                                name: z.name,
+                                adults_members: oldP ? oldP.adults_members : sP.adults_members,
+                                adults_visitors: oldP ? oldP.adults_visitors : sP.adults_visitors,
+                                leaders: oldP ? oldP.leaders : sP.leaders,
+                                auxiliary_leaders: oldP ? oldP.auxiliary_leaders : sP.auxiliary_leaders,
+                                supervisors: oldP ? oldP.supervisors : sP.supervisors,
+                                zone_pastors: oldP ? oldP.zone_pastors : sP.zone_pastors
+                            };
+                        });
+                    },
                     isFilled(index) {
                         const p = this.participations[index];
                         if (!p) return false;
@@ -263,7 +282,7 @@
 
                     <!-- Hidden fields for all zones to ensure they are submitted -->
                     <template x-for="(p, idx) in participations" :key="idx">
-                        <div x-show="selectedZone !== idx">
+                        <div>
                             <input type="hidden" :name="'zone_participations['+idx+'][zone_id]'" :value="p.zone_id">
                             <input type="hidden" :name="'zone_participations['+idx+'][adults_members]'" :value="p.adults_members">
                             <input type="hidden" :name="'zone_participations['+idx+'][adults_visitors]'" :value="p.adults_visitors">
