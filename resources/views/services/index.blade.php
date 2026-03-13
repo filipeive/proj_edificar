@@ -13,7 +13,7 @@
         @can('create', App\Models\Service::class)
             <a href="{{ route('services.create-teaching') }}"
                 class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-orange-600/20">
-                <i class="bi bi-book text-2xl"></i>
+                <i class="bi bi-mortarboard text-2xl"></i>
             </a>
             <a href="{{ route('services.create') }}"
                 class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
@@ -140,7 +140,7 @@
                         </button>
                     </div>
                             <!-- deve estar escondido no modo mobile-->
-                    <div class="flex items-center gap-3">
+                    <div class="hidden md:flex items-center gap-3">
                         <a href="{{ route('services.report') }}"
                             class="group relative flex items-center px-6 py-4 bg-gray-900 dark:bg-gray-800 text-white rounded-2xl hover:scale-105 transition-all duration-300 shadow-xl shadow-gray-900/10">
                             <i class="bi bi-graph-up-arrow text-blue-500 mr-3 text-lg group-hover:rotate-12 transition-transform"></i>
@@ -155,7 +155,7 @@
                                 <a href="{{ route('services.create-teaching') }}"
                                     class="group relative flex items-center px-6 py-4 bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 rounded-2xl hover:bg-orange-600 hover:text-white transition-all duration-300 border border-orange-100 dark:border-orange-800">
                                     <i class="bi bi-mortarboard mr-3 text-lg group-hover:-rotate-12 transition-transform"></i>
-                                    <p class="text-[10px] font-black uppercase tracking-widest">Ensino</p>
+                                    <p class="text-[10px] font-black uppercase tracking-widest">Estudo</p>
                                 </a>
                                 <a href="{{ route('services.create') }}"
                                     class="group relative flex items-center px-8 py-4 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 hover:scale-105 transition-all duration-300 shadow-xl shadow-blue-600/30 overflow-hidden">

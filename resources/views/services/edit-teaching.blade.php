@@ -112,86 +112,201 @@
                 </div>
             </div>
 
-            <!-- Section: Participação por Zona -->
-            <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-8 border-b border-gray-50 bg-blue-50/30 flex items-center justify-between">
-                    <h2 class="text-lg font-black text-gray-900 flex items-center gap-2">
-                        <i class="bi bi-geo-alt-fill text-blue-600"></i>
-                        Participação por Zona
-                    </h2>
+            <!-- Section: Participação por Zona (Novo Fluxo Wizard com Dados Carregados) -->
+            <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden" 
+                 x-data="{ 
+                    selectedZone: 0,
+                    zones: {{ Js::from($zones) }},
+                    participations: {{ Js::from($zones->map(function($z) use ($service) {
+                        $p = $service->zoneParticipations->where('zone_id', $z->id)->first();
+                        return [
+                            'zone_id' => $z->id,
+                            'name' => $z->name,
+                            'adults_members' => $p ? $p->adults_members : 0,
+                            'adults_visitors' => $p ? $p->adults_visitors : 0,
+                            'leaders' => $p ? $p->leaders : 0,
+                            'auxiliary_leaders' => $p ? $p->auxiliary_leaders : 0,
+                            'supervisors' => $p ? $p->supervisors : 0,
+                            'zone_pastors' => $p ? $p->zone_pastors : 0
+                        ];
+                    })) }},
+                    isFilled(index) {
+                        const p = this.participations[index];
+                        return (p.adults_members > 0 || p.adults_visitors > 0 || p.leaders > 0 || p.auxiliary_leaders > 0 || p.supervisors > 0 || p.zone_pastors > 0);
+                    },
+                    getZoneTotal(index) {
+                        const p = this.participations[index];
+                        return Number(p.adults_members) + Number(p.adults_visitors) + Number(p.leaders) + Number(p.auxiliary_leaders) + Number(p.supervisors) + Number(p.zone_pastors);
+                    }
+                 }">
+                <div class="p-8 border-b border-gray-50 bg-blue-50/30 flex items-center justify-between flex-wrap gap-4">
+                    <div class="space-y-1">
+                        <h2 class="text-lg font-black text-gray-900 flex items-center gap-2">
+                            <i class="bi bi-geo-alt-fill text-blue-600"></i>
+                            Participação por Zona
+                        </h2>
+                        <p class="text-[10px] font-black text-blue-600/60 uppercase tracking-widest">
+                            Clique numa zona abaixo para editar os dados correspondentes
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Progresso:</span>
+                        <div class="flex gap-1">
+                            <template x-for="(zone, index) in zones" :key="zone.id">
+                                <div class="w-6 h-1.5 rounded-full transition-all duration-500"
+                                    :class="isFilled(index) ? 'bg-green-500' : 'bg-gray-200'"></div>
+                            </template>
+                        </div>
+                    </div>
                 </div>
-                <div class="overflow-x-auto p-4 md:p-8">
-                    <table class="w-full border-separate border-spacing-2">
-                        <thead>
-                            <tr class="bg-gray-50/50">
-                                <th class="p-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Membros</th>
-                                <th class="p-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Visit.</th>
-                                <th class="p-4 text-[10px] font-black text-orange-600 uppercase tracking-widest text-center">Líderes</th>
-                                <th class="p-4 text-[10px] font-black text-orange-400 uppercase tracking-widest text-center">Timótio</th>
-                                <th class="p-4 text-[10px] font-black text-purple-600 uppercase tracking-widest text-center">Superv.</th>
-                                <th class="p-4 text-[10px] font-black text-red-600 uppercase tracking-widest text-center">Pastores Z.</th>
-                                <th class="p-4 text-[10px] font-black text-blue-600 uppercase tracking-widest text-center">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-50">
-                            @foreach($zones as $index => $zone)
-                                @php
-                                    $part = $service->zoneParticipations->where('zone_id', $zone->id)->first();
-                                @endphp
-                                <tr class="group">
-                                    <td class="p-4 font-black text-gray-900">
-                                        {{ $zone->name }}
-                                        <input type="hidden" name="zone_participations[{{ $index }}][zone_id]" value="{{ $zone->id }}">
-                                    </td>
-                                    <td class="p-2 bg-gray-50/50 group-hover:bg-white transition-colors">
-                                        <input type="number" name="zone_participations[{{ $index }}][adults_members]"
-                                            value="{{ old("zone_participations.{$index}.adults_members", $part ? $part->adults_members : 0) }}" min="0"
-                                            class="zone-participation-input w-full bg-transparent border-transparent focus:ring-0 text-center font-black text-gray-700">
-                                    </td>
-                                    <td class="p-2 bg-gray-50/50 group-hover:bg-white transition-colors">
-                                        <input type="number" name="zone_participations[{{ $index }}][adults_visitors]"
-                                            value="{{ old("zone_participations.{$index}.adults_visitors", $part ? $part->adults_visitors : 0) }}" min="0"
-                                            class="zone-participation-input w-full bg-transparent border-transparent focus:ring-0 text-center font-black text-gray-700">
-                                    </td>
-                                    <td class="p-2 bg-orange-50/30 group-hover:bg-white transition-colors">
-                                        <input type="number" name="zone_participations[{{ $index }}][leaders]"
-                                            value="{{ old("zone_participations.{$index}.leaders", $part ? $part->leaders : 0) }}" min="0"
-                                            class="zone-participation-input w-full bg-transparent border-transparent focus:ring-0 text-center font-black text-orange-600">
-                                    </td>
-                                    <td class="p-2 bg-orange-50/10 group-hover:bg-white transition-colors">
-                                        <input type="number" name="zone_participations[{{ $index }}][auxiliary_leaders]"
-                                            value="{{ old("zone_participations.{$index}.auxiliary_leaders", $part ? $part->auxiliary_leaders : 0) }}" min="0"
-                                            class="zone-participation-input w-full bg-transparent border-transparent focus:ring-0 text-center font-black text-orange-400">
-                                    </td>
-                                    <td class="p-2 bg-purple-50/30 group-hover:bg-white transition-colors">
-                                        <input type="number" name="zone_participations[{{ $index }}][supervisors]"
-                                            value="{{ old("zone_participations.{$index}.supervisors", $part ? $part->supervisors : 0) }}" min="0"
-                                            class="zone-participation-input w-full bg-transparent border-transparent focus:ring-0 text-center font-black text-purple-600">
-                                    </td>
-                                    <td class="p-2 bg-red-50/30 group-hover:bg-white transition-colors">
-                                        <input type="number" name="zone_participations[{{ $index }}][zone_pastors]"
-                                            value="{{ old("zone_participations.{$index}.zone_pastors", $part ? $part->zone_pastors : 0) }}" min="0"
-                                            class="zone-participation-input w-full bg-transparent border-transparent focus:ring-0 text-center font-black text-red-600">
-                                    </td>
-                                    <td class="p-4 text-center font-black text-blue-600 zone-row-total">0</td>
-                                    <input type="hidden" name="zone_participations[{{ $index }}][children_members]" value="0">
-                                    <input type="hidden" name="zone_participations[{{ $index }}][children_visitors]" value="0">
-                                </tr>
-                            @endforeach
-                        </tbody>
-                        <tfoot>
-                            <tr class="bg-blue-600 text-white rounded-2xl overflow-hidden">
-                                <td class="p-6 font-black uppercase tracking-widest text-[10px] rounded-l-[1.5rem]">Total Ensino</td>
-                                <td class="p-6 text-center font-black" id="total_teaching_members">0</td>
-                                <td class="p-6 text-center font-black" id="total_teaching_visitors">0</td>
-                                <td class="p-6 text-center font-black text-orange-200" id="total_teaching_leaders">0</td>
-                                <td class="p-6 text-center font-black text-orange-100" id="total_teaching_aux_leaders">0</td>
-                                <td class="p-6 text-center font-black text-purple-200" id="total_teaching_supervisors">0</td>
-                                <td class="p-6 text-center font-black text-red-200" id="total_teaching_pastors">0</td>
-                                <td class="p-6 text-center font-black bg-blue-700 rounded-r-[1.5rem]" id="total_teaching_grand">0</td>
-                            </tr>
-                        </tfoot>
-                    </table>
+
+                <div class="p-8 space-y-8">
+                    <!-- Zone Selection Grid -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                        <template x-for="(zone, index) in zones" :key="zone.id">
+                            <button type="button" 
+                                @click="selectedZone = index"
+                                :class="selectedZone === index ? 'bg-blue-600 text-white shadow-lg shadow-blue-200 ring-4 ring-blue-100' : (isFilled(index) ? 'bg-green-50 text-green-700 border-green-200' : 'bg-gray-50 text-gray-500 border-gray-100')"
+                                class="p-4 rounded-2xl border text-center transition-all duration-300 group relative overflow-hidden">
+                                <div class="absolute top-2 right-2" x-show="isFilled(index)">
+                                    <i class="bi bi-check-circle-fill text-[10px]"></i>
+                                </div>
+                                <p class="text-[10px] font-black uppercase tracking-tight" x-text="zone.name"></p>
+                                <p class="text-[9px] font-bold opacity-60 mt-1" x-text="getZoneTotal(index) + ' Total'"></p>
+                            </button>
+                        </template>
+                    </div>
+
+                    <!-- Focused Input Area -->
+                    <div x-show="selectedZone !== null" 
+                         x-transition:enter="transition ease-out duration-300"
+                         x-transition:enter-start="opacity-0 translate-y-8"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         class="bg-gray-50/50 rounded-[2rem] border border-gray-100 p-8">
+                        
+                        <div class="flex items-center justify-between mb-8">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-blue-600">
+                                    <i class="bi bi-geo-alt text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-black text-gray-900" x-text="'Zona: ' + zones[selectedZone].name"></h3>
+                                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mt-1">Atualize as métricas desta zona</p>
+                                </div>
+                            </div>
+                            <button type="button" @click="selectedZone = null" class="text-gray-400 hover:text-gray-900 transition-colors">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                            <!-- Hidden Fields for Form Submission -->
+                            <input type="hidden" :name="'zone_participations['+selectedZone+'][zone_id]'" :value="participations[selectedZone]?.zone_id">
+                            <input type="hidden" :name="'zone_participations['+selectedZone+'][children_members]'" value="0">
+                            <input type="hidden" :name="'zone_participations['+selectedZone+'][children_visitors]'" value="0">
+
+                            <!-- Inputs -->
+                            <div class="space-y-2">
+                                <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-1">Membros (A)</label>
+                                <input type="number" :name="'zone_participations['+selectedZone+'][adults_members]'" x-model="participations[selectedZone].adults_members" min="0"
+                                    class="zone-participation-input w-full px-4 py-3 bg-white border-transparent focus:ring-4 focus:ring-blue-500/10 rounded-xl transition-all font-black text-gray-700 text-center">
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-[9px] font-black uppercase tracking-widest text-gray-400 ml-1">Visitantes (A)</label>
+                                <input type="number" :name="'zone_participations['+selectedZone+'][adults_visitors]'" x-model="participations[selectedZone].adults_visitors" min="0"
+                                    class="zone-participation-input w-full px-4 py-3 bg-white border-transparent focus:ring-4 focus:ring-blue-500/10 rounded-xl transition-all font-black text-gray-700 text-center">
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-[9px] font-black uppercase tracking-widest text-orange-600 ml-1">Líderes</label>
+                                <input type="number" :name="'zone_participations['+selectedZone+'][leaders]'" x-model="participations[selectedZone].leaders" min="0"
+                                    class="zone-participation-input w-full px-4 py-3 bg-white border-transparent focus:ring-4 focus:ring-orange-500/10 rounded-xl transition-all font-black text-orange-600 text-center">
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-[9px] font-black uppercase tracking-widest text-orange-400 ml-1">Timóteos</label>
+                                <input type="number" :name="'zone_participations['+selectedZone+'][auxiliary_leaders]'" x-model="participations[selectedZone].auxiliary_leaders" min="0"
+                                    class="zone-participation-input w-full px-4 py-3 bg-white border-transparent focus:ring-4 focus:ring-orange-500/10 rounded-xl transition-all font-black text-orange-400 text-center">
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-[9px] font-black uppercase tracking-widest text-purple-600 ml-1">Supervisores</label>
+                                <input type="number" :name="'zone_participations['+selectedZone+'][supervisors]'" x-model="participations[selectedZone].supervisors" min="0"
+                                    class="zone-participation-input w-full px-4 py-3 bg-white border-transparent focus:ring-4 focus:ring-purple-500/10 rounded-xl transition-all font-black text-purple-600 text-center">
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-[9px] font-black uppercase tracking-widest text-red-600 ml-1">Pastores Z.</label>
+                                <input type="number" :name="'zone_participations['+selectedZone+'][zone_pastors]'" x-model="participations[selectedZone].zone_pastors" min="0"
+                                    class="zone-participation-input w-full px-4 py-3 bg-white border-transparent focus:ring-4 focus:ring-red-500/10 rounded-xl transition-all font-black text-red-600 text-center">
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end mt-8">
+                            <button type="button" @click="selectedZone = (selectedZone + 1 < zones.length ? selectedZone + 1 : null)"
+                                class="bg-blue-600 text-white px-8 py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex items-center gap-2">
+                                Próxima Zona <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div x-show="selectedZone === null" class="py-12 text-center bg-gray-50/30 rounded-[2rem] border-2 border-dashed border-gray-100">
+                        <div class="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-gray-300 mx-auto mb-4">
+                            <i class="bi bi-cursor text-2xl"></i>
+                        </div>
+                        <p class="text-sm font-bold text-gray-400">Selecione uma zona acima para editar os dados</p>
+                    </div>
+
+                    <!-- Hidden fields for all zones to ensure they are submitted -->
+                    <template x-for="(p, idx) in participations" :key="idx">
+                        <div x-show="selectedZone !== idx">
+                            <input type="hidden" :name="'zone_participations['+idx+'][zone_id]'" :value="p.zone_id">
+                            <input type="hidden" :name="'zone_participations['+idx+'][adults_members]'" :value="p.adults_members">
+                            <input type="hidden" :name="'zone_participations['+idx+'][adults_visitors]'" :value="p.adults_visitors">
+                            <input type="hidden" :name="'zone_participations['+idx+'][leaders]'" :value="p.leaders">
+                            <input type="hidden" :name="'zone_participations['+idx+'][auxiliary_leaders]'" :value="p.auxiliary_leaders">
+                            <input type="hidden" :name="'zone_participations['+idx+'][supervisors]'" :value="p.supervisors">
+                            <input type="hidden" :name="'zone_participations['+idx+'][zone_pastors]'" :value="p.zone_pastors">
+                            <input type="hidden" :name="'zone_participations['+idx+'][children_members]'" value="0">
+                            <input type="hidden" :name="'zone_participations['+idx+'][children_visitors]'" value="0">
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Footer Totals Summary -->
+                <div class="p-8 bg-blue-600 text-white">
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-6">
+                        <div class="text-center">
+                            <p class="text-[8px] font-black uppercase tracking-widest opacity-60 mb-1">Membros</p>
+                            <p class="text-xl font-black tabular-nums" x-text="participations.reduce((acc, p) => acc + Number(p.adults_members), 0)"></p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-[8px] font-black uppercase tracking-widest opacity-60 mb-1">Visitantes</p>
+                            <p class="text-xl font-black tabular-nums" x-text="participations.reduce((acc, p) => acc + Number(p.adults_visitors), 0)"></p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-[8px] font-black uppercase tracking-widest opacity-60 mb-1 text-orange-200">Líderes</p>
+                            <p class="text-xl font-black tabular-nums text-orange-200" x-text="participations.reduce((acc, p) => acc + Number(p.leaders), 0)"></p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-[8px] font-black uppercase tracking-widest opacity-60 mb-1 text-orange-100">Timóteos</p>
+                            <p class="text-xl font-black tabular-nums text-orange-100" x-text="participations.reduce((acc, p) => acc + Number(p.auxiliary_leaders), 0)"></p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-[8px] font-black uppercase tracking-widest opacity-60 mb-1 text-purple-200">Superv.</p>
+                            <p class="text-xl font-black tabular-nums text-purple-200" x-text="participations.reduce((acc, p) => acc + Number(p.supervisors), 0)"></p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-[8px] font-black uppercase tracking-widest opacity-60 mb-1 text-red-200">Pastores Z.</p>
+                            <p class="text-xl font-black tabular-nums text-red-200" x-text="participations.reduce((acc, p) => acc + Number(p.zone_pastors), 0)"></p>
+                        </div>
+                        <div class="text-center bg-blue-700/50 rounded-2xl p-2 border border-blue-500/30">
+                            <p class="text-[8px] font-black uppercase tracking-widest opacity-60 mb-1">Geral Ensino</p>
+                            <p class="text-xl font-black tabular-nums" x-text="participations.reduce((acc, p) => acc + Number(p.adults_members) + Number(p.adults_visitors) + Number(p.leaders) + Number(p.auxiliary_leaders) + Number(p.supervisors) + Number(p.zone_pastors), 0)"></p>
+                        </div>
+                    </div>
                 </div>
             </div>
 

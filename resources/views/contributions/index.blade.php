@@ -231,16 +231,22 @@
                                         </a>
                                         @if ($contribution->status === 'pendente')
                                             @if(auth()->user()->isComissaoObra() || auth()->user()->isAdmin())
-                                                <form action="{{ route('contributions.verify', $contribution) }}" method="POST" onsubmit="return confirm('Confirmar verificação desta contribuição?');">
-                                                    @csrf
-                                                    <button type="submit" class="action-icon bg-green-50 text-green-600 hover:bg-green-600 hover:text-white" title="Verificar">
-                                                        <i class="bi bi-check-lg"></i>
+                                                <div class="flex items-center gap-2">
+                                                    <form action="{{ route('contributions.verify', $contribution) }}" method="POST" onsubmit="return confirm('Confirmar verificação desta contribuição?');">
+                                                        @csrf
+                                                        <button type="submit" class="action-icon bg-green-50 text-green-600 hover:bg-green-600 hover:text-white" title="Verificar">
+                                                            <i class="bi bi-check-lg"></i>
+                                                        </button>
+                                                    </form>
+                                                    <a href="{{ route('contributions.edit', $contribution) }}"
+                                                        class="action-icon bg-gray-50 text-gray-400 hover:bg-orange-500 hover:text-white" title="Editar">
+                                                        <i class="bi bi-pencil-square"></i>
+                                                    </a>
+                                                    <button onclick="document.getElementById('reject-form-{{ $contribution->id }}').classList.toggle('hidden')" 
+                                                        class="action-icon bg-red-50 text-red-600 hover:bg-red-600 hover:text-white" title="Rejeitar">
+                                                        <i class="bi bi-x-lg"></i>
                                                     </button>
-                                                </form>
-                                                <button onclick="document.getElementById('reject-form-{{ $contribution->id }}').classList.toggle('hidden')" 
-                                                    class="action-icon bg-red-50 text-red-600 hover:bg-red-600 hover:text-white" title="Rejeitar">
-                                                    <i class="bi bi-x-lg"></i>
-                                                </button>
+                                                </div>
                                             @elseif(auth()->id() === $contribution->user_id)
                                                 <a href="{{ route('contributions.edit', $contribution) }}"
                                                     class="action-icon bg-gray-50 text-gray-400 hover:bg-orange-500 hover:text-white" title="Editar">
@@ -367,6 +373,10 @@
                         </a>
                         @if ($contribution->status === 'pendente')
                             @if(auth()->user()->isComissaoObra() || auth()->user()->isAdmin())
+                                <a href="{{ route('contributions.edit', $contribution) }}"
+                                    class="w-10 h-10 bg-gray-50 text-gray-400 flex items-center justify-center rounded-xl hover:bg-orange-500 hover:text-white transition-all" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
                                 <form action="{{ route('contributions.verify', $contribution) }}" method="POST" onsubmit="return confirm('Confirmar verificação desta contribuição?');">
                                     @csrf
                                     <button type="submit" class="w-10 h-10 bg-green-50 text-green-600 flex items-center justify-center rounded-xl hover:bg-green-600 hover:text-white transition-all">

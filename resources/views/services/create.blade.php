@@ -6,8 +6,8 @@
 
 @section('content')
     <div class="space-y-8" x-data="{ 
-                                    guestPreacher: {{ old('preacher_name') ? 'true' : 'false' }}
-                                }">
+                                        guestPreacher: {{ old('preacher_name') ? 'true' : 'false' }}
+                                    }">
         <!-- Header -->
         <div
             class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -42,6 +42,7 @@
                     </ul>
                 </div>
             @endif
+
 
             <!-- Section 1: Cabeçalho -->
             <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">

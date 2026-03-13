@@ -68,9 +68,13 @@
         @if($authUser && ($authUser->isLider() || $authUser->isResponsavelPacote() || $authUser->isAdmin() || $authUser->isComissaoObra()))
             <div class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-2 mt-2">Atalhos Rápidos</div>
             <div class="grid grid-cols-2 gap-2 px-2 py-2">
-                @if($authUser->isSecretaria() || $authUser->isAdmin() || $authUser->isAdministracao())
-                    <a href="{{ route('services.create') }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-orange-600/20 hover:border-orange-500/50 transition-all group">
-                        <i class="bi bi-plus-circle text-orange-500 mb-1 group-hover:scale-110 transition-transform text-2xl"></i>
+                @if($authUser->isSecretaria() || $authUser->isAdmin() || $authUser->isAdministracao() || $authUser->isPastorZona())
+                    <a href="{{ route('services.create-teaching') }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-orange-600/20 hover:border-orange-500/50 transition-all group">
+                        <i class="bi bi-mortarboard text-orange-400 mb-1 group-hover:scale-110 transition-transform text-2xl"></i>
+                        <span class="hidden md:block text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Registar Estudo</span>
+                    </a>
+                    <a href="{{ route('services.create') }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-blue-600/20 hover:border-blue-500/50 transition-all group">
+                        <i class="bi bi-plus-circle text-blue-500 mb-1 group-hover:scale-110 transition-transform text-2xl"></i>
                         <span class="hidden md:block text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Registar Culto</span>
                     </a>
                 @endif
