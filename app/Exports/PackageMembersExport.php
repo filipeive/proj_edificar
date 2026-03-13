@@ -24,12 +24,15 @@ class PackageMembersExport implements FromCollection, WithHeadings, WithTitle, W
 
         $now = now();
         // Lógica de ciclo: 20 do mês anterior ao dia 5 do mês atual
-        if ($now->day <= 5) {
-            $this->startDate = $now->copy()->subMonth()->startOfMonth()->addDays(19);
-            $this->endDate = $now->copy()->startOfMonth()->addDays(4);
-        } else {
+        // Dia 1-5: ciclo ativo = mês anterior dia 20 até este mês dia 5
+        // Dia 6-19: último ciclo completo = mês anterior dia 20 até este mês dia 5
+        // Dia 20+: ciclo ativo = este mês dia 20 até próximo mês dia 5
+        if ($now->day >= 20) {
             $this->startDate = $now->copy()->startOfMonth()->addDays(19);
             $this->endDate = $now->copy()->addMonth()->startOfMonth()->addDays(4);
+        } else {
+            $this->startDate = $now->copy()->subMonth()->startOfMonth()->addDays(19);
+            $this->endDate = $now->copy()->startOfMonth()->addDays(4);
         }
     }
 

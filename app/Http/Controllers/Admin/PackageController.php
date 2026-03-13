@@ -298,12 +298,14 @@ class PackageController
         }
 
         $now = now();
-        if ($now->day <= 5) {
-            $startDate = $now->copy()->subMonth()->startOfMonth()->addDays(19);
-            $endDate = $now->copy()->startOfMonth()->addDays(4);
-        } else {
+        // Dia 1-19: último ciclo completo (mês anterior dia 20 até este mês dia 5)
+        // Dia 20+: ciclo ativo (este mês dia 20 até próximo mês dia 5)
+        if ($now->day >= 20) {
             $startDate = $now->copy()->startOfMonth()->addDays(19);
             $endDate = $now->copy()->addMonth()->startOfMonth()->addDays(4);
+        } else {
+            $startDate = $now->copy()->subMonth()->startOfMonth()->addDays(19);
+            $endDate = $now->copy()->startOfMonth()->addDays(4);
         }
 
         $statusFilter = $request->query('export_status', 'all');
