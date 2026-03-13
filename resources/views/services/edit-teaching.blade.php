@@ -132,10 +132,12 @@
                     })) }},
                     isFilled(index) {
                         const p = this.participations[index];
+                        if (!p) return false;
                         return (p.adults_members > 0 || p.adults_visitors > 0 || p.leaders > 0 || p.auxiliary_leaders > 0 || p.supervisors > 0 || p.zone_pastors > 0);
                     },
                     getZoneTotal(index) {
                         const p = this.participations[index];
+                        if (!p) return 0;
                         return Number(p.adults_members) + Number(p.adults_visitors) + Number(p.leaders) + Number(p.auxiliary_leaders) + Number(p.supervisors) + Number(p.zone_pastors);
                     }
                  }">

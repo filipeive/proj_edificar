@@ -6,9 +6,9 @@
 
 @section('content')
     <div class="space-y-8" x-data="{ 
-                                                                guestPreacher: {{ old('preacher_name') ? 'true' : 'false' }},
-                                                                serviceType: 'teaching'
-                                                            }">
+                                                                    guestPreacher: {{ old('preacher_name') ? 'true' : 'false' }},
+                                                                    serviceType: 'teaching'
+                                                                }">
         <!-- Header -->
         <div
             class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -117,27 +117,32 @@
 
             <!-- Section: Participação por Zona (Novo Fluxo Wizard) -->
             <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden" x-data="{ 
-                                selectedZone: 0,
-                                zones: {{ Js::from($zones) }},
-                                participations: zones.map(z => ({
-                                    zone_id: z.id,
-                                    name: z.name,
-                                    adults_members: 0,
-                                    adults_visitors: 0,
-                                    leaders: 0,
-                                    auxiliary_leaders: 0,
-                                    supervisors: 0,
-                                    zone_pastors: 0
-                                })),
-                                isFilled(index) {
-                                    const p = this.participations[index];
-                                    return (p.adults_members > 0 || p.adults_visitors > 0 || p.leaders > 0 || p.auxiliary_leaders > 0 || p.supervisors > 0 || p.zone_pastors > 0);
-                                },
-                                getZoneTotal(index) {
-                                    const p = this.participations[index];
-                                    return Number(p.adults_members) + Number(p.adults_visitors) + Number(p.leaders) + Number(p.auxiliary_leaders) + Number(p.supervisors) + Number(p.zone_pastors);
-                                }
-                             }">
+                                    selectedZone: 0,
+                                    zones: {{ Js::from($zones) }},
+                                    participations: [],
+                                    init() {
+                                        this.participations = this.zones.map(z => ({
+                                            zone_id: z.id,
+                                            name: z.name,
+                                            adults_members: 0,
+                                            adults_visitors: 0,
+                                            leaders: 0,
+                                            auxiliary_leaders: 0,
+                                            supervisors: 0,
+                                            zone_pastors: 0
+                                        }));
+                                    },
+                                    isFilled(index) {
+                                        const p = this.participations[index];
+                                        if (!p) return false;
+                                        return (p.adults_members > 0 || p.adults_visitors > 0 || p.leaders > 0 || p.auxiliary_leaders > 0 || p.supervisors > 0 || p.zone_pastors > 0);
+                                    },
+                                    getZoneTotal(index) {
+                                        const p = this.participations[index];
+                                        if (!p) return 0;
+                                        return Number(p.adults_members) + Number(p.adults_visitors) + Number(p.leaders) + Number(p.auxiliary_leaders) + Number(p.supervisors) + Number(p.zone_pastors);
+                                    }
+                                 }">
                 <div class="p-8 border-b border-gray-50 bg-blue-50/30 flex items-center justify-between flex-wrap gap-4">
                     <div class="space-y-1">
                         <h2 class="text-lg font-black text-gray-900 flex items-center gap-2">
