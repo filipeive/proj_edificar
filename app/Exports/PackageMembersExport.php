@@ -18,21 +18,22 @@ class PackageMembersExport implements FromCollection, WithHeadings, WithTitle, W
     protected $startDate;
     protected $endDate;
 
-    public function __construct(CommitmentPackage $package)
+    public function __construct(CommitmentPackage $package, $startDate = null, $endDate = null)
     {
         $this->package = $package;
 
-        $now = now();
-        // Lógica de ciclo: 20 do mês anterior ao dia 5 do mês atual
-        // Dia 1-5: ciclo ativo = mês anterior dia 20 até este mês dia 5
-        // Dia 6-19: último ciclo completo = mês anterior dia 20 até este mês dia 5
-        // Dia 20+: ciclo ativo = este mês dia 20 até próximo mês dia 5
-        if ($now->day >= 20) {
-            $this->startDate = $now->copy()->startOfMonth()->addDays(19);
-            $this->endDate = $now->copy()->addMonth()->startOfMonth()->addDays(4);
+        if ($startDate && $endDate) {
+            $this->startDate = \Carbon\Carbon::parse($startDate);
+            $this->endDate = \Carbon\Carbon::parse($endDate);
         } else {
-            $this->startDate = $now->copy()->subMonth()->startOfMonth()->addDays(19);
-            $this->endDate = $now->copy()->startOfMonth()->addDays(4);
+            $now = now();
+            if ($now->day >= 20) {
+                $this->startDate = $now->copy()->startOfMonth()->addDays(19);
+                $this->endDate = $now->copy()->addMonth()->startOfMonth()->addDays(4);
+            } else {
+                $this->startDate = $now->copy()->subMonth()->startOfMonth()->addDays(19);
+                $this->endDate = $now->copy()->startOfMonth()->addDays(4);
+            }
         }
     }
 

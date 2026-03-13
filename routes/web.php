@@ -277,6 +277,7 @@ Route::middleware('auth')->group(function () {
         Route::post('packages/{package}/members/{user}/send-sms', [PackageController::class, 'sendMemberSms'])->name('packages.members.send-sms');
         Route::get('packages/{package}/export', [PackageController::class, 'export'])->name('packages.export');
         Route::get('packages/{package}/export-pdf', [PackageController::class, 'exportPdf'])->name('packages.export-pdf');
+        Route::get('packages/{package}/whatsapp-export', [PackageController::class, 'whatsappExport'])->name('packages.whatsapp-export');
 
         // Members Management
         Route::delete('packages/{package}/members/{user}', [PackageController::class, 'removeMember'])->name('packages.members.remove');

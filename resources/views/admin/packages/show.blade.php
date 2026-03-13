@@ -54,21 +54,36 @@
                 </div>
             </div>
 
-            <div class="hidden md:flex items-center gap-2">
+            <div class="hidden md:flex items-center gap-2" x-data="exportPanel()" x-init="init()">
                 @if($package->whatsapp_link)
                     <a href="{{ $package->whatsapp_link }}" target="_blank"
                         class="px-4 py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-all text-xs font-bold uppercase tracking-widest flex items-center gap-2">
                         <i class="bi bi-whatsapp"></i> WhatsApp
                     </a>
                 @endif
-                <div class="h-8 w-px bg-gray-200 mx-2"></div>
-                <a href="{{ route('packages.export', $package) }}"
-                    class="px-4 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-all text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                <div class="h-8 w-px bg-gray-200 mx-1"></div>
+
+                {{-- Date Pickers --}}
+                <input type="date" x-model="startDate"
+                    class="px-2 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg text-[10px] font-bold">
+                <span class="text-gray-400 text-[10px] font-bold">a</span>
+                <input type="date" x-model="endDate"
+                    class="px-2 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg text-[10px] font-bold">
+
+                <div class="h-8 w-px bg-gray-200 mx-1"></div>
+
+                {{-- Excel Export --}}
+                <a :href="'{{ route('packages.export', $package) }}' + '?start_date=' + startDate + '&end_date=' + endDate"
+                    class="px-3 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-all text-xs font-bold uppercase tracking-widest flex items-center gap-2">
                     <i class="bi bi-file-earmark-excel"></i> Excel
                 </a>
-                <form action="{{ route('packages.export-pdf', $package) }}" method="GET" class="flex items-center gap-2">
+
+                {{-- PDF Export --}}
+                <form :action="'{{ route('packages.export-pdf', $package) }}'" method="GET" class="flex items-center gap-1">
+                    <input type="hidden" name="start_date" :value="startDate">
+                    <input type="hidden" name="end_date" :value="endDate">
                     <select name="export_status"
-                        class="px-2.5 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg text-[10px] font-black uppercase tracking-widest">
+                        class="px-2 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg text-[10px] font-black uppercase tracking-widest">
                         <option value="all">Todos</option>
                         <option value="pending">Pendentes</option>
                         <option value="partial">Parciais</option>
@@ -76,7 +91,7 @@
                         <option value="surplus">Acréscimo</option>
                     </select>
                     <select name="sort_by"
-                        class="px-2.5 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg text-[10px] font-black uppercase tracking-widest">
+                        class="px-2 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg text-[10px] font-black uppercase tracking-widest">
                         <option value="name_asc">Nome A-Z</option>
                         <option value="name_desc">Nome Z-A</option>
                         <option value="committed_desc">Compromisso</option>
@@ -84,10 +99,18 @@
                         <option value="progress_desc">Progresso</option>
                     </select>
                     <button type="submit"
-                        class="px-4 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-all text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                        class="px-3 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-all text-xs font-bold uppercase tracking-widest flex items-center gap-2">
                         <i class="bi bi-file-earmark-pdf"></i> PDF
                     </button>
                 </form>
+
+                {{-- WhatsApp Export --}}
+                <button @click="copyWhatsapp()" :disabled="loadingWa"
+                    class="px-3 py-2 bg-green-50 text-green-600 border border-green-200 rounded-lg hover:bg-green-100 transition-all text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                    <i class="bi" :class="loadingWa ? 'bi-hourglass-split animate-spin' : copied ? 'bi-check2' : 'bi-whatsapp'"></i>
+                    <span x-text="copied ? 'Copiado!' : 'Lista WA'"></span>
+                </button>
+
                 @if(!auth()->user()->isResponsavelPacote())
                     <a href="{{ route('packages.edit', $package) }}"
                         class="px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all text-xs font-bold uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-gray-200">
@@ -792,6 +815,48 @@
                         element.classList.remove('bg-green-500', 'text-white', 'border-transparent');
                     }, 2000);
                 });
+            }
+
+            function exportPanel() {
+                return {
+                    startDate: '',
+                    endDate: '',
+                    loadingWa: false,
+                    copied: false,
+                    init() {
+                        // Calculate default cycle dates (same logic as backend)
+                        const now = new Date();
+                        const day = now.getDate();
+                        let start, end;
+                        if (day >= 20) {
+                            start = new Date(now.getFullYear(), now.getMonth(), 20);
+                            end = new Date(now.getFullYear(), now.getMonth() + 1, 5);
+                        } else {
+                            start = new Date(now.getFullYear(), now.getMonth() - 1, 20);
+                            end = new Date(now.getFullYear(), now.getMonth(), 5);
+                        }
+                        this.startDate = start.toISOString().split('T')[0];
+                        this.endDate = end.toISOString().split('T')[0];
+                    },
+                    async copyWhatsapp() {
+                        this.loadingWa = true;
+                        this.copied = false;
+                        try {
+                            const url = `{{ route('packages.whatsapp-export', $package) }}?start_date=${this.startDate}&end_date=${this.endDate}`;
+                            const res = await fetch(url, {
+                                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                            });
+                            const data = await res.json();
+                            await navigator.clipboard.writeText(data.message);
+                            this.copied = true;
+                            setTimeout(() => { this.copied = false; }, 3000);
+                        } catch (e) {
+                            alert('Erro ao gerar lista WhatsApp: ' + e.message);
+                        } finally {
+                            this.loadingWa = false;
+                        }
+                    }
+                };
             }
         </script>
 @endsection

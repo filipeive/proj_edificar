@@ -284,10 +284,12 @@ class PackageController
         return back()->with('success', 'Dados do membro atualizados com sucesso!');
     }
 
-    public function export(CommitmentPackage $package)
+    public function export(Request $request, CommitmentPackage $package)
     {
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
         $filename = 'membros_' . \Illuminate\Support\Str::slug($package->name) . '_' . now()->format('Y_m_d') . '.xlsx';
-        return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\PackageMembersExport($package), $filename);
+        return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\PackageMembersExport($package, $startDate, $endDate), $filename);
     }
 
     public function exportPdf(Request $request, CommitmentPackage $package)
@@ -297,15 +299,18 @@ class PackageController
             abort(403, 'Acesso negado a este pacote.');
         }
 
-        $now = now();
-        // Dia 1-19: último ciclo completo (mês anterior dia 20 até este mês dia 5)
-        // Dia 20+: ciclo ativo (este mês dia 20 até próximo mês dia 5)
-        if ($now->day >= 20) {
-            $startDate = $now->copy()->startOfMonth()->addDays(19);
-            $endDate = $now->copy()->addMonth()->startOfMonth()->addDays(4);
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $startDate = \Carbon\Carbon::parse($request->query('start_date'));
+            $endDate = \Carbon\Carbon::parse($request->query('end_date'));
         } else {
-            $startDate = $now->copy()->subMonth()->startOfMonth()->addDays(19);
-            $endDate = $now->copy()->startOfMonth()->addDays(4);
+            $now = now();
+            if ($now->day >= 20) {
+                $startDate = $now->copy()->startOfMonth()->addDays(19);
+                $endDate = $now->copy()->addMonth()->startOfMonth()->addDays(4);
+            } else {
+                $startDate = $now->copy()->subMonth()->startOfMonth()->addDays(19);
+                $endDate = $now->copy()->startOfMonth()->addDays(4);
+            }
         }
 
         $statusFilter = $request->query('export_status', 'all');
@@ -616,5 +621,75 @@ class PackageController
             ->update(['end_date' => now()]);
 
         return back()->with('success', 'Membros selecionados foram removidos do pacote.');
+    }
+
+    public function whatsappExport(Request $request, CommitmentPackage $package)
+    {
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $startDate = \Carbon\Carbon::parse($request->start_date);
+            $endDate = \Carbon\Carbon::parse($request->end_date);
+        } else {
+            $now = now();
+            if ($now->day >= 20) {
+                $startDate = $now->copy()->startOfMonth()->addDays(19);
+                $endDate = $now->copy()->addMonth()->startOfMonth()->addDays(4);
+            } else {
+                $startDate = $now->copy()->subMonth()->startOfMonth()->addDays(19);
+                $endDate = $now->copy()->startOfMonth()->addDays(4);
+            }
+        }
+
+        $paidByUser = Contribution::verified()
+            ->where('package_id', $package->id)
+            ->whereBetween('contribution_date', [$startDate, $endDate])
+            ->selectRaw('user_id, SUM(amount) as total_paid')
+            ->groupBy('user_id')
+            ->get()
+            ->keyBy('user_id');
+
+        $rows = $package->userCommitments()
+            ->with('user')
+            ->get()
+            ->map(function ($commitment) use ($paidByUser) {
+                $paid = (float) ($paidByUser->get($commitment->user_id)?->total_paid ?? 0);
+                $committed = (float) $commitment->committed_amount;
+
+                if ($paid <= 0) {
+                    $icon = '❌';
+                    $status = 'pending';
+                } elseif ($paid < $committed) {
+                    $icon = '🔶';
+                    $status = 'partial';
+                } else {
+                    $icon = '✅';
+                    $status = 'paid';
+                }
+
+                return [
+                    'name' => $commitment->user->name,
+                    'icon' => $icon,
+                    'status' => $status,
+                    'paid' => $paid,
+                    'committed' => $committed,
+                ];
+            })
+            ->sortBy('name')
+            ->values();
+
+        $header = "*{$package->name}* — Período: {$startDate->format('d/m/Y')} a {$endDate->format('d/m/Y')}\n\n";
+        $lines = $rows->map(function ($row, $index) {
+            $num = $index + 1;
+            return "{$num}. {$row['name']} {$row['icon']}";
+        })->implode("\n");
+
+        $paidCount = $rows->where('status', 'paid')->count();
+        $partialCount = $rows->where('status', 'partial')->count();
+        $pendingCount = $rows->where('status', 'pending')->count();
+
+        $footer = "\n\n--- Resumo ---\n✅ Pagos: {$paidCount}\n🔶 Parciais: {$partialCount}\n❌ Pendentes: {$pendingCount}\nTotal: {$rows->count()} membros";
+
+        return response()->json([
+            'message' => $header . $lines . $footer,
+        ]);
     }
 }
