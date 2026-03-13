@@ -804,9 +804,32 @@
         </div>
 
         <script>
+            // Fallback for HTTP (production without HTTPS) where navigator.clipboard is undefined
+            function fallbackCopyText(text) {
+                return new Promise((resolve, reject) => {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(text).then(resolve).catch(reject);
+                    } else {
+                        try {
+                            const ta = document.createElement('textarea');
+                            ta.value = text;
+                            ta.style.position = 'fixed';
+                            ta.style.left = '-9999px';
+                            ta.style.top = '-9999px';
+                            document.body.appendChild(ta);
+                            ta.focus();
+                            ta.select();
+                            const ok = document.execCommand('copy');
+                            document.body.removeChild(ta);
+                            ok ? resolve() : reject(new Error('execCommand failed'));
+                        } catch (e) { reject(e); }
+                    }
+                });
+            }
+
             function copyToClipboard(text, successMessage, element) {
                 if (!text) return alert('Nada para copiar');
-                navigator.clipboard.writeText(text).then(() => {
+                fallbackCopyText(text).then(() => {
                     const originalText = element.innerHTML;
                     element.innerHTML = `<i class="bi bi-check2"></i> ${successMessage}`;
                     element.classList.add('bg-green-500', 'text-white', 'border-transparent');
@@ -824,7 +847,6 @@
                     loadingWa: false,
                     copied: false,
                     init() {
-                        // Calculate default cycle dates (same logic as backend)
                         const now = new Date();
                         const day = now.getDate();
                         let start, end;
@@ -847,7 +869,7 @@
                                 headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
                             });
                             const data = await res.json();
-                            await navigator.clipboard.writeText(data.message);
+                            await fallbackCopyText(data.message);
                             this.copied = true;
                             setTimeout(() => { this.copied = false; }, 3000);
                         } catch (e) {
