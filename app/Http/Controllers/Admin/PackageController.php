@@ -648,6 +648,7 @@ class PackageController
             ->keyBy('user_id');
 
         $rows = $package->userCommitments()
+            ->active()
             ->with('user')
             ->get()
             ->map(function ($commitment) use ($paidByUser) {
@@ -679,7 +680,8 @@ class PackageController
         $header = "*{$package->name}* — Período: {$startDate->format('d/m/Y')} a {$endDate->format('d/m/Y')}\n\n";
         $lines = $rows->map(function ($row, $index) {
             $num = $index + 1;
-            return "{$num}. {$row['name']} {$row['icon']}";
+            $amountText = $row['paid'] > 0 ? " - " . number_format($row['paid'], 0, ',', '.') . " MT" : "";
+            return "{$num}. {$row['name']}{$amountText} {$row['icon']}";
         })->implode("\n");
 
         $paidCount = $rows->where('status', 'paid')->count();
