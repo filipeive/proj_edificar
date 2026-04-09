@@ -11,12 +11,12 @@ class EventTypeSeeder extends Seeder
     {
         $types = [
             [
-                'name' => 'Treinamento',
+                'name' => 'Treinamentos',
                 'code' => 'training',
                 'category' => 'training',
             ],
             [
-                'name' => 'Confraternização',
+                'name' => 'Confraternizações',
                 'code' => 'fellowship',
                 'category' => 'fellowship',
             ],
@@ -36,7 +36,7 @@ class EventTypeSeeder extends Seeder
                 'category' => 'ceremony',
             ],
             [
-                'name' => 'Ação Comunitária',
+                'name' => 'Servindo a Comunidade',
                 'code' => 'community_service',
                 'category' => 'service',
             ],

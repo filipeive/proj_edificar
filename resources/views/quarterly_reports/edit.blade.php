@@ -120,9 +120,9 @@
                                 'timoteos_count' => ['icon' => 'bi-award', 'label' => 'Auxiliares', 'color' => 'indigo'],
                                 'members_count' => ['icon' => 'bi-people', 'label' => 'Membros', 'color' => 'green'],
                                 'visitors_count' => ['icon' => 'bi-person-plus', 'label' => 'Visitantes', 'color' => 'orange'],
-                                'saved_count' => ['icon' => 'bi-heart-pulse', 'label' => 'Decisões', 'color' => 'red'],
+                                'saved_count' => ['icon' => 'bi-heart-pulse', 'label' => 'Salvações', 'color' => 'red'],
                                 'cells_count' => ['icon' => 'bi-grid-3x3-gap', 'label' => 'Células', 'color' => 'purple'],
-                                'participants_count' => ['icon' => 'bi-graph-up', 'label' => 'Part. Médios', 'color' => 'orange'],
+                                'participants_count' => ['icon' => 'bi-graph-up', 'label' => 'Participantes', 'color' => 'orange'],
                             ];
                         @endphp
                         @foreach($stats as $field => $data)
@@ -166,7 +166,7 @@
                         <div class="p-8 space-y-6">
                             @php
                                 $results = [
-                                    'planned_baptism_count' => 'Alvo de Batismos',
+                                    'planned_baptism_count' => 'Baptismos Planificados',
                                     'baptized_count' => 'Batismos Realizados',
                                     'cell_multiplications_count' => 'Multiplicações de Célula',
                                     'disciplined_leaders_count' => 'Líderes Disciplinados',

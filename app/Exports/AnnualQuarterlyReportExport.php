@@ -45,7 +45,7 @@ class AnnualQuarterlyReportExport implements FromCollection, WithHeadings, WithM
                 'AUXILIARES (MÉDIA)',
                 'MEMBROS (MÉDIA)',
                 'VISITANTES (MÉDIA)',
-                'DECISÕES (TOTAL)',
+                'SALVAÇÕES (TOTAL)',
                 'BAPTISMOS PLANO (TOTAL)',
                 'BAPTISMOS REAL (TOTAL)',
                 '% BAPTISMOS',

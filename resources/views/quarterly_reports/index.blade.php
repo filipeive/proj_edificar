@@ -466,7 +466,7 @@
                         </div>
                         <div class="p-4 bg-green-50/30 rounded-2xl border border-green-50 flex flex-col items-center">
                             <span class="text-xl font-black text-green-600">{{ $report->saved_count }}</span>
-                            <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Decisões</span>
+                            <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Salvações</span>
                         </div>
                         <div class="p-4 bg-orange-50/30 rounded-2xl border border-orange-50 flex flex-col items-center">
                             <span class="text-xl font-black text-orange-600">{{ $report->baptized_count }}</span>

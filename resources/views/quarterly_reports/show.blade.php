@@ -77,8 +77,8 @@
                                 ['label' => 'Timóteos (Aux)', 'value' => $quarterlyReport->timoteos_count, 'icon' => 'bi-award', 'color' => 'indigo'],
                                 ['label' => 'Membros Arrolados', 'value' => $quarterlyReport->members_count, 'icon' => 'bi-people', 'color' => 'green'],
                                 ['label' => 'Visitantes', 'value' => $quarterlyReport->visitors_count, 'icon' => 'bi-person-plus', 'color' => 'orange'],
-                                ['label' => 'Média Participação', 'value' => $quarterlyReport->participants_count, 'icon' => 'bi-graph-up', 'color' => 'orange'],
-                                ['label' => 'Novas Conversões', 'value' => $quarterlyReport->saved_count, 'icon' => 'bi-heart-pulse', 'color' => 'red'],
+                                ['label' => 'Participantes', 'value' => $quarterlyReport->participants_count, 'icon' => 'bi-graph-up', 'color' => 'orange'],
+                                ['label' => 'Salvações', 'value' => $quarterlyReport->saved_count, 'icon' => 'bi-heart-pulse', 'color' => 'red'],
                             ];
                         @endphp
                         @foreach($stats as $stat)

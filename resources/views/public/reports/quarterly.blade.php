@@ -155,9 +155,9 @@
                                     'timoteos_count' => ['icon' => 'bi-award', 'label' => 'Auxiliares', 'color' => 'indigo'],
                                     'members_count' => ['icon' => 'bi-people', 'label' => 'Membros', 'color' => 'green'],
                                     'visitors_count' => ['icon' => 'bi-person-plus', 'label' => 'Visitantes', 'color' => 'orange'],
-                                    'saved_count' => ['icon' => 'bi-heart-pulse', 'label' => 'Decisões', 'color' => 'red'],
+                                    'saved_count' => ['icon' => 'bi-heart-pulse', 'label' => 'Salvações', 'color' => 'red'],
                                     'cells_count' => ['icon' => 'bi-grid-3x3-gap', 'label' => 'Células', 'color' => 'purple'],
-                                    'participants_count' => ['icon' => 'bi-graph-up', 'label' => 'Part. Médios', 'color' => 'orange'],
+                                    'participants_count' => ['icon' => 'bi-graph-up', 'label' => 'Participantes', 'color' => 'orange'],
                                 ];
                             @endphp
                             @foreach($stats as $field => $data)
@@ -198,7 +198,7 @@
                             <div class="p-8 space-y-6">
                                 @php
                                     $results = [
-                                        'planned_baptism_count' => 'Alvo de Batismos',
+                                        'planned_baptism_count' => 'Baptismos Planificados',
                                         'baptized_count' => 'Batismos Realizados',
                                         'cell_multiplications_count' => 'Multiplicações de Célula',
                                         'disciplined_leaders_count' => 'Líderes Disciplinados',
@@ -243,7 +243,165 @@
                         </div>
                     </div>
 
-                    <div class="bg-white/5 rounded-[2.5rem] border border-white/10 p-8 flex justify-between items-center">
+                    <div class="bg-white/5 rounded-[2.5rem] border border-white/10 p-8 flex justify-between">
+                        <button type="button" @click="step--"
+                            class="bg-white/10 text-white px-10 py-4 rounded-2xl font-black hover:bg-white/20 transition-all">
+                            <i class="bi bi-arrow-left mr-2"></i>
+                            Voltar
+                        </button>
+                        <button type="button" @click="nextStep()"
+                            class="bg-blue-600 text-white px-10 py-4 rounded-2xl font-black hover:bg-blue-700 transition-all shadow-xl shadow-blue-200">
+                            Próximo Passo
+                            <i class="bi bi-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                {{-- STEP 3: HEALTH INDICATORS (SECÇÃO IV) --}}
+                <div x-show="step === 3" x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-x-12" x-transition:enter-end="opacity-100 translate-x-0"
+                    class="space-y-8">
+                    <div class="bg-white/5 rounded-[2.5rem] border border-white/10 overflow-hidden">
+                        <div class="p-8 border-b border-white/10 bg-white/5 flex flex-col md:flex-row justify-between gap-4">
+                            <h2 class="text-lg font-black text-white flex items-center gap-3">
+                                <span
+                                    class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm">3</span>
+                                Indicadores de Saúde (Pontos Fortes e Fracos)
+                            </h2>
+                            <div class="flex gap-4">
+                                <span
+                                    class="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                                    <span class="w-3 h-3 rounded bg-red-500/30"></span> 0 - Fraco
+                                </span>
+                                <span
+                                    class="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                                    <span class="w-3 h-3 rounded bg-blue-500"></span> 3 - Excelente
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="p-8 space-y-12">
+                            @php
+                                $sections = [
+                                    'discipleship' => [
+                                        'title' => 'Discipulado e Evangelismo',
+                                        'icon' => 'bi-chat-heart',
+                                        'color' => 'blue',
+                                        'questions' => [
+                                            'discipleship_score' => 'Como está o discipulado um a um na supervisão?',
+                                            'evangelism_strategy' => 'Existe uma estratégia clara de evangelismo (GEs)?',
+                                            'consolidation_growth' => 'Os novos convertidos estão sendo consolidados?',
+                                        ]
+                                    ],
+                                    'pastoral' => [
+                                        'title' => 'Cuidado Pastoral',
+                                        'icon' => 'bi-heart-pulse',
+                                        'color' => 'red',
+                                        'questions' => [
+                                            'pastoral_score' => 'Qualidade do cuidado pastoral aos líderes?',
+                                            'visitation_routine' => 'A rotina de visitação está sendo cumprida?',
+                                            'leader_support' => 'Os líderes se sentem apoiados emocional e espiritualmente?',
+                                        ]
+                                    ],
+                                    'participation' => [
+                                        'title' => 'Participação e Frequência',
+                                        'icon' => 'bi-graph-up',
+                                        'color' => 'green',
+                                        'questions' => [
+                                            'cell_participation_score' => 'Participação média nas reuniões de célula?',
+                                            'service_participation_score' => 'Presença dos membros nos cultos de celebração?',
+                                            'tadium_participation' => 'Envolvimento dos líderes no TADEL / Reuniões de Liderança?',
+                                        ]
+                                    ],
+                                    'relationship' => [
+                                        'title' => 'Comunhão e Relacionamentos',
+                                        'icon' => 'bi-people',
+                                        'color' => 'purple',
+                                        'questions' => [
+                                            'communion_in_cells_score' => 'Nível de comunhão interna nas células?',
+                                            'relationship_building_score' => 'Os novos se sentem integrados à família da igreja?',
+                                            'prayer_intercession_score' => 'A vida de oração e intercessão do grupo?',
+                                        ]
+                                    ]
+                                ];
+                            @endphp
+
+                            @foreach($sections as $id => $section)
+                                <div class="space-y-6">
+                                    <h3
+                                        class="flex items-center gap-2 text-sm font-black text-{{ $section['color'] }}-400 uppercase tracking-widest">
+                                        <i class="bi {{ $section['icon'] }}"></i>
+                                        {{ $section['title'] }}
+                                    </h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        @foreach($section['questions'] as $field => $question)
+                                            <div
+                                                class="space-y-4 p-6 bg-white/5 rounded-[2rem] hover:bg-white/10 transition-all border border-white/10 group">
+                                                <p
+                                                    class="text-sm font-black text-gray-200 group-hover:text-{{ $section['color'] }}-300 transition-colors">
+                                                    {{ $question }}
+                                                </p>
+                                                <div class="flex gap-2 justify-between">
+                                                    @for($i = 0; $i <= 3; $i++)
+                                                        <label class="flex-1">
+                                                            <input type="radio" name="{{ $field }}" value="{{ $i }}" class="hidden peer"
+                                                                required @if($i == 2) checked @endif>
+                                                            <div
+                                                                class="w-full py-3 text-center rounded-xl bg-white/10 border border-white/10 text-sm font-black transition-all cursor-pointer
+                                                                peer-checked:bg-{{ $section['color'] }}-600 peer-checked:text-white peer-checked:shadow-lg peer-checked:shadow-{{ $section['color'] }}-900/30
+                                                                hover:border-{{ $section['color'] }}-500 text-gray-400">
+                                                                {{ $i }}
+                                                            </div>
+                                                        </label>
+                                                    @endfor
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <div class="bg-white/5 rounded-[2.5rem] border border-white/10 p-8 flex justify-between">
+                        <button type="button" @click="step--"
+                            class="bg-white/10 text-white px-10 py-4 rounded-2xl font-black hover:bg-white/20 transition-all">
+                            <i class="bi bi-arrow-left mr-2"></i>
+                            Voltar
+                        </button>
+                        <button type="button" @click="nextStep()"
+                            class="bg-blue-600 text-white px-10 py-4 rounded-2xl font-black hover:bg-blue-700 transition-all shadow-xl shadow-blue-200">
+                            Próximo Passo
+                            <i class="bi bi-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                {{-- STEP 4: OBSERVATIONS & SUBMIT --}}
+                <div x-show="step === 4" x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-x-12" x-transition:enter-end="opacity-100 translate-x-0"
+                    class="space-y-8">
+                    <div class="bg-white/5 rounded-[2.5rem] border border-white/10 overflow-hidden">
+                        <div class="p-8 border-b border-white/10 bg-white/5">
+                            <h2 class="text-lg font-black text-white flex items-center gap-3">
+                                <span
+                                    class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm">4</span>
+                                Conclusão e Observações
+                            </h2>
+                        </div>
+                        <div class="p-8 space-y-8">
+                            <div class="space-y-4">
+                                <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Relato
+                                    Descritivo do Trimestre</label>
+                                <textarea name="ministerial_observations" rows="10"
+                                    placeholder="Conte-nos os maiores desafios superados, vitórias alcançadas e o que Deus tem feito nesta supervisão..."
+                                    class="w-full px-8 py-6 bg-white/10 border border-white/10 focus:bg-white/10 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-[2.5rem] transition-all font-medium text-white placeholder-gray-500 resize-none"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-white/5 rounded-[2.5rem] border border-white/10 p-8 flex justify-between items-center">
                         <button type="button" @click="step--"
                             class="bg-white/10 text-white px-10 py-4 rounded-2xl font-black hover:bg-white/20 transition-all">
                             <i class="bi bi-arrow-left mr-2"></i>
