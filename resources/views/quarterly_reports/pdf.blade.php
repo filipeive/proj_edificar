@@ -236,49 +236,47 @@
             </div>
         @endforeach
     @endif
+
+    <style>
+        .indicators-grid {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 10px 15px;
+        }
+
+        .indicator-item {
+            background-color: white;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .indicator-label {
+            font-size: 9px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #6b7280;
+            margin-bottom: 6px;
+        }
+
+        .bar-container {
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .indicator-value {
+            font-size: 11px;
+            font-weight: bold;
+            color: #374151;
+            text-align: right;
+        }
+    </style>
 @endsection
-
-<push name='styles')
-<style>
-    .indicators-grid {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 10px 15px;
-    }
-
-    .indicator-item {
-        background-color: white;
-        padding: 10px;
-        border-radius: 8px;
-        border: 1px solid #e5e7eb;
-    }
-
-    .indicator-label {
-        font-size: 9px;
-        font-weight: bold;
-        text-transform: uppercase;
-        color: #6b7280;
-        margin-bottom: 6px;
-    }
-
-    .bar-container {
-        height: 8px;
-        background-color: #e5e7eb;
-        border-radius: 4px;
-        overflow: hidden;
-        margin-bottom: 4px;
-    }
-
-    .bar-fill {
-        height: 100%;
-        border-radius: 4px;
-    }
-
-    .indicator-value {
-        font-size: 11px;
-        font-weight: bold;
-        color: #374151;
-        text-align: right;
-    }
-</style>
-@endpush
