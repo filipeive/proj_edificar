@@ -11,10 +11,28 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class QuarterlyReportExport implements FromCollection, WithHeadings, WithStyles, WithTitle
 {
+    protected $year;
+
+    protected $quarter;
+
+    public function __construct($year = null, $quarter = null)
+    {
+        $this->year = $year;
+        $this->quarter = $quarter;
+    }
+
     public function collection()
     {
-        return QuarterlyReport::with(['zone', 'supervision', 'supervisor', 'events.eventType'])
-            ->get()
+        $query = QuarterlyReport::with(['zone', 'supervision', 'supervisor', 'events.eventType']);
+
+        if ($this->year) {
+            $query->where('year', $this->year);
+        }
+        if ($this->quarter) {
+            $query->where('quarter', $this->quarter);
+        }
+
+        return $query->get()
             ->map(function ($report) {
                 $eventsSummary = $report->events->map(function ($event) {
                     return $event->eventType->name.': '.$event->count.($event->description ? ' ('.$event->description.')' : '');
@@ -103,7 +121,19 @@ class QuarterlyReportExport implements FromCollection, WithHeadings, WithStyles,
 
     public function title(): string
     {
-        return 'Relatórios Trimestrais';
+        $parts = [];
+        if ($this->year) {
+            $parts[] = $this->year;
+        }
+        if ($this->quarter) {
+            $parts[] = $this->quarter.'º Trimestre';
+        }
+
+        if (empty($parts)) {
+            return 'Todos os Relatórios Trimestrais';
+        }
+
+        return 'Relatório Trimestral - '.implode(' / ', $parts);
     }
 
     public function styles(Worksheet $sheet)

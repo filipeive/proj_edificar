@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Exports\AnnualQuarterlyReportExport;
 use App\Models\EventType;
 use App\Models\QuarterlyReport;
-use App\Models\QuarterlyReportEvent;
 use App\Models\Supervision;
 use App\Models\Zone;
 use Illuminate\Http\Request;
@@ -31,8 +30,8 @@ class QuarterlyReportController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->whereHas('supervisor', fn($sq) => $sq->where('name', 'LIKE', "%$search%"))
-                    ->orWhereHas('zone', fn($zq) => $zq->where('name', 'LIKE', "%$search%"));
+                $q->whereHas('supervisor', fn ($sq) => $sq->where('name', 'LIKE', "%$search%"))
+                    ->orWhereHas('zone', fn ($zq) => $zq->where('name', 'LIKE', "%$search%"));
             });
         }
 
@@ -72,7 +71,7 @@ class QuarterlyReportController extends Controller
             ->get();
 
         // Prepare chart data
-        $chartLabels = $recentStats->map(fn($s) => "Q{$s->quarter}/{$s->year}")->reverse()->values();
+        $chartLabels = $recentStats->map(fn ($s) => "Q{$s->quarter}/{$s->year}")->reverse()->values();
         $membersData = $recentStats->pluck('total_members')->reverse()->values();
         $cellsData = $recentStats->pluck('total_cells')->reverse()->values();
         $savedData = $recentStats->pluck('total_saved')->reverse()->values();
@@ -110,7 +109,7 @@ class QuarterlyReportController extends Controller
 
         QuarterlyReport::whereIn('id', $ids)->delete();
 
-        return back()->with('success', count($ids) . ' relatórios excluídos com sucesso.');
+        return back()->with('success', count($ids).' relatórios excluídos com sucesso.');
     }
 
     public function create()
@@ -256,6 +255,7 @@ class QuarterlyReportController extends Controller
 
         $eventTypes = EventType::where('is_active', true)->get();
         $report = $quarterlyReport;
+
         return view('quarterly_reports.edit', compact('report', 'zones', 'supervisions', 'eventTypes'));
     }
 
@@ -338,11 +338,11 @@ class QuarterlyReportController extends Controller
         return redirect()->route('quarterly-reports.index')->with('success', 'Relatório trimestral excluído com sucesso!');
     }
 
-    public function export()
+    public function export(Request $request)
     {
         return \Maatwebsite\Excel\Facades\Excel::download(
-            new \App\Exports\QuarterlyReportExport(),
-            'relatorios_trimestrais_' . now()->format('Y-m-d') . '.xlsx'
+            new \App\Exports\QuarterlyReportExport($request->year, $request->quarter),
+            'relatorios_trimestrais_'.now()->format('Y-m-d').'.xlsx'
         );
     }
 
@@ -352,7 +352,7 @@ class QuarterlyReportController extends Controller
 
         return \Maatwebsite\Excel\Facades\Excel::download(
             new AnnualQuarterlyReportExport($year),
-            "consolidado_anual_{$year}_" . now()->format('Y-m-d') . '.xlsx'
+            "consolidado_anual_{$year}_".now()->format('Y-m-d').'.xlsx'
         );
     }
 }
