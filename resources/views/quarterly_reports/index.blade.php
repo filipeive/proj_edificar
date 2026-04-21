@@ -255,9 +255,13 @@
             </div>
 
             <div class="flex items-center gap-4">
+                <a href="{{ route('quarterly-reports.export-pdf', request()->query()) }}"
+                    class="bg-white dark:bg-gray-800 text-red-600 border border-red-100 dark:border-red-800 px-4 py-2.5 rounded-xl hover:bg-red-600 hover:text-white transition-all font-black text-[10px] uppercase tracking-widest flex items-center">
+                    <i class="bi bi-file-earmark-pdf mr-2"></i> PDF
+                </a>
                 <a href="{{ route('quarterly-reports.export', request()->query()) }}"
                     class="bg-white dark:bg-gray-800 text-green-600 border border-green-100 dark:border-green-800 px-4 py-2.5 rounded-xl hover:bg-green-600 hover:text-white transition-all font-black text-[10px] uppercase tracking-widest flex items-center">
-                    <i class="bi bi-file-earmark-spreadsheet mr-2"></i> Exportar Atual
+                    <i class="bi bi-file-earmark-spreadsheet mr-2"></i> Excel
                 </a>
                 <a href="{{ route('quarterly-reports.create') }}"
                     class="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition shadow-lg shadow-blue-100 dark:shadow-none">

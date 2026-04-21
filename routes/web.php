@@ -1,28 +1,27 @@
 <?php
 
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Admin\CellController;
+use App\Http\Controllers\Admin\PackageController;
+use App\Http\Controllers\Admin\SupervisionController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\ZoneController;
 use App\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\CommitmentController;
+use App\Http\Controllers\Contribution\ContributionController;
 use App\Http\Controllers\Dashboard\AdminDashboardController;
 use App\Http\Controllers\Dashboard\LiderDashboardController;
 use App\Http\Controllers\Dashboard\MemberDashboardController;
 use App\Http\Controllers\Dashboard\PastorDashboardController;
 use App\Http\Controllers\Dashboard\SupervisorDashboardController;
-use App\Http\Controllers\Admin\ZoneController;
-use App\Http\Controllers\Admin\SupervisionController;
-use App\Http\Controllers\Admin\CellController;
-use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\PackageController;
-use App\Http\Controllers\Contribution\ContributionController;
-use App\Http\Controllers\CommitmentController;
-use App\Http\Controllers\Report\ReportController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\SearchController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Report\ReportController;
+use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 
 // Rotas de autenticação (Breeze)
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
 
 // Welcome Route
 Route::get('/', [\App\Http\Controllers\WelcomeController::class, 'index'])->name('welcome');
@@ -92,7 +91,6 @@ Route::prefix('notifications')->middleware('auth')->name('notifications.')->grou
     Route::post('/bulk-delete', [NotificationController::class, 'bulkDestroy'])
         ->name('bulk-delete');
 });
-
 
 // Register Route (Redundante, removido o duplicado no final)
 
@@ -322,7 +320,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [ContributionController::class, 'index'])
             ->name('contributions.index');
 
-
         // Criar contribuição (membro, líder, supervisor, pastor, admin)
         Route::get('/create', [ContributionController::class, 'create'])
             ->middleware('role:membro,lider_celula,supervisor,pastor_zona,super_admin,admin,responsavel_pacote,comissao_obra')
@@ -396,7 +393,6 @@ Route::middleware('auth')->group(function () {
             ->name('reports.export.excel');
     });
 
-
     // ===== ENCONTROS DE CÉLULA (CELL MEETINGS) ROUTES =====
     Route::get('cell-meetings/export', [\App\Http\Controllers\CellMeetingController::class, 'export'])->name('cell-meetings.export');
     Route::delete('cell-meetings/bulk-destroy', [\App\Http\Controllers\CellMeetingController::class, 'bulkDestroy'])->name('cell-meetings.bulk-destroy');
@@ -407,6 +403,7 @@ Route::middleware('auth')->group(function () {
     // ===== RELATÓRIOS TRIMESTRAIS (QUARTERLY REPORTS) ROUTES =====
     Route::get('quarterly-reports/export', [\App\Http\Controllers\QuarterlyReportController::class, 'export'])->name('quarterly-reports.export');
     Route::get('quarterly-reports/export-annual', [\App\Http\Controllers\QuarterlyReportController::class, 'exportAnnual'])->name('quarterly-reports.export-annual');
+    Route::get('quarterly-reports/export/pdf', [\App\Http\Controllers\QuarterlyReportController::class, 'exportPdf'])->name('quarterly-reports.export-pdf');
     Route::delete('quarterly-reports/bulk-destroy', [\App\Http\Controllers\QuarterlyReportController::class, 'bulkDestroy'])->name('quarterly-reports.bulk-destroy');
     Route::resource('quarterly-reports', \App\Http\Controllers\QuarterlyReportController::class);
     // Quarterly Reports management handled by resource route at 392
@@ -505,9 +502,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('inventory-items', App\Http\Controllers\InventoryItemController::class)
         ->middleware('role:super_admin,admin,secretaria,tesouraria,pastor,pastor_senior,comissao_obra');
 });
-# ============================================
-# ROTA DE REGISTRO (PÚBLICA MAS CONTROLADA)
-# ============================================
+// ============================================
+// ROTA DE REGISTRO (PÚBLICA MAS CONTROLADA)
+// ============================================
 
 Route::get('/register', [RegisteredUserController::class, 'create'])
     ->middleware('guest')

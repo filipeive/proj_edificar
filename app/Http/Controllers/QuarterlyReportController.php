@@ -355,4 +355,39 @@ class QuarterlyReportController extends Controller
             "consolidado_anual_{$year}_".now()->format('Y-m-d').'.xlsx'
         );
     }
+
+    public function exportPdf(Request $request)
+    {
+        $user = auth()->user();
+        $query = QuarterlyReport::with(['zone', 'supervision', 'supervisor', 'events.eventType']);
+
+        if ($request->filled('year')) {
+            $query->where('year', $request->year);
+        }
+        if ($request->filled('quarter')) {
+            $query->where('quarter', $request->quarter);
+        }
+
+        if ($user->role === 'pastor_zona') {
+            $query->where('zone_id', $user->getZoneId());
+        } elseif ($user->role === 'supervisor') {
+            $query->where('supervisor_id', $user->id);
+        }
+
+        $reports = $query->orderBy('year', 'desc')
+            ->orderBy('quarter', 'desc')
+            ->get();
+
+        $title = 'Relatório Trimestral';
+        if ($request->filled('year')) {
+            $title .= ' - '.$request->year;
+        }
+        if ($request->filled('quarter')) {
+            $title .= ' / '.$request->quarter.'º Trimestre';
+        }
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('quarterly_reports.pdf', compact('reports', 'title', 'request'));
+
+        return $pdf->download('relatorio_trimestral_'.now()->format('Y-m-d').'.pdf');
+    }
 }
