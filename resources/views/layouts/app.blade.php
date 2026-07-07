@@ -97,44 +97,7 @@
             display: none;
         }
 
-        /* Skeleton Loading System */
-        .skeleton-shimmer {
-            background: linear-gradient(90deg,
-                    var(--bg-secondary) 25%,
-                    var(--hover-bg) 50%,
-                    var(--bg-secondary) 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-        }
 
-        @keyframes shimmer {
-            0% {
-                background-position: 200% 0;
-            }
-
-            100% {
-                background-position: -200% 0;
-            }
-        }
-
-        .skeleton-text {
-            height: 1rem;
-            margin-bottom: 0.5rem;
-            border-radius: 0.25rem;
-            width: 100%;
-            @apply bg-gray-200 dark:bg-gray-700 animate-pulse;
-        }
-
-        .skeleton-circle {
-            width: 3rem;
-            height: 3rem;
-            border-radius: 9999px;
-            @apply bg-gray-200 dark:bg-gray-700 animate-pulse;
-        }
-
-        .skeleton-card {
-            @apply bg-white dark:bg-gray-800 rounded-[2rem] p-8 border border-gray-100 dark:border-gray-700;
-        }
 
         [x-cloak] {
             display: none !important;
@@ -977,33 +940,8 @@
                 </div>
             </header>
 
-            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 md:p-8 lg:p-12" x-data>
-                <!-- Skeleton Placeholder -->
-                <div x-show="$store.app.loading" x-cloak class="space-y-8 animate-pulse">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                        <div class="space-y-4 w-full md:w-1/3">
-                            <div class="h-10 bg-gray-200 dark:bg-gray-700 rounded-2xl w-3/4"></div>
-                            <div class="h-4 bg-gray-100 dark:bg-gray-800 rounded-lg w-1/2"></div>
-                        </div>
-                        <div class="flex gap-3 w-full md:w-auto">
-                            <div class="h-14 bg-gray-200 dark:bg-gray-700 rounded-2xl w-32"></div>
-                            <div class="h-14 bg-gray-200 dark:bg-gray-700 rounded-2xl w-32"></div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="h-40 bg-white dark:bg-gray-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700"></div>
-                        <div class="h-40 bg-white dark:bg-gray-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700"></div>
-                        <div class="h-40 bg-white dark:bg-gray-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700"></div>
-                    </div>
-
-                    <div class="bg-white dark:bg-gray-800 rounded-[3rem] border border-gray-100 dark:border-gray-700 h-96"></div>
-                </div>
-
-                <!-- Main Page Content -->
-                <div x-show="!$store.app.loading" x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
-                    @yield('content')
-                </div>
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 md:p-8 lg:p-12">
+                @yield('content')
             </main>
         </div>
     </div>
@@ -1487,21 +1425,9 @@
         }
 
         // ===== INITIALIZATION =====
-        document.addEventListener('alpine:init', () => {
-            Alpine.store('app', {
-                loading: true,
-                finish() { setTimeout(() => this.loading = false, 600) }
-            });
-        });
-
         document.addEventListener('DOMContentLoaded', function () {
             // Initialize theme
             initializeTheme();
-
-            // Finish global loading
-            if (window.Alpine) {
-                Alpine.store('app').finish();
-            }
 
             // Initialize sidebar state
             const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
