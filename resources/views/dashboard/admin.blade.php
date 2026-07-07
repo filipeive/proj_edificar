@@ -12,11 +12,11 @@
 
 @section('content')
     <div class="space-y-6 md:space-y-8">
-        <!-- Métricas Eclesiásticas (Hidden on Mobile) -->
-        <div class="hidden md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- QW-05: Métricas agora visíveis em mobile (era hidden md:grid) -->
+        <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-8">
             <!-- Card: Membros Ativos -->
             <div
-                class="bg-white dark:bg-gray-800 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 p-8 hover:shadow-xl transition-all duration-500 group">
+                class="bg-white dark:bg-gray-800 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 p-4 md:p-8 hover:shadow-xl transition-all duration-500 group">
                 <div class="flex items-center justify-between mb-4">
                     <div
                         class="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-2xl group-hover:bg-blue-600 transition-colors duration-500">
@@ -42,7 +42,7 @@
 
             <!-- Card: Total Dízimos/Ofertas -->
             <div
-                class="bg-white dark:bg-gray-800 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 p-8 hover:shadow-xl transition-all duration-500 group">
+                class="bg-white dark:bg-gray-800 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 p-4 md:p-8 hover:shadow-xl transition-all duration-500 group">
                 <div class="flex items-center justify-between mb-4">
                     <div
                         class="bg-green-50 dark:bg-green-900/30 p-4 rounded-2xl group-hover:bg-green-600 transition-colors duration-500">
@@ -72,7 +72,7 @@
 
             <!-- Card: Próximos Eventos -->
             <div
-                class="bg-white dark:bg-gray-800 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 p-8 hover:shadow-xl transition-all duration-500 group">
+                class="bg-white dark:bg-gray-800 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 p-4 md:p-8 hover:shadow-xl transition-all duration-500 group">
                 <div class="flex items-center justify-between mb-4">
                     <div
                         class="bg-purple-50 dark:bg-purple-900/30 p-4 rounded-2xl group-hover:bg-purple-600 transition-colors duration-500">
@@ -96,7 +96,7 @@
 
             <!-- Card: Cultos Recentes -->
             <div
-                class="bg-white dark:bg-gray-800 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 p-8 hover:shadow-xl transition-all duration-500 group">
+                class="bg-white dark:bg-gray-800 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 p-4 md:p-8 hover:shadow-xl transition-all duration-500 group">
                 <div class="flex items-center justify-between mb-4">
                     <div
                         class="bg-orange-50 dark:bg-orange-900/30 p-4 rounded-2xl group-hover:bg-orange-600 transition-colors duration-500">

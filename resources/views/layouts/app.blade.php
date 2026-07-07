@@ -24,7 +24,7 @@
     <meta name="apple-mobile-web-app-title" content="Life Church">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- QW-01: TailwindCSS CDN runtime removido. Tailwind é compilado via Vite. -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -72,16 +72,7 @@
             width: 280px;
         }
 
-        /* Prevent legacy collapse styles from affecting new structure */
-        .sidebar-collapsed {
-            width: 280px !important;
-        }
-
-        .sidebar-collapsed .sidebar-text {
-            opacity: 1 !important;
-            width: auto !important;
-            overflow: visible !important;
-        }
+        /* QW-03: Regras conflitantes de sidebar-collapsed removidas */
 
         .sidebar-text {
             transition: opacity 0.2s ease-in-out;
@@ -446,9 +437,7 @@
             margin-left: 1rem;
         }
 
-        [x-cloak] {
-            display: none !important;
-        }
+        /* QW-04: x-cloak duplicado removido (mantido na linha 102) */
 
         @media (max-width: 767px) {
 
@@ -737,9 +726,7 @@
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
         }
 
-        [x-cloak] {
-            display: none !important;
-        }
+        /* QW-04: x-cloak duplicado removido (mantido na linha 102) */
     </style>
 </head>
 
@@ -946,19 +933,7 @@
         </div>
     </div>
 
-    <!-- SweetAlert Session Messages -->
-    @if ($message = Session::get('success'))
-        <script>document.addEventListener('DOMContentLoaded', () => window.showSuccess(@json($message)));</script>
-    @endif
-    @if ($message = Session::get('error'))
-        <script>document.addEventListener('DOMContentLoaded', () => window.showError(@json($message)));</script>
-    @endif
-    @if ($message = Session::get('warning'))
-        <script>document.addEventListener('DOMContentLoaded', () => window.showWarning(@json($message)));</script>
-    @endif
-    @if ($message = Session::get('info'))
-        <script>document.addEventListener('DOMContentLoaded', () => window.showInfo(@json($message)));</script>
-    @endif
+    <!-- QW-02: Flash messages duplicadas removidas. Bloco único mantido nas linhas 1590-1605 -->
 
     <script>
         // DOM Elements
