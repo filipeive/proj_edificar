@@ -31,12 +31,20 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     const { request } = event;
 
+    // Only intercept GET requests and http/https protocols (ignore POST, PUT, DELETE, Chrome extensions, etc.)
+    if (request.method !== 'GET' || !request.url.startsWith('http')) {
+        return;
+    }
+
     if (request.mode === 'navigate') {
         event.respondWith(
             fetch(request)
                 .then((response) => {
-                    const copy = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+                    // Only cache successful standard responses
+                    if (response.status === 200) {
+                        const copy = response.clone();
+                        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+                    }
                     return response;
                 })
                 .catch(() => {
@@ -49,10 +57,14 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
         caches.match(request).then((cached) => {
             return cached || fetch(request).then((response) => {
-                const copy = response.clone();
-                caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+                // Only cache successful standard responses
+                if (response.status === 200) {
+                    const copy = response.clone();
+                    caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+                }
                 return response;
             });
         })
     );
 });
+

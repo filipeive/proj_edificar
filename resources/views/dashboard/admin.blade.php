@@ -187,224 +187,182 @@
                 </a>
             </div>
         </div>
-
-        <!-- Geo & Structure Charts (Enabled on Mobile) -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             <!-- Members by Zone -->
-            <div
-                class="bg-white dark:bg-gray-800 rounded-3xl md:rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 p-5 md:p-8">
-                <h3 class="text-lg md:text-xl font-black text-gray-900 dark:text-white tracking-tight mb-6 md:mb-8">Membros
-                    por Zona</h3>
+            <x-card title="Membros por Zona">
                 <div class="h-[350px] relative">
                     <canvas id="zoneMembersChart"></canvas>
                 </div>
-            </div>
+            </x-card>
 
             <!-- Structure by Zone (Cells/Supervisions) -->
-            <div
-                class="bg-white dark:bg-gray-800 rounded-3xl md:rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 p-5 md:p-8">
-                <h3 class="text-lg md:text-xl font-black text-gray-900 dark:text-white tracking-tight mb-6 md:mb-8">
-                    Estrutura (Células e
-                    Supervisões)</h3>
+            <x-card title="Estrutura (Células e Supervisões)">
                 <div class="h-[350px] relative">
                     <canvas id="zoneStructureChart"></canvas>
                 </div>
-            </div>
+            </x-card>
         </div>
 
         <!-- Mapa da Obra -->
-        <div
-            class="bg-white dark:bg-gray-800 rounded-[2.5rem] p-10 shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col h-[600px] overflow-hidden group">
-            <div class="flex items-center justify-between mb-8">
-                <div>
-                    <div
-                        class="flex items-center gap-2 text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.2em] mb-2">
-                        <i class="bi bi-map-fill"></i>
-                        <span>Expansão do Reino</span>
+        <x-card class="flex flex-col h-[600px] overflow-hidden group" compact="true">
+            <x-slot name="header">
+                <div class="flex items-center justify-between w-full">
+                    <div>
+                        <div class="flex items-center gap-2 text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.2em] mb-2">
+                            <i class="bi bi-map-fill"></i>
+                            <span>Expansão do Reino</span>
+                        </div>
+                        <h2 class="text-3xl font-black text-gray-900 dark:text-white tracking-tighter">Mapeamento Geográfico</h2>
                     </div>
-                    <h2 class="text-3xl font-black text-gray-900 dark:text-white tracking-tighter">Mapeamento Geográfico
-                    </h2>
                 </div>
-            </div>
-
-            <!-- Placeholder Ilustrativo do Mapa -->
-            <div
-                class="flex-1 bg-gray-50 dark:bg-gray-700 rounded-[2rem] border-2 border-dashed border-gray-200 dark:border-gray-600 flex flex-col items-center justify-center text-center p-12 relative overflow-hidden group/map transition-all hover:bg-gray-100/50 dark:hover:bg-gray-600/50">
-                <div class="relative z-10">
-                    <i
-                        class="bi bi-geo-alt-fill text-6xl text-gray-200 dark:text-gray-500 mb-6 block transform group-hover/map:scale-110 group-hover/map:rotate-12 transition-all duration-500"></i>
-                    <h3
-                        class="text-xl font-black text-gray-400 dark:text-gray-300 mb-2 uppercase tracking-widest leading-none">
-                        Mapa Interativo
-                    </h3>
-                    <p class="text-xs font-bold text-gray-400 dark:text-gray-500 italic">Visualize a presença da Life Church
-                        em Quelimane...
-                    </p>
-                </div>
-
-                <!-- Mini estatísticas flutuantes no mapa placeholder -->
-                <div class="absolute top-10 right-10 flex flex-col gap-3">
-                    <div
-                        class="bg-white/80 dark:bg-gray-800/80 backdrop-blur px-4 py-2 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center gap-3">
-                        <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
-                        <span
-                            class="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">Norte:
-                            12
-                            Células</span>
+            </x-slot>
+            
+            <div class="flex-1 p-6 md:p-8 flex flex-col justify-between">
+                <!-- Placeholder Ilustrativo do Mapa -->
+                <div class="flex-1 bg-gray-50 dark:bg-zinc-800/40 rounded-[2rem] border-2 border-dashed border-gray-200 dark:border-zinc-800 flex flex-col items-center justify-center text-center p-12 relative overflow-hidden group/map transition-all hover:bg-gray-100/50 dark:hover:bg-zinc-800/20">
+                    <div class="relative z-10">
+                        <i class="bi bi-geo-alt-fill text-6xl text-gray-200 dark:text-zinc-700 mb-6 block transform group-hover/map:scale-110 group-hover/map:rotate-12 transition-all duration-500"></i>
+                        <h3 class="text-xl font-black text-gray-400 dark:text-zinc-500 mb-2 uppercase tracking-widest leading-none">
+                            Mapa Interativo
+                        </h3>
+                        <p class="text-xs font-bold text-gray-400 dark:text-zinc-650 italic">Visualize a presença da Life Church em Quelimane...</p>
                     </div>
-                    <div
-                        class="bg-white/80 dark:bg-gray-800/80 backdrop-blur px-4 py-2 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center gap-3">
-                        <div class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></div>
-                        <span
-                            class="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">Centro:
-                            25
-                            Células</span>
+
+                    <!-- Mini estatísticas flutuantes no mapa placeholder -->
+                    <div class="absolute top-10 right-10 flex flex-col gap-3">
+                        <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur px-4 py-2 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-800 flex items-center gap-3">
+                            <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
+                            <span class="text-[10px] font-black text-gray-500 dark:text-zinc-400 uppercase tracking-widest">Norte: 12 Células</span>
+                        </div>
+                        <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur px-4 py-2 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-800 flex items-center gap-3">
+                            <div class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></div>
+                            <span class="text-[10px] font-black text-gray-500 dark:text-zinc-400 uppercase tracking-widest">Centro: 25 Células</span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </x-card>
 
         <!-- Gestão Eclesiástica Stats (Enabled on Mobile) -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             <!-- Crescimento de Membros -->
-            <div
-                class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-3xl md:rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 p-5 md:p-8">
-                <div class="flex items-center justify-between mb-6 md:mb-8">
-                    <h3 class="text-lg md:text-xl font-black text-gray-900 dark:text-white tracking-tight">Crescimento de
-                        Membros</h3>
-                    <span
-                        class="px-4 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-xl text-xs font-bold uppercase tracking-widest">Últimos
-                        6 Meses</span>
-                </div>
+            <x-card class="lg:col-span-2">
+                <x-slot name="header">
+                    <div class="flex items-center justify-between w-full">
+                        <h3 class="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Crescimento de Membros</h3>
+                        <span class="px-4 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-xl text-xs font-bold uppercase tracking-widest">Últimos 6 Meses</span>
+                    </div>
+                </x-slot>
                 <div class="h-[350px] relative">
                     <canvas id="growthChart"></canvas>
                 </div>
-            </div>
+            </x-card>
 
             <!-- Recent Activity Feed -->
-            <div id="recent-activity"
-                class="bg-white dark:bg-gray-800 rounded-3xl md:rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 p-5 md:p-8">
-                <h3 class="text-lg md:text-xl font-black text-gray-900 dark:text-white tracking-tight mb-6 md:mb-8">
-                    Atividade Recente</h3>
+            <x-card id="recent-activity" title="Atividade Recente">
                 <div class="space-y-5 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
                     @forelse($recentActivity as $activity)
                         <div class="flex items-start gap-4 group">
-                            <div
-                                class="w-10 h-10 rounded-xl {{ $activity['bg'] }} {{ $activity['color'] }} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                            <div class="w-10 h-10 rounded-xl {{ $activity['bg'] }} {{ $activity['color'] }} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                                 <i class="bi {{ $activity['icon'] }} text-xl"></i>
                             </div>
-                            <div class="flex-1 min-w-0 border-b border-gray-50 dark:border-gray-700 pb-4 group-last:border-0">
+                            <div class="flex-1 min-w-0 border-b border-gray-50 dark:border-zinc-800 pb-4 group-last:border-0">
                                 <div class="flex items-center justify-between mb-1">
-                                    <p class="font-black text-gray-900 dark:text-white text-sm truncate">
+                                    <p class="font-black text-gray-900 dark:text-zinc-100 text-sm truncate">
                                         {{ $activity['title'] }}</p>
-                                    <span
-                                        class="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase">{{ $activity['time']->diffForHumans() }}</span>
+                                    <span class="text-[9px] font-bold text-gray-400 dark:text-zinc-500 uppercase">{{ $activity['time']->diffForHumans() }}</span>
                                 </div>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed">
+                                <p class="text-xs text-gray-500 dark:text-zinc-400 line-clamp-2 leading-relaxed">
                                     {{ $activity['description'] }}
                                 </p>
                             </div>
                         </div>
                     @empty
                         <div class="flex flex-col items-center justify-center py-10 text-center">
-                            <div
-                                class="w-16 h-16 bg-gray-50 dark:bg-gray-700 rounded-full flex items-center justify-center text-gray-300 dark:text-gray-500 mb-4">
+                            <div class="w-16 h-16 bg-gray-50 dark:bg-zinc-800 rounded-full flex items-center justify-center text-gray-300 dark:text-zinc-600 mb-4">
                                 <i class="bi bi-activity text-3xl"></i>
                             </div>
-                            <p class="text-sm font-bold text-gray-400 dark:text-gray-500">Nenhuma atividade recente</p>
+                            <p class="text-sm font-bold text-gray-400 dark:text-zinc-500">Nenhuma atividade recente</p>
                         </div>
                     @endforelse
                 </div>
-            </div>
+            </x-card>
         </div>
-
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             <!-- Próximos Eventos -->
-            <div
-                class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 p-8">
-                <div class="flex items-center justify-between mb-8">
-                    <h3 class="text-xl font-black text-gray-900 dark:text-white tracking-tight">Próximos Eventos</h3>
-                    <a href="{{ route('events.index') }}"
-                        class="text-xs font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest hover:text-orange-700 dark:hover:text-orange-300">Ver
-                        Calendário</a>
-                </div>
+            <x-card>
+                <x-slot name="header">
+                    <div class="flex items-center justify-between w-full">
+                        <h3 class="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Próximos Eventos</h3>
+                        <a href="{{ route('events.index') }}" class="text-xs font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest hover:text-orange-700 dark:hover:text-orange-300">Ver Calendário</a>
+                    </div>
+                </x-slot>
                 <div class="space-y-6">
                     @forelse($upcomingEvents as $event)
                         <div class="flex items-center space-x-6 group">
-                            <div
-                                class="bg-gray-50 dark:bg-gray-700 px-4 py-3 rounded-2xl text-center min-w-[70px] group-hover:bg-orange-600 group-hover:text-white transition-colors">
-                                <span
-                                    class="block text-xl font-black leading-none text-gray-900 dark:text-gray-100 group-hover:text-white">{{ $event->date->format('d') }}</span>
-                                <span
-                                    class="text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 group-hover:text-white">{{ $event->date->translatedFormat('M') }}</span>
+                            <div class="bg-gray-50 dark:bg-zinc-800/50 px-4 py-3 rounded-2xl text-center min-w-[70px] group-hover:bg-orange-600 group-hover:text-white transition-colors">
+                                <span class="block text-xl font-black leading-none text-gray-900 dark:text-zinc-100 group-hover:text-white">{{ $event->date->format('d') }}</span>
+                                <span class="text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-400 group-hover:text-white">{{ $event->date->translatedFormat('M') }}</span>
                             </div>
                             <div class="flex-1">
-                                <h4
-                                    class="font-black text-gray-900 dark:text-white group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
+                                <h4 class="font-black text-gray-900 dark:text-zinc-100 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
                                     {{ $event->name }}
                                 </h4>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center mt-1">
+                                <p class="text-xs text-gray-500 dark:text-zinc-455 flex items-center mt-1">
                                     <i class="bi bi-geo-alt mr-1"></i> {{ $event->location ?? 'Life Church' }}
                                     <span class="mx-2">•</span>
                                     <i class="bi bi-clock mr-1"></i> {{ $event->date->format('H:i') }}h
                                     @if($event->end_date)
-                                        <span class="ml-1 text-blue-500 dark:text-blue-400 font-bold">até
-                                            {{ $event->end_date->format('d/m/Y') }}</span>
+                                        <span class="ml-1 text-blue-500 dark:text-blue-400 font-bold">até {{ $event->end_date->format('d/m/Y') }}</span>
                                     @endif
                                 </p>
                             </div>
-                            <span
-                                class="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-[8px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-300">
+                            <span class="px-3 py-1 bg-gray-100 dark:bg-zinc-800 rounded-full text-[8px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-350">
                                 {{ $event->eventType->name ?? 'Evento' }}
                             </span>
                         </div>
                     @empty
-                        <p class="text-center text-gray-400 dark:text-gray-500 py-10">Nenhum evento programado.</p>
+                        <p class="text-center text-gray-400 dark:text-zinc-550 py-10">Nenhum evento programado.</p>
                     @endforelse
                 </div>
-            </div>
+            </x-card>
 
             <!-- Últimos Cultos -->
-            <div
-                class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 p-8">
-                <div class="flex items-center justify-between mb-8">
-                    <h3 class="text-xl font-black text-gray-900 dark:text-white tracking-tight">Relatórios de Cultos</h3>
-                    <a href="{{ route('services.index') }}"
-                        class="text-xs font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest hover:text-orange-700 dark:hover:text-orange-300">Ver
-                        Todos</a>
-                </div>
+            <x-card>
+                <x-slot name="header">
+                    <div class="flex items-center justify-between w-full">
+                        <h3 class="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Relatórios de Cultos</h3>
+                        <a href="{{ route('services.index') }}" class="text-xs font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest hover:text-orange-700 dark:hover:text-orange-300">Ver Todos</a>
+                    </div>
+                </x-slot>
                 <div class="space-y-6">
                     @forelse($recentServices as $service)
-                        <div
-                            class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-2xl hover:bg-white dark:hover:bg-gray-600 hover:shadow-lg transition-all duration-300 border border-transparent hover:border-gray-100 dark:hover:border-gray-600">
+                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-zinc-800/50 rounded-2xl hover:bg-white dark:hover:bg-zinc-850 hover:shadow-lg transition-all duration-300 border border-transparent hover:border-gray-100 dark:hover:border-zinc-800">
                             <div class="flex items-center space-x-4">
-                                <div
-                                    class="w-12 h-12 bg-white dark:bg-gray-800 rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 shadow-sm">
+                                <div class="w-12 h-12 bg-white dark:bg-zinc-900 rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 shadow-sm">
                                     <i class="bi bi-journal-text text-2xl"></i>
                                 </div>
                                 <div>
-                                    <h4 class="font-black text-gray-900 dark:text-white">{{ $service->name }}</h4>
-                                    <p class="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">
+                                    <h4 class="font-black text-gray-900 dark:text-zinc-100">{{ $service->name }}</h4>
+                                    <p class="text-[10px] text-gray-400 dark:text-zinc-500 font-bold uppercase tracking-widest">
                                         {{ $service->date->format('d/m/Y') }}
                                     </p>
                                 </div>
                             </div>
                             <div class="text-right">
-                                <p class="font-black text-gray-900 dark:text-white">{{ $service->total_participation ?? 0 }}</p>
-                                <p class="text-[8px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">
-                                    Presentes</p>
+                                <p class="font-black text-gray-900 dark:text-zinc-100">{{ $service->total_participation ?? 0 }}</p>
+                                <p class="text-[8px] text-gray-400 dark:text-zinc-500 font-bold uppercase tracking-widest">Presentes</p>
                             </div>
-                            <a href="{{ route('services.show', $service->id) }}"
-                                class="text-xs font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest hover:text-orange-700 dark:hover:text-orange-300">
+                            <a href="{{ route('services.show', $service->id) }}" class="text-xs font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest hover:text-orange-700 dark:hover:text-orange-300">
                                 <i class="bi bi-arrow-right ml-1"></i> Detalhes
                             </a>
                         </div>
                     @empty
-                        <p class="text-center text-gray-400 dark:text-gray-500 py-10">Nenhum relatório de culto registado.</p>
+                        <p class="text-center text-gray-400 dark:text-zinc-550 py-10">Nenhum relatório de culto registado.</p>
                     @endforelse
                 </div>
-            </div>
+            </x-card>
         </div>
 
         <!-- Chart Scripts -->

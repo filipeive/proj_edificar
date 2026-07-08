@@ -284,7 +284,10 @@ class User extends Authenticatable
 
     public function getZoneId()
     {
-        return $this->getManagedZoneIds()->first();
+        if ($this->memoizedZoneId === null) {
+            $this->memoizedZoneId = $this->getManagedZoneIds()->first() ?: false;
+        }
+        return $this->memoizedZoneId ?: null;
     }
 
     /**
@@ -292,19 +295,20 @@ class User extends Authenticatable
      */
     public function getManagedZoneIds()
     {
-        if ($this->isPastorZona()) {
-            $zoneIds = Zone::where('pastor_id', $this->id)->pluck('id');
-            if ($zoneIds->isEmpty() && $this->cell && $this->cell->supervision && $this->cell->supervision->zone_id) {
-                $zoneIds = collect([$this->cell->supervision->zone_id]);
+        if ($this->memoizedZoneIds === null) {
+            if ($this->isPastorZona()) {
+                $zoneIds = Zone::where('pastor_id', $this->id)->pluck('id');
+                if ($zoneIds->isEmpty() && $this->cell && $this->cell->supervision && $this->cell->supervision->zone_id) {
+                    $zoneIds = collect([$this->cell->supervision->zone_id]);
+                }
+                $this->memoizedZoneIds = $zoneIds;
+            } elseif ($this->isSupervisor() || $this->isSubSupervisor()) {
+                $this->memoizedZoneIds = Supervision::whereIn('id', $this->getManagedSupervisionIds())->pluck('zone_id')->unique();
+            } else {
+                $this->memoizedZoneIds = collect();
             }
-            return $zoneIds;
         }
-
-        if ($this->isSupervisor() || $this->isSubSupervisor()) {
-            return Supervision::whereIn('id', $this->getManagedSupervisionIds())->pluck('zone_id')->unique();
-        }
-
-        return collect();
+        return $this->memoizedZoneIds;
     }
 
     /**
@@ -312,24 +316,23 @@ class User extends Authenticatable
      */
     public function getManagedSupervisionIds()
     {
-        if ($this->isPastorZona()) {
-            return Supervision::whereIn('zone_id', $this->getManagedZoneIds())->pluck('id');
-        }
-
-        if ($this->isSupervisor()) {
-            $ids = $this->supervisedSupervisions()->pluck('id');
-            // Robust fallback: use cell context if no explicit assignment
-            if ($ids->isEmpty() && $this->cell) {
-                $ids = collect([$this->cell->supervision_id]);
+        if ($this->memoizedSupervisionIds === null) {
+            if ($this->isPastorZona()) {
+                $this->memoizedSupervisionIds = Supervision::whereIn('zone_id', $this->getManagedZoneIds())->pluck('id');
+            } elseif ($this->isSupervisor()) {
+                $ids = $this->supervisedSupervisions()->pluck('id');
+                // Robust fallback: use cell context if no explicit assignment
+                if ($ids->isEmpty() && $this->cell) {
+                    $ids = collect([$this->cell->supervision_id]);
+                }
+                $this->memoizedSupervisionIds = $ids;
+            } elseif ($this->isSubSupervisor()) {
+                $this->memoizedSupervisionIds = $this->subSupervisedSupervisions()->pluck('id');
+            } else {
+                $this->memoizedSupervisionIds = collect();
             }
-            return $ids;
         }
-
-        if ($this->isSubSupervisor()) {
-            return $this->subSupervisedSupervisions()->pluck('id');
-        }
-
-        return collect();
+        return $this->memoizedSupervisionIds;
     }
 
     public function getActiveCommitment()
@@ -428,4 +431,59 @@ class User extends Authenticatable
             default => false,
         };
     }
+
+    // Memoization variables for request-lifetime caching
+    protected ?bool $memoizedIsLiderOfAnyCell = null;
+    protected $memoizedFirstLedCell = null;
+    protected $memoizedZoneIds = null;
+    protected $memoizedSupervisionIds = null;
+    protected $memoizedZoneId = null;
+    protected ?int $memoizedPendingContributionsCount = null;
+
+    /**
+     * Check if user is a cell leader of any cell (memoized)
+     */
+    public function isLiderOfAnyCell(): bool
+    {
+        if ($this->memoizedIsLiderOfAnyCell === null) {
+            $this->memoizedIsLiderOfAnyCell = $this->ledCells()->exists();
+        }
+        return $this->memoizedIsLiderOfAnyCell;
+    }
+
+    /**
+     * Get the first cell led by this user (memoized)
+     */
+    public function getFirstLedCell(): ?Cell
+    {
+        if ($this->memoizedFirstLedCell === null) {
+            $this->memoizedFirstLedCell = $this->ledCells()->first() ?: false;
+        }
+        return $this->memoizedFirstLedCell ?: null;
+    }
+
+    /**
+     * Get the count of pending contributions matching user permissions (memoized)
+     */
+    public function getPendingContributionsCount(): int
+    {
+        if ($this->memoizedPendingContributionsCount === null) {
+            if ($this->isAdmin() || $this->isComissaoObra()) {
+                $this->memoizedPendingContributionsCount = Contribution::where('status', 'pendente')->count();
+            } elseif ($this->isPastorZona()) {
+                $zoneId = $this->getZoneId();
+                if ($zoneId) {
+                    $this->memoizedPendingContributionsCount = Contribution::where('status', 'pendente')
+                        ->where('zone_id', $zoneId)
+                        ->count();
+                } else {
+                    $this->memoizedPendingContributionsCount = 0;
+                }
+            } else {
+                $this->memoizedPendingContributionsCount = 0;
+            }
+        }
+        return $this->memoizedPendingContributionsCount;
+    }
 }
+

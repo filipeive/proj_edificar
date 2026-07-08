@@ -51,18 +51,28 @@ class AppServiceProvider extends ServiceProvider
 
         // Compartilhar dados globais com as views
         \Illuminate\Support\Facades\View::composer('*', function ($view) {
-            if (auth()->check()) {
-                $user = auth()->user();
-                $view->with('authUser', $user);
-                $view->with('role', $user->role ?? 'membro');
-                $view->with('unreadNotifications', $user->unreadNotifications()->count());
-                $view->with('pendingCount', \App\Models\Contribution::where('status', 'pendente')->count());
-            } else {
-                $view->with('authUser', null);
-                $view->with('role', 'membro');
-                $view->with('unreadNotifications', 0);
-                $view->with('pendingCount', 0);
+            static $cachedData = null;
+
+            if ($cachedData === null) {
+                if (auth()->check()) {
+                    $user = auth()->user();
+                    $cachedData = [
+                        'authUser' => $user,
+                        'role' => $user->role ?? 'membro',
+                        'unreadNotifications' => $user->unreadNotifications()->count(),
+                        'pendingCount' => \App\Models\Contribution::where('status', 'pendente')->count()
+                    ];
+                } else {
+                    $cachedData = [
+                        'authUser' => null,
+                        'role' => 'membro',
+                        'unreadNotifications' => 0,
+                        'pendingCount' => 0
+                    ];
+                }
             }
+
+            $view->with($cachedData);
         });
     }
 }

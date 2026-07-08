@@ -1,17 +1,7 @@
 @php
     // O View Composer já passa $user e $role
     $authUser = auth()->user();
-    $pendingContributionsCount = null;
-    if ($authUser && ($authUser->isAdmin() || $authUser->isComissaoObra() || $authUser->isPastorZona())) {
-        $pendingQuery = \App\Models\Contribution::where('status', 'pendente');
-        if ($authUser->isPastorZona()) {
-            $zoneId = $authUser->getZoneId();
-            if ($zoneId) {
-                $pendingQuery->where('zone_id', $zoneId);
-            }
-        }
-        $pendingContributionsCount = $pendingQuery->count();
-    }
+    $pendingContributionsCount = $authUser ? $authUser->getPendingContributionsCount() : null;
     $logoPrimary = \App\Models\Setting::get('branding.logo_primary');
     $logoPrimary = $logoPrimary ? asset($logoPrimary) : asset('images/logo.png');
     $showInventoryOperacao = $authUser && ($authUser->isAdmin() || $authUser->isSecretaria());
@@ -206,8 +196,8 @@
                     @if ($authUser && ($authUser->hasRole('membro') || $authUser->isLider() || $authUser->isTimoteo()))
                         @php
                             $myCellLink = route('dashboard.membro') . '#minha-celula';
-                            if ($authUser->isLider() && $authUser->ledCells()->exists()) {
-                                $myCellLink = route('cells.show', $authUser->ledCells()->first());
+                            if ($authUser->isLider() && $authUser->isLiderOfAnyCell()) {
+                                $myCellLink = route('cells.show', $authUser->getFirstLedCell());
                             }
                         @endphp
                         <a href="{{ $myCellLink }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('dashboard.membro') || request()->routeIs('cells.show') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
@@ -230,8 +220,8 @@
                         </a>
                     @endif
 
-                    @if ($authUser && $authUser->isLider() && $authUser->ledCells()->exists())
-                        <a href="{{ route('cells.attendance', $authUser->ledCells()->first()) }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('cells.attendance') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                    @if ($authUser && $authUser->isLider() && $authUser->isLiderOfAnyCell())
+                        <a href="{{ route('cells.attendance', $authUser->getFirstLedCell()) }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('cells.attendance') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                             <i class="bi bi-calendar-check-fill text-xl flex-shrink-0"></i>
                             <span class="sidebar-text ml-4 font-bold tracking-tight">Ficha Guia</span>
                         </a>
@@ -443,38 +433,3 @@
     @endif
 </aside>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const sidebars = document.querySelectorAll('.app-sidebar');
-        if (!sidebars.length) return;
-
-        sidebars.forEach((sidebar) => {
-            const activeItem = sidebar.querySelector(
-                '.nav-item.bg-orange-600, .nav-item.bg-blue-600, .nav-item.bg-indigo-600, .nav-item.bg-zinc-900, .nav-item.bg-zinc-900\\/50'
-            );
-            if (!activeItem) return;
-
-            const scrollContainer = activeItem.closest('.custom-scrollbar') || sidebar;
-            const stickyHeader = sidebar.querySelector('.sticky.top-0');
-            const headerOffset = stickyHeader ? stickyHeader.offsetHeight + 12 : 24;
-
-            const runScroll = () => {
-                const visibleTop = scrollContainer.scrollTop + headerOffset;
-                const visibleBottom = scrollContainer.scrollTop + scrollContainer.clientHeight - 16;
-                const itemTop = activeItem.offsetTop;
-                const itemBottom = itemTop + activeItem.offsetHeight;
-
-                const targetTop = itemTop - headerOffset;
-                const shouldScroll = itemTop < visibleTop || itemBottom > visibleBottom;
-                if (shouldScroll) {
-                    scrollContainer.scrollTo({ top: Math.max(targetTop, 0), behavior: 'smooth' });
-                }
-
-                activeItem.classList.add('nav-item-highlight');
-                setTimeout(() => activeItem.classList.remove('nav-item-highlight'), 1800);
-            };
-
-            requestAnimationFrame(() => setTimeout(runScroll, 60));
-        });
-    });
-</script>

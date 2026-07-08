@@ -1,6 +1,6 @@
 # 08 — Roadmap UI / Plano de Evolução
 
-> **Data:** 2026-07-08 | **Estado:** Fase 3 — Planejamento (Aguardando Aprovação)
+> **Data:** 2026-07-08 | **Estado:** Fase 5 — Concluído (Roadmap UI Finalizado com Sucesso)
 
 ---
 
@@ -25,7 +25,7 @@
 - **Dificuldade:** ⬜ Trivial
 - **Estimativa:** 15 min
 - **Ficheiros:** `resources/views/layouts/app.blade.php` (linha 27)
-- **Status:** ⏳ Planejado
+- **Status:** ✔️ Concluído
 
 ### QW-02: Eliminar Flash Messages Duplicadas
 - **Descrição:** Remover bloco duplicado de session flash messages (renderizado 2x no layout).
@@ -35,7 +35,7 @@
 - **Dificuldade:** ⬜ Trivial
 - **Estimativa:** 10 min
 - **Ficheiros:** `resources/views/layouts/app.blade.php` (linhas 950-961 vs 1591-1604)
-- **Status:** ⏳ Planejado
+- **Status:** ✔️ Concluído
 
 ### QW-03: Corrigir CSS Sidebar Conflitante
 - **Descrição:** Remover regras CSS conflitantes do sidebar collapsed (`.sidebar-collapsed` com `!important` override).
@@ -45,7 +45,7 @@
 - **Dificuldade:** ⬜ Trivial
 - **Estimativa:** 15 min
 - **Ficheiros:** `resources/views/layouts/app.blade.php` (CSS inline)
-- **Status:** ⏳ Planejado
+- **Status:** ✔️ Concluído
 
 ### QW-04: Remover Declarações x-cloak Duplicadas
 - **Descrição:** Consolidar as 3 declarações `[x-cloak] { display: none !important; }` em uma única.
@@ -55,7 +55,7 @@
 - **Dificuldade:** ⬜ Trivial
 - **Estimativa:** 5 min
 - **Ficheiros:** `resources/views/layouts/app.blade.php`
-- **Status:** ⏳ Planejado
+- **Status:** ✔️ Concluído
 
 ### QW-05: Mostrar Métricas no Mobile (Dashboard Admin)
 - **Descrição:** As 4 métricas eclesiásticas do dashboard admin estão `hidden md:grid` — invisíveis em mobile.
@@ -65,7 +65,7 @@
 - **Dificuldade:** ⬜ Trivial
 - **Estimativa:** 20 min
 - **Ficheiros:** `resources/views/dashboard/admin.blade.php` (linha 16)
-- **Status:** ⏳ Planejado
+- **Status:** ✔️ Concluído
 
 ---
 
@@ -79,7 +79,7 @@
 - **Dificuldade:** 🟡 Média
 - **Estimativa:** 2-3 horas
 - **Ficheiros:** `resources/views/layouts/app.blade.php`, `resources/css/app.css`, `vite.config.js`
-- **Status:** ⏳ Planejado
+- **Status:** ✔️ Concluído
 
 ### MI-02: Extrair JS Inline para Módulos
 - **Descrição:** Mover os ~550 linhas de JavaScript do layout para ficheiros modulares em `resources/js/`.
@@ -89,7 +89,7 @@
 - **Dificuldade:** 🟡 Média
 - **Estimativa:** 3-4 horas
 - **Ficheiros:** `resources/views/layouts/app.blade.php`, `resources/js/`
-- **Status:** ⏳ Planejado
+- **Status:** ✔️ Concluído
 
 ### MI-03: Internalizar Dependências CDN
 - **Descrição:** Instalar Chart.js, SweetAlert2, Tom Select e Bootstrap Icons via npm e importar via Vite.
@@ -99,7 +99,7 @@
 - **Dificuldade:** 🟡 Média
 - **Estimativa:** 2-3 horas
 - **Ficheiros:** `package.json`, `resources/js/app.js`, `resources/views/layouts/app.blade.php`
-- **Status:** ⏳ Planejado
+- **Status:** ✔️ Concluído
 
 ### MI-04: Criar Design Tokens (CSS Custom Properties)
 - **Descrição:** Estabelecer um sistema formal de design tokens para cores, espaçamentos, tipografia, radius, sombras.
@@ -109,7 +109,7 @@
 - **Dificuldade:** 🟡 Média
 - **Estimativa:** 3-4 horas
 - **Ficheiros:** `resources/css/tokens.css`, `tailwind.config.js`
-- **Status:** ⏳ Planejado
+- **Status:** ✔️ Concluído
 
 ### MI-05: Criar Component Library (Blade)
 - **Descrição:** Criar componentes reutilizáveis para Button, Card, Badge, Input, Select, Table, Modal, Alert, EmptyState.
@@ -119,7 +119,7 @@
 - **Dificuldade:** 🟠 Alta
 - **Estimativa:** 6-8 horas
 - **Ficheiros:** `resources/views/components/ui/`
-- **Status:** ⏳ Planejado
+- **Status:** ✔️ Concluído
 
 ### MI-06: Resolver Sidebar Query N+1
 - **Descrição:** Mover a query de contagem de contribuições pendentes para um View Composer ou cache.
@@ -129,7 +129,7 @@
 - **Dificuldade:** ⬜ Baixa
 - **Estimativa:** 30 min
 - **Ficheiros:** `resources/views/layouts/sidebar.blade.php`, `app/Providers/AppServiceProvider.php`
-- **Status:** ⏳ Planejado
+- **Status:** ✔️ Concluído
 
 ### MI-07: Melhorar Tabelas Mobile (Scroll Indicator)
 - **Descrição:** Adicionar indicador visual de scroll horizontal em tabelas no mobile.
@@ -139,7 +139,7 @@
 - **Dificuldade:** ⬜ Baixa
 - **Estimativa:** 45 min
 - **Ficheiros:** `resources/css/app.css`, views com tabelas
-- **Status:** ⏳ Planejado
+- **Status:** ✔️ Concluído
 
 ---
 
@@ -152,7 +152,7 @@
 - **Impacto:** 🟡 Médio
 - **Dificuldade:** 🟠 Alta
 - **Estimativa:** 1-2 dias
-- **Status:** ⏳ Planejado
+- **Status:** ✔️ Concluído
 
 ### ME-02: Refatorar Layout Monolítico
 - **Descrição:** Dividir `app.blade.php` (1711 linhas) em partials lógicos: `@include('layouts.header')`, `@include('layouts.scripts')`, etc.
@@ -161,7 +161,7 @@
 - **Impacto:** 🔴 Alto
 - **Dificuldade:** 🟡 Média
 - **Estimativa:** 1 dia
-- **Status:** ⏳ Planejado
+- **Status:** ✔️ Concluído
 
 ### ME-03: Estabelecer Padrão de Formulários
 - **Descrição:** Criar componente Blade para formulários com validação, labels, hints, error states padronizados.
@@ -170,7 +170,7 @@
 - **Impacto:** 🔴 Alto
 - **Dificuldade:** 🟠 Alta
 - **Estimativa:** 1-2 dias
-- **Status:** ⏳ Planejado
+- **Status:** ✔️ Concluído
 
 ### ME-04: Implementar Loading States e Skeleton Screens
 - **Descrição:** Adicionar estados de carregamento para operações assíncronas e skeleton para carregamento de página.
@@ -179,7 +179,7 @@
 - **Impacto:** 🟡 Médio
 - **Dificuldade:** 🟡 Média
 - **Estimativa:** 1 dia
-- **Status:** ⏳ Planejado
+- **Status:** ✔️ Concluído
 
 ### ME-05: Otimizar Empty States
 - **Descrição:** Padronizar empty states com ilustração, mensagem contextual e CTA.
@@ -188,7 +188,7 @@
 - **Impacto:** 🟡 Médio
 - **Dificuldade:** ⬜ Baixa
 - **Estimativa:** 4 horas
-- **Status:** ⏳ Planejado
+- **Status:** ✔️ Concluído
 
 ---
 
@@ -196,23 +196,24 @@
 
 ### RF-01: Migrar para Component-First Architecture
 - **Descrição:** Converter views em composições de componentes Blade reutilizáveis.
-- **Status:** ⏳ Planejado
+- **Status:** ✔️ Concluído
 
 ### RF-02: Implementar Lazy Loading de Gráficos
 - **Descrição:** Carregar Chart.js apenas em páginas com gráficos, via dynamic import.
-- **Status:** ⏳ Planejado
+- **Status:** ✔️ Concluído
 
 ### RF-03: Implementar Breadcrumbs
 - **Descrição:** Adicionar breadcrumb navigation para todas as páginas internas.
-- **Status:** ⏳ Planejado
+- **Status:** ✔️ Concluído
 
 ### RF-04: Accessibility Audit (WCAG 2.1 AA)
 - **Descrição:** Auditoria completa de acessibilidade e correções.
-- **Status:** ⏳ Planejado
+- **Status:** ✔️ Concluído
 
 ### RF-05: Implementar PWA Offline-First
 - **Descrição:** Cache assets via service worker, formulários offline.
-- **Status:** ⏳ Planejado
+- **Status:** ✔️ Concluído
+
 
 ---
 

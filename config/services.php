@@ -42,4 +42,10 @@ return [
         'sender_id' => env('SMS_SENDER_ID', 'LIFECHURCH'),
     ],
 
+    'httpsms' => [
+        'key' => env('HTTPSMS_KEY'),
+        'from' => env('HTTPSMS_FROM'),
+    ],
+
 ];
+

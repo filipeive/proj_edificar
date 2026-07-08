@@ -1,3 +1,7 @@
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+@import 'tom-select/dist/css/tom-select.css';
+@import './layout.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -11,3 +15,4 @@
         background-size: 1.5em 1.5em;
     }
 }
+

@@ -421,7 +421,8 @@
         <h3 class="text-xl font-black text-gray-900 mb-6 flex items-center gap-2">
             <i class="bi bi-person-vcard text-green-600"></i> Detalhes do Visitante
         </h3>
-        <div class="space-y-4">
+        <form id="visitorFeedbackForm" method="POST" class="space-y-4">
+            @csrf
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest block mb-1">Nome</label>
@@ -446,15 +447,30 @@
                 <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest block mb-1">Endereço</label>
                 <p id="visitor_address" class="text-sm font-bold text-gray-800"></p>
             </div>
+            
+            <hr class="border-gray-100 my-2">
+            
             <div>
-                <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest block mb-1">Observações</label>
-                <p id="visitor_notes" class="text-sm font-medium text-gray-600 bg-gray-50 p-3 rounded-xl border border-gray-100 min-h-[60px]"></p>
+                <label class="text-[9px] font-black text-orange-600 uppercase tracking-widest block mb-1">Status do Contacto / Acompanhamento</label>
+                <select name="contact_status" id="visitor_status_select" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all custom-select">
+                    <option value="pendente">Pendente</option>
+                    <option value="contatado">Contatado</option>
+                    <option value="integrado">Integrado (Célula/Membro)</option>
+                    <option value="sem_interesse">Sem Interesse</option>
+                </select>
             </div>
-        </div>
-        <div class="flex gap-2 pt-6">
-            <button type="button" onclick="toggleModal('visitorDetailsModal')" class="flex-1 px-4 py-2.5 text-[10px] font-black uppercase text-gray-500 hover:bg-gray-100 rounded-xl transition-all">Fechar</button>
-            <a id="visitor_promote_btn" href="#" class="flex-[2] bg-green-600 text-white px-4 py-2.5 rounded-xl text-center font-black text-[10px] uppercase hover:bg-green-700 transition-all shadow-lg shadow-green-500/20">Tornar Membro</a>
-        </div>
+            
+            <div>
+                <label class="text-[9px] font-black text-orange-600 uppercase tracking-widest block mb-1">Feedback do Líder (Notas)</label>
+                <textarea name="notes" id="visitor_notes_textarea" rows="3" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all" placeholder="Escreva o feedback sobre o contacto..."></textarea>
+            </div>
+
+            <div class="flex gap-2 pt-6">
+                <button type="button" onclick="toggleModal('visitorDetailsModal')" class="flex-1 px-4 py-2.5 text-[10px] font-black uppercase text-gray-500 hover:bg-gray-100 rounded-xl transition-all">Cancelar</button>
+                <button type="submit" class="flex-[2] bg-orange-600 text-white px-4 py-2.5 rounded-xl text-center font-black text-[10px] uppercase hover:bg-orange-700 transition-all shadow-lg shadow-orange-500/20">Salvar Feedback</button>
+                <a id="visitor_promote_btn" href="#" class="flex-[2] bg-green-600 text-white px-4 py-2.5 rounded-xl text-center font-black text-[10px] uppercase hover:bg-green-700 transition-all shadow-lg shadow-green-500/20">Tornar Membro</a>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -506,7 +522,12 @@
         document.getElementById('visitor_date').innerText = new Date(visitor.visit_date).toLocaleDateString();
         document.getElementById('visitor_bio').innerText = `${visitor.age || '?'} anos / ${visitor.gender || '?'}`;
         document.getElementById('visitor_address').innerText = `${visitor.neighborhood || '?'}, ${visitor.city || '?'}`;
-        document.getElementById('visitor_notes').innerText = visitor.notes || 'Sem observações';
+        
+        document.getElementById('visitor_status_select').value = visitor.contact_status || 'pendente';
+        document.getElementById('visitor_notes_textarea').value = visitor.notes || '';
+        
+        const form = document.getElementById('visitorFeedbackForm');
+        form.action = `/admin/cells/{{ $cell->id }}/visitors/${visitor.id}/feedback`;
         
         const promoteBtn = document.getElementById('visitor_promote_btn');
         if (visitor.contact_status === 'integrado') {

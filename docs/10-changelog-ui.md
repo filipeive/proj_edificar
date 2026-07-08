@@ -44,3 +44,13 @@
 - **Impacto:** As 4 métricas eclesiásticas (Membros, Dízimos, Eventos, Cultos) agora são visíveis em telemóvel.
 - **Benefício:** Mobile-first dashboard. Informação crítica acessível a todos os utilizadores.
 - **Risco:** ⬜ Nenhum — apenas alterações visuais responsivas
+
+## [2026-07-08] — Estabilização do Dark Mode e Alinhamento de Views
+
+### ME-01: Dark Mode Consistente (Ajustes de Contraste e Inputs) ✔️
+- **Ficheiros alterados:** `resources/css/layout.css`
+- **Alteração:** Adicionados overrides globais detalhados para as classes de texto (`text-gray-*`, `text-zinc-*`, `text-slate-*`), fundos e bordas do Tailwind em modo escuro (`[data-theme="dark"]`). Estilização global e robusta de inputs de formulários, selects, textareas e botões secundários ("Cancelar") sem classes `dark:` individuais.
+- **Impacto:** Todas as páginas administrativas e modais agora exibem contraste excelente e legibilidade correta de textos e campos de entrada no tema escuro.
+- **Benefício:** Acessibilidade visual aprimorada, visual premium e consistência em todo o dashboard administrativo.
+- **Risco:** ⬜ Nenhum — regras CSS restritas ao atributo `[data-theme="dark"]`
+

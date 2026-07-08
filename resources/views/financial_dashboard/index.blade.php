@@ -216,7 +216,6 @@
     </div>
 
     @push('scripts')
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
             // Common Options
             Chart.defaults.font.family = "'Inter', sans-serif";

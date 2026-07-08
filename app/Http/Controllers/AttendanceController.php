@@ -161,4 +161,42 @@ class AttendanceController extends Controller
 
         return redirect()->back()->with('success', 'Discipulado removido com sucesso!');
     }
+
+    /**
+     * Permite ao líder da célula (ou pastor/supervisor) registar o feedback de contacto com o visitante.
+     */
+    public function updateVisitorFeedback(Cell $cell, \App\Models\Visitor $visitor, Request $request)
+    {
+        $user = auth()->user();
+        
+        // Garantir que o visitante pertence à célula
+        if ($visitor->cell_id !== $cell->id) {
+            abort(403, 'Este visitante não pertence à célula indicada.');
+        }
+
+        // Se for líder, garantir que lidera esta célula
+        if ($user->role === 'lider_celula' && $cell->leader_id !== $user->id) {
+            abort(403, 'Você não tem permissão para atualizar feedback nesta célula.');
+        }
+
+        $validated = $request->validate([
+            'contact_status' => 'required|in:pendente,contatado,integrado,sem_interesse',
+            'notes' => 'nullable|string',
+        ]);
+
+        $updateData = [
+            'contact_status' => $validated['contact_status'],
+            'notes' => $validated['notes'],
+        ];
+
+        // Se o status for alterado para contatado, registar quem e quando
+        if ($validated['contact_status'] === 'contatado' && !$visitor->isContacted()) {
+            $updateData['contacted_at'] = now();
+            $updateData['contacted_by'] = $user->id;
+        }
+
+        $visitor->update($updateData);
+
+        return redirect()->back()->with('success', 'Feedback do visitante atualizado com sucesso!');
+    }
 }

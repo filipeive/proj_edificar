@@ -225,6 +225,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/cells/{cell}/attendance', [\App\Http\Controllers\AttendanceController::class, 'index'])->name('cells.attendance');
             Route::post('/cells/{cell}/attendance', [\App\Http\Controllers\AttendanceController::class, 'store'])->name('cells.attendance.store');
             Route::post('/cells/{cell}/visitors', [\App\Http\Controllers\AttendanceController::class, 'storeVisitor'])->name('cells.visitors.store');
+            Route::post('/cells/{cell}/visitors/{visitor}/feedback', [\App\Http\Controllers\AttendanceController::class, 'updateVisitorFeedback'])->name('cells.visitors.feedback');
             Route::post('/cells/{cell}/discipleships', [\App\Http\Controllers\AttendanceController::class, 'storeDiscipleship'])->name('cells.discipleships.store');
             Route::put('/cells/{cell}/discipleships/{discipleship}', [\App\Http\Controllers\AttendanceController::class, 'updateDiscipleship'])->name('cells.discipleships.update');
             Route::delete('/cells/{cell}/discipleships/{discipleship}', [\App\Http\Controllers\AttendanceController::class, 'destroyDiscipleship'])->name('cells.discipleships.destroy');

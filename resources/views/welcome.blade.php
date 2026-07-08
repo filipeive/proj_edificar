@@ -22,8 +22,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap"
         rel="stylesheet">
     <style>
@@ -725,7 +724,7 @@
     <section id="vision" class="py-32 bg-gray-900 relative overflow-hidden">
         <div class="absolute inset-0 opacity-20">
             <div
-                class="absolute top-0 right-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1548625361-8889aa3fb942?ixlib=rb-4.0.3&fit=crop&w=2000&q=80')] bg-cover bg-center">
+                class="absolute top-0 right-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=2000&q=80')] bg-cover bg-center">
             </div>
             <div class="absolute inset-0 bg-gradient-to-l from-gray-900 via-gray-900/50 to-transparent"></div>
         </div>

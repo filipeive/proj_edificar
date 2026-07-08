@@ -42,6 +42,54 @@ class Visitor extends Model
         $this->attributes['phone'] = $this->normalizeMozPhone($value);
     }
 
+    protected static function booted()
+    {
+        static::saved(function ($visitor) {
+            if ($visitor->wasChanged('cell_id') && $visitor->cell_id) {
+                $visitor->notifyCellLeaderAboutAssignment();
+            }
+        });
+
+        static::created(function ($visitor) {
+            if ($visitor->cell_id) {
+                $visitor->notifyCellLeaderAboutAssignment();
+            }
+        });
+    }
+
+    /**
+     * Notify cell leader via SMS about new visitor assignment.
+     */
+    public function notifyCellLeaderAboutAssignment(): void
+    {
+        try {
+            $cell = $this->cell;
+            if (!$cell) {
+                return;
+            }
+
+            $leader = $cell->leader;
+            if (!$leader || !$leader->phone) {
+                return;
+            }
+
+            $smsService = app(\App\Services\Sms\SmsService::class);
+            
+            $message = sprintf(
+                "Paz Lider, o visitante %s (%s) do bairro %s foi atribuido a sua celula (%s). Faca o contacto e de o feedback no sistema.",
+                $this->name,
+                $this->phone ?? 'Sem telefone',
+                $this->neighborhood ?? 'Sem bairro',
+                $cell->name
+            );
+
+            $smsService->send($leader->phone, $message);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error notifying cell leader: ' . $e->getMessage());
+        }
+    }
+
+
     /**
      * Relacionamentos
      */

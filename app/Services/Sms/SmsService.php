@@ -22,8 +22,8 @@ class SmsService
                 return new LogSmsProvider();
             case 'mocean':
                 return new MoceanSmsProvider();
-            // case 'generic_http':
-            //     return new GenericHttpSmsProvider();
+            case 'httpsms':
+                return new HttpsmsProvider();
             default:
                 return new LogSmsProvider();
         }
