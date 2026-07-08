@@ -29,7 +29,7 @@ if [ -n "$SEED_CMD" ]; then \
   REMOTE_CMD="$REMOTE_CMD && $SEED_CMD true"; \
 fi; \
 if [ -z "$DO_CLEAR" ] || [ "$DO_CLEAR" = "S" ] || [ "$DO_CLEAR" = "s" ]; then \
-  REMOTE_CMD="$REMOTE_CMD && php artisan optimize:clear && php artisan config:cache && php artisan route:cache && php artisan view:cache"; \
+  REMOTE_CMD="$REMOTE_CMD && npm run build && php artisan optimize:clear && php artisan config:cache && php artisan route:cache && php artisan view:cache"; \
 fi; \
 
 git add . && \
