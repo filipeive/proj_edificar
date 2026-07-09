@@ -29,8 +29,7 @@
 
         <!-- Sidebar Desktop Wrapper -->
         <div :style="sidebarOpen ? 'width: 280px' : 'width: 80px'"
-            :class="sidebarOpen ? 'overflow-hidden' : ''"
-            class="hidden md:block transition-all duration-300 ease-in-out h-full flex-shrink-0 relative">
+            class="hidden md:block transition-all duration-300 ease-in-out h-full overflow-hidden flex-shrink-0 relative">
             <div class="h-full w-full absolute top-0 left-0">
                 @include('layouts.sidebar', ['sidebarId' => 'sidebar-desktop'])
             </div>
@@ -63,6 +62,47 @@
 
     <!-- Flash Messages Parcial -->
     @include('layouts.partials.flash-messages')
+
+    <!-- Global Sidebar Tooltip (for collapsed state) -->
+    <div id="sidebar-global-tooltip"
+         class="fixed bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold pointer-events-none opacity-0 transition-opacity duration-150 z-[9999] shadow-xl border border-white/5 whitespace-nowrap"
+         style="left: 90px; transform: translateY(-50%);">
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tooltip = document.getElementById('sidebar-global-tooltip');
+            if (!tooltip) return;
+
+            document.addEventListener('mouseover', (e) => {
+                const sidebar = document.querySelector('.sidebar-collapsed');
+                if (!sidebar) return;
+
+                const navItem = e.target.closest('.nav-item');
+                if (!navItem) return;
+
+                const text = navItem.getAttribute('data-tooltip');
+                if (!text) return;
+
+                const rect = navItem.getBoundingClientRect();
+                tooltip.textContent = text;
+                tooltip.style.top = `${rect.top + rect.height / 2}px`;
+                tooltip.style.left = `${rect.right + 10}px`;
+                tooltip.style.opacity = '1';
+            });
+
+            document.addEventListener('mouseout', (e) => {
+                const navItem = e.target.closest('.nav-item');
+                if (!navItem) return;
+
+                tooltip.style.opacity = '0';
+            });
+
+            document.addEventListener('scroll', () => {
+                tooltip.style.opacity = '0';
+            }, true);
+        });
+    </script>
 
     @stack('scripts')
 

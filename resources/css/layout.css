@@ -129,11 +129,6 @@ body {
     display: none;
 }
 
-/* Permitir exibição de tooltips quando colapsado */
-.sidebar-collapsed,
-.sidebar-collapsed nav {
-    overflow: visible !important;
-}
 
 /* Ajustes no Logo quando colapsado */
 .sidebar-collapsed .sidebar-header {
