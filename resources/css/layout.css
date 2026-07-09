@@ -129,6 +129,29 @@ body {
     display: none;
 }
 
+/* Permitir exibição de tooltips quando colapsado */
+.sidebar-collapsed,
+.sidebar-collapsed nav {
+    overflow: visible !important;
+}
+
+/* Ajustes no Logo quando colapsado */
+.sidebar-collapsed .sidebar-header {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+}
+
+.sidebar-collapsed .logo-wrapper {
+    padding: 0.35rem !important;
+    border-radius: 0.5rem !important;
+}
+
+.sidebar-collapsed .logo-img {
+    height: 1.5rem !important;
+}
+
 /* Smooth transitions */
 aside {
     transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);

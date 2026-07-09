@@ -14,10 +14,10 @@
     class="app-sidebar {{ ($sidebarId ?? 'sidebar') === 'sidebar-desktop' ? '' : 'sidebar-expanded' }} bg-black text-white flex flex-col h-full min-h-0 overflow-hidden shadow-2xl transition-all duration-300 ease-in-out border-r border-white/5">
     <!-- Header -->
     <div
-        class="px-6 py-8 border-b border-white/5 flex items-center justify-between bg-black/50 backdrop-blur-xl sticky top-0 z-20">
+        class="sidebar-header px-6 py-8 border-b border-white/5 flex items-center justify-between bg-black/50 backdrop-blur-xl sticky top-0 z-20">
         <div class="flex items-center space-x-3 overflow-hidden">
-            <div class="flex-shrink-0 p-2 bg-orange-600 rounded-xl shadow-lg shadow-orange-600/20">
-                <img src="{{ $logoPrimary }}" alt="Logo" class="h-8 w-auto">
+            <div class="logo-wrapper flex-shrink-0 p-2 bg-orange-600 rounded-xl shadow-lg shadow-orange-600/20">
+                <img src="{{ $logoPrimary }}" alt="Logo" class="logo-img h-8 w-auto">
             </div>
             <div class="sidebar-text">
                 <h1 class="text-lg font-black tracking-tighter text-white uppercase leading-none">Life - APP</h1>

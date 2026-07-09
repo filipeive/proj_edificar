@@ -29,7 +29,8 @@
 
         <!-- Sidebar Desktop Wrapper -->
         <div :style="sidebarOpen ? 'width: 280px' : 'width: 80px'"
-            class="hidden md:block transition-all duration-300 ease-in-out h-full overflow-hidden flex-shrink-0 relative">
+            :class="sidebarOpen ? 'overflow-hidden' : ''"
+            class="hidden md:block transition-all duration-300 ease-in-out h-full flex-shrink-0 relative">
             <div class="h-full w-full absolute top-0 left-0">
                 @include('layouts.sidebar', ['sidebarId' => 'sidebar-desktop'])
             </div>
