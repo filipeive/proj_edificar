@@ -8,7 +8,10 @@
     $showInventoryFinanceira = $authUser && ($authUser->isAdmin() || $authUser->isEdificarManager() || $authUser->isComissaoObra() || $authUser->isTesouraria() || $authUser->isPastor());
 @endphp
 <aside id="{{ $sidebarId ?? 'sidebar' }}" data-sidebar-id="{{ $sidebarId ?? 'sidebar' }}"
-    class="app-sidebar sidebar-expanded bg-black text-white flex flex-col h-full min-h-0 overflow-hidden shadow-2xl transition-all duration-300 ease-in-out border-r border-white/5">
+    @if(($sidebarId ?? 'sidebar') === 'sidebar-desktop')
+        :class="sidebarOpen ? 'sidebar-expanded' : 'sidebar-collapsed'"
+    @endif
+    class="app-sidebar {{ ($sidebarId ?? 'sidebar') === 'sidebar-desktop' ? '' : 'sidebar-expanded' }} bg-black text-white flex flex-col h-full min-h-0 overflow-hidden shadow-2xl transition-all duration-300 ease-in-out border-r border-white/5">
     <!-- Header -->
     <div
         class="px-6 py-8 border-b border-white/5 flex items-center justify-between bg-black/50 backdrop-blur-xl sticky top-0 z-20">
@@ -56,49 +59,51 @@
 
         <!-- ATALHOS RÁPIDOS (Frequent Actions) -->
         @if($authUser && ($authUser->isLider() || $authUser->isResponsavelPacote() || $authUser->isAdmin() || $authUser->isComissaoObra()))
-            <div class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-2 mt-2">Atalhos Rápidos</div>
-            <div class="grid grid-cols-2 gap-2 px-2 py-2">
-                @if($authUser->isSecretaria() || $authUser->isAdmin() || $authUser->isAdministracao() || $authUser->isPastorZona())
-                    <a href="{{ route('services.create-teaching') }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-orange-600/20 hover:border-orange-500/50 transition-all group">
-                        <i class="bi bi-mortarboard text-orange-400 mb-1 group-hover:scale-110 transition-transform text-2xl"></i>
-                        <span class="hidden md:block text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Registar Estudo</span>
-                    </a>
-                    <a href="{{ route('services.create') }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-blue-600/20 hover:border-blue-500/50 transition-all group">
-                        <i class="bi bi-plus-circle text-blue-500 mb-1 group-hover:scale-110 transition-transform text-2xl"></i>
-                        <span class="hidden md:block text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Registar Culto</span>
-                    </a>
-                @endif
-                <!-- resgistar encontro de celula -->
-                @if($authUser->isLider() || $authUser->isAdmin() || $authUser->isSupervisor() || $authUser->isPastorZona())
-                    <a href="{{ route('cell-meetings.create') }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-orange-600/20 hover:border-orange-500/50 transition-all group">
-                        <i class="bi bi-plus-circle text-orange-500 mb-1 group-hover:scale-110 transition-transform"></i>
-                        <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Registar Encontro de Célula</span>
-                    </a>
-                @endif
-                @if($authUser->isResponsavelPacote() || $authUser->isAdmin())
-                    <a href="{{ route('contributions.create') }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-blue-600/20 hover:border-blue-500/50 transition-all group">
-                        <i class="bi bi-cash-coin text-blue-500 mb-1 group-hover:scale-110 transition-transform"></i>
-                        <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Registar Contribuição</span>
-                    </a>
-                @endif
-                @if($authUser->isAdmin() || $authUser->isSecretaria() || $authUser->isPastorZona() || $authUser->isAdministracao())
-                    <a href="{{ route('visitors.create') }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-green-600/20 hover:border-green-500/50 transition-all group">
-                        <i class="bi bi-person-plus text-green-500 mb-1 group-hover:scale-110 transition-transform"></i>
-                        <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Registar Visitante</span>
-                    </a>
-                @endif
-                @if($authUser->isAdmin() || $authUser->isTesouraria())
-                    <a href="{{ route('requisitions.create') }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-red-600/20 hover:border-red-500/50 transition-all group">
-                        <i class="bi bi-file-earmark-plus text-red-500 mb-1 group-hover:scale-110 transition-transform"></i>
-                        <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Registar Requisição</span>
-                    </a>
-                @endif
-                @if($authUser->isAdmin() || $authUser->isComissaoObra())
-                    <a href="{{ route('contributions.index', ['status' => 'pendente']) }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-yellow-600/20 hover:border-yellow-500/50 transition-all group">
-                        <i class="bi bi-patch-check text-yellow-500 mb-1 group-hover:scale-110 transition-transform"></i>
-                        <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Validar Contribuição</span>
-                    </a>
-                @endif
+            <div class="sidebar-quick-actions">
+                <div class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-2 mt-2">Atalhos Rápidos</div>
+                <div class="grid grid-cols-2 gap-2 px-2 py-2">
+                    @if($authUser->isSecretaria() || $authUser->isAdmin() || $authUser->isAdministracao() || $authUser->isPastorZona())
+                        <a href="{{ route('services.create-teaching') }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-orange-600/20 hover:border-orange-500/50 transition-all group">
+                            <i class="bi bi-mortarboard text-orange-400 mb-1 group-hover:scale-110 transition-transform text-2xl"></i>
+                            <span class="hidden md:block text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Registar Estudo</span>
+                        </a>
+                        <a href="{{ route('services.create') }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-blue-600/20 hover:border-blue-500/50 transition-all group">
+                            <i class="bi bi-plus-circle text-blue-500 mb-1 group-hover:scale-110 transition-transform text-2xl"></i>
+                            <span class="hidden md:block text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Registar Culto</span>
+                        </a>
+                    @endif
+                    <!-- resgistar encontro de celula -->
+                    @if($authUser->isLider() || $authUser->isAdmin() || $authUser->isSupervisor() || $authUser->isPastorZona())
+                        <a href="{{ route('cell-meetings.create') }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-orange-600/20 hover:border-orange-500/50 transition-all group">
+                            <i class="bi bi-plus-circle text-orange-500 mb-1 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Registar Encontro de Célula</span>
+                        </a>
+                    @endif
+                    @if($authUser->isResponsavelPacote() || $authUser->isAdmin())
+                        <a href="{{ route('contributions.create') }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-blue-600/20 hover:border-blue-500/50 transition-all group">
+                            <i class="bi bi-cash-coin text-blue-500 mb-1 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Registar Contribuição</span>
+                        </a>
+                    @endif
+                    @if($authUser->isAdmin() || $authUser->isSecretaria() || $authUser->isPastorZona() || $authUser->isAdministracao())
+                        <a href="{{ route('visitors.create') }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-green-600/20 hover:border-green-500/50 transition-all group">
+                            <i class="bi bi-person-plus text-green-500 mb-1 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Registar Visitante</span>
+                        </a>
+                    @endif
+                    @if($authUser->isAdmin() || $authUser->isTesouraria())
+                        <a href="{{ route('requisitions.create') }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-red-600/20 hover:border-red-500/50 transition-all group">
+                            <i class="bi bi-file-earmark-plus text-red-500 mb-1 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Registar Requisição</span>
+                        </a>
+                    @endif
+                    @if($authUser->isAdmin() || $authUser->isComissaoObra())
+                        <a href="{{ route('contributions.index', ['status' => 'pendente']) }}" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-yellow-600/20 hover:border-yellow-500/50 transition-all group">
+                            <i class="bi bi-patch-check text-yellow-500 mb-1 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-white">Validar Contribuição</span>
+                        </a>
+                    @endif
+                </div>
             </div>
         @endif
 

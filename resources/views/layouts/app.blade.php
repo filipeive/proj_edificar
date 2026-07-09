@@ -10,12 +10,27 @@
 
     <div class="flex h-screen bg-gray-100"
         x-data="{ sidebarOpen: localStorage.getItem('sidebarOpen') !== 'false', mobileSidebarOpen: false }"
-        x-init="$watch('sidebarOpen', value => localStorage.setItem('sidebarOpen', value));">
+        x-init="
+            $watch('sidebarOpen', value => {
+                localStorage.setItem('sidebarOpen', value);
+                setTimeout(() => window.dispatchEvent(new Event('resize')), 300);
+            });
+            $watch('mobileSidebarOpen', value => {
+                const overlay = document.getElementById('mobileOverlay');
+                if (overlay) {
+                    if (value) overlay.classList.remove('hidden');
+                    else overlay.classList.add('hidden');
+                }
+            });
+            window.toggleSidebar = () => { sidebarOpen = !sidebarOpen; };
+            window.toggleMobileSidebar = () => { mobileSidebarOpen = !mobileSidebarOpen; };
+        "
+        @keydown.window.ctrl.b.prevent="if (window.innerWidth >= 768) { sidebarOpen = !sidebarOpen; } else { mobileSidebarOpen = !mobileSidebarOpen; }">
 
         <!-- Sidebar Desktop Wrapper -->
-        <div :style="sidebarOpen ? 'width: 280px' : 'width: 0px'"
+        <div :style="sidebarOpen ? 'width: 280px' : 'width: 80px'"
             class="hidden md:block transition-all duration-300 ease-in-out h-full overflow-hidden flex-shrink-0 relative">
-            <div style="width: 280px" class="h-full absolute top-0 left-0">
+            <div class="h-full w-full absolute top-0 left-0">
                 @include('layouts.sidebar', ['sidebarId' => 'sidebar-desktop'])
             </div>
         </div>

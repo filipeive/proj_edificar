@@ -600,11 +600,6 @@ window.showInfo = showInfo;
 document.addEventListener('DOMContentLoaded', function () {
     initializeTheme();
 
-    const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-    if (sidebarCollapsed && window.innerWidth >= 768) {
-        toggleSidebar();
-    }
-
     document.querySelectorAll('[role="alert"]').forEach(toast => {
         toast.classList.add('toast-enter');
         setTimeout(() => closeToast(toast.id), 5000);
@@ -640,25 +635,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (searchContainer && !searchContainer.contains(event.target)) {
             searchResults?.classList.add('hidden');
             mobileSearchResults?.classList.add('hidden');
-        }
-    });
-
-    document.querySelectorAll('aside a').forEach(link => {
-        link.addEventListener('click', function () {
-            if (window.innerWidth < 768) {
-                toggleMobileSidebar();
-            }
-        });
-    });
-
-    document.addEventListener('keydown', function (e) {
-        if (e.ctrlKey && e.key === 'b') {
-            e.preventDefault();
-            if (window.innerWidth >= 768) {
-                toggleSidebar();
-            } else {
-                toggleMobileSidebar();
-            }
         }
     });
 

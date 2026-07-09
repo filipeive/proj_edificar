@@ -118,9 +118,11 @@ body {
 }
 
 .sidebar-collapsed .sidebar-text {
-    opacity: 0;
-    width: 0;
-    overflow: hidden;
+    display: none !important;
+}
+
+.sidebar-collapsed .sidebar-quick-actions {
+    display: none !important;
 }
 
 .sidebar-collapsed .menu-label {
