@@ -45,48 +45,84 @@ class Visitor extends Model
     protected static function booted()
     {
         static::saved(function ($visitor) {
-            if ($visitor->wasChanged('cell_id') && $visitor->cell_id) {
-                $visitor->notifyCellLeaderAboutAssignment();
+            if (($visitor->wasChanged('cell_id') && $visitor->cell_id) || ($visitor->wasChanged('zone_id') && $visitor->zone_id)) {
+                $visitor->notifyAssignment();
             }
         });
 
         static::created(function ($visitor) {
-            if ($visitor->cell_id) {
-                $visitor->notifyCellLeaderAboutAssignment();
+            if ($visitor->cell_id || $visitor->zone_id) {
+                $visitor->notifyAssignment();
             }
         });
     }
 
     /**
-     * Notify cell leader via SMS about new visitor assignment.
+     * Notify supervisor and zone pastor via SMS about new visitor assignment.
+     */
+    public function notifyAssignment(): void
+    {
+        try {
+            $smsService = app(\App\Services\Sms\SmsService::class);
+            
+            $cell = $this->cell;
+            $zone = $this->zone;
+            
+            if ($cell) {
+                $supervision = $cell->supervision;
+                $zone = $supervision ? $supervision->zone : $zone;
+                
+                // 1. Notify Supervisor
+                $supervisor = $supervision ? $supervision->supervisor : null;
+                if ($supervisor && $supervisor->phone) {
+                    $msgSupervisor = sprintf(
+                        "Paz Supervisor, o visitante %s (%s) do bairro %s foi atribuido a celula %s (%s). Encaminhe ao lider de celula e de o feedback no sistema.",
+                        $this->name,
+                        $this->phone ?? 'Sem telefone',
+                        $this->neighborhood ?? 'Sem bairro',
+                        $cell->name,
+                        $supervision->name ?? ''
+                    );
+                    $smsService->send($supervisor->phone, $msgSupervisor);
+                }
+                
+                // 2. Notify Pastor de Zona
+                $pastor = $zone ? $zone->pastor : null;
+                if ($pastor && $pastor->phone) {
+                    $msgPastor = sprintf(
+                        "Paz Pastor, o visitante %s (%s) do bairro %s foi atribuido a celula %s (Zona: %s). Encaminhe ao supervisor para acompanhamento.",
+                        $this->name,
+                        $this->phone ?? 'Sem telefone',
+                        $this->neighborhood ?? 'Sem bairro',
+                        $cell->name,
+                        $zone->name ?? ''
+                    );
+                    $smsService->send($pastor->phone, $msgPastor);
+                }
+            } elseif ($zone) {
+                $pastor = $zone->pastor;
+                if ($pastor && $pastor->phone) {
+                    $msgPastor = sprintf(
+                        "Paz Pastor, o visitante %s (%s) do bairro %s foi registado na sua zona (%s). Encaminhe ao supervisor para atribuicao de celula.",
+                        $this->name,
+                        $this->phone ?? 'Sem telefone',
+                        $this->neighborhood ?? 'Sem bairro',
+                        $zone->name
+                    );
+                    $smsService->send($pastor->phone, $msgPastor);
+                }
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error notifying leaders about visitor: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Compatibility wrapper for old method name.
      */
     public function notifyCellLeaderAboutAssignment(): void
     {
-        try {
-            $cell = $this->cell;
-            if (!$cell) {
-                return;
-            }
-
-            $leader = $cell->leader;
-            if (!$leader || !$leader->phone) {
-                return;
-            }
-
-            $smsService = app(\App\Services\Sms\SmsService::class);
-            
-            $message = sprintf(
-                "Paz Lider, o visitante %s (%s) do bairro %s foi atribuido a sua celula (%s). Faca o contacto e de o feedback no sistema.",
-                $this->name,
-                $this->phone ?? 'Sem telefone',
-                $this->neighborhood ?? 'Sem bairro',
-                $cell->name
-            );
-
-            $smsService->send($leader->phone, $message);
-        } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Error notifying cell leader: ' . $e->getMessage());
-        }
+        $this->notifyAssignment();
     }
 
 

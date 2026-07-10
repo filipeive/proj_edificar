@@ -18,25 +18,46 @@
         }
 
         .header {
-            background-color: #111827;
-            color: white;
-            padding: 40px 50px;
-            text-align: left;
+            background-color: #ffffff;
+            color: #000000;
+            padding: 20px 50px 10px 50px;
+            text-align: center;
+            border-bottom: 2.5px solid #000000;
+            margin-bottom: 25px;
         }
 
         .header h1 {
             margin: 0;
-            font-size: 24px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #000000;
         }
 
-        .header p {
-            margin: 5px 0 0;
-            color: #f97316;
+        .header .subtitle {
+            font-size: 10px;
             font-weight: bold;
-            font-size: 12px;
+            color: #4b5563;
+            text-transform: uppercase;
             letter-spacing: 1px;
+            margin-top: 2px;
+            margin-bottom: 2px;
+        }
+
+        .header .congregation {
+            font-size: 12px;
+            font-weight: bold;
+            color: #000000;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .header .report-type {
+            font-size: 14px;
+            font-weight: bold;
+            color: #000000;
+            margin-top: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .content {
@@ -152,9 +173,26 @@
 </head>
 
 <body>
+    @php
+        $logoPath = public_path('images/logo-color.png');
+        if (!file_exists($logoPath)) {
+            $logoPath = public_path('images/logo.png');
+        }
+        $logoExt = strtolower(pathinfo($logoPath, PATHINFO_EXTENSION));
+        $logoMime = $logoExt === 'svg' ? 'image/svg+xml' : 'image/png';
+        $logoData = null;
+        if (file_exists($logoPath)) {
+            $logoData = 'data:' . $logoMime . ';base64,' . base64_encode(file_get_contents($logoPath));
+        }
+    @endphp
     <div class="header">
-        <h1>Portal Life Church</h1>
-        <p>@yield('report_type')</p>
+        @if($logoData)
+            <img src="{{ $logoData }}" alt="Logo" style="height: 55px; display: block; margin: 0 auto 10px auto;">
+        @endif
+        <h1>Comunidade de Vida Cristã - {{ \App\Models\Setting::get('church.name', 'Life Church') }}</h1>
+        <div class="subtitle">MOÇAMBIQUE</div>
+        <div class="congregation">{{ \App\Models\Setting::get('church.congregation', 'Congregação de Chimoio') }}</div>
+        <div class="report-type">@yield('report_type')</div>
     </div>
 
     <div class="content">

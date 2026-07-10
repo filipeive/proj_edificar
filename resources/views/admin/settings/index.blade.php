@@ -60,6 +60,12 @@
                             class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
                     </div>
                     <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Congregação / Filial</label>
+                        <input type="text" name="settings[church.congregation]"
+                            value="{{ $settings['church.congregation']['value'] ?? '' }}"
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">Email</label>
                         <input type="email" name="settings[church.email]"
                             value="{{ $settings['church.email']['value'] ?? '' }}"

@@ -108,9 +108,9 @@
         @if($logoData)
             <img src="{{ $logoData }}" alt="Logo" class="logo-img">
         @endif
-        <div class="header-title">Comunidade de Vida Cristã - Life Church</div>
+        <div class="header-title">Comunidade de Vida Cristã - {{ \App\Models\Setting::get('church.name', 'Life Church') }}</div>
         <div class="header-subtitle">MOÇAMBIQUE</div>
-        <div class="header-congregation">Congregação de Chimoio</div>
+        <div class="header-congregation">{{ \App\Models\Setting::get('church.congregation', 'Congregação de Chimoio') }}</div>
     </div>
 
     <div class="service-info">

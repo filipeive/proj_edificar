@@ -15,6 +15,7 @@ class SettingSeeder extends Seeder
         $settings = [
             // General
             ['key' => 'church.name', 'value' => 'Life Church', 'type' => 'string', 'group' => 'general', 'is_public' => true],
+            ['key' => 'church.congregation', 'value' => 'Congregação de Chimoio', 'type' => 'string', 'group' => 'general', 'is_public' => true],
             ['key' => 'church.description', 'value' => 'Uma igreja comprometida com o crescimento espiritual', 'type' => 'string', 'group' => 'general', 'is_public' => true],
             ['key' => 'church.address', 'value' => '', 'type' => 'string', 'group' => 'general', 'is_public' => true],
             ['key' => 'church.phone', 'value' => '', 'type' => 'string', 'group' => 'general', 'is_public' => true],
