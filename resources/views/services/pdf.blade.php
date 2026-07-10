@@ -211,6 +211,48 @@
         </tr>
     </table>
 
+    @if($service->tithes->count() > 0)
+        <div class="section-title" style="font-weight: bold; margin-top: 30px;">Dízimos Registados (Nominativos)</div>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+            <thead>
+                <tr style="border-bottom: 1.5px solid #000000; font-weight: bold;">
+                    <th style="text-align: left; padding: 6px 0; font-size: 12px; width: 60%;">Dizimista</th>
+                    <th style="text-align: right; padding: 6px 0; font-size: 12px; width: 40%;">Valor (Mt)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($service->tithes as $tithe)
+                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                        <td style="text-align: left; padding: 6px 0; font-size: 12px;">{{ $tithe->member_name ?? 'Anónimo' }}</td>
+                        <td style="text-align: right; padding: 6px 0; font-size: 12px; font-weight: bold;">{{ number_format($tithe->amount, 2, ',', '.') }} Mt</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
+
+    @if($service->individualOfferings->count() > 0)
+        <div class="section-title" style="font-weight: bold; margin-top: 30px;">Ofertas Individuais (Nominativas)</div>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+            <thead>
+                <tr style="border-bottom: 1.5px solid #000000; font-weight: bold;">
+                    <th style="text-align: left; padding: 6px 0; font-size: 12px; width: 35%;">Doador</th>
+                    <th style="text-align: left; padding: 6px 0; font-size: 12px; width: 35%;">Descrição</th>
+                    <th style="text-align: right; padding: 6px 0; font-size: 12px; width: 30%;">Valor (Mt)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($service->individualOfferings as $offering)
+                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                        <td style="text-align: left; padding: 6px 0; font-size: 12px;">{{ $offering->member_name ?? 'Doador Anónimo' }}</td>
+                        <td style="text-align: left; padding: 6px 0; font-size: 12px; color: #4b5563;">{{ $offering->description ?? 'Doação' }}</td>
+                        <td style="text-align: right; padding: 6px 0; font-size: 12px; font-weight: bold;">{{ number_format($offering->amount, 2, ',', '.') }} Mt</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
+
     <div class="comments-section" style="margin-top: 30px;">
         <div style="font-weight: bold; margin-bottom: 8px;">Comentários:</div>
         <div style="border-bottom: 1.5px solid #000000; padding: 8px 0; font-style: italic;">
