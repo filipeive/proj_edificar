@@ -13,7 +13,9 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Jost', ...defaultTheme.fontFamily.sans],
+                display: ['Bodoni Moda', ...defaultTheme.fontFamily.serif],
+                title: ['Outfit', ...defaultTheme.fontFamily.sans],
             },
         },
     },

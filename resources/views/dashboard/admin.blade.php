@@ -13,55 +13,55 @@
 @section('content')
     <div class="space-y-6 md:space-y-8">
         <!-- QW-05: Métricas agora visíveis em mobile (era hidden md:grid) -->
-        <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-8">
+        <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
             <!-- Card: Membros Ativos -->
             <div
-                class="bg-white dark:bg-gray-800 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 p-4 md:p-8 hover:shadow-xl transition-all duration-500 group">
+                class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-6 hover:shadow-md transition-all duration-300 group">
                 <div class="flex items-center justify-between mb-4">
                     <div
-                        class="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-2xl group-hover:bg-blue-600 transition-colors duration-500">
+                        class="bg-orange-50 dark:bg-orange-950/20 p-3.5 rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
                         <i
-                            class="bi bi-people-fill text-blue-600 dark:text-blue-400 text-2xl group-hover:text-white transition-colors duration-500"></i>
+                            class="bi bi-people-fill text-orange-600 dark:text-orange-400 text-xl group-hover:text-white transition-colors duration-300"></i>
                     </div>
                     <span
-                        class="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Comunidade</span>
+                        class="text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Comunidade</span>
                 </div>
                 <div>
-                    <p class="text-gray-500 dark:text-gray-400 text-sm font-bold uppercase tracking-wider">Membros Ativos
+                    <p class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-wider">Membros Ativos
                     </p>
-                    <p class="text-3xl font-black text-gray-900 dark:text-white mt-2 tracking-tighter">{{ $totalMembers }}
+                    <p class="text-2xl font-black text-gray-900 dark:text-white mt-1 tracking-tight">{{ $totalMembers }}
                     </p>
-                    <div class="flex items-center mt-4 text-xs">
-                        <span class="text-blue-500 dark:text-blue-400 font-bold flex items-center">
-                            <i class="bi bi-graph-up text-lg"></i> Crescendo
+                    <div class="flex items-center mt-3 text-[10px]">
+                        <span class="text-orange-500 dark:text-orange-400 font-bold flex items-center">
+                            <i class="bi bi-graph-up mr-1 text-sm"></i> Crescendo
                         </span>
-                        <span class="text-gray-400 dark:text-gray-500 ml-2">este mês</span>
+                        <span class="text-gray-400 dark:text-gray-500 ml-1.5">este mês</span>
                     </div>
                 </div>
             </div>
 
             <!-- Card: Total Dízimos/Ofertas -->
             <div
-                class="bg-white dark:bg-gray-800 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 p-4 md:p-8 hover:shadow-xl transition-all duration-500 group">
+                class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-6 hover:shadow-md transition-all duration-300 group">
                 <div class="flex items-center justify-between mb-4">
                     <div
-                        class="bg-green-50 dark:bg-green-900/30 p-4 rounded-2xl group-hover:bg-green-600 transition-colors duration-500">
+                        class="bg-orange-50 dark:bg-orange-950/20 p-3.5 rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
                         <i
-                            class="bi bi-cash-coin text-green-600 dark:text-green-400 text-2xl group-hover:text-white transition-colors duration-500"></i>
+                            class="bi bi-cash-coin text-orange-600 dark:text-orange-400 text-xl group-hover:text-white transition-colors duration-300"></i>
                     </div>
                     <span
-                        class="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Eclesiástico</span>
+                        class="text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Eclesiástico</span>
                 </div>
                 <div>
-                    <p class="text-gray-500 dark:text-gray-400 text-sm font-bold uppercase tracking-wider">Dízimos e Ofertas
+                    <p class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-wider">Dízimos e Ofertas
                     </p>
-                    <p class="text-3xl font-black text-gray-900 dark:text-white mt-2 tracking-tighter">
+                    <p class="text-2xl font-black text-gray-900 dark:text-white mt-1 tracking-tight">
                         {{ number_format($totalContributed, 2, ',', '.') }} MT
                     </p>
-                    <div class="flex items-center mt-4 text-xs">
+                    <div class="flex items-center mt-3 text-[10px]">
                         @if($totalContributed == 0)
                             <span class="text-yellow-600 dark:text-yellow-400 font-bold flex items-center">
-                                <i class="bi bi-info-circle mr-1"></i> Sem registos este mês
+                                <i class="bi bi-info-circle mr-1"></i> Sem registos
                             </span>
                         @else
                             <span class="text-gray-400 dark:text-gray-500">Total do Mês (Calendário)</span>
@@ -72,23 +72,23 @@
 
             <!-- Card: Próximos Eventos -->
             <div
-                class="bg-white dark:bg-gray-800 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 p-4 md:p-8 hover:shadow-xl transition-all duration-500 group">
+                class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-6 hover:shadow-md transition-all duration-300 group">
                 <div class="flex items-center justify-between mb-4">
                     <div
-                        class="bg-purple-50 dark:bg-purple-900/30 p-4 rounded-2xl group-hover:bg-purple-600 transition-colors duration-500">
+                        class="bg-orange-50 dark:bg-orange-950/20 p-3.5 rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
                         <i
-                            class="bi bi-calendar-event-fill text-purple-600 dark:text-purple-400 text-2xl group-hover:text-white transition-colors duration-500"></i>
+                            class="bi bi-calendar-event-fill text-orange-600 dark:text-orange-400 text-xl group-hover:text-white transition-colors duration-300"></i>
                     </div>
                     <span
-                        class="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Agenda</span>
+                        class="text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Agenda</span>
                 </div>
                 <div>
-                    <p class="text-gray-500 dark:text-gray-400 text-sm font-bold uppercase tracking-wider">Próximos Eventos
+                    <p class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-wider">Próximos Eventos
                     </p>
-                    <p class="text-3xl font-black text-gray-900 dark:text-white mt-2 tracking-tighter">
+                    <p class="text-2xl font-black text-gray-900 dark:text-white mt-1 tracking-tight">
                         {{ count($upcomingEvents) }}</p>
                     <a href="{{ route('events.index') }}"
-                        class="inline-flex items-center mt-4 text-xs font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest hover:text-purple-700 dark:hover:text-purple-300">
+                        class="inline-flex items-center mt-3 text-[9px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest hover:text-orange-700 dark:hover:text-orange-300">
                         Ver Calendário <i class="bi bi-arrow-right ml-1"></i>
                     </a>
                 </div>
@@ -96,97 +96,94 @@
 
             <!-- Card: Cultos Recentes -->
             <div
-                class="bg-white dark:bg-gray-800 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 p-4 md:p-8 hover:shadow-xl transition-all duration-500 group">
+                class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-6 hover:shadow-md transition-all duration-300 group">
                 <div class="flex items-center justify-between mb-4">
                     <div
-                        class="bg-orange-50 dark:bg-orange-900/30 p-4 rounded-2xl group-hover:bg-orange-600 transition-colors duration-500">
+                        class="bg-orange-50 dark:bg-orange-950/20 p-3.5 rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
                         <i
-                            class="bi bi-journal-bookmark-fill text-orange-600 dark:text-orange-400 text-2xl group-hover:text-white transition-colors duration-500"></i>
+                            class="bi bi-journal-bookmark-fill text-orange-600 dark:text-orange-400 text-xl group-hover:text-white transition-colors duration-300"></i>
                     </div>
                     <span
-                        class="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Cultos</span>
+                        class="text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Cultos</span>
                 </div>
                 <div>
-                    <p class="text-gray-500 dark:text-gray-400 text-sm font-bold uppercase tracking-wider">Relatórios</p>
-                    <p class="text-3xl font-black text-gray-900 dark:text-white mt-2 tracking-tighter">
+                    <p class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-wider">Relatórios</p>
+                    <p class="text-2xl font-black text-gray-900 dark:text-white mt-1 tracking-tight">
                         {{ count($recentServices) }}</p>
                     <a href="{{ route('services.index') }}"
-                        class="inline-flex items-center mt-4 text-xs font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest hover:text-orange-700 dark:hover:text-orange-300">
+                        class="inline-flex items-center mt-3 text-[9px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest hover:text-orange-700 dark:hover:text-orange-300">
                         Ver Todos <i class="bi bi-arrow-right ml-1"></i>
                     </a>
                 </div>
             </div>
         </div>
 
-        <!-- Quick Actions -->
-        <div class="mb-8">
-            <h3 class="text-xl font-black text-gray-900 dark:text-white tracking-tight mb-6 flex items-center">
-                <i class="bi bi-lightning-charge-fill text-orange-600 dark:text-orange-400 mr-3"></i> Ações Rápidas
-            </h3>
-            <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
+            <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 <!-- Link to Edificar Dashboard -->
                 <a href="{{ route('edificar.dashboard') }}"
-                    class="bg-blue-600 p-3 md:p-4 rounded-2xl border border-blue-600 shadow-lg shadow-blue-200 dark:shadow-none hover:shadow-xl hover:bg-blue-700 transition-all text-center group">
+                    class="bg-zinc-950 dark:bg-zinc-900 border border-zinc-950 dark:border-zinc-850 hover:bg-zinc-900 dark:hover:bg-zinc-800/80 transition-all p-4 rounded-2xl text-center group shadow-sm hover:shadow-md">
                     <div
-                        class="w-8 h-8 md:w-10 md:h-10 bg-white/20 rounded-xl flex items-center justify-center text-white mx-auto mb-2 md:mb-3">
-                        <i class="bi bi-bricks"></i>
+                        class="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center text-white mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
+                        <i class="bi bi-bricks text-lg"></i>
                     </div>
-                    <span class="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-white">Painel
-                        Edificar</span>
+                    <span class="text-[9px] font-black uppercase tracking-widest text-white">Painel Edificar</span>
                 </a>
 
+                <!-- Novo Evento -->
                 <a href="{{ route('events.create') }}"
-                    class="bg-white dark:bg-gray-800 p-3 md:p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all text-center group">
+                    class="bg-white dark:bg-zinc-900/30 p-4 rounded-2xl border border-gray-100 dark:border-zinc-850 shadow-sm hover:shadow-md transition-all text-center group">
                     <div
-                        class="w-8 h-8 md:w-10 md:h-10 bg-orange-50 dark:bg-orange-900/30 rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 mx-auto mb-2 md:mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors">
-                        <i class="bi bi-calendar-plus"></i>
+                        class="w-10 h-10 bg-orange-50 dark:bg-orange-950/20 rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 mx-auto mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
+                        <i class="bi bi-calendar-plus text-lg"></i>
                     </div>
                     <span
-                        class="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-400 group-hover:text-orange-600 dark:group-hover:text-orange-400">Novo
-                        Evento</span>
+                        class="text-[9px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-400 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">Novo Evento</span>
                 </a>
+
+                <!-- Novo Culto -->
                 <a href="{{ route('services.create') }}"
-                    class="bg-white dark:bg-gray-800 p-3 md:p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all text-center group">
+                    class="bg-white dark:bg-zinc-900/30 p-4 rounded-2xl border border-gray-100 dark:border-zinc-850 shadow-sm hover:shadow-md transition-all text-center group">
                     <div
-                        class="w-8 h-8 md:w-10 md:h-10 bg-blue-50 dark:bg-blue-900/30 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-400 mx-auto mb-2 md:mb-3 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                        <i class="bi bi-journal-plus"></i>
+                        class="w-10 h-10 bg-orange-50 dark:bg-orange-950/20 rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 mx-auto mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
+                        <i class="bi bi-journal-plus text-lg"></i>
                     </div>
                     <span
-                        class="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400">Novo
-                        Culto</span>
+                        class="text-[9px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-400 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">Novo Culto</span>
                 </a>
+
+                <!-- Novo Membro -->
                 <a href="{{ route('users.create') }}"
-                    class="bg-white dark:bg-gray-800 p-3 md:p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all text-center group">
+                    class="bg-white dark:bg-zinc-900/30 p-4 rounded-2xl border border-gray-100 dark:border-zinc-850 shadow-sm hover:shadow-md transition-all text-center group">
                     <div
-                        class="w-8 h-8 md:w-10 md:h-10 bg-green-50 dark:bg-green-900/30 rounded-xl flex items-center justify-center text-green-600 dark:text-green-400 mx-auto mb-2 md:mb-3 group-hover:bg-green-600 group-hover:text-white transition-colors">
-                        <i class="bi bi-person-plus"></i>
+                        class="w-10 h-10 bg-orange-50 dark:bg-orange-950/20 rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 mx-auto mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
+                        <i class="bi bi-person-plus text-lg"></i>
                     </div>
                     <span
-                        class="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-400 group-hover:text-green-600 dark:group-hover:text-green-400">Novo
-                        Membro</span>
+                        class="text-[9px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-400 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">Novo Membro</span>
                 </a>
+
+                <!-- Nova Célula -->
                 <a href="{{ route('cells.create') }}"
-                    class="bg-white dark:bg-gray-800 p-3 md:p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all text-center group">
+                    class="bg-white dark:bg-zinc-900/30 p-4 rounded-2xl border border-gray-100 dark:border-zinc-850 shadow-sm hover:shadow-md transition-all text-center group">
                     <div
-                        class="w-8 h-8 md:w-10 md:h-10 bg-purple-50 dark:bg-purple-900/30 rounded-xl flex items-center justify-center text-purple-600 dark:text-purple-400 mx-auto mb-2 md:mb-3 group-hover:bg-purple-600 group-hover:text-white transition-colors">
-                        <i class="bi bi-diagram-3"></i>
+                        class="w-10 h-10 bg-orange-50 dark:bg-orange-950/20 rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 mx-auto mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
+                        <i class="bi bi-diagram-3 text-lg"></i>
                     </div>
                     <span
-                        class="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-400 group-hover:text-purple-600 dark:group-hover:text-purple-400">Nova
-                        Célula</span>
+                        class="text-[9px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-400 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">Nova Célula</span>
                 </a>
+
+                <!-- Relatório Trimestral -->
                 <a href="{{ route('quarterly-reports.create') }}"
-                    class="bg-white dark:bg-gray-800 p-3 md:p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all text-center group">
+                    class="bg-white dark:bg-zinc-900/30 p-4 rounded-2xl border border-gray-100 dark:border-zinc-850 shadow-sm hover:shadow-md transition-all text-center group">
                     <div
-                        class="w-8 h-8 md:w-10 md:h-10 bg-red-50 dark:bg-red-900/30 rounded-xl flex items-center justify-center text-red-600 dark:text-red-400 mx-auto mb-2 md:mb-3 group-hover:bg-red-600 group-hover:text-white transition-colors">
-                        <i class="bi bi-file-earmark-bar-graph"></i>
+                        class="w-10 h-10 bg-orange-50 dark:bg-orange-950/20 rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 mx-auto mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
+                        <i class="bi bi-file-earmark-bar-graph text-lg"></i>
                     </div>
                     <span
-                        class="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-400 group-hover:text-red-600 dark:group-hover:text-red-400">Relat.
-                        Trimestral</span>
+                        class="text-[9px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-400 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">Relat. Trimestral</span>
                 </a>
             </div>
-        </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             <!-- Members by Zone -->
             <x-card title="Membros por Zona">
@@ -377,7 +374,7 @@
                         datasets: [{
                             label: 'Membros',
                             data: @json($zoneStats->pluck('total')),
-                            backgroundColor: 'rgba(59, 130, 246, 0.8)', // Blue
+                            backgroundColor: 'rgba(249, 115, 22, 0.85)', // Brand Orange
                             borderRadius: 8,
                         }]
                     },
@@ -402,13 +399,13 @@
                             {
                                 label: 'Células',
                                 data: @json($zoneStructures->pluck('cells')),
-                                backgroundColor: 'rgba(168, 85, 247, 0.8)', // Purple
+                                backgroundColor: 'rgba(249, 115, 22, 0.85)', // Brand Orange
                                 borderRadius: 6,
                             },
                             {
                                 label: 'Supervisões',
                                 data: @json($zoneStructures->pluck('supervisions')),
-                                backgroundColor: 'rgba(234, 179, 8, 0.8)', // Yellow
+                                backgroundColor: 'rgba(68, 64, 60, 0.85)', // Secondary Stone
                                 borderRadius: 6,
                             }
                         ]
@@ -426,8 +423,8 @@
                 // Growth Chart
                 const growthCtx = document.getElementById('growthChart').getContext('2d');
                 const growthGradient = growthCtx.createLinearGradient(0, 0, 0, 400);
-                growthGradient.addColorStop(0, 'rgba(59, 130, 246, 0.2)');
-                growthGradient.addColorStop(1, 'rgba(59, 130, 246, 0)');
+                growthGradient.addColorStop(0, 'rgba(249, 115, 22, 0.25)');
+                growthGradient.addColorStop(1, 'rgba(249, 115, 22, 0)');
 
                 new Chart(growthCtx, {
                     type: 'line',
@@ -437,11 +434,11 @@
                             label: 'Total de Membros',
                             data: @json($growthData),
                             backgroundColor: growthGradient,
-                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderColor: 'rgba(249, 115, 22, 1)',
                             borderWidth: 3,
                             fill: true,
                             tension: 0.4,
-                            pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+                            pointBackgroundColor: 'rgba(249, 115, 22, 1)',
                             pointBorderColor: '#fff'
                         }]
                     },

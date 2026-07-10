@@ -129,6 +129,13 @@ body {
     display: none;
 }
 
+.sidebar-collapsed #courses_menu,
+.sidebar-collapsed #contributions,
+.sidebar-collapsed #financial_menu,
+.sidebar-collapsed #reports {
+    display: none !important;
+}
+
 
 /* Ajustes no Logo quando colapsado */
 .sidebar-collapsed .sidebar-header {
@@ -678,10 +685,10 @@ aside::-webkit-scrollbar-thumb:hover {
 /* Dynamic Scroll Shadow Indicators */
 .table-responsive-shadows {
     background-image: 
-        linear-gradient(to right, var(--bg-secondary) 30%, rgba(255, 255, 255, 0)),
-        linear-gradient(to right, rgba(255, 255, 255, 0), var(--bg-secondary) 70%),
-        linear-gradient(to right, var(--shadow), rgba(0, 0, 0, 0)),
-        linear-gradient(to right, rgba(0, 0, 0, 0), var(--shadow));
+        linear-gradient(to right, var(--bg-secondary) 30%, transparent),
+        linear-gradient(to right, transparent, var(--bg-secondary) 70%),
+        linear-gradient(to right, var(--shadow), transparent),
+        linear-gradient(to right, transparent, var(--shadow));
     background-position: left center, right center, left center, right center;
     background-repeat: no-repeat;
     background-size: 30px 100%, 30px 100%, 10px 100%, 10px 100%;

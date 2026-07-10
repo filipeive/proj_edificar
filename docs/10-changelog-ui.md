@@ -54,3 +54,31 @@
 - **Benefício:** Acessibilidade visual aprimorada, visual premium e consistência em todo o dashboard administrativo.
 - **Risco:** ⬜ Nenhum — regras CSS restritas ao atributo `[data-theme="dark"]`
 
+## [2026-07-10] — Ciclo 2: Redesign Premium UI/UX (UIProMax)
+
+### ME-02: Alinhamento de Design System e Fontes ✔️
+- **Ficheiros alterados:** `tailwind.config.js`, `layouts/partials/head.blade.php`, `layouts/partials/header.blade.php`, `layouts/sidebar.blade.php`
+- **Alteração:**
+  - Configuração das fontes `Jost`, `Bodoni Moda` e `Outfit` no `tailwind.config.js` e importação via Google Fonts em `head.blade.php`.
+  - Correção de overflow na sidebar colapsada: os submenus dropdown agora são explicitamente ocultados quando a sidebar está colapsada (`width: 80px`).
+  - Alinhamento de cores do cabeçalho (search inputs, notifications, profile e avatares) para usar realces e anéis de foco laranja (`#F97316`) da marca em vez de azul desatualizado.
+- **Benefício:** Identidade de marca alinhada, visual premium de alta fidelidade e correção de bugs na navegação.
+
+### ME-03: Refatoração Bento Grid e Otimização de Dashboards ✔️
+- **Ficheiros alterados:** `dashboard/admin.blade.php`, `dashboard/lider.blade.php`, `dashboard/membro.blade.php`, `dashboard/pastor.blade.php`, `dashboard/supervisor.blade.php`, `dashboard/secretaria.blade.php`, `dashboard/administracao.blade.php`
+- **Alteração:**
+  - Padronização de cantos arredondados de cartões e tabelas para `rounded-2xl` corporativo de alta-fidelidade.
+  - Tornou as métricas de topo e Bento Grids responsivos e visíveis em ecrãs móveis (removendo `hidden md:grid` e implementando grelhas fluidas de 2 ou 3 colunas no mobile).
+  - Unificação de cores secundárias e realces (azuis, roxos, verdes) para o laranja da marca e Stone.
+  - Atualização dos tons do Chart.js para gradientes e linhas laranja da marca.
+- **Benefício:** Consistência visual uniforme em todos os 7 dashboards do sistema.
+
+### ME-04: Alpine.js Tabs na Ficha Guia e Scroll Horizontal Premium ✔️
+- **Ficheiros alterados:** `admin/cells/attendance.blade.php`, `resources/css/layout.css`
+- **Alteração:**
+  - Restruturação completa da Ficha Guia de Célula: implementação de abas interativas do Alpine.js (`Controle de Presença`, `Visitas e Decisões`, `Acompanhamento & Discipulado`) para maior densidade e melhor arranjo espacial das informações.
+  - Otimização do scroll horizontal da tabela de presença com gradiente fade-out (utilizando a classe `.table-responsive-shadows` refinada com `transparent` em vez de cor estática para compatibilidade 100% com o tema escuro).
+  - Uniformização de modais (Visitas, Discipulado, Decisões) para cores da marca e layout de cantos `rounded-2xl`.
+- **Benefício:** UX e usabilidade móvel drasticamente melhorada para o registo semanal de presença e acompanhamento de visitantes pelos líderes de célula.
+
+

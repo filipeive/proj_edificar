@@ -27,7 +27,7 @@
             <div class="hidden lg:flex flex-1 max-w-md ml-8 search-container">
                 <div class="relative w-full">
                     <input type="text" id="searchInput" placeholder="Pesquisar membros, contribuições..."
-                        class="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-zinc-900/60 border border-gray-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-zinc-100 placeholder-gray-400 dark:placeholder-zinc-500 transition-all"
+                        class="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-zinc-900/60 border border-gray-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 dark:text-zinc-100 placeholder-gray-400 dark:placeholder-zinc-500 transition-all"
                         oninput="debouncedDesktopSearch(this.value)">
                     <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
 
@@ -52,7 +52,7 @@
             <!-- Notifications -->
             <div class="relative">
                 <button onclick="toggleNotifications()"
-                    class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 relative group border border-transparent hover:border-blue-100">
+                    class="text-gray-600 hover:text-orange-600 p-2.5 hover:bg-orange-50 rounded-xl transition-all duration-300 relative group border border-transparent hover:border-orange-100">
                     <i class="bi bi-bell-fill text-2xl"></i>
                     @if ($unreadNotifications > 0)
                         <span class="absolute -top-1 -right-1 flex h-5 w-5">
@@ -69,7 +69,7 @@
                     <div class="p-4 border-b border-gray-200 flex justify-between items-center">
                         <h4 class="font-semibold text-gray-800">Notificações</h4>
                         <button onclick="markAllAsRead()"
-                            class="text-xs text-blue-600 hover:text-blue-800 transition">
+                            class="text-xs text-orange-600 hover:text-orange-700 transition">
                             Marcar todas como lidas
                         </button>
                     </div>
@@ -81,7 +81,7 @@
                     </div>
                     <div class="p-3 border-t border-gray-200 bg-gray-50">
                         <a href="{{ route('notifications.all') }}"
-                            class="block text-center text-sm text-blue-600 hover:text-blue-800 font-medium">
+                            class="block text-center text-sm text-orange-600 hover:text-orange-700 font-medium">
                             Ver todas as notificações <i class="bi bi-arrow-right ml-1"></i>
                         </a>
                     </div>
@@ -107,7 +107,7 @@
                                     {{ ucfirst(str_replace('_', ' ', $role ?? 'membro')) }}
                                 </p>
                             </div>
-                            <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0 font-bold text-white">
+                            <div class="w-10 h-10 rounded-full bg-orange-600 flex items-center justify-center flex-shrink-0 font-bold text-white">
                                 {{ strtoupper(substr($authUser->name, 0, 1)) }}
                             </div>
                             <i class="bi bi-chevron-down text-gray-600 text-sm transition-transform duration-200"></i>
@@ -130,7 +130,7 @@
                                     <button type="submit"
                                         class="flex w-full items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors">
                                         <i class="bi bi-box-arrow-right mr-3 text-lg"></i> Sair do Sistema
-                                    </button>
+                                      </button>
                                 </form>
                             </div>
                         </div>
@@ -139,7 +139,7 @@
             @else
                 <div class="hidden md:block border-l border-gray-300 pl-4">
                     <a href="{{ route('login') }}"
-                        class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-lg shadow-blue-600/20">
+                        class="bg-orange-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-lg shadow-orange-600/20">
                         <i class="bi bi-box-arrow-in-right mr-2"></i> Entrar
                     </a>
                 </div>
@@ -151,7 +151,7 @@
     <div id="mobileSearchInput" class="lg:hidden mt-4 search-container hidden fade-in">
         <div class="relative w-full">
             <input type="text" placeholder="Pesquisar..."
-                class="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-zinc-900/60 border border-gray-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-zinc-100 placeholder-gray-400 dark:placeholder-zinc-500 transition-all"
+                class="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-zinc-900/60 border border-gray-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 dark:text-zinc-100 placeholder-gray-400 dark:placeholder-zinc-500 transition-all"
                 oninput="debouncedMobileSearch(this.value)">
             <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
             <div id="mobileSearchResults" class="search-results hidden"></div>

@@ -22,10 +22,10 @@
             window.ChartQueue = [];
             window.ChartDefaults = {
                 font: {
-                    family: '',
-                    weight: ''
+                    family: 'Jost, sans-serif',
+                    weight: '500'
                 },
-                color: ''
+                color: '#44403c'
             };
             window.Chart = function(ctx, config) {
                 window.ChartQueue.push({ctx: ctx, config: config});
@@ -36,6 +36,11 @@
             window.Chart.defaults = window.ChartDefaults;
         })();
     </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Jost:ital,wght@0,100..900;1,100..900&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
