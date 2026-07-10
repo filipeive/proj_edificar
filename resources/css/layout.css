@@ -571,11 +571,16 @@ form.flex select,
 form.flex input[type="text"],
 form.flex input[type="date"],
 form.flex input[type="search"],
-form.flex button[type="submit"] {
+form.flex button[type="submit"],
+form.grid .ts-wrapper .ts-control,
+form.flex .ts-wrapper .ts-control,
+.ts-wrapper .ts-control {
     height: 44px !important;
     min-height: 44px !important;
     box-sizing: border-box !important;
     line-height: normal !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
 }
 
 form.grid select,
@@ -591,6 +596,54 @@ form select.custom-select {
     padding-bottom: 0 !important;
     display: inline-flex;
     align-items: center;
+}
+
+/* Tom Select Nesting in Dark Containers (e.g. Header Cards or Dark theme components) */
+.bg-zinc-950 .ts-wrapper .ts-control,
+.bg-gray-900 .ts-wrapper .ts-control,
+.bg-zinc-900 .ts-wrapper .ts-control,
+.bg-black .ts-wrapper .ts-control,
+.text-white .ts-wrapper .ts-control {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+}
+
+.bg-zinc-950 .ts-wrapper .ts-control input,
+.bg-gray-900 .ts-wrapper .ts-control input,
+.text-white .ts-wrapper .ts-control input {
+    color: #ffffff !important;
+}
+
+.bg-zinc-950 .ts-wrapper .ts-dropdown,
+.bg-gray-900 .ts-wrapper .ts-dropdown,
+.text-white .ts-wrapper .ts-dropdown {
+    background-color: #18181b !important; /* zinc-900 */
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
+}
+
+.bg-zinc-950 .ts-wrapper .ts-dropdown .option,
+.bg-gray-900 .ts-wrapper .ts-dropdown .option,
+.text-white .ts-wrapper .ts-dropdown .option {
+    color: #e4e4e7 !important; /* zinc-300 */
+}
+
+.bg-zinc-950 .ts-wrapper .ts-dropdown .option:hover,
+.bg-zinc-950 .ts-wrapper .ts-dropdown .option.active,
+.bg-gray-900 .ts-wrapper .ts-dropdown .option:hover,
+.bg-gray-900 .ts-wrapper .ts-dropdown .option.active,
+.text-white .ts-wrapper .ts-dropdown .option:hover,
+.text-white .ts-wrapper .ts-dropdown .option.active {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+}
+
+.bg-zinc-950 .ts-wrapper .ts-dropdown .option.selected,
+.bg-gray-900 .ts-wrapper .ts-dropdown .option.selected,
+.text-white .ts-wrapper .ts-dropdown .option.selected {
+    background-color: var(--color-primary) !important;
+    color: #ffffff !important;
 }
 
 [data-theme="dark"] .hover\:bg-gray-50:hover,

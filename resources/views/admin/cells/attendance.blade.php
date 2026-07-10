@@ -42,20 +42,24 @@
             </div>
 
             <div class="bg-white/5 p-3 rounded-xl border border-white/5 backdrop-blur-md">
-                <form action="{{ route('cells.attendance', $cell) }}" method="GET" class="flex flex-col sm:flex-row items-center gap-2">
+                <form action="{{ route('cells.attendance', $cell) }}" method="GET" class="flex flex-col sm:flex-row items-end gap-2">
                     <div class="grid grid-cols-2 gap-2 w-full sm:w-auto">
-                        <select name="month" data-searchable="false" class="bg-zinc-900 border-transparent text-white rounded-lg text-xs font-black uppercase tracking-widest focus:ring-orange-500 custom-select px-4 py-2.5">
-                            @foreach(range(1, 12) as $m)
-                                <option value="{{ $m }}" {{ $month == $m ? 'selected' : '' }}>
-                                    {{ Carbon\Carbon::create()->month($m)->translatedFormat('F') }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <select name="year" data-searchable="false" class="bg-zinc-900 border-transparent text-white rounded-lg text-xs font-black uppercase tracking-widest focus:ring-orange-500 custom-select px-4 py-2.5">
-                            @foreach(range(now()->year - 1, now()->year + 1) as $y)
-                                <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
-                            @endforeach
-                        </select>
+                        <div class="flex flex-col">
+                            <select name="month" class="searchable-select bg-zinc-900 border-transparent text-white rounded-lg text-xs font-black uppercase tracking-widest focus:ring-orange-500 custom-select px-4 py-2.5">
+                                @foreach(range(1, 12) as $m)
+                                    <option value="{{ $m }}" {{ $month == $m ? 'selected' : '' }}>
+                                        {{ Carbon\Carbon::create()->month($m)->translatedFormat('F') }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="flex flex-col">
+                            <select name="year" class="searchable-select bg-zinc-900 border-transparent text-white rounded-lg text-xs font-black uppercase tracking-widest focus:ring-orange-500 custom-select px-4 py-2.5">
+                                @foreach(range(now()->year - 1, now()->year + 1) as $y)
+                                    <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                     <button type="submit" class="w-full sm:w-auto bg-orange-600 hover:bg-orange-700 text-white px-6 py-2.5 rounded-lg transition-all font-black text-xs uppercase tracking-widest">
                         Filtrar
