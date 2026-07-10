@@ -59,7 +59,7 @@
                 </div>
 
                 <div class="relative group">
-                    <select name="course_id" onchange="this.form.submit()"
+                    <select name="course_id" onchange="this.form.submit()" data-searchable="false"
                         class="w-full pl-4 pr-10 py-3 bg-gray-50 dark:bg-gray-700 border-none rounded-xl focus:ring-2 focus:ring-orange-500 font-black text-[10px] uppercase tracking-widest text-gray-600 dark:text-gray-300">
                         <option value="">Todos os Cursos</option>
                         @foreach($courses as $course)
@@ -69,7 +69,7 @@
                 </div>
 
                 <div class="relative group">
-                    <select name="status" onchange="this.form.submit()"
+                    <select name="status" onchange="this.form.submit()" data-searchable="false"
                         class="w-full pl-4 pr-10 py-3 bg-gray-50 dark:bg-gray-700 border-none rounded-xl focus:ring-2 focus:ring-orange-500 font-black text-[10px] uppercase tracking-widest text-gray-600 dark:text-gray-300">
                         <option value="">Todos os Status</option>
                         <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pendente</option>

@@ -199,7 +199,7 @@
                 <div class="md:col-span-3 space-y-3">
                     <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-2">Filtro de Natureza</label>
                     <div class="relative">
-                        <select name="service_type" 
+                        <select name="service_type" data-searchable="false"
                             class="appearance-none w-full px-6 py-4 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-xs font-black text-gray-700 dark:text-gray-300 outline-none transition-all shadow-sm cursor-pointer">
                             <option value="">Todas as Naturezas</option>
                             <option value="1st" {{ request('service_type') === '1st' ? 'selected' : '' }}>1º Culto Matutino</option>

@@ -48,7 +48,7 @@
                 <input type="hidden" name="scope" value="{{ $scope }}">
                 <div class="space-y-1">
                     <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Mês</label>
-                    <select name="month"
+                    <select name="month" data-searchable="false"
                         class="w-full px-5 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 rounded-2xl font-bold text-gray-700 custom-select">
                         @for($m = 1; $m <= 12; $m++)
                             <option value="{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}" {{ $month == $m ? 'selected' : '' }}>
@@ -59,7 +59,7 @@
                 </div>
                 <div class="space-y-1">
                     <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Ano</label>
-                    <select name="year"
+                    <select name="year" data-searchable="false"
                         class="w-full px-5 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 rounded-2xl font-bold text-gray-700 custom-select">
                         @for($y = date('Y'); $y >= 2020; $y--)
                             <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
