@@ -886,6 +886,23 @@ form select.custom-select {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
 }
 
+/* White arrow for native selects inside dark containers */
+.bg-zinc-950 .custom-select,
+.bg-gray-900 .custom-select,
+.bg-zinc-900 .custom-select,
+.bg-black .custom-select,
+.text-white .custom-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") !important;
+}
+
+/* Native select option text must be dark (browser dropdown is always light bg) */
+.bg-zinc-950 select option,
+.bg-gray-900 select option,
+.text-white select option {
+    color: #1f2937;
+    background-color: #ffffff;
+}
+
 /* ============================================
    8. TOM SELECT CUSTOM STYLING
    ============================================ */

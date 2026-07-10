@@ -8,7 +8,7 @@
     <!-- Header Card -->
     <div class="bg-zinc-950 rounded-2xl p-6 md:p-8 shadow-md border border-zinc-900 relative overflow-hidden text-white">
         <div class="absolute top-0 right-0 w-32 h-32 bg-orange-600/10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
-        <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div class="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
             <div class="space-y-4">
                 <div class="flex items-center gap-3">
                     <a href="{{ route('cells.show', $cell) }}" 
@@ -41,11 +41,12 @@
                 </div>
             </div>
 
-            <div class="bg-white/5 p-3 rounded-xl border border-white/5 backdrop-blur-md">
-                <form action="{{ route('cells.attendance', $cell) }}" method="GET" class="flex flex-col sm:flex-row items-end gap-2">
+            <div class="bg-white/5 p-3 rounded-xl border border-white/5 backdrop-blur-md w-full lg:w-auto">
+                <form action="{{ route('cells.attendance', $cell) }}" method="GET" class="flex flex-col sm:flex-row items-stretch sm:items-end gap-2">
                     <div class="grid grid-cols-2 gap-2 w-full sm:w-auto">
-                        <div class="flex flex-col">
-                            <select name="month" class="searchable-select bg-zinc-900 border-transparent text-white rounded-lg text-xs font-black uppercase tracking-widest focus:ring-orange-500 custom-select px-4 py-2.5">
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Mês</label>
+                            <select name="month" data-searchable="false" class="h-[44px] bg-white/10 border border-white/10 text-white rounded-lg text-xs font-black uppercase tracking-widest focus:ring-2 focus:ring-orange-500 focus:border-orange-500 custom-select px-4 cursor-pointer appearance-none">
                                 @foreach(range(1, 12) as $m)
                                     <option value="{{ $m }}" {{ $month == $m ? 'selected' : '' }}>
                                         {{ Carbon\Carbon::create()->month($m)->translatedFormat('F') }}
@@ -53,15 +54,16 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="flex flex-col">
-                            <select name="year" class="searchable-select bg-zinc-900 border-transparent text-white rounded-lg text-xs font-black uppercase tracking-widest focus:ring-orange-500 custom-select px-4 py-2.5">
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Ano</label>
+                            <select name="year" data-searchable="false" class="h-[44px] bg-white/10 border border-white/10 text-white rounded-lg text-xs font-black uppercase tracking-widest focus:ring-2 focus:ring-orange-500 focus:border-orange-500 custom-select px-4 cursor-pointer appearance-none">
                                 @foreach(range(now()->year - 1, now()->year + 1) as $y)
                                     <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
-                    <button type="submit" class="w-full sm:w-auto bg-orange-600 hover:bg-orange-700 text-white px-6 py-2.5 rounded-lg transition-all font-black text-xs uppercase tracking-widest">
+                    <button type="submit" class="h-[44px] w-full sm:w-auto bg-orange-600 hover:bg-orange-700 text-white px-6 rounded-lg transition-all font-black text-xs uppercase tracking-widest">
                         Filtrar
                     </button>
                 </form>
