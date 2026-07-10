@@ -434,7 +434,7 @@
                                                 </div>
                                                 <div>
                                                     <p class="text-[11px] font-black text-gray-700 dark:text-gray-300 uppercase tracking-tight">{{ $offering->member_name ?? 'Doador Anónimo' }}</p>
-                                                    <span class="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{{ $offering->offeringType->name }}</span>
+                                                    <span class="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Oferta Individual</span>
                                                 </div>
                                             </div>
                                             <span class="text-sm font-black text-gray-900 dark:text-white tracking-tighter">{{ number_format($offering->amount, 0, ',', '.') }} <span class="text-[10px] opacity-40">MT</span></span>
