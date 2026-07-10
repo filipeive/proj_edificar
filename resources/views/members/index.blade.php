@@ -80,15 +80,19 @@
         </div>
 
         <div class="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-            <form method="GET" action="{{ route('members.index') }}" class="grid grid-cols-1 gap-3 lg:grid-cols-12">
-                <div class="relative lg:col-span-5">
-                    <i class="bi bi-search pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar por nome, email ou telefone"
-                        class="w-full rounded-xl border border-gray-300 py-2.5 pl-10 pr-3 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+            <form method="GET" action="{{ route('members.index') }}" class="grid grid-cols-1 gap-3 lg:grid-cols-12 items-end">
+                <div class="relative lg:col-span-5 flex flex-col gap-1.5">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Pesquisar</label>
+                    <div class="relative w-full">
+                        <i class="bi bi-search pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar por nome, email ou telefone"
+                            class="w-full rounded-xl border border-gray-300 py-2.5 pl-10 pr-3 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+                    </div>
                 </div>
 
                 @if($userRole !== 'lider_celula' && $availableCells->count() > 1)
-                    <div class="lg:col-span-3">
+                    <div class="lg:col-span-3 flex flex-col gap-1.5">
+                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Célula</label>
                         <select name="cell_id"
                             class="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
                             <option value="">Todas as Células</option>
@@ -103,18 +107,18 @@
 
                 <div class="flex items-center gap-2 lg:col-span-4 lg:justify-end">
                     <button type="submit"
-                        class="rounded-xl bg-gray-900 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white transition hover:bg-gray-800">
+                        class="h-[44px] rounded-xl bg-gray-900 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white transition hover:bg-gray-800">
                         Filtrar
                     </button>
 
                     @if(request('search') || request('cell_id'))
                         <a href="{{ route('members.index') }}"
-                            class="rounded-xl border border-gray-300 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-gray-700 transition hover:bg-gray-50">
+                            class="h-[44px] inline-flex items-center justify-center rounded-xl border border-gray-300 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-gray-700 transition hover:bg-gray-50">
                             Limpar
                         </a>
                     @endif
 
-                    <div class="hidden rounded-xl border border-gray-300 p-1 md:flex">
+                    <div class="hidden h-[44px] items-center rounded-xl border border-gray-300 p-1 md:flex">
                         <button @click.prevent="view = 'list'" type="button"
                             :class="view === 'list' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:text-gray-700'"
                             class="rounded-lg px-3 py-2 text-xs font-bold">
