@@ -203,12 +203,6 @@
                 @endif
             </td>
         </tr>
-        <tr>
-            <td style="font-weight: bold; padding: 12px 0; font-size: 14px;">Total:</td>
-            <td style="border-bottom: 3px double #000000; padding: 12px 0; font-weight: bold; font-size: 14px; text-align: left; padding-left: 20px;">
-                {{ number_format($service->total_financial, 2, ',', '.') }} Mt
-            </td>
-        </tr>
     </table>
 
     @if($service->tithes->count() > 0)
@@ -252,6 +246,15 @@
             </tbody>
         </table>
     @endif
+
+    <table style="width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 25px;">
+        <tr>
+            <td style="font-weight: bold; padding: 12px 0; font-size: 14px; width: 140px;">Total:</td>
+            <td style="border-bottom: 3px double #000000; padding: 12px 0; font-weight: bold; font-size: 14px; text-align: left; padding-left: 20px;">
+                {{ number_format($service->total_financial, 2, ',', '.') }} Mt
+            </td>
+        </tr>
+    </table>
 
     <div class="comments-section" style="margin-top: 30px;">
         <div style="font-weight: bold; margin-bottom: 8px;">Comentários:</div>
