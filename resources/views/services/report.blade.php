@@ -97,7 +97,7 @@
                                     <label
                                         class="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">Categoria
                                         de Culto</label>
-                                    <select name="service_type"
+                                    <select name="service_type" data-searchable="false"
                                         class="w-full px-5 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-2xl text-sm font-bold text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none appearance-none">
                                         <option value="">Todos os Registos</option>
                                         <option value="1st" {{ request('service_type') == '1st' ? 'selected' : '' }}>1º Culto
@@ -157,18 +157,27 @@
                                     </h4>
                                     <form action="{{ route('services.export.custom') }}" method="GET" class="space-y-4">
                                         <div class="grid grid-cols-2 gap-3">
-                                            <input type="date" name="date_from" required
-                                                class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white outline-none focus:border-blue-500 transition-colors">
-                                            <input type="date" name="date_to" required
-                                                class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white outline-none focus:border-blue-500 transition-colors">
+                                            <div>
+                                                <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Data Início</label>
+                                                <input type="date" name="date_from" required
+                                                    class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white outline-none focus:border-blue-500 transition-colors">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Data Fim</label>
+                                                <input type="date" name="date_to" required
+                                                    class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white outline-none focus:border-blue-500 transition-colors">
+                                            </div>
                                         </div>
-                                        <select name="service_type" required
-                                            class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white outline-none focus:border-blue-500 transition-colors">
-                                            <option value="all" class="bg-gray-900">Todos os Cultos</option>
-                                            <option value="normal" class="bg-gray-900">Cultos Normais</option>
-                                            <option value="teaching" class="bg-gray-900">Cultos de Ensino</option>
-                                        </select>
-                                        <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Categoria de Culto</label>
+                                            <select name="service_type" required data-searchable="false"
+                                                class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white outline-none focus:border-blue-500 transition-colors appearance-none">
+                                                <option value="all" class="bg-gray-900">Todos os Cultos</option>
+                                                <option value="normal" class="bg-gray-900">Cultos Normais</option>
+                                                <option value="teaching" class="bg-gray-900">Cultos de Ensino</option>
+                                            </select>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-2 pt-2">
                                             <button type="submit" formaction="{{ route('services.export.custom') }}"
                                                 class="py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[9px] font-black uppercase tracking-widest transition-colors flex items-center justify-center gap-2">
                                                 <i class="bi bi-file-pdf text-sm"></i> PDF
@@ -190,28 +199,37 @@
                                     </h4>
                                     <form action="{{ route('services.export.monthly') }}" method="GET" class="space-y-4">
                                         <div class="grid grid-cols-2 gap-3">
-                                            <select name="month"
-                                                class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white outline-none focus:border-orange-500 transition-colors">
-                                                @for($m = 1; $m <= 12; $m++)
-                                                    <option value="{{ $m }}" {{ now()->month == $m ? 'selected' : '' }}
-                                                        class="bg-gray-900">
-                                                        {{ \Carbon\Carbon::create(null, $m)->translatedFormat('F') }}</option>
-                                                @endfor
-                                            </select>
-                                            <select name="year"
-                                                class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white outline-none focus:border-orange-500 transition-colors">
-                                                @for($y = now()->year; $y >= 2023; $y--)
-                                                    <option value="{{ $y }}" class="bg-gray-900">{{ $y }}</option>
-                                                @endfor
+                                            <div>
+                                                <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Mês</label>
+                                                <select name="month" data-searchable="false"
+                                                    class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white outline-none focus:border-orange-500 transition-colors appearance-none">
+                                                    @for($m = 1; $m <= 12; $m++)
+                                                        <option value="{{ $m }}" {{ now()->month == $m ? 'selected' : '' }}
+                                                            class="bg-gray-900">
+                                                            {{ \Carbon\Carbon::create(null, $m)->translatedFormat('F') }}</option>
+                                                    @endfor
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Ano</label>
+                                                <select name="year" data-searchable="false"
+                                                    class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white outline-none focus:border-orange-500 transition-colors appearance-none">
+                                                    @for($y = now()->year; $y >= 2023; $y--)
+                                                        <option value="{{ $y }}" class="bg-gray-900">{{ $y }}</option>
+                                                    @endfor
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Categoria de Culto</label>
+                                            <select name="service_type" data-searchable="false"
+                                                class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white outline-none focus:border-orange-500 transition-colors appearance-none">
+                                                <option value="all" class="bg-gray-900">Todos os Cultos</option>
+                                                <option value="normal" class="bg-gray-900">Cultos Normais</option>
+                                                <option value="teaching" class="bg-gray-900">Cultos de Ensino</option>
                                             </select>
                                         </div>
-                                        <select name="service_type"
-                                            class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white outline-none focus:border-orange-500 transition-colors">
-                                            <option value="all" class="bg-gray-900">Todos os Cultos</option>
-                                            <option value="normal" class="bg-gray-900">Cultos Normais</option>
-                                            <option value="teaching" class="bg-gray-900">Cultos de Ensino</option>
-                                        </select>
-                                        <div class="grid grid-cols-2 gap-2">
+                                        <div class="grid grid-cols-2 gap-2 pt-2">
                                             <button type="submit" formaction="{{ route('services.export.monthly') }}"
                                                 class="py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-xl text-[9px] font-black uppercase tracking-widest transition-colors flex items-center justify-center gap-2">
                                                 <i class="bi bi-file-pdf text-sm"></i> PDF
@@ -233,21 +251,27 @@
                                     </h4>
                                     <form action="{{ route('services.export.quarterly') }}" method="GET" class="space-y-4">
                                         <div class="grid grid-cols-2 gap-3">
-                                            <select name="quarter"
-                                                class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white outline-none focus:border-green-500 transition-colors">
-                                                <option value="1" class="bg-gray-900">1º Trimestre</option>
-                                                <option value="2" class="bg-gray-900">2º Trimestre</option>
-                                                <option value="3" class="bg-gray-900">3º Trimestre</option>
-                                                <option value="4" class="bg-gray-900">4º Trimestre</option>
-                                            </select>
-                                            <select name="year"
-                                                class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white outline-none focus:border-green-500 transition-colors">
-                                                @for($y = now()->year; $y >= 2023; $y--)
-                                                    <option value="{{ $y }}" class="bg-gray-900">{{ $y }}</option>
-                                                @endfor
-                                            </select>
+                                            <div>
+                                                <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Trimestre</label>
+                                                <select name="quarter" data-searchable="false"
+                                                    class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white outline-none focus:border-green-500 transition-colors appearance-none">
+                                                    <option value="1" class="bg-gray-900">1º Trimestre</option>
+                                                    <option value="2" class="bg-gray-900">2º Trimestre</option>
+                                                    <option value="3" class="bg-gray-900">3º Trimestre</option>
+                                                    <option value="4" class="bg-gray-900">4º Trimestre</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Ano</label>
+                                                <select name="year" data-searchable="false"
+                                                    class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white outline-none focus:border-green-500 transition-colors appearance-none">
+                                                    @for($y = now()->year; $y >= 2023; $y--)
+                                                        <option value="{{ $y }}" class="bg-gray-900">{{ $y }}</option>
+                                                    @endfor
+                                                </select>
+                                            </div>
                                         </div>
-                                        <div class="grid grid-cols-2 gap-2">
+                                        <div class="grid grid-cols-2 gap-2 pt-2">
                                             <button type="submit" formaction="{{ route('services.export.quarterly') }}"
                                                 class="py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-[9px] font-black uppercase tracking-widest transition-colors flex items-center justify-center gap-2">
                                                 <i class="bi bi-file-pdf text-sm"></i> PDF
@@ -269,21 +293,27 @@
                                     </h4>
                                     <form action="{{ route('services.export.annual') }}" method="GET" class="space-y-4">
                                         <div class="grid grid-cols-2 gap-3">
-                                            <select name="year"
-                                                class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white outline-none focus:border-red-500 transition-colors">
-                                                @for($y = now()->year; $y >= 2023; $y--)
-                                                    <option value="{{ $y }}" class="bg-gray-900">{{ $y }}</option>
-                                                @endfor
-                                            </select>
-                                            <select name="service_type"
-                                                class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white outline-none focus:border-red-500 transition-colors">
-                                                <option value="all" class="bg-gray-900">Todos os Cultos</option>
-                                                <option value="normal" class="bg-gray-900">Cultos Normais</option>
-                                                <option value="teaching" class="bg-gray-900">Cultos de Ensino</option>
-                                                <option value="special" class="bg-gray-900">Cultos Especiais</option>
-                                            </select>
+                                            <div>
+                                                <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Ano</label>
+                                                <select name="year" data-searchable="false"
+                                                    class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white outline-none focus:border-red-500 transition-colors appearance-none">
+                                                    @for($y = now()->year; $y >= 2023; $y--)
+                                                        <option value="{{ $y }}" class="bg-gray-900">{{ $y }}</option>
+                                                    @endfor
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Categoria de Culto</label>
+                                                <select name="service_type" data-searchable="false"
+                                                    class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white outline-none focus:border-red-500 transition-colors appearance-none">
+                                                    <option value="all" class="bg-gray-900">Todos os Cultos</option>
+                                                    <option value="normal" class="bg-gray-900">Cultos Normais</option>
+                                                    <option value="teaching" class="bg-gray-900">Cultos de Ensino</option>
+                                                    <option value="special" class="bg-gray-900">Cultos Especiais</option>
+                                                </select>
+                                            </div>
                                         </div>
-                                        <div class="grid grid-cols-2 gap-2">
+                                        <div class="grid grid-cols-2 gap-2 pt-2">
                                             <button type="submit" formaction="{{ route('services.export.annual') }}"
                                                 class="py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-[9px] font-black uppercase tracking-widest transition-colors flex items-center justify-center gap-2">
                                                 <i class="bi bi-file-pdf text-sm"></i> PDF
