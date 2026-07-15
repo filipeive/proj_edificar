@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('v1')->group(function () {
+Route::prefix('v1')->as('api.v1.')->group(function () {
     // Public Authentication
     Route::post('/login', [AuthController::class, 'login']);
 
