@@ -72,25 +72,31 @@
     </div>
 
     <!-- Alpine.js Tabs Navigation -->
-    <div class="border-b border-gray-200 dark:border-zinc-800">
-        <nav class="-mb-px flex space-x-6" aria-label="Tabs">
+    <div class="border-b border-gray-200 dark:border-zinc-800 overflow-x-auto scrollbar-none">
+        <nav class="-mb-px flex space-x-4 sm:space-x-6 flex-nowrap" aria-label="Tabs">
             <button 
                 @click="activeTab = 'attendance'" 
                 :class="activeTab === 'attendance' ? 'border-orange-500 text-orange-600 dark:text-orange-400' : 'border-transparent text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:border-gray-300'"
-                class="whitespace-nowrap py-4 px-1 border-b-2 font-black text-xs uppercase tracking-widest transition-all">
-                <i class="bi bi-calendar-check mr-2"></i> Controle de Presença
+                class="whitespace-nowrap py-4 px-1 border-b-2 font-black text-xs uppercase tracking-wider transition-all">
+                <i class="bi bi-calendar-check mr-1 sm:mr-2"></i>
+                <span class="hidden sm:inline">Controle de Presença</span>
+                <span class="sm:hidden">Presença</span>
             </button>
             <button 
                 @click="activeTab = 'decisions'" 
                 :class="activeTab === 'decisions' ? 'border-orange-500 text-orange-600 dark:text-orange-400' : 'border-transparent text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:border-gray-300'"
-                class="whitespace-nowrap py-4 px-1 border-b-2 font-black text-xs uppercase tracking-widest transition-all">
-                <i class="bi bi-stars mr-2"></i> Visitas e Decisões
+                class="whitespace-nowrap py-4 px-1 border-b-2 font-black text-xs uppercase tracking-wider transition-all">
+                <i class="bi bi-stars mr-1 sm:mr-2"></i>
+                <span class="hidden sm:inline">Visitas e Decisões</span>
+                <span class="sm:hidden">Visitas</span>
             </button>
             <button 
                 @click="activeTab = 'discipleship'" 
                 :class="activeTab === 'discipleship' ? 'border-orange-500 text-orange-600 dark:text-orange-400' : 'border-transparent text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:border-gray-300'"
-                class="whitespace-nowrap py-4 px-1 border-b-2 font-black text-xs uppercase tracking-widest transition-all">
-                <i class="bi bi-mortarboard mr-2"></i> Acompanhamento & Discipulado
+                class="whitespace-nowrap py-4 px-1 border-b-2 font-black text-xs uppercase tracking-wider transition-all">
+                <i class="bi bi-mortarboard mr-1 sm:mr-2"></i>
+                <span class="hidden sm:inline">Acompanhamento & Discipulado</span>
+                <span class="sm:hidden">Discipulado</span>
             </button>
         </nav>
     </div>
@@ -117,12 +123,12 @@
                     <input type="hidden" name="year" value="{{ $year }}">
 
                     <!-- Horizontal Scroll Container with dynamic fade shadows -->
-                    <div class="table-responsive-container table-responsive-shadows border-none shadow-none mb-0">
+                    <div class="table-responsive-container table-responsive-shadows border-none shadow-none mb-0 hidden md:block">
                         <table class="w-full border-collapse text-[11px]">
                             <thead>
                                 <tr class="bg-gray-100/80 dark:bg-zinc-850/40 text-gray-600 dark:text-zinc-400 font-black uppercase border-b border-gray-150 dark:border-zinc-850">
                                     <th class="p-3 text-left border-r border-gray-150 dark:border-zinc-850 sticky left-0 bg-gray-100 dark:bg-zinc-900 z-10" rowspan="2">Nome do Membro</th>
-                                    <th class="p-2 text-center border-r border-gray-150 dark:border-zinc-850 bg-orange-50/50 dark:bg-orange-950/10 text-orange-850 dark:text-orange-400" colspan="{{ count($saturdays) }}">Sábados (Célula)</th>
+                                    <th class="p-2 text-center border-r border-gray-150 dark:border-zinc-850 bg-orange-50/5 dark:bg-orange-950/10 text-orange-850 dark:text-orange-400" colspan="{{ count($saturdays) }}">Sábados (Célula)</th>
                                     <th class="p-2 text-center border-r border-gray-150 dark:border-zinc-850 bg-zinc-100/55 dark:bg-zinc-800/20 text-zinc-800 dark:text-zinc-300" colspan="{{ count($sundays) }}">Domingos (Culto)</th>
                                     <th class="p-2 text-center border-r border-gray-150 dark:border-zinc-850 bg-orange-50/20 dark:bg-orange-950/5 text-orange-900 dark:text-orange-300/80" colspan="{{ count($wednesdays) }}">4ª Feira (Doutrina)</th>
                                     <th class="p-3 text-left" rowspan="2">Observações</th>
@@ -135,6 +141,20 @@
                             </thead>
                             <tbody class="divide-y divide-gray-150 dark:divide-zinc-850">
                                 @foreach($members as $member)
+                                @php
+                                    $reasonVal = '';
+                                    if (isset($attendances[$member->id])) {
+                                        foreach ($attendances[$member->id] as $type => $dates) {
+                                            foreach ($dates as $dateStr => $records) {
+                                                $firstRecord = $records->first();
+                                                if ($firstRecord && $firstRecord->reason) {
+                                                    $reasonVal = $firstRecord->reason;
+                                                    break 2;
+                                                }
+                                            }
+                                        }
+                                    }
+                                @endphp
                                 <tr class="hover:bg-orange-500/[0.02] dark:hover:bg-orange-500/[0.01] transition-colors group">
                                     <td class="p-3 border-r border-gray-150 dark:border-zinc-850 sticky left-0 bg-white dark:bg-zinc-900 group-hover:bg-gray-50 dark:group-hover:bg-zinc-850/50 z-10 font-bold text-gray-900 dark:text-white border-l border-gray-100 dark:border-zinc-850 uppercase tracking-tight">
                                         {{ $member->name }}
@@ -150,7 +170,7 @@
                                         </label>
                                     </td>
                                     @endforeach
-
+ 
                                     {{-- Culto (Sundays) --}}
                                     @foreach($sundays as $sun)
                                     <td class="p-0 text-center border-r border-gray-150 dark:border-zinc-850 bg-zinc-50/20 dark:bg-zinc-800/5">
@@ -161,7 +181,7 @@
                                         </label>
                                     </td>
                                     @endforeach
-
+ 
                                     {{-- 4ª Feira --}}
                                     @foreach($wednesdays as $wed)
                                     <td class="p-0 text-center border-r border-gray-150 dark:border-zinc-850 bg-orange-500/[0.01]">
@@ -172,15 +192,110 @@
                                         </label>
                                     </td>
                                     @endforeach
-
+ 
                                     <td class="p-2 border-r border-gray-100 dark:border-zinc-850">
-                                        <input type="text" name="reason[{{ $member->id }}]" placeholder="..." 
+                                        <input type="text" name="reason[{{ $member->id }}]" value="{{ $reasonVal }}" placeholder="..." 
                                             class="w-full bg-transparent border-none text-[10px] text-gray-400 dark:text-zinc-500 focus:ring-0 p-1 font-semibold">
                                     </td>
                                 </tr>
                                 @endforeach
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- Mobile Card Grid View for Attendance -->
+                    <div class="grid grid-cols-1 gap-6 md:hidden p-4">
+                        @foreach($members as $member)
+                            @php
+                                $reasonVal = '';
+                                if (isset($attendances[$member->id])) {
+                                    foreach ($attendances[$member->id] as $type => $dates) {
+                                        foreach ($dates as $dateStr => $records) {
+                                            $firstRecord = $records->first();
+                                            if ($firstRecord && $firstRecord->reason) {
+                                                $reasonVal = $firstRecord->reason;
+                                                break 2;
+                                            }
+                                        }
+                                    }
+                                }
+                            @endphp
+                            <div class="bg-white dark:bg-zinc-900 border border-gray-150 dark:border-zinc-850 rounded-3xl p-6 space-y-5 shadow-sm">
+                                <div class="flex items-center gap-3.5 pb-2 border-b border-gray-100 dark:border-zinc-850">
+                                    <div class="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-650 dark:text-orange-400 flex items-center justify-center font-black uppercase text-sm">
+                                        {{ substr($member->name, 0, 1) }}
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xs font-black text-gray-900 dark:text-white uppercase leading-tight">{{ $member->name }}</h4>
+                                        <p class="text-[9px] font-bold text-gray-400 dark:text-zinc-500 mt-0.5">{{ $member->email }}</p>
+                                    </div>
+                                </div>
+
+                                <!-- Saturdays (Célula) -->
+                                @if(count($saturdays) > 0)
+                                    <div class="space-y-2">
+                                        <p class="text-[9px] font-black text-orange-600 dark:text-orange-450 uppercase tracking-widest flex items-center gap-1.5">
+                                            <i class="bi bi-people-fill text-xs"></i> Sábados (Célula)
+                                        </p>
+                                        <div class="flex flex-wrap gap-2">
+                                            @foreach($saturdays as $sat)
+                                                <label class="flex items-center gap-1.5 bg-gray-50 dark:bg-zinc-850/60 border border-gray-100 dark:border-zinc-800/80 px-3 py-2 rounded-xl cursor-pointer select-none text-[10px] font-bold text-gray-750 dark:text-zinc-300">
+                                                    <input type="checkbox" name="attendance[{{ $member->id }}][cell][{{ $sat->format('Y-m-d') }}]" value="1"
+                                                        class="w-3.5 h-3.5 text-orange-600 border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 rounded focus:ring-orange-500"
+                                                        {{ isset($attendances[$member->id]['cell'][$sat->format('Y-m-d')]) && $attendances[$member->id]['cell'][$sat->format('Y-m-d')]->first()->status ? 'checked' : '' }}>
+                                                    <span>{{ $sat->format('d/m') }}</span>
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+
+                                <!-- Sundays (Culto) -->
+                                @if(count($sundays) > 0)
+                                    <div class="space-y-2">
+                                        <p class="text-[9px] font-black text-zinc-800 dark:text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
+                                            <i class="bi bi-journal-bookmark-fill text-xs"></i> Domingos (Culto)
+                                        </p>
+                                        <div class="flex flex-wrap gap-2">
+                                            @foreach($sundays as $sun)
+                                                <label class="flex items-center gap-1.5 bg-gray-50 dark:bg-zinc-850/60 border border-gray-100 dark:border-zinc-800/80 px-3 py-2 rounded-xl cursor-pointer select-none text-[10px] font-bold text-gray-750 dark:text-zinc-300">
+                                                    <input type="checkbox" name="attendance[{{ $member->id }}][service][{{ $sun->format('Y-m-d') }}]" value="1"
+                                                        class="w-3.5 h-3.5 text-zinc-700 border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 rounded focus:ring-zinc-500"
+                                                        {{ isset($attendances[$member->id]['service'][$sun->format('Y-m-d')]) && $attendances[$member->id]['service'][$sun->format('Y-m-d')]->first()->status ? 'checked' : '' }}>
+                                                    <span>{{ $sun->format('d/m') }}</span>
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+
+                                <!-- Wednesdays (Doutrina) -->
+                                @if(count($wednesdays) > 0)
+                                    <div class="space-y-2">
+                                        <p class="text-[9px] font-black text-orange-700 dark:text-orange-500/80 uppercase tracking-widest flex items-center gap-1.5">
+                                            <i class="bi bi-mortarboard-fill text-xs"></i> 4ª Feira (Doutrina)
+                                        </p>
+                                        <div class="flex flex-wrap gap-2">
+                                            @foreach($wednesdays as $wed)
+                                                <label class="flex items-center gap-1.5 bg-gray-50 dark:bg-zinc-850/60 border border-gray-100 dark:border-zinc-800/80 px-3 py-2 rounded-xl cursor-pointer select-none text-[10px] font-bold text-gray-750 dark:text-zinc-300">
+                                                    <input type="checkbox" name="attendance[{{ $member->id }}][wednesday][{{ $wed->format('Y-m-d') }}]" value="1"
+                                                        class="w-3.5 h-3.5 text-orange-700 border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 rounded focus:ring-orange-500"
+                                                        {{ isset($attendances[$member->id]['wednesday'][$wed->format('Y-m-d')]) && $attendances[$member->id]['wednesday'][$wed->format('Y-m-d')]->first()->status ? 'checked' : '' }}>
+                                                    <span>{{ $wed->format('d/m') }}</span>
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+
+                                <!-- Observações -->
+                                <div class="space-y-1">
+                                    <label class="text-[9px] font-black text-gray-400 dark:text-zinc-550 uppercase tracking-widest block pl-1">Observações</label>
+                                    <input type="text" name="reason[{{ $member->id }}]" value="{{ $reasonVal }}" placeholder="Motivo de falta, observação..." 
+                                        class="w-full bg-gray-50 dark:bg-zinc-850 border border-gray-150 dark:border-zinc-800 rounded-xl text-xs font-semibold text-gray-750 dark:text-white px-4 py-2.5 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all">
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
 
                     <div class="p-6 bg-gray-50 dark:bg-zinc-850/30 border-t border-gray-150 dark:border-zinc-850 flex justify-end">
@@ -200,13 +315,13 @@
         <!-- TAB 2: DECISIONS & VISITORS -->
         <div x-show="activeTab === 'decisions'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6">
             <div class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-150 dark:border-zinc-850 p-6 md:p-8 space-y-6">
-                <div class="flex items-center justify-between border-b border-gray-100 dark:border-zinc-850 pb-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-zinc-850 pb-4">
                     <h3 class="text-xs font-black text-gray-900 dark:text-white uppercase tracking-[0.15em] flex items-center gap-2">
                         <i class="bi bi-graph-up text-orange-500"></i> Relatório de Decisões e Visitas
                     </h3>
-                    <div class="flex gap-2">
-                        <button onclick="toggleModal('visitorModal')" class="bg-orange-600 text-white px-3.5 py-2 rounded-xl text-[9px] font-black uppercase hover:bg-orange-700 transition-all shadow-sm">+ Visita</button>
-                        <button onclick="toggleModal('conversionModal')" class="bg-zinc-950 text-white dark:bg-zinc-800 px-3.5 py-2 rounded-xl text-[9px] font-black uppercase hover:bg-black dark:hover:bg-zinc-700 transition-all border border-zinc-800 shadow-sm">+ Decisão</button>
+                    <div class="flex gap-2 w-full sm:w-auto">
+                        <button onclick="toggleModal('visitorModal')" class="flex-1 sm:flex-none bg-orange-600 text-white px-4 py-2.5 rounded-xl text-[9px] font-black uppercase hover:bg-orange-700 transition-all shadow-sm">+ Visita</button>
+                        <button onclick="toggleModal('conversionModal')" class="flex-1 sm:flex-none bg-zinc-950 text-white dark:bg-zinc-800 px-4 py-2.5 rounded-xl text-[9px] font-black uppercase hover:bg-black dark:hover:bg-zinc-700 transition-all border border-zinc-800 shadow-sm">+ Decisão</button>
                     </div>
                 </div>
 
@@ -262,11 +377,11 @@
         <!-- TAB 3: DISCIPLESHIP -->
         <div x-show="activeTab === 'discipleship'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6">
             <div class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-150 dark:border-zinc-850 p-6 md:p-8 space-y-6">
-                <div class="flex items-center justify-between border-b border-gray-100 dark:border-zinc-850 pb-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-zinc-850 pb-4">
                     <h3 class="text-xs font-black text-gray-900 dark:text-white uppercase tracking-[0.15em] flex items-center gap-2">
                         <i class="bi bi-mortarboard text-orange-500"></i> Discipulado e Acompanhamento
                     </h3>
-                    <button onclick="toggleModal('discipleshipModal')" class="bg-orange-600 text-white px-3.5 py-2 rounded-xl text-[9px] font-black uppercase hover:bg-orange-700 transition-all shadow-sm">+ Novo Acompanhamento</button>
+                    <button onclick="toggleModal('discipleshipModal')" class="w-full sm:w-auto bg-orange-600 text-white px-4 py-2.5 rounded-xl text-[9px] font-black uppercase hover:bg-orange-700 transition-all shadow-sm">+ Novo Acompanhamento</button>
                 </div>
 
                 <div class="space-y-3">
