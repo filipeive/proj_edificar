@@ -10,38 +10,14 @@ use Illuminate\Http\Request;
 
 class CourseEnrollmentController extends Controller
 {
-    public function enroll(Course $course)
+    public function enroll(Course $course, \App\Actions\Events\EnrollMemberAction $action)
     {
-        $user = auth()->user();
-
-        // Supervisor can only self-enroll in individual/ministerial courses.
-        if ($user->isSupervisor()) {
-            $preMaritalCourseId = (int) Setting::get('pre_marital_course_id');
-            if ($preMaritalCourseId > 0 && $course->id === $preMaritalCourseId) {
-                return back()->with('error', 'Supervisor não pode se inscrever em curso de casais.');
-            }
+        try {
+            $action->execute(auth()->user(), $course);
+            return back()->with('success', 'Matrícula realizada com sucesso!');
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-
-        // Check if already enrolled
-        $exists = CourseEnrollment::where('course_id', $course->id)
-            ->where('user_id', $user->id)
-            ->exists();
-
-        if ($exists) {
-            return back()->with('error', 'Você já está matriculado neste curso.');
-        }
-
-        if (!$course->isRegistrationOpen()) {
-            return back()->with('error', 'As inscrições para este curso estão encerradas.');
-        }
-
-        CourseEnrollment::create([
-            'course_id' => $course->id,
-            'user_id' => $user->id,
-            'status' => 'cursando',
-        ]);
-
-        return back()->with('success', 'Matrícula realizada com sucesso!');
     }
 
     public function show(CourseEnrollment $courseEnrollment)

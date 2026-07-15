@@ -373,7 +373,7 @@
                                 </td>
                                 <td class="px-6 py-5 text-right">
                                     <div
-                                        class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                        class="flex items-center justify-end gap-2 opacity-70 hover:opacity-100 transition-all duration-300">
                                         <a href="{{ route('quarterly-reports.show', $report) }}" title="Detalhes"
                                             class="action-icon bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white shadow-sm">
                                             <i class="bi bi-eye-fill"></i>

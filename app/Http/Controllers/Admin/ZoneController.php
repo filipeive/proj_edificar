@@ -101,7 +101,7 @@ class ZoneController
                 ->orWhereHas('pastor', fn($q) => $q->where('name', 'LIKE', "%$search%"));
         }
 
-        $zones = $query->paginate(24)->withQueryString();
+        $zones = $query->paginate(8)->withQueryString();
         return view('admin.zones.index', ['zones' => $zones]);
     }
 

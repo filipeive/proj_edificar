@@ -163,7 +163,7 @@ class CellController
 
         if ($user->isPastorZona()) {
             $availableCellsQuery->whereHas('supervision', function ($q) use ($user) {
-                $q->where('zone_id', $user->getZoneId());
+                $q->whereIn('zone_id', $user->getManagedZoneIds());
             });
         } elseif ($user->isSupervisor()) {
             $availableCellsQuery->whereIn('supervision_id', $user->getManagedSupervisionIds());

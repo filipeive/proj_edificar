@@ -256,7 +256,7 @@
                                             </td>
                                             <td class="px-8 py-5 text-right">
                                                 <div
-                                                    class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                                    class="flex items-center justify-end gap-2 opacity-70 hover:opacity-100 transition-opacity duration-200">
                                                     <a href="{{ route('events.show', $event) }}"
                                                         class="action-icon text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30"
                                                         title="Ver detalhes">

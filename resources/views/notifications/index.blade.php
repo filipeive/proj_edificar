@@ -169,7 +169,7 @@
 
                                     <!-- Actions -->
                                     <div
-                                        class="flex md:flex-col items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
+                                        class="flex md:flex-col items-center justify-end gap-2 opacity-70 hover:opacity-100 transition-all">
                                         @if(!$notification->read_at)
                                             <a href="{{ route('notifications.mark-read', $notification->id) }}"
                                                 class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white flex items-center justify-center transition-all shadow-sm"

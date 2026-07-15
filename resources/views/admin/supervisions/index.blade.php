@@ -132,7 +132,7 @@
                                     class="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-2xl font-black shadow-sm group-hover:rotate-6 transition-transform ml-8 mt-2">
                                     {{ substr($supervision->name, 0, 1) }}
                                 </div>
-                                <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div class="flex gap-2 opacity-70 hover:opacity-100 transition-opacity">
                                     <a href="{{ route('supervisions.edit', $supervision) }}"
                                         class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-blue-50 text-gray-400 hover:text-blue-600 flex items-center justify-center transition-all">
                                         <i class="bi bi-pencil-square"></i>
@@ -255,7 +255,7 @@
                                 <td class="px-6 py-6 text-center font-black text-gray-700">{{ $supervision->cells->count() }}
                                 </td>
                                 <td class="px-6 py-6 text-right">
-                                    <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                    <div class="flex justify-end gap-2 opacity-70 hover:opacity-100 transition-all">
                                         <a href="{{ route('supervisions.show', $supervision) }}" title="Detalhes"
                                             class="action-icon bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white">
                                             <i class="bi bi-eye"></i>

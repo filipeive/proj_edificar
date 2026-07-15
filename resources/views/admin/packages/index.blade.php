@@ -155,7 +155,7 @@
                                     </td>
                                     <td class="px-10 py-6 text-right">
                                         <div
-                                            class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                            class="flex items-center justify-end gap-2 opacity-70 hover:opacity-100 transition-all duration-300">
                                             <a href="{{ route('packages.show', $package) }}" title="Ver detalhes"
                                                 class="action-icon bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white shadow-sm">
                                                 <i class="bi bi-eye-fill"></i>

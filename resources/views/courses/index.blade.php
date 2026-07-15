@@ -250,7 +250,7 @@
                                             </td>
                                             <td class="px-8 py-6 text-right">
                                                 <div
-                                                    class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    class="flex items-center justify-end gap-2 opacity-70 hover:opacity-100 transition-opacity">
                                                     <a href="{{ route('courses.show', $course) }}" title="Detalhes"
                                                         class="action-icon bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 hover:bg-orange-500 hover:text-white dark:hover:bg-orange-500 dark:hover:text-white shadow-sm">
                                                         <i class="bi bi-eye-fill"></i>

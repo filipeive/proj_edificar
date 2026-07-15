@@ -72,3 +72,10 @@ O sistema foi configurado para usar o **Vite 5**, que é compatível com o **Nod
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
+
+---
+
+## 5. API V1 & Arquitetura Híbrida
+A partir da versão 1.1.0, o sistema adota uma arquitetura híbrida (Web + API REST) utilizando o **Laravel Sanctum**. As regras de negócio complexas de reatribuição de membros (`ReassignMemberAction`) e de inscrições (`EnrollMemberAction`) foram extraídas para classes independentes de serviço (Actions) compartilhadas entre a aplicação Web e os endpoints da API.
+
+A documentação OpenAPI detalhada dos endpoints, payloads de requisição e estruturas de resposta JSON encontra-se no ficheiro [docs/36-api-specification.md](file:///home/fdev-ms/Filipe/proj_edificar/docs/36-api-specification.md).

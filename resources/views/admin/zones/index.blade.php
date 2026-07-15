@@ -141,7 +141,7 @@
                                         </div>
                                     @endif
                                 </div>
-                                <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div class="flex gap-2 opacity-70 hover:opacity-100 transition-opacity">
                                     <a href="{{ route('zones.edit', $zone) }}"
                                         class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-blue-50 text-gray-400 hover:text-blue-600 flex items-center justify-center transition-all">
                                         <i class="bi bi-pencil-square"></i>
@@ -279,7 +279,7 @@
                                 <td class="px-10 py-6 text-center font-black text-blue-600">{{ $zone->getTotalCells() }}
                                 </td>
                                 <td class="px-10 py-6 text-right">
-                                    <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                    <div class="flex justify-end gap-2 opacity-70 hover:opacity-100 transition-all">
                                         <a href="{{ route('zones.show', $zone) }}" title="Detalhes"
                                             class="action-icon bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white">
                                             <i class="bi bi-eye"></i>

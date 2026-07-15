@@ -135,7 +135,7 @@
                                             {{ number_format($cell->getTotalContributedThisMonth(), 0, ',', '.') }} MT
                                         </td>
                                         <td class="px-10 py-6 text-right">
-                                            <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                            <div class="flex justify-end gap-2 opacity-70 hover:opacity-100 transition-all">
                                                 <button @click="transfer({ id: {{ $cell->id }}, name: '{{ $cell->name }}' })"
                                                     class="action-icon bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600"
                                                     title="Transferir supervisão">
@@ -226,7 +226,7 @@
                     @csrf
                     <div class="space-y-2">
                         <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Selecione a Supervisão de Destino</label>
-                        <select name="supervision_id" required class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all custom-select">
+                        <select name="supervision_id" required data-searchable="false" class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all custom-select">
                             <option value="">Escolha uma supervisão...</option>
                             @foreach($availableSupervisions as $availSup)
                                 <option value="{{ $availSup->id }}">{{ $availSup->display_name }}</option>
@@ -260,7 +260,7 @@
                     @csrf
                     <div class="space-y-2">
                         <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Selecione a Zona de Destino</label>
-                        <select name="zone_id" required class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all custom-select">
+                        <select name="zone_id" required data-searchable="false" class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all custom-select">
                             <option value="">Escolha uma zona...</option>
                             @foreach($availableZones as $availZone)
                                 <option value="{{ $availZone->id }}">{{ $availZone->name }}</option>

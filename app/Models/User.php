@@ -9,7 +9,7 @@ use Laravel\Breeze\Features;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, NormalizesMozPhone, \App\Models\Concerns\LogsActivity;
+    use HasFactory, Notifiable, NormalizesMozPhone, \App\Models\Concerns\LogsActivity, \Laravel\Sanctum\HasApiTokens;
 
     protected $fillable = [
         'name',

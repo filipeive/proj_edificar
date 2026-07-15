@@ -194,7 +194,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div class="flex gap-2 opacity-70 hover:opacity-100 transition-opacity">
                                 <button @click="openAssignModal({ id: {{ $cell->id }}, name: '{{ $cell->name }}', members: {{ $cell->members->where('role', 'membro')->values() }} })"
                                     title="Atribuir Auxiliar/Timóteo"
                                     class="w-10 h-10 rounded-xl bg-orange-50 hover:bg-orange-600 text-orange-400 hover:text-white flex items-center justify-center transition-all shadow-sm">
@@ -325,7 +325,7 @@
                                 <td class="px-6 py-7 text-center font-black text-blue-600 text-lg tracking-tighter">
                                     {{ $cell->members->count() }}</td>
                                 <td class="px-6 py-7 text-right">
-                                    <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                    <div class="flex justify-end gap-2 opacity-70 hover:opacity-100 transition-all">
                                         <button @click="openAssignModal({ id: {{ $cell->id }}, name: '{{ $cell->name }}', members: {{ $cell->members->where('role', 'membro')->values() }} })"
                                             title="Atribuir Auxiliar/Timóteo"
                                             class="action-icon bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white">

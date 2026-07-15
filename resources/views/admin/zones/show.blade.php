@@ -359,7 +359,7 @@
                                     <label
                                         class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Selecione
                                         a Célula de Destino</label>
-                                    <select name="cell_id" required
+                                    <select name="cell_id" required data-searchable="false"
                                         class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all custom-select">
                                         <option value="">Escolha uma célula...</option>
                                         @foreach($cells as $availCell)
@@ -480,7 +480,7 @@
                     <div class="space-y-2">
                         <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Selecione a Zona
                             de Destino</label>
-                        <select name="zone_id" required
+                        <select name="zone_id" required data-searchable="false"
                             class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all custom-select">
                             <option value="">Escolha uma zona...</option>
                             @foreach($availableZones as $availZone)

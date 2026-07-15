@@ -591,12 +591,7 @@ form.flex input {
     margin-bottom: 0 !important;
 }
 
-form select.custom-select {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    display: inline-flex;
-    align-items: center;
-}
+/* Removed form select.custom-select styling to prevent layout/height issues */
 
 /* Tom Select Nesting in Dark Containers (e.g. Header Cards or Dark theme components) */
 .bg-zinc-950 .ts-wrapper .ts-control,

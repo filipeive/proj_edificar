@@ -229,7 +229,7 @@
                                             </span>
                                         </td>
                                         <td class="px-10 py-6 text-right">
-                                            <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                            <div class="flex justify-end gap-2 opacity-70 hover:opacity-100 transition-all">
                                                 <button @click="openObs({ id: {{ $member->id }}, name: '{{ $member->name }}', obs: '{{ addslashes($member->observations) }}' })"
                                                     class="action-icon bg-gray-50 text-gray-400 hover:bg-orange-50 hover:text-orange-600"
                                                     title="Observações">
@@ -448,7 +448,7 @@
                     @csrf
                     <div class="space-y-2">
                         <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Selecione a Célula de Destino</label>
-                        <select name="cell_id" required class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all appearance-none custom-select">
+                        <select name="cell_id" required data-searchable="false" class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all appearance-none custom-select">
                             <option value="">Escolha uma célula...</option>
                             @foreach($availableCells as $availCell)
                                 <option value="{{ $availCell->id }}">{{ $availCell->display_name }}</option>

@@ -708,21 +708,21 @@ class UserController
         }
     }
 
-    public function reassignCell(Request $request, User $user)
+    public function reassignCell(Request $request, User $user, \App\Actions\Cells\ReassignMemberAction $action)
     {
         $validated = $request->validate([
             'cell_id' => 'required|exists:cells,id',
         ]);
 
-        $user->update(['cell_id' => $validated['cell_id']]);
+        $action->execute($user, (int) $validated['cell_id']);
 
         return back()->with('success', 'Membro transferido com sucesso!');
     }
 
-    public function removeFromCell(User $user)
+    public function removeFromCell(User $user, \App\Actions\Cells\ReassignMemberAction $action)
     {
         // Apenas remove da célula, não deleta do sistema
-        $user->update(['cell_id' => null]);
+        $action->execute($user, null);
 
         return back()->with('success', 'Membro removido da célula com sucesso!');
     }

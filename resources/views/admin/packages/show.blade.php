@@ -433,7 +433,7 @@
                                     @endif
 
                                     <form action="{{ route('packages.members.remove', [$package, $commitment->user_id]) }}" method="POST"
-                                        onsubmit="return confirm('Remover membro?');" class="inline opacity-0 group-hover:opacity-100 transition-opacity">
+                                        onsubmit="return confirm('Remover membro?');" class="inline opacity-70 hover:opacity-100 transition-opacity">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="text-red-400 hover:text-red-600">
                                             <i class="bi bi-x-circle-fill"></i>
