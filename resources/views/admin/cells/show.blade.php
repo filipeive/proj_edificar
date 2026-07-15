@@ -190,7 +190,7 @@
                             </a>
                         </div>
                     </div>
-                    <div class="overflow-x-auto">
+                    <div class="overflow-x-auto hidden md:block">
                         <table class="w-full table-compact">
                             <thead>
                                 <tr class="bg-gray-50/50">
@@ -265,6 +265,73 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <!-- Mobile Grid View for Members -->
+                    <div class="grid grid-cols-1 gap-4 md:hidden">
+                        @forelse($members as $member)
+                            <div class="bg-white border border-gray-100 rounded-3xl p-6 space-y-4 hover:shadow-lg transition-shadow">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-500 font-black text-lg">
+                                        {{ substr($member->name, 0, 1) }}
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <h4 class="text-sm font-black text-gray-900 leading-tight">{{ $member->name }}</h4>
+                                        <p class="text-[10px] font-bold text-gray-400 mt-0.5">{{ $member->email }}</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between border-t border-b border-gray-50/80 py-3.5">
+                                    <div class="space-y-1">
+                                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Compromisso</p>
+                                        <div>
+                                            @if ($member->getActiveCommitment())
+                                                <span class="px-2.5 py-0.5 bg-blue-50 text-blue-600 rounded-full text-[9px] font-black uppercase tracking-wider">
+                                                    {{ $member->getActiveCommitment()->package->name }}
+                                                </span>
+                                            @else
+                                                <span class="text-gray-300 text-[9px] font-black uppercase tracking-wider">Sem pacto</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="text-right space-y-1">
+                                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Contribuição</p>
+                                        <p class="text-xs font-black {{ $member->getTotalContributedThisMonth() > 0 ? 'text-green-600' : 'text-gray-300' }}">
+                                            {{ number_format($member->getTotalContributedThisMonth(), 0, ',', '.') }} MT
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-end gap-2 pt-1">
+                                    <button @click="openObs({ id: {{ $member->id }}, name: '{{ $member->name }}', obs: '{{ addslashes($member->observations) }}' })"
+                                        class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-orange-50 hover:text-orange-600 flex items-center justify-center transition-all"
+                                        title="Observações">
+                                        <i class="bi bi-chat-dots{{ $member->observations ? '-fill' : '' }} text-lg"></i>
+                                    </button>
+                                    <button @click="transfer({ id: {{ $member->id }}, name: '{{ $member->name }}' })"
+                                        class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-center transition-all"
+                                        title="Transferir Célula">
+                                        <i class="bi bi-arrow-left-right text-lg"></i>
+                                    </button>
+                                    <form action="{{ route('users.remove-from-cell', $member) }}" method="POST" class="inline" onsubmit="return confirm('Deseja remover este membro desta célula? O membro continuará no sistema, mas sem vínculo a esta célula.')">
+                                        @csrf
+                                        <button type="submit"
+                                            class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 flex items-center justify-center transition-all"
+                                            title="Remover da Célula">
+                                            <i class="bi bi-person-x text-lg"></i>
+                                        </button>
+                                    </form>
+                                    <a href="{{ route('users.show', $member) }}"
+                                        class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-center transition-all">
+                                        <i class="bi bi-chevron-right text-lg"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="bg-white border border-gray-100 rounded-3xl p-12 text-center text-gray-400 font-medium italic">
+                                Nenhum membro ativo nesta célula.
+                            </div>
+                        @endforelse
+                    </div>
                     @if($members->hasPages())
                         <div class="mt-6">
                             {{ $members->links() }}
@@ -286,7 +353,7 @@
                             </a>
                         </div>
                     </div>
-                    <div class="overflow-x-auto">
+                    <div class="overflow-x-auto hidden md:block">
                         <table class="w-full text-sm table-compact">
                             <thead>
                                 <tr class="bg-gray-50/50">
@@ -348,6 +415,62 @@
                                 @endforelse
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- Mobile Grid View for Meetings -->
+                    <div class="grid grid-cols-1 gap-4 md:hidden">
+                        @forelse($meetings as $meeting)
+                            <div class="bg-white border border-gray-100 rounded-3xl p-6 space-y-4 hover:shadow-lg transition-shadow">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-black text-gray-900">{{ $meeting->meeting_date->format('d/m/Y') }}</span>
+                                    <span class="uppercase font-black text-[9px] tracking-widest">
+                                        @if($meeting->meeting_type === 'normal')
+                                            <span class="px-2.5 py-0.5 bg-blue-50 text-blue-600 rounded-full">Reunião de Célula</span>
+                                        @else
+                                            <span class="px-2.5 py-0.5 bg-orange-50 text-orange-600 rounded-full">
+                                                <i class="bi bi-award mr-0.5"></i>
+                                                @switch($meeting->meeting_type)
+                                                    @case('leadership') Liderança @break
+                                                    @case('supervision') Supervisão @break
+                                                    @case('zone') Zona @break
+                                                    @default Especial
+                                                @endswitch
+                                            </span>
+                                        @endif
+                                    </span>
+                                </div>
+                                
+                                <div class="space-y-1">
+                                    <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Tema</p>
+                                    <p class="text-xs text-gray-600 italic font-medium">
+                                        {{ $meeting->theme ?? 'Sem tema registrado' }}
+                                    </p>
+                                </div>
+
+                                <div class="flex items-center justify-between border-t border-gray-50/80 pt-4">
+                                    <div class="space-y-1">
+                                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Presença Total</p>
+                                        <span class="inline-block bg-gray-100 text-gray-600 px-2.5 py-0.5 rounded-full text-[9px] font-black tracking-widest">
+                                            {{ $meeting->adults_count + $meeting->children_count + $meeting->visitors_count }}
+                                        </span>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <a href="{{ route('cell-meetings.pdf', $meeting) }}" title="PDF"
+                                            class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-orange-50 hover:text-orange-600 flex items-center justify-center transition-all">
+                                            <i class="bi bi-file-earmark-pdf text-lg"></i>
+                                        </a>
+                                        <a href="{{ route('cell-meetings.show', $meeting) }}" title="Detalhes"
+                                            class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-center transition-all">
+                                            <i class="bi bi-chevron-right text-lg"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="bg-white border border-gray-100 rounded-3xl p-12 text-center text-gray-400 font-medium italic">
+                                Nenhum encontro registrado ainda.
+                            </div>
+                        @endforelse
                     </div>
                     @if($meetings->hasPages())
                         <div class="mt-6">
@@ -438,7 +561,7 @@
             x-transition:leave="transition ease-in duration-200"
             x-transition:leave-start="opacity-100"
             x-transition:leave-end="opacity-0"
-            style="display: none;">
+            style="display: none; margin-top: -15px">
             <div @click.away="showTransferModal = false" class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden animate-In">
                 <div class="p-8 border-b border-gray-100">
                     <h3 class="text-xl font-black text-gray-900 leading-tight">Transferir Membro</h3>
