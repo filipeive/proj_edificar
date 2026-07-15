@@ -81,4 +81,12 @@
   - Uniformização de modais (Visitas, Discipulado, Decisões) para cores da marca e layout de cantos `rounded-2xl`.
 - **Benefício:** UX e usabilidade móvel drasticamente melhorada para o registo semanal de presença e acompanhamento de visitantes pelos líderes de célula.
 
-
+### ME-05: Ajustes Responsive Mobile e Novas Funcionalidades de Gestão ✔️
+- **Ficheiros alterados:** `admin/cells/show.blade.php`, `admin/cells/attendance.blade.php`, `admin/supervisions/show.blade.php`, `admin/cells/index.blade.php`, `members/index.blade.php`, `app/Http/Controllers/Admin/CellController.php`, `app/Http/Controllers/Admin/UserController.php`, `routes/web.php`
+- **Alterações:**
+  - **Redesign Mobile (Cells Show):** Implementação de visualização responsive móvel em formato de grelha de cartões nas tabelas de Membros e Reuniões.
+  - **Redesign Mobile (Supervision Show):** Stack vertical do header da secção no mobile e substituição da tabela de células por cartões touch-friendly responsivos.
+  - **Ficha Guia (Attendance):** Títulos responsivos (com abreviaturas curtas em mobile) e correção do alinhamento do botão "Salvar".
+  - **Gestão de Timóteos:** Extensão do modal "Escolher Novo Timóteo" (agora "Gestão de Timóteos") para permitir tanto a promoção a Timóteo como a remoção imediata desta função na listagem de células.
+  - **Atribuição de Células:** Adicionado botão verde com ícone de grupo e modal "Atribuir Célula" na listagem de membros para utilizadores sem célula associada, permitindo a sua atribuição rápida.
+- **Benefício:** Acessibilidade, consistência e capacidade de gestão completa a partir de dispositivos móveis.

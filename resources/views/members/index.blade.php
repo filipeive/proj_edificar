@@ -30,9 +30,15 @@
         x-data="{
             view: window.innerWidth < 768 ? 'grid' : (localStorage.getItem('members_view') || 'list'),
             selected: [],
+            showAssignCellModal: false,
+            selectedMember: { id: null, name: '' },
             toggleAll() {
                 const allIds = {{ Js::from($members->pluck('id')->values()) }};
                 this.selected = this.selected.length === allIds.length ? [] : allIds;
+            },
+            openAssignCellModal(member) {
+                this.selectedMember = member;
+                this.showAssignCellModal = true;
             }
         }"
         x-init="$watch('view', value => localStorage.setItem('members_view', value))">
@@ -214,6 +220,13 @@
                                                 class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:border-amber-500 hover:bg-amber-500 hover:text-white">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
+                                            @if(is_null($member->cell_id))
+                                                <button @click="openAssignCellModal({ id: {{ $member->id }}, name: '{{ $member->name }}' })"
+                                                    title="Atribuir Célula"
+                                                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-emerald-200 text-emerald-650 hover:border-emerald-600 hover:bg-emerald-600 hover:text-white transition-all">
+                                                    <i class="bi bi-people-fill"></i>
+                                                </button>
+                                            @endif
                                         @endif
                                     </div>
                                 </td>
@@ -279,6 +292,14 @@
                             </a>
                         @endif
                     </div>
+                    @if($userRole !== 'secretaria' && is_null($member->cell_id))
+                        <div class="mt-2">
+                            <button @click="openAssignCellModal({ id: {{ $member->id }}, name: '{{ $member->name }}' })"
+                                class="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-emerald-50 border border-emerald-200 px-3 py-2 text-[10px] font-black uppercase tracking-wider text-emerald-700 transition hover:bg-emerald-600 hover:text-white">
+                                <i class="bi bi-people-fill"></i> Atribuir Célula
+                            </button>
+                        </div>
+                    @endif
                 </article>
             @empty
                 <div class="col-span-full rounded-2xl border border-dashed border-gray-300 bg-gray-50 py-16 text-center text-gray-500">
@@ -292,6 +313,46 @@
                 {{ $members->appends(request()->query())->links() }}
             </div>
         @endif
+
+        <!-- Assign Cell Modal -->
+        <div x-show="showAssignCellModal" 
+            class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            style="display: none; margin-top:-15px">
+            <div @click.away="showAssignCellModal = false" class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden animate-In">
+                <div class="p-8 border-b border-gray-100 flex justify-between items-center">
+                    <div>
+                        <h3 class="text-xl font-black text-gray-900 leading-tight">Atribuir Membro a Célula</h3>
+                        <p class="text-sm text-gray-500 mt-1" x-text="'Membro: ' + selectedMember.name"></p>
+                    </div>
+                    <button @click="showAssignCellModal = false" class="text-gray-400 hover:text-gray-600">
+                        <i class="bi bi-x-lg text-xl"></i>
+                    </button>
+                </div>
+                
+                <form :action="'{{ url('/members') }}/' + selectedMember.id + '/assign-cell'" method="POST" class="p-8 space-y-6">
+                    @csrf
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Selecione a Célula de Destino</label>
+                        <select name="cell_id" required class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all custom-select">
+                            <option value="">Escolha uma célula...</option>
+                            @foreach($availableCells as $cell)
+                                <option value="{{ $cell->id }}">{{ $cell->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" @click="showAssignCellModal = false" class="flex-1 px-6 py-4 rounded-2xl bg-gray-50 text-gray-500 font-black text-xs uppercase tracking-widest hover:bg-gray-100 transition-all">Cancelar</button>
+                        <button type="submit" class="flex-1 px-6 py-4 rounded-2xl bg-emerald-600 text-white font-black text-xs uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-250">Confirmar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
     </div>
 @endsection

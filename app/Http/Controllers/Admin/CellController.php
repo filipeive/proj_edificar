@@ -329,4 +329,23 @@ class CellController
 
         return back()->with('success', "{$user->name} foi promovido(a) a Timóteo com sucesso!");
     }
+
+    public function removeTimoteo(Request $request, Cell $cell)
+    {
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        $user = User::findOrFail($validated['user_id']);
+
+        // Verificar se usuário pertence à célula
+        if ($user->cell_id !== $cell->id) {
+            return back()->with('error', 'O usuário não pertence a esta célula!');
+        }
+
+        // Remover função de Timóteo, voltar a membro
+        $user->update(['role' => 'membro']);
+
+        return back()->with('success', "{$user->name} deixou de ser Timóteo com sucesso!");
+    }
 }

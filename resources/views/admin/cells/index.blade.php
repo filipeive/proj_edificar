@@ -19,7 +19,7 @@
             view: window.innerWidth < 768 ? 'grid' : (localStorage.getItem('cells_view') || 'grid'),
             selected: [],
             showAssignModal: false,
-            selectedCell: { name: '', id: null, members: [] },
+            selectedCell: { name: '', id: null, members: [], timoteos: [] },
             updateView() {
                 if (window.innerWidth < 768 && this.view === 'list') {
                     this.view = 'grid';
@@ -37,7 +37,12 @@
                 document.getElementById('bulk-delete-form').submit();
             },
             openAssignModal(cell) {
-                this.selectedCell = cell;
+                this.selectedCell = {
+                    id: cell.id,
+                    name: cell.name,
+                    members: (cell.members || []).filter(m => m.role === 'membro'),
+                    timoteos: (cell.members || []).filter(m => m.role === 'timoteo')
+                };
                 this.showAssignModal = true;
             }
         }"
@@ -195,7 +200,7 @@
                                 </div>
                             </div>
                             <div class="flex gap-2 opacity-70 hover:opacity-100 transition-opacity">
-                                <button @click="openAssignModal({ id: {{ $cell->id }}, name: '{{ $cell->name }}', members: {{ $cell->members->where('role', 'membro')->values() }} })"
+                                <button @click="openAssignModal({ id: {{ $cell->id }}, name: '{{ $cell->name }}', members: {{ $cell->members->values() }} })"
                                     title="Atribuir Auxiliar/Timóteo"
                                     class="w-10 h-10 rounded-xl bg-orange-50 hover:bg-orange-600 text-orange-400 hover:text-white flex items-center justify-center transition-all shadow-sm">
                                     <i class="bi bi-person-plus"></i>
@@ -326,7 +331,7 @@
                                     {{ $cell->members->count() }}</td>
                                 <td class="px-6 py-7 text-right">
                                     <div class="flex justify-end gap-2 opacity-70 hover:opacity-100 transition-all">
-                                        <button @click="openAssignModal({ id: {{ $cell->id }}, name: '{{ $cell->name }}', members: {{ $cell->members->where('role', 'membro')->values() }} })"
+                                        <button @click="openAssignModal({ id: {{ $cell->id }}, name: '{{ $cell->name }}', members: {{ $cell->members->values() }} })"
                                             title="Atribuir Auxiliar/Timóteo"
                                             class="action-icon bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white">
                                             <i class="bi bi-person-plus"></i>
@@ -357,11 +362,11 @@
             x-transition:leave="transition ease-in duration-200"
             x-transition:leave-start="opacity-100"
             x-transition:leave-end="opacity-0"
-            style="display: none;">
+            style="display: none; margin-top: -15px">
             <div @click.away="showAssignModal = false" class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-hidden animate-In">
                 <div class="p-8 border-b border-gray-100 flex justify-between items-center">
                     <div>
-                        <h3 class="text-xl font-black text-gray-900 leading-tight">Escolher Novo Timóteo</h3>
+                        <h3 class="text-xl font-black text-gray-900 leading-tight">Gestão de Timóteos</h3>
                         <p class="text-sm text-gray-500 mt-1" x-text="'Célula ' + selectedCell.name"></p>
                     </div>
                     <button @click="showAssignModal = false" class="text-gray-400 hover:text-gray-600">
@@ -370,31 +375,59 @@
                 </div>
                 
                 <div class="p-8">
-                    <div class="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                        <template x-for="member in selectedCell.members" :key="member.id">
-                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-blue-200 transition-all group">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-blue-600 font-bold" x-text="member.name.substring(0, 1)"></div>
-                                    <div class="min-w-0">
-                                        <p class="text-sm font-bold text-gray-900 truncate" x-text="member.name"></p>
-                                        <p class="text-[10px] text-gray-400 truncate" x-text="member.email"></p>
+                    <div class="space-y-6 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                        <!-- Secção: Timóteos Ativos -->
+                        <div x-show="selectedCell.timoteos && selectedCell.timoteos.length > 0" class="space-y-3">
+                            <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Timóteos Ativos</h4>
+                            <template x-for="timoteo in selectedCell.timoteos" :key="timoteo.id">
+                                <div class="flex items-center justify-between p-4 bg-orange-50/30 rounded-2xl border border-orange-100/50 transition-all group gap-2">
+                                    <div class="flex items-center gap-4 min-w-0">
+                                        <div class="w-10 h-10 rounded-xl bg-orange-100 text-orange-700 flex items-center justify-center font-bold flex-shrink-0" x-text="timoteo.name.substring(0, 1)"></div>
+                                        <div class="min-w-0">
+                                            <p class="text-sm font-bold text-gray-900 truncate" x-text="timoteo.name"></p>
+                                            <p class="text-[10px] text-gray-400 truncate" x-text="timoteo.email"></p>
+                                        </div>
                                     </div>
+                                    <form :action="'{{ url('/admin/cells') }}/' + selectedCell.id + '/remove-timoteo'" method="POST" class="flex-shrink-0">
+                                        @csrf
+                                        <input type="hidden" name="user_id" :value="timoteo.id">
+                                        <button type="submit" 
+                                            class="px-3.5 py-2 bg-white text-red-600 border border-red-100 rounded-xl text-[9px] font-black uppercase tracking-wider hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                                            Remover
+                                        </button>
+                                    </form>
                                 </div>
-                                <form :action="'{{ url('/admin/cells') }}/' + selectedCell.id + '/assign-timoteo'" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="user_id" :value="member.id">
-                                    <button type="submit" 
-                                        class="px-4 py-2 bg-white text-orange-600 border border-orange-100 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-orange-600 hover:text-white transition-all shadow-sm">
-                                        Promover
-                                    </button>
-                                </form>
-                            </div>
-                        </template>
-                        <template x-if="selectedCell.members && selectedCell.members.length === 0">
-                            <div class="text-center py-10">
-                                <p class="text-gray-400 italic">Nenhum membro comum nesta célula disponível para promoção.</p>
-                            </div>
-                        </template>
+                            </template>
+                        </div>
+
+                        <!-- Secção: Disponíveis para Promoção -->
+                        <div class="space-y-3">
+                            <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Disponíveis para Promoção</h4>
+                            <template x-for="member in selectedCell.members" :key="member.id">
+                                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-blue-200 transition-all group gap-2">
+                                    <div class="flex items-center gap-4 min-w-0">
+                                        <div class="w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-blue-600 font-bold flex-shrink-0" x-text="member.name.substring(0, 1)"></div>
+                                        <div class="min-w-0">
+                                            <p class="text-sm font-bold text-gray-900 truncate" x-text="member.name"></p>
+                                            <p class="text-[10px] text-gray-400 truncate" x-text="member.email"></p>
+                                        </div>
+                                    </div>
+                                    <form :action="'{{ url('/admin/cells') }}/' + selectedCell.id + '/assign-timoteo'" method="POST" class="flex-shrink-0">
+                                        @csrf
+                                        <input type="hidden" name="user_id" :value="member.id">
+                                        <button type="submit" 
+                                            class="px-3.5 py-2 bg-white text-orange-600 border border-orange-100 rounded-xl text-[9px] font-black uppercase tracking-wider hover:bg-orange-600 hover:text-white transition-all shadow-sm">
+                                            Promover
+                                        </button>
+                                    </form>
+                                </div>
+                            </template>
+                            <template x-if="selectedCell.members && selectedCell.members.length === 0">
+                                <div class="text-center py-6 bg-gray-50 rounded-2xl">
+                                    <p class="text-gray-400 italic text-xs">Nenhum membro comum nesta célula disponível para promoção.</p>
+                                </div>
+                            </template>
+                        </div>
                     </div>
                 </div>
                 

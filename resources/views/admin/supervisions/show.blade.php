@@ -84,17 +84,18 @@
             <div class="lg:col-span-3 space-y-6">
                 <!-- Células da Supervisão -->
                 <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="p-8 md:p-10 flex justify-between items-center border-b border-gray-50">
+                    <div class="p-8 md:p-10 flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-gray-50">
                         <div>
                             <h3 class="text-2xl font-black text-gray-900 tracking-tighter">Unidades de Células</h3>
                             <p class="text-sm font-medium text-gray-400">Distribuição das células sob esta supervisão</p>
                         </div>
                         <a href="{{ route('cells.create') }}?supervision_id={{ $supervision->id }}" 
-                           class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-5 py-3 rounded-2xl flex items-center transition-all font-bold text-sm">
+                           class="w-full sm:w-auto bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-5 py-3 rounded-2xl flex items-center justify-center transition-all font-bold text-sm">
                             <i class="bi bi-plus-lg mr-2"></i> Criar Célula
                         </a>
                     </div>
-                    <div class="overflow-x-auto">
+                    <!-- Desktop Table -->
+                    <div class="overflow-x-auto hidden md:block">
                         <table class="w-full table-compact">
                             <thead>
                                 <tr class="bg-gray-50/50">
@@ -157,6 +158,56 @@
                                 @endforelse
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- Mobile Card Grid -->
+                    <div class="grid grid-cols-1 gap-4 md:hidden p-4">
+                        @forelse($cells as $cell)
+                            <div class="bg-white border border-gray-100 rounded-3xl p-6 space-y-4 hover:shadow-lg transition-shadow">
+                                <div class="flex items-center gap-3.5">
+                                    <div class="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-black text-sm uppercase">
+                                        {{ substr($cell->name, 0, 1) }}
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <h4 class="text-sm font-black text-gray-900 leading-tight truncate">{{ $cell->name }}</h4>
+                                        @if($cell->leader)
+                                            <p class="text-[10px] font-bold text-gray-400 mt-0.5 truncate">Líder: {{ $cell->leader->name }}</p>
+                                        @else
+                                            <p class="text-[10px] font-bold text-gray-300 italic mt-0.5">Sem líder</p>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-3 border-t border-gray-50/80 pt-4">
+                                    <div class="flex-1 space-y-0.5">
+                                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Membros</p>
+                                        <span class="inline-block bg-gray-100 text-gray-600 px-2.5 py-0.5 rounded-full text-[9px] font-black tracking-widest">
+                                            {{ $cell->members()->where('is_active', true)->count() }}
+                                        </span>
+                                    </div>
+                                    <div class="flex-1 space-y-0.5 text-right">
+                                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Contribuição</p>
+                                        <p class="text-sm font-black text-gray-900">{{ number_format($cell->getTotalContributedThisMonth(), 0, ',', '.') }} MT</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex gap-2 border-t border-gray-50/80 pt-4">
+                                    <button @click="transfer({ id: {{ $cell->id }}, name: '{{ $cell->name }}' })"
+                                        class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-center transition-all"
+                                        title="Transferir supervisão">
+                                        <i class="bi bi-arrow-left-right text-lg"></i>
+                                    </button>
+                                    <a href="{{ route('cells.show', $cell) }}"
+                                        class="flex-1 bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-600 h-10 rounded-xl flex items-center justify-center text-[10px] font-black uppercase tracking-widest transition-all">
+                                        <i class="bi bi-chevron-right mr-1.5"></i> Ver Detalhes
+                                    </a>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="bg-white border border-gray-100 rounded-3xl p-12 text-center text-gray-400 font-medium italic">
+                                Nenhuma célula registrada nesta supervisão.
+                            </div>
+                        @endforelse
                     </div>
                     @if($cells->hasPages())
                         <div class="mt-6">

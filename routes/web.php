@@ -150,6 +150,7 @@ Route::middleware('auth')->group(function () {
         // CORREÇÃO CRÍTICA: Mudança de /{user} para /{member}
         Route::post('/bulk-destroy', [UserController::class, 'bulkDestroyFromContext'])->name('members.bulk-destroy');
         Route::get('/{member}', [UserController::class, 'showFromContext'])->name('members.show');
+        Route::post('/{member}/assign-cell', [UserController::class, 'assignMemberToCell'])->name('members.assign-cell');
         Route::get('/{member}/edit', [UserController::class, 'editFromContext'])->name('members.edit');
         Route::put('/{member}', [UserController::class, 'updateFromContext'])->name('members.update');
         Route::delete('/{member}', [UserController::class, 'destroyFromContext'])->name('members.destroy');
@@ -232,6 +233,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/cells/{cell}/conversions', [\App\Http\Controllers\AttendanceController::class, 'storeConversion'])->name('cells.conversions.store');
             Route::post('/cells/{cell}/reassign-supervision', [CellController::class, 'reassignSupervision'])->name('cells.reassign-supervision');
             Route::post('/cells/{cell}/assign-timoteo', [CellController::class, 'assignTimoteo'])->name('cells.assign-timoteo');
+            Route::post('/cells/{cell}/remove-timoteo', [CellController::class, 'removeTimoteo'])->name('cells.remove-timoteo');
             Route::delete('cells/bulk-destroy', [CellController::class, 'bulkDestroy'])->name('cells.bulk-destroy');
             Route::resource('cells', CellController::class);
 

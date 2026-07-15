@@ -736,7 +736,18 @@ class UserController
         $user->update(['observations' => $validated['observations']]);
 
         return back()->with('success', 'Observações atualizadas com sucesso!');
-    }
+     }
+
+     public function assignMemberToCell(Request $request, User $member)
+     {
+         $validated = $request->validate([
+             'cell_id' => 'required|exists:cells,id',
+         ]);
+
+         $member->update(['cell_id' => $validated['cell_id']]);
+
+         return back()->with('success', "Membro {$member->name} foi associado à célula com sucesso!");
+     }
 
     /**
      * Validar se usuário pode criar membro nesta célula
