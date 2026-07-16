@@ -188,7 +188,8 @@ class CellController
                 ->orderBy('meeting_date', 'desc')
                 ->paginate(10)
                 ->withQueryString(),
-            'availableCells' => $availableCells
+            'availableCells' => $availableCells,
+            'visitors' => $cell->visitors()->orderBy('visit_date', 'desc')->get()
         ]);
     }
 

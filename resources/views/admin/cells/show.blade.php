@@ -161,6 +161,11 @@
                         class="px-4 md:px-8 py-2 md:py-3 rounded-xl md:rounded-[1.5rem] text-[10px] md:text-sm font-black uppercase tracking-widest transition-all whitespace-nowrap">
                         Encontros
                     </button>
+                    <button @click="activeTab = 'visitors'"
+                        :class="activeTab === 'visitors' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-gray-500 hover:bg-gray-50'"
+                        class="px-4 md:px-8 py-2 md:py-3 rounded-xl md:rounded-[1.5rem] text-[10px] md:text-sm font-black uppercase tracking-widest transition-all whitespace-nowrap">
+                        Visitas
+                    </button>
                     <button @click="activeTab = 'stats'"
                         :class="activeTab === 'stats' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-gray-500 hover:bg-gray-50'"
                         class="px-4 md:px-8 py-2 md:py-3 rounded-xl md:rounded-[1.5rem] text-[10px] md:text-sm font-black uppercase tracking-widest transition-all whitespace-nowrap">
@@ -477,6 +482,142 @@
                             {{ $meetings->links() }}
                         </div>
                     @endif
+                </div>
+
+                <!-- Tab: Visitors -->
+                <div x-show="activeTab === 'visitors'" x-transition.fade class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-8 md:p-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-gray-50">
+                        <div>
+                            <h3 class="text-2xl font-black text-gray-900 tracking-tighter">Visitas do Culto</h3>
+                            <p class="text-sm font-medium text-gray-400">Visitantes integrados e em acompanhamento nesta célula</p>
+                        </div>
+                    </div>
+
+                    <!-- Desktop Table -->
+                    <div class="overflow-x-auto hidden md:block">
+                        <table class="w-full table-compact">
+                            <thead>
+                                <tr class="bg-gray-50/50">
+                                    <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Visitante</th>
+                                    <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Contacto</th>
+                                    <th class="px-10 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Data da Visita</th>
+                                    <th class="px-10 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Estado</th>
+                                    <th class="px-10 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+                                @forelse($visitors as $visitor)
+                                    <tr class="hover:bg-gray-50/50 transition-colors group">
+                                        <td class="px-10 py-6">
+                                            <div class="flex items-center gap-4">
+                                                <div class="w-10 h-10 rounded-xl bg-orange-50 text-orange-650 flex items-center justify-center font-bold">
+                                                    {{ substr($visitor->name, 0, 1) }}
+                                                </div>
+                                                <div>
+                                                    <p class="text-sm font-bold text-gray-900 leading-tight group-hover:text-orange-650 transition-colors">{{ $visitor->name }}</p>
+                                                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">
+                                                        @if($visitor->age) {{ $visitor->age }} anos @endif
+                                                        @if($visitor->gender) • {{ ucfirst($visitor->gender) }} @endif
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-10 py-6">
+                                            <div class="text-sm font-bold text-gray-800">{{ $visitor->phone ?: 'Sem telefone' }}</div>
+                                            @if($visitor->neighborhood)
+                                                <div class="text-[10px] text-gray-400 font-medium">{{ $visitor->neighborhood }}</div>
+                                            @endif
+                                        </td>
+                                        <td class="px-10 py-6 text-center">
+                                            <span class="text-sm font-bold text-gray-700">
+                                                {{ $visitor->visit_date->format('d/m/Y') }}
+                                            </span>
+                                            <span class="block text-[10px] text-gray-400 font-medium">
+                                                {{ $visitor->visit_date->diffForHumans() }}
+                                            </span>
+                                        </td>
+                                        <td class="px-10 py-6 text-center">
+                                            {!! $visitor->status_badge !!}
+                                        </td>
+                                        <td class="px-10 py-6 text-right">
+                                            <div class="flex justify-end items-center gap-2 opacity-70 hover:opacity-100 transition-all">
+                                                @if($visitor->contact_status !== 'integrado' && auth()->user()->role !== 'secretaria')
+                                                    <a href="{{ route('members.create') }}?visitor_id={{ $visitor->id }}"
+                                                        class="px-4 py-2 bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-sm flex items-center gap-1.5"
+                                                        title="Tornar Membro">
+                                                        <i class="bi bi-person-check-fill"></i> Tornar Membro
+                                                    </a>
+                                                @endif
+                                                <a href="{{ route('visitors.show', $visitor) }}"
+                                                    class="action-icon bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600" title="Ver Acompanhamento">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="px-10 py-16 text-center text-gray-400 font-medium italic">
+                                            Nenhum visitante registrado para esta célula.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Mobile Card Grid -->
+                    <div class="grid grid-cols-1 gap-4 md:hidden p-4">
+                        @forelse($visitors as $visitor)
+                            <div class="bg-white border border-gray-100 rounded-3xl p-6 space-y-4 hover:shadow-lg transition-shadow">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3.5 min-w-0">
+                                        <div class="w-11 h-11 rounded-xl bg-orange-50 text-orange-650 flex items-center justify-center font-black text-sm uppercase flex-shrink-0">
+                                            {{ substr($visitor->name, 0, 1) }}
+                                        </div>
+                                        <div class="min-w-0">
+                                            <h4 class="text-sm font-black text-gray-900 leading-tight truncate">{{ $visitor->name }}</h4>
+                                            <p class="text-[10px] font-bold text-gray-400 mt-0.5 truncate">
+                                                @if($visitor->age) {{ $visitor->age }} anos @endif
+                                                @if($visitor->gender) • {{ ucfirst($visitor->gender) }} @endif
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="flex-shrink-0">
+                                        {!! $visitor->status_badge !!}
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-3 border-t border-gray-50/80 pt-4">
+                                    <div class="flex-1 space-y-0.5">
+                                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Contacto</p>
+                                        <p class="text-xs font-bold text-gray-700">{{ $visitor->phone ?: 'Sem telefone' }}</p>
+                                    </div>
+                                    <div class="flex-1 space-y-0.5 text-right">
+                                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Visita</p>
+                                        <p class="text-xs font-bold text-gray-700">{{ $visitor->visit_date->format('d/m/Y') }}</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex gap-2 border-t border-gray-50/80 pt-4">
+                                    @if($visitor->contact_status !== 'integrado' && auth()->user()->role !== 'secretaria')
+                                        <a href="{{ route('members.create') }}?visitor_id={{ $visitor->id }}"
+                                            class="flex-1 bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white h-10 rounded-xl flex items-center justify-center text-[10px] font-black uppercase tracking-widest transition-all gap-1.5 shadow-sm">
+                                            <i class="bi bi-person-check-fill text-sm"></i> Tornar Membro
+                                        </a>
+                                    @endif
+                                    <a href="{{ route('visitors.show', $visitor) }}"
+                                        class="w-12 h-10 bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-600 rounded-xl flex items-center justify-center transition-all">
+                                        <i class="bi bi-eye text-lg"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="bg-white border border-gray-100 rounded-3xl p-12 text-center text-gray-400 font-medium italic">
+                                Nenhum visitante registrado para esta célula.
+                            </div>
+                        @endforelse
+                    </div>
                 </div>
 
                 <!-- Tab: Stats -->

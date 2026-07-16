@@ -429,6 +429,14 @@ class UserController
             ]);
         }
 
+        // Integrar visitante se aplicável
+        if ($request->filled('visitor_id')) {
+            $visitor = \App\Models\Visitor::find($request->visitor_id);
+            if ($visitor) {
+                $visitor->update(['contact_status' => 'integrado']);
+            }
+        }
+
         // Notificações
         if ($newUser->wantsNotification('member_created')) {
             $newUser->notify(new MemberCreatedNotification($newUser, $plainPassword));

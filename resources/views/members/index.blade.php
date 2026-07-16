@@ -324,7 +324,7 @@
             x-transition:leave-start="opacity-100"
             x-transition:leave-end="opacity-0"
             style="display: none; margin-top:-15px">
-            <div @click.away="showAssignCellModal = false" class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden animate-In">
+            <div @click.away="showAssignCellModal = false" class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-md animate-In">
                 <div class="p-8 border-b border-gray-100 flex justify-between items-center">
                     <div>
                         <h3 class="text-xl font-black text-gray-900 leading-tight">Atribuir Membro a Célula</h3>
@@ -337,7 +337,7 @@
                 
                 <form :action="'{{ url('/members') }}/' + selectedMember.id + '/assign-cell'" method="POST" class="p-8 space-y-6">
                     @csrf
-                    <div class="space-y-2">
+                    <div class="space-y-2 relative z-10">
                         <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Selecione a Célula de Destino</label>
                         <select name="cell_id" required class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all custom-select">
                             <option value="">Escolha uma célula...</option>

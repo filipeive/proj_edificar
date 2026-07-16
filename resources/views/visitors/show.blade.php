@@ -258,15 +258,23 @@
                         <div class="space-y-3">
                             <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Célula</label>
                             @if($visitor->cell)
-                                <div
-                                    class="flex items-center justify-between bg-green-50 p-2.5 rounded-xl border border-green-100">
-                                    <span class="font-bold text-green-700">{{ $visitor->cell->name }}</span>
-                                    @if($visitor->zone && (Auth::user()->isAdmin() || Auth::user()->isSecretaria() || Auth::user()->isPastorZona() || Auth::user()->isSupervisor()))
-                                        <button onclick="document.getElementById('edit-cell-form').classList.toggle('hidden')"
-                                            class="text-green-400 hover:text-green-600">
-                                            <i class="bi bi-pencil-square"></i>
+                                <div class="space-y-2">
+                                    <div
+                                        class="flex items-center justify-between bg-green-50 p-2.5 rounded-xl border border-green-100">
+                                        <span class="font-bold text-green-700">{{ $visitor->cell->name }}</span>
+                                        @if($visitor->zone && (Auth::user()->isAdmin() || Auth::user()->isSecretaria() || Auth::user()->isPastorZona() || Auth::user()->isSupervisor()))
+                                            <button onclick="document.getElementById('edit-cell-form').classList.toggle('hidden')"
+                                                class="text-green-400 hover:text-green-600">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </button>
+                                        @endif
+                                    </div>
+                                    <form method="POST" action="{{ route('visitors.notify-supervisor', $visitor) }}">
+                                        @csrf
+                                        <button type="submit" class="w-full bg-orange-50 hover:bg-orange-600 text-orange-700 hover:text-white px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 border border-orange-200 shadow-sm active:scale-98">
+                                            <i class="bi bi-chat-left-text-fill text-sm"></i> Notificar Liderança
                                         </button>
-                                    @endif
+                                    </form>
                                 </div>
                             @endif
 

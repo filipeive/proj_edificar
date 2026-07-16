@@ -75,6 +75,8 @@
             if (!tooltip) return;
 
             document.addEventListener('mouseover', (e) => {
+                if (window.innerWidth < 768) return;
+
                 const sidebar = document.querySelector('.sidebar-collapsed');
                 if (!sidebar) return;
 

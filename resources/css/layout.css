@@ -641,6 +641,12 @@ form.flex input {
     color: #ffffff !important;
 }
 
+/* TomSelect appends the dropdown to <body> (dropdownParent: 'body'), so it sits
+   outside the modal's stacking context. Raise its z-index above modals (z-[60]). */
+.ts-dropdown {
+    z-index: 9999 !important;
+}
+
 [data-theme="dark"] .hover\:bg-gray-50:hover,
 [data-theme="dark"] .hover\:bg-zinc-50:hover,
 [data-theme="dark"] .hover\:bg-slate-50:hover {

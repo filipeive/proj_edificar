@@ -15,6 +15,7 @@
 
         <form action="{{ route('members.store') }}" method="POST" class="space-y-6">
             @csrf
+            <input type="hidden" name="visitor_id" value="{{ request('visitor_id') }}">
 
             <div class="rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4 text-sm text-blue-800">
                 <p class="font-black uppercase tracking-wider text-[11px] mb-1">Contexto</p>

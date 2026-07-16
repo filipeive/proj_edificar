@@ -299,6 +299,16 @@ class VisitorController extends Controller
         return back()->with('success', 'Visitante atribuído à célula com sucesso!');
     }
 
+    public function manualNotifySupervisor(Visitor $visitor)
+    {
+        $user = Auth::user();
+        $this->ensureCanAccessVisitor($user, $visitor);
+
+        $visitor->notifyAssignment();
+
+        return back()->with('success', 'Supervisor e Pastor de Zona notificados com sucesso via SMS!');
+    }
+
     /**
      * Marcar visitante como contatado
      */
