@@ -99,11 +99,14 @@ class VisitorController extends Controller
         $visitors = $query->paginate(20);
 
         // Estatísticas
+        $statsQuery = Visitor::query();
+        $this->applyManagedZoneScope($statsQuery, $user);
+
         $stats = [
-            'total' => Visitor::count(),
-            'pending' => Visitor::pending()->count(),
-            'contacted' => Visitor::contacted()->count(),
-            'integrated' => Visitor::integrated()->count(),
+            'total' => (clone $statsQuery)->count(),
+            'pending' => (clone $statsQuery)->pending()->count(),
+            'contacted' => (clone $statsQuery)->contacted()->count(),
+            'integrated' => (clone $statsQuery)->integrated()->count(),
         ];
 
         $zones = Zone::orderBy('name')->get();

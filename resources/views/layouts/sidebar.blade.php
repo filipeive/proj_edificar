@@ -142,7 +142,7 @@
                         </a>
                     @endif
 
-                    @if ($authUser && $authUser->hasPermission('menu_visitors'))
+                    @if ($authUser && ($authUser->hasPermission('menu_visitors') || $authUser->isLider()))
                         <a href="{{ route('visitors.index') }}" data-tooltip="Visitantes" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('visitors.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                             <i class="bi bi-person-plus-fill text-xl flex-shrink-0"></i>
                             <span class="sidebar-text ml-4 font-bold tracking-tight">Visitantes</span>
