@@ -17,7 +17,7 @@ class ServiceController extends Controller
     {
         Gate::authorize('viewAny', Service::class);
 
-        $query = Service::with(['preacher', 'offerings.offeringType', 'tithes', 'individualOfferings']);
+        $query = Service::with(['preacher', 'offerings.offeringType', 'tithes', 'individualOfferings', 'zoneParticipations']);
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -413,7 +413,7 @@ class ServiceController extends Controller
     {
         Gate::authorize('view', $service);
 
-        $service->load(['preacher', 'offerings.offeringType', 'tithes', 'individualOfferings']);
+        $service->load(['preacher', 'offerings.offeringType', 'tithes', 'individualOfferings', 'zoneParticipations.zone']);
 
         $pdf = Pdf::loadView('services.pdf', compact('service'));
 
@@ -424,7 +424,7 @@ class ServiceController extends Controller
     {
         Gate::authorize('viewAny', Service::class);
 
-        $query = Service::query();
+        $query = Service::with(['preacher', 'zoneParticipations', 'offerings', 'tithes', 'individualOfferings']);
 
         // Filters applied to both charts and list
         if ($request->filled('date_from')) {

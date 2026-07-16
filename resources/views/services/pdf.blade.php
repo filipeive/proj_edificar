@@ -118,51 +118,157 @@
         <p>Tema: <strong>{{ $service->theme ?? 'Não informado' }}</strong></p>
     </div>
 
-    <div class="section-title" style="font-weight: bold;">Detalhes de Participação</div>
-    <table class="details-table" style="width: 100%;">
-        <tr>
-            <td style="font-weight: bold; width: 140px;">Congregação Geral:</td>
-            <td class="underline-cell" style="width: 80px;">
-                {{ $service->adults_members + $service->adults_visitors + $service->adults_salvations + $service->children_members + $service->children_visitors + $service->children_salvations }}
-            </td>
-            <td style="width: 40px;">&nbsp;</td>
-            <td style="font-weight: bold; text-align: center; width: 100px;">Membros</td>
-            <td style="font-weight: bold; text-align: center; width: 100px;">Visitantes</td>
-            <td style="font-weight: bold; text-align: center; width: 100px;">Salvos</td>
-        </tr>
-        <tr>
-            <td style="font-weight: bold;">Adultos:</td>
-            <td class="underline-cell">
-                {{ $service->adults_members + $service->adults_visitors + $service->adults_salvations }}
-            </td>
-            <td>&nbsp;</td>
-            <td class="underline-cell">
-                {{ $service->adults_members }}
-            </td>
-            <td class="underline-cell">
-                {{ $service->adults_visitors }}
-            </td>
-            <td class="underline-cell">
-                {{ $service->adults_salvations }}
-            </td>
-        </tr>
-        <tr>
-            <td style="font-weight: bold;">Crianças:</td>
-            <td class="underline-cell">
-                {{ $service->children_members + $service->children_visitors + $service->children_salvations }}
-            </td>
-            <td>&nbsp;</td>
-            <td class="underline-cell">
-                {{ $service->children_members }}
-            </td>
-            <td class="underline-cell">
-                {{ $service->children_visitors }}
-            </td>
-            <td class="underline-cell">
-                {{ $service->children_salvations }}
-            </td>
-        </tr>
-    </table>
+    @if($service->service_type === 'teaching')
+        @php
+            $teachingAdultsMembers = $service->zoneParticipations->sum(function ($p) {
+                return $p->adults_members + $p->leaders + $p->auxiliary_leaders + $p->supervisors + $p->zone_pastors;
+            });
+            $teachingAdultsVisitors = $service->zoneParticipations->sum('adults_visitors') + ($service->adults_visitors ?? 0);
+            $teachingAdultsSalvations = $service->adults_salvations ?? 0;
+
+            $teachingChildrenMembers = $service->zoneParticipations->sum('children_members');
+            $teachingChildrenVisitors = $service->zoneParticipations->sum('children_visitors') + ($service->children_visitors ?? 0);
+            $teachingChildrenSalvations = $service->children_salvations ?? 0;
+
+            $teachingTotalAdults = $teachingAdultsMembers + $teachingAdultsVisitors + $teachingAdultsSalvations;
+            $teachingTotalChildren = $teachingChildrenMembers + $teachingChildrenVisitors + $teachingChildrenSalvations;
+            $teachingTotalGeneral = $teachingTotalAdults + $teachingTotalChildren;
+        @endphp
+
+        <div class="section-title" style="font-weight: bold;">Detalhes de Participação (Consolidado)</div>
+        <table class="details-table" style="width: 100%;">
+            <tr>
+                <td style="font-weight: bold; width: 140px;">Congregação Geral:</td>
+                <td class="underline-cell" style="width: 80px;">
+                    {{ $teachingTotalGeneral }}
+                </td>
+                <td style="width: 40px;">&nbsp;</td>
+                <td style="font-weight: bold; text-align: center; width: 100px;">Membros</td>
+                <td style="font-weight: bold; text-align: center; width: 100px;">Visitantes</td>
+                <td style="font-weight: bold; text-align: center; width: 100px;">Salvos</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">Adultos:</td>
+                <td class="underline-cell">
+                    {{ $teachingTotalAdults }}
+                </td>
+                <td>&nbsp;</td>
+                <td class="underline-cell">
+                    {{ $teachingAdultsMembers }}
+                </td>
+                <td class="underline-cell">
+                    {{ $teachingAdultsVisitors }}
+                </td>
+                <td class="underline-cell">
+                    {{ $teachingAdultsSalvations }}
+                </td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">Crianças:</td>
+                <td class="underline-cell">
+                    {{ $teachingTotalChildren }}
+                </td>
+                <td>&nbsp;</td>
+                <td class="underline-cell">
+                    {{ $teachingChildrenMembers }}
+                </td>
+                <td class="underline-cell">
+                    {{ $teachingChildrenVisitors }}
+                </td>
+                <td class="underline-cell">
+                    {{ $teachingChildrenSalvations }}
+                </td>
+            </tr>
+        </table>
+
+        <div class="section-title" style="font-weight: bold; margin-top: 20px;">Participação por Zonas Ministeriais</div>
+        <table class="details-table" style="width: 100%; border-collapse: collapse; margin-top: 5px;">
+            <thead>
+                <tr style="border-bottom: 1.5px solid #000000; font-weight: bold;">
+                    <th style="text-align: left; padding: 4px 0; font-size: 11px;">Zona</th>
+                    <th style="text-align: center; padding: 4px 0; font-size: 11px;">Membros</th>
+                    <th style="text-align: center; padding: 4px 0; font-size: 11px;">Visitantes</th>
+                    <th style="text-align: center; padding: 4px 0; font-size: 11px;">Líderes</th>
+                    <th style="text-align: center; padding: 4px 0; font-size: 11px;">Auxiliares</th>
+                    <th style="text-align: center; padding: 4px 0; font-size: 11px;">Supervisores</th>
+                    <th style="text-align: center; padding: 4px 0; font-size: 11px;">Pastores</th>
+                    <th style="text-align: right; padding: 4px 0; font-size: 11px;">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($service->zoneParticipations as $participation)
+                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                        <td style="text-align: left; padding: 5px 0; font-size: 11px;">{{ $participation->zone->name ?? 'N/A' }}</td>
+                        <td style="text-align: center; padding: 5px 0; font-size: 11px;">{{ $participation->adults_members + $participation->children_members }}</td>
+                        <td style="text-align: center; padding: 5px 0; font-size: 11px;">{{ $participation->adults_visitors + $participation->children_visitors }}</td>
+                        <td style="text-align: center; padding: 5px 0; font-size: 11px;">{{ $participation->leaders }}</td>
+                        <td style="text-align: center; padding: 5px 0; font-size: 11px;">{{ $participation->auxiliary_leaders }}</td>
+                        <td style="text-align: center; padding: 5px 0; font-size: 11px;">{{ $participation->supervisors }}</td>
+                        <td style="text-align: center; padding: 5px 0; font-size: 11px;">{{ $participation->zone_pastors }}</td>
+                        <td style="text-align: right; padding: 5px 0; font-size: 11px; font-weight: bold;">{{ $participation->total }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+            <tfoot>
+                <tr style="border-top: 1.5px solid #000000; font-weight: bold;">
+                    <td style="text-align: left; padding: 6px 0; font-size: 11px;">TOTAIS</td>
+                    <td style="text-align: center; padding: 6px 0; font-size: 11px;">{{ $service->zoneParticipations->sum('adults_members') + $service->zoneParticipations->sum('children_members') }}</td>
+                    <td style="text-align: center; padding: 6px 0; font-size: 11px;">{{ $service->zoneParticipations->sum('adults_visitors') + $service->zoneParticipations->sum('children_visitors') + ($service->adults_visitors ?? 0) + ($service->children_visitors ?? 0) }}</td>
+                    <td style="text-align: center; padding: 6px 0; font-size: 11px;">{{ $service->zoneParticipations->sum('leaders') }}</td>
+                    <td style="text-align: center; padding: 6px 0; font-size: 11px;">{{ $service->zoneParticipations->sum('auxiliary_leaders') }}</td>
+                    <td style="text-align: center; padding: 6px 0; font-size: 11px;">{{ $service->zoneParticipations->sum('supervisors') }}</td>
+                    <td style="text-align: center; padding: 6px 0; font-size: 11px;">{{ $service->zoneParticipations->sum('zone_pastors') }}</td>
+                    <td style="text-align: right; padding: 6px 0; font-size: 11px; font-weight: bold;">{{ $service->total_participation }}</td>
+                </tr>
+            </tfoot>
+        </table>
+    @else
+        <div class="section-title" style="font-weight: bold;">Detalhes de Participação</div>
+        <table class="details-table" style="width: 100%;">
+            <tr>
+                <td style="font-weight: bold; width: 140px;">Congregação Geral:</td>
+                <td class="underline-cell" style="width: 80px;">
+                    {{ $service->adults_members + $service->adults_visitors + $service->adults_salvations + $service->children_members + $service->children_visitors + $service->children_salvations }}
+                </td>
+                <td style="width: 40px;">&nbsp;</td>
+                <td style="font-weight: bold; text-align: center; width: 100px;">Membros</td>
+                <td style="font-weight: bold; text-align: center; width: 100px;">Visitantes</td>
+                <td style="font-weight: bold; text-align: center; width: 100px;">Salvos</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">Adultos:</td>
+                <td class="underline-cell">
+                    {{ $service->adults_members + $service->adults_visitors + $service->adults_salvations }}
+                </td>
+                <td>&nbsp;</td>
+                <td class="underline-cell">
+                    {{ $service->adults_members }}
+                </td>
+                <td class="underline-cell">
+                    {{ $service->adults_visitors }}
+                </td>
+                <td class="underline-cell">
+                    {{ $service->adults_salvations }}
+                </td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">Crianças:</td>
+                <td class="underline-cell">
+                    {{ $service->children_members + $service->children_visitors + $service->children_salvations }}
+                </td>
+                <td>&nbsp;</td>
+                <td class="underline-cell">
+                    {{ $service->children_members }}
+                </td>
+                <td class="underline-cell">
+                    {{ $service->children_visitors }}
+                </td>
+                <td class="underline-cell">
+                    {{ $service->children_salvations }}
+                </td>
+            </tr>
+        </table>
+    @endif
 
     <div class="section-title" style="font-weight: bold; margin-top: 30px;">Ofertas e Dízimos</div>
     <table style="width: 100%; border-collapse: collapse;">

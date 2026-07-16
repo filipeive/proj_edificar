@@ -49,16 +49,36 @@ class ServicesExport implements FromCollection, WithHeadings, WithMapping, WithT
 
     public function map($service): array
     {
+        $isTeaching = $service->service_type === 'teaching';
+
+        $adultsMembers = $isTeaching
+            ? $service->zoneParticipations->sum(function ($p) {
+                return $p->adults_members + $p->leaders + $p->auxiliary_leaders + $p->supervisors + $p->zone_pastors;
+            })
+            : ($service->adults_members ?? 0);
+
+        $adultsVisitors = $isTeaching
+            ? ($service->zoneParticipations->sum('adults_visitors') + ($service->adults_visitors ?? 0))
+            : ($service->adults_visitors ?? 0);
+
+        $childrenMembers = $isTeaching
+            ? $service->zoneParticipations->sum('children_members')
+            : ($service->children_members ?? 0);
+
+        $childrenVisitors = $isTeaching
+            ? ($service->zoneParticipations->sum('children_visitors') + ($service->children_visitors ?? 0))
+            : ($service->children_visitors ?? 0);
+
         return [
             \Carbon\Carbon::parse($service->date)->format('d/m/Y'),
             $this->getServiceTypeLabel($service->service_type),
             $service->theme ?? '-',
             $service->preacher ? $service->preacher->name : ($service->preacher_name ?? '-'),
-            $service->adults_members ?? 0,
-            $service->adults_visitors ?? 0,
+            $adultsMembers,
+            $adultsVisitors,
             $service->adults_salvations ?? 0,
-            $service->children_members ?? 0,
-            $service->children_visitors ?? 0,
+            $childrenMembers,
+            $childrenVisitors,
             $service->children_salvations ?? 0,
             $service->total_participation,
             $service->total_visitors,

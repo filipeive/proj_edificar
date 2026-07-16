@@ -61,6 +61,11 @@
             </div>
             
             <div class="flex flex-wrap items-center gap-3 relative z-10">
+                <a href="{{ route('services.index') }}" class="group flex items-center bg-gray-50 dark:bg-gray-900/30 text-gray-600 dark:text-gray-400 px-8 py-5 rounded-2xl hover:bg-gray-600 hover:text-white dark:hover:bg-gray-600 dark:hover:text-white transition-all font-black text-[11px] uppercase tracking-[0.1em] shadow-lg shadow-gray-600/10 border border-gray-100 dark:border-gray-900/50">
+                    <i class="bi bi-arrow-left-circle text-xl mr-3 group-hover:scale-110 transition-transform"></i>
+                    Voltar
+                </a>
+                
                 <a href="{{ route('services.download-pdf', $service) }}" class="group flex items-center bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-8 py-5 rounded-2xl hover:bg-red-600 hover:text-white dark:hover:bg-red-600 dark:hover:text-white transition-all font-black text-[11px] uppercase tracking-[0.1em] shadow-lg shadow-red-600/10 border border-red-100 dark:border-red-900/50">
                     <i class="bi bi-file-earmark-pdf-fill text-xl mr-3 group-hover:scale-110 transition-transform"></i>
                     Exportar PDF

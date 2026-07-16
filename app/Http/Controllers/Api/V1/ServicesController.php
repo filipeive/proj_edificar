@@ -15,7 +15,7 @@ class ServicesController extends BaseApiController
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Service::query()->with('preacher');
+        $query = Service::query()->with(['preacher', 'zoneParticipations.zone']);
 
         if ($request->filled('service_type')) {
             $query->where('service_type', $request->service_type);
@@ -66,7 +66,7 @@ class ServicesController extends BaseApiController
         ]);
 
         $service = Service::create($validated);
-
+        $service->load(['preacher', 'zoneParticipations.zone']);
         return $this->sendResponse(new ServiceResource($service), 'Culto cadastrado com sucesso.', [], 201);
     }
 
@@ -75,7 +75,7 @@ class ServicesController extends BaseApiController
      */
     public function show(Service $service): JsonResponse
     {
-        $service->load('preacher');
+        $service->load(['preacher', 'zoneParticipations.zone']);
         return $this->sendResponse(new ServiceResource($service), 'Dados do culto carregados.');
     }
 
@@ -102,7 +102,7 @@ class ServicesController extends BaseApiController
         ]);
 
         $service->update($validated);
-
+        $service->load(['preacher', 'zoneParticipations.zone']);
         return $this->sendResponse(new ServiceResource($service), 'Dados do culto atualizados com sucesso.');
     }
 

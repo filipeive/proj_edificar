@@ -460,7 +460,7 @@
                                         @forelse($paginatedServices as $service)
                                             @php
                                                 $salvations = ($service->adults_salvations ?? 0) + ($service->children_salvations ?? 0);
-                                                $totalFinancial = ($service->offerings_sum_amount ?? 0) + ($service->tithes_sum_amount ?? 0);
+                                                $totalFinancial = $service->total_financial;
                                             @endphp
                                             <tr class="hover:bg-gray-50/80 dark:hover:bg-gray-800/50 transition-colors group">
                                                 <td class="px-8 py-6">

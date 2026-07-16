@@ -101,3 +101,11 @@
   - **Correção de Sidebar:** Habilitação do menu "Visitantes" para o líder e ocultação da secção "Formulários Públicos" (Inscrição Pré-Marital e Relatório Trimestral) para líderes e membros.
   - **Restrição de Edição de Si Mesmo:** Ocultação de botões de edição de si mesmo na gestão de membros e bloqueio no backend (403), permitindo apenas a visualização.
 - **Benefício:** Maior consistência de permissões e segurança operacional, evitando a autodegradação de cargos ou reatribuições acidentais de célula.
+
+### ME-07: Integração de Cultos de Ensino por Zonas (Mapeamento & Relatórios) ✔️
+- **Ficheiros alterados:** `app/Exports/ServicesExport.php`, `app/Http/Controllers/Api/V1/ServicesController.php`, `app/Http/Controllers/ServiceController.php`, `app/Http/Resources/ServiceResource.php`, `resources/views/services/create-teaching.blade.php`, `resources/views/services/edit-teaching.blade.php`, `resources/views/services/pdf.blade.php`, `resources/views/services/report.blade.php`, `resources/views/services/show.blade.php`
+- **Alterações:**
+  - **Estatísticas Dinâmicas no API Resource:** O `ServiceResource` foi ajustado para somar os valores das participações de zonas ministeriais (`zoneParticipations`) quando o tipo de culto for `teaching` (Ensino/Doutrina), calculando dinamicamente membros de adultos, visitantes de adultos, membros de crianças e visitantes de crianças.
+  - **Exportação & Relatórios Consolidados:** Integração dos cálculos dinâmicos por zonas em `ServicesExport` e carregamento das relações de zonas nos controllers.
+  - **Geração de PDF de Culto de Ensino:** Refatoração completa do layout do PDF de culto de ensino para listar e somar com rigor as participações das diferentes zonas em formato tabular com totais.
+- **Benefício:** Relatórios e exportações de dados qualitativos e quantitativos fiéis ao modelo de participação por Zonas Ministeriais nos cultos de doutrina/ensino.

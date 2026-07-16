@@ -290,6 +290,27 @@ Todas as respostas seguem uma estrutura padrão definida em `BaseApiController`:
 }
 ```
 
+* **Nota sobre Cultos de Ensino/Doutrina (`service_type: "teaching"`):**
+  Os campos de estatísticas (`adults_members`, `adults_visitors`, `children_members` e `children_visitors`) são calculados dinamicamente no backend a partir da soma de todas as participações das zonas ministeriais (`zone_participations`). Para além disso, a resposta do recurso inclui a chave `zone_participations` com o seguinte formato:
+  ```json
+  "zone_participations": [
+    {
+      "id": 1,
+      "zone_id": 2,
+      "zone_name": "Zona A",
+      "adults_members": 10,
+      "adults_visitors": 2,
+      "leaders": 3,
+      "supervisors": 1,
+      "auxiliary_leaders": 2,
+      "zone_pastors": 1,
+      "children_members": 5,
+      "children_visitors": 1,
+      "total": 25
+    }
+  ]
+  ```
+
 ---
 
 ## 16. Pacotes de Compromisso (Packages)

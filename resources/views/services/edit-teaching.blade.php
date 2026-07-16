@@ -402,7 +402,7 @@
                             <i class="bi bi-people text-blue-600"></i>
                             Contribuições Individuais
                         </h2>
-                        <button type="button" @click="addContribution()" id="addContributionBtn"
+                        <button type="button" id="addContributionBtn"
                             class="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl font-bold text-xs hover:bg-blue-600 hover:text-white transition-all flex items-center gap-2">
                             <i class="bi bi-plus-lg"></i> Adicionar
                         </button>
@@ -544,74 +544,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // ----- Zone Participation (Teaching) Logic -----
-            function updateZoneParticipation() {
-                let totalMembers = 0;
-                let totalVisitors = 0;
-                let totalLeaders = 0;
-                let totalAuxLeaders = 0;
-                let totalSupervisors = 0;
-                let totalPastors = 0;
-                let totalChildren = 0;
-
-                document.querySelectorAll('.group').forEach(row => {
-                    const membersInput = row.querySelector('input[name*="adults_members"]');
-                    const visitorsInput = row.querySelector('input[name*="adults_visitors"]');
-                    const leadersInput = row.querySelector('input[name*="leaders"]');
-                    const auxLeadersInput = row.querySelector('input[name*="auxiliary_leaders"]');
-                    const supervisorsInput = row.querySelector('input[name*="supervisors"]');
-                    const pastorsInput = row.querySelector('input[name*="zone_pastors"]');
-                    const childrenMembersInput = row.querySelector('input[name*="children_members"]');
-                    const childrenVisitorsInput = row.querySelector('input[name*="children_visitors"]');
-                    const rowTotalDisplay = row.querySelector('.zone-row-total');
-
-                    if (rowTotalDisplay) {
-                        const members = parseInt(membersInput?.value) || 0;
-                        const visitors = parseInt(visitorsInput?.value) || 0;
-                        const leaders = parseInt(leadersInput?.value) || 0;
-                        const auxLeaders = parseInt(auxLeadersInput?.value) || 0;
-                        const supervisors = parseInt(supervisorsInput?.value) || 0;
-                        const pastors = parseInt(pastorsInput?.value) || 0;
-                        const childMembers = parseInt(childrenMembersInput?.value) || 0;
-                        const childVisitors = parseInt(childrenVisitorsInput?.value) || 0;
-                        
-                        const rowTotal = members + visitors + leaders + auxLeaders + supervisors + pastors + childMembers + childVisitors;
-
-                        totalMembers += members;
-                        totalVisitors += visitors;
-                        totalLeaders += leaders;
-                        totalAuxLeaders += auxLeaders;
-                        totalSupervisors += supervisors;
-                        totalPastors += pastors;
-                        totalChildren += (childMembers + childVisitors);
-                        
-                        rowTotalDisplay.innerText = rowTotal;
-                    }
-                });
-
-                // Add general visitors
-                const generalAdultsBtn = document.querySelector('input[name="adults_visitors"]');
-                const generalChildrenBtn = document.querySelector('input[name="children_visitors"]');
-                const genVisAdults = parseInt(generalAdultsBtn?.value) || 0;
-                const genVisChildren = parseInt(generalChildrenBtn?.value) || 0;
-
-                totalVisitors += genVisAdults;
-                totalChildren += genVisChildren;
-
-                document.getElementById('total_teaching_members').innerText = totalMembers;
-                document.getElementById('total_teaching_visitors').innerText = totalVisitors + totalChildren;
-                document.getElementById('total_teaching_leaders').innerText = totalLeaders;
-                document.getElementById('total_teaching_aux_leaders').innerText = totalAuxLeaders;
-                document.getElementById('total_teaching_supervisors').innerText = totalSupervisors;
-                document.getElementById('total_teaching_pastors').innerText = totalPastors;
-                document.getElementById('total_teaching_grand').innerText = totalMembers + totalVisitors + totalChildren + totalLeaders + totalAuxLeaders + totalSupervisors + totalPastors;
-            }
-
-            document.querySelectorAll('.zone-participation-input, input[name="adults_visitors"], input[name="children_visitors"]').forEach(input => {
-                input.addEventListener('input', updateZoneParticipation);
-            });
-            updateZoneParticipation(); // Initial call
-
             // ----- Financial Logic -----
             const contributionsContainer = document.getElementById('contributionsContainer');
             const contributionTemplate = document.getElementById('contributionRowTemplate');
@@ -625,6 +557,7 @@
                 row.querySelectorAll('input, select').forEach(el => {
                     el.name = el.name.replace('INDEX', contributionIndex);
                     el.addEventListener('input', updateFinancials);
+                    el.addEventListener('change', updateFinancials);
                 });
 
                 row.querySelector('.remove-contribution').addEventListener('click', () => {
@@ -642,6 +575,7 @@
             document.querySelectorAll('.contribution-row').forEach(row => {
                 row.querySelectorAll('input, select').forEach(el => {
                     el.addEventListener('input', updateFinancials);
+                    el.addEventListener('change', updateFinancials);
                 });
                 row.querySelector('.remove-contribution').addEventListener('click', () => {
                     row.remove();
