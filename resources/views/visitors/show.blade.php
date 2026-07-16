@@ -319,7 +319,7 @@
                                             </button>
                                         @endif
                                     </div>
-                                    @if($visitor->contact_status !== 'integrado')
+                                    @if($visitor->contact_status !== 'integrado' && in_array(Auth::user()->role, ['super_admin', 'admin', 'pastor_senior', 'pastor', 'secretaria']))
                                         <form method="POST" action="{{ route('visitors.notify-supervisor', $visitor) }}">
                                             @csrf
                                             <button type="submit" class="w-full bg-orange-50 hover:bg-orange-600 text-orange-700 hover:text-white px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 border border-orange-200 shadow-sm active:scale-98">
