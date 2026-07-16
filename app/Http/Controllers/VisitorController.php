@@ -188,8 +188,8 @@ class VisitorController extends Controller
     public function edit(Visitor $visitor)
     {
         $user = Auth::user();
-        if ($user->isSupervisor() && !$user->isAdmin()) {
-            abort(403, 'Supervisores não podem editar visitantes.');
+        if (!in_array($user->role, ['super_admin', 'admin', 'secretaria', 'pastor_senior', 'pastor', 'pastor_zona'])) {
+            abort(403, 'Você não tem permissão para editar visitantes.');
         }
 
         $zonesQuery = Zone::orderBy('name');
@@ -215,8 +215,8 @@ class VisitorController extends Controller
     {
         $user = Auth::user();
         $this->ensureCanAccessVisitor($user, $visitor);
-        if ($user->isSupervisor() && !$user->isAdmin()) {
-            abort(403, 'Supervisores não podem editar visitantes.');
+        if (!in_array($user->role, ['super_admin', 'admin', 'secretaria', 'pastor_senior', 'pastor', 'pastor_zona'])) {
+            abort(403, 'Você não tem permissão para editar visitantes.');
         }
 
         $validated = $request->validate([
@@ -249,8 +249,8 @@ class VisitorController extends Controller
     {
         $user = Auth::user();
         $this->ensureCanAccessVisitor($user, $visitor);
-        if ($user->isSupervisor() && !$user->isAdmin()) {
-            abort(403, 'Supervisores não podem eliminar visitantes.');
+        if (!in_array($user->role, ['super_admin', 'admin', 'secretaria', 'pastor_senior', 'pastor', 'pastor_zona'])) {
+            abort(403, 'Você não tem permissão para remover visitantes.');
         }
         $visitor->delete();
 

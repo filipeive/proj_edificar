@@ -323,7 +323,7 @@
                                 class="flex-1 bg-gray-900 dark:bg-black text-white text-center py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition-all shadow-lg hover:shadow-blue-200 active:scale-95 flex items-center justify-center gap-2">
                                 <i class="bi bi-eye"></i> Ver
                             </a>
-                            @if(!auth()->user()->isSupervisor())
+                            @if(in_array(auth()->user()->role, ['super_admin', 'admin', 'secretaria', 'pastor_senior', 'pastor', 'pastor_zona']))
                                 <a href="{{ route('visitors.edit', $visitor) }}"
                                     class="flex-1 bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-300 text-center py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2">
                                     <i class="bi bi-pencil"></i> Editar
@@ -434,7 +434,7 @@
                                                 title="Ver detalhes">
                                                 <i class="bi bi-eye-fill"></i>
                                             </a>
-                                            @if(!auth()->user()->isSupervisor())
+                                            @if(in_array(auth()->user()->role, ['super_admin', 'admin', 'secretaria', 'pastor_senior', 'pastor', 'pastor_zona']))
                                                 <a href="{{ route('visitors.edit', $visitor) }}"
                                                     class="action-icon text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 hover:bg-orange-50 dark:hover:bg-gray-700"
                                                     title="Editar">

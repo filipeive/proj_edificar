@@ -65,7 +65,7 @@
                         </button>
                     </form>
                 @endif
-                @if(!Auth::user()->isSupervisor())
+                @if(in_array(Auth::user()->role, ['super_admin', 'admin', 'secretaria', 'pastor_senior', 'pastor', 'pastor_zona']))
                     <a href="{{ route('visitors.edit', $visitor) }}"
                         class="flex items-center bg-orange-50 text-orange-600 px-5 py-3 rounded-xl hover:bg-orange-600 hover:text-white transition-all font-black text-xs uppercase tracking-widest shadow-sm">
                         <i class="bi bi-pencil-square text-lg mr-2"></i>
