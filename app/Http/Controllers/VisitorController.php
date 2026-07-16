@@ -12,11 +12,16 @@ class VisitorController extends Controller
 {
     private function shouldScopeByManagedZones($user): bool
     {
-        return ($user->isPastorZona() || $user->isSupervisor()) && !$user->isAdmin();
+        return ($user->isPastorZona() || $user->isSupervisor() || $user->isLider()) && !$user->isAdmin();
     }
 
     private function getScopedZoneAndCellIds($user): array
     {
+        if ($user->isLider()) {
+            $cellIds = Cell::where('leader_id', $user->id)->pluck('id');
+            return [collect(), $cellIds];
+        }
+
         $managedZoneIds = $user->getManagedZoneIds();
         $cellIds = Cell::whereHas('supervision', function ($q) use ($managedZoneIds) {
             $q->whereIn('zone_id', $managedZoneIds);

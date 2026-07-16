@@ -30,6 +30,10 @@
             showTransferModal: false,
             showObsModal: false,
             selectedMember: {},
+            showFeedbackModal: false,
+            feedbackVisitorId: null,
+            feedbackStatus: '',
+            feedbackNotes: '',
             transfer(member) {
                 this.selectedMember = member;
                 this.showTransferModal = true;
@@ -37,6 +41,12 @@
             openObs(member) {
                 this.selectedMember = member;
                 this.showObsModal = true;
+            },
+            openFeedback(id, status, notes) {
+                this.feedbackVisitorId = id;
+                this.feedbackStatus = status;
+                this.feedbackNotes = notes || '';
+                this.showFeedbackModal = true;
             }
         }" x-init="$watch('activeTab', value => localStorage.setItem('cell_active_tab', value))">
         <!-- Header & Stats Grid -->
@@ -548,6 +558,15 @@
                                                         <i class="bi bi-person-check-fill"></i> Tornar Membro
                                                     </a>
                                                 @endif
+                                                @if(auth()->user()->role !== 'secretaria')
+                                                    <button @click="openFeedback($el.dataset.id, $el.dataset.status, $el.dataset.notes)"
+                                                        data-id="{{ $visitor->id }}"
+                                                        data-status="{{ $visitor->contact_status }}"
+                                                        data-notes="{{ $visitor->notes }}"
+                                                        class="action-icon bg-gray-50 text-gray-400 hover:bg-orange-50 hover:text-orange-600" title="Registar Feedback">
+                                                        <i class="bi bi-chat-text"></i>
+                                                    </button>
+                                                @endif
                                                 <a href="{{ route('visitors.show', $visitor) }}"
                                                     class="action-icon bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600" title="Ver Acompanhamento">
                                                     <i class="bi bi-eye"></i>
@@ -605,6 +624,16 @@
                                             class="flex-1 bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white h-10 rounded-xl flex items-center justify-center text-[10px] font-black uppercase tracking-widest transition-all gap-1.5 shadow-sm">
                                             <i class="bi bi-person-check-fill text-sm"></i> Tornar Membro
                                         </a>
+                                    @endif
+                                    @if(auth()->user()->role !== 'secretaria')
+                                        <button @click="openFeedback($el.dataset.id, $el.dataset.status, $el.dataset.notes)"
+                                            data-id="{{ $visitor->id }}"
+                                            data-status="{{ $visitor->contact_status }}"
+                                            data-notes="{{ $visitor->notes }}"
+                                            class="w-12 h-10 bg-gray-50 text-gray-500 hover:bg-orange-50 hover:text-orange-650 rounded-xl flex items-center justify-center transition-all"
+                                            title="Registar Feedback">
+                                            <i class="bi bi-chat-text text-lg"></i>
+                                        </button>
                                     @endif
                                     <a href="{{ route('visitors.show', $visitor) }}"
                                         class="w-12 h-10 bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-600 rounded-xl flex items-center justify-center transition-all">
@@ -751,6 +780,44 @@
                     <div class="flex gap-3 pt-4">
                         <button type="button" @click="showObsModal = false" class="flex-1 px-6 py-4 rounded-2xl bg-gray-50 text-gray-500 font-black text-xs uppercase tracking-widest hover:bg-gray-100 transition-all">Cancelar</button>
                         <button type="submit" class="flex-1 px-6 py-4 rounded-2xl bg-green-600 text-white font-black text-xs uppercase tracking-widest hover:bg-green-700 transition-all shadow-lg shadow-green-200">Salvar Notas</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Visitor Feedback Modal -->
+        <div x-show="showFeedbackModal" 
+            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            style="display: none;">
+            <div @click.away="showFeedbackModal = false" class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-hidden animate-In">
+                <div class="p-8 border-b border-gray-100">
+                    <h3 class="text-xl font-black text-gray-900 leading-tight">Registrar Feedback da Visita</h3>
+                    <p class="text-sm text-gray-500 mt-1">Atualize o estado do contacto e observações de acompanhamento</p>
+                </div>
+                <form :action="'{{ url('/visitors') }}/' + feedbackVisitorId + '/update-feedback'" method="POST" class="p-8 space-y-6">
+                    @csrf
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Estado do Contacto</label>
+                        <select name="contact_status" x-model="feedbackStatus" required class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-orange-100 rounded-2xl text-sm font-bold transition-all appearance-none custom-select">
+                            <option value="pendente">Pendente (Não contactado)</option>
+                            <option value="contatado">Contatado (Em Acompanhamento)</option>
+                            <option value="sem_interesse">Sem Interesse</option>
+                            <option value="integrado">Integrado (Já é Membro)</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Notas / Histórico de Conversa</label>
+                        <textarea name="notes" x-model="feedbackNotes" rows="5" class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-orange-100 rounded-2xl text-sm font-medium transition-all placeholder:text-gray-300" placeholder="Escreva aqui detalhes sobre o contacto realizado..."></textarea>
+                    </div>
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" @click="showFeedbackModal = false" class="flex-1 px-6 py-4 rounded-2xl bg-gray-50 text-gray-500 font-black text-xs uppercase tracking-widest hover:bg-gray-100 transition-all">Cancelar</button>
+                        <button type="submit" class="flex-1 px-6 py-4 rounded-2xl bg-orange-600 text-white font-black text-xs uppercase tracking-widest hover:bg-orange-700 transition-all shadow-lg shadow-orange-200">Salvar Feedback</button>
                     </div>
                 </form>
             </div>

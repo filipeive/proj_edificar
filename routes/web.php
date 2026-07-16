@@ -156,8 +156,8 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{member}', [UserController::class, 'destroyFromContext'])->name('members.destroy');
     });
 
-    // Visitantes (Admin, Secretaria, Pastor de Zona, Supervisor)
-    Route::middleware('role:super_admin,admin,secretaria,pastor_zona,supervisor,administracao')->prefix('visitors')->name('visitors.')->group(function () {
+    // Visitantes (Admin, Secretaria, Pastor de Zona, Supervisor, Lider de Celula)
+    Route::middleware('role:super_admin,admin,secretaria,pastor_zona,supervisor,administracao,lider_celula')->prefix('visitors')->name('visitors.')->group(function () {
         Route::get('/', [\App\Http\Controllers\VisitorController::class, 'index'])->name('index');
 
         Route::get('/export', [\App\Http\Controllers\VisitorController::class, 'export'])->name('export');
