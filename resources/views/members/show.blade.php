@@ -6,7 +6,7 @@
 
 @section('header-actions')
     <div class="flex items-center gap-2 md:hidden">
-        @if($userRole !== 'secretaria')
+        @if($userRole !== 'secretaria' && $member->id !== auth()->user()->id)
             <a href="{{ route('members.edit', $member) }}"
                 class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
                 title="Editar perfil">
@@ -72,7 +72,7 @@
 
             <!-- Action Card (Hidden on Mobile) -->
             <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col justify-center gap-3 hidden md:flex">
-                @if($userRole !== 'secretaria')
+                @if($userRole !== 'secretaria' && $member->id !== auth()->user()->id)
                 <a href="{{ route('members.edit', $member) }}" class="w-full py-4 bg-gray-50 text-gray-500 rounded-2xl hover:bg-gray-100 transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2">
                     <i class="bi bi-pencil-square"></i> Editar Perfil
                 </a>

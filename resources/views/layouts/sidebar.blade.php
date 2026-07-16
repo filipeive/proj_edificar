@@ -117,7 +117,7 @@
 
         @foreach($order as $sectionName)
             @if($sectionName === 'operacao')
-                @if ($authUser && ($authUser->isAdmin() || $authUser->isSecretaria() || $authUser->isPastor() || $authUser->isPastorZona() || $authUser->isSupervisor() || $authUser->isAdministracao()))
+                @if ($authUser && ($authUser->isAdmin() || $authUser->isSecretaria() || $authUser->isPastor() || $authUser->isPastorZona() || $authUser->isSupervisor() || $authUser->isAdministracao() || $authUser->isLider()))
                     <!-- OPERAÇÃO ECLESIÁSTICA -->
                     <div class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-2">Operação Eclesiástica</div>
 
@@ -225,7 +225,7 @@
                     @if ($authUser && $authUser->isLider() && $authUser->isLiderOfAnyCell())
                         <a href="{{ route('cells.attendance', $authUser->getFirstLedCell()) }}" data-tooltip="Ficha Guia" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('cells.attendance') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                             <i class="bi bi-calendar-check-fill text-xl flex-shrink-0"></i>
-                            <span class="sidebar-text ml-4 font-bold tracking-tight">Ficha Guia</span>
+                            <span class="sidebar-text ml-4 font-bold tracking-tight">Ficha de Célula</span>
                         </a>
                     @endif
 
@@ -383,7 +383,7 @@
         </a>
 
         <!-- FORMULÁRIOS PÚBLICOS -->
-        @if($authUser && !$authUser->isAdministracao() && !$authUser->isSupervisor())
+        @if($authUser && !$authUser->isAdministracao() && !$authUser->isSupervisor() && !$authUser->isLider() && $authUser->role !== 'membro')
         <div class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-2 mt-4">Formulários Públicos</div>
         <div class="space-y-1">
             <a href="{{ route('public.forms.pre-marital') }}" data-tooltip="Inscrição Pré-Marital"

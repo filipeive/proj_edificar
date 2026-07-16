@@ -498,8 +498,8 @@
                 <div x-show="activeTab === 'visitors'" x-transition.fade class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
                     <div class="p-8 md:p-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-gray-50">
                         <div>
-                            <h3 class="text-2xl font-black text-gray-900 tracking-tighter">Visitas do Culto</h3>
-                            <p class="text-sm font-medium text-gray-400">Visitantes integrados e em acompanhamento nesta célula</p>
+                            <h3 class="text-2xl font-black text-gray-900 tracking-tighter">Visitas na Célula</h3>
+                            <p class="text-sm font-medium text-gray-400">Todos os visitantes associados a esta célula</p>
                         </div>
                     </div>
 
@@ -551,7 +551,7 @@
                                         </td>
                                         <td class="px-10 py-6 text-right">
                                             <div class="flex justify-end items-center gap-2 opacity-70 hover:opacity-100 transition-all">
-                                                @if($visitor->contact_status !== 'integrado' && auth()->user()->role !== 'secretaria')
+                                                @if(in_array($visitor->contact_status, ['pendente', 'contatado']) && auth()->user()->role !== 'secretaria')
                                                     <a href="{{ route('members.create') }}?visitor_id={{ $visitor->id }}"
                                                         class="px-4 py-2 bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-sm flex items-center gap-1.5"
                                                         title="Tornar Membro">
@@ -619,7 +619,7 @@
                                 </div>
 
                                 <div class="flex gap-2 border-t border-gray-50/80 pt-4">
-                                    @if($visitor->contact_status !== 'integrado' && auth()->user()->role !== 'secretaria')
+                                    @if(in_array($visitor->contact_status, ['pendente', 'contatado']) && auth()->user()->role !== 'secretaria')
                                         <a href="{{ route('members.create') }}?visitor_id={{ $visitor->id }}"
                                             class="flex-1 bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white h-10 rounded-xl flex items-center justify-center text-[10px] font-black uppercase tracking-widest transition-all gap-1.5 shadow-sm">
                                             <i class="bi bi-person-check-fill text-sm"></i> Tornar Membro

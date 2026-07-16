@@ -357,7 +357,7 @@ class UserController
                     'cell_id' => $visitor->cell_id,
                 ];
                 if (!$selectedCell && $visitor->cell_id) {
-                    $selectedCell = \App\Models\Cell::find($visitor->cell_id);
+                    $selectedCell = Cell::find($visitor->cell_id);
                 }
             }
         }
@@ -481,6 +481,10 @@ class UserController
             abort(403, 'Acesso de leitura apenas.');
         }
 
+        if ($user->id === $member->id) {
+            abort(403, 'Não é permitido editar o seu próprio perfil a partir da área de membros. Utilize as configurações de perfil.');
+        }
+
         // Validar se pode editar este membro
         $this->validateMemberAccess($user, $member);
 
@@ -511,6 +515,10 @@ class UserController
 
         if ($user->role === 'secretaria') {
             abort(403, 'Acesso de leitura apenas.');
+        }
+
+        if ($user->id === $member->id) {
+            abort(403, 'Não é permitido editar o seu próprio perfil a partir da área de membros. Utilize as configurações de perfil.');
         }
 
         // Validar se pode editar
@@ -544,6 +552,10 @@ class UserController
 
         if ($user->role === 'secretaria') {
             abort(403, 'Acesso de leitura apenas.');
+        }
+
+        if ($user->id === $member->id) {
+            abort(403, 'Não é permitido remover ou alterar o seu próprio perfil a partir da área de membros.');
         }
 
         // Validar se pode deletar
@@ -748,6 +760,10 @@ class UserController
 
      public function assignMemberToCell(Request $request, User $member)
      {
+         $user = auth()->user();
+         if ($user->id === $member->id) {
+             abort(403, 'Não é permitido alterar a sua própria célula a partir da área de membros.');
+         }
          $validated = $request->validate([
              'cell_id' => 'required|exists:cells,id',
          ]);

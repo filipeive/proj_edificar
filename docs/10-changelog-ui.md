@@ -90,3 +90,14 @@
   - **Gestão de Timóteos:** Extensão do modal "Escolher Novo Timóteo" (agora "Gestão de Timóteos") para permitir tanto a promoção a Timóteo como a remoção imediata desta função na listagem de células.
   - **Atribuição de Células:** Adicionado botão verde com ícone de grupo e modal "Atribuir Célula" na listagem de membros para utilizadores sem célula associada, permitindo a sua atribuição rápida.
 - **Benefício:** Acessibilidade, consistência e capacidade de gestão completa a partir de dispositivos móveis.
+
+## [2026-07-16] — Ciclo 3: Gestão de Visitas, Acompanhamento e Permissões do Líder
+
+### ME-06: Acompanhamento de Visitantes e Ajustes de UI/UX do Líder ✔️
+- **Ficheiros alterados:** `resources/views/admin/cells/show.blade.php`, `app/Http/Controllers/VisitorController.php`, `routes/web.php`, `resources/views/layouts/sidebar.blade.php`, `app/Http/Controllers/Admin/UserController.php`, `resources/views/members/index.blade.php`, `resources/views/members/show.blade.php`
+- **Alterações:**
+  - **Acompanhamento & Feedback de Visitantes:** Adicionado botão de feedback (ícone de chat) e modal interativo para registo de estado de contacto e notas de visitas na célula, com rotas e permissões de acesso associadas aos líderes de célula (`lider_celula`).
+  - **Ocultação de Ações Inconsistentes:** O botão "Tornar Membro" para visitantes com status "Sem Interesse" foi removido da listagem.
+  - **Correção de Sidebar:** Habilitação do menu "Visitantes" para o líder e ocultação da secção "Formulários Públicos" (Inscrição Pré-Marital e Relatório Trimestral) para líderes e membros.
+  - **Restrição de Edição de Si Mesmo:** Ocultação de botões de edição de si mesmo na gestão de membros e bloqueio no backend (403), permitindo apenas a visualização.
+- **Benefício:** Maior consistência de permissões e segurança operacional, evitando a autodegradação de cargos ou reatribuições acidentais de célula.
