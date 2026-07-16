@@ -173,6 +173,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/{visitor}/assign-zone', [\App\Http\Controllers\VisitorController::class, 'assignToZone'])->name('assign-zone');
         Route::post('/{visitor}/assign-cell', [\App\Http\Controllers\VisitorController::class, 'assignToCell'])->name('assign-cell');
         Route::post('/{visitor}/notify-supervisor', [\App\Http\Controllers\VisitorController::class, 'manualNotifySupervisor'])->name('notify-supervisor');
+        Route::post('/{visitor}/update-feedback', [\App\Http\Controllers\VisitorController::class, 'updateFeedback'])->name('update-feedback');
         Route::post('/{visitor}/mark-contacted', [\App\Http\Controllers\VisitorController::class, 'markAsContacted'])->name('mark-contacted');
     });
 

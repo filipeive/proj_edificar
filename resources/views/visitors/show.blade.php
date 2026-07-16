@@ -178,6 +178,56 @@
                         </div>
                     @endif
                 </div>
+
+                <!-- Registrar Acompanhamento -->
+                @if(Auth::user()->role !== 'secretaria')
+                    <div class="mt-6 bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="p-6 border-b border-gray-50 bg-gray-50/30 flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-lg bg-orange-100 text-orange-650 flex items-center justify-center text-xl">
+                                <i class="bi bi-chat-text"></i>
+                            </div>
+                            <h3 class="text-base font-black text-gray-900">Registrar Acompanhamento / Feedback</h3>
+                        </div>
+                        <form method="POST" action="{{ route('visitors.update-feedback', $visitor) }}" class="p-6 space-y-4">
+                            @csrf
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Estado do Contacto</label>
+                                    <select name="contact_status" required
+                                        class="w-full px-3.5 py-2.5 bg-gray-50 border-transparent focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 rounded-xl text-sm font-bold text-gray-700 transition-all">
+                                        <option value="pendente" {{ $visitor->contact_status === 'pendente' ? 'selected' : '' }}>Pendente (Não contactado)</option>
+                                        <option value="contatado" {{ $visitor->contact_status === 'contatado' ? 'selected' : '' }}>Contatado (Em Acompanhamento)</option>
+                                        <option value="sem_interesse" {{ $visitor->contact_status === 'sem_interesse' ? 'selected' : '' }}>Sem Interesse</option>
+                                        <option value="integrado" {{ $visitor->contact_status === 'integrado' ? 'selected' : '' }}>Integrado (Já é Membro)</option>
+                                    </select>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Último Contacto</label>
+                                    <div class="px-3.5 py-2.5 bg-gray-50 rounded-xl text-sm font-bold text-gray-500 border border-transparent">
+                                        @if($visitor->contacted_at)
+                                            {{ $visitor->contacted_at->format('d/m/Y H:i') }}
+                                            @if($visitor->contactedBy)
+                                                (por {{ $visitor->contactedBy->name }})
+                                            @endif
+                                        @else
+                                            Nenhum contacto registrado
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Notas / Histórico de Conversa</label>
+                                <textarea name="notes" rows="4" placeholder="Escreva aqui detalhes sobre o contacto realizado (ex: ligou mas estava ocupado, pediu para re-ligar no sábado, sem interesse, etc.)..."
+                                    class="w-full px-4 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 rounded-2xl text-sm font-medium text-gray-700 transition-all placeholder:text-gray-400">{{ $visitor->notes }}</textarea>
+                            </div>
+                            <div class="flex justify-end">
+                                <button type="submit" class="bg-gray-900 hover:bg-black text-white px-6 py-3.5 rounded-2xl transition-all font-black text-xs uppercase tracking-widest flex items-center gap-2 shadow-md">
+                                    <i class="bi bi-check-circle"></i> Salvar Feedback
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                @endif
             </div>
 
             <!-- Sidebar - Status e Atribuições -->
@@ -269,12 +319,14 @@
                                             </button>
                                         @endif
                                     </div>
-                                    <form method="POST" action="{{ route('visitors.notify-supervisor', $visitor) }}">
-                                        @csrf
-                                        <button type="submit" class="w-full bg-orange-50 hover:bg-orange-600 text-orange-700 hover:text-white px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 border border-orange-200 shadow-sm active:scale-98">
-                                            <i class="bi bi-chat-left-text-fill text-sm"></i> Notificar Liderança
-                                        </button>
-                                    </form>
+                                    @if($visitor->contact_status !== 'integrado')
+                                        <form method="POST" action="{{ route('visitors.notify-supervisor', $visitor) }}">
+                                            @csrf
+                                            <button type="submit" class="w-full bg-orange-50 hover:bg-orange-600 text-orange-700 hover:text-white px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 border border-orange-200 shadow-sm active:scale-98">
+                                                <i class="bi bi-chat-left-text-fill text-sm"></i> Notificar Liderança
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             @endif
 

@@ -320,6 +320,25 @@ class VisitorController extends Controller
         return back()->with('success', 'Visitante marcado como contatado!');
     }
 
+    public function updateFeedback(Request $request, Visitor $visitor)
+    {
+        $this->ensureCanAccessVisitor(Auth::user(), $visitor);
+
+        $request->validate([
+            'contact_status' => 'required|in:pendente,contatado,sem_interesse,integrado',
+            'notes' => 'nullable|string',
+        ]);
+
+        $visitor->update([
+            'contact_status' => $request->contact_status,
+            'notes' => $request->notes,
+            'contacted_at' => $request->contact_status !== 'pendente' ? now() : null,
+            'contacted_by' => $request->contact_status !== 'pendente' ? Auth::id() : null,
+        ]);
+
+        return back()->with('success', 'Acompanhamento registrado com sucesso!');
+    }
+
     /**
      * Exportar visitantes para Excel
      */
