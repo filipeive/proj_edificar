@@ -109,3 +109,11 @@
   - **Exportação & Relatórios Consolidados:** Integração dos cálculos dinâmicos por zonas em `ServicesExport` e carregamento das relações de zonas nos controllers.
   - **Geração de PDF de Culto de Ensino:** Refatoração completa do layout do PDF de culto de ensino para listar e somar com rigor as participações das diferentes zonas em formato tabular com totais.
 - **Benefício:** Relatórios e exportações de dados qualitativos e quantitativos fiéis ao modelo de participação por Zonas Ministeriais nos cultos de doutrina/ensino.
+
+### ME-08: Onboarding & Assistente de Instalação Multi-Campus (Setup Wizard) ✔️
+- **Ficheiros alterados:** `app/Http/Controllers/SetupController.php`, `resources/views/setup/welcome.blade.php`, `install.sh`
+- **Alterações:**
+  - **Redesign do Setup Wizard (`/setup`):** Modernização completa da página de boas-vindas e configuração em 4 passos (Congregação, Pastor/Admin, Estrutura Inicial e Marca) com tema escuro glassmorphism e acento Laranja alinhado ao Portal Life Church.
+  - **Expansão de Configurações de Cidade/Província & Zonas Inicial:** Suporte a dados de localização (Cidade/Província) e criação automática da 1ª Zona Pastoral no arranque da nova congregação.
+  - **Script Automatizado `install.sh`:** Criação do script de instalação de 1 clique para facilmente implementar o sistema no computador ou servidor de outra congregação ou campus da igreja.
+- **Benefício:** Processo de instalação e onboarding ágil, padronizado e acessível para a expansão do sistema a novos campus ou congregações.

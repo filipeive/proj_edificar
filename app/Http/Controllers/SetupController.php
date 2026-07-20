@@ -35,6 +35,8 @@ class SetupController extends Controller
             'church_email' => 'required|email',
             'church_phone' => 'nullable|moz_phone',
             'church_address' => 'nullable|string',
+            'church_city' => 'nullable|string|max:100',
+            'church_province' => 'nullable|string|max:100',
         ]);
 
         Setting::set('church.name', $validated['church_name'], 'string', 'general');
@@ -43,33 +45,42 @@ class SetupController extends Controller
         Setting::set('church.phone', $this->normalizeMozPhone($validated['church_phone'] ?? '') ?? '', 'string', 'general');
         Setting::set('church.address', $validated['church_address'] ?? '', 'string', 'general');
 
+        if (!empty($validated['church_city'])) {
+            Setting::set('church.city', $validated['church_city'], 'string', 'general');
+        }
+        if (!empty($validated['church_province'])) {
+            Setting::set('church.province', $validated['church_province'], 'string', 'general');
+        }
+
         return response()->json(['success' => true, 'next_step' => 2]);
     }
 
     /**
-     * Process Step 2: Create First Admin User
+     * Process Step 2: Create First Admin / Pastor User
      */
     public function step2(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
+            'email' => 'required|email|unique:users,email',
+            'phone' => 'nullable|moz_phone',
             'password' => 'required|min:6|confirmed',
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
+            'phone' => $this->normalizeMozPhone($validated['phone'] ?? '') ?? null,
             'password' => Hash::make($validated['password']),
-            'role' => 'admin',
+            'role' => 'super_admin',
             'is_active' => true,
         ]);
 
-        return response()->json(['success' => true, 'next_step' => 3]);
+        return response()->json(['success' => true, 'next_step' => 3, 'user_id' => $user->id]);
     }
 
     /**
-     * Process Step 3: Branding & Theme
+     * Process Step 3: Branding & Initial Structure
      */
     public function step3(Request $request)
     {
@@ -77,6 +88,7 @@ class SetupController extends Controller
             'color_primary' => 'nullable|string|max:7',
             'color_secondary' => 'nullable|string|max:7',
             'color_accent' => 'nullable|string|max:7',
+            'initial_zone_name' => 'nullable|string|max:255',
         ]);
 
         if (!empty($validated['color_primary'])) {
@@ -87,6 +99,13 @@ class SetupController extends Controller
         }
         if (!empty($validated['color_accent'])) {
             Setting::set('branding.color_accent', $validated['color_accent'], 'string', 'branding');
+        }
+
+        if (!empty($validated['initial_zone_name'])) {
+            \App\Models\Zone::firstOrCreate(
+                ['name' => $validated['initial_zone_name']],
+                ['description' => 'Zona Pastoral inicial criada no setup do sistema.']
+            );
         }
 
         return response()->json(['success' => true, 'next_step' => 4]);
@@ -105,7 +124,7 @@ class SetupController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Configuração concluída com sucesso!',
+            'message' => 'Configuração da congregação concluída com sucesso!',
             'redirect' => route('login')
         ]);
     }
