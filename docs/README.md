@@ -68,6 +68,8 @@ Preservação dos relatórios e logs gerados durante os ciclos anteriores de red
 - [15 — Backlog UI](15-backlog-ui.md)
 - [16 — Relatório de Auditoria Final (UI)](16-relatorio-auditoria-final.md)
 - [17 — Integração e Configuração SMS](17-integracao-sms.md)
+- [36 — Especificação de APIs V1 (Mobile)](36-api-specification.md)
+- [37 — Guia de Instalação e Onboarding Multi-Campus](37-guia-instalacao-onboarding.md)
 
 ---
 
