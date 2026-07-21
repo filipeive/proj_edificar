@@ -117,3 +117,9 @@
   - **Expansão de Configurações de Cidade/Província & Zonas Inicial:** Suporte a dados de localização (Cidade/Província) e criação automática da 1ª Zona Pastoral no arranque da nova congregação.
   - **Script Automatizado `install.sh`:** Criação do script de instalação de 1 clique para facilmente implementar o sistema no computador ou servidor de outra congregação ou campus da igreja.
 - **Benefício:** Processo de instalação e onboarding ágil, padronizado e acessível para a expansão do sistema a novos campus ou congregações.
+
+### ME-09: Exibição do Pregador no Relatório PDF de Cultos ✔️
+- **Ficheiros alterados:** `resources/views/services/pdf.blade.php`
+- **Alterações:**
+  - **Resolução de Nome do Pregador:** Corrigida a lógica de renderização do campo de pregador no PDF de relatórios de cultos. Anteriormente o ficheiro lia `$service->preacher` diretamente como string (retornando a instância do modelo ou nulo), o que fazia com que o nome de pregadores cadastrados ou convidados manuais (`preacher_name`) não fosse exibido. Agora a view avalia `$service->preacher ? $service->preacher->name : ($service->preacher_name ?? 'Não informado')`.
+- **Benefício:** Garantia de integridade nos relatórios impressos e exportados pela secretaria.
