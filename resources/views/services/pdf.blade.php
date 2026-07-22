@@ -114,7 +114,7 @@
     </div>
 
     <div class="service-info">
-        <p>Celebração do culto referente ao dia <strong>{{ $service->date->translatedFormat('d') }}</strong> de <strong>{{ $service->date->translatedFormat('F') }}</strong> de <strong>{{ $service->date->translatedFormat('Y') }}</strong></p>
+        <p>Celebração do culto referente ao dia <strong>{{ $service->date->locale('pt')->translatedFormat('d') }}</strong> de <strong>{{ ucfirst($service->date->locale('pt')->translatedFormat('F')) }}</strong> de <strong>{{ $service->date->locale('pt')->translatedFormat('Y') }}</strong></p>
         <p>Pregador: <strong>{{ $service->preacher ? $service->preacher->name : ($service->preacher_name ?? 'Não informado') }}</strong></p>
         <p>Tema: <strong>{{ $service->theme ?? 'Não informado' }}</strong></p>
     </div>
