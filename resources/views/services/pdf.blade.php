@@ -116,9 +116,7 @@
     <div class="service-info">
         <p>Celebração do culto referente ao dia <strong>{{ $service->date->translatedFormat('d') }}</strong> de <strong>{{ $service->date->translatedFormat('F') }}</strong> de <strong>{{ $service->date->translatedFormat('Y') }}</strong></p>
         <p>Pregador: <strong>{{ $service->preacher ? $service->preacher->name : ($service->preacher_name ?? 'Não informado') }}</strong></p>
-        <hr style="width: 100%;">
         <p>Tema: <strong>{{ $service->theme ?? 'Não informado' }}</strong></p>
-        <hr style="width: 100%;">
     </div>
 
     @if($service->service_type === 'teaching')
