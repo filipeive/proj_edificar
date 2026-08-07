@@ -200,7 +200,8 @@ export function initSearchableSelects() {
     const selects = document.querySelectorAll('select.searchable-select, select:not([data-searchable="false"]):not([data-tomselect-ready])');
 
     selects.forEach((select) => {
-        if (select.dataset.tomselectReady || select.multiple || select.size > 1) return;
+        if (select.dataset.tomselectReady) return;
+        if (select.multiple && !select.classList.contains('searchable-select')) return;
         if (!select.classList.contains('searchable-select') && select.options.length <= 6) return;
 
         select.setAttribute('data-tomselect-ready', 'true');

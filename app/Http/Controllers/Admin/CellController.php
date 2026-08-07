@@ -205,8 +205,20 @@ class CellController
         }
 
         $supervisions = $query->with('zone')->orderBy('name')->get();
-        $leaders = User::where('role', 'lider_celula')->get();
-        $timoteos = User::where('role', 'timoteo')->get();
+
+        $leadersQuery = User::where('role', 'lider_celula');
+        if ($user->isPastorZona()) {
+            $leadersQuery->whereHas('cell.supervision', function ($q) use ($user) {
+                $q->whereIn('zone_id', $user->getManagedZoneIds());
+            });
+        } elseif ($user->isSupervisor()) {
+            $leadersQuery->whereHas('cell.supervision', function ($q) use ($user) {
+                $q->whereIn('id', $user->getManagedSupervisionIds());
+            });
+        }
+        $leaders = $leadersQuery->get();
+
+        $timoteos = $cell->members;
 
         return view('admin.cells.edit', [
             'cell' => $cell,
@@ -232,27 +244,38 @@ class CellController
             'leader_id' => $validated['leader_id'],
         ]);
 
-        // Sync Timoteos
-        // 1. Unset cell_id for users currently assigned but not in the new list
-        User::where('cell_id', $cell->id)
-            ->where('role', 'timoteo')
-            ->whereNotIn('id', $validated['timoteos'] ?? [])
-            ->update(['cell_id' => null]);
+        $newTimoteoIds = $validated['timoteos'] ?? [];
+        $oldLeaderId = $cell->leader_id;
 
-        // 2. Set cell_id for new list
-        if (!empty($validated['timoteos'])) {
-            User::whereIn('id', $validated['timoteos'])->update(['cell_id' => $cell->id]);
-        }
+        DB::transaction(function () use ($cell, $newTimoteoIds, $oldLeaderId) {
+            // Unset cell_id for users currently assigned but not in the new timoteo list
+            User::where('cell_id', $cell->id)
+                ->where('role', 'timoteo')
+                ->whereNotIn('id', $newTimoteoIds)
+                ->update(['cell_id' => null, 'role' => 'membro']);
 
-        // Atualizar líder
-        if ($request->leader_id != $cell->leader_id) {
-            // Remover antiga atribuição
-            if ($cell->leader_id) {
-                User::find($cell->leader_id)->update(['cell_id' => null]);
+            // Set cell_id and role for new timoteo list
+            if (!empty($newTimoteoIds)) {
+                User::whereIn('id', $newTimoteoIds)
+                    ->where('role', '!=', 'lider_celula')
+                    ->update(['cell_id' => $cell->id, 'role' => 'timoteo']);
             }
-            // Atribuir novo líder
-            User::find($request->leader_id)->update(['cell_id' => $cell->id]);
-        }
+
+            // Atualizar líder
+            if ($oldLeaderId != $cell->leader_id) {
+                // Remover antiga atribuição de líder
+                if ($oldLeaderId) {
+                    $oldLeader = User::find($oldLeaderId);
+                    if ($oldLeader && !in_array($oldLeader->id, $newTimoteoIds)) {
+                        $oldLeader->update(['role' => 'membro']);
+                    }
+                    $oldLeader?->update(['cell_id' => null]);
+                }
+                // Atribuir novo líder
+                $newLeader = User::find($cell->leader_id);
+                $newLeader?->update(['cell_id' => $cell->id, 'role' => 'lider_celula']);
+            }
+        });
 
         $cell->update(['member_count' => $cell->getMembersCount()]);
 
