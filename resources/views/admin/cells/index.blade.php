@@ -65,7 +65,7 @@
                     <button @click="selected = []" class="px-4 py-2 text-xs font-bold uppercase tracking-wider text-gray-400 hover:text-white transition-colors">
                         Cancelar
                     </button>
-                    <button @click="if(confirm('Deseja excluir as ' + selected.length + ' células selecionadas?')) deleteSelected()"
+                    <button @click="confirmDelete('bulk-delete-form', 'Deseja excluir as ' + selected.length + ' células selecionadas? Apenas células sem membros serão excluídas.')"
                         class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-red-600/20 flex items-center gap-2">
                         <i class="bi bi-trash-fill"></i> Excluir
                     </button>
@@ -205,10 +205,27 @@
                                     class="w-10 h-10 rounded-xl bg-orange-50 hover:bg-orange-600 text-orange-400 hover:text-white flex items-center justify-center transition-all shadow-sm">
                                     <i class="bi bi-person-plus"></i>
                                 </button>
-                                <a href="{{ route('cells.edit', $cell) }}"
-                                    class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-blue-50 text-gray-400 hover:text-blue-600 flex items-center justify-center transition-all shadow-sm">
+                                <a href="{{ route('cells.edit', $cell) }}" title="Editar"
+                                    class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-yellow-500 text-gray-400 hover:text-white flex items-center justify-center transition-all shadow-sm">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
+                                @if($cell->members->count() == 0)
+                                    <form action="{{ route('cells.destroy', $cell) }}" method="POST" id="grid-delete-cell-{{ $cell->id }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" onclick="confirmDelete('grid-delete-cell-{{ $cell->id }}', 'Deseja excluir esta célula?')" title="Eliminar"
+                                            class="w-10 h-10 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                @else
+                                    <button type="button"
+                                        onclick="Swal.fire({icon: 'warning', title: 'Não é possível eliminar', text: 'Esta célula possui membros associados. Remova ou transfira os membros antes de eliminar a célula.'})"
+                                        title="Não é possível eliminar célula com membros"
+                                        class="w-10 h-10 rounded-xl bg-red-50 text-red-300 flex items-center justify-center transition-all shadow-sm cursor-not-allowed opacity-75">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                @endif
                             </div>
                         </div>
 
@@ -344,6 +361,24 @@
                                             class="action-icon bg-gray-50 text-gray-400 hover:bg-yellow-500 hover:text-white">
                                             <i class="bi bi-pencil"></i>
                                         </a>
+                                        {{-- Eliminar Celula --}}
+                                        @if($cell->members->count() == 0)
+                                            <form action="{{ route('cells.destroy', $cell) }}" method="POST" id="list-delete-cell-{{ $cell->id }}">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" onclick="confirmDelete('list-delete-cell-{{ $cell->id }}', 'Deseja excluir esta célula?')" title="Eliminar"
+                                                    class="action-icon bg-red-50 text-red-600 hover:bg-red-600 hover:text-white">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        @else
+                                            <button type="button"
+                                                onclick="Swal.fire({icon: 'warning', title: 'Não é possível eliminar', text: 'Esta célula possui membros associados. Remova ou transfira os membros antes de eliminar a célula.'})"
+                                                title="Não é possível eliminar célula com membros"
+                                                class="action-icon bg-red-50 text-red-300 cursor-not-allowed opacity-75">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

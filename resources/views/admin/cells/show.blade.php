@@ -699,6 +699,24 @@
                                 class="flex-1 bg-gray-50 text-gray-500 px-4 py-4 rounded-2xl hover:bg-gray-100 transition-all font-black text-[10px] uppercase tracking-widest text-center">
                                 Voltar
                             </a>
+                            {{-- se não tiver membros entao pode ter o botao eliminar --}}
+                            @if($cell->members->count() == 0)
+                                <form action="{{ route('cells.destroy', $cell) }}" method="POST" id="delete-cell-form" class="flex-1">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button" onclick="confirmDelete('delete-cell-form', 'Deseja excluir esta célula?')"
+                                        class="w-full bg-red-50 text-red-600 px-4 py-4 rounded-2xl hover:bg-red-600 hover:text-white transition-all font-black text-[10px] uppercase tracking-widest text-center">
+                                        Eliminar
+                                    </button>
+                                </form>
+                            @else
+                                <button type="button"
+                                    onclick="Swal.fire({icon: 'warning', title: 'Não é possível eliminar', text: 'Esta célula possui membros associados. Remova ou transfira os membros antes de eliminar a célula.'})"
+                                    class="flex-1 bg-red-50 text-red-300 px-4 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest text-center cursor-not-allowed opacity-75"
+                                    title="Não é possível eliminar célula com membros">
+                                    Eliminar
+                                </button>
+                            @endif
                         </div>
                     </div>
                 </div>

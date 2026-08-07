@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Cell;
 use App\Models\Supervision;
 use App\Models\User;
+use App\Models\UserCommitment;
 use App\Models\Zone; // Importar o modelo Zone
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class CellController
@@ -263,7 +265,16 @@ class CellController
         if ($cell->members()->exists()) {
             return back()->with('error', 'Não pode deletar célula com membros!');
         }
-        $cell->delete();
+
+        if ($cell->contributions()->exists()) {
+            return back()->with('error', 'Não pode excluir: Existem contribuições financeiras vinculadas a esta célula.');
+        }
+
+        DB::transaction(function () use ($cell) {
+            UserCommitment::where('cell_id', $cell->id)->update(['cell_id' => null]);
+            $cell->delete();
+        });
+
         return redirect()->route('cells.index')->with('success', 'Célula excluída com sucesso!');
     }
 
@@ -277,17 +288,22 @@ class CellController
 
         /** @var \App\Models\Cell $cell */
         foreach ($cells as $cell) {
-            if ($cell->members()->exists()) {
+            if ($cell->members()->exists() || $cell->contributions()->exists()) {
                 $skippedCount++;
                 continue;
             }
-            $cell->delete();
+
+            DB::transaction(function () use ($cell) {
+                UserCommitment::where('cell_id', $cell->id)->update(['cell_id' => null]);
+                $cell->delete();
+            });
+
             $deletedCount++;
         }
 
         $message = "{$deletedCount} células excluídas.";
         if ($skippedCount > 0) {
-            $message .= " {$skippedCount} foram puladas por possuírem membros.";
+            $message .= " {$skippedCount} foram puladas por possuírem membros ou contribuições vinculadas.";
         }
 
         return redirect()->route('cells.index')->with($skippedCount > 0 ? 'warning' : 'success', $message);
