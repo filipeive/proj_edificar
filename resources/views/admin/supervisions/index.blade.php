@@ -36,6 +36,14 @@
                             }" x-init="$watch('view', value => localStorage.setItem('supervisions_view', value))"
         @resize.window.debounce.500ms="updateView()">
 
+         <div class="hidden md:flex justify-end">
+                <a href="{{ route('supervisions.create') }}"
+                    class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white transition hover:bg-blue-700">
+                    <i class="bi bi-person-plus-fill"></i>
+                    <span>Nova Supervisão</span>
+                </a>
+            </div>
+            
         <!-- Bulk Action Bar -->
         <div x-show="selected.length > 0" x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 -translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
@@ -93,12 +101,6 @@
                         <span class="text-[10px] font-black uppercase tracking-widest leading-none">Lista</span>
                     </button>
                 </div>
-
-                <a href="{{ route('supervisions.create') }}"
-                    class="group flex items-center bg-blue-600 text-white px-8 py-4 rounded-2xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-200">
-                    <i class="bi bi-plus-circle text-lg mr-2 group-hover:scale-110 transition-transform"></i>
-                    Nova Supervisão
-                </a>
             </div>
         </div>
 
@@ -137,6 +139,23 @@
                                         class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-blue-50 text-gray-400 hover:text-blue-600 flex items-center justify-center transition-all">
                                         <i class="bi bi-pencil-square"></i>
                                     </a>
+                                    @if($supervision->cells->count() == 0)
+                                        <form action="{{ route('supervisions.destroy', $supervision) }}" method="POST" id="grid-delete-supervision-{{ $supervision->id }}">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" onclick="confirmDelete('grid-delete-supervision-{{ $supervision->id }}', 'Deseja excluir esta supervisão?')" title="Eliminar"
+                                                class="w-10 h-10 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    @else
+                                        <button type="button"
+                                            onclick="Swal.fire({icon: 'warning', title: 'Não é possível eliminar', text: 'Esta supervisão possui células associadas. Remova ou transfira as células antes de eliminar.'})"
+                                            title="Não é possível eliminar supervisão com células"
+                                            class="w-10 h-10 rounded-xl bg-red-50 text-red-300 flex items-center justify-center transition-all shadow-sm cursor-not-allowed opacity-75">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    @endif
                                 </div>
                             </div>
 
@@ -264,6 +283,23 @@
                                             class="action-icon bg-gray-50 text-gray-400 hover:bg-yellow-500 hover:text-white">
                                             <i class="bi bi-pencil"></i>
                                         </a>
+                                        @if($supervision->cells->count() == 0)
+                                            <form action="{{ route('supervisions.destroy', $supervision) }}" method="POST" id="list-delete-supervision-{{ $supervision->id }}">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" onclick="confirmDelete('list-delete-supervision-{{ $supervision->id }}', 'Deseja excluir esta supervisão?')" title="Eliminar"
+                                                    class="action-icon bg-red-50 text-red-600 hover:bg-red-600 hover:text-white">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        @else
+                                            <button type="button"
+                                                onclick="Swal.fire({icon: 'warning', title: 'Não é possível eliminar', text: 'Esta supervisão possui células associadas. Remova ou transfira as células antes de eliminar.'})"
+                                                title="Não é possível eliminar supervisão com células"
+                                                class="action-icon bg-red-50 text-red-300 cursor-not-allowed opacity-75">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

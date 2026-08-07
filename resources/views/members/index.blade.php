@@ -215,12 +215,20 @@
                                             class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:border-blue-600 hover:bg-blue-600 hover:text-white">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        @if($userRole !== 'secretaria' && $member->id !== auth()->user()->id)
-                                            <a href="{{ route('members.edit', $member) }}" title="Editar"
-                                                class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:border-amber-500 hover:bg-amber-500 hover:text-white">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
-                                            @if(is_null($member->cell_id))
+                                @if($userRole !== 'secretaria' && $member->id !== auth()->user()->id)
+                                    <a href="{{ route('members.edit', $member) }}" title="Editar"
+                                        class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:border-amber-500 hover:bg-amber-500 hover:text-white">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form method="POST" action="{{ route('members.destroy', $member) }}" onsubmit="return confirm('Tem certeza que deseja excluir este membro?')" class="inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" title="Eliminar"
+                                            class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-red-200 text-red-500 transition hover:border-red-600 hover:bg-red-600 hover:text-white">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                    @if(is_null($member->cell_id))
                                                 <button @click="openAssignCellModal({ id: {{ $member->id }}, name: '{{ $member->name }}' })"
                                                     title="Atribuir Célula"
                                                     class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-emerald-200 text-emerald-650 hover:border-emerald-600 hover:bg-emerald-600 hover:text-white transition-all">
@@ -280,16 +288,24 @@
                         </span>
                     </div>
 
-                    <div class="mt-4 grid {{ $userRole !== 'secretaria' ? 'grid-cols-2' : 'grid-cols-1' }} gap-2 border-t border-gray-100 pt-4">
+                    <div class="mt-4 flex flex-wrap gap-2 border-t border-gray-100 pt-4">
                         <a href="{{ route('members.show', $member) }}"
-                            class="inline-flex items-center justify-center rounded-lg bg-gray-900 px-3 py-2 text-[10px] font-black uppercase tracking-wider text-white transition hover:bg-blue-600">
+                            class="flex-1 min-w-[80px] inline-flex items-center justify-center rounded-lg bg-gray-900 px-3 py-2 text-[10px] font-black uppercase tracking-wider text-white transition hover:bg-blue-600">
                             Ver
                         </a>
                         @if($userRole !== 'secretaria' && $member->id !== auth()->user()->id)
                             <a href="{{ route('members.edit', $member) }}"
-                                class="inline-flex items-center justify-center rounded-lg border border-gray-300 px-3 py-2 text-[10px] font-black uppercase tracking-wider text-gray-700 transition hover:border-amber-500 hover:text-amber-600">
+                                class="flex-1 min-w-[80px] inline-flex items-center justify-center rounded-lg border border-gray-300 px-3 py-2 text-[10px] font-black uppercase tracking-wider text-gray-700 transition hover:border-amber-500 hover:text-amber-600">
                                 Editar
                             </a>
+                            <form method="POST" action="{{ route('members.destroy', $member) }}" onsubmit="return confirm('Tem certeza que deseja excluir este membro?')" class="flex-1 min-w-[80px]">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                    class="w-full inline-flex items-center justify-center rounded-lg border border-red-300 px-3 py-2 text-[10px] font-black uppercase tracking-wider text-red-700 transition hover:border-red-600 hover:bg-red-600 hover:text-white">
+                                    Eliminar
+                                </button>
+                            </form>
                         @endif
                     </div>
                     @if($userRole !== 'secretaria' && is_null($member->cell_id) && $member->id !== auth()->user()->id)
