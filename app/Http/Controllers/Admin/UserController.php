@@ -296,7 +296,7 @@ class UserController
     public function members(Request $request): View
     {
         $user = auth()->user();
-        $membersQuery = User::whereIn('role', ['membro', 'lider_celula'])
+        $membersQuery = User::whereIn('role', ['membro', 'lider_celula', 'timoteo'])
             ->with(['cell.supervision.zone', 'commitments']);
 
         // Aplicar filtro hierárquico
