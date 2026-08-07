@@ -190,6 +190,8 @@
                                 <td class="px-4 py-3">
                                     @if($member->role === 'lider_celula')
                                         <span class="rounded-full bg-purple-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-purple-700">Líder</span>
+                                    @elseif($member->role === 'timoteo')
+                                        <span class="rounded-full bg-orange-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-orange-700">Timóteo</span>
                                     @else
                                         <span class="rounded-full bg-blue-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-blue-700">Membro</span>
                                     @endif
@@ -283,8 +285,8 @@
                             <span class="rounded-full bg-red-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-red-700">Inativo</span>
                         @endif
 
-                        <span class="rounded-full {{ $member->role === 'lider_celula' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700' }} px-2.5 py-1 text-[10px] font-black uppercase tracking-wider">
-                            {{ $member->role === 'lider_celula' ? 'Líder' : 'Membro' }}
+                        <span class="rounded-full {{ $member->role === 'lider_celula' ? 'bg-purple-100 text-purple-700' : ($member->role === 'timoteo' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700') }} px-2.5 py-1 text-[10px] font-black uppercase tracking-wider">
+                            {{ $member->role === 'lider_celula' ? 'Líder' : ($member->role === 'timoteo' ? 'Timóteo' : 'Membro') }}
                         </span>
                     </div>
 

@@ -78,6 +78,8 @@
                         
                         @if($member->role === 'lider_celula')
                             <span class="px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-purple-100">Líder</span>
+                        @elseif($member->role === 'timoteo')
+                            <span class="px-3 py-1 bg-orange-50 text-orange-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-orange-100">Timóteo</span>
                         @else
                             <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-100">Membro</span>
                         @endif
