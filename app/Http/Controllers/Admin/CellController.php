@@ -206,16 +206,42 @@ class CellController
 
         $supervisions = $query->with('zone')->orderBy('name')->get();
 
-        $leadersQuery = User::where('role', 'lider_celula');
-        if ($user->isPastorZona()) {
-            $leadersQuery->whereHas('cell.supervision', function ($q) use ($user) {
-                $q->whereIn('zone_id', $user->getManagedZoneIds());
+        $zoneId = $cell->supervision->zone_id ?? null;
+        $supervisionId = $cell->supervision_id;
+
+        $leadersQuery = User::query()
+            ->where(function ($q) use ($zoneId) {
+                $q->where('role', 'lider_celula')
+                  ->whereHas('cell.supervision', function ($q2) use ($zoneId) {
+                      if ($zoneId) {
+                          $q2->where('zone_id', $zoneId);
+                      }
+                  });
+            })
+            ->orWhere(function ($q) use ($cell) {
+                $q->where('role', 'timoteo')
+                  ->where('cell_id', $cell->id);
+            })
+            ->orWhere(function ($q) use ($supervisionId) {
+                $q->where('role', 'supervisor')
+                  ->whereHas('supervisedSupervisions', function ($q2) use ($supervisionId) {
+                      $q2->where('id', $supervisionId);
+                  });
+            })
+            ->orWhere(function ($q) use ($supervisionId) {
+                $q->where('role', 'sub_supervisor')
+                  ->whereHas('subSupervisedSupervisions', function ($q2) use ($supervisionId) {
+                      $q2->where('id', $supervisionId);
+                  });
+            })
+            ->orWhere(function ($q) use ($zoneId) {
+                $q->whereIn('role', ['pastor_zona', 'pastor'])
+                  ->whereIn('id', Zone::where('id', $zoneId)->whereNotNull('pastor_id')->pluck('pastor_id'));
+            })
+            ->orWhere(function ($q) {
+                $q->where('role', 'pastor_senior');
             });
-        } elseif ($user->isSupervisor()) {
-            $leadersQuery->whereHas('cell.supervision', function ($q) use ($user) {
-                $q->whereIn('id', $user->getManagedSupervisionIds());
-            });
-        }
+
         $leaders = $leadersQuery->get();
 
         $timoteos = $cell->members;
@@ -258,6 +284,11 @@ class CellController
             if (!empty($newTimoteoIds)) {
                 User::whereIn('id', $newTimoteoIds)
                     ->where('role', '!=', 'lider_celula')
+                    ->where('role', '!=', 'supervisor')
+                    ->where('role', '!=', 'sub_supervisor')
+                    ->where('role', '!=', 'pastor_zona')
+                    ->where('role', '!=', 'pastor')
+                    ->where('role', '!=', 'pastor_senior')
                     ->update(['cell_id' => $cell->id, 'role' => 'timoteo']);
             }
 
@@ -267,13 +298,20 @@ class CellController
                 if ($oldLeaderId) {
                     $oldLeader = User::find($oldLeaderId);
                     if ($oldLeader && !in_array($oldLeader->id, $newTimoteoIds)) {
-                        $oldLeader->update(['role' => 'membro']);
+                        $oldLeader->update(['cell_id' => null]);
+                        if (in_array($oldLeader->role, ['lider_celula', 'timoteo'])) {
+                            $oldLeader->update(['role' => 'membro']);
+                        }
                     }
-                    $oldLeader?->update(['cell_id' => null]);
                 }
                 // Atribuir novo líder
                 $newLeader = User::find($cell->leader_id);
-                $newLeader?->update(['cell_id' => $cell->id, 'role' => 'lider_celula']);
+                if ($newLeader) {
+                    $newLeader->update(['cell_id' => $cell->id]);
+                    if (in_array($newLeader->role, ['membro', 'timoteo'])) {
+                        $newLeader->update(['role' => 'lider_celula']);
+                    }
+                }
             }
         });
 
