@@ -205,6 +205,9 @@
                                 <div>
                                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Célula</p>
                                     <p class="text-sm font-black text-gray-900">{{ $member->cell->name }}</p>
+                                    <span class="inline-block mt-1 px-2 py-0.5 rounded border text-[9px] font-black uppercase tracking-widest {{ $member->cell->type_badge_classes }}">
+                                        {{ $member->cell->type_label }}
+                                    </span>
                                 </div>
                             </div>
                             <!-- Supervisão -->

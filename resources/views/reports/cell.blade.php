@@ -13,7 +13,7 @@
                     <span>Analítico</span>
                 </div>
                 <h1 class="text-3xl font-black text-gray-900 tracking-tight">Relatório de Célula</h1>
-                <p class="text-gray-500 font-medium">{{ $cell ? $cell->name : 'Selecione uma célula para começar' }}</p>
+                                <p class="text-gray-500 font-medium">{{ $cell ? $cell->name . ' (' . $cell->type_label . ')' : 'Selecione uma célula para começar' }}</p>
             </div>
 
             <div class="flex items-center gap-3">
@@ -45,9 +45,9 @@
                             class="w-full px-5 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700 appearance-none"
                             onchange="this.form.submit()">
                             <option value="">-- Escolha uma célula --</option>
-                            @foreach($allCells as $c)
-                                <option value="{{ $c->id }}" @if($cell && $cell->id == $c->id) selected @endif>{{ $c->name }}</option>
-                            @endforeach
+                                @foreach($allCells as $c)
+                                    <option value="{{ $c->id }}" @if($cell && $cell->id == $c->id) selected @endif>{{ $c->name }} ({{ $c->type_label }})</option>
+                                @endforeach
                         </select>
                     </div>
                 @endif

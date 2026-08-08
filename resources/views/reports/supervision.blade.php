@@ -95,6 +95,9 @@
                                     <td class="px-10 py-6">
                                         <div class="flex flex-col">
                                             <span class="text-sm font-black text-gray-900 uppercase tracking-tight">{{ $cell['name'] }}</span>
+                                            <span class="inline-block mt-1 w-fit px-2 py-0.5 rounded border text-[9px] font-black uppercase tracking-widest {{ $cell['type_badge_classes'] ?? 'bg-gray-50 text-gray-600 border-gray-100' }}">
+                                                {{ $cell['type_label'] ?? 'Célula de Membros' }}
+                                            </span>
                                             <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Liderança: {{ $cell['lider'] }}</span>
                                         </div>
                                     </td>

@@ -404,6 +404,12 @@ class UserController
         $cell = Cell::findOrFail($validated['cell_id']);
         $this->validateCellPermission($user, $cell);
 
+        if ($validated['role'] === 'lider_celula') {
+            $this->validateLeaderForCellType($user->find($validated['cell_id'])?->leader ?? $user, $cell->type, 'O líder selecionado não é compatível com o tipo de célula selecionado.');
+        } else {
+            $this->validateMemberForCellType($user, $cell->type, 'Este membro não é compatível com o tipo de célula selecionado.');
+        }
+
         $plainPassword = $validated['password'];
 
         // Criar membro
@@ -536,6 +542,12 @@ class UserController
         // Validar permissão para mover para esta célula
         $cell = Cell::findOrFail($validated['cell_id']);
         $this->validateCellPermission($user, $cell);
+
+        if ($validated['role'] === 'lider_celula') {
+            $this->validateLeaderForCellType($member, $cell->type, 'O líder selecionado não é compatível com o tipo de célula selecionado.');
+        } else {
+            $this->validateMemberForCellType($member, $cell->type, 'Este membro não é compatível com o tipo de célula selecionado.');
+        }
 
         $member->update($validated);
 
@@ -734,6 +746,10 @@ class UserController
             'cell_id' => 'required|exists:cells,id',
         ]);
 
+        $cell = Cell::findOrFail($validated['cell_id']);
+        $this->validateCellPermission(auth()->user(), $cell);
+        $this->validateMemberForCellType($user, $cell->type, "O membro {$user->name} não é compatível com o tipo de célula selecionado.");
+
         $action->execute($user, (int) $validated['cell_id']);
 
         return back()->with('success', 'Membro transferido com sucesso!');
@@ -758,20 +774,24 @@ class UserController
         return back()->with('success', 'Observações atualizadas com sucesso!');
      }
 
-     public function assignMemberToCell(Request $request, User $member)
-     {
-         $user = auth()->user();
-         if ($user->id === $member->id) {
-             abort(403, 'Não é permitido alterar a sua própria célula a partir da área de membros.');
-         }
-         $validated = $request->validate([
-             'cell_id' => 'required|exists:cells,id',
-         ]);
+      public function assignMemberToCell(Request $request, User $member)
+      {
+          $user = auth()->user();
+          if ($user->id === $member->id) {
+              abort(403, 'Não é permitido alterar a sua própria célula a partir da área de membros.');
+          }
+          $validated = $request->validate([
+              'cell_id' => 'required|exists:cells,id',
+          ]);
 
-         $member->update(['cell_id' => $validated['cell_id']]);
+          $cell = Cell::findOrFail($validated['cell_id']);
+          $this->validateCellPermission($user, $cell);
+          $this->validateMemberForCellType($member, $cell->type, "O membro {$member->name} não é compatível com o tipo de célula selecionado.");
 
-         return back()->with('success', "Membro {$member->name} foi associado à célula com sucesso!");
-     }
+          $member->update(['cell_id' => $validated['cell_id']]);
+
+          return back()->with('success', "Membro {$member->name} foi associado à célula com sucesso!");
+      }
 
     /**
      * Validar se usuário pode criar membro nesta célula
@@ -819,5 +839,41 @@ class UserController
         }
 
         return auth()->user()->isSuperAdmin();
+    }
+
+    private function validateMemberForCellType(User $member, string $cellType, string $message): void
+    {
+        $role = $member->role;
+
+        $valid = match ($cellType) {
+            \App\Models\Cell::TYPE_MEMBROS => in_array($role, ['membro', 'timoteo', 'lider_celula']),
+            \App\Models\Cell::TYPE_LIDERES => $role === 'lider_celula',
+            \App\Models\Cell::TYPE_SUPERVISORES => in_array($role, ['supervisor', 'sub_supervisor']),
+            \App\Models\Cell::TYPE_PASTORES_ZONA => in_array($role, ['pastor_zona', 'pastor']),
+            \App\Models\Cell::TYPE_PASTORES => in_array($role, ['pastor', 'pastor_senior']),
+            default => true,
+        };
+
+        if (!$valid) {
+            abort(422, $message);
+        }
+    }
+
+    private function validateLeaderForCellType(User $leader, string $cellType, string $message): void
+    {
+        $role = $leader->role;
+
+        $valid = match ($cellType) {
+            \App\Models\Cell::TYPE_MEMBROS => true,
+            \App\Models\Cell::TYPE_LIDERES => in_array($role, ['supervisor', 'sub_supervisor']),
+            \App\Models\Cell::TYPE_SUPERVISORES => in_array($role, ['pastor_zona', 'pastor']),
+            \App\Models\Cell::TYPE_PASTORES_ZONA => $role === 'pastor_senior',
+            \App\Models\Cell::TYPE_PASTORES => $role === 'pastor_senior',
+            default => true,
+        };
+
+        if (!$valid) {
+            abort(422, $message);
+        }
     }
 }

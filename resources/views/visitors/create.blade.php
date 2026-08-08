@@ -277,7 +277,7 @@
                         
                         if (cells.length > 0) {
                             cells.forEach(cell => {
-                                tomSelect.addOption({value: cell.id, text: cell.name});
+                                tomSelect.addOption({value: cell.id, text: `${cell.name} (${cell.type_label})`});
                             });
                         } else {
                             tomSelect.addOption({value: '', text: 'Nenhuma célula nesta zona'});

@@ -197,7 +197,7 @@
                                     <option value="">Selecione...</option>
                                     @foreach($cells as $cell)
                                         <option value="{{ $cell->id }}" {{ old('cell_id', $visitor->cell_id) == $cell->id ? 'selected' : '' }}>
-                                            {{ $cell->name }}
+                                            {{ $cell->name }} ({{ $cell->type_label }})
                                         </option>
                                     @endforeach
                                 </select>

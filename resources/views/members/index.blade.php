@@ -99,15 +99,15 @@
                 @if($userRole !== 'lider_celula' && $availableCells->count() > 1)
                     <div class="lg:col-span-3 flex flex-col gap-1.5">
                         <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Célula</label>
-                        <select name="cell_id"
-                            class="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
-                            <option value="">Todas as Células</option>
-                            @foreach($availableCells as $cell)
-                                <option value="{{ $cell->id }}" {{ request('cell_id') == $cell->id ? 'selected' : '' }}>
-                                    {{ $cell->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                            <select name="cell_id"
+                                class="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+                                <option value="">Todas as Células</option>
+                                @foreach($availableCells as $cell)
+                                    <option value="{{ $cell->id }}" {{ request('cell_id') == $cell->id ? 'selected' : '' }}>
+                                        {{ $cell->name }} ({{ $cell->type_label }})
+                                    </option>
+                                @endforeach
+                            </select>
                     </div>
                 @endif
 

@@ -17,6 +17,9 @@ class CellResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'type' => $this->type,
+            'type_label' => $this->type_label,
+            'type_badge_classes' => $this->type_badge_classes,
             'supervision_id' => $this->supervision_id,
             'leader_id' => $this->leader_id,
             'member_count' => (int) $this->member_count,

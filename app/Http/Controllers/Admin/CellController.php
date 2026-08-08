@@ -143,6 +143,15 @@ class CellController
             'timoteos.*' => 'exists:users,id'
         ]);
 
+        $leader = User::findOrFail($validated['leader_id']);
+        $this->validateLeaderForCellType($leader, $validated['type'], 'O líder selecionado não é compatível com o tipo de célula selecionado.');
+
+        $newTimoteoIds = collect($validated['timoteos'] ?? []);
+        foreach ($newTimoteoIds as $userId) {
+            $member = User::findOrFail($userId);
+            $this->validateMemberForCellType($member, $validated['type'], "O membro {$member->name} não é compatível com o tipo de célula selecionado.");
+        }
+
         $cell = Cell::create([
             'name' => $validated['name'],
             'type' => $validated['type'],
@@ -151,12 +160,19 @@ class CellController
         ]);
 
         // Sync Timoteos
-        if ($request->has('timoteos')) {
-            User::whereIn('id', $validated['timoteos'])->update(['cell_id' => $cell->id]);
+        if (!$newTimoteoIds->isEmpty()) {
+            User::whereIn('id', $newTimoteoIds)
+                ->where('role', '!=', 'lider_celula')
+                ->where('role', '!=', 'supervisor')
+                ->where('role', '!=', 'sub_supervisor')
+                ->where('role', '!=', 'pastor_zona')
+                ->where('role', '!=', 'pastor')
+                ->where('role', '!=', 'pastor_senior')
+                ->update(['cell_id' => $cell->id, 'role' => 'timoteo']);
         }
 
         // Atribuir líder à célula
-        User::find($validated['leader_id'])->update(['cell_id' => $cell->id]);
+        $leader->update(['cell_id' => $cell->id]);
 
         // Assumindo que member_count está na tabela cells e é atualizado.
         $cell->update(['member_count' => $cell->getMembersCount()]);
@@ -272,6 +288,15 @@ class CellController
             'timoteos.*' => 'exists:users,id'
         ]);
 
+        $leader = User::findOrFail($validated['leader_id']);
+        $this->validateLeaderForCellType($leader, $validated['type'], 'O líder selecionado não é compatível com o tipo de célula selecionado.');
+
+        $newTimoteoIds = collect($validated['timoteos'] ?? []);
+        foreach ($newTimoteoIds as $userId) {
+            $member = User::findOrFail($userId);
+            $this->validateMemberForCellType($member, $validated['type'], "O membro {$member->name} não é compatível com o tipo de célula selecionado.");
+        }
+
         $cell->update([
             'name' => $validated['name'],
             'type' => $validated['type'],
@@ -279,7 +304,6 @@ class CellController
             'leader_id' => $validated['leader_id'],
         ]);
 
-        $newTimoteoIds = $validated['timoteos'] ?? [];
         $oldLeaderId = $cell->leader_id;
 
         DB::transaction(function () use ($cell, $newTimoteoIds, $oldLeaderId) {
@@ -290,7 +314,7 @@ class CellController
                 ->update(['cell_id' => null, 'role' => 'membro']);
 
             // Set cell_id and role for new timoteo list
-            if (!empty($newTimoteoIds)) {
+            if (!$newTimoteoIds->isEmpty()) {
                 User::whereIn('id', $newTimoteoIds)
                     ->where('role', '!=', 'lider_celula')
                     ->where('role', '!=', 'supervisor')
@@ -306,7 +330,7 @@ class CellController
                 // Remover antiga atribuição de líder
                 if ($oldLeaderId) {
                     $oldLeader = User::find($oldLeaderId);
-                    if ($oldLeader && !in_array($oldLeader->id, $newTimoteoIds)) {
+                    if ($oldLeader && !$newTimoteoIds->contains($oldLeader->id)) {
                         $oldLeader->update(['cell_id' => null]);
                         if (in_array($oldLeader->role, ['lider_celula', 'timoteo'])) {
                             $oldLeader->update(['role' => 'membro']);
@@ -328,6 +352,42 @@ class CellController
 
         return redirect()->route('cells.index')
             ->with('success', 'Célula atualizada com sucesso!');
+    }
+
+    private function validateMemberForCellType(User $member, string $cellType, string $message): void
+    {
+        $role = $member->role;
+
+        $valid = match ($cellType) {
+            Cell::TYPE_MEMBROS => in_array($role, ['membro', 'timoteo', 'lider_celula']),
+            Cell::TYPE_LIDERES => $role === 'lider_celula',
+            Cell::TYPE_SUPERVISORES => in_array($role, ['supervisor', 'sub_supervisor']),
+            Cell::TYPE_PASTORES_ZONA => in_array($role, ['pastor_zona', 'pastor']),
+            Cell::TYPE_PASTORES => in_array($role, ['pastor', 'pastor_senior']),
+            default => true,
+        };
+
+        if (!$valid) {
+            abort(422, $message);
+        }
+    }
+
+    private function validateLeaderForCellType(User $leader, string $cellType, string $message): void
+    {
+        $role = $leader->role;
+
+        $valid = match ($cellType) {
+            Cell::TYPE_MEMBROS => true,
+            Cell::TYPE_LIDERES => in_array($role, ['supervisor', 'sub_supervisor']),
+            Cell::TYPE_SUPERVISORES => in_array($role, ['pastor_zona', 'pastor']),
+            Cell::TYPE_PASTORES_ZONA => $role === 'pastor_senior',
+            Cell::TYPE_PASTORES => $role === 'pastor_senior',
+            default => true,
+        };
+
+        if (!$valid) {
+            abort(422, $message);
+        }
     }
 
     public function destroy(Cell $cell)

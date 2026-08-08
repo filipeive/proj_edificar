@@ -202,7 +202,7 @@ class VisitorController extends Controller
         }
 
         $zones = $zonesQuery->get();
-        $cells = $visitor->zone ? $visitor->zone->cells : collect();
+        $cells = $visitor->zone ? $visitor->zone->cells()->with('type')->get() : collect();
         $services = \App\Models\Service::orderBy('date', 'desc')->take(20)->get();
 
         return view('visitors.edit', compact('visitor', 'zones', 'cells', 'services'));
@@ -435,8 +435,15 @@ class VisitorController extends Controller
 
         $cells = Cell::whereHas('supervision', function ($q) use ($zoneId) {
             $q->where('zone_id', $zoneId);
-        })->orderBy('name')->get(['id', 'name']);
+        })->orderBy('name')->get(['id', 'name', 'type']);
 
-        return response()->json($cells);
+        return response()->json($cells->map(function ($cell) {
+            return [
+                'id' => $cell->id,
+                'name' => $cell->name,
+                'type' => $cell->type,
+                'type_label' => $cell->type_label,
+            ];
+        }));
     }
 }
