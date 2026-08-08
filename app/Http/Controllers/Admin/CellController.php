@@ -376,16 +376,27 @@ class CellController
     {
         $role = $leader->role;
 
+        \Log::info('Validando líder para célula', [
+            'cellType' => $cellType,
+            'leaderRole' => $role,
+            'leaderId' => $leader->id,
+        ]);
+
         $valid = match ($cellType) {
             Cell::TYPE_MEMBROS => true,
-            Cell::TYPE_LIDERES => in_array($role, ['supervisor', 'sub_supervisor']),
-            Cell::TYPE_SUPERVISORES => in_array($role, ['pastor_zona', 'pastor']),
-            Cell::TYPE_PASTORES_ZONA => $role === 'pastor_senior',
-            Cell::TYPE_PASTORES => $role === 'pastor_senior',
+            Cell::TYPE_LIDERES => in_array($role, ['supervisor', 'sub_supervisor', 'pastor_zona', 'pastor', 'pastor_senior']),
+            Cell::TYPE_SUPERVISORES => in_array($role, ['pastor_zona', 'pastor', 'pastor_senior']),
+            Cell::TYPE_PASTORES_ZONA => in_array($role, ['pastor_senior']),
+            Cell::TYPE_PASTORES => in_array($role, ['pastor_senior']),
             default => true,
         };
 
         if (!$valid) {
+            \Log::warning('Validação de líder falhou', [
+                'cellType' => $cellType,
+                'leaderRole' => $role,
+                'leaderId' => $leader->id,
+            ]);
             abort(422, $message);
         }
     }
