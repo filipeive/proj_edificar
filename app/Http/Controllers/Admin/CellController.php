@@ -177,7 +177,7 @@ class CellController
         // Assumindo que member_count está na tabela cells e é atualizado.
         $cell->update(['member_count' => $cell->getMembersCount()]);
 
-        return redirect()->route('cells.index')
+        return redirect()->route('cells.show', $cell->id)
             ->with('success', 'Célula criada com sucesso!');
     }
 
@@ -350,7 +350,8 @@ class CellController
 
         $cell->update(['member_count' => $cell->getMembersCount()]);
 
-        return redirect()->route('cells.index')
+        //deve redirecionar para o show da celula editada
+        return redirect()->route('cells.show', $cell->id)
             ->with('success', 'Célula atualizada com sucesso!');
     }
 
