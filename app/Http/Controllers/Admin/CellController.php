@@ -79,7 +79,12 @@ class CellController
             });
         }
 
-        // --- 4. ORDENAÇÃO (Sort) ---
+        // --- 4. FILTRO POR TIPO DE CÉLULA ---
+        if ($request->filled('type')) {
+            $cellsQuery->where('type', $request->input('type'));
+        }
+
+        // --- 5. ORDENAÇÃO (Sort) ---
         $sort = $request->input('sort', 'name');
 
         switch ($sort) {
@@ -131,6 +136,7 @@ class CellController
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'type' => 'required|in:membros,lideres,supervisores,pastores_zona,pastores',
             'supervision_id' => 'required|exists:supervisions,id',
             'leader_id' => 'required|exists:users,id',
             'timoteos' => 'nullable|array',
@@ -139,6 +145,7 @@ class CellController
 
         $cell = Cell::create([
             'name' => $validated['name'],
+            'type' => $validated['type'],
             'supervision_id' => $validated['supervision_id'],
             'leader_id' => $validated['leader_id'],
         ]);
@@ -258,6 +265,7 @@ class CellController
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'type' => 'required|in:membros,lideres,supervisores,pastores_zona,pastores',
             'supervision_id' => 'required|exists:supervisions,id',
             'leader_id' => 'required|exists:users,id',
             'timoteos' => 'nullable|array',
@@ -266,6 +274,7 @@ class CellController
 
         $cell->update([
             'name' => $validated['name'],
+            'type' => $validated['type'],
             'supervision_id' => $validated['supervision_id'],
             'leader_id' => $validated['leader_id'],
         ]);

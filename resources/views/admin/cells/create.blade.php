@@ -37,6 +37,22 @@
                 </div>
 
                 <div class="mb-6">
+                    <label for="type" class="block text-sm font-medium text-gray-700 mb-2">Tipo de Célula</label>
+                    <select name="type" id="type"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 searchable-select custom-select @error('type') border-red-500 @enderror"
+                        required>
+                        <option value="membros" {{ old('type', 'membros') == 'membros' ? 'selected' : '' }}>Célula de Membros</option>
+                        <option value="lideres" {{ old('type') == 'lideres' ? 'selected' : '' }}>Célula de Líderes</option>
+                        <option value="supervisores" {{ old('type') == 'supervisores' ? 'selected' : '' }}>Célula de Supervisores</option>
+                        <option value="pastores_zona" {{ old('type') == 'pastores_zona' ? 'selected' : '' }}>Célula de Pastores de Zona</option>
+                        <option value="pastores" {{ old('type') == 'pastores' ? 'selected' : '' }}>Célula de Pastores</option>
+                    </select>
+                    @error('type')
+                        <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="mb-6">
                     <label for="leader_id" class="block text-sm font-medium text-gray-700 mb-2">Líder da Célula</label>
                     <select name="leader_id" id="leader_id"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 searchable-select custom-select @error('leader_id') border-red-500 @enderror"

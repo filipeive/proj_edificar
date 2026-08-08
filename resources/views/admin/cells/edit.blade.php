@@ -54,6 +54,24 @@
                             @error('name')
                                 <p class="text-red-500 text-[10px] font-bold mt-1 ml-1">{{ $message }}</p>
                             @enderror
+                         </div>
+
+                        <div class="space-y-2">
+                            <label for="type"
+                                class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Tipo de
+                                Célula</label>
+                            <select name="type" id="type"
+                                class="searchable-select custom-select w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all @error('type') border-red-500 @enderror"
+                                required>
+                                <option value="membros" {{ old('type', $cell->type) == 'membros' ? 'selected' : '' }}>Célula de Membros</option>
+                                <option value="lideres" {{ old('type', $cell->type) == 'lideres' ? 'selected' : '' }}>Célula de Líderes</option>
+                                <option value="supervisores" {{ old('type', $cell->type) == 'supervisores' ? 'selected' : '' }}>Célula de Supervisores</option>
+                                <option value="pastores_zona" {{ old('type', $cell->type) == 'pastores_zona' ? 'selected' : '' }}>Célula de Pastores de Zona</option>
+                                <option value="pastores" {{ old('type', $cell->type) == 'pastores' ? 'selected' : '' }}>Célula de Pastores</option>
+                            </select>
+                            @error('type')
+                                <p class="text-red-500 text-[10px] font-bold mt-1 ml-1">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div class="space-y-2">

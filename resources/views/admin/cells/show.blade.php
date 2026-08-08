@@ -58,7 +58,10 @@
                     <span>Célula</span>
                 </div>
                 <p class="text-3xl font-black text-gray-900 tracking-tighter">{{ $cell->name }}</p>
-                <div class="flex items-center gap-2 mt-2">
+                <div class="flex flex-wrap items-center gap-2 mt-2">
+                    <span class="inline-block px-2.5 py-1 rounded-lg border text-[10px] font-black uppercase tracking-widest {{ $cell->type_badge_classes }}">
+                        {{ $cell->type_label }}
+                    </span>
                     <span class="px-3 py-1 bg-gray-100 rounded-full text-[10px] font-bold text-gray-500 uppercase tracking-widest">{{ $cell->supervision->name }}</span>
                 </div>
             </div>
