@@ -177,15 +177,25 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @forelse($members as $member)
-                            <tr class="text-sm text-gray-700 hover:bg-gray-50"
+                            <tr class="text-sm text-gray-700 hover:bg-gray-50 {{ $member->role === 'lider_celula' ? 'bg-purple-50/60 border-l-4 border-purple-500' : '' }}"
                                 :class="selected.includes({{ $member->id }}) ? 'bg-blue-50' : ''">
                                 <td class="px-4 py-3">
                                     <input type="checkbox" value="{{ $member->id }}" x-model="selected"
                                         class="h-4 w-4 rounded border-gray-300 text-blue-600">
                                 </td>
                                 <td class="px-4 py-3">
-                                    <div class="font-bold text-gray-900">{{ $member->name }}</div>
-                                    <div class="text-xs text-gray-400">#{{ $member->id }}</div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-8 w-8 items-center justify-center rounded-lg {{ $member->role === 'lider_celula' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-500' }} font-black text-xs">
+                                            {{ strtoupper(substr($member->name, 0, 1)) }}
+                                        </div>
+                                        <div>
+                                            <div class="font-bold {{ $member->role === 'lider_celula' ? 'text-purple-900' : 'text-gray-900' }}">{{ $member->name }}</div>
+                                            <div class="text-xs text-gray-400">#{{ $member->id }}</div>
+                                            @if($member->role === 'lider_celula')
+                                                <span class="text-[9px] font-black text-purple-600 uppercase tracking-widest">Líder</span>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </td>
                                 <td class="px-4 py-3">
                                     @if($member->role === 'lider_celula')
@@ -255,16 +265,19 @@
 
         <div x-show="view === 'grid'" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             @forelse($members as $member)
-                <article class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
+                <article class="rounded-2xl border {{ $member->role === 'lider_celula' ? 'border-purple-300 bg-purple-50/30' : 'border-gray-200 bg-white' }} p-5 shadow-sm"
                     :class="selected.includes({{ $member->id }}) ? 'ring-2 ring-blue-500 border-blue-300' : ''">
                     <div class="mb-4 flex items-start justify-between gap-3">
                         <div class="flex items-center gap-3">
-                            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-900 text-sm font-black text-white">
+                            <div class="flex h-10 w-10 items-center justify-center rounded-xl {{ $member->role === 'lider_celula' ? 'bg-purple-600 text-white' : 'bg-gray-900 text-white' }} text-sm font-black">
                                 {{ strtoupper(substr($member->name, 0, 1)) }}
                             </div>
                             <div>
-                                <h3 class="line-clamp-1 text-sm font-black text-gray-900">{{ $member->name }}</h3>
+                                <h3 class="line-clamp-1 text-sm font-black {{ $member->role === 'lider_celula' ? 'text-purple-900' : 'text-gray-900' }}">{{ $member->name }}</h3>
                                 <p class="text-[11px] text-gray-400">#{{ $member->id }}</p>
+                                @if($member->role === 'lider_celula')
+                                    <span class="text-[9px] font-black text-purple-600 uppercase tracking-widest">Líder</span>
+                                @endif
                             </div>
                         </div>
                         <input type="checkbox" value="{{ $member->id }}" x-model="selected"

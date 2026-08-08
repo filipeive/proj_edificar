@@ -220,15 +220,18 @@
                             </thead>
                             <tbody class="divide-y divide-gray-50">
                                 @forelse($members as $member)
-                                    <tr class="hover:bg-gray-50/50 transition-colors group">
+                                    <tr class="hover:bg-gray-50/50 transition-colors group {{ $member->role === 'lider_celula' ? 'bg-purple-50/40' : '' }}">
                                         <td class="px-10 py-6">
                                             <div class="flex items-center gap-4">
-                                                <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 font-bold group-hover:bg-blue-50 group-hover:text-blue-600 transition-all">
+                                                <div class="w-10 h-10 rounded-xl {{ $member->role === 'lider_celula' ? 'bg-purple-100 text-purple-600' : 'bg-gray-100 text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600' }} flex items-center justify-center font-bold transition-all">
                                                     {{ substr($member->name, 0, 1) }}
                                                 </div>
                                                 <div class="min-w-0">
-                                                    <p class="text-sm font-bold text-gray-900 leading-tight group-hover:text-blue-600 transition-colors line-clamp-1">{{ $member->name }}</p>
+                                                    <p class="text-sm font-bold {{ $member->role === 'lider_celula' ? 'text-purple-900' : 'text-gray-900 group-hover:text-blue-600' }} transition-colors line-clamp-1">{{ $member->name }}</p>
                                                     <p class="text-[10px] font-medium text-gray-400 line-clamp-1">{{ $member->email }}</p>
+                                                    @if($member->role === 'lider_celula')
+                                                        <span class="text-[9px] font-black text-purple-600 uppercase tracking-widest">Líder</span>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </td>
@@ -287,14 +290,17 @@
                     <!-- Mobile Grid View for Members -->
                     <div class="grid grid-cols-1 gap-4 md:hidden">
                         @forelse($members as $member)
-                            <div class="bg-white border border-gray-100 rounded-3xl p-6 space-y-4 hover:shadow-lg transition-shadow">
+                            <div class="bg-white border {{ $member->role === 'lider_celula' ? 'border-purple-200 ring-1 ring-purple-100' : 'border-gray-100' }} rounded-3xl p-6 space-y-4 hover:shadow-lg transition-shadow">
                                 <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-500 font-black text-lg">
+                                    <div class="w-12 h-12 rounded-2xl {{ $member->role === 'lider_celula' ? 'bg-purple-100 text-purple-600' : 'bg-gray-50 text-gray-500' }} flex items-center justify-center font-black text-lg">
                                         {{ substr($member->name, 0, 1) }}
                                     </div>
                                     <div class="min-w-0 flex-1">
-                                        <h4 class="text-sm font-black text-gray-900 leading-tight">{{ $member->name }}</h4>
+                                        <h4 class="text-sm font-black {{ $member->role === 'lider_celula' ? 'text-purple-900' : 'text-gray-900' }} leading-tight">{{ $member->name }}</h4>
                                         <p class="text-[10px] font-bold text-gray-400 mt-0.5">{{ $member->email }}</p>
+                                        @if($member->role === 'lider_celula')
+                                            <span class="text-[9px] font-black text-purple-600 uppercase tracking-widest">Líder</span>
+                                        @endif
                                     </div>
                                 </div>
                                 
