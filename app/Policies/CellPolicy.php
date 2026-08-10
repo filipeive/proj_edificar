@@ -9,21 +9,26 @@ class CellPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->isAdmin() || in_array($user->role, ['pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'secretaria', 'tesouraria'], true);
+        return $user->isAdmin()
+            || in_array($user->role, ['pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'sub_supervisor', 'secretaria', 'tesouraria', 'administracao', 'lider_celula', 'timoteo'], true);
     }
 
     public function view(User $user, Cell $cell): bool
     {
-        if ($user->isAdmin() || $user->isSecretaria() || $user->isPastor()) {
+        if ($user->isAdmin() || $user->isSecretaria() || $user->isPastor() || $user->isPastorSenior() || $user->isAdministracao()) {
             return true;
         }
 
         if ($user->isPastorZona()) {
-            return $cell->supervision->zone_id === $user->getZoneId();
+            return $user->getManagedZoneIds()->contains($cell->supervision->zone_id);
         }
 
         if ($user->isSupervisor()) {
-            return $cell->supervision_id === $user->supervisedSupervisions()->first()?->id;
+            return $user->getManagedSupervisionIds()->contains($cell->supervision_id);
+        }
+
+        if ($user->isSubSupervisor()) {
+            return $user->getManagedSupervisionIds()->contains($cell->supervision_id);
         }
 
         if ($user->isLider() || $user->isTimoteo()) {
@@ -35,21 +40,31 @@ class CellPolicy
 
     public function create(User $user): bool
     {
-        return $user->isAdmin() || $user->isSecretaria() || $user->isPastorZona() || $user->isSupervisor();
+        return $user->isAdmin()
+            || $user->isSecretaria()
+            || $user->isPastorSenior()
+            || $user->isPastor()
+            || $user->isPastorZona()
+            || $user->isSupervisor()
+            || $user->isAdministracao();
     }
 
     public function update(User $user, Cell $cell): bool
     {
-        if ($user->isAdmin() || $user->isSecretaria()) {
+        if ($user->isAdmin() || $user->isSecretaria() || $user->isPastor() || $user->isPastorSenior() || $user->isAdministracao()) {
             return true;
         }
 
         if ($user->isPastorZona()) {
-            return $cell->supervision->zone_id === $user->getZoneId();
+            return $user->getManagedZoneIds()->contains($cell->supervision->zone_id);
         }
 
         if ($user->isSupervisor()) {
-            return $cell->supervision_id === $user->supervisedSupervisions()->first()?->id;
+            return $user->getManagedSupervisionIds()->contains($cell->supervision_id);
+        }
+
+        if ($user->isSubSupervisor()) {
+            return $user->getManagedSupervisionIds()->contains($cell->supervision_id);
         }
 
         if ($user->isLider() || $user->isTimoteo()) {
@@ -61,6 +76,6 @@ class CellPolicy
 
     public function delete(User $user, Cell $cell): bool
     {
-        return $user->isAdmin() || $user->isSecretaria();
+        return $user->isAdmin() || $user->isSecretaria() || $user->isPastorSenior();
     }
 }

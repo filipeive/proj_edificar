@@ -198,13 +198,25 @@
                     @if ($authUser && ($authUser->hasRole('membro') || $authUser->isLider() || $authUser->isTimoteo()))
                         @php
                             $myCellLink = route('dashboard.membro') . '#minha-celula';
+                            $myCellLabel = 'Minha Célula (Gestão)';
+                            $myCellTooltip = 'Minha Célula (Gestão)';
+                            $managedCellIds = collect();
+
                             if ($authUser->isLider() && $authUser->isLiderOfAnyCell()) {
-                                $myCellLink = route('cells.show', $authUser->getFirstLedCell());
+                                $managedCellIds = $authUser->getManagedCellIds();
+                                $myCellLink = $managedCellIds->count() > 1
+                                    ? route('cells.index')
+                                    : route('cells.show', $managedCellIds->first());
+                                $myCellLabel = $managedCellIds->count() > 1 ? 'Minhas Células' : 'Minha Célula (Gestão)';
+                                $myCellTooltip = $managedCellIds->count() > 1 ? 'Minhas Células' : 'Minha Célula (Gestão)';
                             }
                         @endphp
-                        <a href="{{ $myCellLink }}" data-tooltip="Minha Célula (Gestão)" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('dashboard.membro') || request()->routeIs('cells.show') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                        <a href="{{ $myCellLink }}" data-tooltip="{{ $myCellTooltip }}" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('dashboard.membro') || request()->routeIs('cells.show') || request()->routeIs('cells.index') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                             <i class="bi bi-people-fill text-xl flex-shrink-0"></i>
-                            <span class="sidebar-text ml-4 font-bold tracking-tight">Minha Célula (Gestão)</span>
+                            <span class="sidebar-text ml-4 font-bold tracking-tight">{{ $myCellLabel }}</span>
+                            @if($managedCellIds->count() > 1)
+                                <span class="sidebar-text ml-auto text-[10px] font-black bg-orange-600/20 text-orange-400 rounded-full px-2 py-0.5">{{ $managedCellIds->count() }}</span>
+                            @endif
                         </a>
                     @endif
 
@@ -223,7 +235,13 @@
                     @endif
 
                     @if ($authUser && $authUser->isLider() && $authUser->isLiderOfAnyCell())
-                        <a href="{{ route('cells.attendance', $authUser->getFirstLedCell()) }}" data-tooltip="Ficha Guia" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('cells.attendance') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
+                        @php
+                            $managedCellIds = $authUser->getManagedCellIds();
+                            $attendanceLink = $managedCellIds->count() > 1
+                                ? route('dashboard.lider')
+                                : route('cells.attendance', $managedCellIds->first());
+                        @endphp
+                        <a href="{{ $attendanceLink }}" data-tooltip="Ficha Guia" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('cells.attendance') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                             <i class="bi bi-calendar-check-fill text-xl flex-shrink-0"></i>
                             <span class="sidebar-text ml-4 font-bold tracking-tight">Ficha de Célula</span>
                         </a>

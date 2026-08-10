@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Cell;
@@ -7,15 +8,22 @@ use App\Models\User;
 use App\Models\UserCommitment;
 use App\Models\Zone; // Importar o modelo Zone
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class CellController
 {
+    use AuthorizesRequests;
+
     public function index(Request $request): View
     {
         $user = auth()->user();
+        $this->authorize('viewAny', Cell::class);
 
         // --- PREPARAR FILTROS (Dropdowns) ---
         $zonesQuery = Zone::orderBy('name');
@@ -31,6 +39,14 @@ class CellController
             $zonesQuery->whereHas('supervisions', function ($q) use ($supervisionIds) {
                 $q->whereIn('id', $supervisionIds);
             });
+        } elseif ($user->isLider() || $user->isTimoteo()) {
+            $cellIds = $this->managedCellIds($user);
+            $supervisionsQuery->whereHas('cells', function ($q) use ($cellIds) {
+                $q->whereIn('id', $cellIds);
+            });
+            $zonesQuery->whereHas('supervisions.cells', function ($q) use ($cellIds) {
+                $q->whereIn('id', $cellIds);
+            });
         }
 
         $zones = $zonesQuery->get();
@@ -38,15 +54,7 @@ class CellController
 
         // Iniciar a query
         $cellsQuery = Cell::query()->with('supervision.zone', 'leader', 'members');
-
-        // --- SCOPED ACCESS FOR PASTORS AND SUPERVISORS ---
-        if ($user->isPastorZona()) {
-            $cellsQuery->whereHas('supervision', function ($q) use ($user) {
-                $q->whereIn('zone_id', $user->getManagedZoneIds());
-            });
-        } elseif ($user->isSupervisor()) {
-            $cellsQuery->whereIn('supervision_id', $user->getManagedSupervisionIds());
-        }
+        $this->applyVisibilityScope($cellsQuery, $user);
 
         // --- 1. FILTRO POR ZONA ---
         if ($request->filled('zone')) {
@@ -65,16 +73,16 @@ class CellController
             $searchTerm = $request->input('search');
             $cellsQuery->where(function ($query) use ($searchTerm) {
                 // Busca por nome da célula
-                $query->where('name', 'LIKE', '%' . $searchTerm . '%');
+                $query->where('name', 'LIKE', '%'.$searchTerm.'%');
 
                 // Busca por nome do líder (JOIN necessário)
                 $query->orWhereHas('leader', function ($q) use ($searchTerm) {
-                    $q->where('name', 'LIKE', '%' . $searchTerm . '%');
+                    $q->where('name', 'LIKE', '%'.$searchTerm.'%');
                 });
 
                 // Busca por nome da zona (JOIN necessário)
                 $query->orWhereHas('supervision.zone', function ($q) use ($searchTerm) {
-                    $q->where('name', 'LIKE', '%' . $searchTerm . '%');
+                    $q->where('name', 'LIKE', '%'.$searchTerm.'%');
                 });
             });
         }
@@ -115,6 +123,8 @@ class CellController
     public function create(): View
     {
         $user = auth()->user();
+        $this->authorize('create', Cell::class);
+
         $query = Supervision::query();
 
         if ($user->isPastorZona()) {
@@ -134,22 +144,28 @@ class CellController
 
     public function store(Request $request)
     {
+        $this->authorize('create', Cell::class);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'type' => 'required|in:membros,lideres,supervisores,pastores_zona,pastores',
             'supervision_id' => 'required|exists:supervisions,id',
             'leader_id' => 'required|exists:users,id',
             'timoteos' => 'nullable|array',
-            'timoteos.*' => 'exists:users,id'
+            'timoteos.*' => 'exists:users,id',
         ]);
 
         $leader = User::findOrFail($validated['leader_id']);
-        $this->validateLeaderForCellType($leader, $validated['type'], 'O líder selecionado não é compatível com o tipo de célula selecionado.');
+        if ($response = $this->validateLeaderForCellType($request, $leader, $validated['type'], 'O líder selecionado não é compatível com o tipo de célula selecionado.')) {
+            return $response;
+        }
 
         $newTimoteoIds = collect($validated['timoteos'] ?? []);
         foreach ($newTimoteoIds as $userId) {
             $member = User::findOrFail($userId);
-            $this->validateMemberForCellType($member, $validated['type'], "O membro {$member->name} não é compatível com o tipo de célula selecionado.");
+            if ($response = $this->validateMemberForCellType($request, $member, $validated['type'], "O membro {$member->name} não é compatível com o tipo de célula selecionado.")) {
+                return $response;
+            }
         }
 
         $cell = Cell::create([
@@ -160,7 +176,7 @@ class CellController
         ]);
 
         // Sync Timoteos
-        if (!$newTimoteoIds->isEmpty()) {
+        if (! $newTimoteoIds->isEmpty()) {
             User::whereIn('id', $newTimoteoIds)
                 ->where('role', '!=', 'lider_celula')
                 ->where('role', '!=', 'supervisor')
@@ -184,15 +200,10 @@ class CellController
     public function show(Request $request, Cell $cell): View
     {
         $user = auth()->user();
-        $availableCellsQuery = Cell::orderBy('name');
+        $this->authorize('view', $cell);
 
-        if ($user->isPastorZona()) {
-            $availableCellsQuery->whereHas('supervision', function ($q) use ($user) {
-                $q->whereIn('zone_id', $user->getManagedZoneIds());
-            });
-        } elseif ($user->isSupervisor()) {
-            $availableCellsQuery->whereIn('supervision_id', $user->getManagedSupervisionIds());
-        }
+        $availableCellsQuery = Cell::orderBy('name');
+        $this->applyVisibilityScope($availableCellsQuery, $user);
 
         $availableCells = $availableCellsQuery->where('id', '!=', $cell->id)->get();
 
@@ -201,8 +212,8 @@ class CellController
         if ($request->filled('search')) {
             $searchTerm = $request->input('search');
             $membersQuery->where(function ($query) use ($searchTerm) {
-                $query->where('name', 'LIKE', '%' . $searchTerm . '%')
-                    ->orWhere('email', 'LIKE', '%' . $searchTerm . '%');
+                $query->where('name', 'LIKE', '%'.$searchTerm.'%')
+                    ->orWhere('email', 'LIKE', '%'.$searchTerm.'%');
             });
         }
 
@@ -214,13 +225,15 @@ class CellController
                 ->paginate(10)
                 ->withQueryString(),
             'availableCells' => $availableCells,
-            'visitors' => $cell->visitors()->orderBy('visit_date', 'desc')->get()
+            'visitors' => $cell->visitors()->orderBy('visit_date', 'desc')->get(),
         ]);
     }
 
     public function edit(Cell $cell): View
     {
         $user = auth()->user();
+        $this->authorize('update', $cell);
+
         $query = Supervision::query();
 
         if ($user->isPastorZona()) {
@@ -235,31 +248,31 @@ class CellController
         $leadersQuery = User::query()
             ->where(function ($q) use ($zoneId) {
                 $q->where('role', 'lider_celula')
-                  ->whereHas('cell.supervision', function ($q2) use ($zoneId) {
-                      if ($zoneId) {
-                          $q2->where('zone_id', $zoneId);
-                      }
-                  });
+                    ->whereHas('cell.supervision', function ($q2) use ($zoneId) {
+                        if ($zoneId) {
+                            $q2->where('zone_id', $zoneId);
+                        }
+                    });
             })
             ->orWhere(function ($q) use ($cell) {
                 $q->where('role', 'timoteo')
-                  ->where('cell_id', $cell->id);
+                    ->where('cell_id', $cell->id);
             })
             ->orWhere(function ($q) use ($supervisionId) {
                 $q->where('role', 'supervisor')
-                  ->whereHas('supervisedSupervisions', function ($q2) use ($supervisionId) {
-                      $q2->where('id', $supervisionId);
-                  });
+                    ->whereHas('supervisedSupervisions', function ($q2) use ($supervisionId) {
+                        $q2->where('id', $supervisionId);
+                    });
             })
             ->orWhere(function ($q) use ($supervisionId) {
                 $q->where('role', 'sub_supervisor')
-                  ->whereHas('subSupervisedSupervisions', function ($q2) use ($supervisionId) {
-                      $q2->where('id', $supervisionId);
-                  });
+                    ->whereHas('subSupervisedSupervisions', function ($q2) use ($supervisionId) {
+                        $q2->where('id', $supervisionId);
+                    });
             })
             ->orWhere(function ($q) use ($zoneId) {
                 $q->whereIn('role', ['pastor_zona', 'pastor'])
-                  ->whereIn('id', Zone::where('id', $zoneId)->whereNotNull('pastor_id')->pluck('pastor_id'));
+                    ->whereIn('id', Zone::where('id', $zoneId)->whereNotNull('pastor_id')->pluck('pastor_id'));
             })
             ->orWhere(function ($q) {
                 $q->where('role', 'pastor_senior');
@@ -267,7 +280,7 @@ class CellController
 
         $leaders = $leadersQuery->get();
 
-        $timoteos = $cell->members;
+        $timoteos = $cell->timoteos;
 
         return view('admin.cells.edit', [
             'cell' => $cell,
@@ -279,22 +292,28 @@ class CellController
 
     public function update(Request $request, Cell $cell)
     {
+        $this->authorize('update', $cell);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'type' => 'required|in:membros,lideres,supervisores,pastores_zona,pastores',
             'supervision_id' => 'required|exists:supervisions,id',
             'leader_id' => 'required|exists:users,id',
             'timoteos' => 'nullable|array',
-            'timoteos.*' => 'exists:users,id'
+            'timoteos.*' => 'exists:users,id',
         ]);
 
         $leader = User::findOrFail($validated['leader_id']);
-        $this->validateLeaderForCellType($leader, $validated['type'], 'O líder selecionado não é compatível com o tipo de célula selecionado.');
+        if ($response = $this->validateLeaderForCellType($request, $leader, $validated['type'], 'O líder selecionado não é compatível com o tipo de célula selecionado.')) {
+            return $response;
+        }
 
         $newTimoteoIds = collect($validated['timoteos'] ?? []);
         foreach ($newTimoteoIds as $userId) {
             $member = User::findOrFail($userId);
-            $this->validateMemberForCellType($member, $validated['type'], "O membro {$member->name} não é compatível com o tipo de célula selecionado.");
+            if ($response = $this->validateMemberForCellType($request, $member, $validated['type'], "O membro {$member->name} não é compatível com o tipo de célula selecionado.")) {
+                return $response;
+            }
         }
 
         $cell->update([
@@ -314,7 +333,7 @@ class CellController
                 ->update(['cell_id' => null, 'role' => 'membro']);
 
             // Set cell_id and role for new timoteo list
-            if (!$newTimoteoIds->isEmpty()) {
+            if (! $newTimoteoIds->isEmpty()) {
                 User::whereIn('id', $newTimoteoIds)
                     ->where('role', '!=', 'lider_celula')
                     ->where('role', '!=', 'supervisor')
@@ -330,7 +349,7 @@ class CellController
                 // Remover antiga atribuição de líder
                 if ($oldLeaderId) {
                     $oldLeader = User::find($oldLeaderId);
-                    if ($oldLeader && !$newTimoteoIds->contains($oldLeader->id)) {
+                    if ($oldLeader && ! $newTimoteoIds->contains($oldLeader->id)) {
                         $oldLeader->update(['cell_id' => null]);
                         if (in_array($oldLeader->role, ['lider_celula', 'timoteo'])) {
                             $oldLeader->update(['role' => 'membro']);
@@ -350,12 +369,109 @@ class CellController
 
         $cell->update(['member_count' => $cell->getMembersCount()]);
 
-        //deve redirecionar para o show da celula editada
+        // deve redirecionar para o show da celula editada
         return redirect()->route('cells.show', $cell->id)
             ->with('success', 'Célula atualizada com sucesso!');
     }
 
-    private function validateMemberForCellType(User $member, string $cellType, string $message): void
+    public function getEligibleLeaders(Request $request)
+    {
+        $request->validate([
+            'cell_id' => 'nullable|exists:cells,id',
+            'supervision_id' => 'nullable|exists:supervisions,id',
+            'cell_type' => 'required|in:membros,lideres,supervisores,pastores_zona,pastores',
+        ]);
+
+        $cell = $request->filled('cell_id') ? Cell::findOrFail($request->cell_id) : null;
+        $cellType = $request->cell_type;
+
+        if ($cell) {
+            $zoneId = $cell->supervision->zone_id ?? null;
+            $supervisionId = $cell->supervision_id;
+        } elseif ($request->filled('supervision_id')) {
+            $supervisionId = (int) $request->supervision_id;
+            $zoneId = Supervision::find($supervisionId)->zone_id ?? null;
+        } else {
+            $zoneId = null;
+            $supervisionId = null;
+        }
+
+        $leadersQuery = User::query()
+            ->where(function ($q) use ($cell, $zoneId, $supervisionId) {
+                // Líderes de Célula (para células de membros / padrão)
+                $q->where('role', 'lider_celula')
+                    ->when($zoneId, function ($q2) use ($zoneId) {
+                        $q2->whereHas('cell.supervision', function ($q3) use ($zoneId) {
+                            $q3->where('zone_id', $zoneId);
+                        });
+                    }, function ($q2) use ($supervisionId) {
+                        $q2->when($supervisionId, function ($q3) use ($supervisionId) {
+                            $q3->whereHas('cell.supervision', function ($q4) use ($supervisionId) {
+                                $q4->where('supervision_id', $supervisionId);
+                            });
+                        });
+                    });
+
+                // Timóteos da própria célula (apenas em edição de uma célula existente)
+                if ($cell) {
+                    $q->orWhere(function ($q2) use ($cell) {
+                        $q2->where('role', 'timoteo')->where('cell_id', $cell->id);
+                    });
+                }
+
+                // Supervisores da supervisão
+                $q->orWhere(function ($q2) use ($supervisionId) {
+                    $q2->where('role', 'supervisor')
+                        ->when($supervisionId, function ($q3) use ($supervisionId) {
+                            $q3->whereHas('supervisedSupervisions', function ($q4) use ($supervisionId) {
+                                $q4->where('id', $supervisionId);
+                            });
+                        });
+                });
+
+                // Sub-supervisores da supervisão
+                $q->orWhere(function ($q2) use ($supervisionId) {
+                    $q2->where('role', 'sub_supervisor')
+                        ->when($supervisionId, function ($q3) use ($supervisionId) {
+                            $q3->whereHas('subSupervisedSupervisions', function ($q4) use ($supervisionId) {
+                                $q4->where('id', $supervisionId);
+                            });
+                        });
+                });
+
+                // Pastores de Zona / Pastores (da zona, ou todos sem contexto geográfico)
+                $q->orWhere(function ($q2) use ($zoneId) {
+                    $q2->whereIn('role', ['pastor_zona', 'pastor'])
+                        ->when($zoneId, function ($q3) use ($zoneId) {
+                            $q3->whereIn('id', Zone::where('id', $zoneId)->whereNotNull('pastor_id')->pluck('pastor_id'));
+                        });
+                });
+
+                // Pastor Sénior
+                $q->orWhere(function ($q2) {
+                    $q2->where('role', 'pastor_senior');
+                });
+            });
+
+        $allowedRoles = match ($cellType) {
+            Cell::TYPE_LIDERES => ['supervisor', 'sub_supervisor', 'pastor_zona', 'pastor', 'pastor_senior'],
+            Cell::TYPE_SUPERVISORES => ['pastor_zona', 'pastor', 'pastor_senior'],
+            Cell::TYPE_PASTORES_ZONA => ['pastor_senior'],
+            Cell::TYPE_PASTORES => ['pastor_senior'],
+            // Na criação (sem célula existente) mantém-se apenas líderes de célula para o tipo padrão
+            default => $cell ? null : ['lider_celula'],
+        };
+
+        if ($allowedRoles) {
+            $leadersQuery->whereIn('role', $allowedRoles);
+        }
+
+        $leaders = $leadersQuery->orderBy('name')->get(['id', 'name', 'email', 'role']);
+
+        return response()->json($leaders);
+    }
+
+    private function validateMemberForCellType(Request $request, User $member, string $cellType, string $message): RedirectResponse|JsonResponse|null
     {
         $role = $member->role;
 
@@ -368,12 +484,26 @@ class CellController
             default => true,
         };
 
-        if (!$valid) {
-            abort(422, $message);
+        if ($valid) {
+            return null;
         }
+
+        // Pedidos AJAX/JSON recebem uma resposta JSON 422 normalizada; formulários
+        // normais são redirecionados com erro flash (toast) + mensagem no campo.
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => $message,
+                'errors' => ['timoteos' => [$message]],
+            ], 422);
+        }
+
+        return back()
+            ->withInput()
+            ->withErrors(['timoteos' => $message])
+            ->with('error', $message);
     }
 
-    private function validateLeaderForCellType(User $leader, string $cellType, string $message): void
+    private function validateLeaderForCellType(Request $request, User $leader, string $cellType, string $message): RedirectResponse|JsonResponse|null
     {
         $role = $leader->role;
 
@@ -392,18 +522,35 @@ class CellController
             default => true,
         };
 
-        if (!$valid) {
-            \Log::warning('Validação de líder falhou', [
-                'cellType' => $cellType,
-                'leaderRole' => $role,
-                'leaderId' => $leader->id,
-            ]);
-            abort(422, $message);
+        if ($valid) {
+            return null;
         }
+
+        \Log::warning('Validação de líder falhou', [
+            'cellType' => $cellType,
+            'leaderRole' => $role,
+            'leaderId' => $leader->id,
+        ]);
+
+        // Pedidos AJAX/JSON recebem uma resposta JSON 422 normalizada; formulários
+        // normais são redirecionados com erro flash (toast) + mensagem no campo.
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => $message,
+                'errors' => ['leader_id' => [$message]],
+            ], 422);
+        }
+
+        return back()
+            ->withInput()
+            ->withErrors(['leader_id' => $message])
+            ->with('error', $message);
     }
 
     public function destroy(Cell $cell)
     {
+        $this->authorize('delete', $cell);
+
         if ($cell->members()->exists()) {
             return back()->with('error', 'Não pode deletar célula com membros!');
         }
@@ -430,8 +577,11 @@ class CellController
 
         /** @var \App\Models\Cell $cell */
         foreach ($cells as $cell) {
+            $this->authorize('delete', $cell);
+
             if ($cell->members()->exists() || $cell->contributions()->exists()) {
                 $skippedCount++;
+
                 continue;
             }
 
@@ -453,14 +603,19 @@ class CellController
 
     public function downloadPdf(Cell $cell)
     {
+        $this->authorize('view', $cell);
+
         $cell->load(['supervision.zone', 'leader', 'members']);
 
         $pdf = Pdf::loadView('admin.cells.pdf', compact('cell'));
 
         return $pdf->download("ficha_celula_{$cell->name}.pdf");
     }
+
     public function reassignSupervision(Request $request, Cell $cell)
     {
+        $this->authorize('update', $cell);
+
         $validated = $request->validate([
             'supervision_id' => 'required|exists:supervisions,id',
         ]);
@@ -472,6 +627,8 @@ class CellController
 
     public function assignTimoteo(Request $request, Cell $cell)
     {
+        $this->authorize('update', $cell);
+
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
         ]);
@@ -491,6 +648,8 @@ class CellController
 
     public function removeTimoteo(Request $request, Cell $cell)
     {
+        $this->authorize('update', $cell);
+
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
         ]);
@@ -506,5 +665,37 @@ class CellController
         $user->update(['role' => 'membro']);
 
         return back()->with('success', "{$user->name} deixou de ser Timóteo com sucesso!");
+    }
+
+    private function applyVisibilityScope(Builder $query, User $user): Builder
+    {
+        if ($user->isAdmin() || $user->isSecretaria() || $user->isPastor() || $user->isPastorSenior() || $user->isAdministracao()) {
+            return $query;
+        }
+
+        if ($user->isPastorZona()) {
+            return $query->whereHas('supervision', function ($q) use ($user) {
+                $q->whereIn('zone_id', $user->getManagedZoneIds());
+            });
+        }
+
+        if ($user->isSupervisor()) {
+            return $query->whereIn('supervision_id', $user->getManagedSupervisionIds());
+        }
+
+        if ($user->isSubSupervisor()) {
+            return $query->whereIn('supervision_id', $user->getManagedSupervisionIds());
+        }
+
+        if ($user->isLider() || $user->isTimoteo()) {
+            return $query->whereIn('id', $this->managedCellIds($user));
+        }
+
+        return $query->whereRaw('1 = 0');
+    }
+
+    private function managedCellIds(User $user)
+    {
+        return $user->getManagedCellIds();
     }
 }

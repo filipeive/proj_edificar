@@ -37,7 +37,7 @@
                 Filtros de Período
             </h2>
             <form method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-end">
-                @if(auth()->user()->role === 'admin')
+                @if($allCells->isNotEmpty())
                     <div class="space-y-2">
                         <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Selecionar
                             Célula</label>

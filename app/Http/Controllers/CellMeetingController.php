@@ -43,17 +43,14 @@ class CellMeetingController extends Controller
                 })->orWhereIn('supervision_id', $supervisionIds);
             });
         } elseif ($user->role === 'lider_celula' || $user->role === 'timoteo') {
-            $primaryLeaderCell = Cell::where('leader_id', $user->id)->orderBy('id')->first();
-            $leaderDefaultCellId = $primaryLeaderCell?->id ?? $user->cell_id;
+            $allowedCellIds = $user->getManagedCellIds();
+            $leaderDefaultCellId = $allowedCellIds->count() === 1 ? $allowedCellIds->first() : null;
 
             if (!$request->filled('cell_id') && $leaderDefaultCellId) {
                 $request->merge(['cell_id' => $leaderDefaultCellId]);
             }
 
-            $query->whereHas('cell', function ($q) use ($user) {
-                $q->where('leader_id', $user->id)
-                    ->orWhere('id', $user->cell_id);
-            });
+            $query->whereIn('cell_id', $allowedCellIds);
         }
 
         // Additional Filters
@@ -108,9 +105,7 @@ class CellMeetingController extends Controller
         } elseif ($user->role === 'supervisor' || $user->role === 'sub_supervisor') {
             $cells = Cell::whereIn('supervision_id', $user->getManagedSupervisionIds())->orderBy('name')->get();
         } elseif ($user->role === 'lider_celula' || $user->role === 'timoteo') {
-            $cells = $leaderDefaultCellId
-                ? Cell::where('id', $leaderDefaultCellId)->orderBy('name')->get()
-                : collect();
+            $cells = Cell::whereIn('id', $user->getManagedCellIds())->orderBy('name')->get();
         }
 
         $statsQuery = clone $query;
@@ -152,10 +147,7 @@ class CellMeetingController extends Controller
                 })->orWhereIn('supervision_id', $supervisionIds);
             });
         } elseif ($user->role === 'lider_celula' || $user->role === 'timoteo') {
-            $query->whereHas('cell', function ($q) use ($user) {
-                $q->where('leader_id', $user->id)
-                    ->orWhere('id', $user->cell_id);
-            });
+            $query->whereIn('cell_id', $user->getManagedCellIds());
         }
 
         if ($request->filled('search')) {
@@ -239,9 +231,10 @@ class CellMeetingController extends Controller
             $cells = Cell::whereIn('supervision_id', $user->getManagedSupervisionIds())->get();
         } elseif ($user->role === 'lider_celula' || $user->role === 'timoteo') {
             $isCellRestricted = true;
-            $primaryLeaderCell = Cell::where('leader_id', $user->id)->orderBy('id')->first();
-            $restrictedCellId = $primaryLeaderCell?->id ?? $user->cell_id;
-            $cells = $restrictedCellId ? Cell::where('id', $restrictedCellId)->orderBy('name')->get() : collect();
+            $allowedCellIds = $user->getManagedCellIds();
+            $requestedCellId = request()->integer('cell_id');
+            $restrictedCellId = $allowedCellIds->contains($requestedCellId) ? $requestedCellId : $allowedCellIds->first();
+            $cells = Cell::whereIn('id', $allowedCellIds)->orderBy('name')->get();
         } else {
             $cells = collect();
         }
@@ -271,8 +264,9 @@ class CellMeetingController extends Controller
                     });
             });
         } elseif ($user->isLider() || $user->isTimoteo()) {
+            $allowedCellIds = $user->getManagedCellIds();
             $leadersQuery->where('id', $user->id)
-                ->orWhere('cell_id', $user->cell_id);
+                ->orWhereIn('cell_id', $allowedCellIds);
         }
 
         $leaders = $leadersQuery->orderBy('name')->get();
@@ -282,7 +276,7 @@ class CellMeetingController extends Controller
         if ($selectedCellId) {
             $members = User::where('cell_id', $selectedCellId)->where('is_active', true)->orderBy('name')->get();
         } elseif ($user->role === 'lider_celula' || $user->role === 'timoteo') {
-            $cell = Cell::where('leader_id', $user->id)->orWhere('id', $user->cell_id)->first();
+            $cell = Cell::whereIn('id', $user->getManagedCellIds())->first();
             if ($cell) {
                 $members = $cell->members()->where('is_active', true)->orderBy('name')->get();
             }
@@ -335,8 +329,7 @@ class CellMeetingController extends Controller
 
         // Líder/Timóteo: só pode registrar encontro normal da própria célula
         if ($user->role === 'lider_celula' || $user->role === 'timoteo') {
-            $primaryLeaderCell = Cell::where('leader_id', $user->id)->orderBy('id')->first();
-            $allowedCellIds = collect([$primaryLeaderCell?->id ?? $user->cell_id])->filter()->values();
+            $allowedCellIds = $user->getManagedCellIds();
 
             if (($validated['meeting_type'] ?? null) !== 'normal') {
                 return back()
@@ -346,7 +339,7 @@ class CellMeetingController extends Controller
 
             if (empty($validated['cell_id']) || !$allowedCellIds->contains((int) $validated['cell_id'])) {
                 return back()
-                    ->withErrors(['cell_id' => 'Você só pode registrar encontro da sua célula.'])
+                    ->withErrors(['cell_id' => 'Você só pode registrar encontro de uma célula que você gere.'])
                     ->withInput();
             }
         }
@@ -492,8 +485,8 @@ class CellMeetingController extends Controller
         } elseif ($user->role === 'supervisor') {
             $supervisionIds = $user->getManagedSupervisionIds();
             $cells = Cell::whereIn('supervision_id', $supervisionIds)->get();
-        } elseif ($user->role === 'lider_celula') {
-            $cells = Cell::where('leader_id', $user->id)->get();
+        } elseif ($user->role === 'lider_celula' || $user->role === 'timoteo') {
+            $cells = Cell::whereIn('id', $user->getManagedCellIds())->orderBy('name')->get();
         }
 
         $leadersQuery = User::whereIn('role', ['super_admin', 'admin', 'pastor_senior', 'pastor', 'pastor_zona', 'supervisor', 'sub_supervisor', 'lider_celula', 'timoteo']);
@@ -520,9 +513,10 @@ class CellMeetingController extends Controller
                         $sq->whereIn('id', $supervisionIds);
                     });
             });
-        } elseif ($user->isLider()) {
+        } elseif ($user->isLider() || $user->isTimoteo()) {
+            $allowedCellIds = $user->getManagedCellIds();
             $leadersQuery->where('id', $user->id)
-                ->orWhere('cell_id', $user->cell_id);
+                ->orWhereIn('cell_id', $allowedCellIds);
         }
 
         $leaders = $leadersQuery->orderBy('name')->get();

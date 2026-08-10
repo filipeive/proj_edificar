@@ -4,7 +4,7 @@
 @section('page-title', 'Ficha Guia')
 
 @section('content')
-<div class="w-full px-4 md:px-10 space-y-8 animate-In" x-data="{ activeTab: 'attendance', saving: false }">
+<div class="w-full px-4 md:px-10 space-y-8 animate-In" x-data="{ activeTab: '{{ request('tab', 'attendance') }}', saving: false }">
     <!-- Header Card -->
     <div class="bg-zinc-950 rounded-2xl p-6 md:p-8 shadow-md border border-zinc-900 relative overflow-hidden text-white">
         <div class="absolute top-0 right-0 w-32 h-32 bg-orange-600/10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
@@ -49,7 +49,7 @@
                             <select name="month" data-searchable="false" class="h-[44px] bg-white/10 border border-white/10 text-white rounded-lg text-xs font-black uppercase tracking-widest focus:ring-2 focus:ring-orange-500 focus:border-orange-500 custom-select px-4 cursor-pointer appearance-none">
                                 @foreach(range(1, 12) as $m)
                                     <option value="{{ $m }}" {{ $month == $m ? 'selected' : '' }}>
-                                        {{ Carbon\Carbon::create()->month($m)->translatedFormat('F') }}
+                                        {{ Carbon\Carbon::createFromDate(null, $m, 1)->translatedFormat('F') }}
                                     </option>
                                 @endforeach
                             </select>
@@ -66,6 +66,11 @@
                     <button type="submit" class="h-[44px] w-full sm:w-auto bg-orange-600 hover:bg-orange-700 text-white px-6 rounded-lg transition-all font-black text-xs uppercase tracking-widest">
                         Filtrar
                     </button>
+                    <a href="{{ route('cells.attendance.pdf', ['cell' => $cell->id, 'month' => $month, 'year' => $year]) }}"
+                        class="h-[44px] w-full sm:w-auto bg-white/10 hover:bg-white/15 text-white px-6 rounded-lg transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 border border-white/10">
+                        <i class="bi bi-file-earmark-pdf"></i>
+                        Exportar
+                    </a>
                 </form>
             </div>
         </div>
@@ -90,8 +95,16 @@
                 <span class="hidden sm:inline">Visitas e Decisões</span>
                 <span class="sm:hidden">Visitas</span>
             </button>
-            <button 
-                @click="activeTab = 'discipleship'" 
+            <button
+                @click="activeTab = 'baptisms'"
+                :class="activeTab === 'baptisms' ? 'border-orange-500 text-orange-600 dark:text-orange-400' : 'border-transparent text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:border-gray-300'"
+                class="whitespace-nowrap py-4 px-1 border-b-2 font-black text-xs uppercase tracking-wider transition-all">
+                <i class="bi bi-droplet-fill mr-1 sm:mr-2"></i>
+                <span class="hidden sm:inline">Baptismos</span>
+                <span class="sm:hidden">Bapt.</span>
+            </button>
+            <button
+                @click="activeTab = 'discipleship'"
                 :class="activeTab === 'discipleship' ? 'border-orange-500 text-orange-600 dark:text-orange-400' : 'border-transparent text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:border-gray-300'"
                 class="whitespace-nowrap py-4 px-1 border-b-2 font-black text-xs uppercase tracking-wider transition-all">
                 <i class="bi bi-mortarboard mr-1 sm:mr-2"></i>
@@ -108,7 +121,7 @@
             <div class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-150 dark:border-zinc-850 overflow-hidden">
                 <div class="bg-gray-50 dark:bg-zinc-850/50 border-b border-gray-150 dark:border-zinc-850 p-6 flex justify-between items-center">
                     <h3 class="text-xs font-black text-gray-800 dark:text-zinc-200 uppercase tracking-widest flex items-center gap-2">
-                        <i class="bi bi-table"></i> Controle de Presença - {{ Carbon\Carbon::create()->month($month)->translatedFormat('F') }} / {{ $year }}
+                        <i class="bi bi-table"></i> Controle de Presença - {{ Carbon\Carbon::createFromDate($year, $month, 1)->translatedFormat('F') }} / {{ $year }}
                     </h3>
                     <div class="hidden md:flex gap-4 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-zinc-500">
                         <span class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 rounded-md bg-orange-500"></div> Célula</span>
@@ -374,6 +387,89 @@
             </div>
         </div>
 
+        <!-- TAB 3: BAPTISMS -->
+        <div x-show="activeTab === 'baptisms'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6">
+            <div class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-150 dark:border-zinc-850 p-6 md:p-8 space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-zinc-850 pb-4">
+                    <div>
+                        <h3 class="text-xs font-black text-gray-900 dark:text-white uppercase tracking-[0.15em] flex items-center gap-2">
+                            <i class="bi bi-droplet-fill text-orange-500"></i> Baptismos da Célula
+                        </h3>
+                        <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Registe quem tomou decisão para baptismo e quem já foi baptizado.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="bg-gray-50 dark:bg-zinc-850/30 p-4 rounded-xl border border-gray-100 dark:border-zinc-850/50 text-center">
+                        <p class="text-2xl font-black text-gray-900 dark:text-white">{{ $members->count() }}</p>
+                        <p class="text-[8px] font-black text-gray-400 dark:text-zinc-550 uppercase">Membros</p>
+                    </div>
+                    <div class="bg-orange-50 dark:bg-orange-950/15 p-4 rounded-xl border border-orange-100 dark:border-orange-950/30 text-center">
+                        <p class="text-2xl font-black text-orange-600">{{ $baptismCandidates->count() }}</p>
+                        <p class="text-[8px] font-black text-orange-500/70 uppercase">Decisões</p>
+                    </div>
+                    <div class="bg-emerald-50 dark:bg-emerald-950/15 p-4 rounded-xl border border-emerald-100 dark:border-emerald-950/30 text-center">
+                        <p class="text-2xl font-black text-emerald-600">{{ $baptizedMembers->count() }}</p>
+                        <p class="text-[8px] font-black text-emerald-500/70 uppercase">Baptizados</p>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-[880px]">
+                        <thead>
+                            <tr class="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 border-b border-gray-100 dark:border-zinc-850">
+                                <th class="px-4 py-4 text-left">Membro</th>
+                                <th class="px-4 py-4 text-left">Estado</th>
+                                <th class="px-4 py-4 text-left">Decisão</th>
+                                <th class="px-4 py-4 text-left">Baptismo</th>
+                                <th class="px-4 py-4 text-left">Notas</th>
+                                <th class="px-4 py-4 text-right">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 dark:divide-zinc-850">
+                            @foreach($members as $member)
+                                <tr class="align-top hover:bg-gray-50/60 dark:hover:bg-zinc-850/30 transition-colors">
+                                    <td class="px-4 py-4">
+                                        <form id="baptism-form-{{ $member->id }}" action="{{ route('cells.baptism-status.store', $cell) }}" method="POST" class="hidden">
+                                            @csrf
+                                            <input type="hidden" name="user_id" value="{{ $member->id }}">
+                                        </form>
+                                            <p class="text-sm font-black text-gray-900 dark:text-white">{{ $member->name }}</p>
+                                            <p class="text-[10px] font-bold text-gray-400 dark:text-zinc-500">{{ $member->email }}</p>
+                                    </td>
+                                    <td class="px-4 py-4">
+                                        <select name="baptism_status" form="baptism-form-{{ $member->id }}" data-searchable="false" class="w-full rounded-xl border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs font-black text-gray-700 dark:text-zinc-200">
+                                            <option value="not_baptized" {{ old('baptism_status', $member->baptism_status) === 'not_baptized' ? 'selected' : '' }}>Não baptizado</option>
+                                            <option value="candidate" {{ old('baptism_status', $member->baptism_status) === 'candidate' ? 'selected' : '' }}>Decidiu baptizar</option>
+                                            <option value="baptized" {{ old('baptism_status', $member->baptism_status) === 'baptized' ? 'selected' : '' }}>Já baptizado</option>
+                                        </select>
+                                    </td>
+                                    <td class="px-4 py-4">
+                                        <input type="date" name="baptism_decision_date" form="baptism-form-{{ $member->id }}" value="{{ old('baptism_decision_date', optional($member->baptism_decision_date)->format('Y-m-d')) }}"
+                                            class="w-full rounded-xl border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs font-bold text-gray-700 dark:text-zinc-200">
+                                    </td>
+                                    <td class="px-4 py-4">
+                                        <input type="date" name="baptism_date" form="baptism-form-{{ $member->id }}" value="{{ old('baptism_date', optional($member->baptism_date)->format('Y-m-d')) }}"
+                                            class="w-full rounded-xl border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs font-bold text-gray-700 dark:text-zinc-200">
+                                    </td>
+                                    <td class="px-4 py-4">
+                                        <input type="text" name="baptism_notes" form="baptism-form-{{ $member->id }}" value="{{ old('baptism_notes', $member->baptism_notes) }}" placeholder="Observações..."
+                                            class="w-full rounded-xl border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs font-bold text-gray-700 dark:text-zinc-200">
+                                    </td>
+                                    <td class="px-4 py-4 text-right">
+                                        <button type="submit" form="baptism-form-{{ $member->id }}" class="inline-flex items-center justify-center gap-2 bg-zinc-950 dark:bg-orange-600 text-white px-4 py-2.5 rounded-xl text-[9px] font-black uppercase hover:bg-black dark:hover:bg-orange-700 transition-all">
+                                            <i class="bi bi-save2-fill"></i>
+                                            Salvar
+                                        </button>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- TAB 3: DISCIPLESHIP -->
         <div x-show="activeTab === 'discipleship'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6">
             <div class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-150 dark:border-zinc-850 p-6 md:p-8 space-y-6">
@@ -511,6 +607,10 @@
             <div>
                 <label class="text-[9px] font-black text-gray-450 dark:text-zinc-550 uppercase tracking-widest block mb-1">Nome</label>
                 <input type="text" name="name" required class="w-full px-4 py-2.5 bg-gray-50 dark:bg-zinc-850 border border-gray-200 dark:border-zinc-800 rounded-xl text-sm font-bold text-zinc-900 dark:text-white focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all">
+            </div>
+            <div>
+                <label class="text-[9px] font-black text-gray-450 dark:text-zinc-550 uppercase tracking-widest block mb-1">Data da Decisão</label>
+                <input type="date" name="date" value="{{ now()->format('Y-m-d') }}" required class="w-full px-4 py-2.5 bg-gray-50 dark:bg-zinc-850 border border-gray-200 dark:border-zinc-800 rounded-xl text-sm font-bold text-zinc-900 dark:text-white focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all">
             </div>
             <div class="space-y-3 p-4 bg-gray-50 dark:bg-zinc-850 border border-gray-100 dark:border-zinc-800 rounded-xl">
                 <label class="flex items-center gap-3 cursor-pointer">

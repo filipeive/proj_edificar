@@ -58,11 +58,24 @@
                     <div x-show="meetingType === 'normal'" x-transition>
                         <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Célula *</label>
                         @if($isCellRestricted ?? false)
-                            <input type="hidden" name="cell_id" value="{{ $restrictedCellId }}">
-                            <div
-                                class="w-full rounded-2xl border border-gray-100 bg-gray-50/70 text-gray-700 font-bold py-3 px-4">
-                                {{ optional($cells->first())->name ?? 'Célula não definida' }}
-                            </div>
+                            @if($cells->count() > 1)
+                                <select name="cell_id"
+                                    onchange="window.location.href='{{ route('cell-meetings.create') }}?cell_id=' + this.value"
+                                    class="w-full rounded-2xl border-gray-100 bg-gray-50/50 focus:ring-blue-500 focus:border-blue-500 font-bold py-3"
+                                    required>
+                                    @foreach($cells as $cell)
+                                        <option value="{{ $cell->id }}" {{ old('cell_id', $restrictedCellId) == $cell->id ? 'selected' : '' }}>
+                                            {{ $cell->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            @else
+                                <input type="hidden" name="cell_id" value="{{ $restrictedCellId }}">
+                                <div
+                                    class="w-full rounded-2xl border border-gray-100 bg-gray-50/70 text-gray-700 font-bold py-3 px-4">
+                                    {{ optional($cells->first())->name ?? 'Célula não definida' }}
+                                </div>
+                            @endif
                         @else
                             <select name="cell_id"
                                 onchange="window.location.href='{{ route('cell-meetings.create') }}?cell_id=' + this.value + '&meeting_type=' + document.querySelector('[name=meeting_type]').value"

@@ -10,6 +10,8 @@ use App\Models\CommitmentPackage;
 use App\Notifications\MemberCreatedNotification;
 use App\Notifications\MemberAddedToCellNotification;
 use App\Notifications\UserPromotedNotification;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
@@ -340,10 +342,15 @@ class UserController
         $availableCells = $this->getAvailableCells($user);
         $packages = CommitmentPackage::where('is_active', true)->orderBy('order')->get();
 
-        // Se for líder de célula, pré-selecionar sua célula
+        // Se for líder de uma única célula, pré-selecionar; se gere várias, manter seletor.
         $selectedCell = null;
         if ($user->role === 'lider_celula') {
-            $selectedCell = $user->cell;
+            $managedCellIds = $user->getManagedCellIds();
+            if ($request->filled('cell_id') && $managedCellIds->contains((int) $request->cell_id)) {
+                $selectedCell = Cell::find($request->cell_id);
+            } elseif ($managedCellIds->count() === 1) {
+                $selectedCell = Cell::find($managedCellIds->first());
+            }
         }
 
         // Pré-preenchimento opcional a partir de um visitante
@@ -405,9 +412,13 @@ class UserController
         $this->validateCellPermission($user, $cell);
 
         if ($validated['role'] === 'lider_celula') {
-            $this->validateLeaderForCellType($user->find($validated['cell_id'])?->leader ?? $user, $cell->type, 'O líder selecionado não é compatível com o tipo de célula selecionado.');
+            if ($response = $this->validateLeaderForCellType($request, $user->find($validated['cell_id'])?->leader ?? $user, $cell->type, 'O líder selecionado não é compatível com o tipo de célula selecionado.')) {
+                return $response;
+            }
         } else {
-            $this->validateMemberForCellType($user, $cell->type, 'Este membro não é compatível com o tipo de célula selecionado.');
+            if ($response = $this->validateMemberForCellType($request, $user, $cell->type, 'Este membro não é compatível com o tipo de célula selecionado.')) {
+                return $response;
+            }
         }
 
         $plainPassword = $validated['password'];
@@ -544,9 +555,13 @@ class UserController
         $this->validateCellPermission($user, $cell);
 
         if ($validated['role'] === 'lider_celula') {
-            $this->validateLeaderForCellType($member, $cell->type, 'O líder selecionado não é compatível com o tipo de célula selecionado.');
+            if ($response = $this->validateLeaderForCellType($request, $member, $cell->type, 'O líder selecionado não é compatível com o tipo de célula selecionado.')) {
+                return $response;
+            }
         } else {
-            $this->validateMemberForCellType($member, $cell->type, 'Este membro não é compatível com o tipo de célula selecionado.');
+            if ($response = $this->validateMemberForCellType($request, $member, $cell->type, 'Este membro não é compatível com o tipo de célula selecionado.')) {
+                return $response;
+            }
         }
 
         $member->update($validated);
@@ -629,8 +644,8 @@ class UserController
     {
         switch ($user->role) {
             case 'lider_celula':
-                // Vê apenas membros e líderes (se houver mais de um, o que é raro) da sua célula
-                $query->where('cell_id', $user->cell_id);
+                // Vê membros das células que lidera diretamente.
+                $query->whereIn('cell_id', $user->getManagedCellIds());
                 break;
 
             case 'supervisor':
@@ -676,8 +691,8 @@ class UserController
 
         switch ($user->role) {
             case 'lider_celula':
-                // Apenas sua célula
-                $cellsQuery->where('id', $user->cell_id);
+                // Apenas células sob sua gestão direta
+                $cellsQuery->whereIn('id', $user->getManagedCellIds());
                 break;
 
             case 'supervisor':
@@ -715,8 +730,8 @@ class UserController
             return;
 
         if ($user->role === 'lider_celula') {
-            if ($member->cell_id !== $user->cell_id) {
-                abort(403, 'Você só pode gerenciar membros da sua célula');
+            if (!$user->getManagedCellIds()->contains($member->cell_id)) {
+                abort(403, 'Você só pode gerenciar membros das células que lidera');
             }
         }
 
@@ -748,7 +763,9 @@ class UserController
 
         $cell = Cell::findOrFail($validated['cell_id']);
         $this->validateCellPermission(auth()->user(), $cell);
-        $this->validateMemberForCellType($user, $cell->type, "O membro {$user->name} não é compatível com o tipo de célula selecionado.");
+        if ($response = $this->validateMemberForCellType($request, $user, $cell->type, "O membro {$user->name} não é compatível com o tipo de célula selecionado.")) {
+            return $response;
+        }
 
         $action->execute($user, (int) $validated['cell_id']);
 
@@ -786,7 +803,9 @@ class UserController
 
           $cell = Cell::findOrFail($validated['cell_id']);
           $this->validateCellPermission($user, $cell);
-          $this->validateMemberForCellType($member, $cell->type, "O membro {$member->name} não é compatível com o tipo de célula selecionado.");
+          if ($response = $this->validateMemberForCellType($request, $member, $cell->type, "O membro {$member->name} não é compatível com o tipo de célula selecionado.")) {
+            return $response;
+        }
 
           $member->update(['cell_id' => $validated['cell_id']]);
 
@@ -802,8 +821,8 @@ class UserController
             return;
 
         if ($user->role === 'lider_celula') {
-            if ($cell->id !== $user->cell_id) {
-                abort(403, 'Você só pode criar membros na sua célula');
+            if (!$user->getManagedCellIds()->contains($cell->id)) {
+                abort(403, 'Você só pode criar membros nas células que lidera');
             }
         }
 
@@ -841,7 +860,7 @@ class UserController
         return auth()->user()->isSuperAdmin();
     }
 
-    private function validateMemberForCellType(User $member, string $cellType, string $message): void
+    private function validateMemberForCellType(Request $request, User $member, string $cellType, string $message): RedirectResponse|JsonResponse|null
     {
         $role = $member->role;
 
@@ -854,26 +873,56 @@ class UserController
             default => true,
         };
 
-        if (!$valid) {
-            abort(422, $message);
+        if ($valid) {
+            return null;
         }
+
+        // Pedidos AJAX/JSON recebem uma resposta JSON 422 normalizada; formulários
+        // normais são redirecionados com erro flash (toast) + mensagem no campo.
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => $message,
+                'errors' => ['role' => [$message]],
+            ], 422);
+        }
+
+        return back()
+            ->withInput()
+            ->withErrors(['role' => $message])
+            ->with('error', $message);
     }
 
-    private function validateLeaderForCellType(User $leader, string $cellType, string $message): void
+    private function validateLeaderForCellType(Request $request, User $leader, string $cellType, string $message): RedirectResponse|JsonResponse|null
     {
         $role = $leader->role;
 
+        // Regras alinhadas com CellController (células de líderes podem ser lideradas
+        // por supervisores, sub-supervisores, pastores de zona, pastores e pastor sénior).
         $valid = match ($cellType) {
             \App\Models\Cell::TYPE_MEMBROS => true,
-            \App\Models\Cell::TYPE_LIDERES => in_array($role, ['supervisor', 'sub_supervisor']),
-            \App\Models\Cell::TYPE_SUPERVISORES => in_array($role, ['pastor_zona', 'pastor']),
-            \App\Models\Cell::TYPE_PASTORES_ZONA => $role === 'pastor_senior',
-            \App\Models\Cell::TYPE_PASTORES => $role === 'pastor_senior',
+            \App\Models\Cell::TYPE_LIDERES => in_array($role, ['supervisor', 'sub_supervisor', 'pastor_zona', 'pastor', 'pastor_senior']),
+            \App\Models\Cell::TYPE_SUPERVISORES => in_array($role, ['pastor_zona', 'pastor', 'pastor_senior']),
+            \App\Models\Cell::TYPE_PASTORES_ZONA => in_array($role, ['pastor_senior']),
+            \App\Models\Cell::TYPE_PASTORES => in_array($role, ['pastor_senior']),
             default => true,
         };
 
-        if (!$valid) {
-            abort(422, $message);
+        if ($valid) {
+            return null;
         }
+
+        // Pedidos AJAX/JSON recebem uma resposta JSON 422 normalizada; formulários
+        // normais são redirecionados com erro flash (toast) + mensagem no campo.
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => $message,
+                'errors' => ['role' => [$message]],
+            ], 422);
+        }
+
+        return back()
+            ->withInput()
+            ->withErrors(['role' => $message])
+            ->with('error', $message);
     }
 }

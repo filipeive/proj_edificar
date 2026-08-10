@@ -28,11 +28,25 @@ class ReportController
         $cells = collect();
         $selectedCell = null;
 
-        // Se for admin, pode ver todas as células. Se não, só a sua.
+        // Admin vê todas; liderança operacional vê apenas as células que gere.
         if ($user->isAdmin()) {
             $cells = Cell::orderBy('name')->get();
             if ($request->filled('cell_id')) {
                 $selectedCell = Cell::findOrFail($request->cell_id);
+            }
+        } elseif ($user->isLider() || $user->isTimoteo()) {
+            $cells = Cell::whereIn('id', $user->getManagedCellIds())->orderBy('name')->get();
+            if ($cells->isEmpty()) {
+                abort(403, 'Você não está associado a uma célula.');
+            }
+
+            if ($request->filled('cell_id')) {
+                $selectedCell = $cells->firstWhere('id', (int) $request->cell_id);
+                if (!$selectedCell) {
+                    abort(403, 'Você só pode consultar relatório de uma célula que você gere.');
+                }
+            } else {
+                $selectedCell = $cells->first();
             }
         } else {
             $selectedCell = $user->cell;
@@ -58,7 +72,7 @@ class ReportController
             'startDate' => $startDate,
             'endDate' => $endDate,
             'total' => $contributions->where('status', 'verificada')->sum('amount'),
-            'allCells' => $cells, // Para o dropdown do admin
+            'allCells' => $cells,
         ]);
     }
 

@@ -680,6 +680,28 @@
                         </div>
                     </div>
                 </div>
+                <!--Tab Baptismos -->
+                <div x-show="activeTab === 'baptisms'" x-transition.fade class="space-y-8">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-100 text-center space-y-2">
+                            <p class="text-5xl font-black text-blue-600 tracking-tighter">{{ $cell->members()->where('is_active', true)->count() }}</p>
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Fidelidade Mensal</p>
+                        </div>
+                        <div class="bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-100 text-center space-y-2">
+                            <p class="text-5xl font-black text-green-600 tracking-tighter">{{ $cell->getMembersContributedThisMonth() }}</p>
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Pactos Cumpridos</p>
+                        </div>
+                        <div class="bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-100 text-center space-y-2">
+                            @php
+                                $total = $cell->members()->where('is_active', true)->count();
+                                $contrib = $cell->getMembersContributedThisMonth();
+                                $perc = $total > 0 ? round(($contrib / $total) * 100) : 0;
+                            @endphp
+                            <p class="text-5xl font-black text-purple-600 tracking-tighter">{{ $perc }}%</p>
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Efetividade</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Coluna de Ações Rápidas (Hidden on Mobile) -->
@@ -694,6 +716,10 @@
                         <a href="{{ route('cells.attendance', $cell) }}"
                             class="w-full bg-gray-900 text-white px-6 py-4 rounded-2xl hover:bg-black transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3">
                             <i class="bi bi-calendar-check"></i> Ficha de Presença
+                        </a>
+                        <a href="{{ route('cells.attendance', ['cell' => $cell->id, 'tab' => 'baptisms']) }}"
+                            class="w-full bg-white text-gray-800 border-2 border-gray-100 px-6 py-4 rounded-2xl hover:border-orange-600 hover:text-orange-600 transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3">
+                            <i class="bi bi-droplet-fill"></i> Baptismos
                         </a>
                         <a href="{{ route('contributions.index') }}?cell_id={{ $cell->id }}"
                             class="w-full bg-white text-gray-800 border-2 border-gray-100 px-6 py-4 rounded-2xl hover:border-blue-600 hover:text-blue-600 transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3">

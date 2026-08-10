@@ -43,8 +43,9 @@ class ContributionController
         if ($isMine) {
             $contributions->where('user_id', $user->id);
         } elseif ($isMyCellScope) {
-            if ($user->cell_id) {
-                $contributions->where('cell_id', $user->cell_id);
+            $managedCellIds = $user->isLider() ? $user->getManagedCellIds() : collect([$user->cell_id])->filter();
+            if ($managedCellIds->isNotEmpty()) {
+                $contributions->whereIn('cell_id', $managedCellIds);
             } else {
                 $cellScopeUnavailable = true;
                 $contributions->where('id', 0);
@@ -55,7 +56,7 @@ class ContributionController
                     $contributions->where('user_id', $user->id);
                     break;
                 case 'lider_celula':
-                    $contributions->where('cell_id', $user->cell_id);
+                    $contributions->whereIn('cell_id', $user->getManagedCellIds());
                     break;
                 case 'supervisor':
                     // Protege quando o utilizador não tem célula atribuída
@@ -267,7 +268,9 @@ class ContributionController
             abort(403, 'Você não tem permissão para ver esta contribuição');
         }
         if ($user->role === 'lider_celula' && $contribution->cell_id !== $user->cell_id) {
-            abort(403, 'Você não tem permissão para ver esta contribuição');
+            if (!$user->getManagedCellIds()->contains($contribution->cell_id)) {
+                abort(403, 'Você não tem permissão para ver esta contribuição');
+            }
         }
 
         if ($user->role === 'supervisor') {
@@ -577,7 +580,9 @@ class ContributionController
             abort(403, 'Você não tem permissão para ver este comprovativo');
         }
         if ($user->role === 'lider_celula' && $contribution->cell_id !== $user->cell_id) {
-            abort(403, 'Você não tem permissão para ver este comprovativo');
+            if (!$user->getManagedCellIds()->contains($contribution->cell_id)) {
+                abort(403, 'Você não tem permissão para ver este comprovativo');
+            }
         }
 
         if ($user->role === 'supervisor') {
@@ -709,8 +714,8 @@ class ContributionController
 
         // Líder pode registar para membros da sua célula
         if ($user->role === 'lider_celula') {
-            if ($user->cell_id === null || $targetUser->cell_id !== $user->cell_id) {
-                abort(403, 'Você só pode registar para membros da sua célula');
+            if (!$user->getManagedCellIds()->contains($targetUser->cell_id)) {
+                abort(403, 'Você só pode registar para membros das células que lidera');
             }
             return;
         }

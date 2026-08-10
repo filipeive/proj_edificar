@@ -226,6 +226,7 @@ Route::middleware('auth')->group(function () {
             // Gestão de Células
             Route::get('/cells/{cell}/pdf', [CellController::class, 'downloadPdf'])->name('cells.pdf');
             Route::get('/cells/{cell}/attendance', [\App\Http\Controllers\AttendanceController::class, 'index'])->name('cells.attendance');
+            Route::get('/cells/{cell}/attendance/pdf', [\App\Http\Controllers\AttendanceController::class, 'downloadPdf'])->name('cells.attendance.pdf');
             Route::post('/cells/{cell}/attendance', [\App\Http\Controllers\AttendanceController::class, 'store'])->name('cells.attendance.store');
             Route::post('/cells/{cell}/visitors', [\App\Http\Controllers\AttendanceController::class, 'storeVisitor'])->name('cells.visitors.store');
             Route::post('/cells/{cell}/visitors/{visitor}/feedback', [\App\Http\Controllers\AttendanceController::class, 'updateVisitorFeedback'])->name('cells.visitors.feedback');
@@ -233,9 +234,11 @@ Route::middleware('auth')->group(function () {
             Route::put('/cells/{cell}/discipleships/{discipleship}', [\App\Http\Controllers\AttendanceController::class, 'updateDiscipleship'])->name('cells.discipleships.update');
             Route::delete('/cells/{cell}/discipleships/{discipleship}', [\App\Http\Controllers\AttendanceController::class, 'destroyDiscipleship'])->name('cells.discipleships.destroy');
             Route::post('/cells/{cell}/conversions', [\App\Http\Controllers\AttendanceController::class, 'storeConversion'])->name('cells.conversions.store');
+            Route::post('/cells/{cell}/baptism-status', [\App\Http\Controllers\AttendanceController::class, 'storeBaptismStatus'])->name('cells.baptism-status.store');
             Route::post('/cells/{cell}/reassign-supervision', [CellController::class, 'reassignSupervision'])->name('cells.reassign-supervision');
             Route::post('/cells/{cell}/assign-timoteo', [CellController::class, 'assignTimoteo'])->name('cells.assign-timoteo');
             Route::post('/cells/{cell}/remove-timoteo', [CellController::class, 'removeTimoteo'])->name('cells.remove-timoteo');
+            Route::get('/cells/eligible-leaders', [CellController::class, 'getEligibleLeaders'])->name('cells.eligible-leaders');
             Route::delete('cells/bulk-destroy', [CellController::class, 'bulkDestroy'])->name('cells.bulk-destroy');
             Route::resource('cells', CellController::class);
 
