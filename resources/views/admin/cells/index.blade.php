@@ -221,10 +221,12 @@
                                     class="w-10 h-10 rounded-xl bg-orange-50 hover:bg-orange-600 text-orange-400 hover:text-white flex items-center justify-center transition-all shadow-sm">
                                     <i class="bi bi-person-plus"></i>
                                 </button>
-                                <a href="{{ route('cells.edit', $cell) }}" title="Editar"
-                                    class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-yellow-500 text-gray-400 hover:text-white flex items-center justify-center transition-all shadow-sm">
-                                    <i class="bi bi-pencil-square"></i>
-                                </a>
+                                @if(!auth()->user()->isLider())
+                                    <a href="{{ route('cells.edit', $cell) }}" title="Editar"
+                                        class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-yellow-500 text-gray-400 hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                @endif
                                 @if($cell->members->count() == 0)
                                     <form action="{{ route('cells.destroy', $cell) }}" method="POST" id="grid-delete-cell-{{ $cell->id }}">
                                         @csrf
@@ -381,10 +383,12 @@
                                             class="action-icon bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white">
                                             <i class="bi bi-speedometer2"></i>
                                         </a>
-                                        <a href="{{ route('cells.edit', $cell) }}" title="Editar"
-                                            class="action-icon bg-gray-50 text-gray-400 hover:bg-yellow-500 hover:text-white">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
+                                        @if(!auth()->user()->isLider())
+                                            <a href="{{ route('cells.edit', $cell) }}" title="Editar"
+                                                class="action-icon bg-gray-50 text-gray-400 hover:bg-yellow-500 hover:text-white">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                        @endif
                                         {{-- Eliminar Celula --}}
                                         @if($cell->members->count() == 0)
                                             <form action="{{ route('cells.destroy', $cell) }}" method="POST" id="list-delete-cell-{{ $cell->id }}">

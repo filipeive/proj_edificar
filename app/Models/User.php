@@ -219,6 +219,16 @@ class User extends Authenticatable
         return $this->role === 'sub_supervisor';
     }
 
+    public function isSubPastorZona()
+    {
+        return $this->role === 'subpastor_zona';
+    }
+
+    public function isSubPastor()
+    {
+        return $this->role === 'subpastor';
+    }
+
     public function isLider()
     {
         return $this->role === 'lider_celula';
@@ -286,6 +296,32 @@ class User extends Authenticatable
         }
 
         return $this->role === $role;
+    }
+
+    public function getRoleLabel(): string
+    {
+        $labels = [
+            'super_admin' => 'Super Admin',
+            'admin' => 'Administrador',
+            'pastor_senior' => 'Pastor Senior',
+            'pastor' => 'Pastor',
+            'pastor_zona' => 'Pastor de Zona',
+            'subpastor_zona' => 'Sub-Pastor de Zona',
+            'supervisor' => 'Supervisor',
+            'sub_supervisor' => 'Sub-Supervisor',
+            'subpastor' => 'Sub-Pastor',
+            'lider_celula' => 'Líder de Célula',
+            'lider' => 'Líder',
+            'timoteo' => 'Timóteo',
+            'membro' => 'Membro',
+            'secretaria' => 'Secretária',
+            'tesouraria' => 'Tesouraria',
+            'administracao' => 'Administração',
+            'comissao_obra' => 'Comissão de Obra',
+            'responsavel_pacote' => 'Responsável de Pacote',
+        ];
+
+        return $labels[$this->role] ?? ucfirst(str_replace('_', ' ', $this->role));
     }
 
     public function getZoneId()

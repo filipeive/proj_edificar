@@ -239,7 +239,13 @@ Route::middleware('auth')->group(function () {
             Route::post('/cells/{cell}/assign-timoteo', [CellController::class, 'assignTimoteo'])->name('cells.assign-timoteo');
             Route::post('/cells/{cell}/remove-timoteo', [CellController::class, 'removeTimoteo'])->name('cells.remove-timoteo');
             Route::get('/cells/eligible-leaders', [CellController::class, 'getEligibleLeaders'])->name('cells.eligible-leaders');
+            Route::get('/cells/{cell}/eligible-members', [CellController::class, 'getEligibleMembers'])->name('cells.eligible-members');
+            Route::post('/cells/{cell}/add-member', [CellController::class, 'addMember'])->name('cells.add-member');
             Route::delete('cells/bulk-destroy', [CellController::class, 'bulkDestroy'])->name('cells.bulk-destroy');
+            //restringir edit para lideres de celula
+            Route::middleware('role:super_admin,admin,pastor_zona,supervisor,secretaria,pastor')->group(function () {
+                Route::get('cells/{cell}/edit', [CellController::class, 'edit'])->name('cells.edit');
+            });
             Route::resource('cells', CellController::class);
 
             // Cultos (Relatórios de Celebração)

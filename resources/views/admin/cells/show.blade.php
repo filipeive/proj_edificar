@@ -6,27 +6,29 @@
 
 @section('header-actions')
     <div class="flex items-center gap-2 md:hidden">
-        <a href="{{ route('cells.pdf', $cell) }}"
-            class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50"
-            title="Exportar ficha">
-            <i class="bi bi-file-earmark-pdf"></i>
-        </a>
-        <a href="{{ route('cells.attendance', $cell) }}"
-            class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
-            title="Ficha de presença">
-            <i class="bi bi-calendar-check"></i>
-        </a>
-        <a href="{{ route('cells.edit', $cell) }}"
-            class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
-            title="Editar célula">
-            <i class="bi bi-pencil-square"></i>
-        </a>
+        <a href="{{ route('cells.attendance', $cell) }}" class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50" title="Ficha de presença"><i class="bi bi-calendar-check"></i></a>
+        <a href="{{ route('cells.pdf', $cell) }}" class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50" title="Exportar ficha"><i class="bi bi-file-earmark-pdf"></i></a>
+        @if(!auth()->user()->isLider())
+            <a href="{{ route('cells.edit', $cell) }}" class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50" title="Editar célula"><i class="bi bi-pencil-square"></i></a>
+        @endif
     </div>
 @endsection
 
 @section('content')
-    <div class="space-y-8" x-data="{ 
-            activeTab: localStorage.getItem('cell_active_tab') || 'members',
+    <div class="space-y-8" x-data="{
+            activeTab: (function() {
+                try {
+                    var params = new URLSearchParams(window.location.search);
+                    if (params.has('tab') && ['members','meetings','visitors','stats'].indexOf(params.get('tab')) !== -1) {
+                        return params.get('tab');
+                    }
+                    var stored = localStorage.getItem('cell_active_tab');
+                    if (stored && ['members','meetings','visitors','stats'].indexOf(stored) !== -1) {
+                        return stored;
+                    }
+                } catch(e) {}
+                return 'members';
+            })(),
             showTransferModal: false,
             showObsModal: false,
             selectedMember: {},
@@ -34,846 +36,635 @@
             feedbackVisitorId: null,
             feedbackStatus: '',
             feedbackNotes: '',
+            showAddExistingModal: {{ $errors->has('member_id') ? 'true' : 'false' }},
+            addExistingSearch: '',
+            addExistingMemberId: '',
+            addExistingRoleInCell: 'membro',
+            addExistingResults: [],
+            eligibleMembersUrl: '{{ route('cells.eligible-members', $cell) }}',
+            memberSearch: '',
+            openAddExistingModal() {
+                this.showAddExistingModal = true;
+                this.addExistingSearch = '';
+                this.addExistingMemberId = '';
+                this.addExistingRoleInCell = 'membro';
+                this.addExistingResults = [];
+                this.addExistingSearchMembers();
+            },
+            addExistingSearchMembers() {
+                const q = (this.addExistingSearch || '').trim();
+                fetch(this.eligibleMembersUrl + '?search=' + encodeURIComponent(q))
+                    .then(r => r.json())
+                    .then(data => { this.addExistingResults = data; })
+                    .catch(() => { this.addExistingResults = []; });
+            },
             transfer(member) {
-                this.selectedMember = member;
+                this.selectedMember = member || {};
                 this.showTransferModal = true;
             },
             openObs(member) {
-                this.selectedMember = member;
+                this.selectedMember = member || {};
                 this.showObsModal = true;
             },
             openFeedback(id, status, notes) {
                 this.feedbackVisitorId = id;
-                this.feedbackStatus = status;
+                this.feedbackStatus = status || 'pendente';
                 this.feedbackNotes = notes || '';
                 this.showFeedbackModal = true;
+            },
+            switchTab(tab) {
+                this.activeTab = tab;
+                try {
+                    localStorage.setItem('cell_active_tab', tab);
+                    var url = new URL(window.location.href);
+                    url.searchParams.set('tab', tab);
+                    window.history.replaceState({}, '', url);
+                } catch(e) {}
             }
-        }" x-init="$watch('activeTab', value => localStorage.setItem('cell_active_tab', value))">
-        <!-- Header & Stats Grid -->
+        }" x-init="$watch('activeTab', value => { try { localStorage.setItem('cell_active_tab', value); } catch(e) {} })">
+
+        <!-- Header Card -->
+        <div class="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-gray-100 relative overflow-hidden">
+            <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2 text-[10px] font-black text-blue-600 uppercase tracking-[0.2em]">
+                        <i class="bi bi-layers-fill"></i>
+                        <span>Célula</span>
+                    </div>
+                    <h1 class="text-3xl md:text-4xl font-black text-gray-900 tracking-tight">{{ $cell->name }}</h1>
+                    <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                        <span class="inline-block px-2.5 py-1 rounded-lg border text-[10px] font-black uppercase tracking-widest {{ $cell->type_badge_classes }}">
+                            {{ $cell->type_label }}
+                        </span>
+                        <span class="flex items-center gap-1.5"><i class="bi bi-geo-alt-fill text-blue-500"></i> {{ $cell->supervision->zone->name ?? 'Sem zona' }}</span>
+                        <span class="flex items-center gap-1.5"><i class="bi bi-diagram-3-fill text-purple-500"></i> {{ $cell->supervision->name ?? 'Sem supervisão' }}</span>
+                        <span class="flex items-center gap-1.5"><i class="bi bi-people-fill text-green-500"></i> {{ $cell->getMembersCount() }} membros</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a href="{{ route('cells.attendance', $cell) }}" class="hidden md:inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-blue-50 text-blue-700 font-bold hover:bg-blue-100 transition-colors">
+                        <i class="bi bi-calendar-check"></i> Presenças
+                    </a>
+                    <a href="{{ route('cells.pdf', $cell) }}" class="hidden md:inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-orange-50 text-orange-700 font-bold hover:bg-orange-100 transition-colors">
+                        <i class="bi bi-file-earmark-pdf"></i> PDF
+                    </a>
+                    @if(!auth()->user()->isLider())
+                        <a href="{{ route('cells.edit', $cell) }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">
+                            <i class="bi bi-pencil-square"></i> Editar
+                        </a>
+                    @endif
+                </div>
+            </div>
+            <div class="absolute -right-20 -bottom-20 w-96 h-96 bg-gradient-to-br from-blue-50 to-transparent rounded-full opacity-50"></div>
+        </div>
+
+        <!-- Stats Overview -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Info Célula -->
             <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col justify-center">
                 <div class="flex items-center gap-2 text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] mb-3">
-                    <i class="bi bi-layers-fill"></i>
-                    <span>Célula</span>
+                    <i class="bi bi-people-fill"></i><span>Membros Ativos</span>
                 </div>
-                <p class="text-3xl font-black text-gray-900 tracking-tighter">{{ $cell->name }}</p>
-                <div class="flex flex-wrap items-center gap-2 mt-2">
-                    <span class="inline-block px-2.5 py-1 rounded-lg border text-[10px] font-black uppercase tracking-widest {{ $cell->type_badge_classes }}">
-                        {{ $cell->type_label }}
-                    </span>
-                    <span class="px-3 py-1 bg-gray-100 rounded-full text-[10px] font-bold text-gray-500 uppercase tracking-widest">{{ $cell->supervision->name }}</span>
-                </div>
+                <p class="text-4xl font-black text-gray-900 tracking-tighter">{{ $cell->getMembersCount() }}</p>
             </div>
-
-            <!-- Líder e Timóteos -->
-            <div class="bg-gray-900 rounded-[2rem] shadow-xl border border-gray-800 p-8 flex flex-col justify-center text-white relative overflow-hidden group">
-                <div class="relative z-10">
-                    <div class="flex items-center justify-between mb-6">
-                        <div class="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">
-                            <i class="bi bi-person-badge-fill text-orange-500"></i>
-                            <span>Equipe de Liderança</span>
-                        </div>
-                        <a href="{{ route('cells.edit', $cell) }}" class="text-[9px] font-black text-blue-400 hover:text-blue-300 uppercase tracking-widest transition-colors">
-                            <i class="bi bi-pencil-square mr-1"></i> Gerir
-                        </a>
-                    </div>
-
-                    @if ($cell->leader)
-                        <div class="flex items-center gap-4 mb-6 pb-6 border-b border-white/5">
-                            <div class="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-400 font-black text-2xl shadow-inner border border-white/5">
-                                {{ substr($cell->leader->name, 0, 1) }}
-                            </div>
-                            <div class="min-w-0 flex-1">
-                                <a href="{{ route('users.show', $cell->leader) }}" class="text-xl font-black text-white hover:text-blue-400 transition-colors leading-tight line-clamp-1 tracking-tight">
-                                    {{ $cell->leader->name }}
-                                </a>
-                                <div class="flex items-center gap-2 mt-1">
-                                    <span class="text-[9px] font-black text-blue-500 uppercase tracking-widest bg-blue-500/10 px-2 py-0.5 rounded">Líder</span>
-                                    <div class="flex gap-2">
-                                        @if($cell->leader->phone)
-                                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $cell->leader->phone) }}" target="_blank" class="text-gray-500 hover:text-green-500 transition-colors">
-                                                <i class="bi bi-whatsapp text-xs"></i>
-                                            </a>
-                                        @endif
-                                        <a href="mailto:{{ $cell->leader->email }}" class="text-gray-500 hover:text-blue-400 transition-colors">
-                                            <i class="bi bi-envelope text-xs"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-
-                    <div class="space-y-4">
-                        @forelse($cell->timoteos as $timoteo)
-                            <div class="flex items-center gap-3 bg-white/5 p-3 rounded-2xl border border-white/5 hover:bg-white/10 transition-all group/item">
-                                <div class="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-400 font-black text-sm">
-                                    {{ substr($timoteo->name, 0, 1) }}
-                                </div>
-                                <div class="min-w-0 flex-1">
-                                    <a href="{{ route('users.show', $timoteo) }}" class="text-sm font-bold text-gray-200 hover:text-orange-400 transition-colors line-clamp-1">
-                                        {{ $timoteo->name }}
-                                    </a>
-                                    <p class="text-[8px] font-black text-orange-500/50 uppercase tracking-widest mt-0.5">Auxiliar / Timóteo</p>
-                                </div>
-                                <div class="flex gap-2 opacity-0 group-hover/item:opacity-100 transition-opacity">
-                                    @if($timoteo->phone)
-                                        <a href="tel:{{ $timoteo->phone }}" class="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all">
-                                            <i class="bi bi-telephone text-[10px]"></i>
-                                        </a>
-                                    @endif
-                                </div>
-                            </div>
-                        @empty
-                            @if(!$cell->leader)
-                                <div class="py-4 text-center">
-                                    <p class="text-sm font-bold text-gray-600 italic">Sem liderança designada</p>
-                                    <a href="{{ route('cells.edit', $cell) }}" class="text-[10px] font-black text-blue-500 uppercase tracking-widest mt-2 block">Atribuir Agora</a>
-                                </div>
-                            @endif
-                        @endforelse
-                    </div>
+            <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col justify-center">
+                <div class="flex items-center gap-2 text-[10px] font-black text-green-600 uppercase tracking-[0.2em] mb-3">
+                    <i class="bi bi-calendar-event-fill"></i><span>Encontros</span>
                 </div>
-                <!-- Background decoration -->
-                <div class="absolute -right-8 -bottom-8 text-9xl text-white/5 rotate-12 group-hover:scale-110 transition-transform duration-500">
-                    <i class="bi bi-shield-check"></i>
-                </div>
+                <p class="text-4xl font-black text-gray-900 tracking-tighter">{{ $cell->meetings()->count() }}</p>
             </div>
-
-            <!-- Total Membros -->
-            <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col justify-center text-center">
-                <p class="text-5xl font-black text-blue-600 tracking-tighter">{{ $cell->members()->where('is_active', true)->count() }}</p>
-                <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mt-2">Membros Ativos</p>
-            </div>
-
-            <!-- Total Arrecadado -->
-            <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col justify-center text-center relative overflow-hidden">
-                <div class="relative z-10">
-                    <p class="text-4xl font-black text-green-600 tracking-tighter">
-                        {{ number_format($cell->getTotalContributedThisMonth(), 0, ',', '.') }}<span class="text-sm ml-1 uppercase">MT</span>
-                    </p>
-                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mt-2">Arrecadado este mês</p>
+            <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col justify-center">
+                <div class="flex items-center gap-2 text-[10px] font-black text-purple-600 uppercase tracking-[0.2em] mb-3">
+                    <i class="bi bi-person-badge-fill"></i><span>Timóteos</span>
                 </div>
-                <div class="absolute -right-4 -bottom-4 text-8xl text-green-50 opacity-50"><i class="bi bi-cash-stack"></i></div>
+                <p class="text-4xl font-black text-gray-900 tracking-tighter">{{ $cell->timoteos()->count() }}</p>
+            </div>
+            <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col justify-center">
+                <div class="flex items-center gap-2 text-[10px] font-black text-orange-600 uppercase tracking-[0.2em] mb-3">
+                    <i class="bi bi-globe2"></i><span>Visitas</span>
+                </div>
+                <p class="text-4xl font-black text-gray-900 tracking-tighter">{{ $visitors->count() }}</p>
             </div>
         </div>
 
-        <!-- Main Content Area with Tabs -->
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <div class="lg:col-span-3 space-y-6">
+
+                <!-- Hidden radio inputs for CSS-only tabs (must be siblings of panels) -->
+                <input type="radio" name="cell_tab" id="tab-members" value="members" class="hidden" checked>
+                <input type="radio" name="cell_tab" id="tab-meetings" value="meetings" class="hidden">
+                <input type="radio" name="cell_tab" id="tab-visitors" value="visitors" class="hidden">
+                <input type="radio" name="cell_tab" id="tab-stats" value="stats" class="hidden">
+
                 <!-- Tab Navigation -->
-                <div class="flex items-center gap-2 md:gap-4 bg-white p-1.5 md:p-2 rounded-2xl md:rounded-[2rem] shadow-sm border border-gray-100 w-full md:w-fit overflow-x-auto no-scrollbar">
-                    <button @click="activeTab = 'members'"
-                        :class="activeTab === 'members' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-gray-500 hover:bg-gray-50'"
-                        class="px-4 md:px-8 py-2 md:py-3 rounded-xl md:rounded-[1.5rem] text-[10px] md:text-sm font-black uppercase tracking-widest transition-all whitespace-nowrap">
-                        Membros
-                    </button>
-                    <button @click="activeTab = 'meetings'"
-                        :class="activeTab === 'meetings' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-gray-500 hover:bg-gray-50'"
-                        class="px-4 md:px-8 py-2 md:py-3 rounded-xl md:rounded-[1.5rem] text-[10px] md:text-sm font-black uppercase tracking-widest transition-all whitespace-nowrap">
-                        Encontros
-                    </button>
-                    <button @click="activeTab = 'visitors'"
-                        :class="activeTab === 'visitors' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-gray-500 hover:bg-gray-50'"
-                        class="px-4 md:px-8 py-2 md:py-3 rounded-xl md:rounded-[1.5rem] text-[10px] md:text-sm font-black uppercase tracking-widest transition-all whitespace-nowrap">
-                        Visitas
-                    </button>
-                    <button @click="activeTab = 'stats'"
-                        :class="activeTab === 'stats' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-gray-500 hover:bg-gray-50'"
-                        class="px-4 md:px-8 py-2 md:py-3 rounded-xl md:rounded-[1.5rem] text-[10px] md:text-sm font-black uppercase tracking-widest transition-all whitespace-nowrap">
-                        Desempenho
-                    </button>
+                <div class="tab-nav flex items-center gap-2 md:gap-4 bg-white p-1.5 md:p-2 rounded-2xl md:rounded-[2rem] shadow-sm border border-gray-100 w-full md:w-fit overflow-x-auto no-scrollbar">
+                    <label for="tab-members" class="tab-nav-label px-4 md:px-8 py-2 md:py-3 rounded-xl md:rounded-[1.5rem] text-[10px] md:text-sm font-black uppercase tracking-widest transition-all whitespace-nowrap cursor-pointer bg-blue-600 text-white shadow-lg shadow-blue-200">Membros</label>
+                    <label for="tab-meetings" class="tab-nav-label px-4 md:px-8 py-2 md:py-3 rounded-xl md:rounded-[1.5rem] text-[10px] md:text-sm font-black uppercase tracking-widest transition-all whitespace-nowrap cursor-pointer text-gray-500 hover:bg-gray-50">Encontros</label>
+                    <label for="tab-visitors" class="tab-nav-label px-4 md:px-8 py-2 md:py-3 rounded-xl md:rounded-[1.5rem] text-[10px] md:text-sm font-black uppercase tracking-widest transition-all whitespace-nowrap cursor-pointer text-gray-500 hover:bg-gray-50">Visitas</label>
+                    <label for="tab-stats" class="tab-nav-label px-4 md:px-8 py-2 md:py-3 rounded-xl md:rounded-[1.5rem] text-[10px] md:text-sm font-black uppercase tracking-widest transition-all whitespace-nowrap cursor-pointer text-gray-500 hover:bg-gray-50">Desempenho</label>
                 </div>
 
+                <style>
+                    #tab-members:checked ~ .tab-panel-members,
+                    #tab-meetings:checked ~ .tab-panel-meetings,
+                    #tab-visitors:checked ~ .tab-panel-visitors,
+                    #tab-stats:checked ~ .tab-panel-stats {
+                        display: block;
+                    }
+                    #tab-members:not(:checked) ~ .tab-panel-members,
+                    #tab-meetings:not(:checked) ~ .tab-panel-meetings,
+                    #tab-visitors:not(:checked) ~ .tab-panel-visitors,
+                    #tab-stats:not(:checked) ~ .tab-panel-stats {
+                        display: none;
+                    }
+                </style>
+
                 <!-- Tab: Members -->
-                <div x-show="activeTab === 'members'" x-transition.fade class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="p-8 md:p-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-gray-50">
-                        <div>
-                            <h3 class="text-2xl font-black text-gray-900 tracking-tighter">Corpo de Membros</h3>
-                            <p class="text-sm font-medium text-gray-400">Pessoas vinculadas diretamente a esta célula</p>
+                <div class="tab-panel-members bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6 md:p-8">
+                    <!-- Actions Bar -->
+                    <div class="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center mb-6">
+                        <div class="relative w-full md:w-80">
+                            <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                            <input type="text" x-model="memberSearch" @input="filterMembers()" placeholder="Pesquisar membros..."
+                                class="w-full pl-11 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-sm outline-none transition-all">
                         </div>
-                        <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
-                            <form action="{{ route('cells.show', $cell) }}" method="GET" class="w-full md:w-80">
-                                <div class="relative">
-                                    <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                                    <input type="text" name="search" value="{{ request('search') }}"
-                                        placeholder="Pesquisar membro por nome ou email..."
-                                        class="w-full pl-11 pr-4 py-3 bg-gray-50/60 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all">
-                                </div>
-                            </form>
-                            <a href="{{ route('members.create') }}?cell_id={{ $cell->id }}"
-                                class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-5 py-3 rounded-2xl flex items-center transition-all font-bold text-sm">
-                                <i class="bi bi-person-plus mr-2"></i> Adicionar
+                        <div class="flex gap-3 w-full md:w-auto">
+                            <a href="{{ route('members.create') }}?cell_id={{ $cell->id }}" class="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition-all shadow-sm hover:shadow-md">
+                                <i class="bi bi-person-plus-fill"></i> Adicionar
                             </a>
+                            <button type="button" onclick="openAddExistingModal()" class="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-green-600 text-white text-sm font-bold hover:bg-green-700 transition-all shadow-sm hover:shadow-md">
+                                <i class="bi bi-people-fill"></i> Adicionar existente
+                            </button>
                         </div>
                     </div>
-                    <div class="overflow-x-auto hidden md:block">
-                        <table class="w-full table-compact">
+
+                    <!-- Desktop Table -->
+                    <div class="hidden md:block overflow-x-auto">
+                        <table class="w-full">
                             <thead>
-                                <tr class="bg-gray-50/50">
-                                    <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Membro</th>
-                                    <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Compromisso</th>
-                                    <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Contribuição</th>
-                                    <th class="px-10 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest"></th>
+                                <tr class="text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                    <th class="text-left py-4 px-4">Nome</th>
+                                    <th class="text-left py-4 px-4">Papel</th>
+                                    <th class="text-left py-4 px-4">Contacto</th>
+                                    <th class="text-left py-4 px-4">Status</th>
+                                    <th class="text-right py-4 px-4">Ações</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-50">
+                            <tbody class="text-sm" x-ref="membersTableBody">
                                 @forelse($members as $member)
-                                    <tr class="hover:bg-gray-50/50 transition-colors group {{ $member->role === 'lider_celula' ? 'bg-purple-50/40' : '' }}">
-                                        <td class="px-10 py-6">
-                                            <div class="flex items-center gap-4">
-                                                <div class="w-10 h-10 rounded-xl {{ $member->role === 'lider_celula' ? 'bg-purple-100 text-purple-600' : 'bg-gray-100 text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600' }} flex items-center justify-center font-bold transition-all">
+                                    <tr class="border-b border-gray-50 hover:bg-gray-50/50 transition-colors group" data-member-name="{{ strtolower($member->name) }}" data-member-role="{{ $member->role }}">
+                                        <td class="py-4 px-4">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-sm font-bold">
                                                     {{ substr($member->name, 0, 1) }}
                                                 </div>
-                                                <div class="min-w-0">
-                                                    <p class="text-sm font-bold {{ $member->role === 'lider_celula' ? 'text-purple-900' : 'text-gray-900 group-hover:text-blue-600' }} transition-colors line-clamp-1">{{ $member->name }}</p>
-                                                    <p class="text-[10px] font-medium text-gray-400 line-clamp-1">{{ $member->email }}</p>
-                                                    @if($member->role === 'lider_celula')
-                                                        <span class="text-[9px] font-black text-purple-600 uppercase tracking-widest">Líder</span>
-                                                    @endif
+                                                <div>
+                                                    <a href="{{ route('users.show', $member) }}" class="font-bold text-gray-900 hover:text-blue-600 transition-colors">{{ $member->name }}</a>
+                                                    <div class="text-xs text-gray-400">{{ $member->email ?? '—' }}</div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="px-10 py-6">
-                                            @if ($member->getActiveCommitment())
-                                                <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest">
-                                                    {{ $member->getActiveCommitment()->package->name }}
-                                                </span>
-                                            @else
-                                                <span class="text-gray-300 text-[10px] font-black uppercase tracking-widest">Sem pacto</span>
-                                            @endif
-                                        </td>
-                                        <td class="px-10 py-6 text-right font-black text-gray-900">
-                                            <span class="{{ $member->getTotalContributedThisMonth() > 0 ? 'text-green-600' : 'text-gray-300' }}">
-                                                {{ number_format($member->getTotalContributedThisMonth(), 0, ',', '.') }} MT
+                                        <td class="py-4 px-4">
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider {{ $member->role === 'lider_celula' ? 'bg-blue-50 text-blue-600' : ($member->role === 'lider' ? 'bg-purple-50 text-purple-600' : 'bg-gray-100 text-gray-600') }}">
+                                                {{ $member->getRoleLabel() }}
                                             </span>
                                         </td>
-                                        <td class="px-10 py-6 text-right">
-                                            <div class="flex justify-end gap-2 opacity-70 hover:opacity-100 transition-all">
-                                                <button @click="openObs({ id: {{ $member->id }}, name: '{{ $member->name }}', obs: '{{ addslashes($member->observations) }}' })"
-                                                    class="action-icon bg-gray-50 text-gray-400 hover:bg-orange-50 hover:text-orange-600"
-                                                    title="Observações">
-                                                    <i class="bi bi-chat-dots{{ $member->observations ? '-fill' : '' }}"></i>
-                                                </button>
-                                                <button @click="transfer({ id: {{ $member->id }}, name: '{{ $member->name }}' })"
-                                                    class="action-icon bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600"
-                                                    title="Transferir Célula">
-                                                    <i class="bi bi-arrow-left-right"></i>
-                                                </button>
-                                                <form action="{{ route('users.remove-from-cell', $member) }}" method="POST" class="inline" onsubmit="return confirm('Deseja remover este membro desta célula? O membro continuará no sistema, mas sem vínculo a esta célula.')">
+                                        <td class="py-4 px-4 text-gray-600">{{ $member->phone ?? '—' }}</td>
+                                        <td class="py-4 px-4">
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-green-50 text-green-600">
+                                                <i class="bi bi-check-circle-fill text-[8px]"></i> Ativo
+                                            </span>
+                                        </td>
+                                        
+                                        <td class="py-4 px-4 text-right">
+                                            <div class="flex items-center justify-end gap-2 opacity-70 hover:opacity-100 transition-all">
+                                                <button type="button" @click='openObs({{ json_encode(["id" => $member->id, "name" => $member->name, "observations" => $member->observations ?? ""], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT) }})' class="p-2 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Observações"><i class="bi bi-chat-square-text"></i></button>
+                                                <button type="button" @click='transfer({{ json_encode(["id" => $member->id, "name" => $member->name], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT) }})' class="p-2 rounded-lg text-gray-400 hover:text-orange-600 hover:bg-orange-50 transition-colors" title="Transferir"><i class="bi bi-arrow-left-right"></i></button>
+                                                <form action="{{ route('users.remove-from-cell', $member) }}" method="POST" class="inline" onsubmit="return confirm('Deseja remover este membro desta célula?')">
                                                     @csrf
-                                                    <button type="submit"
-                                                        class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 flex items-center justify-center transition-all"
-                                                        title="Remover da Célula">
-                                                        <i class="bi bi-person-x"></i>
-                                                    </button>
+                                                    <button type="submit" class="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Remover"><i class="bi bi-person-x"></i></button>
                                                 </form>
-                                                <a href="{{ route('users.show', $member) }}"
-                                                    class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-center transition-all">
-                                                    <i class="bi bi-chevron-right"></i>
-                                                </a>
+                                                <a href="{{ route('members.edit', $member) }}" class="p-2 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Editar"><i class="bi bi-pencil-square"></i></a>
                                             </div>
                                         </td>
                                     </tr>
                                 @empty
-                                    <tr>
-                                        <td colspan="4" class="px-10 py-16 text-center text-gray-400 font-medium italic">
-                                            Nenhum membro ativo nesta célula.
-                                        </td>
-                                    </tr>
+                                    <tr><td colspan="5" class="py-12 text-center text-gray-400 text-sm">Nenhum membro nesta célula.</td></tr>
                                 @endforelse
                             </tbody>
                         </table>
                     </div>
 
-                    <!-- Mobile Grid View for Members -->
-                    <div class="grid grid-cols-1 gap-4 md:hidden">
+                    <!-- Mobile Cards -->
+                    <div class="md:hidden space-y-4">
                         @forelse($members as $member)
-                            <div class="bg-white border {{ $member->role === 'lider_celula' ? 'border-purple-200 ring-1 ring-purple-100' : 'border-gray-100' }} rounded-3xl p-6 space-y-4 hover:shadow-lg transition-shadow">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 rounded-2xl {{ $member->role === 'lider_celula' ? 'bg-purple-100 text-purple-600' : 'bg-gray-50 text-gray-500' }} flex items-center justify-center font-black text-lg">
-                                        {{ substr($member->name, 0, 1) }}
-                                    </div>
-                                    <div class="min-w-0 flex-1">
-                                        <h4 class="text-sm font-black {{ $member->role === 'lider_celula' ? 'text-purple-900' : 'text-gray-900' }} leading-tight">{{ $member->name }}</h4>
-                                        <p class="text-[10px] font-bold text-gray-400 mt-0.5">{{ $member->email }}</p>
-                                        @if($member->role === 'lider_celula')
-                                            <span class="text-[9px] font-black text-purple-600 uppercase tracking-widest">Líder</span>
-                                        @endif
-                                    </div>
-                                </div>
-                                
-                                <div class="flex items-center justify-between border-t border-b border-gray-50/80 py-3.5">
-                                    <div class="space-y-1">
-                                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Compromisso</p>
+                            <div class="bg-gray-50 rounded-2xl p-5 border border-gray-100" data-member-name="{{ strtolower($member->name) }}" data-member-role="{{ $member->role }}">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold">
+                                            {{ substr($member->name, 0, 1) }}
+                                        </div>
                                         <div>
-                                            @if ($member->getActiveCommitment())
-                                                <span class="px-2.5 py-0.5 bg-blue-50 text-blue-600 rounded-full text-[9px] font-black uppercase tracking-wider">
-                                                    {{ $member->getActiveCommitment()->package->name }}
-                                                </span>
-                                            @else
-                                                <span class="text-gray-300 text-[9px] font-black uppercase tracking-wider">Sem pacto</span>
-                                            @endif
+                                            <a href="{{ route('users.show', $member) }}" class="font-bold text-gray-900 hover:text-blue-600 transition-colors">{{ $member->name }}</a>
+                                            <div class="text-xs text-gray-400">{{ $member->email ?? '—' }}</div>
                                         </div>
                                     </div>
-                                    <div class="text-right space-y-1">
-                                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Contribuição</p>
-                                        <p class="text-xs font-black {{ $member->getTotalContributedThisMonth() > 0 ? 'text-green-600' : 'text-gray-300' }}">
-                                            {{ number_format($member->getTotalContributedThisMonth(), 0, ',', '.') }} MT
-                                        </p>
-                                    </div>
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider {{ $member->role === 'lider_celula' ? 'bg-blue-50 text-blue-600' : ($member->role === 'lider' ? 'bg-purple-50 text-purple-600' : 'bg-gray-100 text-gray-600') }}">
+                                        {{ $member->getRoleLabel() }}
+                                    </span>
                                 </div>
-
-                                <div class="flex items-center justify-end gap-2 pt-1">
-                                    <button @click="openObs({ id: {{ $member->id }}, name: '{{ $member->name }}', obs: '{{ addslashes($member->observations) }}' })"
-                                        class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-orange-50 hover:text-orange-600 flex items-center justify-center transition-all"
-                                        title="Observações">
-                                        <i class="bi bi-chat-dots{{ $member->observations ? '-fill' : '' }} text-lg"></i>
-                                    </button>
-                                    <button @click="transfer({ id: {{ $member->id }}, name: '{{ $member->name }}' })"
-                                        class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-center transition-all"
-                                        title="Transferir Célula">
-                                        <i class="bi bi-arrow-left-right text-lg"></i>
-                                    </button>
-                                    <form action="{{ route('users.remove-from-cell', $member) }}" method="POST" class="inline" onsubmit="return confirm('Deseja remover este membro desta célula? O membro continuará no sistema, mas sem vínculo a esta célula.')">
+                                <div class="text-xs text-gray-500 mb-3">{{ $member->phone ?? '—' }}</div>
+                                <div class="flex gap-2 pt-3 border-t border-gray-200">
+                                    <button type="button" @click='openObs({{ json_encode(["id" => $member->id, "name" => $member->name, "observations" => $member->observations ?? ""], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT) }})' class="flex-1 py-2 rounded-xl text-xs font-bold text-gray-600 bg-white border border-gray-200 hover:bg-gray-100 transition-colors"><i class="bi bi-chat-square-text mr-1"></i> Obs</button>
+                                    <button type="button" @click='transfer({{ json_encode(["id" => $member->id, "name" => $member->name], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT) }})' class="flex-1 py-2 rounded-xl text-xs font-bold text-gray-600 bg-white border border-gray-200 hover:bg-gray-100 transition-colors"><i class="bi bi-arrow-left-right mr-1"></i> Transferir</button>
+                                    <form action="{{ route('users.remove-from-cell', $member) }}" method="POST" class="flex-1" onsubmit="return confirm('Deseja remover este membro desta célula?')">
                                         @csrf
-                                        <button type="submit"
-                                            class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 flex items-center justify-center transition-all"
-                                            title="Remover da Célula">
-                                            <i class="bi bi-person-x text-lg"></i>
-                                        </button>
+                                        <button type="submit" class="w-full py-2 rounded-xl text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 transition-colors"><i class="bi bi-person-x mr-1"></i> Remover</button>
                                     </form>
-                                    <a href="{{ route('users.show', $member) }}"
-                                        class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-center transition-all">
-                                        <i class="bi bi-chevron-right text-lg"></i>
-                                    </a>
+                                    <a href="{{ route('members.edit', $member) }}" class="flex-1 py-2 rounded-xl text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors"><i class="bi bi-pencil-square mr-1"></i> Editar</a>
                                 </div>
                             </div>
                         @empty
-                            <div class="bg-white border border-gray-100 rounded-3xl p-12 text-center text-gray-400 font-medium italic">
-                                Nenhum membro ativo nesta célula.
-                            </div>
+                            <div class="text-center py-12 text-gray-400 text-sm">Nenhum membro nesta célula.</div>
                         @endforelse
                     </div>
+
                     @if($members->hasPages())
                         <div class="mt-6">
-                            {{ $members->links() }}
+                            {{ $members->appends(['tab' => 'members'])->links() }}
                         </div>
                     @endif
                 </div>
 
                 <!-- Tab: Meetings -->
-                <div x-show="activeTab === 'meetings'" x-transition.fade class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="p-8 md:p-10 flex justify-between items-center border-b border-gray-50">
-                        <div>
-                            <h3 class="text-2xl font-black text-gray-900 tracking-tighter">Histórico de Encontros</h3>
-                            <p class="text-sm font-medium text-gray-400">Registros de reuniões, liderança e atos</p>
-                        </div>
-                        <div class="flex gap-3">
-                            <a href="{{ route('cell-meetings.create') }}?cell_id={{ $cell->id }}"
-                                class="bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white px-5 py-3 rounded-2xl flex items-center transition-all font-bold text-sm">
-                                <i class="bi bi-calendar-event mr-2"></i> Novo Encontro
-                            </a>
-                        </div>
+                <div class="tab-panel-meetings bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6 md:p-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-bold text-gray-900">Encontros realizados</h3>
+                        <a href="{{ route('cell-meetings.create', ['cell_id' => $cell->id]) }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition-all shadow-sm">
+                            <i class="bi bi-plus-circle"></i> Novo encontro
+                        </a>
                     </div>
-                    <div class="overflow-x-auto hidden md:block">
-                        <table class="w-full text-sm table-compact">
-                            <thead>
-                                <tr class="bg-gray-50/50">
-                                    <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Data</th>
-                                    <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Tipo</th>
-                                    <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Tema</th>
-                                    <th class="px-10 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Presença</th>
-                                    <th class="px-10 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest"></th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-50">
-                                @forelse($meetings as $meeting)
-                                    <tr class="hover:bg-gray-50/50 transition-colors group">
-                                        <td class="px-10 py-6 font-bold text-gray-900">
-                                            {{ $meeting->meeting_date->format('d/m/Y') }}
-                                        </td>
-                                        <td class="px-10 py-6 uppercase font-black text-[10px] tracking-widest">
-                                            @if($meeting->meeting_type === 'normal')
-                                                <span class="text-blue-600">Reunião de Célula</span>
-                                            @else
-                                                <span class="text-orange-600">
-                                                    <i class="bi bi-award mr-1"></i>
-                                                    @switch($meeting->meeting_type)
-                                                        @case('leadership') Liderança @break
-                                                        @case('supervision') Supervisão @break
-                                                        @case('zone') Zona @break
-                                                        @default Especial
-                                                    @endswitch
-                                                </span>
-                                            @endif
-                                        </td>
-                                        <td class="px-10 py-6 text-gray-600 italic font-medium">
-                                            {{ $meeting->theme ?? 'Sem tema registrado' }}
-                                        </td>
-                                        <td class="px-10 py-6 text-center">
-                                            <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-[10px] font-black tracking-widest">
-                                                {{ $meeting->adults_count + $meeting->children_count + $meeting->visitors_count }}
-                                            </span>
-                                        </td>
-                                        <td class="px-10 py-6 text-right">
-                                            <div class="flex justify-end gap-2">
-                                                <a href="{{ route('cell-meetings.pdf', $meeting) }}" title="PDF"
-                                                    class="action-icon text-gray-300 hover:text-orange-600 hover:bg-orange-50">
-                                                    <i class="bi bi-file-earmark-pdf"></i>
-                                                </a>
-                                                <a href="{{ route('cell-meetings.show', $meeting) }}" title="Detalhes"
-                                                    class="action-icon text-gray-300 hover:text-blue-600 hover:bg-blue-50">
-                                                    <i class="bi bi-chevron-right"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="5" class="px-10 py-16 text-center text-gray-400 font-medium italic">
-                                            Nenhum encontro registrado ainda.
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Mobile Grid View for Meetings -->
-                    <div class="grid grid-cols-1 gap-4 md:hidden">
+                    <div class="space-y-4">
                         @forelse($meetings as $meeting)
-                            <div class="bg-white border border-gray-100 rounded-3xl p-6 space-y-4 hover:shadow-lg transition-shadow">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm font-black text-gray-900">{{ $meeting->meeting_date->format('d/m/Y') }}</span>
-                                    <span class="uppercase font-black text-[9px] tracking-widest">
-                                        @if($meeting->meeting_type === 'normal')
-                                            <span class="px-2.5 py-0.5 bg-blue-50 text-blue-600 rounded-full">Reunião de Célula</span>
-                                        @else
-                                            <span class="px-2.5 py-0.5 bg-orange-50 text-orange-600 rounded-full">
-                                                <i class="bi bi-award mr-0.5"></i>
-                                                @switch($meeting->meeting_type)
-                                                    @case('leadership') Liderança @break
-                                                    @case('supervision') Supervisão @break
-                                                    @case('zone') Zona @break
-                                                    @default Especial
-                                                @endswitch
-                                            </span>
-                                        @endif
-                                    </span>
+                            <div class="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 border border-gray-100 hover:border-blue-200 transition-colors">
+                                <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600"><i class="bi bi-calendar-event-fill text-xl"></i></div>
+                                <div class="flex-1">
+                                    <div class="font-bold text-gray-900">{{ $meeting->theme ?? 'Encontro da célula' }}</div>
+                                    <div class="text-xs text-gray-400">{{ $meeting->meeting_date ? $meeting->meeting_date->format('d/m/Y H:i') : 'Data não definida' }}</div>
                                 </div>
-                                
-                                <div class="space-y-1">
-                                    <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Tema</p>
-                                    <p class="text-xs text-gray-600 italic font-medium">
-                                        {{ $meeting->theme ?? 'Sem tema registrado' }}
-                                    </p>
+                                <div class="text-right">
+                                    <div class="text-sm font-bold text-gray-900">{{ $meeting->adults_count + $meeting->children_count + $meeting->visitors_count }} <span class="text-xs font-normal text-gray-400">presentes</span></div>
                                 </div>
-
-                                <div class="flex items-center justify-between border-t border-gray-50/80 pt-4">
-                                    <div class="space-y-1">
-                                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Presença Total</p>
-                                        <span class="inline-block bg-gray-100 text-gray-600 px-2.5 py-0.5 rounded-full text-[9px] font-black tracking-widest">
-                                            {{ $meeting->adults_count + $meeting->children_count + $meeting->visitors_count }}
-                                        </span>
-                                    </div>
-                                    <div class="flex gap-2">
-                                        <a href="{{ route('cell-meetings.pdf', $meeting) }}" title="PDF"
-                                            class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-orange-50 hover:text-orange-600 flex items-center justify-center transition-all">
-                                            <i class="bi bi-file-earmark-pdf text-lg"></i>
-                                        </a>
-                                        <a href="{{ route('cell-meetings.show', $meeting) }}" title="Detalhes"
-                                            class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-center transition-all">
-                                            <i class="bi bi-chevron-right text-lg"></i>
-                                        </a>
-                                    </div>
+                                <div class="flex items-center gap-2">
+                                    <a href="{{ route('cell-meetings.pdf', $meeting) }}" class="p-2 rounded-lg text-gray-400 hover:text-orange-600 hover:bg-orange-50 transition-colors" title="Exportar PDF"><i class="bi bi-file-earmark-pdf"></i></a>
+                                    <a href="{{ route('cell-meetings.show', $meeting) }}" class="p-2 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"><i class="bi bi-chevron-right"></i></a>
                                 </div>
                             </div>
                         @empty
-                            <div class="bg-white border border-gray-100 rounded-3xl p-12 text-center text-gray-400 font-medium italic">
-                                Nenhum encontro registrado ainda.
-                            </div>
+                            <div class="text-center py-12 text-gray-400 text-sm">Nenhum encontro registado.</div>
                         @endforelse
                     </div>
                     @if($meetings->hasPages())
                         <div class="mt-6">
-                            {{ $meetings->links() }}
+                            {{ $meetings->appends(['tab' => 'meetings'])->links() }}
                         </div>
                     @endif
                 </div>
 
                 <!-- Tab: Visitors -->
-                <div x-show="activeTab === 'visitors'" x-transition.fade class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="p-8 md:p-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-gray-50">
-                        <div>
-                            <h3 class="text-2xl font-black text-gray-900 tracking-tighter">Visitas na Célula</h3>
-                            <p class="text-sm font-medium text-gray-400">Todos os visitantes associados a esta célula</p>
-                        </div>
+                <div class="tab-panel-visitors bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6 md:p-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-bold text-gray-900">Visitas recentes</h3>
+                        <a href="{{ route('visitors.create') }}?cell_id={{ $cell->id }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition-all shadow-sm">
+                            <i class="bi bi-plus-circle"></i> Nova visita
+                        </a>
                     </div>
-
-                    <!-- Desktop Table -->
-                    <div class="overflow-x-auto hidden md:block">
-                        <table class="w-full table-compact">
-                            <thead>
-                                <tr class="bg-gray-50/50">
-                                    <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Visitante</th>
-                                    <th class="px-10 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Contacto</th>
-                                    <th class="px-10 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Data da Visita</th>
-                                    <th class="px-10 py-5 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Estado</th>
-                                    <th class="px-10 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-50">
-                                @forelse($visitors as $visitor)
-                                    <tr class="hover:bg-gray-50/50 transition-colors group">
-                                        <td class="px-10 py-6">
-                                            <div class="flex items-center gap-4">
-                                                <div class="w-10 h-10 rounded-xl bg-orange-50 text-orange-650 flex items-center justify-center font-bold">
-                                                    {{ substr($visitor->name, 0, 1) }}
-                                                </div>
-                                                <div>
-                                                    <p class="text-sm font-bold text-gray-900 leading-tight group-hover:text-orange-650 transition-colors">{{ $visitor->name }}</p>
-                                                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">
-                                                        @if($visitor->age) {{ $visitor->age }} anos @endif
-                                                        @if($visitor->gender) • {{ ucfirst($visitor->gender) }} @endif
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="px-10 py-6">
-                                            <div class="text-sm font-bold text-gray-800">{{ $visitor->phone ?: 'Sem telefone' }}</div>
-                                            @if($visitor->neighborhood)
-                                                <div class="text-[10px] text-gray-400 font-medium">{{ $visitor->neighborhood }}</div>
-                                            @endif
-                                        </td>
-                                        <td class="px-10 py-6 text-center">
-                                            <span class="text-sm font-bold text-gray-700">
-                                                {{ $visitor->visit_date->format('d/m/Y') }}
-                                            </span>
-                                            <span class="block text-[10px] text-gray-400 font-medium">
-                                                {{ $visitor->visit_date->diffForHumans() }}
-                                            </span>
-                                        </td>
-                                        <td class="px-10 py-6 text-center">
-                                            {!! $visitor->status_badge !!}
-                                        </td>
-                                        <td class="px-10 py-6 text-right">
-                                            <div class="flex justify-end items-center gap-2 opacity-70 hover:opacity-100 transition-all">
-                                                @if(in_array($visitor->contact_status, ['pendente', 'contatado']) && auth()->user()->role !== 'secretaria')
-                                                    <a href="{{ route('members.create') }}?visitor_id={{ $visitor->id }}"
-                                                        class="px-4 py-2 bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-sm flex items-center gap-1.5"
-                                                        title="Tornar Membro">
-                                                        <i class="bi bi-person-check-fill"></i> Tornar Membro
-                                                    </a>
-                                                @endif
-                                                @if(auth()->user()->role !== 'secretaria')
-                                                    <button @click="openFeedback($el.dataset.id, $el.dataset.status, $el.dataset.notes)"
-                                                        data-id="{{ $visitor->id }}"
-                                                        data-status="{{ $visitor->contact_status }}"
-                                                        data-notes="{{ $visitor->notes }}"
-                                                        class="action-icon bg-gray-50 text-gray-400 hover:bg-orange-50 hover:text-orange-600" title="Registar Feedback">
-                                                        <i class="bi bi-chat-text"></i>
-                                                    </button>
-                                                @endif
-                                                <a href="{{ route('visitors.show', $visitor) }}"
-                                                    class="action-icon bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600" title="Ver Acompanhamento">
-                                                    <i class="bi bi-eye"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="5" class="px-10 py-16 text-center text-gray-400 font-medium italic">
-                                            Nenhum visitante registrado para esta célula.
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Mobile Card Grid -->
-                    <div class="grid grid-cols-1 gap-4 md:hidden p-4">
+                    <div class="space-y-4">
                         @forelse($visitors as $visitor)
-                            <div class="bg-white border border-gray-100 rounded-3xl p-6 space-y-4 hover:shadow-lg transition-shadow">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3.5 min-w-0">
-                                        <div class="w-11 h-11 rounded-xl bg-orange-50 text-orange-650 flex items-center justify-center font-black text-sm uppercase flex-shrink-0">
-                                            {{ substr($visitor->name, 0, 1) }}
-                                        </div>
-                                        <div class="min-w-0">
-                                            <h4 class="text-sm font-black text-gray-900 leading-tight truncate">{{ $visitor->name }}</h4>
-                                            <p class="text-[10px] font-bold text-gray-400 mt-0.5 truncate">
-                                                @if($visitor->age) {{ $visitor->age }} anos @endif
-                                                @if($visitor->gender) • {{ ucfirst($visitor->gender) }} @endif
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="flex-shrink-0">
-                                        {!! $visitor->status_badge !!}
-                                    </div>
+                            <div class="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 border border-gray-100 hover:border-purple-200 transition-colors">
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-bold">{{ substr($visitor->name, 0, 1) }}</div>
+                                <div class="flex-1">
+                                    <div class="font-bold text-gray-900">{{ $visitor->name }}</div>
+                                    <div class="text-xs text-gray-400">{{ $visitor->visit_date ? $visitor->visit_date->format('d/m/Y') : 'Data não definida' }}</div>
                                 </div>
-
-                                <div class="flex items-center gap-3 border-t border-gray-50/80 pt-4">
-                                    <div class="flex-1 space-y-0.5">
-                                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Contacto</p>
-                                        <p class="text-xs font-bold text-gray-700">{{ $visitor->phone ?: 'Sem telefone' }}</p>
-                                    </div>
-                                    <div class="flex-1 space-y-0.5 text-right">
-                                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Visita</p>
-                                        <p class="text-xs font-bold text-gray-700">{{ $visitor->visit_date->format('d/m/Y') }}</p>
-                                    </div>
-                                </div>
-
-                                <div class="flex gap-2 border-t border-gray-50/80 pt-4">
-                                    @if(in_array($visitor->contact_status, ['pendente', 'contatado']) && auth()->user()->role !== 'secretaria')
-                                        <a href="{{ route('members.create') }}?visitor_id={{ $visitor->id }}"
-                                            class="flex-1 bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white h-10 rounded-xl flex items-center justify-center text-[10px] font-black uppercase tracking-widest transition-all gap-1.5 shadow-sm">
-                                            <i class="bi bi-person-check-fill text-sm"></i> Tornar Membro
-                                        </a>
-                                    @endif
-                                    @if(auth()->user()->role !== 'secretaria')
-                                        <button @click="openFeedback($el.dataset.id, $el.dataset.status, $el.dataset.notes)"
-                                            data-id="{{ $visitor->id }}"
-                                            data-status="{{ $visitor->contact_status }}"
-                                            data-notes="{{ $visitor->notes }}"
-                                            class="w-12 h-10 bg-gray-50 text-gray-500 hover:bg-orange-50 hover:text-orange-650 rounded-xl flex items-center justify-center transition-all"
-                                            title="Registar Feedback">
-                                            <i class="bi bi-chat-text text-lg"></i>
-                                        </button>
-                                    @endif
-                                    <a href="{{ route('visitors.show', $visitor) }}"
-                                        class="w-12 h-10 bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-600 rounded-xl flex items-center justify-center transition-all">
-                                        <i class="bi bi-eye text-lg"></i>
-                                    </a>
+                                <div class="flex gap-2 items-center">
+                                    <button type="button"
+                                        @click="openFeedback($el.dataset.id, $el.dataset.status, $el.dataset.notes)"
+                                        data-id="{{ $visitor->id }}"
+                                        data-status="{{ $visitor->contact_status ?? 'pendente' }}"
+                                        data-notes="{{ $visitor->notes ?? '' }}"
+                                        class="px-4 py-2 rounded-xl text-xs font-bold {{ $visitor->contact_status === 'integrado' ? 'bg-green-50 text-green-600' : ($visitor->contact_status === 'sem_interesse' ? 'bg-red-50 text-red-600' : 'bg-yellow-50 text-yellow-600') }}">
+                                        {{ $visitor->contact_status === 'integrado' ? 'Integrado' : ($visitor->contact_status === 'sem_interesse' ? 'Sem interesse' : ($visitor->contact_status === 'contatado' ? 'Contatado' : 'Pendente')) }}
+                                    </button>
+                                    <a href="{{ route('visitors.edit', $visitor) }}" class="p-2 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"><i class="bi bi-pencil-square"></i></a>
+                                    <a href="{{ route('visitors.show', $visitor) }}" class="p-2 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Ver acompanhamento"><i class="bi bi-eye"></i></a>
                                 </div>
                             </div>
                         @empty
-                            <div class="bg-white border border-gray-100 rounded-3xl p-12 text-center text-gray-400 font-medium italic">
-                                Nenhum visitante registrado para esta célula.
-                            </div>
+                            <div class="text-center py-12 text-gray-400 text-sm">Nenhuma visita registada.</div>
                         @endforelse
                     </div>
                 </div>
 
                 <!-- Tab: Stats -->
-                <div x-show="activeTab === 'stats'" x-transition.fade class="space-y-8">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div class="bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-100 text-center space-y-2">
-                            <p class="text-5xl font-black text-blue-600 tracking-tighter">{{ $cell->members()->where('is_active', true)->count() }}</p>
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Fidelidade Mensal</p>
+                <div class="tab-panel-stats bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6 md:p-8">
+                    <h3 class="text-lg font-bold text-gray-900 mb-6">Desempenho da célula</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="p-6 rounded-2xl bg-blue-50 border border-blue-100 text-center">
+                            <div class="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] mb-2">Fidelidade Mensal</div>
+                            <div class="text-3xl font-black text-gray-900 tracking-tighter">{{ $cell->members()->where('is_active', true)->count() }}</div>
                         </div>
-                        <div class="bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-100 text-center space-y-2">
-                            <p class="text-5xl font-black text-green-600 tracking-tighter">{{ $cell->getMembersContributedThisMonth() }}</p>
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Pactos Cumpridos</p>
+                        <div class="p-6 rounded-2xl bg-green-50 border border-green-100 text-center">
+                            <div class="text-[10px] font-black text-green-600 uppercase tracking-[0.2em] mb-2">Pactos Cumpridos</div>
+                            <div class="text-3xl font-black text-gray-900 tracking-tighter">{{ $cell->getMembersContributedThisMonth() }}</div>
                         </div>
-                        <div class="bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-100 text-center space-y-2">
+                        <div class="p-6 rounded-2xl bg-purple-50 border border-purple-100 text-center">
                             @php
                                 $total = $cell->members()->where('is_active', true)->count();
                                 $contrib = $cell->getMembersContributedThisMonth();
                                 $perc = $total > 0 ? round(($contrib / $total) * 100) : 0;
                             @endphp
-                            <p class="text-5xl font-black text-purple-600 tracking-tighter">{{ $perc }}%</p>
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Efetividade</p>
+                            <div class="text-[10px] font-black text-purple-600 uppercase tracking-[0.2em] mb-2">Efetividade</div>
+                            <div class="text-3xl font-black text-gray-900 tracking-tighter">{{ $perc }}%</div>
                         </div>
                     </div>
                 </div>
-                <!--Tab Baptismos -->
-                <div x-show="activeTab === 'baptisms'" x-transition.fade class="space-y-8">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div class="bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-100 text-center space-y-2">
-                            <p class="text-5xl font-black text-blue-600 tracking-tighter">{{ $cell->members()->where('is_active', true)->count() }}</p>
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Fidelidade Mensal</p>
-                        </div>
-                        <div class="bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-100 text-center space-y-2">
-                            <p class="text-5xl font-black text-green-600 tracking-tighter">{{ $cell->getMembersContributedThisMonth() }}</p>
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Pactos Cumpridos</p>
-                        </div>
-                        <div class="bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-100 text-center space-y-2">
-                            @php
-                                $total = $cell->members()->where('is_active', true)->count();
-                                $contrib = $cell->getMembersContributedThisMonth();
-                                $perc = $total > 0 ? round(($contrib / $total) * 100) : 0;
-                            @endphp
-                            <p class="text-5xl font-black text-purple-600 tracking-tighter">{{ $perc }}%</p>
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Efetividade</p>
-                        </div>
-                    </div>
-                </div>
+
             </div>
 
-            <!-- Coluna de Ações Rápidas (Hidden on Mobile) -->
-            <div class="space-y-6 hidden md:block">
-                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 space-y-6">
-                    <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Gestão da Unidade</h3>
-                    <div class="grid grid-cols-1 gap-3">
-                        <a href="{{ route('cells.pdf', $cell) }}"
-                            class="w-full bg-orange-600 text-white px-6 py-4 rounded-2xl hover:bg-orange-700 transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3">
-                            <i class="bi bi-file-earmark-pdf"></i> Exportar Ficha
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6">
+                    <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Ações rápidas</h4>
+                    <div class="space-y-2">
+                        <a href="{{ route('cells.pdf', $cell) }}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors group">
+                            <div class="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition-colors"><i class="bi bi-file-earmark-pdf"></i></div>
+                            <span class="text-sm font-bold text-gray-700 group-hover:text-orange-600 transition-colors">Exportar ficha PDF</span>
                         </a>
-                        <a href="{{ route('cells.attendance', $cell) }}"
-                            class="w-full bg-gray-900 text-white px-6 py-4 rounded-2xl hover:bg-black transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3">
-                            <i class="bi bi-calendar-check"></i> Ficha de Presença
+                        <a href="{{ route('cells.attendance', $cell) }}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors group">
+                            <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors"><i class="bi bi-calendar-check"></i></div>
+                            <span class="text-sm font-bold text-gray-700 group-hover:text-blue-600 transition-colors">Ficha de presença</span>
                         </a>
-                        <a href="{{ route('cells.attendance', ['cell' => $cell->id, 'tab' => 'baptisms']) }}"
-                            class="w-full bg-white text-gray-800 border-2 border-gray-100 px-6 py-4 rounded-2xl hover:border-orange-600 hover:text-orange-600 transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3">
-                            <i class="bi bi-droplet-fill"></i> Baptismos
+                        <a href="{{ route('cells.attendance', ['cell' => $cell->id, 'tab' => 'baptisms']) }}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors group">
+                            <div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors"><i class="bi bi-droplet-fill"></i></div>
+                            <span class="text-sm font-bold text-gray-700 group-hover:text-indigo-600 transition-colors">Baptismos</span>
                         </a>
-                        <a href="{{ route('contributions.index') }}?cell_id={{ $cell->id }}"
-                            class="w-full bg-white text-gray-800 border-2 border-gray-100 px-6 py-4 rounded-2xl hover:border-blue-600 hover:text-blue-600 transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3">
-                            <i class="bi bi-cash-coin"></i> Contribuições
+                        <a href="{{ route('contributions.index') }}?cell_id={{ $cell->id }}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors group">
+                            <div class="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center text-green-600 group-hover:bg-green-600 group-hover:text-white transition-colors"><i class="bi bi-cash-coin"></i></div>
+                            <span class="text-sm font-bold text-gray-700 group-hover:text-green-600 transition-colors">Contribuições</span>
                         </a>
-                        <div class="pt-4 border-t border-gray-50 flex gap-2">
-                            <a href="{{ route('cells.edit', $cell) }}"
-                                class="flex-1 bg-gray-50 text-gray-500 px-4 py-4 rounded-2xl hover:bg-gray-100 transition-all font-black text-[10px] uppercase tracking-widest text-center">
-                                Editar
+                        @if(!auth()->user()->isLider())
+                            <a href="{{ route('cells.edit', $cell) }}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors group">
+                                <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600 group-hover:bg-gray-600 group-hover:text-white transition-colors"><i class="bi bi-pencil-square"></i></div>
+                                <span class="text-sm font-bold text-gray-700 group-hover:text-gray-600 transition-colors">Editar célula</span>
                             </a>
-                            <a href="{{ route('cells.index') }}"
-                                class="flex-1 bg-gray-50 text-gray-500 px-4 py-4 rounded-2xl hover:bg-gray-100 transition-all font-black text-[10px] uppercase tracking-widest text-center">
-                                Voltar
-                            </a>
-                            {{-- se não tiver membros entao pode ter o botao eliminar --}}
-                            @if($cell->members->count() == 0)
-                                <form action="{{ route('cells.destroy', $cell) }}" method="POST" id="delete-cell-form" class="flex-1">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="button" onclick="confirmDelete('delete-cell-form', 'Deseja excluir esta célula?')"
-                                        class="w-full bg-red-50 text-red-600 px-4 py-4 rounded-2xl hover:bg-red-600 hover:text-white transition-all font-black text-[10px] uppercase tracking-widest text-center">
-                                        Eliminar
-                                    </button>
-                                </form>
-                            @else
-                                <button type="button"
-                                    onclick="Swal.fire({icon: 'warning', title: 'Não é possível eliminar', text: 'Esta célula possui membros associados. Remova ou transfira os membros antes de eliminar a célula.'})"
-                                    class="flex-1 bg-red-50 text-red-300 px-4 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest text-center cursor-not-allowed opacity-75"
-                                    title="Não é possível eliminar célula com membros">
-                                    Eliminar
+                        @endif
+                        <a href="{{ route('cells.index') }}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors group">
+                            <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600 group-hover:bg-gray-600 group-hover:text-white transition-colors"><i class="bi bi-arrow-left"></i></div>
+                            <span class="text-sm font-bold text-gray-700 group-hover:text-gray-600 transition-colors">Voltar</span>
+                        </a>
+                        @if($cell->members->count() == 0)
+                            <form action="{{ route('cells.destroy', $cell) }}" method="POST" id="delete-cell-form" onsubmit="return confirm('Deseja excluir esta célula?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 transition-colors group">
+                                    <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors"><i class="bi bi-trash"></i></div>
+                                    <span class="text-sm font-bold text-red-600 group-hover:text-red-700 transition-colors">Eliminar</span>
                                 </button>
-                            @endif
-                        </div>
+                            </form>
+                        @else
+                            <button type="button" onclick="alert('Não é possível eliminar célula com membros. Remova ou transfira os membros antes de eliminar.')" class="w-full flex items-center gap-3 p-3 rounded-xl opacity-50 cursor-not-allowed group" disabled>
+                                <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center text-red-300"><i class="bi bi-trash"></i></div>
+                                <span class="text-sm font-bold text-red-300">Eliminar</span>
+                            </button>
+                        @endif
                     </div>
                 </div>
 
-                <div class="bg-gradient-to-br from-indigo-900 to-blue-900 rounded-[2.5rem] shadow-xl p-10 text-white relative overflow-hidden">
-                    <div class="relative z-10 space-y-6">
-                        <p class="text-[10px] font-black text-blue-300 uppercase tracking-[0.2em]">Visão Geral</p>
-                        <div class="space-y-1">
-                            <p class="text-sm font-medium text-blue-100">Crescimento Mensal</p>
-                            <div class="flex items-end gap-2">
-                                <span class="text-4xl font-black tracking-tighter text-white">+{{ $cell->members()->where('created_at', '>=', now()->startOfMonth())->count() }}</span>
-                                <span class="text-xs font-bold text-blue-300 mb-1">Novos Membros</span>
+                <!-- Leader Info -->
+                <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6">
+                    <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Liderança</h4>
+                    @if($cell->leader)
+                        <a href="{{ route('users.show', $cell->leader) }}" class="flex items-center gap-3 hover:bg-gray-50 p-2 rounded-xl transition-colors">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-sm font-bold">{{ substr($cell->leader->name, 0, 1) }}</div>
+                            <div>
+                                <div class="font-bold text-gray-900 text-sm">{{ $cell->leader->name }}</div>
+                                <div class="text-xs text-gray-400">Líder da célula</div>
                             </div>
-                        </div>
-                        <div class="w-full bg-white/10 rounded-full h-1.5 mt-4">
-                            <div class="bg-blue-400 h-1.5 rounded-full" style="width: 65%"></div>
-                        </div>
-                    </div>
-                    <i class="bi bi-lightning-charge-fill absolute -right-4 -bottom-4 text-9xl text-white opacity-5"></i>
+                        </a>
+                    @else
+                        <div class="text-sm text-gray-400 text-center py-4">Sem líder definido</div>
+                    @endif
                 </div>
             </div>
         </div>
 
-        <!-- Transfer Member Modal -->
-        <div x-show="showTransferModal" 
-            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0"
-            x-transition:enter-end="opacity-100"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0"
-            style="display: none; margin-top: -15px">
-            <div @click.away="showTransferModal = false" class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden animate-In">
-                <div class="p-8 border-b border-gray-100">
-                    <h3 class="text-xl font-black text-gray-900 leading-tight">Transferir Membro</h3>
-                    <p class="text-sm text-gray-500 mt-1" x-text="'Mover ' + selectedMember.name + ' para outra célula'"></p>
+    <!-- Transfer Modal -->
+    <div x-show="showTransferModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="showTransferModal = false"></div>
+        <div class="relative bg-white rounded-[2rem] shadow-2xl p-8 max-w-lg w-full">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Transferir membro</h3>
+            <p class="text-sm text-gray-500 mb-6">Mover <strong x-text="selectedMember.name"></strong> para outra célula.</p>
+            <form :action="'{{ url('/admin/users') }}/' + selectedMember.id + '/reassign-cell'" method="POST">
+                @csrf
+                <div class="mb-6">
+                    <label class="block text-xs font-bold text-gray-700 mb-2">Célula de destino</label>
+                    <select name="cell_id" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-sm outline-none transition-all" required>
+                        <option value="">Selecione uma célula...</option>
+                        @foreach($availableCells as $c)
+                            <option value="{{ $c->id }}">{{ $c->display_name }}</option>
+                        @endforeach
+                    </select>
                 </div>
-                <form :action="'{{ url('/admin/users') }}/' + selectedMember.id + '/reassign-cell'" method="POST" class="p-8 space-y-6">
-                    @csrf
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Selecione a Célula de Destino</label>
-                        <select name="cell_id" required data-searchable="false" class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all appearance-none custom-select">
-                            <option value="">Escolha uma célula...</option>
-                            @foreach($availableCells as $availCell)
-                                <option value="{{ $availCell->id }}">{{ $availCell->display_name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="flex gap-3 pt-4">
-                        <button type="button" @click="showTransferModal = false" class="flex-1 px-6 py-4 rounded-2xl bg-gray-50 text-gray-500 font-black text-xs uppercase tracking-widest hover:bg-gray-100 transition-all">Cancelar</button>
-                        <button type="submit" class="flex-1 px-6 py-4 rounded-2xl bg-blue-600 text-white font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">Confirmar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Observations Modal -->
-        <div x-show="showObsModal" 
-            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0"
-            x-transition:enter-end="opacity-100"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0"
-            style="display: none;">
-            <div @click.away="showObsModal = false" class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-hidden animate-In">
-                <div class="p-8 border-b border-gray-100">
-                    <h3 class="text-xl font-black text-gray-900 leading-tight">Observações do Membro</h3>
-                    <p class="text-sm text-gray-500 mt-1" x-text="selectedMember.name"></p>
+                <div class="flex gap-3">
+                    <button type="button" @click="showTransferModal = false" class="flex-1 py-3 rounded-xl border border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+                    <button type="submit" class="flex-1 py-3 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition-colors">Confirmar</button>
                 </div>
-                <form :action="'{{ url('/admin/users') }}/' + selectedMember.id + '/update-observations'" method="POST" class="p-8 space-y-6">
-                    @csrf
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Notas e Status (ex: Desistente, Afastado)</label>
-                        <textarea name="observations" x-model="selectedMember.obs" rows="5" class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all placeholder:text-gray-300" placeholder="Digite as observações aqui..."></textarea>
-                    </div>
-                    <div class="flex gap-3 pt-4">
-                        <button type="button" @click="showObsModal = false" class="flex-1 px-6 py-4 rounded-2xl bg-gray-50 text-gray-500 font-black text-xs uppercase tracking-widest hover:bg-gray-100 transition-all">Cancelar</button>
-                        <button type="submit" class="flex-1 px-6 py-4 rounded-2xl bg-green-600 text-white font-black text-xs uppercase tracking-widest hover:bg-green-700 transition-all shadow-lg shadow-green-200">Salvar Notas</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Visitor Feedback Modal -->
-        <div x-show="showFeedbackModal" 
-            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0"
-            x-transition:enter-end="opacity-100"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0"
-            style="display: none;">
-            <div @click.away="showFeedbackModal = false" class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-hidden animate-In">
-                <div class="p-8 border-b border-gray-100">
-                    <h3 class="text-xl font-black text-gray-900 leading-tight">Registrar Feedback da Visita</h3>
-                    <p class="text-sm text-gray-500 mt-1">Atualize o estado do contacto e observações de acompanhamento</p>
-                </div>
-                <form :action="'{{ url('/visitors') }}/' + feedbackVisitorId + '/update-feedback'" method="POST" class="p-8 space-y-6">
-                    @csrf
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Estado do Contacto</label>
-                        <select name="contact_status" x-model="feedbackStatus" required class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-orange-100 rounded-2xl text-sm font-bold transition-all appearance-none custom-select">
-                            <option value="pendente">Pendente (Não contactado)</option>
-                            <option value="contatado">Contatado (Em Acompanhamento)</option>
-                            <option value="sem_interesse">Sem Interesse</option>
-                            <option value="integrado">Integrado (Já é Membro)</option>
-                        </select>
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Notas / Histórico de Conversa</label>
-                        <textarea name="notes" x-model="feedbackNotes" rows="5" class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-orange-100 rounded-2xl text-sm font-medium transition-all placeholder:text-gray-300" placeholder="Escreva aqui detalhes sobre o contacto realizado..."></textarea>
-                    </div>
-                    <div class="flex gap-3 pt-4">
-                        <button type="button" @click="showFeedbackModal = false" class="flex-1 px-6 py-4 rounded-2xl bg-gray-50 text-gray-500 font-black text-xs uppercase tracking-widest hover:bg-gray-100 transition-all">Cancelar</button>
-                        <button type="submit" class="flex-1 px-6 py-4 rounded-2xl bg-orange-600 text-white font-black text-xs uppercase tracking-widest hover:bg-orange-700 transition-all shadow-lg shadow-orange-200">Salvar Feedback</button>
-                    </div>
-                </form>
-            </div>
+            </form>
         </div>
     </div>
+
+    <!-- Observations Modal -->
+    <div x-show="showObsModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="showObsModal = false"></div>
+        <div class="relative bg-white rounded-[2rem] shadow-2xl p-8 max-w-lg w-full">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Observações</h3>
+            <p class="text-sm text-gray-500 mb-6">Notas sobre <strong x-text="selectedMember.name"></strong>.</p>
+            <form :action="'{{ url('/admin/users') }}/' + selectedMember.id + '/update-observations'" method="POST">
+                @csrf
+                <div class="mb-6">
+                    <label class="block text-xs font-bold text-gray-700 mb-2">Observações</label>
+                    <textarea name="observations" x-model="selectedMember.observations" rows="4" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-sm outline-none transition-all resize-none" placeholder="Escreva aqui..."></textarea>
+                </div>
+                <div class="flex gap-3">
+                    <button type="button" @click="showObsModal = false" class="flex-1 py-3 rounded-xl border border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+                    <button type="submit" class="flex-1 py-3 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition-colors">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Feedback Visitor Modal -->
+    <div x-show="showFeedbackModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="showFeedbackModal = false"></div>
+        <div class="relative bg-white rounded-[2rem] shadow-2xl p-8 max-w-lg w-full">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Registrar Feedback da Visita</h3>
+            <form :action="'{{ url('/visitors') }}/' + feedbackVisitorId + '/update-feedback'" method="POST">
+                @csrf
+                <div class="mb-6">
+                    <label class="block text-xs font-bold text-gray-700 mb-2">Estado do Contacto</label>
+                    <select name="contact_status" x-model="feedbackStatus" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-sm outline-none transition-all" required>
+                        <option value="pendente">Pendente (Não contactado)</option>
+                        <option value="contatado">Contatado (Em Acompanhamento)</option>
+                        <option value="sem_interesse">Sem Interesse</option>
+                        <option value="integrado">Integrado (Já é Membro)</option>
+                    </select>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-xs font-bold text-gray-700 mb-2">Notas</label>
+                    <textarea name="notes" x-model="feedbackNotes" rows="4" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-sm outline-none transition-all resize-none" placeholder="Observações sobre a visita..."></textarea>
+                </div>
+                <div class="flex gap-3">
+                    <button type="button" @click="showFeedbackModal = false" class="flex-1 py-3 rounded-xl border border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+                    <button type="submit" class="flex-1 py-3 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition-colors">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Existing Member Modal (no Alpine dependency) -->
+    <div id="addExistingModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" onclick="closeAddExistingModal()"></div>
+        <div class="relative bg-white rounded-[2rem] shadow-2xl p-8 max-w-lg w-full">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Adicionar membro existente</h3>
+            <form action="{{ route('cells.add-member', $cell) }}" method="POST" id="addExistingForm">
+                @csrf
+                @error('member_id')
+                    <p class="text-red-500 text-xs font-bold mb-4">{{ $message }}</p>
+                @enderror
+                <div class="mb-4">
+                    <label class="block text-xs font-bold text-gray-700 mb-2">Pesquisar pessoa</label>
+                    <input type="text" id="addExistingSearchInput" placeholder="Digite o nome..." class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-sm outline-none transition-all">
+                    <input type="hidden" name="cell_id" value="{{ $cell->id }}">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-xs font-bold text-gray-700 mb-2">Pessoa selecionada</label>
+                    <select name="member_id" id="addExistingMemberSelect" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-sm outline-none transition-all" required>
+                        <option value="">Selecione...</option>
+                    </select>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-xs font-bold text-gray-700 mb-2">Papel na célula</label>
+                    <select name="role_in_cell" id="addExistingRoleSelect" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-sm outline-none transition-all">
+                        <option value="membro">Membro</option>
+                        @if($cell->type === 'membros')
+                            <option value="lider">Líder</option>
+                        @endif
+                    </select>
+                </div>
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeAddExistingModal()" class="flex-1 py-3 rounded-xl border border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+                    <button type="submit" id="addExistingSubmitBtn" class="flex-1 py-3 rounded-xl bg-green-600 text-white text-sm font-bold hover:bg-green-700 transition-colors" disabled>Adicionar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    </div> {{-- Close x-data scope --}}
+
+    <script>
+        function filterMembers() {
+            const search = document.querySelector('[x-model="memberSearch"]')?.value.toLowerCase() || '';
+            const rows = document.querySelectorAll('[data-member-name]');
+            rows.forEach(row => {
+                const name = row.dataset.memberName || '';
+                row.style.display = name.includes(search) ? '' : 'none';
+            });
+        }
+
+        // Add Existing Member Modal - vanilla JS, no Alpine dependency
+        var addExistingDebounce = null;
+        document.getElementById('addExistingSearchInput').addEventListener('input', function() {
+            clearTimeout(addExistingDebounce);
+            var query = this.value.trim();
+            var select = document.getElementById('addExistingMemberSelect');
+            select.innerHTML = '<option value="">Selecione...</option>';
+            document.getElementById('addExistingSubmitBtn').disabled = true;
+
+            if (query.length < 2) return;
+
+            addExistingDebounce = setTimeout(function() {
+                fetch("{{ route('cells.eligible-members', $cell) }}?search=" + encodeURIComponent(query))
+                    .then(r => r.json())
+                    .then(data => {
+                        data.forEach(function(member) {
+                            var option = document.createElement('option');
+                            option.value = member.id;
+                            option.textContent = member.name + ' (' + member.role_label + ')';
+                            select.appendChild(option);
+                        });
+                    })
+                    .catch(() => {
+                        select.innerHTML = '<option value="">Selecione...</option>';
+                    });
+            }, 300);
+        });
+
+        document.getElementById('addExistingMemberSelect').addEventListener('change', function() {
+            document.getElementById('addExistingSubmitBtn').disabled = !this.value;
+        });
+
+        function openAddExistingModal() {
+            document.getElementById('addExistingSearchInput').value = '';
+            document.getElementById('addExistingMemberSelect').innerHTML = '<option value="">Selecione...</option>';
+            document.getElementById('addExistingRoleSelect').value = 'membro';
+            document.getElementById('addExistingSubmitBtn').disabled = true;
+            var modal = document.getElementById('addExistingModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeAddExistingModal() {
+            var modal = document.getElementById('addExistingModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // Update tab label styles when radio changes
+        document.addEventListener('DOMContentLoaded', function() {
+            const radios = document.querySelectorAll('input[name="cell_tab"]');
+            const labels = document.querySelectorAll('.tab-nav-label');
+            const activeClasses = ['bg-blue-600', 'text-white', 'shadow-lg', 'shadow-blue-200'];
+            const inactiveClasses = ['text-gray-500', 'hover:bg-gray-50'];
+
+            function updateTabLabels(checkedRadio) {
+                labels.forEach(label => {
+                    label.classList.remove(...activeClasses);
+                    label.classList.add(...inactiveClasses);
+                });
+                const activeLabel = document.querySelector('label[for="tab-' + checkedRadio.value + '"]');
+                if (activeLabel) {
+                    activeLabel.classList.remove(...inactiveClasses);
+                    activeLabel.classList.add(...activeClasses);
+                }
+            }
+
+            radios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    updateTabLabels(this);
+                });
+            });
+
+            // Set initial state
+            const checkedRadio = document.querySelector('input[name="cell_tab"]:checked');
+            if (checkedRadio) {
+                updateTabLabels(checkedRadio);
+            }
+
+            // Auto-open add existing modal if validation error exists
+            @if($errors->has('member_id'))
+                openAddExistingModal();
+            @endif
+        });
+    </script>
 @endsection

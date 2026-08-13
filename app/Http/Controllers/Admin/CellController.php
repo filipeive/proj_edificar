@@ -7,6 +7,8 @@ use App\Models\Supervision;
 use App\Models\User;
 use App\Models\UserCommitment;
 use App\Models\Zone; // Importar o modelo Zone
+use App\Actions\Cells\ReassignMemberAction;
+use App\Services\CellEligibilityService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -218,7 +220,7 @@ class CellController
         }
 
         return view('admin.cells.show', [
-            'cell' => $cell->load('supervision', 'leader'),
+            'cell' => $cell->load('supervision.zone', 'leader', 'timoteos'),
             'members' => $membersQuery->paginate(20)->withQueryString(),
             'meetings' => $cell->meetings()
                 ->orderBy('meeting_date', 'desc')
@@ -230,7 +232,7 @@ class CellController
     }
 
     public function edit(Cell $cell): View
-    {
+    {   
         $user = auth()->user();
         $this->authorize('update', $cell);
 
@@ -469,6 +471,80 @@ class CellController
         $leaders = $leadersQuery->orderBy('name')->get(['id', 'name', 'email', 'role']);
 
         return response()->json($leaders);
+    }
+
+    /**
+     * Lista (JSON) de membros JÁ CADASTRADOS e elegíveis para serem adicionados a
+     * esta célula (usado no modal "Adicionar membro existente").
+     */
+    public function getEligibleMembers(Request $request, Cell $cell, CellEligibilityService $service)
+    {
+        $this->authorize('update', $cell);
+
+        $query = $service->membrosElegiveisPara($cell);
+
+        if ($request->filled('search')) {
+            $term = trim($request->input('search'));
+            $query->where(function ($q) use ($term) {
+                $q->where('name', 'like', "%{$term}%")
+                    ->orWhere('email', 'like', "%{$term}%");
+            });
+        }
+
+        $members = $query->orderBy('name')->limit(50)->get(['id', 'name', 'email', 'role', 'cell_id']);
+
+        return response()->json($members->map(function ($m) {
+            return [
+                'id' => $m->id,
+                'name' => $m->name,
+                'email' => $m->email,
+                'role' => $m->role,
+                'current_cell' => $m->cell?->name,
+            ];
+        }));
+    }
+
+    /**
+     * Adiciona um membro já existente a esta célula (movendo-o, no modelo atual em
+     * que cada pessoa pertence a uma única célula). Revalida tudo server-side.
+     */
+    public function addMember(Request $request, Cell $cell)
+    {
+        $this->authorize('update', $cell);
+
+        $validated = $request->validate([
+            'member_id' => 'required|exists:users,id',
+            'role_in_cell' => 'nullable|in:membro,lider',
+        ]);
+
+        $member = User::findOrFail($validated['member_id']);
+        $service = app(CellEligibilityService::class);
+
+        $result = $service->podeSerAdicionado($member, $cell);
+
+        if ($result !== true) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => $result,
+                    'errors' => ['member_id' => [$result]],
+                ], 422);
+            }
+
+            return back()
+                ->withInput()
+                ->withErrors(['member_id' => $result])
+                ->with('error', $result);
+        }
+
+        // Mover a pessoa para esta célula (função atualiza as contagens de membros).
+        app(ReassignMemberAction::class)->execute($member, (int) $cell->id);
+
+        // Papel dentro da célula: "líder" => definir como líder desta célula de membros.
+        if (($validated['role_in_cell'] ?? 'membro') === 'lider' && $cell->type === Cell::TYPE_MEMBROS) {
+            $cell->update(['leader_id' => $member->id]);
+        }
+
+        return back()->with('success', "{$member->name} foi adicionado(a) à célula {$cell->name} com sucesso!");
     }
 
     private function validateMemberForCellType(Request $request, User $member, string $cellType, string $message): RedirectResponse|JsonResponse|null
