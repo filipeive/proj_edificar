@@ -123,37 +123,6 @@
             </article>
         </section>
 
-        @if($relatedCells->count() > 0)
-        <section class="grid grid-cols-1 gap-5 xl:grid-cols-3">
-            <div class="xl:col-span-2 space-y-6">
-                <article class="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
-                    <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-                        <div>
-                            <h2 class="text-lg font-black tracking-tight text-gray-900">Células Relacionadas</h2>
-                            <p class="text-[10px] font-black uppercase tracking-wider text-gray-400">Dependendo do papel de {{ $user->name }}</p>
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
-                            @foreach($relatedCells as $cell)
-                                <a href="{{ route('cells.show', $cell) }}" class="flex items-center gap-3 rounded-2xl border border-gray-100 p-4 transition hover:border-blue-200 hover:bg-blue-50/50">
-                                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                                        <i class="bi bi-house-door-fill"></i>
-                                    </div>
-                                    <div class="min-w-0">
-                                        <p class="text-sm font-black text-gray-900 line-clamp-1">{{ $cell->name }}</p>
-                                        <p class="text-[10px] font-black uppercase tracking-wider text-gray-400">{{ $cell->supervision->name ?? 'Sem supervisão' }}</p>
-                                    </div>
-                                    <i class="bi bi-chevron-right ml-auto text-gray-300"></i>
-                                </a>
-                            @endforeach
-                        </div>
-                    </div>
-                </article>
-            </div>
-        </section>
-        @endif
-
         <section class="grid grid-cols-1 gap-5 xl:grid-cols-3">
             <div class="xl:col-span-2 space-y-6">
                 <article class="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
@@ -207,6 +176,81 @@
                                 @endforelse
                             </tbody>
                         </table>
+                    </div>
+                </article>
+
+                <article class="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
+                    <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+                        <div>
+                            <h2 class="text-lg font-black tracking-tight text-gray-900">Células Vinculadas</h2>
+                            <p class="text-[10px] font-black uppercase tracking-wider text-gray-400">Relação e atribuições por papel de {{ $user->name }}</p>
+                        </div>
+                        <span class="rounded-xl border border-blue-100 bg-blue-50 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-blue-700">
+                            {{ $relatedCells->count() }} {{ $relatedCells->count() === 1 ? 'célula' : 'células' }}
+                        </span>
+                    </div>
+                    <div class="p-6">
+                        @if($relatedCells->count() > 0)
+                            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                @foreach($relatedCells as $cell)
+                                    <a href="{{ route('cells.show', $cell) }}" class="group flex flex-col justify-between rounded-2xl border border-gray-200 p-5 transition-all duration-200 hover:border-blue-300 hover:bg-blue-50/40 hover:shadow-md">
+                                        <div>
+                                            <div class="flex items-start justify-between gap-3">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-md shadow-blue-100 transition duration-300 group-hover:scale-105">
+                                                        <i class="bi bi-house-door-fill text-lg"></i>
+                                                    </div>
+                                                    <div class="min-w-0">
+                                                        <h3 class="text-base font-black tracking-tight text-gray-900 group-hover:text-blue-700 truncate">{{ $cell->name }}</h3>
+                                                        <p class="text-[11px] font-bold text-gray-500 flex items-center gap-1.5 mt-0.5">
+                                                            <i class="bi bi-diagram-3 text-gray-400"></i>
+                                                            <span>{{ $cell->supervision->name ?? 'Sem supervisão' }}</span>
+                                                            @if($cell->supervision && $cell->supervision->zone)
+                                                                <span class="text-gray-300">•</span>
+                                                                <span class="text-gray-400">{{ $cell->supervision->zone->name }}</span>
+                                                            @endif
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <i class="bi bi-chevron-right text-gray-300 transition duration-200 group-hover:translate-x-1 group-hover:text-blue-600"></i>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-gray-100 pt-3">
+                                            <div class="flex flex-wrap items-center gap-1.5">
+                                                @foreach($cell->user_roles as $roleTag)
+                                                    @php
+                                                        $tagClasses = match($roleTag) {
+                                                            'Líder' => 'bg-blue-100 text-blue-800 border-blue-200',
+                                                            'Timóteo' => 'bg-indigo-100 text-indigo-800 border-indigo-200',
+                                                            'Supervisor' => 'bg-purple-100 text-purple-800 border-purple-200',
+                                                            'Sub-supervisor' => 'bg-pink-100 text-pink-800 border-pink-200',
+                                                            'Pastor de Zona' => 'bg-amber-100 text-amber-800 border-amber-200',
+                                                            'Membro da Célula' => 'bg-emerald-100 text-emerald-800 border-emerald-200',
+                                                            default => 'bg-gray-100 text-gray-700 border-gray-200',
+                                                        };
+                                                    @endphp
+                                                    <span class="rounded-lg border px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider {{ $tagClasses }}">
+                                                        {{ $roleTag }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                            <span class="text-[11px] font-bold text-gray-500">
+                                                <i class="bi bi-people-fill text-gray-400 mr-1"></i>{{ $cell->members_count ?? $cell->members()->count() }} membros
+                                            </span>
+                                        </div>
+                                    </a>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="rounded-2xl border border-dashed border-gray-200 bg-gray-50/50 p-8 text-center">
+                                <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-gray-100 text-gray-400">
+                                    <i class="bi bi-house-door text-xl"></i>
+                                </div>
+                                <p class="mt-3 text-xs font-bold uppercase tracking-wider text-gray-500">Nenhuma célula vinculada a este perfil</p>
+                                <p class="mt-1 text-xs text-gray-400">Este utilizador ainda não possui atribuição de liderança, supervisão ou pertença a uma célula.</p>
+                            </div>
+                        @endif
                     </div>
                 </article>
             </div>

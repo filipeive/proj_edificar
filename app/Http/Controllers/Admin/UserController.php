@@ -126,32 +126,82 @@ class UserController
     public function show(User $user): View
     {
         $this->authorize('view', $user);
-        $user->load('cell', 'commitments');
+        $user->load(['cell', 'commitments']);
 
-        $relatedCells = collect();
+        $cellRolesMap = [];
 
-        if ($user->isLider()) {
-            $relatedCells = $user->ledCells()->with('supervision')->get();
-        } elseif ($user->isTimoteo()) {
-            $relatedCells = $user->timoteoCells()->with('supervision')->get();
-        } elseif ($user->isSupervisor() || $user->isSubSupervisor()) {
-            $relatedCells = Cell::whereIn('supervision_id', $user->supervisedSupervisions()->pluck('id'))
-                ->orWhereIn('supervision_id', $user->subSupervisedSupervisions()->pluck('id'))
-                ->with('supervision')
-                ->get();
-        } elseif ($user->isPastorZona() || $user->isSubPastorZona()) {
-            $zones = Zone::where('pastor_id', $user->id)->get();
-            $supervisionIds = $zones->flatMap(fn($z) => $z->supervisions()->pluck('id'));
-            $relatedCells = Cell::whereIn('supervision_id', $supervisionIds)->with('supervision')->get();
-        } elseif ($user->isPastor() || $user->isSubPastor()) {
-            $zones = Zone::where('pastor_id', $user->id)->get();
-            $supervisionIds = $zones->flatMap(fn($z) => $z->supervisions()->pluck('id'));
-            $relatedCells = Cell::whereIn('supervision_id', $supervisionIds)->with('supervision')->get();
-        } elseif ($user->isAdmin() || $user->isSuperAdmin() || $user->isPastorSenior()) {
-            $relatedCells = Cell::with('supervision')->get();
-        } elseif ($user->cell) {
-            $relatedCells = Cell::where('id', $user->cell_id)->with('supervision')->get();
+        // 1. Células que o utilizador lidera
+        $ledCells = Cell::where('leader_id', $user->id)->with('supervision.zone')->get();
+        foreach ($ledCells as $cell) {
+            $cellRolesMap[$cell->id]['cell'] = $cell;
+            $cellRolesMap[$cell->id]['roles'][] = 'Líder';
         }
+
+        // 2. Células onde o utilizador é Timóteo
+        $timoteoCells = Cell::where('timoteo_id', $user->id)->with('supervision.zone')->get();
+        foreach ($timoteoCells as $cell) {
+            $cellRolesMap[$cell->id]['cell'] = $cell;
+            if (!in_array('Timóteo', $cellRolesMap[$cell->id]['roles'] ?? [])) {
+                $cellRolesMap[$cell->id]['roles'][] = 'Timóteo';
+            }
+        }
+
+        // 3. Célula a que pertence como Membro
+        if ($user->cell_id) {
+            $memberCell = Cell::with('supervision.zone')->find($user->cell_id);
+            if ($memberCell) {
+                $cellRolesMap[$memberCell->id]['cell'] = $memberCell;
+                if (!in_array('Membro da Célula', $cellRolesMap[$memberCell->id]['roles'] ?? []) && !in_array('Líder', $cellRolesMap[$memberCell->id]['roles'] ?? [])) {
+                    $cellRolesMap[$memberCell->id]['roles'][] = 'Membro da Célula';
+                }
+            }
+        }
+
+        // 4. Supervisões onde é Supervisor Principal
+        $supervisedSupIds = Supervision::where('supervisor_id', $user->id)->pluck('id');
+        if ($supervisedSupIds->isNotEmpty()) {
+            $supCells = Cell::whereIn('supervision_id', $supervisedSupIds)->with('supervision.zone')->get();
+            foreach ($supCells as $cell) {
+                $cellRolesMap[$cell->id]['cell'] = $cell;
+                if (!in_array('Supervisor', $cellRolesMap[$cell->id]['roles'] ?? [])) {
+                    $cellRolesMap[$cell->id]['roles'][] = 'Supervisor';
+                }
+            }
+        }
+
+        // 5. Supervisões onde é Sub-Supervisor
+        $subSupervisedSupIds = Supervision::where('sub_supervisor_id', $user->id)->pluck('id');
+        if ($subSupervisedSupIds->isNotEmpty()) {
+            $subSupCells = Cell::whereIn('supervision_id', $subSupervisedSupIds)->with('supervision.zone')->get();
+            foreach ($subSupCells as $cell) {
+                $cellRolesMap[$cell->id]['cell'] = $cell;
+                if (!in_array('Sub-supervisor', $cellRolesMap[$cell->id]['roles'] ?? [])) {
+                    $cellRolesMap[$cell->id]['roles'][] = 'Sub-supervisor';
+                }
+            }
+        }
+
+        // 6. Zonas onde é Pastor de Zona
+        $pastoredZoneIds = Zone::where('pastor_id', $user->id)->pluck('id');
+        if ($pastoredZoneIds->isNotEmpty()) {
+            $zoneSupIds = Supervision::whereIn('zone_id', $pastoredZoneIds)->pluck('id');
+            if ($zoneSupIds->isNotEmpty()) {
+                $zoneCells = Cell::whereIn('supervision_id', $zoneSupIds)->with('supervision.zone')->get();
+                foreach ($zoneCells as $cell) {
+                    $cellRolesMap[$cell->id]['cell'] = $cell;
+                    if (!in_array('Pastor de Zona', $cellRolesMap[$cell->id]['roles'] ?? [])) {
+                        $cellRolesMap[$cell->id]['roles'][] = 'Pastor de Zona';
+                    }
+                }
+            }
+        }
+
+        // Formatar lista de células vinculadas com papéis associados
+        $relatedCells = collect($cellRolesMap)->map(function ($item) {
+            $cell = $item['cell'];
+            $cell->user_roles = $item['roles'];
+            return $cell;
+        })->values();
 
         return view('admin.users.show', [
             'user' => $user,
