@@ -126,7 +126,35 @@ class UserController
     public function show(User $user): View
     {
         $this->authorize('view', $user);
-        return view('admin.users.show', ['user' => $user->load('cell', 'commitments')]);
+        $user->load('cell', 'commitments');
+
+        $relatedCells = collect();
+
+        if ($user->isLider()) {
+            $relatedCells = $user->ledCells()->with('supervision')->get();
+        } elseif ($user->isTimoteo()) {
+            $relatedCells = $user->timoteoCells()->with('supervision')->get();
+        } elseif ($user->isSupervisor() || $user->isSubSupervisor()) {
+            $relatedCells = Cell::whereIn('supervision_id', $user->supervisedSupervisions()->pluck('id'))
+                ->orWhereIn('supervision_id', $user->subSupervisedSupervisions()->pluck('id'))
+                ->with('supervision')
+                ->get();
+        } elseif ($user->isPastorZona() || $user->isSubPastorZona()) {
+            $zones = Zone::where('pastor_id', $user->id)->get();
+            $supervisionIds = $zones->flatMap(fn($z) => $z->supervisions()->pluck('id'));
+            $relatedCells = Cell::whereIn('supervision_id', $supervisionIds)->with('supervision')->get();
+        } elseif ($user->isPastor() || $user->isSubPastor()) {
+            $zones = Zone::where('pastor_id', $user->id)->get();
+            $supervisionIds = $zones->flatMap(fn($z) => $z->supervisions()->pluck('id'));
+            $relatedCells = Cell::whereIn('supervision_id', $supervisionIds)->with('supervision')->get();
+        } elseif ($user->isAdmin() || $user->isSuperAdmin() || $user->isPastorSenior()) {
+            $relatedCells = Cell::with('supervision')->get();
+        }
+
+        return view('admin.users.show', [
+            'user' => $user,
+            'relatedCells' => $relatedCells,
+        ]);
     }
 
     public function edit(User $user): View

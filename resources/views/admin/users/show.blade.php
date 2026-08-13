@@ -123,6 +123,37 @@
             </article>
         </section>
 
+        @if($relatedCells->count() > 0)
+        <section class="grid grid-cols-1 gap-5 xl:grid-cols-3">
+            <div class="xl:col-span-2 space-y-6">
+                <article class="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
+                    <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+                        <div>
+                            <h2 class="text-lg font-black tracking-tight text-gray-900">Células Relacionadas</h2>
+                            <p class="text-[10px] font-black uppercase tracking-wider text-gray-400">Dependendo do papel de {{ $user->name }}</p>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+                            @foreach($relatedCells as $cell)
+                                <a href="{{ route('cells.show', $cell) }}" class="flex items-center gap-3 rounded-2xl border border-gray-100 p-4 transition hover:border-blue-200 hover:bg-blue-50/50">
+                                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                                        <i class="bi bi-house-door-fill"></i>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <p class="text-sm font-black text-gray-900 line-clamp-1">{{ $cell->name }}</p>
+                                        <p class="text-[10px] font-black uppercase tracking-wider text-gray-400">{{ $cell->supervision->name ?? 'Sem supervisão' }}</p>
+                                    </div>
+                                    <i class="bi bi-chevron-right ml-auto text-gray-300"></i>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+        @endif
+
         <section class="grid grid-cols-1 gap-5 xl:grid-cols-3">
             <div class="xl:col-span-2 space-y-6">
                 <article class="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
