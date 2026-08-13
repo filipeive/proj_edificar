@@ -28,8 +28,21 @@ class ZoneController
 
         try {
             DB::transaction(function () use ($zone, $targetZone) {
-                // 1. Move Supervisions
-                $zone->supervisions()->update(['zone_id' => $targetZone->id]);
+                // 1. Move Supervisions (handle duplicate names)
+                $sourceSupervisions = $zone->supervisions()->get();
+                foreach ($sourceSupervisions as $sourceSupervision) {
+                    $existingSupervision = $targetZone->supervisions()
+                        ->where('name', $sourceSupervision->name)
+                        ->first();
+
+                    if ($existingSupervision) {
+                        // Merge cells into existing supervision
+                        $sourceSupervision->cells()->update(['supervision_id' => $existingSupervision->id]);
+                        $sourceSupervision->delete();
+                    } else {
+                        $sourceSupervision->update(['zone_id' => $targetZone->id]);
+                    }
+                }
 
                 // 2. Move Contributions
                 $zone->contributions()->update(['zone_id' => $targetZone->id]);
