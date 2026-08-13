@@ -203,7 +203,6 @@ class UserController
             return $cell;
         })->values();
 
->>>>>>> feature/redesign-premium
         return view('admin.users.show', [
             'user' => $user,
             'relatedCells' => $relatedCells,
