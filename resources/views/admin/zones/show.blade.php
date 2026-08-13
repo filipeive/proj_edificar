@@ -256,7 +256,48 @@
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto">
+                    <div class="md:hidden space-y-4 p-4">
+                        @foreach($members as $member)
+                            <div class="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 border border-gray-100">
+                                <div class="w-10 h-10 rounded-xl bg-gray-100 text-gray-400 flex items-center justify-center font-bold flex-shrink-0">
+                                    {{ substr($member->name, 0, 1) }}
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-black text-gray-900 leading-tight line-clamp-1">{{ $member->name }}</p>
+                                    <p class="text-[10px] text-gray-400 font-medium line-clamp-1">{{ $member->email }}</p>
+                                    <span class="inline-block mt-1 px-2 py-0.5 bg-gray-100 rounded-full text-[9px] font-black text-gray-500 uppercase">
+                                        {{ $member->cell->name ?? '-' }}
+                                    </span>
+                                </div>
+                                <div class="flex flex-col gap-2 items-end">
+                                    <form action="{{ route('users.toggle-status', $member) }}" method="POST">
+                                        @csrf
+                                        <button type="submit"
+                                            class="px-2 py-1 rounded-full text-[9px] font-black uppercase transition-all {{ $member->is_active ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600' }}">
+                                            {{ $member->is_active ? 'Ativo' : 'Inativo' }}
+                                        </button>
+                                    </form>
+                                    <div class="flex gap-1">
+                                        <button @click="openObservations({{ Js::from($member) }})"
+                                            class="p-1.5 rounded-lg text-gray-400 hover:text-orange-500 hover:bg-orange-50"
+                                            title="Observações">
+                                            <i class="bi bi-chat-dots"></i>
+                                        </button>
+                                        <button @click="openTransferMember({{ Js::from($member) }})"
+                                            class="p-1.5 rounded-lg text-gray-400 hover:text-amber-500 hover:bg-amber-50"
+                                            title="Transferir Célula">
+                                            <i class="bi bi-arrow-left-right"></i>
+                                        </button>
+                                        <a href="{{ route('users.show', $member) }}" title="Perfil Completo"
+                                            class="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50">
+                                            <i class="bi bi-person-fill"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="hidden md:block overflow-x-auto">
                         <table class="w-full table-compact">
                             <thead>
                                 <tr class="bg-gray-50/50">
