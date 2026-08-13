@@ -99,15 +99,15 @@
                 @if($userRole !== 'lider_celula' && $availableCells->count() > 1)
                     <div class="lg:col-span-3 flex flex-col gap-1.5">
                         <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Célula</label>
-                        <select name="cell_id"
-                            class="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
-                            <option value="">Todas as Células</option>
-                            @foreach($availableCells as $cell)
-                                <option value="{{ $cell->id }}" {{ request('cell_id') == $cell->id ? 'selected' : '' }}>
-                                    {{ $cell->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                            <select name="cell_id"
+                                class="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+                                <option value="">Todas as Células</option>
+                                @foreach($availableCells as $cell)
+                                    <option value="{{ $cell->id }}" {{ request('cell_id') == $cell->id ? 'selected' : '' }}>
+                                        {{ $cell->name }} ({{ $cell->type_label }})
+                                    </option>
+                                @endforeach
+                            </select>
                     </div>
                 @endif
 
@@ -177,19 +177,31 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @forelse($members as $member)
-                            <tr class="text-sm text-gray-700 hover:bg-gray-50"
+                            <tr class="text-sm text-gray-700 hover:bg-gray-50 {{ $member->role === 'lider_celula' ? 'bg-purple-50/60 border-l-4 border-purple-500' : '' }}"
                                 :class="selected.includes({{ $member->id }}) ? 'bg-blue-50' : ''">
                                 <td class="px-4 py-3">
                                     <input type="checkbox" value="{{ $member->id }}" x-model="selected"
                                         class="h-4 w-4 rounded border-gray-300 text-blue-600">
                                 </td>
                                 <td class="px-4 py-3">
-                                    <div class="font-bold text-gray-900">{{ $member->name }}</div>
-                                    <div class="text-xs text-gray-400">#{{ $member->id }}</div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-8 w-8 items-center justify-center rounded-lg {{ $member->role === 'lider_celula' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-500' }} font-black text-xs">
+                                            {{ strtoupper(substr($member->name, 0, 1)) }}
+                                        </div>
+                                        <div>
+                                            <div class="font-bold {{ $member->role === 'lider_celula' ? 'text-purple-900' : 'text-gray-900' }}">{{ $member->name }}</div>
+                                            <div class="text-xs text-gray-400">#{{ $member->id }}</div>
+                                            @if($member->role === 'lider_celula')
+                                                <span class="text-[9px] font-black text-purple-600 uppercase tracking-widest">Líder</span>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </td>
                                 <td class="px-4 py-3">
                                     @if($member->role === 'lider_celula')
                                         <span class="rounded-full bg-purple-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-purple-700">Líder</span>
+                                    @elseif($member->role === 'timoteo')
+                                        <span class="rounded-full bg-orange-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-orange-700">Timóteo</span>
                                     @else
                                         <span class="rounded-full bg-blue-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-blue-700">Membro</span>
                                     @endif
@@ -215,12 +227,20 @@
                                             class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:border-blue-600 hover:bg-blue-600 hover:text-white">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        @if($userRole !== 'secretaria' && $member->id !== auth()->user()->id)
-                                            <a href="{{ route('members.edit', $member) }}" title="Editar"
-                                                class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:border-amber-500 hover:bg-amber-500 hover:text-white">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
-                                            @if(is_null($member->cell_id))
+                                @if($userRole !== 'secretaria' && $member->id !== auth()->user()->id)
+                                    <a href="{{ route('members.edit', $member) }}" title="Editar"
+                                        class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:border-amber-500 hover:bg-amber-500 hover:text-white">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form method="POST" action="{{ route('members.destroy', $member) }}" onsubmit="return confirm('Tem certeza que deseja excluir este membro?')" class="inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" title="Eliminar"
+                                            class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-red-200 text-red-500 transition hover:border-red-600 hover:bg-red-600 hover:text-white">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                    @if(is_null($member->cell_id))
                                                 <button @click="openAssignCellModal({ id: {{ $member->id }}, name: '{{ $member->name }}' })"
                                                     title="Atribuir Célula"
                                                     class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-emerald-200 text-emerald-650 hover:border-emerald-600 hover:bg-emerald-600 hover:text-white transition-all">
@@ -245,16 +265,19 @@
 
         <div x-show="view === 'grid'" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             @forelse($members as $member)
-                <article class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
+                <article class="rounded-2xl border {{ $member->role === 'lider_celula' ? 'border-purple-300 bg-purple-50/30' : 'border-gray-200 bg-white' }} p-5 shadow-sm"
                     :class="selected.includes({{ $member->id }}) ? 'ring-2 ring-blue-500 border-blue-300' : ''">
                     <div class="mb-4 flex items-start justify-between gap-3">
                         <div class="flex items-center gap-3">
-                            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-900 text-sm font-black text-white">
+                            <div class="flex h-10 w-10 items-center justify-center rounded-xl {{ $member->role === 'lider_celula' ? 'bg-purple-600 text-white' : 'bg-gray-900 text-white' }} text-sm font-black">
                                 {{ strtoupper(substr($member->name, 0, 1)) }}
                             </div>
                             <div>
-                                <h3 class="line-clamp-1 text-sm font-black text-gray-900">{{ $member->name }}</h3>
+                                <h3 class="line-clamp-1 text-sm font-black {{ $member->role === 'lider_celula' ? 'text-purple-900' : 'text-gray-900' }}">{{ $member->name }}</h3>
                                 <p class="text-[11px] text-gray-400">#{{ $member->id }}</p>
+                                @if($member->role === 'lider_celula')
+                                    <span class="text-[9px] font-black text-purple-600 uppercase tracking-widest">Líder</span>
+                                @endif
                             </div>
                         </div>
                         <input type="checkbox" value="{{ $member->id }}" x-model="selected"
@@ -275,21 +298,29 @@
                             <span class="rounded-full bg-red-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-red-700">Inativo</span>
                         @endif
 
-                        <span class="rounded-full {{ $member->role === 'lider_celula' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700' }} px-2.5 py-1 text-[10px] font-black uppercase tracking-wider">
-                            {{ $member->role === 'lider_celula' ? 'Líder' : 'Membro' }}
+                        <span class="rounded-full {{ $member->role === 'lider_celula' ? 'bg-purple-100 text-purple-700' : ($member->role === 'timoteo' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700') }} px-2.5 py-1 text-[10px] font-black uppercase tracking-wider">
+                            {{ $member->role === 'lider_celula' ? 'Líder' : ($member->role === 'timoteo' ? 'Timóteo' : 'Membro') }}
                         </span>
                     </div>
 
-                    <div class="mt-4 grid {{ $userRole !== 'secretaria' ? 'grid-cols-2' : 'grid-cols-1' }} gap-2 border-t border-gray-100 pt-4">
+                    <div class="mt-4 flex flex-wrap gap-2 border-t border-gray-100 pt-4">
                         <a href="{{ route('members.show', $member) }}"
-                            class="inline-flex items-center justify-center rounded-lg bg-gray-900 px-3 py-2 text-[10px] font-black uppercase tracking-wider text-white transition hover:bg-blue-600">
+                            class="flex-1 min-w-[80px] inline-flex items-center justify-center rounded-lg bg-gray-900 px-3 py-2 text-[10px] font-black uppercase tracking-wider text-white transition hover:bg-blue-600">
                             Ver
                         </a>
                         @if($userRole !== 'secretaria' && $member->id !== auth()->user()->id)
                             <a href="{{ route('members.edit', $member) }}"
-                                class="inline-flex items-center justify-center rounded-lg border border-gray-300 px-3 py-2 text-[10px] font-black uppercase tracking-wider text-gray-700 transition hover:border-amber-500 hover:text-amber-600">
+                                class="flex-1 min-w-[80px] inline-flex items-center justify-center rounded-lg border border-gray-300 px-3 py-2 text-[10px] font-black uppercase tracking-wider text-gray-700 transition hover:border-amber-500 hover:text-amber-600">
                                 Editar
                             </a>
+                            <form method="POST" action="{{ route('members.destroy', $member) }}" onsubmit="return confirm('Tem certeza que deseja excluir este membro?')" class="flex-1 min-w-[80px]">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                    class="w-full inline-flex items-center justify-center rounded-lg border border-red-300 px-3 py-2 text-[10px] font-black uppercase tracking-wider text-red-700 transition hover:border-red-600 hover:bg-red-600 hover:text-white">
+                                    Eliminar
+                                </button>
+                            </form>
                         @endif
                     </div>
                     @if($userRole !== 'secretaria' && is_null($member->cell_id) && $member->id !== auth()->user()->id)

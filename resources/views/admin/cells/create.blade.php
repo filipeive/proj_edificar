@@ -37,6 +37,22 @@
                 </div>
 
                 <div class="mb-6">
+                    <label for="type" class="block text-sm font-medium text-gray-700 mb-2">Tipo de Célula</label>
+                    <select name="type" id="type"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 searchable-select custom-select @error('type') border-red-500 @enderror"
+                        required>
+                        <option value="membros" {{ old('type', 'membros') == 'membros' ? 'selected' : '' }}>Célula de Membros</option>
+                        <option value="lideres" {{ old('type') == 'lideres' ? 'selected' : '' }}>Célula de Líderes</option>
+                        <option value="supervisores" {{ old('type') == 'supervisores' ? 'selected' : '' }}>Célula de Supervisores</option>
+                        <option value="pastores_zona" {{ old('type') == 'pastores_zona' ? 'selected' : '' }}>Célula de Pastores de Zona</option>
+                        <option value="pastores" {{ old('type') == 'pastores' ? 'selected' : '' }}>Célula de Pastores</option>
+                    </select>
+                    @error('type')
+                        <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="mb-6">
                     <label for="leader_id" class="block text-sm font-medium text-gray-700 mb-2">Líder da Célula</label>
                     <select name="leader_id" id="leader_id"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 searchable-select custom-select @error('leader_id') border-red-500 @enderror"
@@ -81,3 +97,78 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const typeSelect = document.getElementById('type');
+        const supervisionSelect = document.getElementById('supervision_id');
+        const leaderSelect = document.getElementById('leader_id');
+
+        if (!typeSelect || !supervisionSelect || !leaderSelect) return;
+
+        const loadEligibleLeaders = async function() {
+            const params = new URLSearchParams({ cell_type: typeSelect.value });
+            if (supervisionSelect.value) {
+                params.set('supervision_id', supervisionSelect.value);
+            }
+
+            try {
+                const response = await fetch(`{{ route('cells.eligible-leaders') }}?${params.toString()}`);
+                const leaders = await response.json();
+
+                const tomSelect = leaderSelect.tomselect;
+                const previousValue = tomSelect ? tomSelect.getValue() : leaderSelect.value;
+
+                if (tomSelect) {
+                    tomSelect.clear();
+                    tomSelect.clearOptions();
+                } else {
+                    leaderSelect.innerHTML = '';
+                }
+
+                if (leaders.length === 0) {
+                    const fallbackText = 'Nenhum líder disponível para este tipo de célula';
+                    if (tomSelect) {
+                        tomSelect.addOption({value: '', text: fallbackText});
+                    } else {
+                        const option = document.createElement('option');
+                        option.value = '';
+                        option.textContent = fallbackText;
+                        leaderSelect.appendChild(option);
+                    }
+                }
+
+                leaders.forEach(leader => {
+                    if (tomSelect) {
+                        tomSelect.addOption({value: leader.id, text: `${leader.name} (${leader.email})`});
+                    } else {
+                        const option = document.createElement('option');
+                        option.value = leader.id;
+                        option.textContent = `${leader.name} (${leader.email})`;
+                        leaderSelect.appendChild(option);
+                    }
+                });
+
+                if (previousValue && leaders.some(leader => leader.id == previousValue)) {
+                    if (tomSelect) {
+                        tomSelect.setValue(previousValue);
+                    } else {
+                        leaderSelect.value = previousValue;
+                    }
+                }
+
+                if (tomSelect) tomSelect.refreshOptions(false);
+            } catch (error) {
+                console.error('Erro ao carregar líderes elegíveis:', error);
+            }
+        };
+
+        typeSelect.addEventListener('change', loadEligibleLeaders);
+        supervisionSelect.addEventListener('change', loadEligibleLeaders);
+
+        // Pré-carregar os líderes elegíveis conforme o tipo/supervisão selecionados
+        loadEligibleLeaders();
+    });
+</script>
+@endpush

@@ -16,6 +16,23 @@
             title="Editar estrutura">
             <i class="bi bi-pencil-square"></i>
         </a>
+        @if($supervision->cells->count() == 0)
+            <form action="{{ route('supervisions.destroy', $supervision) }}" method="POST" id="mobile-delete-supervision-{{ $supervision->id }}">
+                @csrf
+                @method('DELETE')
+                <button type="button" onclick="confirmDelete('mobile-delete-supervision-{{ $supervision->id }}', 'Deseja excluir esta supervisão?')" title="Eliminar"
+                    class="action-icon text-red-600 hover:text-red-600 hover:bg-red-50">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </form>
+        @else
+            <button type="button"
+                onclick="Swal.fire({icon: 'warning', title: 'Não é possível eliminar', text: 'Esta supervisão possui células associadas. Remova ou transfira as células antes de eliminar.'})"
+                title="Não é possível eliminar supervisão com células"
+                class="action-icon text-red-300 cursor-not-allowed opacity-75">
+                <i class="bi bi-trash"></i>
+            </button>
+        @endif
     </div>
 @endsection
 

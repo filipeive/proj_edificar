@@ -20,6 +20,10 @@ class User extends Authenticatable
         'cell_id',
         'is_active',
         'observations',
+        'baptism_status',
+        'baptism_decision_date',
+        'baptism_date',
+        'baptism_notes',
         'notification_preferences',
         'last_login_at',
         'menu_permissions',
@@ -36,6 +40,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
+            'baptism_decision_date' => 'date',
+            'baptism_date' => 'date',
             'notification_preferences' => 'array',
             'last_login_at' => 'datetime',
             'menu_permissions' => 'array',
@@ -213,6 +219,16 @@ class User extends Authenticatable
         return $this->role === 'sub_supervisor';
     }
 
+    public function isSubPastorZona()
+    {
+        return $this->role === 'subpastor_zona';
+    }
+
+    public function isSubPastor()
+    {
+        return $this->role === 'subpastor';
+    }
+
     public function isLider()
     {
         return $this->role === 'lider_celula';
@@ -280,6 +296,32 @@ class User extends Authenticatable
         }
 
         return $this->role === $role;
+    }
+
+    public function getRoleLabel(): string
+    {
+        $labels = [
+            'super_admin' => 'Super Admin',
+            'admin' => 'Administrador',
+            'pastor_senior' => 'Pastor Senior',
+            'pastor' => 'Pastor',
+            'pastor_zona' => 'Pastor de Zona',
+            'subpastor_zona' => 'Sub-Pastor de Zona',
+            'supervisor' => 'Supervisor',
+            'sub_supervisor' => 'Sub-Supervisor',
+            'subpastor' => 'Sub-Pastor',
+            'lider_celula' => 'Líder de Célula',
+            'lider' => 'Líder',
+            'timoteo' => 'Timóteo',
+            'membro' => 'Membro',
+            'secretaria' => 'Secretária',
+            'tesouraria' => 'Tesouraria',
+            'administracao' => 'Administração',
+            'comissao_obra' => 'Comissão de Obra',
+            'responsavel_pacote' => 'Responsável de Pacote',
+        ];
+
+        return $labels[$this->role] ?? ucfirst(str_replace('_', ' ', $this->role));
     }
 
     public function getZoneId()
@@ -438,6 +480,7 @@ class User extends Authenticatable
     protected $memoizedZoneIds = null;
     protected $memoizedSupervisionIds = null;
     protected $memoizedZoneId = null;
+    protected $memoizedManagedCellIds = null;
     protected ?int $memoizedPendingContributionsCount = null;
 
     /**
@@ -460,6 +503,24 @@ class User extends Authenticatable
             $this->memoizedFirstLedCell = $this->ledCells()->first() ?: false;
         }
         return $this->memoizedFirstLedCell ?: null;
+    }
+
+    /**
+     * Get IDs of cells this user can manage directly as leader or timoteo.
+     */
+    public function getManagedCellIds()
+    {
+        if ($this->memoizedManagedCellIds === null) {
+            $cellIds = $this->ledCells()->pluck('id');
+
+            if ($this->cell_id) {
+                $cellIds->push($this->cell_id);
+            }
+
+            $this->memoizedManagedCellIds = $cellIds->unique()->values();
+        }
+
+        return $this->memoizedManagedCellIds;
     }
 
     /**
@@ -486,4 +547,3 @@ class User extends Authenticatable
         return $this->memoizedPendingContributionsCount;
     }
 }
-

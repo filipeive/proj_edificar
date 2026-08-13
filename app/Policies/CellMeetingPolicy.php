@@ -28,7 +28,7 @@ class CellMeetingPolicy
         }
 
         if ($user->role === 'lider_celula' || $user->role === 'timoteo') {
-            return $cellMeeting->cell->leader_id === $user->id || $user->cell_id === $cellMeeting->cell_id;
+            return $user->getManagedCellIds()->contains($cellMeeting->cell_id);
         }
 
         return false;
@@ -45,12 +45,18 @@ class CellMeetingPolicy
             return true;
         }
 
-        return $cellMeeting->leader_id === $user->id || ($user->role === 'timoteo' && $user->cell_id === $cellMeeting->cell_id);
+        return $cellMeeting->leader_id === $user->id
+            || (($user->role === 'lider_celula' || $user->role === 'timoteo') && $user->getManagedCellIds()->contains($cellMeeting->cell_id));
     }
 
     public function delete(User $user, CellMeeting $cellMeeting): bool
     {
-        return $user->isAdmin() || ($cellMeeting->leader_id === $user->id || ($user->role === 'timoteo' && $user->cell_id === $cellMeeting->cell_id)) && $cellMeeting->created_at->diffInHours(now()) < 24;
+        return $user->isAdmin()
+            || (
+                ($cellMeeting->leader_id === $user->id
+                    || (($user->role === 'lider_celula' || $user->role === 'timoteo') && $user->getManagedCellIds()->contains($cellMeeting->cell_id)))
+                && $cellMeeting->created_at->diffInHours(now()) < 24
+            );
     }
 
     public function deleteAny(User $user): bool

@@ -18,11 +18,48 @@
             title="Nova oferta">
             <i class="bi bi-plus-circle"></i>
         </a>
+        <a href="{{ route('members.index') }}"
+            class="action-icon text-gray-600 hover:text-gray-600 hover:bg-gray-50"
+            title="Lista de Membros">
+            <i class="bi bi-list"></i>
+        </a>
+        {{-- delete --}}
+        <form method="POST" action="{{ route('members.destroy', $member) }}" onsubmit="return confirm('Tem certeza que deseja excluir este membro? Esta ação não pode ser revertida.')">
+            @csrf
+            @method('DELETE')
+            <button type="submit"
+                class="action-icon text-red-600 hover:text-red-600 hover:bg-red-50"
+                title="Eliminar Membro">
+                <i class="bi bi-trash"></i>
+            </button>
+        </form>
     </div>
 @endsection
 
 @section('content')
     <div class="space-y-8">
+        <!-- Desktop Actions -->
+        <div class="hidden md:flex items-center justify-end gap-3">
+            @if($userRole !== 'secretaria' && $member->id !== auth()->user()->id)
+                <a href="{{ route('members.edit', $member) }}"
+                    class="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-xs font-black uppercase tracking-wider text-gray-700 transition hover:border-amber-500 hover:text-amber-600">
+                    <i class="bi bi-pencil-square"></i> Editar Perfil
+                </a>
+                <form method="POST" action="{{ route('members.destroy', $member) }}" onsubmit="return confirm('Tem certeza que deseja excluir este membro? Esta ação não pode ser revertida.')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit"
+                        class="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-red-600 transition hover:border-red-600 hover:bg-red-600 hover:text-white">
+                        <i class="bi bi-trash"></i> Eliminar Membro
+                    </button>
+                </form>
+            @endif
+            <a href="{{ route('contributions.create', ['user_id' => $member->id]) }}"
+                class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white transition hover:bg-blue-700 shadow-lg shadow-blue-100">
+                <i class="bi bi-plus-lg"></i> Nova Oferta
+            </a>
+        </div>
+
         <!-- Header & Profile Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <!-- Profile Info -->
@@ -30,7 +67,7 @@
                 <div class="w-24 h-24 md:w-32 md:h-32 rounded-[2rem] md:rounded-[2.5rem] bg-blue-50 text-blue-600 flex items-center justify-center font-black text-4xl md:text-5xl shadow-lg shadow-blue-50">
                     {{ strtoupper(substr($member->name, 0, 1)) }}
                 </div>
-                <div class="space-y-2 text-center md:text-left">
+                <div class="space-y-3 text-center md:text-left flex-1">
                     <div class="flex flex-col md:flex-row items-center gap-2 md:gap-3">
                         <h1 class="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter">{{ $member->name }}</h1>
                         @if($member->is_active)
@@ -41,6 +78,8 @@
                         
                         @if($member->role === 'lider_celula')
                             <span class="px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-purple-100">Líder</span>
+                        @elseif($member->role === 'timoteo')
+                            <span class="px-3 py-1 bg-orange-50 text-orange-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-orange-100">Timóteo</span>
                         @else
                             <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-100">Membro</span>
                         @endif
@@ -48,12 +87,13 @@
                     <p class="text-gray-400 font-medium flex items-center justify-center md:justify-start gap-2 text-sm">
                         <i class="bi bi-envelope-fill"></i> {{ $member->email }}
                     </p>
-                    <div class="flex justify-center md:justify-start gap-4 pt-2">
+                    <div class="flex flex-col md:flex-row justify-center md:justify-start gap-4 md:gap-6 pt-2">
                         <div class="flex flex-col">
                             <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Membro desde</span>
                             <span class="text-sm font-bold text-gray-700">{{ $member->created_at->format('d/m/Y') }}</span>
                         </div>
-                        <div class="flex flex-col border-l border-gray-100 pl-4">
+                        <div class="hidden md:block w-px bg-gray-100"></div>
+                        <div class="flex flex-col">
                             <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Contacto</span>
                             <span class="text-sm font-bold text-gray-700">{{ $member->phone ?? 'Indisponível' }}</span>
                         </div>
@@ -61,25 +101,16 @@
                 </div>
             </div>
 
-            <!-- Stats: Total Contributed -->
-            <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col justify-center text-center group hover:bg-green-50 transition-colors">
-                <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 group-hover:text-green-400">Total Contribuído</p>
-                <p class="text-4xl font-black text-green-600 tracking-tighter">
-                    {{ number_format($member->contributions->where('status', 'verificada')->sum('amount'), 0, ',', '.') }}<span class="text-sm ml-1 uppercase">MT</span>
-                </p>
-                <p class="text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-widest">{{ $member->contributions->where('status', 'verificada')->count() }} Doações</p>
-            </div>
-
-            <!-- Action Card (Hidden on Mobile) -->
-            <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col justify-center gap-3 hidden md:flex">
-                @if($userRole !== 'secretaria' && $member->id !== auth()->user()->id)
-                <a href="{{ route('members.edit', $member) }}" class="w-full py-4 bg-gray-50 text-gray-500 rounded-2xl hover:bg-gray-100 transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2">
-                    <i class="bi bi-pencil-square"></i> Editar Perfil
-                </a>
-                @endif
-                <a href="{{ route('contributions.create', ['user_id' => $member->id]) }}" class="w-full py-4 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-blue-100">
-                    <i class="bi bi-plus-lg"></i> Nova Oferta
-                </a>
+            <!-- Stats Cards -->
+            <div class="lg:col-span-2 grid grid-cols-4 gap-4">
+                <!-- Total Contribuído -->
+                <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6 flex flex-col justify-center text-center group hover:bg-green-50 transition-colors">
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] mb-2 group-hover:text-green-400">Total Contribuído</p>
+                    <p class="text-3xl md:text-4xl font-black text-green-600 tracking-tighter">
+                        {{ number_format($member->contributions->where('status', 'verificada')->sum('amount'), 0, ',', '.') }}<span class="text-xs ml-1 uppercase">MT</span>
+                    </p>
+                    <p class="text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-widest">{{ $member->contributions->where('status', 'verificada')->count() }} Doações</p>
+                </div>
             </div>
         </div>
 
@@ -174,6 +205,9 @@
                                 <div>
                                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Célula</p>
                                     <p class="text-sm font-black text-gray-900">{{ $member->cell->name }}</p>
+                                    <span class="inline-block mt-1 px-2 py-0.5 rounded border text-[9px] font-black uppercase tracking-widest {{ $member->cell->type_badge_classes }}">
+                                        {{ $member->cell->type_label }}
+                                    </span>
                                 </div>
                             </div>
                             <!-- Supervisão -->
@@ -207,8 +241,8 @@
                 </div>
 
                 <!-- Support Card -->
-                <div class="bg-gradient-to-br from-blue-900 to-indigo-900 rounded-[2.5rem] shadow-xl p-10 text-white relative overflow-hidden">
-                    <div class="relative z-10 space-y-6">
+                <div class="bg-gradient-to-br from-blue-900 to-indigo-900 rounded-[2.5rem] shadow-xl p-8 text-white relative overflow-hidden">
+                    <div class="relative z-10 space-y-5">
                         <p class="text-[10px] font-black text-blue-300 uppercase tracking-[0.2em]">Assistance</p>
                         <p class="text-sm font-medium leading-relaxed">Este membro faz parte do corpo de cristo. Ajude-o a permanecer firme em sua caminhada.</p>
                         <button class="w-full py-4 bg-white/10 hover:bg-white/20 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all">

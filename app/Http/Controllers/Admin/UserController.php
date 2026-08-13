@@ -10,6 +10,8 @@ use App\Models\CommitmentPackage;
 use App\Notifications\MemberCreatedNotification;
 use App\Notifications\MemberAddedToCellNotification;
 use App\Notifications\UserPromotedNotification;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
@@ -124,33 +126,84 @@ class UserController
     public function show(User $user): View
     {
         $this->authorize('view', $user);
-        $user->load('cell', 'commitments');
+        $user->load(['cell', 'commitments']);
 
-        $relatedCells = collect();
+        $cellRolesMap = [];
 
-        if ($user->isLider()) {
-            $relatedCells = $user->ledCells()->with('supervision')->get();
-        } elseif ($user->isTimoteo()) {
-            $relatedCells = $user->timoteoCells()->with('supervision')->get();
-        } elseif ($user->isSupervisor() || $user->isSubSupervisor()) {
-            $relatedCells = Cell::whereIn('supervision_id', $user->supervisedSupervisions()->pluck('id'))
-                ->orWhereIn('supervision_id', $user->subSupervisedSupervisions()->pluck('id'))
-                ->with('supervision')
-                ->get();
-        } elseif ($user->isPastorZona() || $user->isSubPastorZona()) {
-            $zones = Zone::where('pastor_id', $user->id)->get();
-            $supervisionIds = $zones->flatMap(fn($z) => $z->supervisions()->pluck('id'));
-            $relatedCells = Cell::whereIn('supervision_id', $supervisionIds)->with('supervision')->get();
-        } elseif ($user->isPastor() || $user->isSubPastor()) {
-            $zones = Zone::where('pastor_id', $user->id)->get();
-            $supervisionIds = $zones->flatMap(fn($z) => $z->supervisions()->pluck('id'));
-            $relatedCells = Cell::whereIn('supervision_id', $supervisionIds)->with('supervision')->get();
-        } elseif ($user->isAdmin() || $user->isSuperAdmin() || $user->isPastorSenior()) {
-            $relatedCells = Cell::with('supervision')->get();
-        } elseif ($user->cell) {
-            $relatedCells = Cell::where('id', $user->cell_id)->with('supervision')->get();
+        // 1. Células que o utilizador lidera
+        $ledCells = Cell::where('leader_id', $user->id)->with('supervision.zone')->get();
+        foreach ($ledCells as $cell) {
+            $cellRolesMap[$cell->id]['cell'] = $cell;
+            $cellRolesMap[$cell->id]['roles'][] = 'Líder';
         }
 
+        // 2. Células onde o utilizador é Timóteo
+        $timoteoCells = Cell::where('timoteo_id', $user->id)->with('supervision.zone')->get();
+        foreach ($timoteoCells as $cell) {
+            $cellRolesMap[$cell->id]['cell'] = $cell;
+            if (!in_array('Timóteo', $cellRolesMap[$cell->id]['roles'] ?? [])) {
+                $cellRolesMap[$cell->id]['roles'][] = 'Timóteo';
+            }
+        }
+
+        // 3. Célula a que pertence como Membro
+        if ($user->cell_id) {
+            $memberCell = Cell::with('supervision.zone')->find($user->cell_id);
+            if ($memberCell) {
+                $cellRolesMap[$memberCell->id]['cell'] = $memberCell;
+                if (!in_array('Membro da Célula', $cellRolesMap[$memberCell->id]['roles'] ?? []) && !in_array('Líder', $cellRolesMap[$memberCell->id]['roles'] ?? [])) {
+                    $cellRolesMap[$memberCell->id]['roles'][] = 'Membro da Célula';
+                }
+            }
+        }
+
+        // 4. Supervisões onde é Supervisor Principal
+        $supervisedSupIds = Supervision::where('supervisor_id', $user->id)->pluck('id');
+        if ($supervisedSupIds->isNotEmpty()) {
+            $supCells = Cell::whereIn('supervision_id', $supervisedSupIds)->with('supervision.zone')->get();
+            foreach ($supCells as $cell) {
+                $cellRolesMap[$cell->id]['cell'] = $cell;
+                if (!in_array('Supervisor', $cellRolesMap[$cell->id]['roles'] ?? [])) {
+                    $cellRolesMap[$cell->id]['roles'][] = 'Supervisor';
+                }
+            }
+        }
+
+        // 5. Supervisões onde é Sub-Supervisor
+        $subSupervisedSupIds = Supervision::where('sub_supervisor_id', $user->id)->pluck('id');
+        if ($subSupervisedSupIds->isNotEmpty()) {
+            $subSupCells = Cell::whereIn('supervision_id', $subSupervisedSupIds)->with('supervision.zone')->get();
+            foreach ($subSupCells as $cell) {
+                $cellRolesMap[$cell->id]['cell'] = $cell;
+                if (!in_array('Sub-supervisor', $cellRolesMap[$cell->id]['roles'] ?? [])) {
+                    $cellRolesMap[$cell->id]['roles'][] = 'Sub-supervisor';
+                }
+            }
+        }
+
+        // 6. Zonas onde é Pastor de Zona
+        $pastoredZoneIds = Zone::where('pastor_id', $user->id)->pluck('id');
+        if ($pastoredZoneIds->isNotEmpty()) {
+            $zoneSupIds = Supervision::whereIn('zone_id', $pastoredZoneIds)->pluck('id');
+            if ($zoneSupIds->isNotEmpty()) {
+                $zoneCells = Cell::whereIn('supervision_id', $zoneSupIds)->with('supervision.zone')->get();
+                foreach ($zoneCells as $cell) {
+                    $cellRolesMap[$cell->id]['cell'] = $cell;
+                    if (!in_array('Pastor de Zona', $cellRolesMap[$cell->id]['roles'] ?? [])) {
+                        $cellRolesMap[$cell->id]['roles'][] = 'Pastor de Zona';
+                    }
+                }
+            }
+        }
+
+        // Formatar lista de células vinculadas com papéis associados
+        $relatedCells = collect($cellRolesMap)->map(function ($item) {
+            $cell = $item['cell'];
+            $cell->user_roles = $item['roles'];
+            return $cell;
+        })->values();
+
+>>>>>>> feature/redesign-premium
         return view('admin.users.show', [
             'user' => $user,
             'relatedCells' => $relatedCells,
@@ -326,7 +379,7 @@ class UserController
     public function members(Request $request): View
     {
         $user = auth()->user();
-        $membersQuery = User::whereIn('role', ['membro', 'lider_celula'])
+        $membersQuery = User::whereIn('role', ['membro', 'lider_celula', 'timoteo'])
             ->with(['cell.supervision.zone', 'commitments']);
 
         // Aplicar filtro hierárquico
@@ -370,10 +423,15 @@ class UserController
         $availableCells = $this->getAvailableCells($user);
         $packages = CommitmentPackage::where('is_active', true)->orderBy('order')->get();
 
-        // Se for líder de célula, pré-selecionar sua célula
+        // Se for líder de uma única célula, pré-selecionar; se gere várias, manter seletor.
         $selectedCell = null;
         if ($user->role === 'lider_celula') {
-            $selectedCell = $user->cell;
+            $managedCellIds = $user->getManagedCellIds();
+            if ($request->filled('cell_id') && $managedCellIds->contains((int) $request->cell_id)) {
+                $selectedCell = Cell::find($request->cell_id);
+            } elseif ($managedCellIds->count() === 1) {
+                $selectedCell = Cell::find($managedCellIds->first());
+            }
         }
 
         // Pré-preenchimento opcional a partir de um visitante
@@ -433,6 +491,16 @@ class UserController
         // Validar permissão para criar nesta célula
         $cell = Cell::findOrFail($validated['cell_id']);
         $this->validateCellPermission($user, $cell);
+
+        if ($validated['role'] === 'lider_celula') {
+            if ($response = $this->validateLeaderForCellType($request, $user->find($validated['cell_id'])?->leader ?? $user, $cell->type, 'O líder selecionado não é compatível com o tipo de célula selecionado.')) {
+                return $response;
+            }
+        } else {
+            if ($response = $this->validateMemberForCellType($request, $user, $cell->type, 'Este membro não é compatível com o tipo de célula selecionado.')) {
+                return $response;
+            }
+        }
 
         $plainPassword = $validated['password'];
 
@@ -567,6 +635,16 @@ class UserController
         $cell = Cell::findOrFail($validated['cell_id']);
         $this->validateCellPermission($user, $cell);
 
+        if ($validated['role'] === 'lider_celula') {
+            if ($response = $this->validateLeaderForCellType($request, $member, $cell->type, 'O líder selecionado não é compatível com o tipo de célula selecionado.')) {
+                return $response;
+            }
+        } else {
+            if ($response = $this->validateMemberForCellType($request, $member, $cell->type, 'Este membro não é compatível com o tipo de célula selecionado.')) {
+                return $response;
+            }
+        }
+
         $member->update($validated);
 
         return redirect()->route('members.show', $member)
@@ -647,8 +725,8 @@ class UserController
     {
         switch ($user->role) {
             case 'lider_celula':
-                // Vê apenas membros e líderes (se houver mais de um, o que é raro) da sua célula
-                $query->where('cell_id', $user->cell_id);
+                // Vê membros das células que lidera diretamente.
+                $query->whereIn('cell_id', $user->getManagedCellIds());
                 break;
 
             case 'supervisor':
@@ -694,8 +772,8 @@ class UserController
 
         switch ($user->role) {
             case 'lider_celula':
-                // Apenas sua célula
-                $cellsQuery->where('id', $user->cell_id);
+                // Apenas células sob sua gestão direta
+                $cellsQuery->whereIn('id', $user->getManagedCellIds());
                 break;
 
             case 'supervisor':
@@ -733,8 +811,8 @@ class UserController
             return;
 
         if ($user->role === 'lider_celula') {
-            if ($member->cell_id !== $user->cell_id) {
-                abort(403, 'Você só pode gerenciar membros da sua célula');
+            if (!$user->getManagedCellIds()->contains($member->cell_id)) {
+                abort(403, 'Você só pode gerenciar membros das células que lidera');
             }
         }
 
@@ -764,6 +842,12 @@ class UserController
             'cell_id' => 'required|exists:cells,id',
         ]);
 
+        $cell = Cell::findOrFail($validated['cell_id']);
+        $this->validateCellPermission(auth()->user(), $cell);
+        if ($response = $this->validateMemberForCellType($request, $user, $cell->type, "O membro {$user->name} não é compatível com o tipo de célula selecionado.")) {
+            return $response;
+        }
+
         $action->execute($user, (int) $validated['cell_id']);
 
         return back()->with('success', 'Membro transferido com sucesso!');
@@ -788,20 +872,26 @@ class UserController
         return back()->with('success', 'Observações atualizadas com sucesso!');
      }
 
-     public function assignMemberToCell(Request $request, User $member)
-     {
-         $user = auth()->user();
-         if ($user->id === $member->id) {
-             abort(403, 'Não é permitido alterar a sua própria célula a partir da área de membros.');
-         }
-         $validated = $request->validate([
-             'cell_id' => 'required|exists:cells,id',
-         ]);
+      public function assignMemberToCell(Request $request, User $member)
+      {
+          $user = auth()->user();
+          if ($user->id === $member->id) {
+              abort(403, 'Não é permitido alterar a sua própria célula a partir da área de membros.');
+          }
+          $validated = $request->validate([
+              'cell_id' => 'required|exists:cells,id',
+          ]);
 
-         $member->update(['cell_id' => $validated['cell_id']]);
+          $cell = Cell::findOrFail($validated['cell_id']);
+          $this->validateCellPermission($user, $cell);
+          if ($response = $this->validateMemberForCellType($request, $member, $cell->type, "O membro {$member->name} não é compatível com o tipo de célula selecionado.")) {
+            return $response;
+        }
 
-         return back()->with('success', "Membro {$member->name} foi associado à célula com sucesso!");
-     }
+          $member->update(['cell_id' => $validated['cell_id']]);
+
+          return back()->with('success', "Membro {$member->name} foi associado à célula com sucesso!");
+      }
 
     /**
      * Validar se usuário pode criar membro nesta célula
@@ -812,8 +902,8 @@ class UserController
             return;
 
         if ($user->role === 'lider_celula') {
-            if ($cell->id !== $user->cell_id) {
-                abort(403, 'Você só pode criar membros na sua célula');
+            if (!$user->getManagedCellIds()->contains($cell->id)) {
+                abort(403, 'Você só pode criar membros nas células que lidera');
             }
         }
 
@@ -849,5 +939,71 @@ class UserController
         }
 
         return auth()->user()->isSuperAdmin();
+    }
+
+    private function validateMemberForCellType(Request $request, User $member, string $cellType, string $message): RedirectResponse|JsonResponse|null
+    {
+        $role = $member->role;
+
+        $valid = match ($cellType) {
+            \App\Models\Cell::TYPE_MEMBROS => in_array($role, ['membro', 'timoteo', 'lider_celula']),
+            \App\Models\Cell::TYPE_LIDERES => $role === 'lider_celula',
+            \App\Models\Cell::TYPE_SUPERVISORES => in_array($role, ['supervisor', 'sub_supervisor']),
+            \App\Models\Cell::TYPE_PASTORES_ZONA => in_array($role, ['pastor_zona', 'pastor']),
+            \App\Models\Cell::TYPE_PASTORES => in_array($role, ['pastor', 'pastor_senior']),
+            default => true,
+        };
+
+        if ($valid) {
+            return null;
+        }
+
+        // Pedidos AJAX/JSON recebem uma resposta JSON 422 normalizada; formulários
+        // normais são redirecionados com erro flash (toast) + mensagem no campo.
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => $message,
+                'errors' => ['role' => [$message]],
+            ], 422);
+        }
+
+        return back()
+            ->withInput()
+            ->withErrors(['role' => $message])
+            ->with('error', $message);
+    }
+
+    private function validateLeaderForCellType(Request $request, User $leader, string $cellType, string $message): RedirectResponse|JsonResponse|null
+    {
+        $role = $leader->role;
+
+        // Regras alinhadas com CellController (células de líderes podem ser lideradas
+        // por supervisores, sub-supervisores, pastores de zona, pastores e pastor sénior).
+        $valid = match ($cellType) {
+            \App\Models\Cell::TYPE_MEMBROS => true,
+            \App\Models\Cell::TYPE_LIDERES => in_array($role, ['supervisor', 'sub_supervisor', 'pastor_zona', 'pastor', 'pastor_senior']),
+            \App\Models\Cell::TYPE_SUPERVISORES => in_array($role, ['pastor_zona', 'pastor', 'pastor_senior']),
+            \App\Models\Cell::TYPE_PASTORES_ZONA => in_array($role, ['pastor_senior']),
+            \App\Models\Cell::TYPE_PASTORES => in_array($role, ['pastor_senior']),
+            default => true,
+        };
+
+        if ($valid) {
+            return null;
+        }
+
+        // Pedidos AJAX/JSON recebem uma resposta JSON 422 normalizada; formulários
+        // normais são redirecionados com erro flash (toast) + mensagem no campo.
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => $message,
+                'errors' => ['role' => [$message]],
+            ], 422);
+        }
+
+        return back()
+            ->withInput()
+            ->withErrors(['role' => $message])
+            ->with('error', $message);
     }
 }

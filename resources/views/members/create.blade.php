@@ -54,11 +54,11 @@
                             <option value="">-- Selecione uma célula --</option>
                             @foreach($availableCells as $cell)
                                 <option value="{{ $cell->id }}" {{ (old('cell_id', $prefill['cell_id'] ?? '')) == $cell->id ? 'selected' : '' }}>
-                                    {{ $cell->name }}
+                                    {{ $cell->name }} ({{ $cell->type_label }})
                                     @if($cell->supervision)
-                                        ({{ $cell->supervision->name }})
+                                        - {{ $cell->supervision->name }}
                                         @if($cell->supervision->zone)
-                                            - {{ $cell->supervision->zone->name }}
+                                            / {{ $cell->supervision->zone->name }}
                                         @endif
                                     @endif
                                 </option>

@@ -9,10 +9,10 @@
         onclick="toggleMobileSidebar()"></div>
 
     <div class="flex h-screen bg-gray-100"
-        x-data="{ sidebarOpen: localStorage.getItem('sidebarOpen') !== 'false', mobileSidebarOpen: false }"
+        x-data="{ sidebarOpen: (function() { try { return localStorage.getItem('sidebarOpen') !== 'false'; } catch(e) { return true; } })(), mobileSidebarOpen: false }"
         x-init="
             $watch('sidebarOpen', value => {
-                localStorage.setItem('sidebarOpen', value);
+                try { localStorage.setItem('sidebarOpen', value); } catch(e) {}
                 setTimeout(() => window.dispatchEvent(new Event('resize')), 300);
             });
             $watch('mobileSidebarOpen', value => {

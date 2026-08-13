@@ -8,7 +8,35 @@ class Cell extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'supervision_id', 'leader_id', 'member_count'];
+    protected $fillable = ['name', 'type', 'supervision_id', 'leader_id', 'member_count'];
+
+    public const TYPE_MEMBROS = 'membros';
+    public const TYPE_LIDERES = 'lideres';
+    public const TYPE_SUPERVISORES = 'supervisores';
+    public const TYPE_PASTORES_ZONA = 'pastores_zona';
+    public const TYPE_PASTORES = 'pastores';
+
+    public function getTypeLabelAttribute(): string
+    {
+        return match ($this->type) {
+            self::TYPE_LIDERES => 'Célula de Líderes',
+            self::TYPE_SUPERVISORES => 'Célula de Supervisores',
+            self::TYPE_PASTORES_ZONA => 'Célula de Pastores de Zona',
+            self::TYPE_PASTORES => 'Célula de Pastores',
+            default => 'Célula de Membros',
+        };
+    }
+
+    public function getTypeBadgeClassesAttribute(): string
+    {
+        return match ($this->type) {
+            self::TYPE_LIDERES => 'bg-purple-50 text-purple-600 border-purple-100',
+            self::TYPE_SUPERVISORES => 'bg-pink-50 text-pink-600 border-pink-100',
+            self::TYPE_PASTORES_ZONA => 'bg-blue-50 text-blue-600 border-blue-100',
+            self::TYPE_PASTORES => 'bg-indigo-50 text-indigo-600 border-indigo-100',
+            default => 'bg-gray-50 text-gray-600 border-gray-100',
+        };
+    }
 
     public function supervision()
     {

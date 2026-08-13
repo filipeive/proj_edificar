@@ -61,6 +61,7 @@ class CellsController extends BaseApiController
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'type' => 'required|in:membros,lideres,supervisores,pastores_zona,pastores',
             'supervision_id' => 'required|exists:supervisions,id',
             'leader_id' => 'required|exists:users,id',
         ]);
@@ -89,6 +90,7 @@ class CellsController extends BaseApiController
     {
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
+            'type' => 'sometimes|required|in:membros,lideres,supervisores,pastores_zona,pastores',
             'supervision_id' => 'sometimes|required|exists:supervisions,id',
             'leader_id' => 'sometimes|required|exists:users,id',
         ]);

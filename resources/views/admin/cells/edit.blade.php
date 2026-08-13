@@ -54,6 +54,24 @@
                             @error('name')
                                 <p class="text-red-500 text-[10px] font-bold mt-1 ml-1">{{ $message }}</p>
                             @enderror
+                         </div>
+
+                        <div class="space-y-2">
+                            <label for="type"
+                                class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Tipo de
+                                Célula</label>
+                            <select name="type" id="type"
+                                class="searchable-select custom-select w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all @error('type') border-red-500 @enderror"
+                                required>
+                                <option value="membros" {{ old('type', $cell->type) == 'membros' ? 'selected' : '' }}>Célula de Membros</option>
+                                <option value="lideres" {{ old('type', $cell->type) == 'lideres' ? 'selected' : '' }}>Célula de Líderes</option>
+                                <option value="supervisores" {{ old('type', $cell->type) == 'supervisores' ? 'selected' : '' }}>Célula de Supervisores</option>
+                                <option value="pastores_zona" {{ old('type', $cell->type) == 'pastores_zona' ? 'selected' : '' }}>Célula de Pastores de Zona</option>
+                                <option value="pastores" {{ old('type', $cell->type) == 'pastores' ? 'selected' : '' }}>Célula de Pastores</option>
+                            </select>
+                            @error('type')
+                                <p class="text-red-500 text-[10px] font-bold mt-1 ml-1">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div class="space-y-2">
@@ -143,3 +161,62 @@
         </form>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const typeSelect = document.getElementById('type');
+        const leaderSelect = document.getElementById('leader_id');
+        const cellId = {{ $cell->id }};
+
+        if (!typeSelect || !leaderSelect) return;
+
+        const updateLeaders = async function(preserveCurrent = false) {
+            const cellType = typeSelect.value;
+            const tomSelect = leaderSelect.tomselect;
+
+            try {
+                const response = await fetch(`{{ route('cells.eligible-leaders') }}?cell_id=${cellId}&cell_type=${cellType}`);
+                const leaders = await response.json();
+
+                if (!tomSelect) return;
+
+                const currentValue = tomSelect.getValue();
+                const currentOption = currentValue ? tomSelect.options[currentValue] : null;
+                const currentText = currentOption ? currentOption.text : '';
+
+                tomSelect.clear();
+                tomSelect.clearOptions();
+
+                if (leaders.length > 0) {
+                    leaders.forEach(leader => {
+                        tomSelect.addOption({value: leader.id, text: `${leader.name} (${leader.email})`});
+                    });
+
+                    if (currentValue && leaders.some(l => l.id == currentValue)) {
+                        tomSelect.setValue(currentValue);
+                    } else if (currentValue && preserveCurrent && currentText) {
+                        tomSelect.addOption({value: currentValue, text: `${currentText} (atual — incompatível)`});
+                        tomSelect.setValue(currentValue);
+                    }
+                } else {
+                    tomSelect.addOption({value: '', text: 'Nenhum líder elegível para este tipo de célula'});
+                    if (currentValue && preserveCurrent && currentText) {
+                        tomSelect.addOption({value: currentValue, text: `${currentText} (atual — incompatível)`});
+                        tomSelect.setValue(currentValue);
+                    }
+                }
+
+                tomSelect.refreshOptions(false);
+            } catch (error) {
+                console.error('Error loading eligible leaders:', error);
+            }
+        };
+
+        typeSelect.addEventListener('change', function() { updateLeaders(false); });
+
+        // Pré-filtrar os líderes elegíveis ao carregar a página, mantendo o líder atual
+        updateLeaders(true);
+    });
+</script>
+@endpush

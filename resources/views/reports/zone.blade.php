@@ -156,8 +156,7 @@
                                                 <span
                                                     class="text-sm font-black text-gray-900 tracking-tight">{{ $contribution->user->name }}</span>
                                                 <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                                                    {{ $contribution->user->cell?->supervision?->name ?? 'N/A' }} —
-                                                    {{ $contribution->user->cell?->name ?? 'N/A' }}
+                                                    {{ $contribution->user->cell?->name ?? 'N/A' }} — {{ $contribution->user->cell?->type_label ?? '' }}
                                                 </span>
                                             </div>
                                         </div>

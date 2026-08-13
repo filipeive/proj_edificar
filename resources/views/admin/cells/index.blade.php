@@ -152,7 +152,20 @@
                     </select>
                 </div>
 
-                @if(request()->hasAny(['search', 'zone', 'supervision']))
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Tipo</label>
+                    <select name="type" onchange="this.form.submit()"
+                        class="searchable-select px-6 py-3 bg-white border-transparent focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-xl transition-all font-bold text-gray-700 text-sm min-w-[180px] custom-select" data-label="Tipo">
+                        <option value="">Todos os Tipos</option>
+                        <option value="membros" {{ request('type') == 'membros' ? 'selected' : '' }}>Membros</option>
+                        <option value="lideres" {{ request('type') == 'lideres' ? 'selected' : '' }}>Líderes</option>
+                        <option value="supervisores" {{ request('type') == 'supervisores' ? 'selected' : '' }}>Supervisores</option>
+                        <option value="pastores_zona" {{ request('type') == 'pastores_zona' ? 'selected' : '' }}>Pastores de Zona</option>
+                        <option value="pastores" {{ request('type') == 'pastores' ? 'selected' : '' }}>Pastores</option>
+                    </select>
+                </div>
+
+                @if(request()->hasAny(['search', 'zone', 'supervision', 'type']))
                     <div class="flex gap-2">
                         <a href="{{ route('cells.index') }}"
                             class="flex items-center gap-2 px-6 py-3 text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-all font-black text-[10px] uppercase tracking-widest">
@@ -192,8 +205,11 @@
                                 </div>
                                 <div>
                                     <h3 class="text-xl font-black text-gray-900 leading-tight mb-1">{{ $cell->name }}</h3>
+                                    <span class="inline-block px-2.5 py-1 rounded-lg border text-[10px] font-black uppercase tracking-widest {{ $cell->type_badge_classes }}">
+                                        {{ $cell->type_label }}
+                                    </span>
                                     <div
-                                        class="flex items-center text-[10px] font-black text-gray-400 uppercase tracking-widest gap-2">
+                                        class="flex items-center text-[10px] font-black text-gray-400 uppercase tracking-widest gap-2 mt-2">
                                         <span
                                             class="bg-gray-50 px-2 py-1 rounded-lg text-blue-600">{{ $cell->supervision->name ?? 'Independente' }}</span>
                                     </div>
@@ -205,10 +221,12 @@
                                     class="w-10 h-10 rounded-xl bg-orange-50 hover:bg-orange-600 text-orange-400 hover:text-white flex items-center justify-center transition-all shadow-sm">
                                     <i class="bi bi-person-plus"></i>
                                 </button>
-                                <a href="{{ route('cells.edit', $cell) }}" title="Editar"
-                                    class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-yellow-500 text-gray-400 hover:text-white flex items-center justify-center transition-all shadow-sm">
-                                    <i class="bi bi-pencil-square"></i>
-                                </a>
+                                @if(!auth()->user()->isLider())
+                                    <a href="{{ route('cells.edit', $cell) }}" title="Editar"
+                                        class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-yellow-500 text-gray-400 hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                @endif
                                 @if($cell->members->count() == 0)
                                     <form action="{{ route('cells.destroy', $cell) }}" method="POST" id="grid-delete-cell-{{ $cell->id }}">
                                         @csrf
@@ -306,6 +324,9 @@
                             </th>
                             <th
                                 class="px-6 py-6 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                Tipo</th>
+                            <th
+                                class="px-6 py-6 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
                                 Membros</th>
                             <th
                                 class="px-6 py-6 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">
@@ -344,6 +365,11 @@
                                             class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{{ $cell->supervision->zone->name ?? 'Zonal Life' }}</span>
                                     </div>
                                 </td>
+                                <td class="px-6 py-7 text-center">
+                                    <span class="inline-block px-2.5 py-1 rounded-lg border text-[10px] font-black uppercase tracking-widest {{ $cell->type_badge_classes }}">
+                                        {{ $cell->type_label }}
+                                    </span>
+                                </td>
                                 <td class="px-6 py-7 text-center font-black text-blue-600 text-lg tracking-tighter">
                                     {{ $cell->members->count() }}</td>
                                 <td class="px-6 py-7 text-right">
@@ -357,10 +383,12 @@
                                             class="action-icon bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white">
                                             <i class="bi bi-speedometer2"></i>
                                         </a>
-                                        <a href="{{ route('cells.edit', $cell) }}" title="Editar"
-                                            class="action-icon bg-gray-50 text-gray-400 hover:bg-yellow-500 hover:text-white">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
+                                        @if(!auth()->user()->isLider())
+                                            <a href="{{ route('cells.edit', $cell) }}" title="Editar"
+                                                class="action-icon bg-gray-50 text-gray-400 hover:bg-yellow-500 hover:text-white">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                        @endif
                                         {{-- Eliminar Celula --}}
                                         @if($cell->members->count() == 0)
                                             <form action="{{ route('cells.destroy', $cell) }}" method="POST" id="list-delete-cell-{{ $cell->id }}">
