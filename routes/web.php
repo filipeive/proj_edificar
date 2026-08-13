@@ -238,6 +238,8 @@ Route::middleware('auth')->group(function () {
             Route::post('/cells/{cell}/reassign-supervision', [CellController::class, 'reassignSupervision'])->name('cells.reassign-supervision');
             Route::post('/cells/{cell}/assign-timoteo', [CellController::class, 'assignTimoteo'])->name('cells.assign-timoteo');
             Route::post('/cells/{cell}/remove-timoteo', [CellController::class, 'removeTimoteo'])->name('cells.remove-timoteo');
+            Route::post('/cells/{cell}/members/{user}/promote-sub-supervisor', [CellController::class, 'promoteSubSupervisor'])->name('cells.promote-sub-supervisor');
+            Route::post('/cells/{cell}/members/{user}/promote-subpastor-zona', [CellController::class, 'promoteSubpastorZona'])->name('cells.promote-subpastor-zona');
             Route::get('/cells/eligible-leaders', [CellController::class, 'getEligibleLeaders'])->name('cells.eligible-leaders');
             Route::get('/cells/{cell}/eligible-members', [CellController::class, 'getEligibleMembers'])->name('cells.eligible-members');
             Route::post('/cells/{cell}/add-member', [CellController::class, 'addMember'])->name('cells.add-member');

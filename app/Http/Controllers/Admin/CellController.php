@@ -743,6 +743,44 @@ class CellController
         return back()->with('success', "{$user->name} deixou de ser Timóteo com sucesso!");
     }
 
+    public function promoteSubSupervisor(Cell $cell, User $user): RedirectResponse
+    {
+        $this->authorize('update', $cell);
+
+        if ($cell->type !== Cell::TYPE_LIDERES) {
+            return back()->with('error', 'Apenas membros de Célula de Líderes podem ser designados como Sub-supervisor!');
+        }
+
+        if ($user->cell_id !== $cell->id) {
+            return back()->with('error', 'O utilizador não pertence a esta célula!');
+        }
+
+        $user->update(['role' => 'sub_supervisor']);
+
+        if ($cell->supervision) {
+            $cell->supervision->update(['sub_supervisor_id' => $user->id]);
+        }
+
+        return back()->with('success', "{$user->name} foi promovido(a) a Sub-supervisor da supervisão {$cell->supervision?->name} com sucesso!");
+    }
+
+    public function promoteSubpastorZona(Cell $cell, User $user): RedirectResponse
+    {
+        $this->authorize('update', $cell);
+
+        if ($cell->type !== Cell::TYPE_SUPERVISORES) {
+            return back()->with('error', 'Apenas membros de Célula de Supervisores podem ser designados como Sub-pastor de Zona!');
+        }
+
+        if ($user->cell_id !== $cell->id) {
+            return back()->with('error', 'O utilizador não pertence a esta célula!');
+        }
+
+        $user->update(['role' => 'subpastor_zona']);
+
+        return back()->with('success', "{$user->name} foi promovido(a) a Sub-pastor de Zona (Auxiliar) com sucesso!");
+    }
+
     private function applyVisibilityScope(Builder $query, User $user): Builder
     {
         if ($user->isAdmin() || $user->isSecretaria() || $user->isPastor() || $user->isPastorSenior() || $user->isAdministracao()) {

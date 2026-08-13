@@ -237,6 +237,17 @@
                                         
                                         <td class="py-4 px-4 text-right">
                                             <div class="flex items-center justify-end gap-2 opacity-70 hover:opacity-100 transition-all">
+                                                @if($cell->type === \App\Models\Cell::TYPE_LIDERES && $member->role !== 'sub_supervisor')
+                                                    <form action="{{ route('cells.promote-sub-supervisor', ['cell' => $cell, 'user' => $member]) }}" method="POST" class="inline" onsubmit="return confirm('Promover {{ $member->name }} a Sub-supervisor da supervisão {{ $cell->supervision?->name }}?')">
+                                                        @csrf
+                                                        <button type="submit" class="p-2 rounded-lg text-gray-400 hover:text-purple-600 hover:bg-purple-50 transition-colors" title="Promover a Sub-supervisor"><i class="bi bi-award-fill"></i></button>
+                                                    </form>
+                                                @elseif($cell->type === \App\Models\Cell::TYPE_SUPERVISORES && $member->role !== 'subpastor_zona')
+                                                    <form action="{{ route('cells.promote-subpastor-zona', ['cell' => $cell, 'user' => $member]) }}" method="POST" class="inline" onsubmit="return confirm('Promover {{ $member->name }} a Sub-pastor de Zona (Auxiliar)?')">
+                                                        @csrf
+                                                        <button type="submit" class="p-2 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors" title="Promover a Sub-pastor de Zona"><i class="bi bi-star-fill"></i></button>
+                                                    </form>
+                                                @endif
                                                 <button type="button" @click='openObs({{ json_encode(["id" => $member->id, "name" => $member->name, "observations" => $member->observations ?? ""], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT) }})' class="p-2 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Observações"><i class="bi bi-chat-square-text"></i></button>
                                                 <button type="button" @click='transfer({{ json_encode(["id" => $member->id, "name" => $member->name], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT) }})' class="p-2 rounded-lg text-gray-400 hover:text-orange-600 hover:bg-orange-50 transition-colors" title="Transferir"><i class="bi bi-arrow-left-right"></i></button>
                                                 <form action="{{ route('users.remove-from-cell', $member) }}" method="POST" class="inline" onsubmit="return confirm('Deseja remover este membro desta célula?')">
@@ -274,6 +285,17 @@
                                 </div>
                                 <div class="text-xs text-gray-500 mb-3">{{ $member->phone ?? '—' }}</div>
                                 <div class="flex gap-2 pt-3 border-t border-gray-200">
+                                    @if($cell->type === \App\Models\Cell::TYPE_LIDERES && $member->role !== 'sub_supervisor')
+                                        <form action="{{ route('cells.promote-sub-supervisor', ['cell' => $cell, 'user' => $member]) }}" method="POST" class="flex-1" onsubmit="return confirm('Promover {{ $member->name }} a Sub-supervisor da supervisão {{ $cell->supervision?->name }}?')">
+                                            @csrf
+                                            <button type="submit" class="w-full py-2 rounded-xl text-xs font-bold text-purple-600 bg-purple-50 hover:bg-purple-100 transition-colors"><i class="bi bi-award-fill mr-1"></i> Sub-sup</button>
+                                        </form>
+                                    @elseif($cell->type === \App\Models\Cell::TYPE_SUPERVISORES && $member->role !== 'subpastor_zona')
+                                        <form action="{{ route('cells.promote-subpastor-zona', ['cell' => $cell, 'user' => $member]) }}" method="POST" class="flex-1" onsubmit="return confirm('Promover {{ $member->name }} a Sub-pastor de Zona (Auxiliar)?')">
+                                            @csrf
+                                            <button type="submit" class="w-full py-2 rounded-xl text-xs font-bold text-amber-600 bg-amber-50 hover:bg-amber-100 transition-colors"><i class="bi bi-star-fill mr-1"></i> Sub-pastor</button>
+                                        </form>
+                                    @endif
                                     <button type="button" @click='openObs({{ json_encode(["id" => $member->id, "name" => $member->name, "observations" => $member->observations ?? ""], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT) }})' class="flex-1 py-2 rounded-xl text-xs font-bold text-gray-600 bg-white border border-gray-200 hover:bg-gray-100 transition-colors"><i class="bi bi-chat-square-text mr-1"></i> Obs</button>
                                     <button type="button" @click='transfer({{ json_encode(["id" => $member->id, "name" => $member->name], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT) }})' class="flex-1 py-2 rounded-xl text-xs font-bold text-gray-600 bg-white border border-gray-200 hover:bg-gray-100 transition-colors"><i class="bi bi-arrow-left-right mr-1"></i> Transferir</button>
                                     <form action="{{ route('users.remove-from-cell', $member) }}" method="POST" class="flex-1" onsubmit="return confirm('Deseja remover este membro desta célula?')">
