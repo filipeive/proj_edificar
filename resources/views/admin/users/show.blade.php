@@ -167,7 +167,6 @@
                             Ver Tudo
                         </a>
                     </div>
-
                     <div class="overflow-x-auto">
                         <table class="min-w-full">
                             <thead class="bg-gray-50 text-[10px] font-black uppercase tracking-wider text-gray-400">

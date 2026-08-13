@@ -147,6 +147,8 @@ class UserController
             $relatedCells = Cell::whereIn('supervision_id', $supervisionIds)->with('supervision')->get();
         } elseif ($user->isAdmin() || $user->isSuperAdmin() || $user->isPastorSenior()) {
             $relatedCells = Cell::with('supervision')->get();
+        } elseif ($user->cell) {
+            $relatedCells = Cell::where('id', $user->cell_id)->with('supervision')->get();
         }
 
         return view('admin.users.show', [
