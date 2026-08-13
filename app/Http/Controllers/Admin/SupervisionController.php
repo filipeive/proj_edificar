@@ -225,6 +225,10 @@ class SupervisionController
             return back()->with('error', 'Não pode deletar supervisão com células!');
         }
 
+        if ($supervision->contributions()->exists()) {
+            return back()->with('error', 'Não pode deletar supervisão com contribuições financeiras vinculadas!');
+        }
+
         $supervision->delete();
 
         return redirect()->route('supervisions.index')
