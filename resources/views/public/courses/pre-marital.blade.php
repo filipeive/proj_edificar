@@ -1168,6 +1168,9 @@
                 el.querySelectorAll('input, select, textarea').forEach(function (f) {
                     f.removeAttribute('tabindex');
                     f.removeAttribute('disabled');
+                    if (f.tagName === 'SELECT' && f.tomselect && typeof f.tomselect.enable === 'function') {
+                        f.tomselect.enable();
+                    }
                 });
             }
 
@@ -1177,6 +1180,9 @@
                 el.querySelectorAll('input, select, textarea').forEach(function (f) {
                     f.setAttribute('tabindex', '-1');
                     f.setAttribute('disabled', 'disabled');
+                    if (f.tagName === 'SELECT' && f.tomselect && typeof f.tomselect.disable === 'function') {
+                        f.tomselect.disable();
+                    }
                 });
             }
 
