@@ -258,9 +258,18 @@ class CellController
 
         $leaders = $leadersQuery->get();
 
-        $timoteos = User::where('cell_id', $cell->id)
+        // Load all compatible members for auxiliary selection using the eligibility service
+        $service = app(CellEligibilityService::class);
+        $eligibleMembers = $service->membrosElegiveisPara($cell)->get();
+
+        // Also include members already in this cell (excluding the leader)
+        $currentMembers = User::where('cell_id', $cell->id)
             ->where('id', '!=', $cell->leader_id)
-            ->get()
+            ->get();
+
+        // Merge: eligible members + current cell members + existing timoteos
+        $timoteos = $eligibleMembers
+            ->merge($currentMembers)
             ->merge($cell->timoteos)
             ->unique('id');
 
