@@ -135,12 +135,10 @@ class CellController
 
         $supervisions = $query->with('zone')->orderBy('name')->get();
         $leaders = User::where('role', 'lider_celula')->get();
-        $timoteos = User::where('role', 'timoteo')->get();
 
         return view('admin.cells.create', [
             'supervisions' => $supervisions,
             'leaders' => $leaders,
-            'timoteos' => $timoteos,
         ]);
     }
 
@@ -153,21 +151,11 @@ class CellController
             'type' => 'required|in:membros,lideres,supervisores,pastores_zona,pastores',
             'supervision_id' => 'required|exists:supervisions,id',
             'leader_id' => 'required|exists:users,id',
-            'timoteos' => 'nullable|array',
-            'timoteos.*' => 'exists:users,id',
         ]);
 
         $leader = User::findOrFail($validated['leader_id']);
         if ($response = $this->validateLeaderForCellType($request, $leader, $validated['type'], 'O líder selecionado não é compatível com o tipo de célula selecionado.')) {
             return $response;
-        }
-
-        $newTimoteoIds = collect($validated['timoteos'] ?? []);
-        foreach ($newTimoteoIds as $userId) {
-            $member = User::findOrFail($userId);
-            if ($response = $this->validateMemberForCellType($request, $member, $validated['type'], "O membro {$member->name} não é compatível com o tipo de célula selecionado.")) {
-                return $response;
-            }
         }
 
         $cell = Cell::create([
@@ -176,18 +164,6 @@ class CellController
             'supervision_id' => $validated['supervision_id'],
             'leader_id' => $validated['leader_id'],
         ]);
-
-        // Sync Timoteos
-        if (! $newTimoteoIds->isEmpty()) {
-            User::whereIn('id', $newTimoteoIds)
-                ->where('role', '!=', 'lider_celula')
-                ->where('role', '!=', 'supervisor')
-                ->where('role', '!=', 'sub_supervisor')
-                ->where('role', '!=', 'pastor_zona')
-                ->where('role', '!=', 'pastor')
-                ->where('role', '!=', 'pastor_senior')
-                ->update(['cell_id' => $cell->id, 'role' => 'timoteo']);
-        }
 
         // Atribuir líder à célula
         $leader->update(['cell_id' => $cell->id]);
@@ -503,6 +479,7 @@ class CellController
                 'name' => $m->name,
                 'email' => $m->email,
                 'role' => $m->role,
+                'role_label' => $m->getRoleLabel(),
                 'current_cell' => $m->cell?->name,
             ];
         }));
