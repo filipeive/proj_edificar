@@ -282,7 +282,11 @@ class CellController
 
         $leaders = $leadersQuery->get();
 
-        $timoteos = $cell->timoteos;
+        $timoteos = User::where('cell_id', $cell->id)
+            ->where('id', '!=', $cell->leader_id)
+            ->get()
+            ->merge($cell->timoteos)
+            ->unique('id');
 
         return view('admin.cells.edit', [
             'cell' => $cell,
@@ -553,10 +557,10 @@ class CellController
 
         $valid = match ($cellType) {
             Cell::TYPE_MEMBROS => in_array($role, ['membro', 'timoteo', 'lider_celula']),
-            Cell::TYPE_LIDERES => $role === 'lider_celula',
-            Cell::TYPE_SUPERVISORES => in_array($role, ['supervisor', 'sub_supervisor']),
-            Cell::TYPE_PASTORES_ZONA => in_array($role, ['pastor_zona', 'pastor']),
-            Cell::TYPE_PASTORES => in_array($role, ['pastor', 'pastor_senior']),
+            Cell::TYPE_LIDERES => in_array($role, ['lider_celula', 'timoteo', 'sub_supervisor']),
+            Cell::TYPE_SUPERVISORES => in_array($role, ['supervisor', 'sub_supervisor', 'subpastor_zona']),
+            Cell::TYPE_PASTORES_ZONA => in_array($role, ['pastor_zona', 'subpastor_zona', 'pastor']),
+            Cell::TYPE_PASTORES => in_array($role, ['pastor', 'subpastor', 'pastor_senior']),
             default => true,
         };
 
