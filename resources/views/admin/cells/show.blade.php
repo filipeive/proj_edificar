@@ -463,20 +463,38 @@
                     </div>
                 </div>
 
-                <!-- Leader Info -->
-                <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6">
-                    <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Liderança</h4>
-                    @if($cell->leader)
-                        <a href="{{ route('users.show', $cell->leader) }}" class="flex items-center gap-3 hover:bg-gray-50 p-2 rounded-xl transition-colors">
-                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-sm font-bold">{{ substr($cell->leader->name, 0, 1) }}</div>
-                            <div>
-                                <div class="font-bold text-gray-900 text-sm">{{ $cell->leader->name }}</div>
-                                <div class="text-xs text-gray-400">Líder da célula</div>
-                            </div>
-                        </a>
-                    @else
-                        <div class="text-sm text-gray-400 text-center py-4">Sem líder definido</div>
-                    @endif
+                <!-- Leader & Auxiliaries Info -->
+                <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6 space-y-4">
+                    <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest">Equipe de Liderança</h4>
+                    <div>
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider block mb-2">Líder Principal</span>
+                        @if($cell->leader)
+                            <a href="{{ route('users.show', $cell->leader) }}" class="flex items-center gap-3 hover:bg-gray-50 p-2 rounded-xl transition-colors">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-sm font-bold">{{ substr($cell->leader->name, 0, 1) }}</div>
+                                <div>
+                                    <div class="font-bold text-gray-900 text-sm">{{ $cell->leader->name }}</div>
+                                    <div class="text-xs text-gray-400">Líder da célula</div>
+                                </div>
+                            </a>
+                        @else
+                            <div class="text-sm text-gray-400 py-1">Sem líder definido</div>
+                        @endif
+                    </div>
+
+                    <div class="border-t border-gray-100 pt-3">
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider block mb-2">Auxiliares (Timóteos)</span>
+                        @forelse($cell->timoteos as $auxiliar)
+                            <a href="{{ route('users.show', $auxiliar) }}" class="flex items-center gap-3 hover:bg-gray-50 p-2 rounded-xl transition-colors">
+                                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white text-xs font-bold">{{ substr($auxiliar->name, 0, 1) }}</div>
+                                <div>
+                                    <div class="font-bold text-gray-900 text-sm">{{ $auxiliar->name }}</div>
+                                    <div class="text-[11px] text-gray-400">Auxiliar da célula</div>
+                                </div>
+                            </a>
+                        @empty
+                            <div class="text-xs text-gray-400 py-1 italic">Nenhum auxiliar atribuído</div>
+                        @endforelse
+                    </div>
                 </div>
             </div>
         </div>
