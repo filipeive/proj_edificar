@@ -158,6 +158,20 @@ class WeddingController extends Controller
         return redirect()->route('weddings.index')->with('success', 'Casamento atualizado com sucesso!');
     }
 
+    public function complete(Request $request, Wedding $wedding)
+    {
+        $validated = $request->validate([
+            'observations' => 'nullable|string',
+        ]);
+
+        $wedding->update([
+            'status' => 'completed',
+            'observations' => $validated['observations'] ?? $wedding->observations,
+        ]);
+
+        return redirect()->route('weddings.show', $wedding)->with('success', 'Casamento marcado como realizado com sucesso!');
+    }
+
     public function destroy(Wedding $wedding)
     {
         $wedding->delete();

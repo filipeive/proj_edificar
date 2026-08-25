@@ -511,6 +511,7 @@ Route::middleware('auth')->group(function () {
     Route::get('weddings/feed', [App\Http\Controllers\Admin\WeddingController::class, 'feed'])->name('weddings.feed');
     Route::get('weddings/pdf', [App\Http\Controllers\Admin\WeddingController::class, 'downloadPdf'])->name('weddings.pdf');
     Route::post('weddings/bulk-delete', [App\Http\Controllers\Admin\WeddingController::class, 'bulkDestroy'])->name('weddings.bulk-delete');
+    Route::patch('weddings/{wedding}/complete', [App\Http\Controllers\Admin\WeddingController::class, 'complete'])->name('weddings.complete');
     Route::resource('weddings', App\Http\Controllers\Admin\WeddingController::class);
     Route::post('/test-email', [App\Http\Controllers\Admin\WeddingController::class, 'testEmail'])->name('test.email');
 
