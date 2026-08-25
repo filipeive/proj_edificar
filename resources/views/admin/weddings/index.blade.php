@@ -63,7 +63,7 @@
                         class="px-4 py-2 text-xs font-bold uppercase tracking-wider text-gray-400 hover:text-white transition-colors">
                         Cancelar
                     </button>
-                    @if(auth()->user()->role === 'admin')
+                    @if(auth()->user()->isAdmin() || auth()->user()->isSecretaria() || auth()->user()->isPastor() || auth()->user()->isPastorSenior())
                         <form method="POST" action="{{ route('weddings.bulk-delete') }}" @submit.prevent="
                                                 Swal.fire({
                                                     title: 'Confirmação de Exclusão',
@@ -175,7 +175,7 @@
                 <table class="w-full table-compact">
                     <thead>
                         <tr class="bg-gray-50/50 border-b border-gray-100">
-                            @if(auth()->user()->role === 'admin')
+                            @if(auth()->user()->isAdmin() || auth()->user()->isSecretaria() || auth()->user()->isPastor() || auth()->user()->isPastorSenior())
                                 <th class="px-8 py-5 text-left w-10">
                                     <input type="checkbox" @click="toggleAll()"
                                         :checked="selected.length === {{ $weddings->count() }} && selected.length > 0"
@@ -201,7 +201,7 @@
                     <tbody class="divide-y divide-gray-100">
                         @forelse($weddings as $wedding)
                             <tr class="group hover:bg-gray-50/50 transition-colors duration-200">
-                                @if(auth()->user()->role === 'admin')
+                                @if(auth()->user()->isAdmin() || auth()->user()->isSecretaria() || auth()->user()->isPastor() || auth()->user()->isPastorSenior())
                                     <td class="px-8 py-5 relative">
                                         <div class="absolute left-0 top-0 bottom-0 w-1 bg-orange-500 opacity-0 transition-opacity"
                                             :class="{'opacity-100': selected.includes({{ $wedding->id }})}"></div>
@@ -283,8 +283,7 @@
                                             title="Ver detalhes">
                                             <i class="bi bi-eye-fill"></i>
                                         </a>
-                                        </a>
-                                        @if(in_array(auth()->user()->role, ['admin', 'secretaria']))
+                                        @if(auth()->user()->isAdmin() || auth()->user()->isSecretaria() || auth()->user()->isPastor() || auth()->user()->isPastorSenior())
                                             <form id="list-delete-wedding-{{ $wedding->id }}"
                                                 action="{{ route('weddings.destroy', $wedding->id) }}" method="POST" class="inline">
                                                 @csrf
@@ -340,7 +339,7 @@
                                         class="px-3 py-1 rounded-lg {{ $statusColors[$status] }} text-[10px] font-black uppercase tracking-widest">
                                         {{ $statusLabels[$status] ?? $status }}
                                     </span>
-                                    @if(auth()->user()->role === 'admin')
+                                    @if(auth()->user()->isAdmin() || auth()->user()->isSecretaria() || auth()->user()->isPastor() || auth()->user()->isPastorSenior())
                                         <input type="checkbox" value="{{ $wedding->id }}" x-model="selected"
                                             class="wedding-checkbox rounded-lg border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5">
                                     @endif
@@ -409,14 +408,15 @@
                                         class="w-10 h-10 bg-gray-50 text-gray-400 flex items-center justify-center rounded-xl hover:bg-blue-500 hover:text-white transition-all">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    @if(in_array(auth()->user()->role, ['admin', 'secretaria']))
+                                    @if(auth()->user()->isAdmin() || auth()->user()->isSecretaria() || auth()->user()->isPastor() || auth()->user()->isPastorSenior())
                                         <form id="grid-delete-wedding-{{ $wedding->id }}"
                                             action="{{ route('weddings.destroy', $wedding) }}" method="POST" class="inline">
                                             @csrf
                                             @method('DELETE')
 
                                             <button type="button" onclick="confirmDelete('grid-delete-wedding-{{ $wedding->id }}')"
-                                                class="w-10 h-10 bg-gray-50 text-gray-400 flex items-center justify-center rounded-xl hover:bg-red-500 hover:text-white transition-all">
+                                                class="w-10 h-10 bg-gray-50 text-gray-400 flex items-center justify-center rounded-xl hover:bg-red-500 hover:text-white transition-all"
+                                                title="Excluir">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>

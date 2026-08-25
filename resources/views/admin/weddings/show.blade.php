@@ -11,7 +11,7 @@
             title="Exportar PDF">
             <i class="bi bi-file-earmark-pdf"></i>
         </a>
-        @if(in_array(auth()->user()->role, ['admin', 'secretaria']))
+        @if(auth()->user()->isAdmin() || auth()->user()->isSecretaria() || auth()->user()->isPastor() || auth()->user()->isPastorSenior())
             <a href="{{ route('weddings.edit', $wedding) }}"
                 class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
                 title="Editar">
@@ -23,13 +23,6 @@
             title="Voltar à lista">
             <i class="bi bi-arrow-left"></i>
         </a>
-        @if(in_array(auth()->user()->role, ['admin', 'secretaria']))
-            <a href="{{ route('weddings.edit', $wedding) }}"
-                class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50"
-                title="Editar casamento">
-                <i class="bi bi-pencil-square"></i>
-            </a>
-        @endif
     </div>
 @endsection
 

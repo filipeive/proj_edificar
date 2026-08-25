@@ -182,8 +182,8 @@ class WeddingController extends Controller
      */
     public function bulkDestroy(Request $request)
     {
-        if (!auth()->user()->isAdmin()) {
-            return redirect()->back()->with('error', 'Apenas administradores podem realizar esta ação.');
+        if (!auth()->user()->isAdmin() && !auth()->user()->isSecretaria() && !auth()->user()->isPastor() && !auth()->user()->isPastorSenior()) {
+            return redirect()->back()->with('error', 'Apenas utilizadores autorizados podem realizar esta ação.');
         }
 
         $validated = $request->validate([
