@@ -1,0 +1,92 @@
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #10231b;
+  background: #f5f7f6;
+  font-synthesis: none;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; min-height: 100vh; }
+button, input { font: inherit; }
+
+.app-shell {
+  min-height: 100vh;
+  padding: max(24px, env(safe-area-inset-top)) 18px max(24px, env(safe-area-inset-bottom));
+  display: flex;
+  justify-content: center;
+}
+
+.auth-card {
+  width: min(100%, 420px);
+  align-self: center;
+  background: white;
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: 0 12px 40px rgba(15, 91, 60, .10);
+}
+
+.brand {
+  color: #0f5b3c;
+  font-weight: 900;
+  font-size: 1.65rem;
+  letter-spacing: .08em;
+}
+
+.subtitle { margin-top: 4px; color: #64746c; }
+
+form { display: grid; gap: 16px; margin-top: 28px; }
+label { display: grid; gap: 7px; font-weight: 700; font-size: .9rem; }
+input {
+  width: 100%;
+  border: 1px solid #d7dfdb;
+  border-radius: 12px;
+  padding: 13px 14px;
+  outline: none;
+}
+input:focus { border-color: #0f5b3c; box-shadow: 0 0 0 3px rgba(15,91,60,.10); }
+
+button {
+  border: 0;
+  border-radius: 12px;
+  padding: 13px 16px;
+  background: #0f5b3c;
+  color: white;
+  font-weight: 800;
+  cursor: pointer;
+}
+button:disabled { opacity: .6; cursor: wait; }
+button.secondary { background: #edf2ef; color: #0f5b3c; }
+
+.error { color: #b42318; font-size: .9rem; margin: 0; }
+
+.dashboard { width: min(100%, 760px); }
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.topbar div { display: grid; gap: 3px; }
+.topbar span { color: #68776f; font-size: .8rem; }
+.welcome { margin: 38px 0 22px; }
+.welcome h1 { margin: 0 0 6px; font-size: clamp(1.7rem, 7vw, 2.5rem); }
+.welcome p { margin: 0; color: #64746c; }
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.metrics article {
+  background: white;
+  border-radius: 18px;
+  padding: 18px;
+  display: grid;
+  gap: 10px;
+}
+.metrics span { color: #64746c; text-transform: capitalize; font-size: .8rem; }
+.metrics strong { font-size: 1.55rem; color: #0f5b3c; }
+
+@media (min-width: 640px) {
+  .metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
