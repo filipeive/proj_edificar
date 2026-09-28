@@ -151,7 +151,7 @@
 
                     @if ($authUser && $authUser->hasPermission('menu_courses'))
                         <div>
-                            <button class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('courses.*') || request()->routeIs('course-classes.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" data-tooltip="Escola Ministerial" onclick="toggleMenu('courses_menu')">
+                            <button class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('courses.*') || request()->routeIs('course-classes.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" data-tooltip="Escola Ministerial" onclick="toggleMenu(this)">
                                 <i class="bi bi-mortarboard-fill text-xl flex-shrink-0"></i>
                                 <span class="sidebar-text ml-4 font-bold tracking-tight flex-1">Escola Ministerial</span>
                                 <i class="bi bi-chevron-down sidebar-text ml-2 text-[10px] transition-transform duration-300 {{ request()->routeIs('courses.*') || request()->routeIs('course-classes.*') ? 'rotate-180' : '' }}"></i>
@@ -280,7 +280,7 @@
                 @endif
 
                 <div>
-                    <button class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('contributions.*') || request()->routeIs('commitments.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" data-tooltip="Contribuições" onclick="toggleMenu('contributions')">
+                    <button class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('contributions.*') || request()->routeIs('commitments.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" data-tooltip="Contribuições" onclick="toggleMenu(this)">
                         <i class="bi bi-cash-stack text-xl flex-shrink-0"></i>
                         <span class="sidebar-text ml-4 font-bold tracking-tight flex-1">Contribuições</span>
                         <i class="bi bi-chevron-down sidebar-text ml-2 text-[10px] transition-transform duration-300 {{ request()->routeIs('contributions.*') || request()->routeIs('commitments.*') ? 'rotate-180' : '' }}"></i>
@@ -323,7 +323,7 @@
 
                 @if ($authUser && $authUser->hasPermission('menu_finance'))
                     <div>
-                        <button class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('financial.dashboard') || request()->routeIs('requisitions.*') || request()->routeIs('expenses.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" data-tooltip="Financeiro" onclick="toggleMenu('financial_menu')">
+                        <button class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('financial.dashboard') || request()->routeIs('requisitions.*') || request()->routeIs('expenses.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" data-tooltip="Financeiro" onclick="toggleMenu(this)">
                             <i class="bi bi-pie-chart-fill text-xl flex-shrink-0"></i>
                             <span class="sidebar-text ml-4 font-bold tracking-tight flex-1">Financeiro</span>
                             <i class="bi bi-chevron-down sidebar-text ml-2 text-[10px] transition-transform duration-300 {{ request()->routeIs('financial.dashboard') || request()->routeIs('requisitions.*') || request()->routeIs('expenses.*') ? 'rotate-180' : '' }}"></i>
@@ -353,7 +353,7 @@
 
             @if ($authUser && $authUser->hasPermission('menu_stats'))
                 <div>
-                    <button class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('reports.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" data-tooltip="Estatísticas" onclick="toggleMenu('reports')">
+                    <button class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('reports.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" data-tooltip="Estatísticas" onclick="toggleMenu(this)">
                         <i class="bi bi-bar-chart-line-fill text-xl flex-shrink-0"></i>
                         <span class="sidebar-text ml-4 font-bold tracking-tight flex-1">Estatísticas</span>
                         <i class="bi bi-chevron-down sidebar-text ml-2 text-[10px] transition-transform duration-300 {{ request()->routeIs('reports.*') ? 'rotate-180' : '' }}"></i>

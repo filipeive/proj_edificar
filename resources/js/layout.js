@@ -50,10 +50,19 @@ export function toggleMobileSidebar() {
     document.body.style.overflow = mobileSidebar.classList.contains('mobile-open') ? 'hidden' : '';
 }
 
-export function toggleMenu(menuId) {
-    const menu = document.getElementById(menuId);
+export function toggleMenu(param, fallbackId) {
+    let menu = null;
+    let button = null;
+
+    if (param && param.nodeType === 1) {
+        button = param;
+        menu = button.nextElementSibling;
+    } else if (typeof param === 'string') {
+        menu = document.getElementById(param);
+        if (menu) button = menu.previousElementSibling;
+    }
+
     if (!menu) return;
-    const button = menu.previousElementSibling;
     const icon = button?.querySelector('.bi-chevron-down');
 
     menu.classList.toggle('hidden');

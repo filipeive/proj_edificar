@@ -54,11 +54,14 @@
             @include('layouts.partials.header')
 
             <!-- Main Yield -->
-            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 md:p-8 lg:p-12">
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 pb-20 md:p-8 md:pb-8 lg:p-12">
                 @yield('content')
             </main>
         </div>
     </div>
+
+    <!-- Mobile Bottom Navigation Bar -->
+    @include('layouts.partials.bottom-nav')
 
     <!-- Flash Messages Parcial -->
     @include('layouts.partials.flash-messages')
