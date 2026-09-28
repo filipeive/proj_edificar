@@ -19,8 +19,8 @@ function createWindow() {
     autoHideMenuBar: false
   });
 
-  const defaultDevUrl = 'http://127.0.0.1:8000';
-  const prodUrl = 'http://146.235.224.99/edificar';
+  const defaultDevUrl = 'http://127.0.0.1:8000/login';
+  const prodUrl = 'http://146.235.224.99/edificar/login';
   const appUrl = process.env.APP_URL || defaultDevUrl;
 
   mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {

@@ -24,3 +24,10 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Electron & Mobile Build Artifacts
+/electron/node_modules
+/electron/dist
+/android
+/ios
+/.capacitor
