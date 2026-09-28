@@ -19,7 +19,17 @@ function createWindow() {
     autoHideMenuBar: false
   });
 
-  const appUrl = process.env.APP_URL || 'http://127.0.0.1:8000';
+  const defaultDevUrl = 'http://127.0.0.1:8000';
+  const prodUrl = 'http://146.235.224.99/edificar';
+  const appUrl = process.env.APP_URL || defaultDevUrl;
+
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
+    if (validatedURL.includes('127.0.0.1') || validatedURL.includes('localhost')) {
+      console.log(`[Electron] Dev server unavailable at ${validatedURL}. Falling back to production: ${prodUrl}`);
+      mainWindow.loadURL(prodUrl);
+    }
+  });
+
   mainWindow.loadURL(appUrl);
 
   mainWindow.on('closed', function () {
