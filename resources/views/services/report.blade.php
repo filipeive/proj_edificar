@@ -372,7 +372,7 @@
                             class="bg-white dark:bg-gray-900 p-8 rounded-[3rem] shadow-sm border border-gray-100 dark:border-gray-800 h-full flex flex-col">
                             <div class="mb-10 text-center">
                                 <h3 class="text-xs font-black text-gray-900 dark:text-white uppercase tracking-widest mb-1">
-                                    Composição de Público
+                                    Composição de Participantes
                                 </h3>
                                 <p class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-tighter">
                                     Proporção Membros vs. Visitantes
@@ -448,70 +448,69 @@
                                 <table class="w-full text-left border-collapse">
                                     <thead>
                                         <tr class="bg-gray-50/50 dark:bg-gray-800/50">
-                                            <th class="px-8 py-5 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800">Data e Evento</th>
-                                            <th class="px-8 py-5 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800">Impacto Total</th>
-                                            <th class="px-8 py-5 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800">Visitantes</th>
-                                            <th class="px-8 py-5 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800">Decisões</th>
-                                            <th class="px-8 py-5 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800">Dízimos e Ofertas</th>
-                                            <th class="px-8 py-5 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 text-right">Ações</th>
+                                            <th class="px-6 py-5 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800">Data e Evento</th>
+                                            <th class="px-4 py-5 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800">Participantes</th>
+                                            <th class="px-4 py-5 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800">Visitantes</th>
+                                            <th class="px-4 py-5 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800">Salvações</th>
+                                            <th class="px-4 py-5 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 text-right">Ofertas</th>
+                                            <th class="px-4 py-5 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 text-right">Dízimos</th>
+                                            <th class="px-4 py-5 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 text-right">Ações</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-gray-50 dark:divide-gray-800">
                                         @forelse($paginatedServices as $service)
                                             @php
-                                                $salvations = ($service->adults_salvations ?? 0) + ($service->children_salvations ?? 0);
-                                                $totalFinancial = $service->total_financial;
+                                                $salvations = $service->total_salvations;
                                             @endphp
                                             <tr class="hover:bg-gray-50/80 dark:hover:bg-gray-800/50 transition-colors group">
-                                                <td class="px-8 py-6">
-                                                    <div class="flex items-center gap-4">
-                                                        <div class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/20 flex flex-col items-center justify-center border border-blue-100 dark:border-blue-800 group-hover:scale-110 transition-transform">
-                                                            <span class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase leading-none">{{ \Carbon\Carbon::parse($service->date)->translatedFormat('M') }}</span>
-                                                            <span class="text-xl font-black text-blue-700 dark:text-blue-300 leading-none">{{ \Carbon\Carbon::parse($service->date)->format('d') }}</span>
+                                                <td class="px-6 py-5">
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="w-11 h-11 rounded-2xl bg-blue-50 dark:bg-blue-900/20 flex flex-col items-center justify-center border border-blue-100 dark:border-blue-800 group-hover:scale-110 transition-transform flex-shrink-0">
+                                                            <span class="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase leading-none">{{ \Carbon\Carbon::parse($service->date)->translatedFormat('M') }}</span>
+                                                            <span class="text-lg font-black text-blue-700 dark:text-blue-300 leading-none">{{ \Carbon\Carbon::parse($service->date)->format('d') }}</span>
                                                         </div>
-                                                        <div>
-                                                            <p class="text-sm font-black text-gray-900 dark:text-white mb-0.5 leading-tight">{{ $service->theme ?: 'Cálice de Celebração' }}</p>
-                                                            <p class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{{ $service->service_type }} • {{ $service->preacher_name }}</p>
+                                                        <div class="min-w-0">
+                                                            <p class="text-xs font-black text-gray-900 dark:text-white mb-0.5 leading-tight truncate">{{ $service->theme ?: '—' }}</p>
+                                                            <p class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest truncate">{{ $service->service_type }} • {{ $service->preacher ? $service->preacher->name : ($service->preacher_name ?: '—') }}</p>
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td class="px-8 py-6">
+                                                <td class="px-4 py-5">
                                                     <div class="flex flex-col">
                                                         <span class="text-lg font-black text-gray-900 dark:text-white leading-none">{{ $service->total_participation }}</span>
-                                                        <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-1">Participantes</span>
+                                                        <span class="text-[8px] font-black text-gray-400 uppercase tracking-widest mt-0.5">Total</span>
                                                     </div>
                                                 </td>
-                                                <td class="px-8 py-6">
-                                                    <div class="flex items-center gap-2">
-                                                        <span class="w-2 h-2 rounded-full bg-orange-500"></span>
+                                                <td class="px-4 py-5">
+                                                    <div class="flex items-center gap-1.5">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
                                                         <span class="text-sm font-bold text-gray-700 dark:text-gray-300">{{ $service->total_visitors }}</span>
-                                                        <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Visitantes</span>
                                                     </div>
                                                 </td>
-                                                <td class="px-8 py-6">
+                                                <td class="px-4 py-5">
                                                     @if($salvations > 0)
-                                                        <span class="px-3 py-1.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-xl text-[10px] font-black uppercase tracking-widest border border-green-200 dark:border-green-800/50">
-                                                            <i class="bi bi-heart-fill mr-1"></i> {{ $salvations }} Decisões
+                                                        <span class="px-2.5 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-lg text-[10px] font-black uppercase tracking-wider border border-green-200 dark:border-green-800/50">
+                                                            <i class="bi bi-heart-fill mr-0.5"></i> {{ $salvations }}
                                                         </span>
                                                     @else
-                                                        <span class="text-[10px] font-bold text-gray-300 dark:text-gray-600 uppercase tracking-widest">Nenhuma</span>
+                                                        <span class="text-[10px] font-bold text-gray-300 dark:text-gray-600">0</span>
                                                     @endif
                                                 </td>
-                                                <td class="px-8 py-6">
-                                                    <div class="flex flex-col">
-                                                        <span class="text-sm font-black text-emerald-600 dark:text-emerald-400">MT {{ number_format($totalFinancial, 2, ',', '.') }}</span>
-                                                        <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-0.5">Total Coletado</span>
-                                                    </div>
+                                                <td class="px-4 py-5 text-right">
+                                                    <span class="text-xs font-black text-emerald-600 dark:text-emerald-400">{{ number_format($service->total_offerings, 0, ',', '.') }} MT</span>
                                                 </td>
-                                                <td class="px-8 py-6 text-right">
-                                                    <a href="{{ route('services.show', $service) }}" class="p-2.5 bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl hover:bg-white dark:hover:bg-gray-700 border border-transparent hover:border-blue-100 dark:hover:border-blue-900 transition-all shadow-sm">
+                                                <td class="px-4 py-5 text-right">
+                                                    <span class="text-xs font-black text-indigo-600 dark:text-indigo-400">{{ number_format($service->total_tithes, 0, ',', '.') }} MT</span>
+                                                </td>
+                                                <td class="px-4 py-5 text-right">
+                                                    <a href="{{ route('services.show', $service) }}" class="p-2 bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl hover:bg-white dark:hover:bg-gray-700 border border-transparent hover:border-blue-100 dark:hover:border-blue-900 transition-all shadow-sm inline-flex items-center justify-center">
                                                         <i class="bi bi-eye-fill"></i>
                                                     </a>
                                                 </td>
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="6" class="px-8 py-20 text-center">
+                                                <td colspan="7" class="px-8 py-20 text-center">
                                                     <div class="flex flex-col items-center gap-4">
                                                         <div class="w-16 h-16 rounded-full bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-gray-300 dark:text-gray-600">
                                                             <i class="bi bi-search text-3xl"></i>
@@ -553,7 +552,7 @@
                                 data: {
                                     labels: {!! json_encode($stats['labels']) !!},
                                     datasets: [{
-                                        label: 'Público Total',
+                                        label: 'Participantes Total',
                                         data: {!! json_encode($stats['attendance']) !!},
                                         borderColor: '#2563eb',
                                         backgroundColor: blueGradient,

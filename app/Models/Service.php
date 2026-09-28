@@ -108,6 +108,12 @@ class Service extends Model
 
     public function getTotalParticipationAttribute()
     {
-        return $this->total_members + $this->total_visitors + ($this->adults_salvations ?? 0) + ($this->children_salvations ?? 0);
+        // Salvações NÃO entram no total porque já estão inclusos nos membros
+        return $this->total_members + $this->total_visitors;
+    }
+
+    public function getTotalSalvationsAttribute()
+    {
+        return ($this->adults_salvations ?? 0) + ($this->children_salvations ?? 0);
     }
 }

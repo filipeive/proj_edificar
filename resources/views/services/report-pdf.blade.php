@@ -8,7 +8,9 @@
         $totalAttendance = $services->sum('total_participation');
         $totalMembers = $services->sum('total_members');
         $totalVisitors = $services->sum('total_visitors');
-        $totalSalvations = $services->sum(fn($s) => ($s->adults_salvations + $s->children_salvations));
+        $totalSalvations = $services->sum(fn($s) => $s->total_salvations);
+        $totalOfferings = $services->sum('total_offerings');
+        $totalTithes = $services->sum('total_tithes');
         $totalFinancial = $services->sum('total_financial');
 
         $normalServices = $services->filter(fn($s) => in_array($s->service_type, ['1st', '2nd', '3rd', '4th']));
@@ -25,7 +27,7 @@
                 </td>
                 <td class="stats-item">
                     <div class="stats-value">{{ $totalAttendance }}</div>
-                    <div class="stats-label">Público Total</div>
+                    <div class="stats-label">Total de Participantes</div>
                 </td>
                 <td class="stats-item">
                     <div class="stats-value text-green-600">{{ number_format($totalFinancial, 2, ',', '.') }} MT</div>
@@ -33,7 +35,7 @@
                 </td>
                 <td class="stats-item">
                     <div class="stats-value text-blue-600">{{ $totalSalvations }}</div>
-                    <div class="stats-label">Decisões</div>
+                    <div class="stats-label">Salvações</div>
                 </td>
             </tr>
         </table>
@@ -46,11 +48,14 @@
                 <tr>
                     <th>Data</th>
                     <th>Tipo</th>
-                    <th>Público</th>
+                    <th>Tema</th>
+                    <th>Pregador</th>
+                    <th>Participantes</th>
                     <th>Membros</th>
                     <th>Visitantes</th>
-                    <th>Decisões</th>
-                    <th style="text-align: right">Financeiro</th>
+                    <th>Salvações</th>
+                    <th style="text-align: right">Ofertas</th>
+                    <th style="text-align: right">Dízimos</th>
                 </tr>
             </thead>
             <tbody>
@@ -59,22 +64,26 @@
                         <td>{{ $service->date->format('d/m/Y') }}</td>
                         <td>{{ match ($service->service_type) { '1st' => '1º', '2nd' => '2º', '3rd' => '3º', '4th' => '4º', 'special' => 'Especial', default => $service->service_type} }}
                         </td>
+                        <td style="font-size: 9px; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $service->theme ?: '—' }}</td>
+                        <td style="font-size: 9px;">{{ $service->preacher ? $service->preacher->name : ($service->preacher_name ?: '—') }}</td>
                         <td style="font-weight: bold">{{ $service->total_participation }}</td>
                         <td>{{ $service->total_members }}</td>
                         <td>{{ $service->total_visitors }}</td>
-                        <td>{{ $service->adults_salvations + $service->children_salvations }}</td>
-                        <td style="text-align: right">{{ number_format($service->total_financial, 2, ',', '.') }} MT</td>
+                        <td>{{ $service->total_salvations }}</td>
+                        <td style="text-align: right">{{ number_format($service->total_offerings, 2, ',', '.') }} MT</td>
+                        <td style="text-align: right">{{ number_format($service->total_tithes, 2, ',', '.') }} MT</td>
                     </tr>
                 @endforeach
             </tbody>
             <tfoot>
                 <tr class="total-row">
-                    <td colspan="2">TOTAL NORMAS</td>
+                    <td colspan="4">TOTAL NORMAS</td>
                     <td>{{ $normalServices->sum('total_participation') }}</td>
                     <td>{{ $normalServices->sum('total_members') }}</td>
                     <td>{{ $normalServices->sum('total_visitors') }}</td>
-                    <td>{{ $normalServices->sum(fn($s) => $s->adults_salvations + $s->children_salvations) }}</td>
-                    <td style="text-align: right">{{ number_format($normalServices->sum('total_financial'), 2, ',', '.') }} MT
+                    <td>{{ $normalServices->sum(fn($s) => $s->total_salvations) }}</td>
+                    <td style="text-align: right">{{ number_format($normalServices->sum('total_offerings'), 2, ',', '.') }} MT</td>
+                    <td style="text-align: right">{{ number_format($normalServices->sum('total_tithes'), 2, ',', '.') }} MT
                     </td>
                 </tr>
             </tfoot>
@@ -87,33 +96,40 @@
             <thead>
                 <tr>
                     <th>Data</th>
-                    <th>Público</th>
+                    <th>Tema</th>
+                    <th>Pregador</th>
+                    <th>Participantes</th>
                     <th>Membros</th>
                     <th>Visitantes</th>
-                    <th>Decisões</th>
-                    <th style="text-align: right">Financeiro</th>
+                    <th>Salvações</th>
+                    <th style="text-align: right">Ofertas</th>
+                    <th style="text-align: right">Dízimos</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($teachingServices as $service)
                     <tr>
                         <td>{{ $service->date->format('d/m/Y') }}</td>
+                        <td style="font-size: 9px; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $service->theme ?: '—' }}</td>
+                        <td style="font-size: 9px;">{{ $service->preacher ? $service->preacher->name : ($service->preacher_name ?: '—') }}</td>
                         <td style="font-weight: bold">{{ $service->total_participation }}</td>
                         <td>{{ $service->total_members }}</td>
                         <td>{{ $service->total_visitors }}</td>
-                        <td>{{ $service->adults_salvations + $service->children_salvations }}</td>
-                        <td style="text-align: right">{{ number_format($service->total_financial, 2, ',', '.') }} MT</td>
+                        <td>{{ $service->total_salvations }}</td>
+                        <td style="text-align: right">{{ number_format($service->total_offerings, 2, ',', '.') }} MT</td>
+                        <td style="text-align: right">{{ number_format($service->total_tithes, 2, ',', '.') }} MT</td>
                     </tr>
                 @endforeach
             </tbody>
             <tfoot>
                 <tr class="total-row" style="background-color: #fff7ed;">
-                    <td>TOTAL ENSINO</td>
+                    <td colspan="3">TOTAL ENSINO</td>
                     <td>{{ $teachingServices->sum('total_participation') }}</td>
                     <td>{{ $teachingServices->sum('total_members') }}</td>
                     <td>{{ $teachingServices->sum('total_visitors') }}</td>
-                    <td>{{ $teachingServices->sum(fn($s) => $s->adults_salvations + $s->children_salvations) }}</td>
-                    <td style="text-align: right">{{ number_format($teachingServices->sum('total_financial'), 2, ',', '.') }} MT
+                    <td>{{ $teachingServices->sum(fn($s) => $s->total_salvations) }}</td>
+                    <td style="text-align: right">{{ number_format($teachingServices->sum('total_offerings'), 2, ',', '.') }} MT</td>
+                    <td style="text-align: right">{{ number_format($teachingServices->sum('total_tithes'), 2, ',', '.') }} MT
                     </td>
                 </tr>
             </tfoot>
@@ -126,33 +142,40 @@
             <thead>
                 <tr>
                     <th>Data</th>
-                    <th>Público</th>
+                    <th>Tema</th>
+                    <th>Pregador</th>
+                    <th>Participantes</th>
                     <th>Membros</th>
                     <th>Visitantes</th>
-                    <th>Decisões</th>
-                    <th style="text-align: right">Financeiro</th>
+                    <th>Salvações</th>
+                    <th style="text-align: right">Ofertas</th>
+                    <th style="text-align: right">Dízimos</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($specialServices as $service)
                     <tr>
                         <td>{{ $service->date->format('d/m/Y') }}</td>
+                        <td style="font-size: 9px; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $service->theme ?: '—' }}</td>
+                        <td style="font-size: 9px;">{{ $service->preacher ? $service->preacher->name : ($service->preacher_name ?: '—') }}</td>
                         <td style="font-weight: bold">{{ $service->total_participation }}</td>
                         <td>{{ $service->total_members }}</td>
                         <td>{{ $service->total_visitors }}</td>
-                        <td>{{ $service->adults_salvations + $service->children_salvations }}</td>
-                        <td style="text-align: right">{{ number_format($service->total_financial, 2, ',', '.') }} MT</td>
+                        <td>{{ $service->total_salvations }}</td>
+                        <td style="text-align: right">{{ number_format($service->total_offerings, 2, ',', '.') }} MT</td>
+                        <td style="text-align: right">{{ number_format($service->total_tithes, 2, ',', '.') }} MT</td>
                     </tr>
                 @endforeach
             </tbody>
             <tfoot>
                 <tr class="total-row" style="background-color: #f5f3ff;">
-                    <td>TOTAL ESPECIAIS</td>
+                    <td colspan="3">TOTAL ESPECIAIS</td>
                     <td>{{ $specialServices->sum('total_participation') }}</td>
                     <td>{{ $specialServices->sum('total_members') }}</td>
                     <td>{{ $specialServices->sum('total_visitors') }}</td>
-                    <td>{{ $specialServices->sum(fn($s) => $s->adults_salvations + $s->children_salvations) }}</td>
-                    <td style="text-align: right">{{ number_format($specialServices->sum('total_financial'), 2, ',', '.') }} MT
+                    <td>{{ $specialServices->sum(fn($s) => $s->total_salvations) }}</td>
+                    <td style="text-align: right">{{ number_format($specialServices->sum('total_offerings'), 2, ',', '.') }} MT</td>
+                    <td style="text-align: right">{{ number_format($specialServices->sum('total_tithes'), 2, ',', '.') }} MT
                     </td>
                 </tr>
             </tfoot>
@@ -168,7 +191,7 @@
             <tr>
                 <td class="stats-item">
                     <div class="stats-value">{{ round($totalAttendance / $count, 1) }}</div>
-                    <div class="stats-label">Média Público</div>
+                    <div class="stats-label">Média Participantes</div>
                 </td>
                 <td class="stats-item">
                     <div class="stats-value">{{ round($totalVisitors / $count, 1) }}</div>
@@ -176,7 +199,7 @@
                 </td>
                 <td class="stats-item">
                     <div class="stats-value">{{ round($totalSalvations / $count, 1) }}</div>
-                    <div class="stats-label">Média Decisões</div>
+                    <div class="stats-label">Média Salvações</div>
                 </td>
                 <td class="stats-item">
                     <div class="stats-value">{{ number_format($totalFinancial / $count, 2, ',', '.') }} MT</div>

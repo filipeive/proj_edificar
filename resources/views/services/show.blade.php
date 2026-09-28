@@ -158,7 +158,7 @@
 
                         <div class="p-8 bg-blue-600 rounded-[2.5rem] shadow-xl shadow-blue-600/20 text-center relative overflow-hidden group">
                             <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/10 to-transparent"></div>
-                            <span class="text-[9px] font-black text-blue-100/60 uppercase tracking-[0.3em] block mb-2 relative z-10">PÚBLICO TOTAL</span>
+                            <span class="text-[9px] font-black text-blue-100/60 uppercase tracking-[0.3em] block mb-2 relative z-10">PARTICIPANTES TOTAL</span>
                             <span class="text-6xl font-black text-white tracking-tighter relative z-10 group-hover:scale-110 transition-transform duration-500 block">{{ $service->total_participation }}</span>
                             <div class="mt-4 pt-4 border-t border-white/10 relative z-10 flex items-center justify-center gap-2">
                                 <span class="text-[9px] font-black text-blue-100 uppercase tracking-widest">Impacto da Celebração</span>
@@ -236,10 +236,10 @@
                             <table class="w-full text-left border-collapse">
                                 <thead>
                                     <tr class="bg-gray-50/50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-600">
-                                        <th class="px-10 py-6 text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Categoria de Público</th>
+                                        <th class="px-10 py-6 text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Categoria de Participante</th>
                                         <th class="px-10 py-6 text-center text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Membros Ativos</th>
                                         <th class="px-10 py-6 text-center text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Visitantes</th>
-                                        <th class="px-10 py-6 text-center text-[9px] font-black text-green-600/60 dark:text-green-400/60 uppercase tracking-[0.2em]">Reconciliações/Decisões</th>
+                                        <th class="px-10 py-6 text-center text-[9px] font-black text-green-600/60 dark:text-green-400/60 uppercase tracking-[0.2em]">Reconciliações/Salvações</th>
                                         <th class="px-10 py-6 text-right text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.2em]">Consolidação</th>
                                     </tr>
                                 </thead>
@@ -251,7 +251,7 @@
                                                     <i class="bi bi-people-fill text-xl"></i>
                                                 </div>
                                                 <div>
-                                                    <span class="text-base font-black text-gray-900 dark:text-white uppercase tracking-tight">Público Adulto</span>
+                                                    <span class="text-base font-black text-gray-900 dark:text-white uppercase tracking-tight">Participantes Adultos</span>
                                                     <p class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Congregação Geral</p>
                                                 </div>
                                             </div>
