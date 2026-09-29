@@ -6,7 +6,7 @@
     <title>@yield('title')</title>
     <style>
         @page {
-            margin: 0cm 0cm;
+            margin: 0.8cm 1cm;
         }
 
         body {
@@ -20,21 +20,21 @@
         .header {
             background-color: #ffffff;
             color: #000000;
-            padding: 20px 50px 10px 50px;
+            padding: 15px 25px 10px 25px;
             text-align: center;
             border-bottom: 2.5px solid #000000;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
         }
 
         .header h1 {
             margin: 0;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             color: #000000;
         }
 
         .header .subtitle {
-            font-size: 10px;
+            font-size: 9px;
             font-weight: bold;
             color: #4b5563;
             text-transform: uppercase;
@@ -44,42 +44,42 @@
         }
 
         .header .congregation {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
             color: #000000;
             text-transform: uppercase;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .header .report-type {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             color: #000000;
-            margin-top: 15px;
+            margin-top: 10px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         .content {
-            padding: 40px 50px;
+            padding: 15px 25px;
         }
 
         .section-title {
-            font-size: 14px;
+            font-size: 12px;
             font-weight: bold;
             text-transform: uppercase;
             color: #4b5563;
             border-bottom: 2px solid #f3f4f6;
-            padding-bottom: 8px;
-            margin-bottom: 20px;
-            margin-top: 30px;
+            padding-bottom: 6px;
+            margin-bottom: 12px;
+            margin-top: 20px;
         }
 
         .stats-box {
             background-color: #f9fafb;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 15px;
         }
 
         .stats-grid {
@@ -91,37 +91,41 @@
         }
 
         .stats-value {
-            font-size: 20px;
+            font-size: 16px;
             font-weight: bold;
             color: #111827;
         }
 
         .stats-label {
-            font-size: 9px;
+            font-size: 8.5px;
             color: #6b7280;
             text-transform: uppercase;
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
         table.data-table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
+            word-wrap: break-word;
         }
 
         table.data-table th {
             text-align: left;
-            font-size: 10px;
+            font-size: 8.5px;
             color: #6b7280;
             text-transform: uppercase;
-            padding: 12px 10px;
+            padding: 8px 5px;
             border-bottom: 1px solid #e5e7eb;
             background-color: #f9fafb;
         }
 
         table.data-table td {
-            padding: 12px 10px;
-            font-size: 11px;
+            padding: 7px 5px;
+            font-size: 9px;
             border-bottom: 1px solid #f3f4f6;
+            word-wrap: break-word;
+            overflow: hidden;
         }
 
         .total-row {
@@ -132,16 +136,18 @@
             font-weight: bold;
             color: #ea580c;
             border-bottom: none;
-            font-size: 13px;
+            font-size: 10px;
         }
 
         .footer {
             position: fixed;
             bottom: 0;
+            left: 0;
+            right: 0;
             width: 100%;
-            padding: 20px 50px;
+            padding: 10px 25px;
             text-align: center;
-            font-size: 10px;
+            font-size: 8.5px;
             color: #9ca3af;
             border-top: 1px solid #f3f4f6;
         }

@@ -46,16 +46,16 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Data</th>
-                    <th>Tipo</th>
-                    <th>Tema</th>
-                    <th>Pregador</th>
-                    <th>Participantes</th>
-                    <th>Membros</th>
-                    <th>Visitantes</th>
-                    <th>Salvações</th>
-                    <th style="text-align: right">Ofertas</th>
-                    <th style="text-align: right">Dízimos</th>
+                    <th style="width: 9%;">Data</th>
+                    <th style="width: 5%;">Tipo</th>
+                    <th style="width: 20%;">Tema</th>
+                    <th style="width: 18%;">Pregador</th>
+                    <th style="width: 8%;">Participantes</th>
+                    <th style="width: 7%;">Membros</th>
+                    <th style="width: 7%;">Visitantes</th>
+                    <th style="width: 6%;">Salvações</th>
+                    <th style="width: 10%; text-align: right">Ofertas</th>
+                    <th style="width: 10%; text-align: right">Dízimos</th>
                 </tr>
             </thead>
             <tbody>
@@ -64,8 +64,8 @@
                         <td>{{ $service->date->format('d/m/Y') }}</td>
                         <td>{{ match ($service->service_type) { '1st' => '1º', '2nd' => '2º', '3rd' => '3º', '4th' => '4º', 'special' => 'Especial', default => $service->service_type} }}
                         </td>
-                        <td style="font-size: 9px; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $service->theme ?: '—' }}</td>
-                        <td style="font-size: 9px;">{{ $service->preacher ? $service->preacher->name : ($service->preacher_name ?: '—') }}</td>
+                        <td style="font-size: 8.5px;">{{ $service->theme ?: '—' }}</td>
+                        <td style="font-size: 8.5px;">{{ $service->preacher ? $service->preacher->name : ($service->preacher_name ?: '—') }}</td>
                         <td style="font-weight: bold">{{ $service->total_participation }}</td>
                         <td>{{ $service->total_members }}</td>
                         <td>{{ $service->total_visitors }}</td>
@@ -95,23 +95,23 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Data</th>
-                    <th>Tema</th>
-                    <th>Pregador</th>
-                    <th>Participantes</th>
-                    <th>Membros</th>
-                    <th>Visitantes</th>
-                    <th>Salvações</th>
-                    <th style="text-align: right">Ofertas</th>
-                    <th style="text-align: right">Dízimos</th>
+                    <th style="width: 9%;">Data</th>
+                    <th style="width: 24%;">Tema</th>
+                    <th style="width: 19%;">Pregador</th>
+                    <th style="width: 8%;">Participantes</th>
+                    <th style="width: 7%;">Membros</th>
+                    <th style="width: 7%;">Visitantes</th>
+                    <th style="width: 6%;">Salvações</th>
+                    <th style="width: 10%; text-align: right">Ofertas</th>
+                    <th style="width: 10%; text-align: right">Dízimos</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($teachingServices as $service)
                     <tr>
                         <td>{{ $service->date->format('d/m/Y') }}</td>
-                        <td style="font-size: 9px; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $service->theme ?: '—' }}</td>
-                        <td style="font-size: 9px;">{{ $service->preacher ? $service->preacher->name : ($service->preacher_name ?: '—') }}</td>
+                        <td style="font-size: 8.5px;">{{ $service->theme ?: '—' }}</td>
+                        <td style="font-size: 8.5px;">{{ $service->preacher ? $service->preacher->name : ($service->preacher_name ?: '—') }}</td>
                         <td style="font-weight: bold">{{ $service->total_participation }}</td>
                         <td>{{ $service->total_members }}</td>
                         <td>{{ $service->total_visitors }}</td>
@@ -141,23 +141,23 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Data</th>
-                    <th>Tema</th>
-                    <th>Pregador</th>
-                    <th>Participantes</th>
-                    <th>Membros</th>
-                    <th>Visitantes</th>
-                    <th>Salvações</th>
-                    <th style="text-align: right">Ofertas</th>
-                    <th style="text-align: right">Dízimos</th>
+                    <th style="width: 9%;">Data</th>
+                    <th style="width: 24%;">Tema</th>
+                    <th style="width: 19%;">Pregador</th>
+                    <th style="width: 8%;">Participantes</th>
+                    <th style="width: 7%;">Membros</th>
+                    <th style="width: 7%;">Visitantes</th>
+                    <th style="width: 6%;">Salvações</th>
+                    <th style="width: 10%; text-align: right">Ofertas</th>
+                    <th style="width: 10%; text-align: right">Dízimos</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($specialServices as $service)
                     <tr>
                         <td>{{ $service->date->format('d/m/Y') }}</td>
-                        <td style="font-size: 9px; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $service->theme ?: '—' }}</td>
-                        <td style="font-size: 9px;">{{ $service->preacher ? $service->preacher->name : ($service->preacher_name ?: '—') }}</td>
+                        <td style="font-size: 8.5px;">{{ $service->theme ?: '—' }}</td>
+                        <td style="font-size: 8.5px;">{{ $service->preacher ? $service->preacher->name : ($service->preacher_name ?: '—') }}</td>
                         <td style="font-weight: bold">{{ $service->total_participation }}</td>
                         <td>{{ $service->total_members }}</td>
                         <td>{{ $service->total_visitors }}</td>

@@ -497,7 +497,7 @@ class ServiceController extends Controller
 
         $title = "Relatório Mensal de Cultos{$typeLabel} - " . \Carbon\Carbon::createFromDate($request->year, $request->month)->translatedFormat('F/Y');
 
-        $pdf = Pdf::loadView('services.report-pdf', compact('services', 'title'));
+        $pdf = Pdf::loadView('services.report-pdf', compact('services', 'title'))->setPaper('a4', 'landscape');
         return $pdf->download("relatorio_mensal_cultos_{$request->year}_{$request->month}.pdf");
     }
 
@@ -538,7 +538,7 @@ class ServiceController extends Controller
 
         $title = "Relatório Trimestral de Cultos{$typeLabel} - {$request->quarter}º Trimestre / {$request->year}";
 
-        $pdf = Pdf::loadView('services.report-pdf', compact('services', 'title'));
+        $pdf = Pdf::loadView('services.report-pdf', compact('services', 'title'))->setPaper('a4', 'landscape');
         return $pdf->download("relatorio_trimestral_cultos_{$request->year}_Q{$request->quarter}.pdf");
     }
 
@@ -586,7 +586,7 @@ class ServiceController extends Controller
         $dateTo = \Carbon\Carbon::parse($request->date_to)->format('d/m/Y');
         $title = "Relatório Personalizado de Cultos{$typeLabel} - {$dateFrom} a {$dateTo}";
 
-        $pdf = Pdf::loadView('services.report-pdf', compact('services', 'title'));
+        $pdf = Pdf::loadView('services.report-pdf', compact('services', 'title'))->setPaper('a4', 'landscape');
 
         $filename = "relatorio_cultos_" . \Carbon\Carbon::parse($request->date_from)->format('Y-m-d') . "_a_" . \Carbon\Carbon::parse($request->date_to)->format('Y-m-d') . ".pdf";
 
@@ -627,7 +627,7 @@ class ServiceController extends Controller
 
         $title = "Relatório Anual de Cultos{$typeLabel} - {$request->year}";
 
-        $pdf = Pdf::loadView('services.report-pdf', compact('services', 'title'));
+        $pdf = Pdf::loadView('services.report-pdf', compact('services', 'title'))->setPaper('a4', 'landscape');
         return $pdf->download("relatorio_anual_cultos_{$request->year}.pdf");
     }
 
