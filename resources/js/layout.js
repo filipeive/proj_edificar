@@ -489,11 +489,34 @@ export function markAllAsRead() {
             'X-CSRF-TOKEN': csrfToken,
         }
     })
-        .then(() => loadNotifications(true))
+        .then(() => {
+            loadNotifications(true);
+            updateNotificationBadge(0);
+        })
         .catch(error => console.error('Mark as read error:', error));
 }
 
-export function updateNotificationBadge() {
+export function updateNotificationBadge(explicitCount = null) {
+    const applyCount = (count) => {
+        const badges = document.querySelectorAll('[data-notification-badge]');
+        badges.forEach(badge => {
+            if (count > 0) {
+                badge.classList.remove('hidden');
+                badge.style.display = '';
+                const countElem = badge.querySelector('.badge-count') || badge;
+                countElem.textContent = count > 9 ? '9+' : count;
+            } else {
+                badge.classList.add('hidden');
+                badge.style.display = 'none';
+            }
+        });
+    };
+
+    if (explicitCount !== null) {
+        applyCount(explicitCount);
+        return;
+    }
+
     const notificationsUnreadCountRoute = window.AppConfig?.routes?.notificationsUnreadCount;
     if (!notificationsUnreadCountRoute) return;
 
@@ -504,13 +527,8 @@ export function updateNotificationBadge() {
     })
         .then(response => response.json())
         .then(data => {
-            const bell = document.querySelector('.bi-bell');
-            if (!bell) return;
-            // O badge pode ser um elemento seguinte (nextElementSibling) ou um filho, dependendo do markup
-            const badge = bell.nextElementSibling || bell.parentElement.querySelector('.badge');
-            if (badge) {
-                badge.style.display = data.count > 0 ? 'block' : 'none';
-            }
+            const count = typeof data.count === 'number' ? data.count : parseInt(data.count || 0, 10);
+            applyCount(count);
         })
         .catch(error => console.error('Badge update error:', error));
 }

@@ -78,4 +78,81 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     }
+
+    // ===== MOBILE & PWA UNIVERSAL DOCUMENT / PDF DOWNLOAD INTERCEPTOR =====
+    document.addEventListener('click', function(e) {
+        const link = e.target.closest('a[href]');
+        if (!link) return;
+
+        const href = link.getAttribute('href');
+        if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+
+        // Check if link is a download / PDF / export link
+        const isPdfOrReport = href.includes('/pdf') || 
+                              href.includes('/export') || 
+                              href.includes('/report') || 
+                              href.includes('/download') ||
+                              link.hasAttribute('download');
+
+        if (isPdfOrReport) {
+            e.preventDefault();
+
+            Swal.fire({
+                title: 'Descarregar Documento',
+                text: 'A transferir o ficheiro para o seu dispositivo...',
+                icon: 'info',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch(href, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Falha ao descarregar documento.');
+                const disposition = res.headers.get('Content-Disposition');
+                let filename = 'documento.pdf';
+                if (disposition && disposition.indexOf('filename=') !== -1) {
+                    const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(disposition);
+                    if (matches != null && matches[1]) {
+                        filename = matches[1].replace(/['"]/g, '');
+                    }
+                } else if (href.includes('.pdf')) {
+                    filename = href.split('/').pop().split('?')[0] || 'relatorio.pdf';
+                }
+                return res.blob().then(blob => ({ blob, filename }));
+            })
+            .then(({ blob, filename }) => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }, 1000);
+
+                Swal.fire({
+                    title: 'Download Concluído!',
+                    text: `Ficheiro ${filename} guardado com sucesso.`,
+                    icon: 'success',
+                    timer: 2500,
+                    showConfirmButton: false
+                });
+            })
+            .catch(err => {
+                console.error('Download error:', err);
+                // Fallback direct navigation
+                window.location.href = href;
+            });
+        }
+    });
 });

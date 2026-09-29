@@ -113,19 +113,20 @@ class CellTypeValidationTest extends TestCase
 
     public function test_store_redirects_with_toast_when_timoteo_is_incompatible_with_type(): void
     {
+        $this->actingAs($this->admin);
         $this->get(route('cells.create'));
 
         $response = $this->post(route('cells.store'), [
-            'name' => 'Nova Célula',
-            'type' => Cell::TYPE_MEMBROS,
+            'name' => 'Nova Célula de Líderes',
+            'type' => Cell::TYPE_LIDERES,
             'supervision_id' => $this->supervision->id,
-            'leader_id' => $this->liderCelula->id,
-            'timoteos' => [$this->supervisor->id],
+            'leader_id' => $this->supervisor->id,
+            'timoteos' => [$this->membro->id],
         ]);
 
-        $response->assertSessionHas('error', 'O membro Supervisor Teste não é compatível com o tipo de célula selecionado.');
+        $response->assertSessionHas('error', 'O membro Membro Comum não é compatível com o tipo de célula selecionado.');
         $response->assertSessionHasErrors('timoteos');
-        $this->assertDatabaseMissing('cells', ['name' => 'Nova Célula']);
+        $this->assertDatabaseMissing('cells', ['name' => 'Nova Célula de Líderes']);
     }
 
     public function test_eligible_leaders_endpoint_works_without_cell_id_for_create(): void

@@ -151,11 +151,22 @@ class CellController
             'type' => 'required|in:membros,lideres,supervisores,pastores_zona,pastores',
             'supervision_id' => 'required|exists:supervisions,id',
             'leader_id' => 'required|exists:users,id',
+            'timoteos' => 'nullable|array',
+            'timoteos.*' => 'exists:users,id',
         ]);
 
         $leader = User::findOrFail($validated['leader_id']);
         if ($response = $this->validateLeaderForCellType($request, $leader, $validated['type'], 'O líder selecionado não é compatível com o tipo de célula selecionado.')) {
             return $response;
+        }
+
+        if (!empty($validated['timoteos'])) {
+            foreach ($validated['timoteos'] as $tId) {
+                $timoteo = User::find($tId);
+                if ($timoteo && ($resp = $this->validateLeaderForCellType($request, $timoteo, $validated['type'], "O membro {$timoteo->name} não é compatível com o tipo de célula selecionado.", 'timoteos'))) {
+                    return $resp;
+                }
+            }
         }
 
         $cell = Cell::create([
@@ -569,7 +580,7 @@ class CellController
             ->with('error', $message);
     }
 
-    private function validateLeaderForCellType(Request $request, User $leader, string $cellType, string $message): RedirectResponse|JsonResponse|null
+    private function validateLeaderForCellType(Request $request, User $leader, string $cellType, string $message, string $field = 'leader_id'): RedirectResponse|JsonResponse|null
     {
         $role = $leader->role;
 
@@ -603,13 +614,13 @@ class CellController
         if ($request->expectsJson()) {
             return response()->json([
                 'message' => $message,
-                'errors' => ['leader_id' => [$message]],
+                'errors' => [$field => [$message]],
             ], 422);
         }
 
         return back()
             ->withInput()
-            ->withErrors(['leader_id' => $message])
+            ->withErrors([$field => $message])
             ->with('error', $message);
     }
 

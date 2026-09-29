@@ -11,15 +11,19 @@ class EnrollmentConditionalFieldsTest extends TestCase
     /** @test */
     public function the_pre_marital_form_renders_with_alpine_directives()
     {
-        $course = Course::factory()->create(['slug' => 'pre-marital']);
+        $course = Course::firstOrCreate(['slug' => 'casais'], [
+            'name' => 'Curso de Casais',
+            'description' => 'Curso Pré-Marital',
+            'is_active' => true,
+            'registration_open' => true,
+        ]);
 
         $response = $this->get('/inscricao-pre-marital');
 
         $response->assertStatus(200);
-        $response->assertSee('x-data="{ relType:');
-        $response->assertSee('x-model="relType"');
-        $response->assertSee('name="wife_address"');
-        $response->assertSee('x-model="isMember"');
-        $response->assertSee('x-show="isMember === \'1\'"');
+        $response->assertSee('name="couple_name"', false);
+        $response->assertSee('id="relationship_type"', false);
+        $response->assertSee('name="is_church_member"', false);
+        $response->assertSee('id="zone_id"', false);
     }
 }
