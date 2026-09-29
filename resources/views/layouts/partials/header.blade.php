@@ -1,22 +1,21 @@
 @php
     $authUser = auth()->user();
     $role = $authUser->role ?? 'membro';
-    $logoPrimary = config('branding.logo_primary', 'images/logo.png');
 @endphp
 
 <header class="bg-white border-b border-gray-200 px-4 md:px-8 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] shadow-sm sticky top-0 z-30">
     <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-3 flex-1">
+        <div class="flex items-center space-x-3 flex-1 min-w-0">
             <!-- Mobile Menu Button -->
             <button @click="mobileSidebarOpen = true"
-                class="md:hidden text-gray-600 hover:text-gray-800 p-2 hover:bg-gray-100 rounded-xl transition-colors">
+                aria-label="Abrir Menu"
+                class="md:hidden text-gray-700 hover:text-orange-600 p-2 hover:bg-orange-50 rounded-xl transition-colors flex-shrink-0">
                 <i class="bi bi-list text-2xl"></i>
             </button>
 
-            <!-- Mobile App Brand Title -->
-            <div class="flex items-center space-x-2 md:hidden">
-                <img src="{{ asset($logoPrimary) }}" alt="Life App Logo" class="w-7 h-7 object-contain" onError="this.src='/images/logo.png'">
-                <span class="font-extrabold text-gray-900 tracking-tight text-base">Life App</span>
+            <!-- Mobile Page Title -->
+            <div class="md:hidden min-w-0 flex-1">
+                <h2 class="text-base font-extrabold text-gray-900 truncate">@yield('page-title', 'Dashboard')</h2>
             </div>
 
             <!-- Desktop Sidebar Toggle -->
