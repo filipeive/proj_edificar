@@ -393,6 +393,11 @@ export function initPhonePrefixInputs() {
 export function toggleNotifications() {
     const notificationsPanel = document.getElementById('notificationsPanel');
     if (!notificationsPanel) return;
+
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
+
     notificationsPanel.classList.toggle('hidden');
     if (!notificationsPanel.classList.contains('hidden')) {
         loadNotifications();
@@ -496,6 +501,32 @@ export function markAllAsRead() {
         .catch(error => console.error('Mark as read error:', error));
 }
 
+let lastUnreadCount = null;
+
+export function triggerNativePushNotification(title, body, link = '/notifications') {
+    if (!('Notification' in window)) return;
+
+    if (Notification.permission === 'granted') {
+        if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+            navigator.serviceWorker.ready.then(reg => {
+                reg.showNotification(title, {
+                    body: body,
+                    icon: '/icons/icon-192.png',
+                    badge: '/icons/icon-192.png',
+                    vibrate: [200, 100, 200],
+                    data: { url: link }
+                });
+            });
+        } else {
+            new Notification(title, {
+                body: body,
+                icon: '/icons/icon-192.png',
+                data: { url: link }
+            });
+        }
+    }
+}
+
 export function updateNotificationBadge(explicitCount = null) {
     const applyCount = (count) => {
         const badges = document.querySelectorAll('[data-notification-badge]');
@@ -510,6 +541,15 @@ export function updateNotificationBadge(explicitCount = null) {
                 badge.style.display = 'none';
             }
         });
+
+        if (lastUnreadCount !== null && count > lastUnreadCount) {
+            triggerNativePushNotification(
+                'Portal Life Church',
+                `Você tem ${count} notificação(ões) não lida(s).`,
+                '/notifications'
+            );
+        }
+        lastUnreadCount = count;
     };
 
     if (explicitCount !== null) {
