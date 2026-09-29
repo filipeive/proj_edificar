@@ -23,8 +23,9 @@ use Illuminate\Support\Facades\Route;
 // Rotas de autenticação (Breeze)
 require __DIR__.'/auth.php';
 
-// Welcome Route
+// Welcome & Root Routes
 Route::get('/', [\App\Http\Controllers\WelcomeController::class, 'index'])->name('welcome');
+Route::get('/welcome', [\App\Http\Controllers\WelcomeController::class, 'landing'])->name('welcome.landing');
 
 // Public Course Enrollment
 Route::get('/cursos/{course:slug}/inscricao', [\App\Http\Controllers\PublicCourseController::class, 'register'])->name('public.courses.register');
