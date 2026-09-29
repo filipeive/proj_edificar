@@ -1,10 +1,10 @@
 {
   "appId": "com.edificar.lifechurch",
-  "appName": "Life Church Edificar",
+  "appName": "Life App",
   "webDir": "public",
   "bundledWebRuntime": false,
   "server": {
-    "url": "https://edificar.portal-lifechurch.com",
+    "url": "http://146.235.224.99/edificar",
     "cleartext": true,
     "allowNavigation": [
       "*"
