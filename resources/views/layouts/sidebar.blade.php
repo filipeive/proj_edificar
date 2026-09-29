@@ -151,12 +151,12 @@
 
                     @if ($authUser && $authUser->hasPermission('menu_courses'))
                         <div>
-                            <button class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('courses.*') || request()->routeIs('course-classes.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" data-tooltip="Escola Ministerial" onclick="toggleMenu(this)">
+                            <button class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('courses.*') || request()->routeIs('course-classes.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" data-tooltip="Escola Ministerial" onclick="toggleMenu(this, '{{ $sidebarId ?? 'sidebar' }}_courses_menu')">
                                 <i class="bi bi-mortarboard-fill text-xl flex-shrink-0"></i>
                                 <span class="sidebar-text ml-4 font-bold tracking-tight flex-1">Escola Ministerial</span>
                                 <i class="bi bi-chevron-down sidebar-text ml-2 text-[10px] transition-transform duration-300 {{ request()->routeIs('courses.*') || request()->routeIs('course-classes.*') ? 'rotate-180' : '' }}"></i>
                             </button>
-                            <div id="courses_menu" class="overflow-hidden {{ request()->routeIs('courses.*') || request()->routeIs('course-classes.*') ? '' : 'hidden' }}">
+                            <div id="{{ $sidebarId ?? 'sidebar' }}_courses_menu" class="overflow-hidden {{ request()->routeIs('courses.*') || request()->routeIs('course-classes.*') ? '' : 'hidden' }}">
                                 <div class="ml-12 mt-2 space-y-1 border-l border-white/10 pl-4">
                                     <a href="{{ route('courses.index') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('courses.index') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Cursos</a>
                                     @if ($authUser && $authUser->hasPermission('menu_public_enrollments'))
@@ -280,12 +280,12 @@
                 @endif
 
                 <div>
-                    <button class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('contributions.*') || request()->routeIs('commitments.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" data-tooltip="Contribuições" onclick="toggleMenu(this)">
+                    <button class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('contributions.*') || request()->routeIs('commitments.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" data-tooltip="Contribuições" onclick="toggleMenu(this, '{{ $sidebarId ?? 'sidebar' }}_contributions')">
                         <i class="bi bi-cash-stack text-xl flex-shrink-0"></i>
                         <span class="sidebar-text ml-4 font-bold tracking-tight flex-1">Contribuições</span>
                         <i class="bi bi-chevron-down sidebar-text ml-2 text-[10px] transition-transform duration-300 {{ request()->routeIs('contributions.*') || request()->routeIs('commitments.*') ? 'rotate-180' : '' }}"></i>
                     </button>
-                    <div id="contributions" class="overflow-hidden {{ request()->routeIs('contributions.*') || request()->routeIs('commitments.*') ? '' : 'hidden' }}">
+                    <div id="{{ $sidebarId ?? 'sidebar' }}_contributions" class="overflow-hidden {{ request()->routeIs('contributions.*') || request()->routeIs('commitments.*') ? '' : 'hidden' }}">
                         <div class="ml-12 mt-2 space-y-1 border-l border-white/10 pl-4">
                             <a href="{{ route('commitments.index') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('commitments.*') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Meu Compromisso</a>
                             @if ($authUser && !$authUser->isAdmin())
@@ -323,12 +323,12 @@
 
                 @if ($authUser && $authUser->hasPermission('menu_finance'))
                     <div>
-                        <button class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('financial.dashboard') || request()->routeIs('requisitions.*') || request()->routeIs('expenses.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" data-tooltip="Financeiro" onclick="toggleMenu(this)">
+                        <button class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('financial.dashboard') || request()->routeIs('requisitions.*') || request()->routeIs('expenses.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" data-tooltip="Financeiro" onclick="toggleMenu(this, '{{ $sidebarId ?? 'sidebar' }}_financial_menu')">
                             <i class="bi bi-pie-chart-fill text-xl flex-shrink-0"></i>
                             <span class="sidebar-text ml-4 font-bold tracking-tight flex-1">Financeiro</span>
                             <i class="bi bi-chevron-down sidebar-text ml-2 text-[10px] transition-transform duration-300 {{ request()->routeIs('financial.dashboard') || request()->routeIs('requisitions.*') || request()->routeIs('expenses.*') ? 'rotate-180' : '' }}"></i>
                         </button>
-                        <div id="financial_menu" class="overflow-hidden {{ request()->routeIs('financial.dashboard') || request()->routeIs('requisitions.*') || request()->routeIs('expenses.*') ? '' : 'hidden' }}">
+                        <div id="{{ $sidebarId ?? 'sidebar' }}_financial_menu" class="overflow-hidden {{ request()->routeIs('financial.dashboard') || request()->routeIs('requisitions.*') || request()->routeIs('expenses.*') ? '' : 'hidden' }}">
                             <div class="ml-12 mt-2 space-y-1 border-l border-white/10 pl-4">
                                 <a href="{{ route('financial.dashboard') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('financial.dashboard') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Dashboard</a>
                                 <a href="{{ route('requisitions.index') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('requisitions.*') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Requisições</a>
@@ -353,12 +353,12 @@
 
             @if ($authUser && $authUser->hasPermission('menu_stats'))
                 <div>
-                    <button class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('reports.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" data-tooltip="Estatísticas" onclick="toggleMenu(this)">
+                    <button class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('reports.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" data-tooltip="Estatísticas" onclick="toggleMenu(this, '{{ $sidebarId ?? 'sidebar' }}_reports')">
                         <i class="bi bi-bar-chart-line-fill text-xl flex-shrink-0"></i>
                         <span class="sidebar-text ml-4 font-bold tracking-tight flex-1">Estatísticas</span>
                         <i class="bi bi-chevron-down sidebar-text ml-2 text-[10px] transition-transform duration-300 {{ request()->routeIs('reports.*') ? 'rotate-180' : '' }}"></i>
                     </button>
-                    <div id="reports" class="overflow-hidden {{ request()->routeIs('reports.*') ? '' : 'hidden' }}">
+                    <div id="{{ $sidebarId ?? 'sidebar' }}_reports" class="overflow-hidden {{ request()->routeIs('reports.*') ? '' : 'hidden' }}">
                         <div class="ml-12 mt-2 space-y-1 border-l border-white/10 pl-4">
                             @if($authUser && $authUser->role !== 'comissao_obra')
                                 <a href="{{ route('reports.cell') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('reports.cell') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Célula</a>

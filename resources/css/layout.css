@@ -129,10 +129,10 @@ body {
     display: none;
 }
 
-.sidebar-collapsed #courses_menu,
-.sidebar-collapsed #contributions,
-.sidebar-collapsed #financial_menu,
-.sidebar-collapsed #reports {
+.sidebar-collapsed [id*="courses_menu"],
+.sidebar-collapsed [id*="contributions"],
+.sidebar-collapsed [id*="financial_menu"],
+.sidebar-collapsed [id*="reports"] {
     display: none !important;
 }
 

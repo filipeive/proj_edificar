@@ -50,20 +50,39 @@ export function toggleMobileSidebar() {
     document.body.style.overflow = mobileSidebar.classList.contains('mobile-open') ? 'hidden' : '';
 }
 
-export function toggleMenu(param, fallbackId) {
-    let menu = null;
+export function toggleMenu(param, menuId) {
     let button = null;
+    let menu = null;
 
     if (param && param.nodeType === 1) {
-        button = param;
+        button = param.closest('button') || param;
         menu = button.nextElementSibling;
-    } else if (typeof param === 'string') {
-        menu = document.getElementById(param);
-        if (menu) button = menu.previousElementSibling;
+        if (!menu || !menu.classList.contains('overflow-hidden')) {
+            menu = button.parentElement?.querySelector('.overflow-hidden');
+        }
+    }
+
+    if (!menu && typeof param === 'string') {
+        menuId = param;
+    }
+
+    if (!menu && menuId) {
+        const sidebar = (button && button.closest('.app-sidebar')) || document.querySelector('.mobile-sidebar[x-show="true"]') || document.querySelector('#sidebar-desktop') || document;
+        menu = sidebar.querySelector('#' + menuId) || document.getElementById(menuId);
     }
 
     if (!menu) return;
+    if (!button) button = menu.previousElementSibling;
+
     const icon = button?.querySelector('.bi-chevron-down');
+
+    // If sidebar is collapsed on desktop and user clicks dropdown button, auto-expand desktop sidebar
+    if (window.innerWidth >= 768 && typeof window.toggleSidebar === 'function') {
+        const desktopSidebar = document.getElementById('sidebar-desktop');
+        if (desktopSidebar && desktopSidebar.classList.contains('sidebar-collapsed')) {
+            window.toggleSidebar();
+        }
+    }
 
     menu.classList.toggle('hidden');
 
@@ -71,7 +90,9 @@ export function toggleMenu(param, fallbackId) {
         menu.classList.add('submenu-enter');
     }
 
-    icon?.classList.toggle('rotate-180');
+    if (icon) {
+        icon.classList.toggle('rotate-180');
+    }
 }
 
 // ===== THEME FUNCTIONS =====
