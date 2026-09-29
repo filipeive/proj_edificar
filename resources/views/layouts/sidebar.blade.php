@@ -150,13 +150,13 @@
                     @endif
 
                     @if ($authUser && $authUser->hasPermission('menu_courses'))
-                        <div>
-                            <button class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('courses.*') || request()->routeIs('course-classes.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" data-tooltip="Escola Ministerial" onclick="toggleMenu(this, '{{ $sidebarId ?? 'sidebar' }}_courses_menu')">
+                        <div x-data="{ open: {{ request()->routeIs('courses.*') || request()->routeIs('course-classes.*') ? 'true' : 'false' }} }">
+                            <button type="button" @click="open = !open; if (window.innerWidth >= 768 && !sidebarOpen) sidebarOpen = true" class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('courses.*') || request()->routeIs('course-classes.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" data-tooltip="Escola Ministerial">
                                 <i class="bi bi-mortarboard-fill text-xl flex-shrink-0"></i>
                                 <span class="sidebar-text ml-4 font-bold tracking-tight flex-1">Escola Ministerial</span>
-                                <i class="bi bi-chevron-down sidebar-text ml-2 text-[10px] transition-transform duration-300 {{ request()->routeIs('courses.*') || request()->routeIs('course-classes.*') ? 'rotate-180' : '' }}"></i>
+                                <i class="bi bi-chevron-down sidebar-text ml-2 text-[10px] transition-transform duration-300" :class="{ 'rotate-180': open }"></i>
                             </button>
-                            <div id="{{ $sidebarId ?? 'sidebar' }}_courses_menu" class="overflow-hidden {{ request()->routeIs('courses.*') || request()->routeIs('course-classes.*') ? '' : 'hidden' }}">
+                            <div x-show="open" x-cloak class="overflow-hidden">
                                 <div class="ml-12 mt-2 space-y-1 border-l border-white/10 pl-4">
                                     <a href="{{ route('courses.index') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('courses.index') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Cursos</a>
                                     @if ($authUser && $authUser->hasPermission('menu_public_enrollments'))
@@ -279,13 +279,13 @@
                     </a>
                 @endif
 
-                <div>
-                    <button class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('contributions.*') || request()->routeIs('commitments.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" data-tooltip="Contribuições" onclick="toggleMenu(this, '{{ $sidebarId ?? 'sidebar' }}_contributions')">
+                <div x-data="{ open: {{ request()->routeIs('contributions.*') || request()->routeIs('commitments.*') ? 'true' : 'false' }} }">
+                    <button type="button" @click="open = !open; if (window.innerWidth >= 768 && !sidebarOpen) sidebarOpen = true" class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('contributions.*') || request()->routeIs('commitments.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" data-tooltip="Contribuições">
                         <i class="bi bi-cash-stack text-xl flex-shrink-0"></i>
                         <span class="sidebar-text ml-4 font-bold tracking-tight flex-1">Contribuições</span>
-                        <i class="bi bi-chevron-down sidebar-text ml-2 text-[10px] transition-transform duration-300 {{ request()->routeIs('contributions.*') || request()->routeIs('commitments.*') ? 'rotate-180' : '' }}"></i>
+                        <i class="bi bi-chevron-down sidebar-text ml-2 text-[10px] transition-transform duration-300" :class="{ 'rotate-180': open }"></i>
                     </button>
-                    <div id="{{ $sidebarId ?? 'sidebar' }}_contributions" class="overflow-hidden {{ request()->routeIs('contributions.*') || request()->routeIs('commitments.*') ? '' : 'hidden' }}">
+                    <div x-show="open" x-cloak class="overflow-hidden">
                         <div class="ml-12 mt-2 space-y-1 border-l border-white/10 pl-4">
                             <a href="{{ route('commitments.index') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('commitments.*') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Meu Compromisso</a>
                             @if ($authUser && !$authUser->isAdmin())
@@ -322,13 +322,13 @@
                 </div>
 
                 @if ($authUser && $authUser->hasPermission('menu_finance'))
-                    <div>
-                        <button class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('financial.dashboard') || request()->routeIs('requisitions.*') || request()->routeIs('expenses.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" data-tooltip="Financeiro" onclick="toggleMenu(this, '{{ $sidebarId ?? 'sidebar' }}_financial_menu')">
+                    <div x-data="{ open: {{ request()->routeIs('financial.dashboard') || request()->routeIs('requisitions.*') || request()->routeIs('expenses.*') ? 'true' : 'false' }} }">
+                        <button type="button" @click="open = !open; if (window.innerWidth >= 768 && !sidebarOpen) sidebarOpen = true" class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('financial.dashboard') || request()->routeIs('requisitions.*') || request()->routeIs('expenses.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" data-tooltip="Financeiro">
                             <i class="bi bi-pie-chart-fill text-xl flex-shrink-0"></i>
                             <span class="sidebar-text ml-4 font-bold tracking-tight flex-1">Financeiro</span>
-                            <i class="bi bi-chevron-down sidebar-text ml-2 text-[10px] transition-transform duration-300 {{ request()->routeIs('financial.dashboard') || request()->routeIs('requisitions.*') || request()->routeIs('expenses.*') ? 'rotate-180' : '' }}"></i>
+                            <i class="bi bi-chevron-down sidebar-text ml-2 text-[10px] transition-transform duration-300" :class="{ 'rotate-180': open }"></i>
                         </button>
-                        <div id="{{ $sidebarId ?? 'sidebar' }}_financial_menu" class="overflow-hidden {{ request()->routeIs('financial.dashboard') || request()->routeIs('requisitions.*') || request()->routeIs('expenses.*') ? '' : 'hidden' }}">
+                        <div x-show="open" x-cloak class="overflow-hidden">
                             <div class="ml-12 mt-2 space-y-1 border-l border-white/10 pl-4">
                                 <a href="{{ route('financial.dashboard') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('financial.dashboard') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Dashboard</a>
                                 <a href="{{ route('requisitions.index') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('requisitions.*') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Requisições</a>
@@ -352,13 +352,13 @@
             <div class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-4">Sistema & Relatórios</div>
 
             @if ($authUser && $authUser->hasPermission('menu_stats'))
-                <div>
-                    <button class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('reports.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" data-tooltip="Estatísticas" onclick="toggleMenu(this, '{{ $sidebarId ?? 'sidebar' }}_reports')">
+                <div x-data="{ open: {{ request()->routeIs('reports.*') ? 'true' : 'false' }} }">
+                    <button type="button" @click="open = !open; if (window.innerWidth >= 768 && !sidebarOpen) sidebarOpen = true" class="nav-item relative w-full text-left flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('reports.*') ? 'bg-zinc-900/50 text-white' : 'text-slate-400' }}" data-tooltip="Estatísticas">
                         <i class="bi bi-bar-chart-line-fill text-xl flex-shrink-0"></i>
                         <span class="sidebar-text ml-4 font-bold tracking-tight flex-1">Estatísticas</span>
-                        <i class="bi bi-chevron-down sidebar-text ml-2 text-[10px] transition-transform duration-300 {{ request()->routeIs('reports.*') ? 'rotate-180' : '' }}"></i>
+                        <i class="bi bi-chevron-down sidebar-text ml-2 text-[10px] transition-transform duration-300" :class="{ 'rotate-180': open }"></i>
                     </button>
-                    <div id="{{ $sidebarId ?? 'sidebar' }}_reports" class="overflow-hidden {{ request()->routeIs('reports.*') ? '' : 'hidden' }}">
+                    <div x-show="open" x-cloak class="overflow-hidden">
                         <div class="ml-12 mt-2 space-y-1 border-l border-white/10 pl-4">
                             @if($authUser && $authUser->role !== 'comissao_obra')
                                 <a href="{{ route('reports.cell') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('reports.cell') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Célula</a>
