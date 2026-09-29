@@ -1,6 +1,6 @@
 /**
- * MI-02: PWA Logic — Extraído de app.blade.php
- * Portal Life Church — Immersive PWA Experience JS
+ * MI-02: PWA Logic — Service Worker, Offline Queue & Universal Document Downloader
+ * Portal Life Church — Immersive PWA & Native App JS
  */
 
 import Swal from 'sweetalert2';
@@ -15,19 +15,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let deferredPrompt;
     window.addEventListener('beforeinstallprompt', (e) => {
-        // Prevent Chrome 67 and earlier from automatically showing the prompt
         e.preventDefault();
-        // Stash the event so it can be triggered later.
         deferredPrompt = e;
-        console.log('beforeinstallprompt event fired');
-
-        // If we are on mobile, show the prompt with the Install option
         showImmersivePrompt(true);
     });
 
-    // check if on mobile
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
+
     function showImmersivePrompt(canInstall) {
         if (sessionStorage.getItem('pwa_prompt_shown')) return;
 
@@ -38,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 : 'Para uma melhor experiência, você pode usar o modo tela cheia ou adicionar à tela de início.',
             icon: 'info',
             showCancelButton: true,
-            confirmButtonColor: '#2563eb',
+            confirmButtonColor: '#ea580c',
             cancelButtonColor: '#6b7280',
             confirmButtonText: canInstall ? 'Instalar App' : 'Tela Cheia',
             cancelButtonText: 'Agora não',
@@ -48,9 +42,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (canInstall && deferredPrompt) {
                     deferredPrompt.prompt();
                     deferredPrompt.userChoice.then((choiceResult) => {
-                        if (choiceResult.outcome === 'accepted') {
-                            console.log('User accepted the install prompt');
-                        }
                         deferredPrompt = null;
                     });
                 } else {
@@ -64,7 +55,6 @@ document.addEventListener('DOMContentLoaded', function () {
     function enterFullScreen() {
         const doc = window.document;
         const docEl = doc.documentElement;
-
         const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
 
         if (requestFullScreen) {
@@ -79,33 +69,36 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // ===== MOBILE & PWA UNIVERSAL DOCUMENT / PDF DOWNLOAD INTERCEPTOR =====
-    document.addEventListener('click', function(e) {
+    // ===== 1. NO-FLICKER TOAST NOTIFICATIONS FOR PDF & DOCUMENT DOWNLOADS =====
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3500,
+        timerProgressBar: true,
+        background: '#0f172a',
+        color: '#f8fafc',
+    });
+
+    document.addEventListener('click', function (e) {
         const link = e.target.closest('a[href]');
         if (!link) return;
 
         const href = link.getAttribute('href');
         if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
 
-        // Check if link is a download / PDF / export link
-        const isPdfOrReport = href.includes('/pdf') || 
-                              href.includes('/export') || 
-                              href.includes('/report') || 
-                              href.includes('/download') ||
-                              link.hasAttribute('download');
+        const isPdfOrReport = href.includes('/pdf') ||
+            href.includes('/export') ||
+            href.includes('/report') ||
+            href.includes('/download') ||
+            link.hasAttribute('download');
 
         if (isPdfOrReport) {
             e.preventDefault();
 
-            Swal.fire({
-                title: 'Descarregar Documento',
-                text: 'A transferir o ficheiro para o seu dispositivo...',
+            Toast.fire({
                 icon: 'info',
-                allowOutsideClick: false,
-                showConfirmButton: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
+                title: 'A descarregar documento...'
             });
 
             fetch(href, {
@@ -113,46 +106,109 @@ document.addEventListener('DOMContentLoaded', function () {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             })
-            .then(res => {
-                if (!res.ok) throw new Error('Falha ao descarregar documento.');
-                const disposition = res.headers.get('Content-Disposition');
-                let filename = 'documento.pdf';
-                if (disposition && disposition.indexOf('filename=') !== -1) {
-                    const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(disposition);
-                    if (matches != null && matches[1]) {
-                        filename = matches[1].replace(/['"]/g, '');
+                .then(res => {
+                    if (!res.ok) throw new Error('Falha ao descarregar documento.');
+                    const disposition = res.headers.get('Content-Disposition');
+                    let filename = 'documento.pdf';
+                    if (disposition && disposition.indexOf('filename=') !== -1) {
+                        const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(disposition);
+                        if (matches != null && matches[1]) {
+                            filename = matches[1].replace(/['"]/g, '');
+                        }
+                    } else if (href.includes('.pdf')) {
+                        filename = href.split('/').pop().split('?')[0] || 'relatorio.pdf';
                     }
-                } else if (href.includes('.pdf')) {
-                    filename = href.split('/').pop().split('?')[0] || 'relatorio.pdf';
-                }
-                return res.blob().then(blob => ({ blob, filename }));
-            })
-            .then(({ blob, filename }) => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    window.URL.revokeObjectURL(url);
-                }, 1000);
+                    return res.blob().then(blob => ({ blob, filename }));
+                })
+                .then(({ blob, filename }) => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    setTimeout(() => {
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(url);
+                    }, 1000);
 
-                Swal.fire({
-                    title: 'Download Concluído!',
-                    text: `Ficheiro ${filename} guardado com sucesso.`,
-                    icon: 'success',
-                    timer: 2500,
-                    showConfirmButton: false
+                    Toast.fire({
+                        icon: 'success',
+                        title: `Ficheiro ${filename} guardado!`
+                    });
+                })
+                .catch(err => {
+                    console.error('Download error:', err);
+                    window.location.href = href;
                 });
-            })
-            .catch(err => {
-                console.error('Download error:', err);
-                // Fallback direct navigation
-                window.location.href = href;
-            });
         }
     });
+
+    // ===== 2. OFFLINE DETECTOR & AUTOMATIC SYNCHRONIZATION QUEUE =====
+    function createOfflineBanner() {
+        if (document.getElementById('offline-banner')) return;
+        const banner = document.createElement('div');
+        banner.id = 'offline-banner';
+        banner.className = 'fixed top-0 left-0 right-0 z-[10000] bg-amber-500 text-slate-950 font-bold text-xs py-2 px-4 text-center shadow-lg transition-transform duration-300 transform -translate-y-full flex items-center justify-center gap-2';
+        banner.innerHTML = '<i class="bi bi-wifi-off text-base"></i> <span>Modo Offline: Suas alterações serão guardadas e sincronizadas ao reconectar à internet.</span>';
+        document.body.appendChild(banner);
+    }
+    createOfflineBanner();
+
+    function updateNetworkStatus() {
+        const banner = document.getElementById('offline-banner');
+        if (!banner) return;
+
+        if (!navigator.onLine) {
+            banner.classList.remove('-translate-y-full');
+            banner.classList.add('translate-y-0');
+        } else {
+            banner.classList.remove('translate-y-0');
+            banner.classList.add('-translate-y-full');
+            syncOfflineQueue();
+        }
+    }
+
+    window.addEventListener('online', updateNetworkStatus);
+    window.addEventListener('offline', updateNetworkStatus);
+    updateNetworkStatus();
+
+    // Process queued offline requests when internet connection is restored
+    function syncOfflineQueue() {
+        try {
+            const queue = JSON.parse(localStorage.getItem('life_offline_queue') || '[]');
+            if (queue.length === 0) return;
+
+            Toast.fire({
+                icon: 'info',
+                title: `A sincronizar ${queue.length} ação(ões) pendente(s)...`
+            });
+
+            const syncPromises = queue.map(item => {
+                return fetch(item.url, {
+                    method: item.method || 'POST',
+                    headers: item.headers || {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    },
+                    body: item.body ? JSON.stringify(item.body) : null
+                });
+            });
+
+            Promise.all(syncPromises)
+                .then(() => {
+                    localStorage.removeItem('life_offline_queue');
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Sincronização concluída com sucesso!'
+                    });
+                })
+                .catch(err => {
+                    console.error('Erro na sincronização offline:', err);
+                });
+        } catch (e) {
+            console.error('Erro ao ler fila offline:', e);
+        }
+    }
 });
