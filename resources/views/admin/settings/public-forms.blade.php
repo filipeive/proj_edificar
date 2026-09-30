@@ -5,7 +5,7 @@
 @section('page-subtitle', 'Defina os cursos de destino para inscrições externas')
 
 @section('content')
-    <div class="max-w-5xl mx-auto space-y-6">
+    <div class="w-full space-y-6">
         <!-- Header -->
         <div class="bg-white rounded-3xl border border-gray-200 shadow-sm p-6">
             <h1 class="text-3xl font-black text-gray-900 dark:text-white mb-2">Configuração de Formulários</h1>

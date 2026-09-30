@@ -56,7 +56,38 @@ class CourseClassController extends Controller
         $groupedClasses = $classes->groupBy('course_id');
         $courses = Course::all();
 
-        return view('course_classes.index', compact('groupedClasses', 'courses', 'courseId', 'type', 'status'));
+        $stats = [
+            'total' => CourseClass::count(),
+            'active' => CourseClass::where('status', 'em_andamento')->count(),
+            'students' => CourseEnrollment::whereNotNull('course_class_id')->count() + CoupleEnrollment::whereNotNull('course_class_id')->count(),
+            'courses' => Course::has('classes')->count(),
+        ];
+
+        return view('course_classes.index', compact('groupedClasses', 'courses', 'courseId', 'type', 'status', 'stats'));
+    }
+
+    public function exportAllPdf(Request $request)
+    {
+        $this->abortIfPastorZonaCannotManage();
+
+        $query = CourseClass::with(['course', 'teacherMale', 'teacherFemale'])
+            ->withCount(['courseEnrollments', 'coupleEnrollments']);
+
+        if ($request->filled('course_id')) {
+            $query->where('course_id', $request->course_id);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $classes = $query->latest()->get();
+        $title = 'Relatório Geral de Turmas';
+
+        $pdf = Pdf::loadView('course_classes.pdf', compact('classes', 'title'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->download('relatorio_geral_turmas_' . date('Ymd_His') . '.pdf');
     }
 
     public function create(Request $request)

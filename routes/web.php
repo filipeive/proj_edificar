@@ -465,11 +465,11 @@ Route::middleware('auth')->group(function () {
     Route::post('course-classes/{course_class}/remove-enrollment', [\App\Http\Controllers\CourseClassController::class, 'removeEnrollment'])->name('course-classes.remove-enrollment');
     Route::post('course-classes/{course_class}/meetings', [\App\Http\Controllers\CourseClassController::class, 'storeMeeting'])->name('course-classes.meetings.store');
     Route::get('course-classes/{course_class}/report', [\App\Http\Controllers\CourseClassController::class, 'report'])->name('course-classes.report');
-    Route::get('course-classes/{course_class}/export', [\App\Http\Controllers\CourseClassController::class, 'exportReport'])->name('course-classes.export');
-
+    Route::get('course-classes-export-all-pdf', [\App\Http\Controllers\CourseClassController::class, 'exportAllPdf'])->name('course-classes.export-all-pdf');
     Route::resource('course-classes', \App\Http\Controllers\CourseClassController::class);
 
     Route::get('courses/export-global', [\App\Http\Controllers\CourseController::class, 'exportGlobalReport'])->name('courses.export-global');
+    Route::get('courses/export-pdf', [\App\Http\Controllers\CourseController::class, 'exportPdf'])->name('courses.export-pdf');
     Route::post('course-classes/{course_class}/move', [\App\Http\Controllers\CourseClassController::class, 'move'])->name('course-classes.move');
     Route::post('courses/bulk-delete', [\App\Http\Controllers\CourseController::class, 'bulkDestroy'])->name('courses.bulk-delete');
     Route::post('courses/{course}/assign-public-enrollment', [\App\Http\Controllers\CourseController::class, 'assignPublicEnrollment'])->name('courses.assign-public-enrollment');
@@ -494,6 +494,7 @@ Route::middleware('auth')->group(function () {
         Route::get('couple-enrollments-export-pdf', [\App\Http\Controllers\CoupleEnrollmentController::class, 'exportPdf'])->name('couple-enrollments.export-pdf');
 
         // Ministerial Enrollments
+        Route::get('ministerial-enrollments-export-pdf', [\App\Http\Controllers\MinisterialEnrollmentController::class, 'exportPdf'])->name('ministerial-enrollments.export-pdf');
         Route::get('ministerial-enrollments', [\App\Http\Controllers\MinisterialEnrollmentController::class, 'index'])->name('ministerial-enrollments.index');
         Route::get('ministerial-enrollments/{ministerial_enrollment}', [\App\Http\Controllers\MinisterialEnrollmentController::class, 'show'])->name('ministerial-enrollments.show');
         Route::get('ministerial-enrollments/{ministerial_enrollment}/edit', [\App\Http\Controllers\MinisterialEnrollmentController::class, 'edit'])->name('ministerial-enrollments.edit');

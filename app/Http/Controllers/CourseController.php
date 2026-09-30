@@ -47,14 +47,27 @@ class CourseController extends Controller
                 $availableCourses = $availableCourses->where('id', '!=', $preMaritalCourseId)->values();
             }
         }
+            
+        $stats = [
+            'total' => Course::count(),
+            'open' => Course::where('registration_open', true)->count(),
+            'students' => CourseEnrollment::count() + CoupleEnrollment::count(),
+            'classes' => CourseClass::count(),
+        ];
 
-        // 3. For admins/pastors, list all courses separately if needed (optional)
-        $allCourses = collect();
-        if ($user->isAdmin() || $user->role === 'pastor') {
-            $allCourses = Course::withCount(['enrollments', 'coupleEnrollments'])->get();
-        }
+        return view('courses.index', compact('enrolledCourses', 'availableCourses', 'stats'));
+    }
 
-        return view('courses.index', compact('enrolledCourses', 'availableCourses', 'allCourses'));
+    public function exportPdf(Request $request)
+    {
+        $this->ensureCourseManagementAccess();
+        $courses = Course::withCount(['enrollments', 'coupleEnrollments', 'classes'])->orderBy('name')->get();
+        $title = 'Relatório Geral de Cursos & Academia';
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('courses.pdf', compact('courses', 'title'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download('relatorio_cursos_' . date('Ymd_His') . '.pdf');
     }
 
     public function create()

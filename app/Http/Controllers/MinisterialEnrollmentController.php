@@ -13,13 +13,62 @@ use Illuminate\Support\Str;
 
 class MinisterialEnrollmentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $enrollments = MinisterialEnrollment::with('course', 'courseClass')
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+        $query = MinisterialEnrollment::with('course', 'courseClass')
+            ->orderBy('created_at', 'desc');
 
-        return view('admin.ministerial_enrollments.index', compact('enrollments'));
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('full_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('course_id')) {
+            $query->where('course_id', $request->course_id);
+        }
+
+        $enrollments = $query->paginate(20)->withQueryString();
+        $courses = Course::orderBy('name')->get();
+
+        $stats = [
+            'total' => MinisterialEnrollment::count(),
+            'pending' => MinisterialEnrollment::whereNull('course_class_id')->count(),
+            'assigned' => MinisterialEnrollment::whereNotNull('course_class_id')->count(),
+            'members' => MinisterialEnrollment::where('is_church_member', true)->count(),
+        ];
+
+        return view('admin.ministerial_enrollments.index', compact('enrollments', 'courses', 'stats'));
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $query = MinisterialEnrollment::with('course', 'courseClass')
+            ->orderBy('created_at', 'desc');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('full_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('course_id')) {
+            $query->where('course_id', $request->course_id);
+        }
+
+        $enrollments = $query->get();
+        $title = 'Relatório de Inscrições Ministeriais Públicas';
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.ministerial_enrollments.pdf', compact('enrollments', 'title'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->download('relatorio_inscricoes_ministeriais_' . date('Ymd_His') . '.pdf');
     }
 
     public function show(MinisterialEnrollment $ministerialEnrollment)
