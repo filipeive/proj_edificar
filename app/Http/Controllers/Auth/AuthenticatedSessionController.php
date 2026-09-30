@@ -33,6 +33,11 @@ class AuthenticatedSessionController extends Controller
         $user->update(['last_login_at' => now()]);
         $user->logActivity('login', 'Sessão iniciada no sistema');
 
+        $intended = session()->get('url.intended');
+        if ($intended && (str_contains($intended, '/pdf') || str_contains($intended, '/export') || $intended === url('/'))) {
+            session()->forget('url.intended');
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 

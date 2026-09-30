@@ -24,8 +24,8 @@ use Illuminate\Support\Facades\Route;
 require __DIR__.'/auth.php';
 
 // Welcome & Root Routes
-Route::get('/', [\App\Http\Controllers\WelcomeController::class, 'index'])->name('welcome');
-Route::get('/welcome', [\App\Http\Controllers\WelcomeController::class, 'landing'])->name('welcome.landing');
+Route::match(['get', 'post'], '/', [\App\Http\Controllers\WelcomeController::class, 'index'])->name('welcome');
+Route::match(['get', 'post'], '/welcome', [\App\Http\Controllers\WelcomeController::class, 'landing'])->name('welcome.landing');
 
 // Public Course Enrollment
 Route::get('/cursos/{course:slug}/inscricao', [\App\Http\Controllers\PublicCourseController::class, 'register'])->name('public.courses.register');
@@ -98,42 +98,42 @@ Route::prefix('notifications')->middleware('auth')->name('notifications.')->grou
 // Rotas protegidas (autenticado)
 Route::middleware('auth')->group(function () {
 
-    // Dashboard Principal (Redireciona por Role)
-    Route::get('/dashboard', [DashboardController::class, 'index'])
+    // Dashboard Principal (Redireciona por Role) - Suporta GET e POST para evitar 405
+    Route::match(['get', 'post'], '/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
 
     // Dashboard Admin
-    Route::get('/admin/dashboard', AdminDashboardController::class)
+    Route::match(['get', 'post'], '/admin/dashboard', AdminDashboardController::class)
         ->middleware('role:super_admin,admin,pastor_senior')
         ->name('dashboard.admin');
 
     // Dashboard Pastor de Zona
-    Route::get('/pastor/dashboard', PastorDashboardController::class)
+    Route::match(['get', 'post'], '/pastor/dashboard', PastorDashboardController::class)
         ->middleware('role:pastor_zona')
         ->name('dashboard.pastor');
 
     // Dashboard Supervisor
-    Route::get('/supervisor/dashboard', SupervisorDashboardController::class)
+    Route::match(['get', 'post'], '/supervisor/dashboard', SupervisorDashboardController::class)
         ->middleware('role:supervisor,pastor_zona')
         ->name('dashboard.supervisor');
 
     // Dashboard Líder de Célula
-    Route::get('/lider/dashboard', LiderDashboardController::class)
+    Route::match(['get', 'post'], '/lider/dashboard', LiderDashboardController::class)
         ->middleware('role:lider_celula,supervisor,pastor_zona')
         ->name('dashboard.lider');
 
     // Dashboard Membro
-    Route::get('/membro/dashboard', MemberDashboardController::class)
+    Route::match(['get', 'post'], '/membro/dashboard', MemberDashboardController::class)
         ->middleware('role:membro,lider_celula,supervisor,pastor_zona')
         ->name('dashboard.membro');
 
     // Dashboard Secretaria
-    Route::get('/secretaria/dashboard', \App\Http\Controllers\Dashboard\SecretaryDashboardController::class)
+    Route::match(['get', 'post'], '/secretaria/dashboard', \App\Http\Controllers\Dashboard\SecretaryDashboardController::class)
         ->middleware('role:secretaria')
         ->name('dashboard.secretaria');
 
     // Dashboard Administração
-    Route::get('/administracao/dashboard', \App\Http\Controllers\Dashboard\AdministracaoDashboardController::class)
+    Route::match(['get', 'post'], '/administracao/dashboard', \App\Http\Controllers\Dashboard\AdministracaoDashboardController::class)
         ->middleware('role:administracao')
         ->name('dashboard.administracao');
 
