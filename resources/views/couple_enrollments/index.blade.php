@@ -25,7 +25,18 @@
         <p class="text-xs text-gray-500 mt-1">Gerado em {{ date('d/m/Y H:i') }}</p>
     </div>
 
-    <div class="w-full space-y-6">
+    <div x-data="{ 
+            view: window.innerWidth < 768 ? 'grid' : 'list',
+            updateView() {
+                if (window.innerWidth < 768 && this.view === 'list') {
+                    this.view = 'grid'; 
+                }
+            }
+        }"
+        x-init="$watch('view', value => localStorage.setItem('couple_enrollments_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('couple_enrollments_view') || 'list')"
+        @resize.window.debounce.500ms="updateView()"
+        class="w-full space-y-6">
+
         <!-- Header Actions & Title Card for Desktop -->
         <div class="bg-white dark:bg-gray-800 p-6 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row md:items-center md:justify-between gap-4 print:hidden">
             <div>
@@ -57,7 +68,6 @@
 
         <!-- Top Stats Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 print:hidden">
-            <!-- Total -->
             <div class="bg-white dark:bg-gray-800 p-5 rounded-[2rem] border border-gray-100 dark:border-gray-700/80 shadow-sm flex items-center justify-between">
                 <div>
                     <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">Total Registados</p>
@@ -69,7 +79,6 @@
                 </div>
             </div>
 
-            <!-- Pendentes -->
             <div class="bg-white dark:bg-gray-800 p-5 rounded-[2rem] border border-gray-100 dark:border-gray-700/80 shadow-sm flex items-center justify-between">
                 <div>
                     <p class="text-[10px] font-black uppercase tracking-widest text-amber-500">Pendentes</p>
@@ -81,7 +90,6 @@
                 </div>
             </div>
 
-            <!-- Alocados -->
             <div class="bg-white dark:bg-gray-800 p-5 rounded-[2rem] border border-gray-100 dark:border-gray-700/80 shadow-sm flex items-center justify-between">
                 <div>
                     <p class="text-[10px] font-black uppercase tracking-widest text-emerald-500">Alocados</p>
@@ -93,7 +101,6 @@
                 </div>
             </div>
 
-            <!-- Cursos -->
             <div class="bg-white dark:bg-gray-800 p-5 rounded-[2rem] border border-gray-100 dark:border-gray-700/80 shadow-sm flex items-center justify-between">
                 <div>
                     <p class="text-[10px] font-black uppercase tracking-widest text-blue-500">Cursos Ativos</p>
@@ -106,42 +113,37 @@
             </div>
         </div>
 
-        <!-- Quick Access Banner -->
-        <div class="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 dark:from-orange-600 dark:to-amber-700 rounded-[2rem] p-6 text-white shadow-lg shadow-orange-500/10 print:hidden">
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                <div class="space-y-1">
-                    <span class="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest text-white">
-                        Gestão de Ensino
-                    </span>
-                    <h3 class="text-xl font-black tracking-tight">Atalhos de Cursos e Turmas</h3>
-                    <p class="text-xs font-medium text-orange-100">Gerencie a estrutura de cursos e organize as turmas para alocação de casais.</p>
-                </div>
-                <div class="flex flex-wrap items-center gap-2">
-                    <a href="{{ route('courses.index') }}"
-                        class="px-4 py-2.5 bg-white text-orange-600 hover:bg-orange-50 rounded-xl transition-all text-xs font-black uppercase tracking-wider shadow-sm flex items-center gap-2">
-                        <i class="bi bi-journal-check"></i>
-                        <span>Cursos</span>
-                    </a>
-                    <a href="{{ route('course-classes.index') }}"
-                        class="px-4 py-2.5 bg-black/20 hover:bg-black/30 backdrop-blur-md text-white border border-white/20 rounded-xl transition-all text-xs font-black uppercase tracking-wider flex items-center gap-2">
-                        <i class="bi bi-mortarboard-fill"></i>
-                        <span>Turmas</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Filters Card -->
+        <!-- Filters & View Toggle Card -->
         <div class="bg-white dark:bg-gray-800 p-6 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 print:hidden">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
                 <div>
                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Filtros Avançados</p>
                     <h4 class="text-sm font-black text-gray-900 dark:text-white">Filtrar inscrições por curso, status ou termo</h4>
                 </div>
-                <span class="inline-flex items-center px-3 py-1 rounded-full bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400 text-[10px] font-black uppercase tracking-widest border border-orange-100 dark:border-orange-800/40">
-                    {{ $enrollments->total() }} registos encontrados
-                </span>
+                
+                <div class="flex items-center gap-3">
+                    <!-- View Toggle -->
+                    <div class="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-xl">
+                        <button @click="view = 'list'"
+                            :class="view === 'list' ? 'bg-white dark:bg-gray-600 text-orange-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
+                            class="px-3 py-1.5 rounded-lg transition-all flex items-center gap-1 text-[10px] font-black uppercase">
+                            <i class="bi bi-list-ul"></i>
+                            <span>Lista</span>
+                        </button>
+                        <button @click="view = 'grid'"
+                            :class="view === 'grid' ? 'bg-white dark:bg-gray-600 text-orange-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
+                            class="px-3 py-1.5 rounded-lg transition-all flex items-center gap-1 text-[10px] font-black uppercase">
+                            <i class="bi bi-grid-fill"></i>
+                            <span>Grelha</span>
+                        </button>
+                    </div>
+
+                    <span class="inline-flex items-center px-3 py-1.5 rounded-full bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400 text-[10px] font-black uppercase tracking-widest border border-orange-100 dark:border-orange-800/40">
+                        {{ $enrollments->total() }} registos
+                    </span>
+                </div>
             </div>
+
             <form action="{{ route('couple-enrollments.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div class="relative">
                     <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
@@ -182,8 +184,8 @@
             </form>
         </div>
 
-        <!-- Table Card -->
-        <div class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <!-- Table View (Desktop & List mode) -->
+        <div x-show="view === 'list'" class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
             <div class="px-8 py-5 border-b border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 print:hidden">
                 <div>
                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Inscrições</p>
@@ -209,6 +211,9 @@
                     </thead>
                     <tbody class="divide-y divide-gray-50 dark:divide-gray-700">
                         @forelse($enrollments as $enrollment)
+                            @php
+                                $relLabel = $enrollment->relationship_type === 'namoro' || $enrollment->relationship_type === 'em_relacionamento' ? 'Em relacionamento' : ucfirst(str_replace('_', ' ', $enrollment->relationship_type));
+                            @endphp
                             <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors group">
                                 <td class="px-6 py-5">
                                     <div class="flex items-center gap-3">
@@ -232,7 +237,7 @@
                                 </td>
                                 <td class="px-6 py-5">
                                     <p class="text-xs font-black text-gray-800 dark:text-gray-200 uppercase">
-                                        {{ ucfirst($enrollment->relationship_type) }}
+                                        {{ $relLabel }}
                                     </p>
                                     <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
                                         {{ $enrollment->years_together }} anos juntos
@@ -345,7 +350,6 @@
                                         <i class="bi bi-people text-3xl"></i>
                                     </div>
                                     <p class="text-sm font-black text-gray-400 uppercase tracking-widest">Nenhuma inscrição encontrada</p>
-                                    <p class="text-xs text-gray-400 mt-1">Tente ajustar os filtros de busca no topo.</p>
                                 </td>
                             </tr>
                         @endforelse
@@ -359,5 +363,134 @@
                 </div>
             @endif
         </div>
+
+        <!-- Grid Cards View (Mobile & Grid Mode) -->
+        <div x-show="view === 'grid'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 print:hidden">
+            @forelse($enrollments as $enrollment)
+                @php
+                    $relLabel = $enrollment->relationship_type === 'namoro' || $enrollment->relationship_type === 'em_relacionamento' ? 'Em relacionamento' : ucfirst(str_replace('_', ' ', $enrollment->relationship_type));
+                @endphp
+                <div class="bg-white dark:bg-gray-800 rounded-[2.5rem] p-6 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden">
+                    <div>
+                        <!-- Header with Avatars & Status -->
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white flex items-center justify-center font-black text-lg shadow-md shadow-orange-500/20">
+                                    {{ substr($enrollment->husband_name, 0, 1) }}
+                                </div>
+                                <div class="w-10 h-10 rounded-2xl bg-pink-100 text-pink-600 dark:bg-pink-950 dark:text-pink-300 flex items-center justify-center font-black text-base">
+                                    {{ substr($enrollment->wife_name, 0, 1) }}
+                                </div>
+                            </div>
+
+                            @if($enrollment->course_class_id)
+                                <span class="px-3 py-1 bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-[9px] font-black uppercase rounded-full border border-emerald-200">
+                                    Alocado
+                                </span>
+                            @else
+                                <span class="px-3 py-1 bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 text-[9px] font-black uppercase rounded-full border border-amber-200">
+                                    Pendente
+                                </span>
+                            @endif
+                        </div>
+
+                        <!-- Names & Course -->
+                        <h4 class="text-base font-black text-gray-900 dark:text-white leading-snug">
+                            {{ $enrollment->husband_name }} & {{ $enrollment->wife_name }}
+                        </h4>
+                        <p class="text-xs font-bold text-orange-600 dark:text-orange-400 uppercase mt-0.5 mb-3">
+                            <i class="bi bi-journal-bookmark mr-1"></i>{{ $enrollment->course->name ?? 'N/A' }}
+                        </p>
+
+                        <!-- Details Box -->
+                        <div class="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-4 space-y-2 mb-4 text-xs">
+                            <div class="flex justify-between items-center text-gray-600 dark:text-gray-400">
+                                <span class="font-bold text-[10px] uppercase">Relação:</span>
+                                <span class="font-black text-gray-900 dark:text-white uppercase">{{ $relLabel }} ({{ $enrollment->years_together }} anos)</span>
+                            </div>
+                            <div class="flex justify-between items-center text-gray-600 dark:text-gray-400">
+                                <span class="font-bold text-[10px] uppercase">Turma:</span>
+                                <span class="font-black text-gray-900 dark:text-white uppercase">{{ $enrollment->courseClass->name ?? 'Sem Turma' }}</span>
+                            </div>
+                            @if($enrollment->cell_zone)
+                                <div class="flex justify-between items-center text-gray-600 dark:text-gray-400">
+                                    <span class="font-bold text-[10px] uppercase">Célula / Zona:</span>
+                                    <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $enrollment->cell_zone }}</span>
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- Contacts -->
+                        <div class="space-y-1.5 mb-4">
+                            @if($enrollment->husband_phone)
+                                <a href="tel:{{ $enrollment->husband_phone }}" class="flex items-center gap-2 text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline">
+                                    <i class="bi bi-telephone-fill"></i> Ele: {{ $enrollment->husband_phone }}
+                                </a>
+                            @endif
+                            @if($enrollment->wife_phone)
+                                <a href="tel:{{ $enrollment->wife_phone }}" class="flex items-center gap-2 text-xs font-bold text-pink-600 dark:text-pink-400 hover:underline">
+                                    <i class="bi bi-telephone-fill"></i> Ela: {{ $enrollment->wife_phone }}
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Card Actions Footer -->
+                    <div class="pt-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between gap-2">
+                        @if(!$enrollment->course_class_id)
+                            <div x-data="{ open: false }" class="relative inline-block text-left">
+                                <button @click="open = !open" type="button" class="px-3 py-2 bg-orange-600 text-white rounded-xl text-[10px] font-black uppercase tracking-wider hover:bg-orange-700 shadow-sm flex items-center gap-1">
+                                    <i class="bi bi-person-plus-fill"></i> Alocar
+                                </button>
+                                <div x-show="open" @click.away="open = false" 
+                                     class="absolute left-0 bottom-full mb-2 w-64 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 z-50 p-4 text-left">
+                                    <h5 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Selecionar Turma</h5>
+                                    <form action="{{ route('couple-enrollments.assign-class', $enrollment) }}" method="POST">
+                                        @csrf
+                                        <select name="course_class_id" required class="w-full bg-gray-50 dark:bg-gray-900 border-none rounded-xl text-xs font-bold mb-3 focus:ring-orange-500">
+                                            <option value="">Escolha uma turma...</option>
+                                            @if(is_object($classes) && method_exists($classes, 'where'))
+                                                @foreach($classes->where('course_id', $enrollment->course_id) as $class)
+                                                    <option value="{{ $class->id }}">{{ $class->name }}</option>
+                                                @endforeach
+                                            @endif
+                                        </select>
+                                        <button type="submit" class="w-full bg-orange-600 text-white py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-orange-700">Confirmar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        @else
+                            <span></span>
+                        @endif
+
+                        <div class="flex items-center gap-1.5">
+                            <a href="{{ route('couple-enrollments.show', $enrollment) }}" class="w-8 h-8 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-400 hover:text-purple-600 flex items-center justify-center">
+                                <i class="bi bi-eye-fill"></i>
+                            </a>
+                            <a href="{{ route('couple-enrollments.edit', $enrollment) }}" class="w-8 h-8 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-400 hover:text-blue-600 flex items-center justify-center">
+                                <i class="bi bi-pencil-fill"></i>
+                            </a>
+                            <form action="{{ route('couple-enrollments.destroy', $enrollment) }}" method="POST" onsubmit="return confirm('Remover inscrição?')">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="w-8 h-8 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-400 hover:text-rose-600 flex items-center justify-center">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="col-span-full bg-white dark:bg-gray-800 rounded-[2.5rem] p-16 text-center border border-dashed border-gray-200 dark:border-gray-700">
+                    <i class="bi bi-people text-4xl text-gray-300"></i>
+                    <p class="text-sm font-black text-gray-400 uppercase tracking-widest mt-2">Nenhuma inscrição encontrada</p>
+                </div>
+            @endforelse
+        </div>
+
+        @if($enrollments->hasPages() && false)
+            <div class="px-8 py-6 bg-gray-50 dark:bg-gray-900/30 border-t border-gray-50 dark:border-gray-700 print:hidden">
+                {{ $enrollments->links() }}
+            </div>
+        @endif
     </div>
 @endsection

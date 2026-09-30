@@ -776,8 +776,8 @@
                                 class="field-select @error('relationship_type') is-invalid @enderror" required>
                                 <option value="" disabled {{ old('relationship_type') ? '' : 'selected' }}>Selecione...
                                 </option>
-                                <option value="namoro" {{ old('relationship_type') == 'namoro' ? 'selected' : '' }}>
-                                    Relacionamento / Namoro</option>
+                                <option value="em_relacionamento" {{ old('relationship_type') == 'em_relacionamento' || old('relationship_type') == 'namoro' ? 'selected' : '' }}>
+                                    Em relacionamento</option>
                                 <option value="noivos" {{ old('relationship_type') == 'noivos' ? 'selected' : '' }}>Noivos
                                 </option>
                                 <option value="vivendo_maritalmente" {{ old('relationship_type') == 'vivendo_maritalmente' ? 'selected' : '' }}>Vivendo Maritalmente</option>

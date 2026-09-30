@@ -53,7 +53,7 @@
                             <select name="relationship_type" required
                                 class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition appearance-none">
                                 <option value="" class="bg-gray-900">Selecione...</option>
-                                <option value="namoro" class="bg-gray-900">Em relacionamento (Namoro)</option>
+                                <option value="em_relacionamento" class="bg-gray-900">Em relacionamento</option>
                                 <option value="noivos" class="bg-gray-900">Noivos</option>
                                 <option value="vivendo_maritalmente" class="bg-gray-900">Vivendo Maritalmente</option>
                                 <option value="casados" class="bg-gray-900">Casados (Reciclagem)</option>

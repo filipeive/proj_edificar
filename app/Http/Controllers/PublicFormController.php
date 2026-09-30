@@ -72,7 +72,7 @@ class PublicFormController extends Controller
         $validated = $request->validate([
             'course_id' => 'required|exists:courses,id',
             'couple_name' => 'required|string|max:255',
-            'relationship_type' => 'required|in:namoro,noivos,vivendo_maritalmente,casados',
+            'relationship_type' => 'required|in:em_relacionamento,namoro,noivos,vivendo_maritalmente,casados',
             'address' => 'required|string|max:255',
             'wife_address' => 'nullable|string|max:255',
             'husband_phone' => 'nullable|string|max:30',

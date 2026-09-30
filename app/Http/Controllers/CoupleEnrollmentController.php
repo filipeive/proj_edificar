@@ -209,7 +209,7 @@ class CoupleEnrollmentController extends Controller
             'address' => 'required|string|max:255',
             'wife_address' => 'nullable|string|max:255',
             'contacts' => 'nullable|string|max:255',
-            'relationship_type' => 'required|in:namoro,noivos,vivendo_maritalmente,casados',
+            'relationship_type' => 'required|in:em_relacionamento,namoro,noivos,vivendo_maritalmente,casados',
             'years_together' => 'required|integer|min:0',
             'cell_zone' => 'nullable|string|max:255',
             'leader_name' => 'nullable|string|max:255',

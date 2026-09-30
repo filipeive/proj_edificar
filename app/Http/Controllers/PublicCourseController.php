@@ -85,7 +85,7 @@ class PublicCourseController extends Controller
             'course_id' => 'required|exists:courses,id',
             'husband_name' => 'required|string|max:255',
             'wife_name' => 'required|string|max:255',
-            'relationship_type' => 'required|in:namoro,noivos,vivendo_maritalmente,casados',
+            'relationship_type' => 'required|in:em_relacionamento,namoro,noivos,vivendo_maritalmente,casados',
             'address' => 'required|string|max:255',
             'contacts' => 'required|string|max:255',
             'cell_zone' => 'nullable|string|max:255',

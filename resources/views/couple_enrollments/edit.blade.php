@@ -5,7 +5,7 @@
 @section('page-subtitle', 'Atualizar dados do casal inscrito')
 
 @section('content')
-    <div class="max-w-4xl mx-auto space-y-6">
+    <div class="w-full space-y-6">
         <form action="{{ route('couple-enrollments.update', $coupleEnrollment) }}" method="POST"
             class="bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700">
             @csrf
@@ -70,7 +70,7 @@
                     </div>
 
                     <div class="space-y-3 p-5 bg-gray-50 dark:bg-gray-900/50 rounded-2xl border border-gray-100 dark:border-gray-700"
-                        x-show="relType === 'namoro' || relType === 'noivos'" x-transition>
+                        x-show="relType === 'em_relacionamento' || relType === 'namoro' || relType === 'noivos'" x-transition>
                         <div class="flex items-center gap-2 mb-1">
                             <i class="bi bi-geo-alt-fill text-pink-500"></i>
                             <label class="text-[10px] uppercase font-bold text-gray-500 tracking-widest">Endereço da
@@ -96,9 +96,9 @@
                             Relacionamento</label>
                         <select name="relationship_type" required x-model="relType"
                             class="w-full bg-gray-50 dark:bg-gray-900 border-none rounded-xl font-bold text-gray-800 dark:text-gray-200 focus:ring-orange-500">
-                            @foreach(['namoro', 'noivos', 'vivendo_maritalmente', 'casados'] as $type)
+                            @foreach(['em_relacionamento', 'noivos', 'vivendo_maritalmente', 'casados'] as $type)
                                 <option value="{{ $type }}">
-                                    {{ ucfirst(str_replace('_', ' ', $type === 'namoro' ? 'em relacionamento' : $type)) }}
+                                    {{ ucfirst(str_replace('_', ' ', $type === 'em_relacionamento' ? 'em relacionamento' : ($type === 'namoro' ? 'em relacionamento' : $type))) }}
                                 </option>
                             @endforeach
                         </select>
