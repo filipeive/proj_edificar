@@ -5,33 +5,14 @@
 @section('page-subtitle', 'Gerencie a formação ministerial e cursos da igreja')
 
 @section('header-actions')
-    <div class="flex flex-wrap items-center gap-1.5 print:hidden">
-        @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor' || auth()->user()->role === 'pastor_senior')
+    @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor' || auth()->user()->role === 'pastor_senior')
+        <div class="md:hidden">
             <a href="{{ route('courses.create') }}"
-                class="bg-orange-600 text-white px-3 py-2 md:px-4 md:py-2.5 rounded-xl hover:bg-orange-700 transition-all flex items-center gap-1.5 text-xs font-black uppercase tracking-wider shadow-md shadow-orange-600/20">
-                <i class="bi bi-plus-lg text-sm"></i>
-                <span class="hidden sm:inline">Novo Curso</span>
+                class="text-gray-600 hover:text-orange-600 p-2.5 hover:bg-orange-50 rounded-xl transition-all duration-300 flex items-center justify-center">
+                <i class="bi bi-journal-plus text-2xl"></i>
             </a>
-
-            <a href="{{ route('courses.export-global') }}"
-                class="bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60 px-3 py-2 md:px-4 md:py-2.5 rounded-xl hover:bg-emerald-100 transition-all flex items-center gap-1.5 text-xs font-black uppercase tracking-wider shadow-sm">
-                <i class="bi bi-file-earmark-spreadsheet-fill text-sm"></i>
-                <span class="hidden md:inline">Excel</span>
-            </a>
-
-            <a href="{{ route('courses.export-pdf') }}"
-                class="bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 dark:border-rose-800/60 px-3 py-2 md:px-4 md:py-2.5 rounded-xl hover:bg-rose-100 transition-all flex items-center gap-1.5 text-xs font-black uppercase tracking-wider shadow-sm">
-                <i class="bi bi-file-earmark-pdf-fill text-sm"></i>
-                <span class="hidden md:inline">PDF</span>
-            </a>
-
-            <button onclick="window.print()"
-                class="bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900 px-3 py-2 md:px-4 md:py-2.5 rounded-xl hover:bg-black dark:hover:bg-white transition-all flex items-center gap-1.5 text-xs font-black uppercase tracking-wider shadow-sm">
-                <i class="bi bi-printer-fill text-sm"></i>
-                <span class="hidden md:inline">Imprimir</span>
-            </button>
-        @endif
-    </div>
+        </div>
+    @endif
 @endsection
 
 @section('content')
@@ -43,6 +24,43 @@
     </div>
 
     <div class="w-full space-y-8">
+        <!-- Desktop Header Action Card -->
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row md:items-center md:justify-between gap-4 print:hidden">
+            <div>
+                <p class="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500">Módulo de Ensino</p>
+                <h2 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">Academia & Formação</h2>
+                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mt-0.5">Gerencie os módulos de capacitação e acompanhe inscrições.</p>
+            </div>
+
+            @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor' || auth()->user()->role === 'pastor_senior')
+                <div class="hidden md:flex flex-wrap items-center gap-2">
+                    <a href="{{ route('courses.create') }}"
+                        class="bg-orange-600 text-white px-4 py-2.5 rounded-xl hover:bg-orange-700 transition-all flex items-center gap-2 text-xs font-black uppercase tracking-wider shadow-md shadow-orange-600/20">
+                        <i class="bi bi-plus-lg text-sm"></i>
+                        <span>Novo Curso</span>
+                    </a>
+
+                    <a href="{{ route('courses.export-global') }}"
+                        class="bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60 px-4 py-2.5 rounded-xl hover:bg-emerald-100 transition-all flex items-center gap-2 text-xs font-black uppercase tracking-wider shadow-sm">
+                        <i class="bi bi-file-earmark-spreadsheet-fill text-sm"></i>
+                        <span>Excel</span>
+                    </a>
+
+                    <a href="{{ route('courses.export-pdf') }}"
+                        class="bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 dark:border-rose-800/60 px-4 py-2.5 rounded-xl hover:bg-rose-100 transition-all flex items-center gap-2 text-xs font-black uppercase tracking-wider shadow-sm">
+                        <i class="bi bi-file-earmark-pdf-fill text-sm"></i>
+                        <span>PDF</span>
+                    </a>
+
+                    <button onclick="window.print()"
+                        class="bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900 px-4 py-2.5 rounded-xl hover:bg-black dark:hover:bg-white transition-all flex items-center gap-2 text-xs font-black uppercase tracking-wider shadow-sm">
+                        <i class="bi bi-printer-fill text-sm"></i>
+                        <span>Imprimir</span>
+                    </button>
+                </div>
+            @endif
+        </div>
+
         <!-- Top Stats Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 print:hidden">
             <div class="bg-white dark:bg-gray-800 p-5 rounded-[2rem] border border-gray-100 dark:border-gray-700/80 shadow-sm flex items-center justify-between">

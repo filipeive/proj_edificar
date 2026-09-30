@@ -8,33 +8,14 @@
     @php
         $canManageClasses = !auth()->user()->isPastorZona();
     @endphp
-    <div class="flex flex-wrap items-center gap-1.5 print:hidden">
-        @if($canManageClasses)
+    @if($canManageClasses)
+        <div class="md:hidden">
             <a href="{{ route('course-classes.create', ['course_id' => request('course_id')]) }}"
-                class="bg-orange-600 text-white px-3 py-2 md:px-4 md:py-2.5 rounded-xl hover:bg-orange-700 transition-all flex items-center gap-1.5 text-xs font-black uppercase tracking-wider shadow-md shadow-orange-600/20">
-                <i class="bi bi-plus-lg text-sm"></i>
-                <span class="hidden sm:inline">Nova Turma</span>
+                class="text-gray-600 hover:text-orange-600 p-2.5 hover:bg-orange-50 rounded-xl transition-all duration-300 flex items-center justify-center">
+                <i class="bi bi-plus-circle text-2xl"></i>
             </a>
-
-            <a href="{{ route('course-classes.export-all') }}"
-                class="bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/60 px-3 py-2 md:px-4 md:py-2.5 rounded-xl hover:bg-indigo-100 transition-all flex items-center gap-1.5 text-xs font-black uppercase tracking-wider shadow-sm">
-                <i class="bi bi-file-earmark-spreadsheet-fill text-sm"></i>
-                <span class="hidden md:inline">Excel</span>
-            </a>
-
-            <a href="{{ route('course-classes.export-all-pdf', request()->all()) }}"
-                class="bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 dark:border-rose-800/60 px-3 py-2 md:px-4 md:py-2.5 rounded-xl hover:bg-rose-100 transition-all flex items-center gap-1.5 text-xs font-black uppercase tracking-wider shadow-sm">
-                <i class="bi bi-file-earmark-pdf-fill text-sm"></i>
-                <span class="hidden md:inline">PDF</span>
-            </a>
-
-            <button onclick="window.print()"
-                class="bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900 px-3 py-2 md:px-4 md:py-2.5 rounded-xl hover:bg-black dark:hover:bg-white transition-all flex items-center gap-1.5 text-xs font-black uppercase tracking-wider shadow-sm">
-                <i class="bi bi-printer-fill text-sm"></i>
-                <span class="hidden md:inline">Imprimir</span>
-            </button>
-        @endif
-    </div>
+        </div>
+    @endif
 @endsection
 
 @section('content')
@@ -65,6 +46,43 @@
         x-init="$watch('view', value => localStorage.setItem('course_classes_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('course_classes_view') || 'list')"
         @resize.window.debounce.500ms="updateView()"
         class="w-full space-y-6">
+
+        <!-- Desktop Header Action Card -->
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row md:items-center md:justify-between gap-4 print:hidden">
+            <div>
+                <p class="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500">Módulo de Ensino</p>
+                <h2 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">Gestão de Turmas</h2>
+                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mt-0.5">Organização de turmas ativas, líderes e acompanhamento de alunos.</p>
+            </div>
+
+            @if($canManageClasses)
+                <div class="hidden md:flex flex-wrap items-center gap-2">
+                    <a href="{{ route('course-classes.create', ['course_id' => request('course_id')]) }}"
+                        class="bg-orange-600 text-white px-4 py-2.5 rounded-xl hover:bg-orange-700 transition-all flex items-center gap-2 text-xs font-black uppercase tracking-wider shadow-md shadow-orange-600/20">
+                        <i class="bi bi-plus-lg text-sm"></i>
+                        <span>Nova Turma</span>
+                    </a>
+
+                    <a href="{{ route('course-classes.export-all') }}"
+                        class="bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/60 px-4 py-2.5 rounded-xl hover:bg-indigo-100 transition-all flex items-center gap-2 text-xs font-black uppercase tracking-wider shadow-sm">
+                        <i class="bi bi-file-earmark-spreadsheet-fill text-sm"></i>
+                        <span>Excel</span>
+                    </a>
+
+                    <a href="{{ route('course-classes.export-all-pdf', request()->all()) }}"
+                        class="bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 dark:border-rose-800/60 px-4 py-2.5 rounded-xl hover:bg-rose-100 transition-all flex items-center gap-2 text-xs font-black uppercase tracking-wider shadow-sm">
+                        <i class="bi bi-file-earmark-pdf-fill text-sm"></i>
+                        <span>PDF</span>
+                    </a>
+
+                    <button onclick="window.print()"
+                        class="bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900 px-4 py-2.5 rounded-xl hover:bg-black dark:hover:bg-white transition-all flex items-center gap-2 text-xs font-black uppercase tracking-wider shadow-sm">
+                        <i class="bi bi-printer-fill text-sm"></i>
+                        <span>Imprimir</span>
+                    </button>
+                </div>
+            @endif
+        </div>
 
         <!-- Top Stats Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 print:hidden">
