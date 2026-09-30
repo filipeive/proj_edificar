@@ -86,7 +86,17 @@ class CoupleEnrollmentController extends Controller
         }
 
         $enrollments = $query->get();
+        
         $title = 'Relatório de Inscrições Públicas (Casais)';
+        if ($request->filled('course_id')) {
+            $selectedCourse = Course::find($request->course_id);
+            if ($selectedCourse) {
+                $title .= ' - ' . $selectedCourse->name;
+            }
+        }
+        if ($request->filled('status')) {
+            $title .= ' (' . ($request->status === 'approved' ? 'Alocados em Turma' : 'Aguardando Turma') . ')';
+        }
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('couple_enrollments.pdf', compact('enrollments', 'title'))
             ->setPaper('a4', 'landscape');
@@ -134,12 +144,26 @@ class CoupleEnrollmentController extends Controller
         }
 
         if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            if ($request->status === 'pending') {
+                $query->whereNull('course_class_id');
+            } elseif ($request->status === 'approved') {
+                $query->whereNotNull('course_class_id');
+            } else {
+                $query->where('status', $request->status);
+            }
         }
 
         $enrollments = $query->get();
 
-        $response = new StreamedResponse(function () use ($enrollments) {
+        $relTypes = [
+            'namoro' => 'Em relacionamento',
+            'em_relacionamento' => 'Em relacionamento',
+            'noivos' => 'Noivos',
+            'vivendo_maritalmente' => 'Vivendo Maritalmente',
+            'casados' => 'Casados',
+        ];
+
+        $response = new StreamedResponse(function () use ($enrollments, $relTypes) {
             $handle = fopen('php://output', 'w');
             fputcsv($handle, [
                 'ID',
@@ -162,12 +186,13 @@ class CoupleEnrollmentController extends Controller
             ]);
 
             foreach ($enrollments as $enrollment) {
+                $relLabel = $relTypes[$enrollment->relationship_type] ?? ucfirst(str_replace('_', ' ', $enrollment->relationship_type));
                 fputcsv($handle, [
                     $enrollment->id,
-                    $enrollment->course->name,
+                    $enrollment->course->name ?? 'N/A',
                     $enrollment->husband_name,
                     $enrollment->wife_name,
-                    $enrollment->relationship_type,
+                    $relLabel,
                     $enrollment->address,
                     $enrollment->wife_address ?? '',
                     $enrollment->husband_phone ?? '',
@@ -178,7 +203,7 @@ class CoupleEnrollmentController extends Controller
                     $enrollment->leader_name,
                     $enrollment->is_church_member === 'both' ? 'Ambos' : ($enrollment->is_church_member === 'one' ? '1 de nós' : 'Não'),
                     $enrollment->courseClass->name ?? 'Não alocado',
-                    $enrollment->status,
+                    $enrollment->course_class_id ? 'Alocado' : 'Pendente',
                     $enrollment->created_at->format('d/m/Y H:i')
                 ]);
             }

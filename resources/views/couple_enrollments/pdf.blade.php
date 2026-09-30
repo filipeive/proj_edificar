@@ -51,7 +51,17 @@
                     </td>
                     <td>{{ $enrollment->course->name ?? 'N/A' }}</td>
                     <td>
-                        {{ ucfirst($enrollment->relationship_type) }}
+                        @php
+                            $relTypes = [
+                                'namoro' => 'Em relacionamento',
+                                'em_relacionamento' => 'Em relacionamento',
+                                'noivos' => 'Noivos',
+                                'vivendo_maritalmente' => 'Vivendo Maritalmente',
+                                'casados' => 'Casados',
+                            ];
+                            $relLabel = $relTypes[$enrollment->relationship_type] ?? ucfirst(str_replace('_', ' ', $enrollment->relationship_type));
+                        @endphp
+                        {{ $relLabel }}
                         <br><span style="font-size: 8px; color: #6b7280;">{{ $enrollment->years_together }} anos juntos</span>
                     </td>
                     <td>
