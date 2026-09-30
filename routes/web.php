@@ -491,6 +491,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('couple-enrollments/{couple_enrollment}', [\App\Http\Controllers\CoupleEnrollmentController::class, 'destroy'])->name('couple-enrollments.destroy');
         Route::post('couple-enrollments/{couple_enrollment}/assign-class', [\App\Http\Controllers\CoupleEnrollmentController::class, 'assignClass'])->name('couple-enrollments.assign-class');
         Route::get('couple-enrollments-export', [\App\Http\Controllers\CoupleEnrollmentController::class, 'export'])->name('couple-enrollments.export');
+        Route::get('couple-enrollments-export-pdf', [\App\Http\Controllers\CoupleEnrollmentController::class, 'exportPdf'])->name('couple-enrollments.export-pdf');
 
         // Ministerial Enrollments
         Route::get('ministerial-enrollments', [\App\Http\Controllers\MinisterialEnrollmentController::class, 'index'])->name('ministerial-enrollments.index');

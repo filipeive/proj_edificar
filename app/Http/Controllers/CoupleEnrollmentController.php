@@ -21,7 +21,13 @@ class CoupleEnrollmentController extends Controller
         }
 
         if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            if ($request->status === 'pending') {
+                $query->whereNull('course_class_id');
+            } elseif ($request->status === 'approved') {
+                $query->whereNotNull('course_class_id');
+            } else {
+                $query->where('status', $request->status);
+            }
         }
 
         if ($request->filled('search')) {
@@ -39,7 +45,53 @@ class CoupleEnrollmentController extends Controller
         $courses = Course::orderBy('name')->get();
         $classes = CourseClass::orderBy('name')->get();
 
-        return view('couple_enrollments.index', compact('enrollments', 'courses', 'classes'));
+        $stats = [
+            'total' => CoupleEnrollment::count(),
+            'pending' => CoupleEnrollment::whereNull('course_class_id')->count(),
+            'assigned' => CoupleEnrollment::whereNotNull('course_class_id')->count(),
+            'courses' => Course::has('coupleEnrollments')->count(),
+        ];
+
+        return view('couple_enrollments.index', compact('enrollments', 'courses', 'classes', 'stats'));
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $query = CoupleEnrollment::with(['course', 'courseClass'])
+            ->orderBy('created_at', 'desc');
+
+        if ($request->filled('course_id')) {
+            $query->where('course_id', $request->course_id);
+        }
+
+        if ($request->filled('status')) {
+            if ($request->status === 'pending') {
+                $query->whereNull('course_class_id');
+            } elseif ($request->status === 'approved') {
+                $query->whereNotNull('course_class_id');
+            } else {
+                $query->where('status', $request->status);
+            }
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('husband_name', 'like', "%{$search}%")
+                    ->orWhere('wife_name', 'like', "%{$search}%")
+                    ->orWhere('contacts', 'like', "%{$search}%")
+                    ->orWhere('husband_phone', 'like', "%{$search}%")
+                    ->orWhere('wife_phone', 'like', "%{$search}%");
+            });
+        }
+
+        $enrollments = $query->get();
+        $title = 'Relatório de Inscrições Públicas (Casais)';
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('couple_enrollments.pdf', compact('enrollments', 'title'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->download('relatorio_inscricoes_casais_' . date('Ymd_His') . '.pdf');
     }
 
     public function show(CoupleEnrollment $coupleEnrollment)
