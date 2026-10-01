@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // ===== 1. NO-FLICKER TOAST NOTIFICATIONS FOR PDF & DOCUMENT DOWNLOADS =====
+    // ===== 1. TOAST UTILITY FOR APP NOTIFICATIONS =====
     const Toast = Swal.mixin({
         toast: true,
         position: 'top-end',
@@ -78,71 +78,6 @@ document.addEventListener('DOMContentLoaded', function () {
         timerProgressBar: true,
         background: '#0f172a',
         color: '#f8fafc',
-    });
-
-    document.addEventListener('click', function (e) {
-        const link = e.target.closest('a[href]');
-        if (!link) return;
-
-        const href = link.getAttribute('href');
-        if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
-
-        const isPdfOrReport = href.includes('/pdf') ||
-            href.includes('/export') ||
-            href.includes('/report') ||
-            href.includes('/download') ||
-            link.hasAttribute('download');
-
-        if (isPdfOrReport) {
-            e.preventDefault();
-
-            Toast.fire({
-                icon: 'info',
-                title: 'A descarregar documento...'
-            });
-
-            fetch(href, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-                .then(res => {
-                    if (!res.ok) throw new Error('Falha ao descarregar documento.');
-                    const disposition = res.headers.get('Content-Disposition');
-                    let filename = 'documento.pdf';
-                    if (disposition && disposition.indexOf('filename=') !== -1) {
-                        const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(disposition);
-                        if (matches != null && matches[1]) {
-                            filename = matches[1].replace(/['"]/g, '');
-                        }
-                    } else if (href.includes('.pdf')) {
-                        filename = href.split('/').pop().split('?')[0] || 'relatorio.pdf';
-                    }
-                    return res.blob().then(blob => ({ blob, filename }));
-                })
-                .then(({ blob, filename }) => {
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.style.display = 'none';
-                    a.href = url;
-                    a.download = filename;
-                    document.body.appendChild(a);
-                    a.click();
-                    setTimeout(() => {
-                        document.body.removeChild(a);
-                        window.URL.revokeObjectURL(url);
-                    }, 1000);
-
-                    Toast.fire({
-                        icon: 'success',
-                        title: `Ficheiro ${filename} guardado!`
-                    });
-                })
-                .catch(err => {
-                    console.error('Download error:', err);
-                    window.location.href = href;
-                });
-        }
     });
 
     // ===== 2. OFFLINE DETECTOR & AUTOMATIC SYNCHRONIZATION QUEUE =====
