@@ -46,6 +46,7 @@
             </div>
             
             <div class="hidden md:flex flex-wrap items-center gap-2">
+
                 <a href="{{ route('couple-enrollments.export', request()->all()) }}"
                     class="bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60 px-4 py-2.5 rounded-xl hover:bg-emerald-100 transition-all flex items-center gap-2 text-xs font-black uppercase tracking-wider shadow-sm">
                     <i class="bi bi-file-earmark-spreadsheet-fill text-base"></i>
@@ -365,97 +366,98 @@
         </div>
 
         <!-- Grid Cards View (Mobile & Grid Mode) -->
-        <div x-show="view === 'grid'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 print:hidden">
+        <div x-show="view === 'grid'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 print:hidden">
             @forelse($enrollments as $enrollment)
                 @php
                     $relLabel = $enrollment->relationship_type === 'namoro' || $enrollment->relationship_type === 'em_relacionamento' ? 'Em relacionamento' : ucfirst(str_replace('_', ' ', $enrollment->relationship_type));
                 @endphp
-                <div class="bg-white dark:bg-gray-800 rounded-[2.5rem] p-6 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-700/80 shadow-sm hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden">
                     <div>
-                        <!-- Header with Avatars & Status -->
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="flex items-center gap-2">
-                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white flex items-center justify-center font-black text-lg shadow-md shadow-orange-500/20">
+                        <!-- Compact Header with Avatars & Status Badge -->
+                        <div class="flex justify-between items-center mb-2.5">
+                            <div class="flex items-center -space-x-1.5">
+                                <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 text-white flex items-center justify-center font-black text-xs ring-2 ring-white dark:ring-gray-800 shadow-sm">
                                     {{ substr($enrollment->husband_name, 0, 1) }}
                                 </div>
-                                <div class="w-10 h-10 rounded-2xl bg-pink-100 text-pink-600 dark:bg-pink-950 dark:text-pink-300 flex items-center justify-center font-black text-base">
+                                <div class="w-7 h-7 rounded-xl bg-pink-500 text-white flex items-center justify-center font-black text-[11px] ring-2 ring-white dark:ring-gray-800 shadow-sm">
                                     {{ substr($enrollment->wife_name, 0, 1) }}
                                 </div>
                             </div>
 
                             @if($enrollment->course_class_id)
-                                <span class="px-3 py-1 bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-[9px] font-black uppercase rounded-full border border-emerald-200">
+                                <span class="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 text-[9px] font-black uppercase rounded-full border border-emerald-200/60 dark:border-emerald-800/40">
                                     Alocado
                                 </span>
                             @else
-                                <span class="px-3 py-1 bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 text-[9px] font-black uppercase rounded-full border border-amber-200">
+                                <span class="px-2.5 py-0.5 bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 text-[9px] font-black uppercase rounded-full border border-amber-200/60 dark:border-amber-800/40">
                                     Pendente
                                 </span>
                             @endif
                         </div>
 
                         <!-- Names & Course -->
-                        <h4 class="text-base font-black text-gray-900 dark:text-white leading-snug">
-                            {{ $enrollment->husband_name }} & {{ $enrollment->wife_name }}
+                        <h4 class="text-sm font-black text-gray-900 dark:text-white leading-tight">
+                            {{ $enrollment->husband_name }} <span class="text-gray-400 font-medium">&</span> {{ $enrollment->wife_name }}
                         </h4>
-                        <p class="text-xs font-bold text-orange-600 dark:text-orange-400 uppercase mt-0.5 mb-3">
-                            <i class="bi bi-journal-bookmark mr-1"></i>{{ $enrollment->course->name ?? 'N/A' }}
+                        <p class="text-[11px] font-bold text-orange-600 dark:text-orange-400 uppercase mt-0.5 mb-2.5 flex items-center gap-1">
+                            <i class="bi bi-journal-bookmark text-xs"></i>
+                            <span class="truncate">{{ $enrollment->course->name ?? 'N/A' }}</span>
                         </p>
 
-                        <!-- Details Box -->
-                        <div class="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-4 space-y-2 mb-4 text-xs">
+                        <!-- Compact Info Grid -->
+                        <div class="bg-gray-50/80 dark:bg-gray-900/60 rounded-xl p-2.5 space-y-1 mb-2.5 text-[11px]">
                             <div class="flex justify-between items-center text-gray-600 dark:text-gray-400">
-                                <span class="font-bold text-[10px] uppercase">Relação:</span>
-                                <span class="font-black text-gray-900 dark:text-white uppercase">{{ $relLabel }} ({{ $enrollment->years_together }} anos)</span>
+                                <span class="font-bold text-[9px] uppercase tracking-wider text-gray-400">Relação:</span>
+                                <span class="font-bold text-gray-800 dark:text-gray-200">{{ $relLabel }} ({{ $enrollment->years_together }}a)</span>
                             </div>
                             <div class="flex justify-between items-center text-gray-600 dark:text-gray-400">
-                                <span class="font-bold text-[10px] uppercase">Turma:</span>
-                                <span class="font-black text-gray-900 dark:text-white uppercase">{{ $enrollment->courseClass->name ?? 'Sem Turma' }}</span>
+                                <span class="font-bold text-[9px] uppercase tracking-wider text-gray-400">Turma:</span>
+                                <span class="font-bold text-gray-900 dark:text-white">{{ $enrollment->courseClass->name ?? 'Sem Turma' }}</span>
                             </div>
                             @if($enrollment->cell_zone)
                                 <div class="flex justify-between items-center text-gray-600 dark:text-gray-400">
-                                    <span class="font-bold text-[10px] uppercase">Célula / Zona:</span>
-                                    <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $enrollment->cell_zone }}</span>
+                                    <span class="font-bold text-[9px] uppercase tracking-wider text-gray-400">Célula:</span>
+                                    <span class="font-medium text-gray-700 dark:text-gray-300 truncate max-w-[140px]">{{ $enrollment->cell_zone }}</span>
                                 </div>
                             @endif
                         </div>
 
-                        <!-- Contacts -->
-                        <div class="space-y-1.5 mb-4">
+                        <!-- Phones -->
+                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mb-3 text-[11px]">
                             @if($enrollment->husband_phone)
-                                <a href="tel:{{ $enrollment->husband_phone }}" class="flex items-center gap-2 text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline">
-                                    <i class="bi bi-telephone-fill"></i> Ele: {{ $enrollment->husband_phone }}
+                                <a href="tel:{{ $enrollment->husband_phone }}" class="inline-flex items-center gap-1 font-bold text-blue-600 dark:text-blue-400 hover:underline">
+                                    <i class="bi bi-telephone-fill text-[10px]"></i> {{ $enrollment->husband_phone }}
                                 </a>
                             @endif
                             @if($enrollment->wife_phone)
-                                <a href="tel:{{ $enrollment->wife_phone }}" class="flex items-center gap-2 text-xs font-bold text-pink-600 dark:text-pink-400 hover:underline">
-                                    <i class="bi bi-telephone-fill"></i> Ela: {{ $enrollment->wife_phone }}
+                                <a href="tel:{{ $enrollment->wife_phone }}" class="inline-flex items-center gap-1 font-bold text-pink-600 dark:text-pink-400 hover:underline">
+                                    <i class="bi bi-person-heart text-[10px]"></i> {{ $enrollment->wife_phone }}
                                 </a>
                             @endif
                         </div>
                     </div>
 
-                    <!-- Card Actions Footer -->
-                    <div class="pt-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between gap-2">
+                    <!-- Actions Footer -->
+                    <div class="pt-2.5 border-t border-gray-100 dark:border-gray-700/60 flex items-center justify-between gap-2">
                         @if(!$enrollment->course_class_id)
                             <div x-data="{ open: false }" class="relative inline-block text-left">
-                                <button @click="open = !open" type="button" class="px-3 py-2 bg-orange-600 text-white rounded-xl text-[10px] font-black uppercase tracking-wider hover:bg-orange-700 shadow-sm flex items-center gap-1">
+                                <button @click="open = !open" type="button" class="px-2.5 py-1.5 bg-orange-600 text-white rounded-lg text-[9px] font-black uppercase tracking-wider hover:bg-orange-700 shadow-sm flex items-center gap-1">
                                     <i class="bi bi-person-plus-fill"></i> Alocar
                                 </button>
                                 <div x-show="open" @click.away="open = false" 
-                                     class="absolute left-0 bottom-full mb-2 w-64 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 z-50 p-4 text-left">
-                                    <h5 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Selecionar Turma</h5>
+                                     class="absolute left-0 bottom-full mb-2 w-60 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700 z-50 p-3 text-left">
+                                    <h5 class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Selecionar Turma</h5>
                                     <form action="{{ route('couple-enrollments.assign-class', $enrollment) }}" method="POST">
                                         @csrf
-                                        <select name="course_class_id" required class="w-full bg-gray-50 dark:bg-gray-900 border-none rounded-xl text-xs font-bold mb-3 focus:ring-orange-500">
-                                            <option value="">Escolha uma turma...</option>
+                                        <select name="course_class_id" required class="w-full bg-gray-50 dark:bg-gray-900 border-none rounded-lg text-xs font-bold mb-2 focus:ring-orange-500">
+                                            <option value="">Escolha a turma...</option>
                                             @if(is_object($classes) && method_exists($classes, 'where'))
                                                 @foreach($classes->where('course_id', $enrollment->course_id) as $class)
                                                     <option value="{{ $class->id }}">{{ $class->name }}</option>
                                                 @endforeach
                                             @endif
                                         </select>
-                                        <button type="submit" class="w-full bg-orange-600 text-white py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-orange-700">Confirmar</button>
+                                        <button type="submit" class="w-full bg-orange-600 text-white py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-orange-700">Confirmar</button>
                                     </form>
                                 </div>
                             </div>
@@ -463,16 +465,16 @@
                             <span></span>
                         @endif
 
-                        <div class="flex items-center gap-1.5">
-                            <a href="{{ route('couple-enrollments.show', $enrollment) }}" class="w-8 h-8 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-400 hover:text-purple-600 flex items-center justify-center">
+                        <div class="flex items-center gap-1">
+                            <a href="{{ route('couple-enrollments.show', $enrollment) }}" class="w-7 h-7 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-400 hover:text-purple-600 hover:bg-purple-50 flex items-center justify-center text-xs">
                                 <i class="bi bi-eye-fill"></i>
                             </a>
-                            <a href="{{ route('couple-enrollments.edit', $enrollment) }}" class="w-8 h-8 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-400 hover:text-blue-600 flex items-center justify-center">
+                            <a href="{{ route('couple-enrollments.edit', $enrollment) }}" class="w-7 h-7 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-400 hover:text-blue-600 hover:bg-blue-50 flex items-center justify-center text-xs">
                                 <i class="bi bi-pencil-fill"></i>
                             </a>
                             <form action="{{ route('couple-enrollments.destroy', $enrollment) }}" method="POST" onsubmit="return confirm('Remover inscrição?')">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="w-8 h-8 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-400 hover:text-rose-600 flex items-center justify-center">
+                                <button type="submit" class="w-7 h-7 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center text-xs">
                                     <i class="bi bi-trash-fill"></i>
                                 </button>
                             </form>
@@ -480,7 +482,7 @@
                     </div>
                 </div>
             @empty
-                <div class="col-span-full bg-white dark:bg-gray-800 rounded-[2.5rem] p-16 text-center border border-dashed border-gray-200 dark:border-gray-700">
+                <div class="col-span-full bg-white dark:bg-gray-800 rounded-2xl p-12 text-center border border-dashed border-gray-200 dark:border-gray-700">
                     <i class="bi bi-people text-4xl text-gray-300"></i>
                     <p class="text-sm font-black text-gray-400 uppercase tracking-widest mt-2">Nenhuma inscrição encontrada</p>
                 </div>

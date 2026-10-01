@@ -1,70 +1,158 @@
 <!DOCTYPE html>
 <html lang="pt">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Life Church - Offline</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sem Conexão - Life App</title>
     <style>
-      body {
-        margin: 0;
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        background: #0b0b0b;
-        color: #fff;
-        display: flex;
-        min-height: 100vh;
-        align-items: center;
-        justify-content: center;
-        padding: 24px;
-      }
-      .card {
-        max-width: 480px;
-        width: 100%;
-        background: #111;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 24px;
-        padding: 32px;
-        text-align: center;
-      }
-      .badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: rgba(249, 115, 22, 0.15);
-        color: #f97316;
-        padding: 6px 12px;
-        border-radius: 999px;
-        font-weight: 700;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        font-size: 10px;
-      }
-      h1 {
-        margin: 16px 0 12px;
-        font-size: 28px;
-        letter-spacing: -0.02em;
-      }
-      p {
-        margin: 0 0 24px;
-        color: #c7c7c7;
-        line-height: 1.6;
-      }
-      button {
-        background: #f97316;
-        color: #fff;
-        border: 0;
-        padding: 12px 18px;
-        border-radius: 14px;
-        font-weight: 700;
-        cursor: pointer;
-      }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 24px;
+            text-align: center;
+        }
+        .card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 32px;
+            padding: 40px 28px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .icon-container {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, rgba(234, 88, 12, 0.2), rgba(245, 158, 11, 0.1));
+            border: 1px solid rgba(234, 88, 12, 0.3);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            color: #f97316;
+        }
+        .icon-container svg {
+            width: 40px;
+            height: 40px;
+        }
+        h1 {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+            color: #ffffff;
+        }
+        p {
+            font-size: 14px;
+            color: #94a3b8;
+            line-height: 1.6;
+            margin-bottom: 28px;
+            font-weight: 500;
+        }
+        .btn-retry {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #ea580c, #f97316);
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 16px 28px;
+            border-radius: 18px;
+            border: none;
+            width: 100%;
+            cursor: pointer;
+            box-shadow: 0 10px 25px -5px rgba(234, 88, 12, 0.4);
+            transition: all 0.2s ease;
+        }
+        .btn-retry:active {
+            transform: scale(0.97);
+            box-shadow: 0 5px 15px -3px rgba(234, 88, 12, 0.4);
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-top: 20px;
+        }
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #ef4444;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.85); }
+        }
     </style>
-  </head>
-  <body>
+</head>
+<body>
     <div class="card">
-      <div class="badge">Offline</div>
-      <h1>Sem conexão</h1>
-      <p>Não foi possível conectar. Verifique sua internet e tente novamente.</p>
-      <button onclick="location.reload()">Tentar novamente</button>
+        <div class="icon-container">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.657a9 9 0 01-2.121-3.536M3 3l18 18"></path>
+            </svg>
+        </div>
+        
+        <h1>Sem Conexão à Internet</h1>
+        <p>Não foi possível carregar o sistema <strong>Life App</strong>. Por favor, verifique se a sua ligação Wi-Fi ou dados móveis está ativa.</p>
+
+        <button class="btn-retry" onclick="retryConnection()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            Tentar Novamente
+        </button>
+
+        <div class="status-badge">
+            <span class="dot" id="statusDot"></span>
+            <span id="statusText">Aguardando Rede</span>
+        </div>
     </div>
-  </body>
+
+    <script>
+        const TARGET_URL = "http://146.235.224.99/edificar/";
+
+        function retryConnection() {
+            const btn = document.querySelector('.btn-retry');
+            btn.style.opacity = '0.7';
+            btn.innerText = 'A Conectar...';
+            window.location.href = TARGET_URL;
+        }
+
+        window.addEventListener('online', function() {
+            document.getElementById('statusDot').style.backgroundColor = '#10b981';
+            document.getElementById('statusText').innerText = 'Rede Detetada! A carregar...';
+            setTimeout(retryConnection, 500);
+        });
+    </script>
+</body>
 </html>

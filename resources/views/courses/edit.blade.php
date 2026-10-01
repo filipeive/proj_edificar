@@ -5,15 +5,15 @@
 @section('page-subtitle', 'Atualize as informações do curso')
 
 @section('content')
-    <div class="container-fluid">
-        <div class="mb-6">
+    <div class="w-full">
+        <div class="w-full mx-auto">
             <a href="{{ route('courses.index') }}"
                 class="text-gray-600 hover:text-orange-600 flex items-center transition font-semibold">
                 <i class="bi bi-arrow-left mr-2"></i> Voltar para Lista
             </a>
         </div>
 
-        <div class="max-w-3xl mx-auto">
+        <div class="w-full mx-auto">
             <form action="{{ route('courses.update', $course) }}" method="POST"
                 class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 @csrf
