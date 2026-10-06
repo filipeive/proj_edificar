@@ -152,10 +152,11 @@ class PublicFormController extends Controller
             $enrollmentData['course_class_id'] = $validated['course_class_id'];
         }
 
-        CoupleEnrollment::create($enrollmentData);
+        $enrollment = CoupleEnrollment::create($enrollmentData);
 
         return redirect()->route('public.forms.pre-marital')
-            ->with('success', 'Inscrição enviada com sucesso! Entraremos em contacto em breve.');
+            ->with('success', 'Inscrição enviada com sucesso! Entraremos em contacto em breve.')
+            ->with('enrollment_success', $enrollment->id);
     }
 
     public function showQuarterlyReportForm()

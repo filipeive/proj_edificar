@@ -85,7 +85,8 @@ document.addEventListener('DOMContentLoaded', function () {
         if (document.getElementById('offline-banner')) return;
         const banner = document.createElement('div');
         banner.id = 'offline-banner';
-        banner.className = 'fixed top-0 left-0 right-0 z-[10000] bg-amber-500 text-slate-950 font-bold text-xs py-2 px-4 text-center shadow-lg transition-transform duration-300 transform -translate-y-full flex items-center justify-center gap-2';
+        banner.style.display = 'none';
+        banner.className = 'fixed top-0 left-0 right-0 z-[10000] bg-amber-500 text-slate-950 font-bold text-xs py-2.5 px-4 text-center shadow-lg flex items-center justify-center gap-2 transition-all duration-300';
         banner.innerHTML = '<i class="bi bi-wifi-off text-base"></i> <span>Modo Offline: Suas alterações serão guardadas e sincronizadas ao reconectar à internet.</span>';
         document.body.appendChild(banner);
     }
@@ -96,11 +97,9 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!banner) return;
 
         if (!navigator.onLine) {
-            banner.classList.remove('-translate-y-full');
-            banner.classList.add('translate-y-0');
+            banner.style.display = 'flex';
         } else {
-            banner.classList.remove('translate-y-0');
-            banner.classList.add('-translate-y-full');
+            banner.style.display = 'none';
             syncOfflineQueue();
         }
     }

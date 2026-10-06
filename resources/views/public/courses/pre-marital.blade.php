@@ -728,7 +728,17 @@
 
         {{-- ══ ALERTS (Hidden, handled by SweetAlert) ══ --}}
         @if(session('success'))
-            <div id="swal-success" data-message="{{ session('success') }}" style="display:none;"></div>
+            @php
+                $createdEnrollment = session('enrollment_success') ? \App\Models\CoupleEnrollment::find(session('enrollment_success')) : null;
+            @endphp
+            <div id="swal-success"
+                data-message="{{ session('success') }}"
+                data-husband="{{ $createdEnrollment->husband_name ?? '' }}"
+                data-wife="{{ $createdEnrollment->wife_name ?? '' }}"
+                data-phone="{{ $createdEnrollment->husband_phone ?? $createdEnrollment->wife_phone ?? '' }}"
+                data-id="{{ $createdEnrollment->id ?? '' }}"
+                data-course="{{ $course->name }}"
+                style="display:none;"></div>
         @endif
 
         @if ($errors->any())
@@ -1272,14 +1282,44 @@
             // Success Alert
             const successEl = document.getElementById('swal-success');
             if (successEl) {
+                const husband = successEl.dataset.husband;
+                const wife = successEl.dataset.wife;
+                const phone = successEl.dataset.phone;
+                const id = successEl.dataset.id;
+                const course = successEl.dataset.course;
+
+                let htmlContent = `
+                    <div style="text-align: center; padding: 10px 0;">
+                        <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 16px; padding: 16px; margin-bottom: 16px;">
+                            <div style="color: #10b981; font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px;">Comprovativo Nº #${id ? String(id).padStart(4, '0') : 'REGISTADO'}</div>
+                            <div style="color: #ffffff; font-size: 15px; font-weight: 800;">${husband ? husband + ' & ' + wife : 'Inscrição Confirmada'}</div>
+                            <div style="color: #f97316; font-size: 12px; font-weight: 700; margin-top: 4px;">${course}</div>
+                        </div>
+                        <p style="color: #94a3b8; font-size: 12.5px; line-height: 1.5; margin-bottom: 8px;">A vossa inscrição foi efetuada com sucesso! Guardem o comprovativo ou enviem a confirmação para a secretaria pelo WhatsApp.</p>
+                    </div>
+                `;
+
+                let rawPhone = phone ? phone.replace(/\D/g, '') : '';
+                let waText = encodeURIComponent(`Graça e Paz! Confirmamos a inscrição do casal ${husband} & ${wife} no curso ${course} (Ref #${id ? String(id).padStart(4, '0') : ''}). Portal Life Church.`);
+                let waUrl = rawPhone ? `https://api.whatsapp.com/send?phone=${rawPhone}&text=${waText}` : `https://api.whatsapp.com/send?text=${waText}`;
+
                 Swal.fire({
                     ...swalConfig,
                     icon: 'success',
                     iconColor: '#10b981',
-                    title: 'Sucesso!',
-                    text: successEl.dataset.message,
-                    timer: 5000,
-                    timerProgressBar: true
+                    title: 'Inscrição Efetuada com Sucesso!',
+                    html: htmlContent,
+                    showCancelButton: true,
+                    confirmButtonText: '<i class="bi bi-whatsapp" style="margin-right: 6px;"></i> Notificar por WhatsApp',
+                    cancelButtonText: '<i class="bi bi-printer" style="margin-right: 6px;"></i> Imprimir',
+                    confirmButtonColor: '#25D366',
+                    cancelButtonColor: '#334155',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.open(waUrl, '_blank');
+                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                        window.print();
+                    }
                 });
             }
 

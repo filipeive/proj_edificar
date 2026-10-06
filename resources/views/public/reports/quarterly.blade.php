@@ -326,6 +326,15 @@
                                 ];
                             @endphp
 
+                            @php
+                                $peerCheckedDarkStyles = [
+                                    'blue' => 'peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:shadow-lg peer-checked:shadow-blue-900/40 hover:border-blue-400',
+                                    'red' => 'peer-checked:bg-rose-600 peer-checked:text-white peer-checked:border-rose-500 peer-checked:shadow-lg peer-checked:shadow-rose-900/40 hover:border-rose-400',
+                                    'green' => 'peer-checked:bg-emerald-600 peer-checked:text-white peer-checked:border-emerald-500 peer-checked:shadow-lg peer-checked:shadow-emerald-900/40 hover:border-emerald-400',
+                                    'purple' => 'peer-checked:bg-purple-600 peer-checked:text-white peer-checked:border-purple-500 peer-checked:shadow-lg peer-checked:shadow-purple-900/40 hover:border-purple-400',
+                                ];
+                            @endphp
+
                             @foreach($sections as $id => $section)
                                 <div class="space-y-6">
                                     <h3
@@ -338,18 +347,16 @@
                                             <div
                                                 class="space-y-4 p-6 bg-white/5 rounded-[2rem] hover:bg-white/10 transition-all border border-white/10 group">
                                                 <p
-                                                    class="text-sm font-black text-gray-200 group-hover:text-{{ $section['color'] }}-300 transition-colors">
+                                                    class="text-sm font-black text-gray-200 transition-colors">
                                                     {{ $question }}
                                                 </p>
                                                 <div class="flex gap-2 justify-between">
                                                     @for($i = 0; $i <= 3; $i++)
-                                                        <label class="flex-1">
+                                                        <label class="flex-1 cursor-pointer">
                                                             <input type="radio" name="{{ $field }}" value="{{ $i }}" class="hidden peer"
                                                                 required @if($i == 2) checked @endif>
                                                             <div
-                                                                class="w-full py-3 text-center rounded-xl bg-white/10 border border-white/10 text-sm font-black transition-all cursor-pointer
-                                                                peer-checked:bg-{{ $section['color'] }}-600 peer-checked:text-white peer-checked:shadow-lg peer-checked:shadow-{{ $section['color'] }}-900/30
-                                                                hover:border-{{ $section['color'] }}-500 text-gray-400">
+                                                                class="w-full py-3.5 text-center rounded-xl bg-white/10 border border-white/10 text-sm font-black transition-all cursor-pointer text-gray-400 select-none {{ $peerCheckedDarkStyles[$section['color']] ?? $peerCheckedDarkStyles['blue'] }}">
                                                                 {{ $i }}
                                                             </div>
                                                         </label>

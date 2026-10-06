@@ -291,6 +291,15 @@
                             ];
                         @endphp
 
+                        @php
+                            $peerCheckedStyles = [
+                                'blue' => 'peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-600 peer-checked:shadow-lg peer-checked:shadow-blue-200 hover:border-blue-500',
+                                'red' => 'peer-checked:bg-rose-600 peer-checked:text-white peer-checked:border-rose-600 peer-checked:shadow-lg peer-checked:shadow-rose-200 hover:border-rose-500',
+                                'green' => 'peer-checked:bg-emerald-600 peer-checked:text-white peer-checked:border-emerald-600 peer-checked:shadow-lg peer-checked:shadow-emerald-200 hover:border-emerald-500',
+                                'purple' => 'peer-checked:bg-purple-600 peer-checked:text-white peer-checked:border-purple-600 peer-checked:shadow-lg peer-checked:shadow-purple-200 hover:border-purple-500',
+                            ];
+                        @endphp
+
                         @foreach($sections as $id => $section)
                             <div class="space-y-6">
                                 <h3
@@ -301,20 +310,18 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     @foreach($section['questions'] as $field => $question)
                                         <div
-                                            class="space-y-4 p-6 bg-gray-50 rounded-[2rem] hover:bg-white hover:shadow-xl transition-all border border-transparent hover:border-{{ $section['color'] }}-100 group">
+                                            class="space-y-4 p-6 bg-gray-50 rounded-[2rem] hover:bg-white hover:shadow-xl transition-all border border-gray-100 group">
                                             <p
-                                                class="text-sm font-black text-gray-700 group-hover:text-{{ $section['color'] }}-700 transition-colors">
+                                                class="text-sm font-black text-gray-700 transition-colors">
                                                 {{ $question }}
                                             </p>
                                             <div class="flex gap-2 justify-between">
                                                 @for($i = 0; $i <= 3; $i++)
-                                                    <label class="flex-1">
+                                                    <label class="flex-1 cursor-pointer">
                                                         <input type="radio" name="{{ $field }}" value="{{ $i }}" class="hidden peer"
                                                             required @if($i == 2) checked @endif>
                                                         <div
-                                                            class="w-full py-3 text-center rounded-xl bg-white border border-gray-100 text-sm font-black transition-all cursor-pointer
-                                                                                                                                                                                            peer-checked:bg-{{ $section['color'] }}-600 peer-checked:text-white peer-checked:shadow-lg peer-checked:shadow-{{ $section['color'] }}-200
-                                                                                                                                                                                            hover:border-{{ $section['color'] }}-500 text-gray-400">
+                                                            class="w-full py-3.5 text-center rounded-xl bg-white border border-gray-200 text-sm font-black transition-all cursor-pointer text-gray-400 select-none {{ $peerCheckedStyles[$section['color']] ?? $peerCheckedStyles['blue'] }}">
                                                             {{ $i }}
                                                         </div>
                                                     </label>

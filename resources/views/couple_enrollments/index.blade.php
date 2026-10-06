@@ -27,6 +27,8 @@
 
     <div x-data="{ 
             view: window.innerWidth < 768 ? 'grid' : 'list',
+            showCommunicatorModal: false,
+            customMessage: 'Graça e Paz estimado casal {casal}! Convidamos-vos a participar do nosso Encontro de Orientação para Casais no Portal Life Church.',
             updateView() {
                 if (window.innerWidth < 768 && this.view === 'list') {
                     this.view = 'grid'; 
@@ -46,6 +48,12 @@
             </div>
             
             <div class="hidden md:flex flex-wrap items-center gap-2">
+
+                <button @click="showCommunicatorModal = true"
+                    class="bg-blue-600 text-white dark:bg-blue-500 px-4 py-2.5 rounded-xl hover:bg-blue-700 transition-all flex items-center gap-2 text-xs font-black uppercase tracking-wider shadow-sm shadow-blue-500/20">
+                    <i class="bi bi-chat-dots-fill text-base"></i>
+                    <span>Comunicar Casais</span>
+                </button>
 
                 <a href="{{ route('couple-enrollments.export', request()->all()) }}"
                     class="bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60 px-4 py-2.5 rounded-xl hover:bg-emerald-100 transition-all flex items-center gap-2 text-xs font-black uppercase tracking-wider shadow-sm">
@@ -494,5 +502,113 @@
                 {{ $enrollments->links() }}
             </div>
         @endif
+
+        <!-- Couple Communication Center Modal -->
+        <div x-show="showCommunicatorModal" x-cloak
+             class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm print:hidden"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100">
+            <div @click.away="showCommunicatorModal = false" class="bg-white dark:bg-gray-800 rounded-[2.5rem] max-w-3xl w-full p-6 md:p-8 shadow-2xl border border-gray-100 dark:border-gray-700 space-y-6">
+                
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700/60 pb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center font-black text-xl">
+                            <i class="bi bi-chat-dots-fill"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-black text-gray-900 dark:text-white tracking-tight">Central de Comunicação com Casais</h3>
+                            <p class="text-xs font-bold text-gray-400">Envie avisos, convites e lembretes diretamente pelo WhatsApp</p>
+                        </div>
+                    </div>
+                    <button @click="showCommunicatorModal = false" class="w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-400 hover:text-gray-600 flex items-center justify-center">
+                        <i class="bi bi-x-lg text-sm"></i>
+                    </button>
+                </div>
+
+                <!-- Preset Message Templates -->
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black uppercase tracking-widest text-gray-400">Modelos de Comunicação Prontos</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                        <button type="button" @click="customMessage = 'Graça e Paz estimado casal {casal}! Convidamos-vos com alegria a participar do nosso Encontro de Orientação para Casais no Portal Life Church. Contamos com a vossa presença!'"
+                            class="p-3.5 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 rounded-2xl text-left hover:bg-blue-100 transition-all group">
+                            <p class="text-xs font-black text-blue-700 dark:text-blue-300 flex items-center gap-1">
+                                <i class="bi bi-megaphone-fill"></i> Orientação
+                            </p>
+                            <p class="text-[10px] font-bold text-blue-600/70 dark:text-blue-400/70 truncate mt-1">Encontro de Orientação</p>
+                        </button>
+
+                        <button type="button" @click="customMessage = 'Olá {casal}! As aulas do vosso curso de casais vão iniciar em breve. Favor fiquem atentos à programação e ao início da vossa turma no Portal Life Church.'"
+                            class="p-3.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl text-left hover:bg-emerald-100 transition-all group">
+                            <p class="text-xs font-black text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
+                                <i class="bi bi-journal-check"></i> Início de Aulas
+                            </p>
+                            <p class="text-[10px] font-bold text-emerald-600/70 dark:text-emerald-400/70 truncate mt-1">Aviso de Turma</p>
+                        </button>
+
+                        <button type="button" @click="customMessage = 'Paz e Graça {casal}! Recordamos que a vossa inscrição no curso de casais necessita da confirmação da turma. Por favor entrem em contacto connosco.'"
+                            class="p-3.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-2xl text-left hover:bg-amber-100 transition-all group">
+                            <p class="text-xs font-black text-amber-700 dark:text-amber-300 flex items-center gap-1">
+                                <i class="bi bi-bell-fill"></i> Lembrete
+                            </p>
+                            <p class="text-[10px] font-bold text-amber-600/70 dark:text-amber-400/70 truncate mt-1">Status Pendente</p>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Custom Message Input -->
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 flex justify-between">
+                        <span>Texto da Mensagem</span>
+                        <span class="text-blue-500 lowercase">use {casal} para o nome automático</span>
+                    </label>
+                    <textarea x-model="customMessage" rows="3"
+                        class="w-full p-4 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl text-xs font-bold text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                </div>
+
+                <!-- Couples WhatsApp Broadcast List -->
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Lista de Disparo WhatsApp ({{ count($enrollments) }} Casais)</span>
+                    </div>
+
+                    <div class="max-h-60 overflow-y-auto space-y-2 pr-1">
+                        @foreach($enrollments as $enrollment)
+                            @php
+                                $coupleName = $enrollment->husband_name . ' & ' . $enrollment->wife_name;
+                                $hPhone = preg_replace('/\D/', '', $enrollment->husband_phone ?? '');
+                                $wPhone = preg_replace('/\D/', '', $enrollment->wife_phone ?? '');
+                            @endphp
+                            <div class="p-3.5 bg-gray-50 dark:bg-gray-900/60 rounded-2xl border border-gray-100 dark:border-gray-700/60 flex items-center justify-between gap-2">
+                                <div class="min-w-0">
+                                    <p class="text-xs font-black text-gray-900 dark:text-white truncate">{{ $coupleName }}</p>
+                                    <p class="text-[10px] font-bold text-gray-400 truncate">{{ $enrollment->course->name ?? 'Curso' }} • {{ $enrollment->courseClass->name ?? 'Sem Turma' }}</p>
+                                </div>
+                                <div class="flex items-center gap-1.5 flex-shrink-0">
+                                    @if($hPhone)
+                                        <a :href="'https://api.whatsapp.com/send?phone={{ $hPhone }}&text=' + encodeURIComponent(customMessage.replace('{casal}', '{{ addslashes($coupleName) }}'))"
+                                           target="_blank"
+                                           class="px-3 py-1.5 bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase tracking-wider hover:bg-emerald-700 flex items-center gap-1 shadow-sm">
+                                            <i class="bi bi-whatsapp"></i> Ele
+                                        </a>
+                                    @endif
+                                    @if($wPhone)
+                                        <a :href="'https://api.whatsapp.com/send?phone={{ $wPhone }}&text=' + encodeURIComponent(customMessage.replace('{casal}', '{{ addslashes($coupleName) }}'))"
+                                           target="_blank"
+                                           class="px-3 py-1.5 bg-pink-600 text-white rounded-xl text-[10px] font-black uppercase tracking-wider hover:bg-pink-700 flex items-center gap-1 shadow-sm">
+                                            <i class="bi bi-whatsapp"></i> Ela
+                                        </a>
+                                    @endif
+                                    @if(!$hPhone && !$wPhone)
+                                        <span class="text-[10px] font-bold text-gray-400">Sem contacto</span>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
