@@ -71,14 +71,44 @@
             scroll-behavior: smooth;
         }
 
+        /* ═══════════════════════════════════════════
+           FORCE LIGHT THEME OVERRIDE (AUTH LAYOUT)
+        ═══════════════════════════════════════════ */
+        .auth-bg, .auth-overlay, body {
+            background: #f8fafc !important;
+            color: #0f172a !important;
+        }
+
+        .auth-overlay, .floating-shapes {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+        }
+
+        .light-swal-popup {
+            border-radius: 28px !important;
+            padding: 28px !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.18) !important;
+        }
+
+        .light-swal-button {
+            border-radius: 14px !important;
+            padding: 12px 24px !important;
+            font-weight: 800 !important;
+            font-size: 13px !important;
+            letter-spacing: 0.5px !important;
+            text-transform: uppercase !important;
+        }
+
         body {
             font-family: 'DM Sans', sans-serif;
             font-size: 14px;
             line-height: 1.6;
-            color: var(--text-primary);
+            color: #0f172a !important;
             background-color: #f8fafc !important;
-            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
-            background-size: 24px 24px;
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px) !important;
+            background-size: 24px 24px !important;
             min-height: 100vh;
         }
 
@@ -120,6 +150,8 @@
             height: auto;
             margin: 0 auto 20px;
             display: block;
+            filter: drop-shadow(0 10px 20px -10px rgba(15, 23, 42, 0.2));
+            backdrop-filter: drop-shadow(0 10px 20px -10px rgba(15, 23, 42, 0.2));
         }
 
         .page-title {

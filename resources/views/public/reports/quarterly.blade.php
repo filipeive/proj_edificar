@@ -6,9 +6,20 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
+        .auth-bg, .auth-overlay, body {
+            background: #f8fafc !important;
+            color: #0f172a !important;
+        }
+        .auth-overlay, .floating-shapes {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+        }
         body {
             background-color: #f8fafc !important;
-            color: #0f172a;
+            color: #0f172a !important;
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px) !important;
+            background-size: 24px 24px !important;
         }
         .custom-select {
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
