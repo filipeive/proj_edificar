@@ -4,14 +4,15 @@
 
 @section('content')
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;700;800&display=swap"
         rel="stylesheet">
 
     <style>
         /* ═══════════════════════════════════════════
-           RESET & TOKENS
+           RESET & TOKENS (LIGHT THEME)
         ═══════════════════════════════════════════ */
         *,
         *::before,
@@ -22,49 +23,46 @@
         }
 
         :root {
-            /* Life Church Dark Palette */
-            --bg-page: #020617;
-            /* Darker Slate */
-            --bg-card: rgba(30, 41, 59, 0.7);
-            /* Translucent Slate-800 */
-            --bg-section: rgba(15, 23, 42, 0.6);
-            /* Translucent Slate-900 */
-            --bg-input: #0f172a;
-            --bg-hover: #1e293b;
-            --bg-pill: #1e293b;
-            --bg-pill-active: #334155;
+            /* Life Church Light Palette */
+            --bg-page: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-section: #ffffff;
+            --bg-input: #f1f5f9;
+            --bg-hover: #e2e8f0;
+            --bg-pill: #f1f5f9;
+            --bg-pill-active: #ea580c;
 
             /* Vibrant Orange Accent */
-            --orange: #f97316;
+            --orange: #ea580c;
             --orange-dim: #c2410c;
-            --orange-glow: rgba(249, 115, 22, 0.15);
-            --orange-pale: rgba(249, 115, 22, 0.05);
+            --orange-glow: rgba(234, 88, 12, 0.12);
+            --orange-pale: rgba(234, 88, 12, 0.05);
 
             /* Borders */
-            --border: rgba(255, 255, 255, 0.1);
-            --border-focus: #f97316;
-            --border-hover: rgba(255, 255, 255, 0.2);
+            --border: #e2e8f0;
+            --border-focus: #ea580c;
+            --border-hover: #cbd5e1;
 
             /* Text */
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
             --text-muted: #64748b;
-            --text-label: #94a3b8;
+            --text-label: #475569;
 
             /* States */
-            --error: #ef4444;
-            --error-bg: rgba(239, 68, 68, 0.1);
-            --error-border: rgba(239, 68, 68, 0.2);
-            --success: #10b981;
-            --success-bg: rgba(16, 185, 129, 0.1);
-            --success-border: rgba(16, 185, 129, 0.2);
+            --error: #dc2626;
+            --error-bg: #fef2f2;
+            --error-border: #fecaca;
+            --success: #059669;
+            --success-bg: #ecfdf5;
+            --success-border: #a7f3d0;
 
             /* Layout */
-            --radius-sm: 6px;
-            --radius: 10px;
-            --radius-lg: 16px;
+            --radius-sm: 8px;
+            --radius: 12px;
+            --radius-lg: 24px;
             --radius-pill: 9999px;
-            --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 15px 35px -5px rgba(15, 23, 42, 0.08);
 
             /* Z-index stack */
             --z-base: 1;
@@ -726,19 +724,49 @@
             <p class="page-sub"><i class="bi bi-pencil-square"></i>&nbsp; Formulário de Inscrição</p>
         </header>
 
-        {{-- ══ ALERTS (Hidden, handled by SweetAlert) ══ --}}
+        {{-- ══ ALERTS & SUCCESS CONFIRMATION CARD ══ --}}
         @if(session('success'))
             @php
                 $createdEnrollment = session('enrollment_success') ? \App\Models\CoupleEnrollment::find(session('enrollment_success')) : null;
+                $husband = $createdEnrollment->husband_name ?? '';
+                $wife = $createdEnrollment->wife_name ?? '';
+                $phone = $createdEnrollment->husband_phone ?? $createdEnrollment->wife_phone ?? '';
+                $id = $createdEnrollment->id ?? '';
+                $rawPhone = preg_replace('/\D/', '', $phone);
+                $waText = urlencode("Graça e Paz! Confirmamos a inscrição do casal {$husband} & {$wife} no curso {$course->name} (Ref: #" . sprintf('%04d', $id) . "). Portal Life Church.");
+                $waUrl = $rawPhone ? "https://api.whatsapp.com/send?phone={$rawPhone}&text={$waText}" : "https://api.whatsapp.com/send?text={$waText}";
             @endphp
+
             <div id="swal-success"
                 data-message="{{ session('success') }}"
-                data-husband="{{ $createdEnrollment->husband_name ?? '' }}"
-                data-wife="{{ $createdEnrollment->wife_name ?? '' }}"
-                data-phone="{{ $createdEnrollment->husband_phone ?? $createdEnrollment->wife_phone ?? '' }}"
-                data-id="{{ $createdEnrollment->id ?? '' }}"
+                data-husband="{{ $husband }}"
+                data-wife="{{ $wife }}"
+                data-phone="{{ $phone }}"
+                data-id="{{ $id }}"
                 data-course="{{ $course->name }}"
                 style="display:none;"></div>
+
+            <div style="background: #ffffff; border: 2px solid #10b981; border-radius: 24px; padding: 32px 24px; text-align: center; box-shadow: 0 20px 40px -10px rgba(16, 185, 129, 0.15); margin-bottom: 32px; animation: fadeUp 0.5s ease;">
+                <div style="width: 64px; height: 64px; background: #ecfdf5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: #10b981; font-size: 32px;">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+                <span style="background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; padding: 4px 14px; border-radius: 99px;">
+                    Comprovativo Nº #{{ sprintf('%04d', $id) }}
+                </span>
+                <h2 style="font-size: 22px; font-weight: 800; color: #0f172a; margin: 12px 0 4px;">Inscrição Registada com Sucesso!</h2>
+                <p style="font-size: 16px; font-weight: 700; color: #ea580c; margin-bottom: 8px;">{{ $husband ? $husband . ' & ' . $wife : 'Casal Registado' }}</p>
+                <p style="font-size: 13.5px; color: #475569; max-width: 480px; margin: 0 auto 24px; line-height: 1.5;">
+                    A vossa inscrição no curso <strong>{{ $course->name }}</strong> foi recebida com sucesso. Entraremos em contacto em breve para o Encontro de Orientação.
+                </p>
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px;">
+                    <a href="{{ $waUrl }}" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: #25D366; color: #ffffff; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 14px 24px; border-radius: 14px; text-decoration: none; box-shadow: 0 8px 20px -4px rgba(37, 211, 102, 0.4);">
+                        <i class="bi bi-whatsapp" style="font-size: 16px;"></i> Notificar por WhatsApp
+                    </a>
+                    <button onclick="window.print()" style="display: inline-flex; align-items: center; gap: 8px; background: #0f172a; color: #ffffff; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 14px 24px; border-radius: 14px; border: none; cursor: pointer; box-shadow: 0 8px 20px -4px rgba(15, 23, 42, 0.2);">
+                        <i class="bi bi-printer-fill" style="font-size: 16px;"></i> Imprimir Comprovativo
+                    </button>
+                </div>
+            </div>
         @endif
 
         @if ($errors->any())
@@ -747,7 +775,7 @@
 
         {{-- ══ FORM CARD ══ --}}
         <div class="form-card">
-            <img src="{{ asset('images/logo-white-orange.png') }}" alt="Life Church" class="form-logo">
+            <img src="{{ asset('images/logo.png') }}" alt="Life Church" class="form-logo" onerror="this.src='{{ asset('images/logo-white-orange.png') }}'">
             <form method="POST" action="{{ route('public.forms.pre-marital.store') }}" novalidate>
                 @csrf
                 <input type="hidden" name="course_id" value="{{ $course->id }}">
@@ -1270,18 +1298,18 @@
                4. SWEETALERT FEEDBACK
             ───────────────────────────────────────── */
             const swalConfig = {
-                background: '#1e293b',
-                color: '#f8fafc',
-                confirmButtonColor: '#f97316',
+                background: '#ffffff',
+                color: '#0f172a',
+                confirmButtonColor: '#ea580c',
                 customClass: {
-                    popup: 'premium-swal-popup',
-                    confirmButton: 'premium-swal-button'
+                    popup: 'light-swal-popup',
+                    confirmButton: 'light-swal-button'
                 }
             };
 
             // Success Alert
             const successEl = document.getElementById('swal-success');
-            if (successEl) {
+            if (successEl && typeof Swal !== 'undefined') {
                 const husband = successEl.dataset.husband;
                 const wife = successEl.dataset.wife;
                 const phone = successEl.dataset.phone;
@@ -1290,12 +1318,12 @@
 
                 let htmlContent = `
                     <div style="text-align: center; padding: 10px 0;">
-                        <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 16px; padding: 16px; margin-bottom: 16px;">
-                            <div style="color: #10b981; font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px;">Comprovativo Nº #${id ? String(id).padStart(4, '0') : 'REGISTADO'}</div>
-                            <div style="color: #ffffff; font-size: 15px; font-weight: 800;">${husband ? husband + ' & ' + wife : 'Inscrição Confirmada'}</div>
-                            <div style="color: #f97316; font-size: 12px; font-weight: 700; margin-top: 4px;">${course}</div>
+                        <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 16px; padding: 16px; margin-bottom: 16px;">
+                            <div style="color: #059669; font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px;">Comprovativo Nº #${id ? String(id).padStart(4, '0') : 'REGISTADO'}</div>
+                            <div style="color: #0f172a; font-size: 15px; font-weight: 800;">${husband ? husband + ' & ' + wife : 'Inscrição Confirmada'}</div>
+                            <div style="color: #ea580c; font-size: 12px; font-weight: 700; margin-top: 4px;">${course}</div>
                         </div>
-                        <p style="color: #94a3b8; font-size: 12.5px; line-height: 1.5; margin-bottom: 8px;">A vossa inscrição foi efetuada com sucesso! Guardem o comprovativo ou enviem a confirmação para a secretaria pelo WhatsApp.</p>
+                        <p style="color: #64748b; font-size: 12.5px; line-height: 1.5; margin-bottom: 8px;">A vossa inscrição foi efetuada com sucesso! Guardem o comprovativo ou enviem a confirmação para a secretaria pelo WhatsApp.</p>
                     </div>
                 `;
 
