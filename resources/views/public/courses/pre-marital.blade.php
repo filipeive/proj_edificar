@@ -6,17 +6,13 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;700;800&display=swap" rel="stylesheet">
 
     <style>
         /* ═══════════════════════════════════════════
-           RESET & TOKENS (LIGHT THEME)
+           RESET & TOKENS (ULTRA LIGHT THEME)
         ═══════════════════════════════════════════ */
-        *,
-        *::before,
-        *::after {
+        *, *::before, *::after {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
@@ -27,16 +23,16 @@
             --bg-page: #f8fafc;
             --bg-card: #ffffff;
             --bg-section: #ffffff;
-            --bg-input: #f1f5f9;
-            --bg-hover: #e2e8f0;
+            --bg-input: #f8fafc;
+            --bg-hover: #f1f5f9;
             --bg-pill: #f1f5f9;
             --bg-pill-active: #ea580c;
 
             /* Vibrant Orange Accent */
             --orange: #ea580c;
             --orange-dim: #c2410c;
-            --orange-glow: rgba(234, 88, 12, 0.12);
-            --orange-pale: rgba(234, 88, 12, 0.05);
+            --orange-glow: rgba(234, 88, 12, 0.15);
+            --orange-pale: rgba(234, 88, 12, 0.08);
 
             /* Borders */
             --border: #e2e8f0;
@@ -58,36 +54,17 @@
             --success-border: #a7f3d0;
 
             /* Layout */
-            --radius-sm: 8px;
-            --radius: 12px;
-            --radius-lg: 24px;
+            --radius-sm: 10px;
+            --radius: 16px;
+            --radius-lg: 32px;
             --radius-pill: 9999px;
-            --shadow-lg: 0 15px 35px -5px rgba(15, 23, 42, 0.08);
+            --shadow-lg: 0 20px 45px -10px rgba(15, 23, 42, 0.08);
 
             /* Z-index stack */
             --z-base: 1;
             --z-raised: 5;
             --z-dropdown: 10;
             --z-overlay: 20;
-        }
-
-        /* ── Custom Scrollbar Mastery ── */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--bg-page);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--orange);
         }
 
         html {
@@ -99,135 +76,72 @@
             font-size: 14px;
             line-height: 1.6;
             color: var(--text-primary);
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #020617 100%);
+            background-color: #f8fafc !important;
+            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 24px 24px;
             min-height: 100vh;
-            overflow-y: auto;
-            /* Ensure scroll is allowed */
         }
 
         /* ═══════════════════════════════════════════
-           PAGE LAYOUT
+           PAGE LAYOUT & HEADER
         ═══════════════════════════════════════════ */
         .page-wrap {
             position: relative;
             z-index: var(--z-base);
-            max-width: 760px;
+            max-width: 800px;
             margin: 0 auto;
-            padding: 40px 16px 40px; /* Further reduced bottom padding */
+            padding: 40px 20px 60px;
         }
 
-        .form-logo {
-            display: block;
-            max-width: 120px;
-            height: auto;
-            margin: 0 auto 30px;
-            filter: drop-shadow(0 0 15px rgba(249, 115, 22, 0.3));
-            animation: fadeIn 0.8s ease both;
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            background: rgba(234, 88, 12, 0.08);
+            border: 1px solid rgba(234, 88, 12, 0.2);
+            border-radius: var(--radius-pill);
+            color: var(--orange);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 20px;
         }
 
-        /* ═══════════════════════════════════════════
-           HEADER
-        ═══════════════════════════════════════════ */
         .page-header {
             text-align: center;
-            margin-bottom: 44px;
+            margin-bottom: 40px;
             animation: fadeDown .55s ease both;
         }
 
-        .church-eyebrow {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 10.5px;
-            font-weight: 500;
-            letter-spacing: .22em;
-            text-transform: uppercase;
-            color: var(--orange);
-            margin-bottom: 18px;
-        }
-
-        .church-eyebrow::before,
-        .church-eyebrow::after {
-            content: '';
+        .brand-logo-img {
+            max-width: 140px;
+            height: auto;
+            margin: 0 auto 20px;
             display: block;
-            width: 32px;
-            height: 1px;
-            background: linear-gradient(to right, transparent, var(--orange-dim));
-        }
-
-        .church-eyebrow::after {
-            background: linear-gradient(to left, transparent, var(--orange-dim));
         }
 
         .page-title {
             font-family: 'Cormorant Garamond', serif;
-            font-size: clamp(2.2rem, 6.5vw, 3.4rem);
-            font-weight: 300;
+            font-size: clamp(2.4rem, 6.5vw, 3.6rem);
+            font-weight: 400;
             color: var(--text-primary);
-            line-height: 1.1;
+            line-height: 1.15;
             letter-spacing: -0.01em;
         }
 
         .page-title em {
             font-style: italic;
             color: var(--orange);
-            font-weight: 400;
+            font-weight: 600;
         }
 
         .page-sub {
             margin-top: 12px;
-            font-size: 14px;
-            color: var(--text-secondary);
-            letter-spacing: .02em;
-        }
-
-        /* ═══════════════════════════════════════════
-           ALERTS
-        ═══════════════════════════════════════════ */
-        .alert {
-            position: relative;
-            z-index: var(--z-raised);
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 14px 18px;
-            border-radius: var(--radius);
-            border: 1px solid;
-            margin-bottom: 28px;
-            font-size: 13.5px;
-            animation: fadeIn .35s ease both;
-        }
-
-        .alert-success {
-            background: var(--success-bg);
-            border-color: var(--success-border);
-            color: var(--success);
-        }
-
-        .alert-error {
-            background: var(--error-bg);
-            border-color: var(--error-border);
-            color: var(--error);
-        }
-
-        .alert i {
-            font-size: 17px;
-            flex-shrink: 0;
-            margin-top: 1px;
-        }
-
-        .alert ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .alert ul li+li {
-            margin-top: 3px;
-        }
-
-        .alert ul li::before {
-            content: '· ';
-            font-weight: 700;
+            font-size: 15px;
+            color: var(--text-muted);
+            font-weight: 500;
         }
 
         /* ═══════════════════════════════════════════
@@ -237,27 +151,16 @@
             position: relative;
             z-index: var(--z-base);
             background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-lg);
-            overflow: visible;
+            overflow: hidden;
             animation: fadeUp .6s ease both .08s;
         }
 
-        /* ═══════════════════════════════════════════
-           FORM SECTIONS
-        ═══════════════════════════════════════════ */
         .form-section {
-            position: relative;
-            z-index: var(--z-base);
-            padding: 30px 36px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .form-section:first-child {
-            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            padding: 32px 40px;
+            border-bottom: 1px solid #f1f5f9;
         }
 
         .form-section:last-of-type {
@@ -267,43 +170,44 @@
         .section-header {
             display: flex;
             align-items: center;
-            gap: 14px;
-            margin-bottom: 26px;
+            gap: 16px;
+            margin-bottom: 28px;
         }
 
         .section-icon {
-            width: 40px;
-            height: 40px;
+            width: 46px;
+            height: 46px;
             flex-shrink: 0;
-            border-radius: 12px;
+            border-radius: 16px;
             background: var(--orange-pale);
-            border: 1px solid var(--orange-dim);
+            border: 1px solid rgba(234, 88, 12, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--orange);
-            font-size: 18px;
+            font-size: 20px;
+            box-shadow: 0 4px 12px rgba(234, 88, 12, 0.1);
         }
 
         .section-title {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             font-weight: 600;
             color: var(--text-primary);
         }
 
         .section-desc {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--text-muted);
             margin-top: 1px;
         }
 
         /* ═══════════════════════════════════════════
-           GRID
+           FIELDS & INPUTS
         ═══════════════════════════════════════════ */
         .field-grid {
             display: grid;
-            gap: 18px;
+            gap: 20px;
         }
 
         .col-2 {
@@ -318,81 +222,79 @@
             grid-column: 1 / -1;
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 640px) {
             .form-section {
-                padding: 22px 18px;
+                padding: 24px 20px;
             }
 
-            .col-2,
-            .col-3 {
+            .col-2, .col-3 {
                 grid-template-columns: 1fr;
             }
         }
 
-        /* ═══════════════════════════════════════════
-           FIELDS
-        ═══════════════════════════════════════════ */
         .field {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
         }
 
         .field-label {
             font-size: 11px;
-            font-weight: 500;
-            letter-spacing: .1em;
+            font-weight: 700;
+            letter-spacing: .08em;
             text-transform: uppercase;
             color: var(--text-label);
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
         }
 
         .field-label i {
             font-size: 13px;
-            color: var(--orange-dim);
+            color: var(--orange);
         }
 
         .req {
             color: var(--orange);
+            font-weight: 800;
         }
 
         .field-input,
         .field-select,
         .field-textarea {
-            position: relative;
-            z-index: var(--z-base);
             width: 100%;
-            padding: 10px 14px;
+            padding: 12px 16px;
             background: var(--bg-input);
-            border: 1px solid var(--border);
+            border: 1.5px solid var(--border);
             border-radius: var(--radius-sm);
             color: var(--text-primary);
             font-family: 'DM Sans', sans-serif;
             font-size: 14px;
+            font-weight: 600;
             outline: none;
             -webkit-appearance: none;
             appearance: none;
-            transition: border-color .18s, box-shadow .18s, background .18s;
+            transition: all .2s ease;
         }
 
         .field-input::placeholder,
         .field-textarea::placeholder {
-            color: var(--text-muted);
+            color: #94a3b8;
+            font-weight: 400;
         }
 
         .field-select {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A8070' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 14 10'%3E%3Cpath d='M1 2l6 6 6-6' stroke='%2364748b' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 13px center;
-            padding-right: 36px;
+            background-position: right 16px center;
+            padding-right: 44px;
             cursor: pointer;
         }
 
         .field-select option {
-            background: #1E1B17;
-            color: var(--text-primary);
+            background: #ffffff !important;
+            color: #0f172a !important;
+            font-weight: 600;
         }
 
         .field-input:hover,
@@ -403,28 +305,28 @@
         .field-input:focus,
         .field-select:focus,
         .field-textarea:focus {
-            border-color: var(--border-focus);
-            box-shadow: 0 0 0 3px var(--orange-glow);
-            background: var(--bg-hover);
-            z-index: var(--z-dropdown);
+            border-color: var(--orange);
+            box-shadow: 0 0 0 4px var(--orange-glow);
+            background: #ffffff;
         }
 
         .field-input.is-invalid,
         .field-select.is-invalid,
         .field-textarea.is-invalid {
-            border-color: var(--error-border);
-            box-shadow: 0 0 0 3px rgba(224, 80, 80, .1);
+            border-color: var(--error);
+            box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1);
         }
 
         .field-textarea {
             resize: vertical;
-            min-height: 88px;
+            min-height: 100px;
             line-height: 1.6;
         }
 
         .field-error {
             font-size: 12px;
             color: var(--error);
+            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 5px;
@@ -433,19 +335,19 @@
         .field-hint {
             font-size: 12px;
             color: var(--text-muted);
-            font-style: italic;
+            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 5px;
         }
 
         /* ═══════════════════════════════════════════
-           RADIO PILLS
+           RADIO PILLS (CHECKED STYLES)
         ═══════════════════════════════════════════ */
         .radio-group {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 10px;
         }
 
         .radio-pill {
@@ -463,16 +365,17 @@
         .radio-pill label {
             display: inline-flex;
             align-items: center;
-            gap: 7px;
-            padding: 9px 18px;
+            gap: 8px;
+            padding: 10px 20px;
             background: var(--bg-pill);
             border: 1.5px solid var(--border);
             border-radius: var(--radius-pill);
             color: var(--text-secondary);
             font-size: 13.5px;
+            font-weight: 700;
             cursor: pointer;
             user-select: none;
-            transition: all .18s;
+            transition: all .2s ease;
         }
 
         .radio-pill label i {
@@ -485,47 +388,41 @@
             background: var(--bg-hover);
         }
 
-        .radio-pill input:checked+label {
+        .radio-pill input:checked + label {
             border-color: var(--orange);
-            background: var(--orange-pale);
-            color: var(--orange);
-            font-weight: 600;
-            box-shadow: 0 0 15px var(--orange-glow);
+            background: var(--orange);
+            color: #ffffff;
+            box-shadow: 0 8px 20px -4px rgba(234, 88, 12, 0.4);
+        }
+
+        .radio-pill input:checked + label i {
+            color: #ffffff;
         }
 
         /* ═══════════════════════════════════════════
-           CONDITIONAL BLOCKS
-           Uses max-height transition for smooth animation.
-           z-index is set ABOVE siblings so dropdowns
-           inside open panels are never clipped.
+           CONDITIONAL PANELS
         ═══════════════════════════════════════════ */
         .cond-block {
             overflow: hidden;
             max-height: 0;
             opacity: 0;
             pointer-events: none;
-            transition: max-height .38s ease, opacity .25s ease, margin-top .25s ease;
+            transition: max-height .35s ease, opacity .25s ease, margin-top .25s ease;
             margin-top: 0;
-            position: relative;
-            z-index: var(--z-base);
         }
 
         .cond-block.open {
             max-height: 2000px;
-            /* large enough for any content */
             opacity: 1;
             pointer-events: auto;
             margin-top: 20px;
-            z-index: var(--z-raised);
-            /* lift open panel above siblings */
         }
 
         .cond-panel {
-            background: var(--bg-section);
-            border: 1px solid var(--border);
+            background: #f8fafc;
+            border: 1.5px solid var(--border);
             border-radius: var(--radius);
-            overflow: visible;
-            /* crucial: do NOT clip children */
+            overflow: hidden;
         }
 
         .cond-panel-header {
@@ -536,22 +433,16 @@
             border-bottom: 1px solid var(--border);
             color: var(--orange);
             font-size: 11.5px;
-            font-weight: 700;
+            font-weight: 800;
             letter-spacing: .08em;
             text-transform: uppercase;
-            border-radius: var(--radius) var(--radius) 0 0;
-            background: rgba(249, 115, 22, 0.03);
-        }
-
-        .cond-panel-header i {
-            font-size: 15px;
+            background: rgba(234, 88, 12, 0.04);
         }
 
         .cond-panel-body {
-            padding: 22px;
+            padding: 24px;
         }
 
-        /* Address dual panel */
         .address-grid {
             display: grid;
             gap: 16px;
@@ -561,17 +452,17 @@
             grid-template-columns: 1fr 1fr;
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 640px) {
             .address-grid.two-cols {
                 grid-template-columns: 1fr;
             }
         }
 
         .address-person {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
+            background: #ffffff;
+            border: 1.5px solid var(--border);
             border-radius: var(--radius);
-            overflow: visible;
+            overflow: hidden;
         }
 
         .address-person-header {
@@ -579,71 +470,57 @@
             align-items: center;
             gap: 8px;
             padding: 10px 16px;
-            background: rgba(249, 115, 22, .05);
+            background: rgba(234, 88, 12, 0.05);
             border-bottom: 1px solid var(--border);
             font-size: 11.5px;
-            font-weight: 700;
+            font-weight: 800;
             color: var(--orange);
             letter-spacing: .07em;
             text-transform: uppercase;
-            border-radius: var(--radius) var(--radius) 0 0;
         }
 
         .address-person-body {
-            padding: 16px;
+            padding: 18px;
         }
 
         /* ═══════════════════════════════════════════
-           FORM FOOTER
+           FOOTER BUTTONS
         ═══════════════════════════════════════════ */
         .form-footer {
-            position: relative;
-            z-index: var(--z-base);
-            padding: 26px 36px;
-            background: var(--bg-section);
+            padding: 32px 40px;
+            background: #f8fafc;
             border-top: 1px solid var(--border);
-            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 16px;
         }
 
-        @media (max-width: 600px) {
-            .form-footer {
-                padding: 22px 18px;
-            }
-        }
-
         .btn-submit {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 10px;
             width: 100%;
-            max-width: 320px;
-            padding: 14px 40px;
+            max-width: 360px;
+            padding: 16px 40px;
             background: var(--orange);
-            color: #fff;
+            color: #ffffff;
             border: none;
             border-radius: var(--radius-pill);
             font-family: 'DM Sans', sans-serif;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 800;
-            letter-spacing: .08em;
+            letter-spacing: .06em;
             text-transform: uppercase;
             cursor: pointer;
-            transition: all .25s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 10px 25px -5px rgba(249, 115, 22, 0.4);
-        }
-
-        .btn-submit i {
-            font-size: 16px;
+            transition: all .25s ease;
+            box-shadow: 0 12px 30px -5px rgba(234, 88, 12, 0.4);
         }
 
         .btn-submit:hover {
-            background: #ea580c;
-            box-shadow: 0 15px 35px -5px rgba(249, 115, 22, 0.5);
+            background: #c2410c;
+            box-shadow: 0 16px 36px -5px rgba(234, 88, 12, 0.5);
             transform: translateY(-2px);
         }
 
@@ -655,60 +532,25 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            font-size: 13px;
+            font-size: 13.5px;
+            font-weight: 600;
             color: var(--text-muted);
             text-decoration: none;
             transition: color .18s;
         }
 
-        .btn-back i {
-            font-size: 14px;
-            transition: transform .18s;
-        }
-
         .btn-back:hover {
-            color: var(--text-secondary);
+            color: var(--text-primary);
         }
 
-        .btn-back:hover i {
-            transform: translateX(-3px);
-        }
-
-        /* ═══════════════════════════════════════════
-           ANIMATIONS
-        ═══════════════════════════════════════════ */
         @keyframes fadeDown {
-            from {
-                opacity: 0;
-                transform: translateY(-16px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-16px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 
@@ -716,15 +558,16 @@
 
         {{-- ══ HEADER ══ --}}
         <header class="page-header">
-            <div class="church-eyebrow">
+            <img src="{{ asset('images/logo.png') }}" alt="Life Church" class="brand-logo-img" onerror="this.style.display='none'">
+            <div class="header-badge">
                 <i class="bi bi-gem"></i>
                 Portal Life Church
             </div>
             <h1 class="page-title">{!! str_replace(' & ', '<br><em>& ', $course->name) !!}</h1>
-            <p class="page-sub"><i class="bi bi-pencil-square"></i>&nbsp; Formulário de Inscrição</p>
+            <p class="page-sub"><i class="bi bi-pencil-square"></i>&nbsp; Formulário de Inscrição Online</p>
         </header>
 
-        {{-- ══ ALERTS & SUCCESS CONFIRMATION CARD ══ --}}
+        {{-- ══ SUCCESS CONFIRMATION RECEIPT ══ --}}
         @if(session('success'))
             @php
                 $createdEnrollment = session('enrollment_success') ? \App\Models\CoupleEnrollment::find(session('enrollment_success')) : null;
@@ -746,24 +589,24 @@
                 data-course="{{ $course->name }}"
                 style="display:none;"></div>
 
-            <div style="background: #ffffff; border: 2px solid #10b981; border-radius: 24px; padding: 32px 24px; text-align: center; box-shadow: 0 20px 40px -10px rgba(16, 185, 129, 0.15); margin-bottom: 32px; animation: fadeUp 0.5s ease;">
-                <div style="width: 64px; height: 64px; background: #ecfdf5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: #10b981; font-size: 32px;">
+            <div style="background: #ffffff; border: 2px solid #10b981; border-radius: 28px; padding: 36px 28px; text-align: center; box-shadow: 0 20px 40px -10px rgba(16, 185, 129, 0.12); margin-bottom: 36px; animation: fadeUp 0.5s ease;">
+                <div style="width: 70px; height: 70px; background: #ecfdf5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; color: #10b981; font-size: 34px;">
                     <i class="bi bi-check-circle-fill"></i>
                 </div>
-                <span style="background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; padding: 4px 14px; border-radius: 99px;">
+                <span style="background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; padding: 5px 16px; border-radius: 99px;">
                     Comprovativo Nº #{{ sprintf('%04d', $id) }}
                 </span>
-                <h2 style="font-size: 22px; font-weight: 800; color: #0f172a; margin: 12px 0 4px;">Inscrição Registada com Sucesso!</h2>
-                <p style="font-size: 16px; font-weight: 700; color: #ea580c; margin-bottom: 8px;">{{ $husband ? $husband . ' & ' . $wife : 'Casal Registado' }}</p>
-                <p style="font-size: 13.5px; color: #475569; max-width: 480px; margin: 0 auto 24px; line-height: 1.5;">
+                <h2 style="font-size: 24px; font-weight: 800; color: #0f172a; margin: 14px 0 6px;">Inscrição Registada com Sucesso!</h2>
+                <p style="font-size: 17px; font-weight: 800; color: #ea580c; margin-bottom: 10px;">{{ $husband ? $husband . ' & ' . $wife : 'Casal Registado' }}</p>
+                <p style="font-size: 14px; color: #475569; max-width: 500px; margin: 0 auto 26px; line-height: 1.6;">
                     A vossa inscrição no curso <strong>{{ $course->name }}</strong> foi recebida com sucesso. Entraremos em contacto em breve para o Encontro de Orientação.
                 </p>
-                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px;">
-                    <a href="{{ $waUrl }}" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: #25D366; color: #ffffff; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 14px 24px; border-radius: 14px; text-decoration: none; box-shadow: 0 8px 20px -4px rgba(37, 211, 102, 0.4);">
-                        <i class="bi bi-whatsapp" style="font-size: 16px;"></i> Notificar por WhatsApp
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 14px;">
+                    <a href="{{ $waUrl }}" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: #25D366; color: #ffffff; font-size: 13.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 14px 28px; border-radius: 16px; text-decoration: none; box-shadow: 0 8px 22px -4px rgba(37, 211, 102, 0.4);">
+                        <i class="bi bi-whatsapp" style="font-size: 18px;"></i> Notificar por WhatsApp
                     </a>
-                    <button onclick="window.print()" style="display: inline-flex; align-items: center; gap: 8px; background: #0f172a; color: #ffffff; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 14px 24px; border-radius: 14px; border: none; cursor: pointer; box-shadow: 0 8px 20px -4px rgba(15, 23, 42, 0.2);">
-                        <i class="bi bi-printer-fill" style="font-size: 16px;"></i> Imprimir Comprovativo
+                    <button onclick="window.print()" style="display: inline-flex; align-items: center; gap: 8px; background: #0f172a; color: #ffffff; font-size: 13.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 14px 28px; border-radius: 16px; border: none; cursor: pointer; box-shadow: 0 8px 22px -4px rgba(15, 23, 42, 0.2);">
+                        <i class="bi bi-printer-fill" style="font-size: 18px;"></i> Imprimir Comprovativo
                     </button>
                 </div>
             </div>
@@ -775,14 +618,11 @@
 
         {{-- ══ FORM CARD ══ --}}
         <div class="form-card">
-            <img src="{{ asset('images/logo.png') }}" alt="Life Church" class="form-logo" onerror="this.src='{{ asset('images/logo-white-orange.png') }}'">
             <form method="POST" action="{{ route('public.forms.pre-marital.store') }}" novalidate>
                 @csrf
                 <input type="hidden" name="course_id" value="{{ $course->id }}">
 
-                {{-- ╔══════════════════════════════════
-                ║ 1 · IDENTIFICAÇÃO DO CASAL
-                ╚══════════════════════════════════ --}}
+                {{-- 1 · IDENTIFICAÇÃO DO CASAL --}}
                 <div class="form-section">
                     <div class="section-header">
                         <div class="section-icon"><i class="bi bi-people-fill"></i></div>
@@ -812,16 +652,12 @@
                             </label>
                             <select id="relationship_type" name="relationship_type"
                                 class="field-select @error('relationship_type') is-invalid @enderror" required>
-                                <option value="" disabled {{ old('relationship_type') ? '' : 'selected' }}>Selecione...
-                                </option>
+                                <option value="" disabled {{ old('relationship_type') ? '' : 'selected' }}>Selecione...</option>
                                 <option value="em_relacionamento" {{ old('relationship_type') == 'em_relacionamento' || old('relationship_type') == 'namoro' ? 'selected' : '' }}>
                                     Em relacionamento</option>
-                                <option value="noivos" {{ old('relationship_type') == 'noivos' ? 'selected' : '' }}>Noivos
-                                </option>
+                                <option value="noivos" {{ old('relationship_type') == 'noivos' ? 'selected' : '' }}>Noivos</option>
                                 <option value="vivendo_maritalmente" {{ old('relationship_type') == 'vivendo_maritalmente' ? 'selected' : '' }}>Vivendo Maritalmente</option>
-                                <option value="casados" {{ old('relationship_type') == 'casados' ? 'selected' : '' }}>Casados
-                                </option>
-                                </option>
+                                <option value="casados" {{ old('relationship_type') == 'casados' ? 'selected' : '' }}>Casados</option>
                             </select>
                             @error('relationship_type')
                                 <span class="field-error"><i class="bi bi-x-circle"></i> {{ $message }}</span>
@@ -842,7 +678,7 @@
 
                     </div>
 
-                    {{-- ── Morada: única (coabitando/casados) ── --}}
+                    {{-- Morada única (coabitando/casados) --}}
                     <div class="cond-block" id="addr-single">
                         <div class="cond-panel">
                             <div class="cond-panel-header">
@@ -871,8 +707,7 @@
                                         @enderror
                                     </div>
                                     <div class="field">
-                                        <label class="field-label" for="province"><i class="bi bi-map"></i>
-                                            Província</label>
+                                        <label class="field-label" for="province"><i class="bi bi-map"></i> Província</label>
                                         <input id="province" name="province" type="text"
                                             class="field-input @error('province') is-invalid @enderror"
                                             value="{{ old('province') }}" placeholder="Maputo">
@@ -885,7 +720,7 @@
                         </div>
                     </div>
 
-                    {{-- ── Morada: separada (namorados/noivos) ── --}}
+                    {{-- Morada separada (namorados/noivos) --}}
                     <div class="cond-block" id="addr-dual">
                         <div class="address-grid two-cols">
                             <div class="address-person">
@@ -895,8 +730,7 @@
                                 <div class="address-person-body">
                                     <div class="field-grid">
                                         <div class="field">
-                                            <label class="field-label" for="husband_address"><i class="bi bi-geo-alt"></i>
-                                                Endereço</label>
+                                            <label class="field-label" for="husband_address"><i class="bi bi-geo-alt"></i> Endereço</label>
                                             <input id="husband_address" name="address" type="text"
                                                 class="field-input @error('address') is-invalid @enderror"
                                                 value="{{ old('address') }}" placeholder="Rua, Bairro">
@@ -905,8 +739,7 @@
                                             @enderror
                                         </div>
                                         <div class="field">
-                                            <label class="field-label" for="husband_city"><i class="bi bi-building"></i>
-                                                Cidade</label>
+                                            <label class="field-label" for="husband_city"><i class="bi bi-building"></i> Cidade</label>
                                             <input id="husband_city" name="husband_city" type="text"
                                                 class="field-input @error('husband_city') is-invalid @enderror"
                                                 value="{{ old('husband_city') }}" placeholder="Maputo">
@@ -924,8 +757,7 @@
                                 <div class="address-person-body">
                                     <div class="field-grid">
                                         <div class="field">
-                                            <label class="field-label" for="wife_address"><i class="bi bi-geo-alt"></i>
-                                                Endereço</label>
+                                            <label class="field-label" for="wife_address"><i class="bi bi-geo-alt"></i> Endereço</label>
                                             <input id="wife_address" name="wife_address" type="text"
                                                 class="field-input @error('wife_address') is-invalid @enderror"
                                                 value="{{ old('wife_address') }}" placeholder="Rua, Bairro">
@@ -934,8 +766,7 @@
                                             @enderror
                                         </div>
                                         <div class="field">
-                                            <label class="field-label" for="wife_city"><i class="bi bi-building"></i>
-                                                Cidade</label>
+                                            <label class="field-label" for="wife_city"><i class="bi bi-building"></i> Cidade</label>
                                             <input id="wife_city" name="wife_city" type="text"
                                                 class="field-input @error('wife_city') is-invalid @enderror"
                                                 value="{{ old('wife_city') }}" placeholder="Maputo">
@@ -949,16 +780,14 @@
                         </div>
                     </div>
 
-                </div>{{-- /section identificação --}}
+                </div>
 
-                {{-- ╔══════════════════════════════════
-                ║ 2 · CONTACTOS
-                ╚══════════════════════════════════ --}}
+                {{-- 2 · CONTACTOS --}}
                 <div class="form-section">
                     <div class="section-header">
                         <div class="section-icon"><i class="bi bi-telephone-fill"></i></div>
                         <div>
-                            <div class="section-title">Contactos</div>
+                            <div class="section-title">Contactos Telefónicos</div>
                             <div class="section-desc">Pelo menos um contacto é obrigatório</div>
                         </div>
                     </div>
@@ -988,13 +817,11 @@
                     </div>
                     <p class="field-hint" style="margin-top:10px;">
                         <i class="bi bi-info-circle"></i>
-                        Preencha pelo menos um dos contactos acima.
+                        Preencha pelo menos um dos contactos para podermos enviar os detalhes do curso.
                     </p>
                 </div>
 
-                {{-- ╔══════════════════════════════════
-                ║ 3 · VÍNCULO À IGREJA
-                ╚══════════════════════════════════ --}}
+                {{-- 3 · VÍNCULO À IGREJA --}}
                 <div class="form-section">
                     <div class="section-header">
                         <div class="section-icon"><i class="bi bi-building-fill"></i></div>
@@ -1094,8 +921,7 @@
                                         <div class="field">
                                             <label class="field-label" for="course_class_id">
                                                 <i class="bi bi-calendar3-fill"></i> Turma para frequência
-                                                <span
-                                                    style="font-weight:300;text-transform:none;letter-spacing:0;color:var(--text-muted);">(opcional)</span>
+                                                <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted);">(opcional)</span>
                                             </label>
                                             <select id="course_class_id" name="course_class_id"
                                                 class="field-select @error('course_class_id') is-invalid @enderror">
@@ -1149,16 +975,14 @@
                         </div>
                     </div>
 
-                </div>{{-- /section igreja --}}
+                </div>
 
-                {{-- ╔══════════════════════════════════
-                ║ 4 · OBSERVAÇÕES
-                ╚══════════════════════════════════ --}}
+                {{-- 4 · OBSERVAÇÕES --}}
                 <div class="form-section">
                     <div class="section-header">
                         <div class="section-icon"><i class="bi bi-chat-text-fill"></i></div>
                         <div>
-                            <div class="section-title">Observações</div>
+                            <div class="section-title">Observações Finais</div>
                             <div class="section-desc">Informação adicional que queiram partilhar</div>
                         </div>
                     </div>
@@ -1168,16 +992,14 @@
                         </label>
                         <textarea id="observations" name="observations" rows="4"
                             class="field-textarea @error('observations') is-invalid @enderror"
-                            placeholder="Partilhe qualquer informação adicional relevante para a vossa inscrição...">{{ old('observations') }}</textarea>
+                            placeholder="Partilhe qualquer informação adicional relevante para a vossa inscrição..."></textarea>
                         @error('observations')
                             <span class="field-error"><i class="bi bi-x-circle"></i> {{ $message }}</span>
                         @enderror
                     </div>
                 </div>
 
-                {{-- ╔══════════════════════════════════
-                ║ FOOTER / SUBMIT
-                ╚══════════════════════════════════ --}}
+                {{-- FOOTER / SUBMIT --}}
                 <div class="form-footer">
                     <button type="submit" class="btn-submit">
                         <i class="bi bi-send-check-fill"></i>
@@ -1190,25 +1012,19 @@
                 </div>
 
             </form>
-        </div>{{-- /form-card --}}
-    </div>{{-- /page-wrap --}}
+        </div>
+    </div>
 
     <script>
         (function () {
             'use strict';
 
-            /* ─────────────────────────────────────────
-               Helpers
-            ───────────────────────────────────────── */
             function openBlock(el) {
                 if (!el) return;
                 el.classList.add('open');
                 el.querySelectorAll('input, select, textarea').forEach(function (f) {
                     f.removeAttribute('tabindex');
                     f.removeAttribute('disabled');
-                    if (f.tagName === 'SELECT' && f.tomselect && typeof f.tomselect.enable === 'function') {
-                        f.tomselect.enable();
-                    }
                 });
             }
 
@@ -1218,18 +1034,9 @@
                 el.querySelectorAll('input, select, textarea').forEach(function (f) {
                     f.setAttribute('tabindex', '-1');
                     f.setAttribute('disabled', 'disabled');
-                    if (f.tagName === 'SELECT' && f.tomselect && typeof f.tomselect.disable === 'function') {
-                        f.tomselect.disable();
-                    }
                 });
             }
 
-            /* ─────────────────────────────────────────
-               1. TIPO DE RELAÇÃO → morada condicional
-                  dating / engaged       → addr-dual  (moradas separadas)
-                  cohabiting / married   → addr-single (morada única)
-                  (nada selecionado)     → nenhum
-            ───────────────────────────────────────── */
             var relSelect = document.getElementById('relationship_type');
             var addrSingle = document.getElementById('addr-single');
             var addrDual = document.getElementById('addr-dual');
@@ -1239,7 +1046,7 @@
                 if (v === 'vivendo_maritalmente' || v === 'casados') {
                     openBlock(addrSingle);
                     closeBlock(addrDual);
-                } else if (v === 'namoro' || v === 'noivos') {
+                } else if (v === 'namoro' || v === 'noivos' || v === 'em_relacionamento') {
                     closeBlock(addrSingle);
                     openBlock(addrDual);
                 } else {
@@ -1251,11 +1058,8 @@
             if (relSelect) {
                 relSelect.addEventListener('change', applyAddressLogic);
             }
-            applyAddressLogic(); // restore old() on page load
+            applyAddressLogic();
 
-            /* ─────────────────────────────────────────
-               2. SÃO MEMBROS → info de membro
-            ───────────────────────────────────────── */
             var memberInfo = document.getElementById('member-info');
 
             function applyMemberLogic() {
@@ -1271,11 +1075,8 @@
             document.querySelectorAll('[name="is_church_member"]').forEach(function (r) {
                 r.addEventListener('change', applyMemberLogic);
             });
-            applyMemberLogic(); // restore old() on page load
+            applyMemberLogic();
 
-            /* ─────────────────────────────────────────
-               3. ZONA → campo "outra zona"
-            ───────────────────────────────────────── */
             var zoneSelect = document.getElementById('zone_id');
             var zoneOtherField = document.getElementById('zone-other-field');
 
@@ -1292,11 +1093,8 @@
             if (zoneSelect) {
                 zoneSelect.addEventListener('change', applyZoneLogic);
             }
-            applyZoneLogic(); // restore old() on page load
+            applyZoneLogic();
 
-            /* ─────────────────────────────────────────
-               4. SWEETALERT FEEDBACK
-            ───────────────────────────────────────── */
             const swalConfig = {
                 background: '#ffffff',
                 color: '#0f172a',
@@ -1307,7 +1105,6 @@
                 }
             };
 
-            // Success Alert
             const successEl = document.getElementById('swal-success');
             if (successEl && typeof Swal !== 'undefined') {
                 const husband = successEl.dataset.husband;
@@ -1339,9 +1136,9 @@
                     html: htmlContent,
                     showCancelButton: true,
                     confirmButtonText: '<i class="bi bi-whatsapp" style="margin-right: 6px;"></i> Notificar por WhatsApp',
-                    cancelButtonText: '<i class="bi bi-printer" style="margin-right: 6px;"></i> Imprimir',
+                    cancelButtonText: '<i class="bi bi-printer" style="margin-right: 6px;"></i> Imprimir Comprovativo',
                     confirmButtonColor: '#25D366',
-                    cancelButtonColor: '#334155',
+                    cancelButtonColor: '#0f172a',
                 }).then((result) => {
                     if (result.isConfirmed) {
                         window.open(waUrl, '_blank');
@@ -1351,7 +1148,6 @@
                 });
             }
 
-            // Error Alert
             const errorEl = document.getElementById('swal-error');
             if (errorEl) {
                 const errors = JSON.parse(errorEl.dataset.errors);
@@ -1367,8 +1163,6 @@
                            </div>`,
                 });
             }
-
         })();
     </script>
-
 @endsection
