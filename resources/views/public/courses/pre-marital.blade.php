@@ -20,7 +20,7 @@
 
         :root {
             /* Life Church Light Palette */
-            --bg-page: #f8fafc;
+            --bg-page: #f1f1f1;
             --bg-card: #ffffff;
             --bg-section: #ffffff;
             --bg-input: #f8fafc;
@@ -75,7 +75,7 @@
            FORCE LIGHT THEME OVERRIDE (AUTH LAYOUT)
         ═══════════════════════════════════════════ */
         .auth-bg, .auth-overlay, body {
-            background: #f8fafc !important;
+            background: #9aeeffff !important;
             color: #0f172a !important;
         }
 
@@ -106,7 +106,7 @@
             font-size: 14px;
             line-height: 1.6;
             color: #0f172a !important;
-            background-color: #f8fafc !important;
+            background-color: #afafafff !important;
             background-image: radial-gradient(#cbd5e1 1px, transparent 1px) !important;
             background-size: 24px 24px !important;
             min-height: 100vh;
