@@ -76,6 +76,15 @@ class CellPolicy
 
     public function delete(User $user, Cell $cell): bool
     {
-        return $user->isAdmin() || $user->isSecretaria() || $user->isPastorSenior();
+        if ($user->isAdmin() || $user->isSecretaria() || $user->isPastor() || $user->isPastorSenior() || $user->isAdministracao()) {
+            return true;
+        }
+
+        if ($user->isPastorZona()) {
+            $zoneId = $cell->supervision?->zone_id;
+            return $zoneId ? $user->getManagedZoneIds()->contains($zoneId) : false;
+        }
+
+        return false;
     }
 }
