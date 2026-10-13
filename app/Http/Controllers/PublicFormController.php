@@ -167,8 +167,53 @@ class PublicFormController extends Controller
         return view('public.reports.quarterly', compact('zones', 'supervisions', 'eventTypes'));
     }
 
+    /**
+     * Normaliza campos numéricos: aceita "01", " 5 ", "" (=> 0), "3,0" etc.
+     */
+    public static function normalizeNumericInput(Request $request): void
+    {
+        $normalize = function ($value) {
+            if ($value === null || (is_string($value) && trim($value) === '')) {
+                return 0;
+            }
+            if (is_string($value)) {
+                $clean = preg_replace('/[^\d]/', '', explode(',', explode('.', trim($value))[0])[0]);
+                return $clean === '' ? $value : (int) $clean;
+            }
+            return $value;
+        };
+
+        $fields = [
+            'leaders_count', 'cells_count', 'timoteos_count', 'members_count', 'participants_count',
+            'pastors_count', 'supervisors_count', 'visitors_count', 'saved_count', 'planned_baptism_count',
+            'baptized_count', 'cell_multiplications_count', 'disciplined_leaders_count', 'closed_cells_count',
+            'year', 'quarter',
+        ];
+
+        $data = [];
+        foreach ($fields as $field) {
+            if ($request->has($field)) {
+                $data[$field] = $normalize($request->input($field));
+            }
+        }
+
+        if (is_array($request->input('events'))) {
+            $events = $request->input('events');
+            foreach ($events as $i => $event) {
+                if (is_array($event)) {
+                    $events[$i]['count'] = $normalize($event['count'] ?? 0);
+                }
+            }
+            $data['events'] = $events;
+        }
+
+        $request->merge($data);
+    }
+
     public function storeQuarterlyReport(Request $request)
     {
+        self::normalizeNumericInput($request);
+
         $validated = $request->validate([
             'zone_id' => 'required|exists:zones,id',
             'supervision_id' => 'required|exists:supervisions,id',

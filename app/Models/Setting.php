@@ -74,10 +74,16 @@ class Setting extends Model
     }
 
     /**
-     * Clear all settings cache
+     * Clear only the cached setting entries without flushing the whole application cache.
      */
     public static function clearCache(): void
     {
-        Cache::flush();
+        $settingKeys = self::query()->pluck('key')->map(function (string $key) {
+            return "setting.{$key}";
+        })->all();
+
+        foreach ($settingKeys as $cacheKey) {
+            Cache::forget($cacheKey);
+        }
     }
 }

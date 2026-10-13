@@ -59,7 +59,7 @@ class PublicCourseController extends Controller
         \App\Models\CourseEnrollment::create([
             'course_id' => $course->id,
             'user_id' => $user->id,
-            'status' => 'pending', // Or 'active' depending on logic
+            'status' => 'cursando',
             'enrolled_at' => now(),
         ]);
 

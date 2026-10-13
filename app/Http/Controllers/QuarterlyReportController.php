@@ -147,6 +147,8 @@ class QuarterlyReportController extends Controller
     {
         Gate::authorize('create', QuarterlyReport::class);
 
+        \App\Http\Controllers\PublicFormController::normalizeNumericInput($request);
+
         $validated = $request->validate([
             'zone_id' => 'required|exists:zones,id',
             'supervision_id' => 'required|exists:supervisions,id',
