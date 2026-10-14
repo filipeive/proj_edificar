@@ -6,12 +6,12 @@
 
 @section('content')
     <div class="space-y-6 md:space-y-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
             <!-- Meu Compromisso -->
             <div
-                class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-6 hover:shadow-md transition-all duration-300 group">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-base font-bold text-gray-900 dark:text-white tracking-tight">Meu Compromisso</h3>
+                class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-3.5 sm:p-5 md:p-6 hover:shadow-md transition-all duration-300 group">
+                <div class="flex items-center justify-between mb-3 sm:mb-4">
+                    <h3 class="text-sm sm:text-base font-bold text-gray-900 dark:text-white tracking-tight">Meu Compromisso</h3>
                     <a href="{{ route('commitments.index') }}"
                         class="text-[9px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest hover:text-orange-700 dark:hover:text-orange-300">
                         Alterar <i class="bi bi-chevron-right ml-1"></i>
@@ -19,13 +19,13 @@
                 </div>
                 @if($commitment)
                     <div
-                        class="bg-orange-50 dark:bg-orange-950/20 border border-orange-100/50 dark:border-orange-900/20 rounded-xl p-4 transition-all duration-300">
+                        class="bg-orange-50 dark:bg-orange-950/20 border border-orange-100/50 dark:border-orange-900/20 rounded-lg sm:rounded-xl p-3 sm:p-4 transition-all duration-300">
                         <p
                             class="text-[9px] font-black uppercase tracking-widest text-orange-600 dark:text-orange-400 mb-1">
                             {{ $commitment->package->name }}
                         </p>
                         <p
-                            class="text-xl font-black text-orange-900 dark:text-orange-100 mt-1 tracking-tight">
+                            class="text-lg sm:text-xl font-black text-orange-900 dark:text-orange-100 mt-1 tracking-tight">
                             {{ number_format($commitment->package->min_amount, 0, ',', '.') }} -
                             @if($commitment->package->max_amount)
                                 {{ number_format($commitment->package->max_amount, 0, ',', '.') }}
@@ -35,15 +35,15 @@
                             MT
                         </p>
                         <p
-                            class="text-[9px] text-gray-400 dark:text-zinc-500 mt-3 font-bold uppercase tracking-widest">
+                            class="text-[9px] text-gray-400 dark:text-zinc-500 mt-2 sm:mt-3 font-bold uppercase tracking-widest">
                             Desde {{ $commitment->start_date->format('d/m/Y') }}</p>
                     </div>
                 @else
                     <div
-                        class="text-center py-6 bg-gray-50 dark:bg-zinc-850 rounded-xl border border-dashed border-gray-200 dark:border-zinc-800">
+                        class="text-center py-5 sm:py-6 bg-gray-50 dark:bg-zinc-850 rounded-lg sm:rounded-xl border border-dashed border-gray-200 dark:border-zinc-800">
                         <p class="text-gray-500 dark:text-gray-400 text-xs mb-3">Você ainda não escolheu um compromisso</p>
                         <a href="{{ route('commitments.index') }}"
-                            class="inline-flex items-center px-4 py-2 bg-orange-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-orange-600/20 hover:bg-orange-700 transition-all">
+                            class="inline-flex items-center px-3.5 py-1.5 sm:px-4 sm:py-2 bg-orange-600 text-white rounded-lg sm:rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-orange-600/20 hover:bg-orange-700 transition-all">
                             Escolher Agora
                         </a>
                     </div>
@@ -52,59 +52,59 @@
 
             <!-- Total Este Mês -->
             <div
-                class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-6 hover:shadow-md transition-all duration-300 group">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-base font-bold text-gray-900 dark:text-white tracking-tight">Total Este Mês</h3>
-                    <div class="bg-orange-50 dark:bg-orange-950/20 p-2.5 rounded-xl">
-                        <i class="bi bi-cash-stack text-orange-600 dark:text-orange-400 text-xl"></i>
+                class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-3.5 sm:p-5 md:p-6 hover:shadow-md transition-all duration-300 group">
+                <div class="flex items-center justify-between mb-3 sm:mb-4">
+                    <h3 class="text-sm sm:text-base font-bold text-gray-900 dark:text-white tracking-tight">Total Este Mês</h3>
+                    <div class="bg-orange-50 dark:bg-orange-950/20 p-2 sm:p-2.5 rounded-lg sm:rounded-xl">
+                        <i class="bi bi-cash-stack text-orange-600 dark:text-orange-400 text-base sm:text-xl"></i>
                     </div>
                 </div>
                 <div
-                    class="bg-orange-50 dark:bg-orange-950/20 border border-orange-100/50 dark:border-orange-900/20 rounded-xl p-4 transition-all duration-300">
+                    class="bg-orange-50 dark:bg-orange-950/20 border border-orange-100/50 dark:border-orange-900/20 rounded-lg sm:rounded-xl p-3 sm:p-4 transition-all duration-300">
                     <p
                         class="text-[9px] font-black uppercase tracking-widest text-orange-600 dark:text-orange-400 mb-1">
                         Contribuição Acumulada</p>
                     <p
-                        class="text-xl font-black text-orange-900 dark:text-orange-100 mt-1 tracking-tight">
+                        class="text-lg sm:text-xl font-black text-orange-900 dark:text-orange-100 mt-1 tracking-tight">
                         {{ number_format($totalThisMonth, 2, ',', '.') }} MT
                     </p>
                     <p
-                        class="text-[9px] text-gray-400 dark:text-zinc-500 mt-3 font-bold uppercase tracking-widest">
+                        class="text-[9px] text-gray-400 dark:text-zinc-500 mt-2 sm:mt-3 font-bold uppercase tracking-widest">
                         Período: Dia 20 ao 5</p>
                 </div>
             </div>
 
             <!-- Ações Rápidas -->
             <div
-                class="col-span-1 md:col-span-2 lg:col-span-1 bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-6 hover:shadow-md transition-all duration-300">
-                <h3 class="text-base font-bold text-gray-900 dark:text-white tracking-tight mb-4">Próximos Passos</h3>
-                <div class="space-y-3">
+                class="col-span-1 md:col-span-2 lg:col-span-1 bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-3.5 sm:p-5 md:p-6 hover:shadow-md transition-all duration-300">
+                <h3 class="text-sm sm:text-base font-bold text-gray-900 dark:text-white tracking-tight mb-3 sm:mb-4">Próximos Passos</h3>
+                <div class="space-y-2.5 sm:space-y-3">
                     <a href="{{ route('contributions.create') }}"
-                        class="flex items-center p-3 bg-orange-600 text-white rounded-xl shadow-lg shadow-orange-600/10 hover:bg-orange-700 transition-all group">
-                        <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center mr-3">
-                            <i class="bi bi-plus-lg text-lg"></i>
+                        class="flex items-center p-2.5 sm:p-3 bg-orange-600 text-white rounded-lg sm:rounded-xl shadow-lg shadow-orange-600/10 hover:bg-orange-700 transition-all group">
+                        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/20 flex items-center justify-center mr-2.5 sm:mr-3">
+                            <i class="bi bi-plus-lg text-sm sm:text-base"></i>
                         </div>
-                        <span class="font-black uppercase tracking-widest text-[10px]">Nova Contribuição</span>
+                        <span class="font-black uppercase tracking-widest text-[9px] sm:text-[10px]">Nova Contribuição</span>
                     </a>
                     <a href="{{ route('contributions.index', ['mine' => 1]) }}"
-                        class="flex items-center p-3 bg-gray-50 dark:bg-zinc-850 text-gray-650 dark:text-zinc-350 rounded-xl border border-gray-100 dark:border-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-900 transition-all group">
+                        class="flex items-center p-2.5 sm:p-3 bg-gray-50 dark:bg-zinc-850 text-gray-650 dark:text-zinc-350 rounded-lg sm:rounded-xl border border-gray-100 dark:border-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-900 transition-all group">
                         <div
-                            class="w-8 h-8 rounded-lg bg-white dark:bg-zinc-900 flex items-center justify-center mr-3 shadow-sm">
-                            <i class="bi bi-clock-history text-lg text-orange-600 dark:text-orange-400"></i>
+                            class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white dark:bg-zinc-900 flex items-center justify-center mr-2.5 sm:mr-3 shadow-sm">
+                            <i class="bi bi-clock-history text-sm sm:text-base text-orange-600 dark:text-orange-400"></i>
                         </div>
-                        <span class="font-black uppercase tracking-widest text-[10px]">Ver Histórico</span>
+                        <span class="font-black uppercase tracking-widest text-[9px] sm:text-[10px]">Ver Histórico</span>
                     </a>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-8">
             <!-- Últimas Contribuições -->
             <div
-                class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 overflow-hidden">
+                class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 overflow-hidden">
                 <div
-                    class="px-6 py-5 border-b border-gray-50 dark:border-zinc-850 flex items-center justify-between">
-                    <h3 class="text-base font-bold text-gray-900 dark:text-white tracking-tight">Minhas Contribuições</h3>
+                    class="px-4 sm:px-6 py-3.5 sm:py-5 border-b border-gray-50 dark:border-zinc-850 flex items-center justify-between">
+                    <h3 class="text-sm sm:text-base font-bold text-gray-900 dark:text-white tracking-tight">Minhas Contribuições</h3>
                     <a href="{{ route('contributions.index', ['mine' => 1]) }}"
                         class="text-[9px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest hover:text-orange-700 dark:hover:text-orange-300">Ver Todas</a>
                 </div>
@@ -112,44 +112,44 @@
                     <table class="w-full">
                         <thead>
                             <tr
-                                class="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 border-b border-gray-50 dark:border-zinc-850">
-                                <th class="px-6 py-4 text-left">Data</th>
-                                <th class="px-6 py-4 text-center">Status</th>
-                                <th class="px-6 py-4 text-right">Valor</th>
+                                class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 border-b border-gray-50 dark:border-zinc-850">
+                                <th class="px-3 sm:px-6 py-2.5 sm:py-4 text-left">Data</th>
+                                <th class="px-3 sm:px-6 py-2.5 sm:py-4 text-center">Status</th>
+                                <th class="px-3 sm:px-6 py-2.5 sm:py-4 text-right">Valor</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-50 dark:divide-zinc-850">
                             @forelse($contributions as $contribution)
                                 <tr class="hover:bg-gray-50 dark:hover:bg-zinc-900/40 transition-colors group">
-                                    <td class="px-6 py-4">
+                                    <td class="px-3 sm:px-6 py-2.5 sm:py-4">
                                         <span
-                                            class="font-black text-gray-900 dark:text-white text-sm">{{ $contribution->contribution_date->format('d/m/Y') }}</span>
+                                            class="font-black text-gray-900 dark:text-white text-xs sm:text-sm">{{ $contribution->contribution_date->format('d/m/Y') }}</span>
                                     </td>
-                                    <td class="px-6 py-4 text-center">
+                                    <td class="px-3 sm:px-6 py-2.5 sm:py-4 text-center">
                                         @if($contribution->status === 'verificada')
                                             <span
-                                                class="px-2.5 py-0.5 bg-green-50 dark:bg-green-950/20 text-green-600 dark:text-green-400 rounded-full text-[9px] font-black uppercase tracking-widest">
+                                                class="px-2 py-0.5 bg-green-50 dark:bg-green-950/20 text-green-600 dark:text-green-400 rounded-full text-[8px] sm:text-[9px] font-black uppercase tracking-widest">
                                                 ✓ Verificada
                                             </span>
                                         @elseif($contribution->status === 'pendente')
                                             <span
-                                                class="px-2.5 py-0.5 bg-yellow-50 dark:bg-yellow-950/20 text-yellow-600 dark:text-yellow-400 rounded-full text-[9px] font-black uppercase tracking-widest">
+                                                class="px-2 py-0.5 bg-yellow-50 dark:bg-yellow-950/20 text-yellow-600 dark:text-yellow-400 rounded-full text-[8px] sm:text-[9px] font-black uppercase tracking-widest">
                                                 ⌚ Pendente
                                             </span>
                                         @else
                                             <span
-                                                class="px-2.5 py-0.5 bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 rounded-full text-[9px] font-black uppercase tracking-widest">
+                                                class="px-2 py-0.5 bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 rounded-full text-[8px] sm:text-[9px] font-black uppercase tracking-widest">
                                                 ✕ Rejeitada
                                             </span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 text-right font-black text-gray-900 dark:text-white tracking-tight text-sm">
+                                    <td class="px-3 sm:px-6 py-2.5 sm:py-4 text-right font-black text-gray-900 dark:text-white tracking-tight text-xs sm:text-sm">
                                         {{ number_format($contribution->amount, 2, ',', '.') }} MT
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="3" class="px-6 py-8 text-center text-gray-400 dark:text-zinc-500">
+                                    <td colspan="3" class="px-4 sm:px-6 py-6 sm:py-8 text-center text-gray-400 dark:text-zinc-500 text-xs sm:text-sm">
                                         Nenhuma contribuição registada recentemente.
                                     </td>
                                 </tr>
@@ -160,24 +160,24 @@
             </div>
 
             <!-- Próximos Eventos -->
-            <div class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-6 md:p-8"
+            <div class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-4 sm:p-6 md:p-8"
                 x-data="{ activeEvent: null }">
-                <div class="flex items-center justify-between mb-8">
-                    <h3 class="text-base font-bold text-gray-900 dark:text-white tracking-tight">Próximos Eventos
+                <div class="flex items-center justify-between mb-4 sm:mb-8">
+                    <h3 class="text-sm sm:text-base font-bold text-gray-900 dark:text-white tracking-tight">Próximos Eventos
                     </h3>
                     <a href="{{ route('events.index') }}"
                         class="text-[9px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest hover:text-orange-700 dark:hover:text-orange-300">Ver Calendário</a>
                 </div>
-                <div class="space-y-6">
+                <div class="space-y-4 sm:space-y-6">
                     @forelse($upcomingEvents as $event)
                         <div @click="activeEvent = {{ $event->toJson() }}"
-                            class="flex items-center space-x-6 group cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-850 p-2 rounded-2xl transition-all">
+                            class="flex items-center space-x-3 sm:space-x-6 group cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-850 p-1.5 sm:p-2 rounded-xl sm:rounded-2xl transition-all">
                             <div
-                                class="bg-gray-50 dark:bg-zinc-850 px-4 py-3 rounded-2xl text-center min-w-[70px] group-hover:bg-orange-600 group-hover:text-white transition-colors">
+                                class="bg-gray-50 dark:bg-zinc-850 px-3 py-2 sm:px-4 sm:py-3 rounded-xl sm:rounded-2xl text-center min-w-[55px] sm:min-w-[70px] group-hover:bg-orange-600 group-hover:text-white transition-colors">
                                 <span
-                                    class="block text-xl font-black leading-none text-gray-900 dark:text-gray-100 group-hover:text-white">{{ $event->date->format('d') }}</span>
+                                    class="block text-base sm:text-xl font-black leading-none text-gray-900 dark:text-gray-100 group-hover:text-white">{{ $event->date->format('d') }}</span>
                                 <span
-                                    class="text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-400 group-hover:text-white">{{ $event->date->translatedFormat('M') }}</span>
+                                    class="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-400 group-hover:text-white">{{ $event->date->translatedFormat('M') }}</span>
                             </div>
                             <div class="flex-1">
                                 <h4
@@ -278,51 +278,51 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
             @if(isset($myCell) && $myCell)
                 <!-- Minha Célula (Gestão Eclesiástica) -->
                 <div id="minha-celula"
-                    class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm p-6 md:p-8 border border-gray-100 dark:border-zinc-850 relative overflow-hidden flex flex-col justify-between group h-full">
+                    class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-6 md:p-8 border border-gray-100 dark:border-zinc-850 relative overflow-hidden flex flex-col justify-between group h-full">
                     <div
                         class="absolute top-0 right-0 w-64 h-64 bg-orange-500/5 dark:bg-orange-950/10 rounded-full -mr-32 -mt-32 blur-3xl transition-all duration-700 group-hover:bg-orange-500/10">
                     </div>
 
                     <div class="relative z-10">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-xl font-black tracking-tight text-gray-900 dark:text-white">Minha Célula (Gestão)</h3>
+                        <div class="flex items-center justify-between mb-4 sm:mb-6">
+                            <h3 class="text-base sm:text-xl font-black tracking-tight text-gray-900 dark:text-white">Minha Célula (Gestão)</h3>
                             <div
-                                class="w-12 h-12 rounded-full bg-orange-50 dark:bg-orange-950/30 flex items-center justify-center text-orange-600 dark:text-orange-400 transform group-hover:rotate-12 transition-transform duration-500">
-                                <i class="bi bi-people-fill text-xl"></i>
+                                class="w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-orange-50 dark:bg-orange-950/30 flex items-center justify-center text-orange-600 dark:text-orange-400 transform group-hover:rotate-12 transition-transform duration-500">
+                                <i class="bi bi-people-fill text-base sm:text-xl"></i>
                             </div>
                         </div>
 
-                        <div class="mb-6">
-                            <h4 class="text-2xl font-black text-orange-600 dark:text-orange-400 mb-1 tracking-tight">
+                        <div class="mb-4 sm:mb-6">
+                            <h4 class="text-xl sm:text-2xl font-black text-orange-600 dark:text-orange-400 mb-1 tracking-tight">
                                 {{ $myCell->name }}</h4>
                             <p class="text-xs font-bold text-gray-400 dark:text-zinc-500 flex items-center gap-2">
                                 <i class="bi bi-person-badge"></i> Líder: {{ $myCell->leader->name ?? 'N/A' }}
                             </p>
-                            <div class="mt-3 inline-flex items-center gap-2 rounded-full bg-orange-50 dark:bg-orange-950/30 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-orange-700 dark:text-orange-300">
+                            <div class="mt-2.5 sm:mt-3 inline-flex items-center gap-2 rounded-full bg-orange-50 dark:bg-orange-950/30 px-2.5 sm:px-3 py-0.5 sm:py-1 text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-orange-700 dark:text-orange-300">
                                 <span class="h-1.5 w-1.5 rounded-full bg-orange-500"></span>
                                 Gestão Eclesiástica Ativa
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4 mb-6">
-                            <div class="bg-gray-50 dark:bg-zinc-850 p-4 rounded-xl">
+                        <div class="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
+                            <div class="bg-gray-50 dark:bg-zinc-850 p-3 sm:p-4 rounded-lg sm:rounded-xl">
                                 <p
                                     class="text-[9px] font-black text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-1">
                                     Presenças (Total)
                                 </p>
-                                <p class="text-xl font-black text-gray-900 dark:text-white">
+                                <p class="text-lg sm:text-xl font-black text-gray-900 dark:text-white">
                                     {{ $attendanceStats['total_present'] ?? 0 }}</p>
                             </div>
-                            <div class="bg-gray-50 dark:bg-zinc-850 p-4 rounded-xl">
+                            <div class="bg-gray-50 dark:bg-zinc-850 p-3 sm:p-4 rounded-lg sm:rounded-xl">
                                 <p
                                     class="text-[9px] font-black text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-1">
                                     Últimos 3 Meses
                                 </p>
-                                <p class="text-xl font-black text-gray-900 dark:text-white">
+                                <p class="text-lg sm:text-xl font-black text-gray-900 dark:text-white">
                                     {{ $attendanceStats['last_3_months_present'] ?? 0 }}
                                 </p>
                             </div>
@@ -330,27 +330,27 @@
 
                         @if(isset($attendanceStats['last_attendance']) && $attendanceStats['last_attendance'])
                             <div
-                                class="inline-flex items-center gap-2 px-3 py-1.5 bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-300 rounded-full text-xs font-bold w-fit">
+                                class="inline-flex items-center gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-300 rounded-full text-[11px] sm:text-xs font-bold w-fit">
                                 <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
                                 Última presença: {{ \Carbon\Carbon::parse($attendanceStats['last_attendance'])->format('d/m/Y') }}
                             </div>
                         @endif
 
-                        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="mt-4 sm:mt-6 grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                             @php
                                 $cellDetailsLink = ($authUser->isLider() || $authUser->isSupervisor() || $authUser->isPastorZona() || $authUser->isAdmin())
                                     ? route('cells.show', $myCell)
                                     : route('dashboard.membro') . '#minha-celula';
                             @endphp
                             <a href="{{ $cellDetailsLink }}"
-                                class="inline-flex items-center justify-center gap-2 px-4 py-3 bg-zinc-950 dark:bg-zinc-900 hover:bg-zinc-900 text-white rounded-xl font-black text-[9px] uppercase tracking-widest transition-all">
+                                class="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 bg-zinc-950 dark:bg-zinc-900 hover:bg-zinc-900 text-white rounded-lg sm:rounded-xl font-black text-[9px] uppercase tracking-widest transition-all">
                                 <i class="bi bi-diagram-3-fill"></i>
                                 Ver Detalhes
                             </a>
 
                             @if($authUser->isLider() || $authUser->isSupervisor() || $authUser->isPastorZona() || $authUser->isAdmin())
                                 <a href="{{ route('members.index', ['cell_id' => $myCell->id]) }}"
-                                    class="inline-flex items-center justify-center gap-2 px-4 py-3 bg-orange-650 text-white rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-orange-700 transition-all">
+                                    class="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 bg-orange-650 text-white rounded-lg sm:rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-orange-700 transition-all">
                                     <i class="bi bi-person-lines-fill"></i>
                                     Gerir Membros
                                 </a>
@@ -361,15 +361,15 @@
             @else
                 <!-- Sem célula vinculada -->
                 <div
-                    class="bg-zinc-950 rounded-2xl shadow-xl p-8 text-white relative overflow-hidden flex flex-col justify-center border border-zinc-900">
+                    class="bg-zinc-950 rounded-xl sm:rounded-2xl shadow-xl p-5 sm:p-8 text-white relative overflow-hidden flex flex-col justify-center border border-zinc-900">
                     <div class="absolute top-0 right-0 w-64 h-64 bg-orange-600/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
                     <div class="relative z-10">
-                        <h3 class="text-xl font-black tracking-tight mb-3">Minha Célula (Gestão)</h3>
-                        <p class="text-gray-400 text-xs leading-relaxed mb-6">
+                        <h3 class="text-lg sm:text-xl font-black tracking-tight mb-2 sm:mb-3">Minha Célula (Gestão)</h3>
+                        <p class="text-gray-400 text-xs leading-relaxed mb-4 sm:mb-6">
                             Você não pertence a nenhuma célula neste momento. Contacte o seu líder, supervisor ou administração para ser vinculado a uma célula.
                         </p>
                         <a href="{{ route('members.index') }}"
-                            class="inline-flex items-center px-4 py-2.5 bg-orange-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-700 transition-all">
+                            class="inline-flex items-center px-3.5 py-2 sm:px-4 sm:py-2.5 bg-orange-600 text-white rounded-lg sm:rounded-xl font-black text-[9px] sm:text-[10px] uppercase tracking-widest hover:bg-orange-700 transition-all">
                             Ver Estrutura de Membros
                         </a>
                     </div>

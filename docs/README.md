@@ -26,6 +26,7 @@ Estes documentos contêm o mapeamento completo de toda a estrutura técnica do P
 | 25 | [Ficheiro de Rotas](25-routes.md) | Mapeamento completo de todos os 225+ endpoints da aplicação com métodos, URLs e middlewares. |
 | 26 | [Dicionário de Controllers](26-controllers.md) | Responsabilidades, injeção de dependências e responsabilidades de cada uma das 44 classes. |
 | 27 | [Dicionário de Models](27-models.md) | Mapeamento de atributos, scopes, mutators, accessors e relações dos 36 Eloquent Models. |
+| 40 | [Multi-Tenancy por Congregação](40-multi-tenancy.md) | Isolamento por `congregation_id`, resolução de contexto, provisionamento e regras para migrations, jobs, pivots e testes. |
 
 ---
 

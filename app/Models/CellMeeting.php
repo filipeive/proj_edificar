@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CellMeeting extends Model
+class CellMeeting extends CongregationModel
 {
     use HasFactory;
 
@@ -52,7 +52,9 @@ class CellMeeting extends Model
 
     public function participants()
     {
-        return $this->belongsToMany(User::class, 'cell_meeting_participants');
+        return $this->belongsToMany(User::class, 'cell_meeting_participants')
+            ->using(CellMeetingParticipant::class)
+            ->withPivot('congregation_id');
     }
 
     public function attendances()

@@ -90,6 +90,8 @@
                         class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-medium text-gray-700 placeholder-gray-400 resize-none">{{ old('description') }}</textarea>
                 </div>
 
+                    <x-location-map id="zone-location-map" mode="area" />
+
                 <div class="flex flex-col md:flex-row gap-4 pt-4">
                     <button type="submit"
                         class="flex-1 bg-blue-600 text-white px-8 py-4 rounded-2xl hover:bg-blue-700 transition-all duration-300 font-black shadow-lg shadow-blue-200">

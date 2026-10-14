@@ -85,22 +85,30 @@ class UserController
     public function create(): View
     {
         $cells = Cell::all();
-        $roles = ['membro', 'lider_celula', 'supervisor', 'pastor_zona', 'administracao', 'admin', 'super_admin'];
+        $hasEdificar = app(\App\Services\CongregationContext::class)->hasEdificar();
+        $roles = ['membro', 'lider_celula', 'supervisor', 'pastor_zona', 'administracao', 'secretaria', 'tesouraria', 'pastor', 'pastor_senior', 'admin'];
+        if ($hasEdificar) {
+            $roles = array_merge($roles, ['comissao_obra', 'responsavel_pacote']);
+        }
+
         return view('admin.users.create', [
             'cells' => $cells,
             'roles' => $roles,
-            'canManageAdminRoles' => auth()->user()->isSuperAdmin(),
+            'canManageAdminRoles' => auth()->user()->isSuperAdmin() || auth()->user()->isAdmin(),
         ]);
     }
 
     public function store(Request $request)
     {
+        $hasEdificar = app(\App\Services\CongregationContext::class)->hasEdificar();
+        $allowedRoles = 'membro,lider_celula,supervisor,pastor_zona,secretaria,admin,tesouraria,pastor,pastor_senior,administracao' . ($hasEdificar ? ',comissao_obra,responsavel_pacote' : '');
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6|confirmed',
             'phone' => 'nullable|moz_phone',
-            'role' => 'required|in:membro,lider_celula,supervisor,pastor_zona,secretaria,admin,super_admin,comissao_obra,responsavel_pacote,tesouraria,pastor,pastor_senior,administracao',
+            'role' => "required|in:{$allowedRoles}",
             'cell_id' => 'nullable|exists:cells,id',
             'is_active' => 'boolean',
         ]);
@@ -217,13 +225,22 @@ class UserController
             abort(403, 'Apenas super admin pode gerir contas admin/super admin.');
         }
 
+        if (!$this->canManagePrivilegedUser($user)) {
+            abort(403, 'Apenas super admin pode gerir contas admin/super admin.');
+        }
+
         $cells = Cell::all();
-        $roles = ['membro', 'lider_celula', 'supervisor', 'pastor_zona', 'administracao', 'admin', 'super_admin'];
+        $hasEdificar = app(\App\Services\CongregationContext::class)->hasEdificar();
+        $roles = ['membro', 'lider_celula', 'supervisor', 'pastor_zona', 'administracao', 'secretaria', 'tesouraria', 'pastor', 'pastor_senior', 'admin'];
+        if ($hasEdificar) {
+            $roles = array_merge($roles, ['comissao_obra', 'responsavel_pacote']);
+        }
+
         return view('admin.users.edit', [
             'user' => $user,
             'cells' => $cells,
             'roles' => $roles,
-            'canManageAdminRoles' => auth()->user()->isSuperAdmin(),
+            'canManageAdminRoles' => auth()->user()->isSuperAdmin() || auth()->user()->isAdmin(),
         ]);
     }
 
@@ -233,11 +250,14 @@ class UserController
             return back()->with('error', 'Apenas super admin pode gerir contas admin/super admin.');
         }
 
+        $hasEdificar = app(\App\Services\CongregationContext::class)->hasEdificar();
+        $allowedRoles = 'membro,lider_celula,supervisor,pastor_zona,secretaria,admin,tesouraria,pastor,pastor_senior,administracao' . ($hasEdificar ? ',comissao_obra,responsavel_pacote' : '');
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => "required|email|unique:users,email,{$user->id}",
             'phone' => 'nullable|moz_phone',
-            'role' => 'required|in:membro,lider_celula,supervisor,pastor_zona,secretaria,admin,super_admin,comissao_obra,responsavel_pacote,tesouraria,pastor,pastor_senior,administracao',
+            'role' => "required|in:{$allowedRoles}",
             'cell_id' => 'nullable|exists:cells,id',
             'is_active' => 'boolean',
             'menu_permissions' => 'nullable|array',
@@ -926,8 +946,12 @@ class UserController
 
     private function validateRoleAssignment(string $targetRole): void
     {
-        if (in_array($targetRole, ['admin', 'super_admin'], true) && !auth()->user()->isSuperAdmin()) {
-            abort(403, 'Apenas super admin pode atribuir papéis admin/super admin.');
+        if ($targetRole === 'super_admin') {
+            abort(403, 'O papel Super Admin não pode ser atribuído no portal da congregação.');
+        }
+
+        if (in_array($targetRole, ['admin', 'pastor_senior'], true) && !auth()->user()->isSuperAdmin() && !auth()->user()->isAdmin()) {
+            abort(403, 'Apenas administradores podem atribuir papéis administrativos.');
         }
     }
 

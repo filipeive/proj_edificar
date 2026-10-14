@@ -146,6 +146,8 @@
                 </div>
             </div>
 
+            <x-location-map id="cell-location-map" :latitude="$cell->latitude" :longitude="$cell->longitude" />
+
             <!-- Footer Actions -->
             <div class="flex flex-col md:flex-row gap-4 pt-4">
                 <button type="submit"

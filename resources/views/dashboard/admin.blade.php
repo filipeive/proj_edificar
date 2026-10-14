@@ -2,7 +2,8 @@
 
 @push('styles')
     <style>
-        /* Removed #zonesMap and .leaflet-container styles */
+        .church-map .leaflet-container { min-height: 420px; z-index: 0; }
+        .leaflet-draw-toolbar a { background-size: 300px 30px; }
     </style>
 @endpush
 
@@ -13,58 +14,58 @@
 @section('content')
     <div class="space-y-6 md:space-y-8">
         <!-- QW-05: Métricas agora visíveis em mobile (era hidden md:grid) -->
-        <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+        <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-6 mb-6 md:mb-8">
             <!-- Card: Membros Ativos -->
             <div
-                class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-6 hover:shadow-md transition-all duration-300 group">
-                <div class="flex items-center justify-between mb-4">
+                class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-3 sm:p-4 md:p-6 hover:shadow-md transition-all duration-300 group">
+                <div class="flex items-center justify-between mb-2 sm:mb-3 md:mb-4">
                     <div
-                        class="bg-orange-50 dark:bg-orange-950/20 p-3.5 rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
+                        class="bg-orange-50 dark:bg-orange-950/20 p-2 sm:p-2.5 md:p-3.5 rounded-lg sm:rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
                         <i
-                            class="bi bi-people-fill text-orange-600 dark:text-orange-400 text-xl group-hover:text-white transition-colors duration-300"></i>
+                            class="bi bi-people-fill text-orange-600 dark:text-orange-400 text-base sm:text-lg md:text-xl group-hover:text-white transition-colors duration-300"></i>
                     </div>
                     <span
-                        class="text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Comunidade</span>
+                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Comunidade</span>
                 </div>
                 <div>
-                    <p class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-wider">Membros Ativos
+                    <p class="text-gray-400 dark:text-gray-500 text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">Membros Ativos
                     </p>
-                    <p class="text-2xl font-black text-gray-900 dark:text-white mt-1 tracking-tight">{{ $totalMembers }}
+                    <p class="text-lg sm:text-xl md:text-2xl font-black text-gray-900 dark:text-white mt-0.5 sm:mt-1 tracking-tight truncate">{{ $totalMembers }}
                     </p>
-                    <div class="flex items-center mt-3 text-[10px]">
+                    <div class="flex items-center mt-1.5 sm:mt-2.5 md:mt-3 text-[9px] sm:text-[10px]">
                         <span class="text-orange-500 dark:text-orange-400 font-bold flex items-center">
-                            <i class="bi bi-graph-up mr-1 text-sm"></i> Crescendo
+                            <i class="bi bi-graph-up mr-1 text-xs"></i> Crescendo
                         </span>
-                        <span class="text-gray-400 dark:text-gray-500 ml-1.5">este mês</span>
+                        <span class="text-gray-400 dark:text-gray-500 ml-1 truncate">este mês</span>
                     </div>
                 </div>
             </div>
 
             <!-- Card: Total Dízimos/Ofertas -->
             <div
-                class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-6 hover:shadow-md transition-all duration-300 group">
-                <div class="flex items-center justify-between mb-4">
+                class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-3 sm:p-4 md:p-6 hover:shadow-md transition-all duration-300 group">
+                <div class="flex items-center justify-between mb-2 sm:mb-3 md:mb-4">
                     <div
-                        class="bg-orange-50 dark:bg-orange-950/20 p-3.5 rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
+                        class="bg-orange-50 dark:bg-orange-950/20 p-2 sm:p-2.5 md:p-3.5 rounded-lg sm:rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
                         <i
-                            class="bi bi-cash-coin text-orange-600 dark:text-orange-400 text-xl group-hover:text-white transition-colors duration-300"></i>
+                            class="bi bi-cash-coin text-orange-600 dark:text-orange-400 text-base sm:text-lg md:text-xl group-hover:text-white transition-colors duration-300"></i>
                     </div>
                     <span
-                        class="text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Eclesiástico</span>
+                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Eclesiástico</span>
                 </div>
                 <div>
-                    <p class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-wider">Dízimos e Ofertas
+                    <p class="text-gray-400 dark:text-gray-500 text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">Dízimos e Ofertas
                     </p>
-                    <p class="text-2xl font-black text-gray-900 dark:text-white mt-1 tracking-tight">
+                    <p class="text-base sm:text-xl md:text-2xl font-black text-gray-900 dark:text-white mt-0.5 sm:mt-1 tracking-tight truncate">
                         {{ number_format($totalContributed, 2, ',', '.') }} MT
                     </p>
-                    <div class="flex items-center mt-3 text-[10px]">
+                    <div class="flex items-center mt-1.5 sm:mt-2.5 md:mt-3 text-[9px] sm:text-[10px]">
                         @if($totalContributed == 0)
                             <span class="text-yellow-600 dark:text-yellow-400 font-bold flex items-center">
-                                <i class="bi bi-info-circle mr-1"></i> Sem registos
+                                <i class="bi bi-info-circle mr-1 text-xs"></i> Sem registos
                             </span>
                         @else
-                            <span class="text-gray-400 dark:text-gray-500">Total do Mês (Calendário)</span>
+                            <span class="text-gray-400 dark:text-gray-500 truncate">Total do Mês</span>
                         @endif
                     </div>
                 </div>
@@ -72,23 +73,23 @@
 
             <!-- Card: Próximos Eventos -->
             <div
-                class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-6 hover:shadow-md transition-all duration-300 group">
-                <div class="flex items-center justify-between mb-4">
+                class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-3 sm:p-4 md:p-6 hover:shadow-md transition-all duration-300 group">
+                <div class="flex items-center justify-between mb-2 sm:mb-3 md:mb-4">
                     <div
-                        class="bg-orange-50 dark:bg-orange-950/20 p-3.5 rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
+                        class="bg-orange-50 dark:bg-orange-950/20 p-2 sm:p-2.5 md:p-3.5 rounded-lg sm:rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
                         <i
-                            class="bi bi-calendar-event-fill text-orange-600 dark:text-orange-400 text-xl group-hover:text-white transition-colors duration-300"></i>
+                            class="bi bi-calendar-event-fill text-orange-600 dark:text-orange-400 text-base sm:text-lg md:text-xl group-hover:text-white transition-colors duration-300"></i>
                     </div>
                     <span
-                        class="text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Agenda</span>
+                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Agenda</span>
                 </div>
                 <div>
-                    <p class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-wider">Próximos Eventos
+                    <p class="text-gray-400 dark:text-gray-500 text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">Próximos Eventos
                     </p>
-                    <p class="text-2xl font-black text-gray-900 dark:text-white mt-1 tracking-tight">
+                    <p class="text-lg sm:text-xl md:text-2xl font-black text-gray-900 dark:text-white mt-0.5 sm:mt-1 tracking-tight truncate">
                         {{ count($upcomingEvents) }}</p>
                     <a href="{{ route('events.index') }}"
-                        class="inline-flex items-center mt-3 text-[9px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest hover:text-orange-700 dark:hover:text-orange-300">
+                        class="inline-flex items-center mt-1.5 sm:mt-2.5 md:mt-3 text-[8px] sm:text-[9px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest hover:text-orange-700 dark:hover:text-orange-300 truncate">
                         Ver Calendário <i class="bi bi-arrow-right ml-1"></i>
                     </a>
                 </div>
@@ -96,92 +97,94 @@
 
             <!-- Card: Cultos Recentes -->
             <div
-                class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-6 hover:shadow-md transition-all duration-300 group">
-                <div class="flex items-center justify-between mb-4">
+                class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-3 sm:p-4 md:p-6 hover:shadow-md transition-all duration-300 group">
+                <div class="flex items-center justify-between mb-2 sm:mb-3 md:mb-4">
                     <div
-                        class="bg-orange-50 dark:bg-orange-950/20 p-3.5 rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
+                        class="bg-orange-50 dark:bg-orange-950/20 p-2 sm:p-2.5 md:p-3.5 rounded-lg sm:rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
                         <i
-                            class="bi bi-journal-bookmark-fill text-orange-600 dark:text-orange-400 text-xl group-hover:text-white transition-colors duration-300"></i>
+                            class="bi bi-journal-bookmark-fill text-orange-600 dark:text-orange-400 text-base sm:text-lg md:text-xl group-hover:text-white transition-colors duration-300"></i>
                     </div>
                     <span
-                        class="text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Cultos</span>
+                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Cultos</span>
                 </div>
                 <div>
-                    <p class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-wider">Relatórios</p>
-                    <p class="text-2xl font-black text-gray-900 dark:text-white mt-1 tracking-tight">
+                    <p class="text-gray-400 dark:text-gray-500 text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">Relatórios</p>
+                    <p class="text-lg sm:text-xl md:text-2xl font-black text-gray-900 dark:text-white mt-0.5 sm:mt-1 tracking-tight truncate">
                         {{ count($recentServices) }}</p>
                     <a href="{{ route('services.index') }}"
-                        class="inline-flex items-center mt-3 text-[9px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest hover:text-orange-700 dark:hover:text-orange-300">
+                        class="inline-flex items-center mt-1.5 sm:mt-2.5 md:mt-3 text-[8px] sm:text-[9px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest hover:text-orange-700 dark:hover:text-orange-300 truncate">
                         Ver Todos <i class="bi bi-arrow-right ml-1"></i>
                     </a>
                 </div>
             </div>
         </div>
 
-            <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3 md:gap-4 mb-6 md:mb-8">
+                @if(app(\App\Services\CongregationContext::class)->hasEdificar())
                 <!-- Link to Edificar Dashboard -->
                 <a href="{{ route('edificar.dashboard') }}"
-                    class="bg-zinc-950 dark:bg-zinc-900 border border-zinc-950 dark:border-zinc-850 hover:bg-zinc-900 dark:hover:bg-zinc-800/80 transition-all p-4 rounded-2xl text-center group shadow-sm hover:shadow-md">
+                    class="bg-zinc-950 dark:bg-zinc-900 border border-zinc-950 dark:border-zinc-850 hover:bg-zinc-900 dark:hover:bg-zinc-800/80 transition-all p-2.5 sm:p-3.5 md:p-4 rounded-xl sm:rounded-2xl text-center group shadow-sm hover:shadow-md">
                     <div
-                        class="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center text-white mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
-                        <i class="bi bi-bricks text-lg"></i>
+                        class="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-orange-500 rounded-lg md:rounded-xl flex items-center justify-center text-white mx-auto mb-1.5 sm:mb-2 md:mb-3 group-hover:scale-110 transition-transform duration-300">
+                        <i class="bi bi-bricks text-sm sm:text-base md:text-lg"></i>
                     </div>
-                    <span class="text-[9px] font-black uppercase tracking-widest text-white">Painel Edificar</span>
+                    <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-white truncate block">Painel Edificar</span>
                 </a>
+                @endif
 
                 <!-- Novo Evento -->
                 <a href="{{ route('events.create') }}"
-                    class="bg-white dark:bg-zinc-900/30 p-4 rounded-2xl border border-gray-100 dark:border-zinc-850 shadow-sm hover:shadow-md transition-all text-center group">
+                    class="bg-white dark:bg-zinc-900/30 p-2.5 sm:p-3.5 md:p-4 rounded-xl sm:rounded-2xl border border-gray-100 dark:border-zinc-850 shadow-sm hover:shadow-md transition-all text-center group">
                     <div
-                        class="w-10 h-10 bg-orange-50 dark:bg-orange-950/20 rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 mx-auto mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
-                        <i class="bi bi-calendar-plus text-lg"></i>
+                        class="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-orange-50 dark:bg-orange-950/20 rounded-lg md:rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 mx-auto mb-1.5 sm:mb-2 md:mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
+                        <i class="bi bi-calendar-plus text-sm sm:text-base md:text-lg"></i>
                     </div>
                     <span
-                        class="text-[9px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-400 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">Novo Evento</span>
+                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-gray-500 dark:text-zinc-400 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors truncate block">Novo Evento</span>
                 </a>
 
                 <!-- Novo Culto -->
                 <a href="{{ route('services.create') }}"
-                    class="bg-white dark:bg-zinc-900/30 p-4 rounded-2xl border border-gray-100 dark:border-zinc-850 shadow-sm hover:shadow-md transition-all text-center group">
+                    class="bg-white dark:bg-zinc-900/30 p-2.5 sm:p-3.5 md:p-4 rounded-xl sm:rounded-2xl border border-gray-100 dark:border-zinc-850 shadow-sm hover:shadow-md transition-all text-center group">
                     <div
-                        class="w-10 h-10 bg-orange-50 dark:bg-orange-950/20 rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 mx-auto mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
-                        <i class="bi bi-journal-plus text-lg"></i>
+                        class="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-orange-50 dark:bg-orange-950/20 rounded-lg md:rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 mx-auto mb-1.5 sm:mb-2 md:mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
+                        <i class="bi bi-journal-plus text-sm sm:text-base md:text-lg"></i>
                     </div>
                     <span
-                        class="text-[9px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-400 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">Novo Culto</span>
+                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-gray-500 dark:text-zinc-400 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors truncate block">Novo Culto</span>
                 </a>
 
                 <!-- Novo Membro -->
                 <a href="{{ route('users.create') }}"
-                    class="bg-white dark:bg-zinc-900/30 p-4 rounded-2xl border border-gray-100 dark:border-zinc-850 shadow-sm hover:shadow-md transition-all text-center group">
+                    class="bg-white dark:bg-zinc-900/30 p-2.5 sm:p-3.5 md:p-4 rounded-xl sm:rounded-2xl border border-gray-100 dark:border-zinc-850 shadow-sm hover:shadow-md transition-all text-center group">
                     <div
-                        class="w-10 h-10 bg-orange-50 dark:bg-orange-950/20 rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 mx-auto mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
-                        <i class="bi bi-person-plus text-lg"></i>
+                        class="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-orange-50 dark:bg-orange-950/20 rounded-lg md:rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 mx-auto mb-1.5 sm:mb-2 md:mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
+                        <i class="bi bi-person-plus text-sm sm:text-base md:text-lg"></i>
                     </div>
                     <span
-                        class="text-[9px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-400 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">Novo Membro</span>
+                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-gray-500 dark:text-zinc-400 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors truncate block">Novo Membro</span>
                 </a>
 
                 <!-- Nova Célula -->
                 <a href="{{ route('cells.create') }}"
-                    class="bg-white dark:bg-zinc-900/30 p-4 rounded-2xl border border-gray-100 dark:border-zinc-850 shadow-sm hover:shadow-md transition-all text-center group">
+                    class="bg-white dark:bg-zinc-900/30 p-2.5 sm:p-3.5 md:p-4 rounded-xl sm:rounded-2xl border border-gray-100 dark:border-zinc-850 shadow-sm hover:shadow-md transition-all text-center group">
                     <div
-                        class="w-10 h-10 bg-orange-50 dark:bg-orange-950/20 rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 mx-auto mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
-                        <i class="bi bi-diagram-3 text-lg"></i>
+                        class="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-orange-50 dark:bg-orange-950/20 rounded-lg md:rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 mx-auto mb-1.5 sm:mb-2 md:mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
+                        <i class="bi bi-diagram-3 text-sm sm:text-base md:text-lg"></i>
                     </div>
                     <span
-                        class="text-[9px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-400 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">Nova Célula</span>
+                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-gray-500 dark:text-zinc-400 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors truncate block">Nova Célula</span>
                 </a>
 
                 <!-- Relatório Trimestral -->
                 <a href="{{ route('quarterly-reports.create') }}"
-                    class="bg-white dark:bg-zinc-900/30 p-4 rounded-2xl border border-gray-100 dark:border-zinc-850 shadow-sm hover:shadow-md transition-all text-center group">
+                    class="bg-white dark:bg-zinc-900/30 p-2.5 sm:p-3.5 md:p-4 rounded-xl sm:rounded-2xl border border-gray-100 dark:border-zinc-850 shadow-sm hover:shadow-md transition-all text-center group">
                     <div
-                        class="w-10 h-10 bg-orange-50 dark:bg-orange-950/20 rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 mx-auto mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
-                        <i class="bi bi-file-earmark-bar-graph text-lg"></i>
+                        class="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-orange-50 dark:bg-orange-950/20 rounded-lg md:rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 mx-auto mb-1.5 sm:mb-2 md:mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
+                        <i class="bi bi-file-earmark-bar-graph text-sm sm:text-base md:text-lg"></i>
                     </div>
                     <span
-                        class="text-[9px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-400 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">Relat. Trimestral</span>
+                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-gray-500 dark:text-zinc-400 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors truncate block">Relatório</span>
                 </a>
             </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
@@ -214,28 +217,16 @@
                 </div>
             </x-slot>
             
-            <div class="flex-1 p-6 md:p-8 flex flex-col justify-between">
-                <!-- Placeholder Ilustrativo do Mapa -->
-                <div class="flex-1 bg-gray-50 dark:bg-zinc-800/40 rounded-[2rem] border-2 border-dashed border-gray-200 dark:border-zinc-800 flex flex-col items-center justify-center text-center p-12 relative overflow-hidden group/map transition-all hover:bg-gray-100/50 dark:hover:bg-zinc-800/20">
-                    <div class="relative z-10">
-                        <i class="bi bi-geo-alt-fill text-6xl text-gray-200 dark:text-zinc-700 mb-6 block transform group-hover/map:scale-110 group-hover/map:rotate-12 transition-all duration-500"></i>
-                        <h3 class="text-xl font-black text-gray-400 dark:text-zinc-500 mb-2 uppercase tracking-widest leading-none">
-                            Mapa Interativo
-                        </h3>
-                        <p class="text-xs font-bold text-gray-400 dark:text-zinc-650 italic">Visualize a presença da Life Church em Quelimane...</p>
-                    </div>
-
-                    <!-- Mini estatísticas flutuantes no mapa placeholder -->
-                    <div class="absolute top-10 right-10 flex flex-col gap-3">
-                        <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur px-4 py-2 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-800 flex items-center gap-3">
-                            <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
-                            <span class="text-[10px] font-black text-gray-500 dark:text-zinc-400 uppercase tracking-widest">Norte: 12 Células</span>
-                        </div>
-                        <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur px-4 py-2 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-800 flex items-center gap-3">
-                            <div class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></div>
-                            <span class="text-[10px] font-black text-gray-500 dark:text-zinc-400 uppercase tracking-widest">Centro: 25 Células</span>
-                        </div>
-                    </div>
+            <div class="flex-1 p-6 md:p-8">
+                <div id="church-map" data-church-map data-map-data="church-map-data"
+                    class="church-map w-full h-[420px] rounded-2xl overflow-hidden border border-gray-200 dark:border-zinc-700"
+                    aria-label="Mapa das zonas pastorais e células"></div>
+                <script id="church-map-data" type="application/json">@json(['zones' => $mapZones])</script>
+                <div class="flex flex-wrap items-center gap-5 pt-4 text-[10px] font-bold uppercase tracking-widest text-gray-500">
+                    <span class="inline-flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-teal-500"></span>Zona</span>
+                    <span class="inline-flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-500"></span>Célula</span>
+                    <a href="{{ route('zones.index') }}" class="ml-auto text-blue-600 hover:text-blue-700">Configurar zonas</a>
+                    <a href="{{ route('cells.index') }}" class="text-blue-600 hover:text-blue-700">Configurar células</a>
                 </div>
             </div>
         </x-card>

@@ -4,6 +4,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
+use App\Services\CongregationContext;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -12,7 +13,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->scoped(CongregationContext::class, fn() => new CongregationContext());
     }
 
     /**
@@ -51,7 +52,8 @@ class AppServiceProvider extends ServiceProvider
 
         // Compartilhar dados globais com as views
         \Illuminate\Support\Facades\View::composer('*', function ($view) {
-            static $cachedData = null;
+            $request = request();
+            $cachedData = $request->attributes->get('shared_view_data');
 
             if ($cachedData === null) {
                 if (auth()->check()) {
@@ -70,6 +72,8 @@ class AppServiceProvider extends ServiceProvider
                         'pendingCount' => 0
                     ];
                 }
+
+                $request->attributes->set('shared_view_data', $cachedData);
             }
 
             $view->with($cachedData);

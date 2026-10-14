@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CourseClassMeeting extends Model
+class CourseClassMeeting extends CongregationModel
 {
     protected $fillable = [
         'course_class_id',

@@ -151,6 +151,8 @@ class CellController
             'type' => 'required|in:membros,lideres,supervisores,pastores_zona,pastores',
             'supervision_id' => 'required|exists:supervisions,id',
             'leader_id' => 'required|exists:users,id',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             'timoteos' => 'nullable|array',
             'timoteos.*' => 'exists:users,id',
         ]);
@@ -174,6 +176,8 @@ class CellController
             'type' => $validated['type'],
             'supervision_id' => $validated['supervision_id'],
             'leader_id' => $validated['leader_id'],
+            'latitude' => $validated['latitude'] ?? null,
+            'longitude' => $validated['longitude'] ?? null,
         ]);
 
         // Atribuir líder à célula
@@ -301,6 +305,8 @@ class CellController
             'type' => 'required|in:membros,lideres,supervisores,pastores_zona,pastores',
             'supervision_id' => 'required|exists:supervisions,id',
             'leader_id' => 'required|exists:users,id',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             'timoteos' => 'nullable|array',
             'timoteos.*' => 'exists:users,id',
         ]);
@@ -323,6 +329,8 @@ class CellController
             'type' => $validated['type'],
             'supervision_id' => $validated['supervision_id'],
             'leader_id' => $validated['leader_id'],
+            'latitude' => $validated['latitude'] ?? null,
+            'longitude' => $validated['longitude'] ?? null,
         ]);
 
         $oldLeaderId = $cell->leader_id;

@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Models\Concerns\NormalizesMozPhone;
 use Illuminate\Database\Eloquent\Model;
 
-class CellVisitor extends Model
+class CellVisitor extends CongregationModel
 {
     use NormalizesMozPhone;
     protected $fillable = [

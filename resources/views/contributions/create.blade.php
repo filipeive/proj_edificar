@@ -83,36 +83,37 @@
                         <i class="bi bi-cash-coin mr-2"></i>Dados da Contribuição
                     </h3>
 
-                    {{-- Informação do Pacote Atual --}}
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Seu Compromisso Atual:
-                            <span class="font-semibold text-gray-800">
-                                {{ $currentPackage->name ?? 'Nenhum' }}
-                                @if($currentPackage->committed_amount > 0)
-                                    (Comprometido: {{ number_format($currentPackage->committed_amount, 2, ',', '.') }} MT)
-                                @else
-                                    (Sem compromisso ativo)
-                                @endif
-                            </span>
-                        </label>
+                    @if($packages->isNotEmpty())
+                        {{-- Informação do Pacote Atual --}}
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Seu Compromisso Atual:
+                                <span class="font-semibold text-gray-800">
+                                    {{ $currentPackage->name ?? 'Nenhum' }}
+                                    @if($currentPackage->committed_amount > 0)
+                                        (Comprometido: {{ number_format($currentPackage->committed_amount, 2, ',', '.') }} MT)
+                                    @else
+                                        (Sem compromisso ativo)
+                                    @endif
+                                </span>
+                            </label>
 
-                        {{-- Seleção do Pacote (Apenas se precisar trocar o pacote na contribuição) --}}
-                        <select name="package_id" id="package_id"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent custom-select @error('package_id') border-red-500 @enderror"
-                            required>
-                            <option value="">-- Selecione o Pacote Referente à Contribuição --</option>
-                            @foreach($packages as $package)
-                                <option value="{{ $package->id }}" @selected(old('package_id') == $package->id || ($preselectedPackageId == $package->id) || ($currentPackage->id ?? null) == $package->id)>
-                                    {{ $package->name }} ({{ number_format($package->min_amount, 2, ',', '.') }} -
-                                    {{ number_format($package->max_amount, 2, ',', '.') }} MT)
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('package_id')
-                            <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
-                        @enderror
-                    </div>
+                            {{-- Seleção do Pacote (Apenas se precisar trocar o pacote na contribuição) --}}
+                            <select name="package_id" id="package_id"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent custom-select @error('package_id') border-red-500 @enderror">
+                                <option value="">-- Selecione o Pacote Referente à Contribuição --</option>
+                                @foreach($packages as $package)
+                                    <option value="{{ $package->id }}" @selected(old('package_id') == $package->id || ($preselectedPackageId == $package->id) || ($currentPackage->id ?? null) == $package->id)>
+                                        {{ $package->name }} ({{ number_format($package->min_amount, 2, ',', '.') }} -
+                                        {{ number_format($package->max_amount, 2, ',', '.') }} MT)
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('package_id')
+                                <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    @endif
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>

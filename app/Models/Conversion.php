@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Conversion extends Model
+class Conversion extends CongregationModel
 {
     protected $fillable = [
         'cell_id',

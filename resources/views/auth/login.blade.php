@@ -36,6 +36,19 @@
                 <form action="{{ route('login') }}" method="POST" class="space-y-6">
                     @csrf
 
+                    @if($congregations->count() > 1)
+                        <div>
+                            <label for="congregation" class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Congregação</label>
+                            <select name="congregation" id="congregation" class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500">
+                                @foreach($congregations as $congregation)
+                                    <option class="text-gray-900" value="{{ $congregation->slug }}" @selected(old('congregation', $currentCongregation?->slug) === $congregation->slug)>
+                                        {{ $congregation->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
+
                     <!-- Email -->
                     <div>
                         <label for="email"

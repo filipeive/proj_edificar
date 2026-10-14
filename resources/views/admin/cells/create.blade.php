@@ -69,6 +69,10 @@
                     @enderror
                 </div>
 
+                <div class="mb-6">
+                    <x-location-map id="cell-location-map" />
+                </div>
+
 
                 <div class="flex space-x-4">
                     <button type="submit" class="flex-1 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">

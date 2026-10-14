@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Wedding extends Model
+class Wedding extends CongregationModel
 {
     protected $fillable = [
         'groom_name',

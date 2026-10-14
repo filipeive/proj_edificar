@@ -13,6 +13,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Illuminate\Validation\Rule;
+use App\Services\CongregationContext;
 
 class PackageController
 {
@@ -51,7 +53,7 @@ class PackageController
         }
 
         $validated = $request->validate([
-            'name' => 'required|unique:commitment_packages|string|max:255',
+            'name' => ['required', 'string', 'max:255', Rule::unique('commitment_packages', 'name')->where('congregation_id', app(CongregationContext::class)->id())],
             'min_amount' => 'required|numeric|min:0',
             'max_amount' => 'nullable|numeric|min:0|gte:min_amount',
             'description' => 'nullable|string',
@@ -165,7 +167,7 @@ class PackageController
         }
 
         $validated = $request->validate([
-            'name' => "required|unique:commitment_packages,name,{$package->id}|string|max:255",
+            'name' => ['required', 'string', 'max:255', Rule::unique('commitment_packages', 'name')->where('congregation_id', app(CongregationContext::class)->id())->ignore($package->id)],
             'min_amount' => 'required|numeric|min:0',
             'max_amount' => 'nullable|numeric|min:0|gte:min_amount',
             'description' => 'nullable|string',

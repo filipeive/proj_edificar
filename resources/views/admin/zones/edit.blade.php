@@ -97,6 +97,8 @@
                         class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-medium text-gray-700 placeholder-gray-400 resize-none">{{ old('description', $zone->description) }}</textarea>
                 </div>
 
+                    <x-location-map id="zone-location-map" mode="area" :latitude="$zone->latitude" :longitude="$zone->longitude" :boundary="$zone->boundary" />
+
                 <!-- Zone Visibility in Teaching Services -->
                 <div
                     class="px-8 py-6 bg-blue-50/30 rounded-3xl border border-blue-100/50 flex items-center justify-between">

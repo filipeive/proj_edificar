@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use App\Services\CongregationContext;
 
 class LoginRequest extends FormRequest
 {
@@ -40,6 +41,17 @@ class LoginRequest extends FormRequest
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
+
+        $candidateUser = \App\Models\User::withoutGlobalScope('congregation')
+            ->where('email', $this->input('email'))
+            ->first();
+
+        if ($candidateUser && $candidateUser->congregation) {
+            app(CongregationContext::class)->set($candidateUser->congregation);
+            if ($this->hasSession()) {
+                $this->session()->put('current_congregation_slug', $candidateUser->congregation->slug);
+            }
+        }
 
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
@@ -80,6 +92,7 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        $congregationId = app(CongregationContext::class)->id();
+        return Str::transliterate($congregationId . '|' . Str::lower($this->string('email')) . '|' . $this->ip());
     }
 }

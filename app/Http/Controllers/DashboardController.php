@@ -10,8 +10,14 @@ class DashboardController
         $user = auth()->user();
 
         // Redirecionar baseado no role
+        if ($user->role === 'super_admin') {
+            return session('portal_context') === 'local'
+                ? redirect()->route('dashboard.admin')
+                : redirect()->route('national.dashboard');
+        }
+
         return match ($user->role) {
-            'super_admin', 'admin', 'pastor_senior' => redirect()->route('dashboard.admin'),
+            'admin', 'pastor_senior' => redirect()->route('dashboard.admin'),
             'comissao_obra' => redirect()->route('edificar.dashboard'),
             'responsavel_pacote' => redirect()->route('packages.dashboard'),
             'pastor_zona' => redirect()->route('dashboard.pastor'),

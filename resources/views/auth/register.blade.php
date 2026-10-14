@@ -17,6 +17,7 @@
 
             <form action="{{ route('register') }}" method="POST">
                 @csrf
+                <input type="hidden" name="congregation" value="{{ app(\App\Services\CongregationContext::class)->get()?->slug }}">
 
                 <!-- Nome -->
                 <div class="mb-6">

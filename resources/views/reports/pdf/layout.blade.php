@@ -197,7 +197,7 @@
         @endif
         <h1>Comunidade de Vida Cristã - {{ \App\Models\Setting::get('church.name', 'Life Church') }}</h1>
         <div class="subtitle">MOÇAMBIQUE</div>
-        <div class="congregation">{{ \App\Models\Setting::get('church.congregation', 'Congregação de Chimoio') }}</div>
+        <div class="congregation">{{ $congregation->name ?? app(\App\Services\CongregationContext::class)->get()?->name ?? \App\Models\Setting::get('church.congregation', 'Congregação de Chimoio') }}</div>
         <div class="report-type">@yield('report_type')</div>
     </div>
 

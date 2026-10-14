@@ -38,6 +38,7 @@ Alpine.start();
 // Importar os scripts do layout e do PWA
 import './layout.js';
 import './pwa.js';
+import './church-map.js';
 
 // O formatador de moeda é útil e não causa conflitos, por isso fica.
 document.addEventListener('DOMContentLoaded', function() {

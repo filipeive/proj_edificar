@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\EventType;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use App\Services\CongregationContext;
 
 class EventTypeController extends Controller
 {
@@ -27,9 +29,11 @@ class EventTypeController extends Controller
     public function store(Request $request)
     {
 
+        $request->merge(['code' => Str::slug((string) $request->input('name'))]);
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:event_types,name',
+            'name' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:50', Rule::unique('event_types', 'code')->where('congregation_id', app(CongregationContext::class)->id())],
             'description' => 'nullable|string',
             'is_active' => 'boolean',
         ]);
@@ -52,9 +56,11 @@ class EventTypeController extends Controller
     public function update(Request $request, EventType $eventType)
     {
 
+        $request->merge(['code' => Str::slug((string) $request->input('name'))]);
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:event_types,name,' . $eventType->id,
+            'name' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:50', Rule::unique('event_types', 'code')->where('congregation_id', app(CongregationContext::class)->id())->ignore($eventType->id)],
             'description' => 'nullable|string',
             'is_active' => 'boolean',
         ]);

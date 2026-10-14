@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class UserActivity extends Model
+class UserActivity extends CongregationModel
 {
     protected $fillable = [
         'user_id',

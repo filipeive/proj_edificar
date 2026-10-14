@@ -7,7 +7,7 @@
 ])
 
 @php
-    $baseClasses = 'inline-flex items-center justify-center font-bold tracking-tight rounded-2xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-[0.98] border shadow-sm cursor-pointer disabled:opacity-60 disabled:pointer-events-none relative overflow-hidden';
+    $baseClasses = 'inline-flex items-center justify-center font-bold tracking-tight rounded-xl sm:rounded-2xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-[0.98] border shadow-sm cursor-pointer disabled:opacity-60 disabled:pointer-events-none relative overflow-hidden';
     
     $variantClasses = match($variant) {
         'primary' => 'bg-orange-500 hover:bg-orange-600 border-orange-600/10 text-white focus:ring-orange-500',
@@ -21,10 +21,11 @@
     };
 
     $sizeClasses = match($size) {
-        'sm' => 'px-3 py-1.5 text-xs',
-        'md' => 'px-4 py-2.5 text-sm',
-        'lg' => 'px-6 py-3.5 text-base',
-        default => 'px-4 py-2.5 text-sm'
+        'xs' => 'px-2.5 py-1 text-xs',
+        'sm' => 'px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs',
+        'md' => 'px-3 sm:px-4 py-1.5 sm:py-2.5 text-xs sm:text-sm',
+        'lg' => 'px-4 sm:px-6 py-2.5 sm:py-3.5 text-sm sm:text-base',
+        default => 'px-3 sm:px-4 py-1.5 sm:py-2.5 text-xs sm:text-sm'
     };
 @endphp
 

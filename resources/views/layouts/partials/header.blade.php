@@ -125,6 +125,19 @@
                                 <p class="text-xs text-gray-500 dark:text-zinc-400 truncate">{{ $authUser->email }}</p>
                             </div>
                             <div class="py-1">
+                                @if($authUser && $authUser->role === 'super_admin')
+                                    @if(session('portal_context') === 'local')
+                                        <a href="{{ route('national.switch.national') }}"
+                                            class="flex items-center px-4 py-2 text-sm text-orange-600 hover:bg-orange-50 font-bold transition-colors">
+                                            <i class="bi bi-globe-americas mr-3 text-lg"></i> Consola Nacional
+                                        </a>
+                                    @else
+                                        <a href="{{ route('national.switch.local') }}"
+                                            class="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-gray-50 font-bold transition-colors">
+                                            <i class="bi bi-box-arrow-in-right mr-3 text-lg text-orange-600"></i> Portal Local (Life Church)
+                                        </a>
+                                    @endif
+                                @endif
                                 <a href="{{ route('profile.edit') }}"
                                     class="flex items-center px-4 py-2 text-sm text-gray-600 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors">
                                     <i class="bi bi-person mr-3 text-lg"></i> O Meu Perfil

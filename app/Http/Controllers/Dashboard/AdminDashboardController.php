@@ -91,6 +91,22 @@ class AdminDashboardController
         $zoneStats = collect($zoneStats);
         $zoneStructures = collect($zoneStructures);
 
+        $mapZones = Zone::with('supervisions.cells')->get()->map(function (Zone $zone) {
+            return [
+                'name' => $zone->name,
+                'latitude' => $zone->latitude !== null ? (float) $zone->latitude : null,
+                'longitude' => $zone->longitude !== null ? (float) $zone->longitude : null,
+                'boundary' => $zone->boundary,
+                'cells' => $zone->supervisions->flatMap->cells
+                    ->filter(fn(Cell $cell) => $cell->latitude !== null && $cell->longitude !== null)
+                    ->map(fn(Cell $cell) => [
+                        'name' => $cell->name,
+                        'latitude' => (float) $cell->latitude,
+                        'longitude' => (float) $cell->longitude,
+                    ])->values(),
+            ];
+        })->values();
+
 
         // Top Cells (Ecclesiastical Only)
         $topCells = Cell::with('supervision')
@@ -194,6 +210,7 @@ class AdminDashboardController
             'pendingContributions' => $pendingContributions,
             'zoneStats' => $zoneStats, // Now Members per Zone
             'zoneStructures' => $zoneStructures, // New: Cells/Supervisions per Zone
+            'mapZones' => $mapZones,
             'topCells' => $topCells,
             'upcomingEvents' => $upcomingEvents,
             'recentServices' => $recentServices,

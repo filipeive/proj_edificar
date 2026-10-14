@@ -4,7 +4,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Zone extends Model
+class Zone extends CongregationModel
 {
     use HasFactory;
 
@@ -14,11 +14,17 @@ class Zone extends Model
         'description', // Adicionado para consistência com o Controller
         'is_active',
         'show_in_teaching_services',
+        'latitude',
+        'longitude',
+        'boundary',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'show_in_teaching_services' => 'boolean',
+        'latitude' => 'decimal:7',
+        'longitude' => 'decimal:7',
+        'boundary' => 'array',
     ];
 
     // RELACIONAMENTOS

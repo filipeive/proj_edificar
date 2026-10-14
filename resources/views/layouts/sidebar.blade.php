@@ -1,11 +1,27 @@
 @php
     // O View Composer já passa $user e $role
     $authUser = auth()->user();
+    $currentCongregation = app(\App\Services\CongregationContext::class)->get();
+    $hasEdificar = app(\App\Services\CongregationContext::class)->hasEdificar();
+    $isSuperAdmin = $authUser && $authUser->role === 'super_admin';
+    $portalContext = session('portal_context', 'national');
+
+    if ($isSuperAdmin) {
+        if ($portalContext === 'local') {
+            $isNationalArea = request()->routeIs('national.*');
+        } else {
+            $isExplicitLocalRoute = request()->routeIs('dashboard.admin', 'members.*', 'visitors.*', 'services.*', 'packages.*', 'financial.*', 'edificar.*', 'cells.*', 'zones.*', 'supervisions.*', 'settings.*');
+            $isNationalArea = request()->routeIs('national.*') || !$isExplicitLocalRoute;
+        }
+    } else {
+        $isNationalArea = request()->routeIs('national.*');
+    }
+
     $pendingContributionsCount = $authUser ? $authUser->getPendingContributionsCount() : null;
     $logoPrimary = \App\Models\Setting::get('branding.logo_primary');
     $logoPrimary = $logoPrimary ? asset($logoPrimary) : asset('images/logo.png');
     $showInventoryOperacao = $authUser && ($authUser->isAdmin() || $authUser->isSecretaria());
-    $showInventoryFinanceira = $authUser && ($authUser->isAdmin() || $authUser->isEdificarManager() || $authUser->isComissaoObra() || $authUser->isTesouraria() || $authUser->isPastor());
+    $showInventoryFinanceira = $authUser && ($authUser->isAdmin() || ($hasEdificar && $authUser->isEdificarManager()) || ($hasEdificar && $authUser->isComissaoObra()) || $authUser->isTesouraria() || $authUser->isPastor());
 @endphp
 <aside id="{{ $sidebarId ?? 'sidebar' }}" data-sidebar-id="{{ $sidebarId ?? 'sidebar' }}"
     @if(($sidebarId ?? 'sidebar') === 'sidebar-desktop')
@@ -20,39 +36,88 @@
                 <img src="{{ $logoPrimary }}" alt="Logo" class="logo-img h-8 w-auto">
             </div>
             <div class="sidebar-text">
-                <h1 class="text-lg font-black tracking-tighter text-white uppercase leading-none">Life - APP</h1>
-                <p class="text-[9px] text-orange-500 font-black uppercase tracking-[0.2em] mt-1"><small>Portal de
-                        Gestão/Edificar</small></p>
+                <h1 class="text-base font-black tracking-tight text-white uppercase leading-none truncate max-w-[170px]" title="{{ $isNationalArea ? 'Consola Nacional' : ($currentCongregation->name ?? 'Life - APP') }}">
+                    {{ $isNationalArea ? 'Consola Nacional' : ($currentCongregation->name ?? 'Life - APP') }}
+                </h1>
+                <p class="text-[9px] text-orange-500 font-black uppercase tracking-[0.2em] mt-1 truncate">
+                    <small>{{ $isNationalArea ? 'Super Admin' : ($hasEdificar ? 'Gestão & Edificar' : 'Portal Eclesiástico') }}</small>
+                </p>
             </div>
         </div>
     </div>
 
     <!-- Navigation -->
     <nav class="flex-1 min-h-0 px-4 py-6 space-y-1 overflow-y-auto custom-scrollbar">
-        <!-- DASHBOARD -->
-        <div class="pb-4">
-            <a href="{{ route('dashboard') }}" data-tooltip="Dashboard Geral"
-                class="nav-item relative flex items-center px-4 py-3.5 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('dashboard') ? 'bg-orange-600 text-white shadow-xl shadow-orange-600/30' : 'text-slate-400' }}">
-                <i class="bi bi-grid-1x2-fill text-xl flex-shrink-0"></i>
-                <span class="sidebar-text ml-4 font-bold tracking-tight">Dashboard</span>
-            </a>
-
-            @if ($authUser && $authUser->hasPermission('dashboard_edificar'))
-                <a href="{{ route('edificar.dashboard') }}" data-tooltip="Painel Edificar"
-                    class="nav-item relative flex items-center px-4 py-3.5 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('edificar.dashboard') ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/30' : 'text-slate-400' }}">
-                    <i class="bi bi-graph-up-arrow text-xl flex-shrink-0"></i>
-                    <span class="sidebar-text ml-4 font-bold tracking-tight">Painel Edificar</span>
-                </a>
-            @endif
-
-            @if ($authUser && $authUser->hasPermission('dashboard_packages'))
-                <a href="{{ route('packages.dashboard') }}" data-tooltip="Painel do Pacote"
-                    class="nav-item relative flex items-center px-4 py-3.5 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('packages.dashboard') ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/30' : 'text-slate-400' }}">
+        @if($isNationalArea)
+            <!-- NAVEGAÇÃO NACIONAL (Super Admin) -->
+            <div class="space-y-1 pb-4">
+                <div class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-2">
+                    Painel Central
+                </div>
+                <a href="{{ route('national.dashboard') }}" data-tooltip="Painel Nacional"
+                    class="nav-item relative flex items-center px-4 py-3.5 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('national.dashboard') ? 'bg-orange-600 text-white shadow-xl shadow-orange-600/30' : 'text-slate-400' }}">
                     <i class="bi bi-speedometer2 text-xl flex-shrink-0"></i>
-                    <span class="sidebar-text ml-4 font-bold tracking-tight">Painel do Pacote</span>
+                    <span class="sidebar-text ml-4 font-bold tracking-tight">Painel Nacional</span>
                 </a>
-            @endif
-        </div>
+                <a href="{{ route('national.congregations.index') }}" data-tooltip="Congregações"
+                    class="nav-item relative flex items-center px-4 py-3.5 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('national.congregations.*') ? 'bg-orange-600 text-white shadow-xl shadow-orange-600/30' : 'text-slate-400' }}">
+                    <i class="bi bi-buildings text-xl flex-shrink-0"></i>
+                    <span class="sidebar-text ml-4 font-bold tracking-tight">Congregações</span>
+                </a>
+                <a href="{{ route('national.reports.index') }}" data-tooltip="Relatório Nacional"
+                    class="nav-item relative flex items-center px-4 py-3.5 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('national.reports.*') ? 'bg-orange-600 text-white shadow-xl shadow-orange-600/30' : 'text-slate-400' }}">
+                    <i class="bi bi-file-earmark-bar-graph text-xl flex-shrink-0"></i>
+                    <span class="sidebar-text ml-4 font-bold tracking-tight">Relatório Nacional</span>
+                </a>
+                <a href="{{ route('national.congregations.create') }}" data-tooltip="Registar Congregação"
+                    class="nav-item relative flex items-center px-4 py-3.5 rounded-2xl hover:bg-white/5 transition-all duration-300 group text-slate-400">
+                    <i class="bi bi-plus-circle-fill text-xl flex-shrink-0 text-emerald-400"></i>
+                    <span class="sidebar-text ml-4 font-bold tracking-tight">Registar Congregação</span>
+                </a>
+            </div>
+
+            <div class="pt-4 border-t border-white/5">
+                <div class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-2">
+                    Acesso Local
+                </div>
+                <a href="{{ route('national.switch.local') }}" data-tooltip="Ver Congregação Local"
+                    class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group text-slate-400">
+                    <i class="bi bi-box-arrow-in-right text-xl flex-shrink-0 text-orange-400"></i>
+                    <span class="sidebar-text ml-4 font-bold tracking-tight">Portal Local (Life Church)</span>
+                </a>
+            </div>
+        @else
+            <!-- DASHBOARD LOCAL -->
+            <div class="pb-4">
+                @if($authUser && $authUser->role === 'super_admin')
+                    <a href="{{ route('national.switch.national') }}" data-tooltip="Painel Nacional"
+                        class="nav-item relative flex items-center px-4 py-3.5 rounded-2xl hover:bg-white/5 transition-all duration-300 group bg-orange-600/10 text-orange-400 border border-orange-500/30 mb-2">
+                        <i class="bi bi-globe-americas text-xl flex-shrink-0 text-orange-400"></i>
+                        <span class="sidebar-text ml-4 font-bold tracking-tight">Voltar à Consola Nacional</span>
+                    </a>
+                @endif
+                <a href="{{ $isSuperAdmin && session('portal_context') === 'local' ? route('dashboard.admin') : route('dashboard') }}" data-tooltip="Dashboard Geral"
+                    class="nav-item relative flex items-center px-4 py-3.5 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('dashboard', 'dashboard.admin') ? 'bg-orange-600 text-white shadow-xl shadow-orange-600/30' : 'text-slate-400' }}">
+                    <i class="bi bi-grid-1x2-fill text-xl flex-shrink-0"></i>
+                    <span class="sidebar-text ml-4 font-bold tracking-tight">Dashboard</span>
+                </a>
+
+                @if ($hasEdificar && $authUser && $authUser->hasPermission('dashboard_edificar'))
+                    <a href="{{ route('edificar.dashboard') }}" data-tooltip="Painel Edificar"
+                        class="nav-item relative flex items-center px-4 py-3.5 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('edificar.dashboard') ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/30' : 'text-slate-400' }}">
+                        <i class="bi bi-graph-up-arrow text-xl flex-shrink-0"></i>
+                        <span class="sidebar-text ml-4 font-bold tracking-tight">Painel Edificar</span>
+                    </a>
+                @endif
+
+                @if ($hasEdificar && $authUser && $authUser->hasPermission('dashboard_packages'))
+                    <a href="{{ route('packages.dashboard') }}" data-tooltip="Painel do Pacote"
+                        class="nav-item relative flex items-center px-4 py-3.5 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('packages.dashboard') ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/30' : 'text-slate-400' }}">
+                        <i class="bi bi-speedometer2 text-xl flex-shrink-0"></i>
+                        <span class="sidebar-text ml-4 font-bold tracking-tight">Painel do Pacote</span>
+                    </a>
+                @endif
+            </div>
 
         <!-- ATALHOS RÁPIDOS (Frequent Actions) -->
         @if($authUser && ($authUser->isLider() || $authUser->isResponsavelPacote() || $authUser->isAdmin() || $authUser->isComissaoObra()))
@@ -269,10 +334,10 @@
                     @endif
                 @endif
             @elseif($sectionName === 'financeira')
-                <!-- GESTÃO FINANCEIRA & EDIFICAR -->
-                <div class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-4">Gestão Financeira & Edificar</div>
+                <!-- GESTÃO FINANCEIRA -->
+                <div class="sidebar-section-header sidebar-text text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-4 mt-4">{{ $hasEdificar ? 'Gestão Financeira & Edificar' : 'Gestão Financeira' }}</div>
 
-                @if ($authUser && $authUser->hasPermission('menu_packages'))
+                @if ($hasEdificar && $authUser && $authUser->hasPermission('menu_packages'))
                     <a href="{{ route('packages.index') }}" data-tooltip="Pacotes" class="nav-item relative flex items-center px-4 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group {{ request()->routeIs('packages.*') ? 'bg-zinc-900 text-orange-500 border border-white/5' : 'text-slate-400' }}">
                         <i class="bi bi-box-seam-fill text-xl flex-shrink-0"></i>
                         <span class="sidebar-text ml-4 font-bold tracking-tight">Pacotes</span>
@@ -287,7 +352,9 @@
                     </button>
                     <div x-show="open" x-cloak class="overflow-hidden">
                         <div class="ml-12 mt-2 space-y-1 border-l border-white/10 pl-4">
-                            <a href="{{ route('commitments.index') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('commitments.*') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Meu Compromisso</a>
+                            @if ($hasEdificar)
+                                <a href="{{ route('commitments.index') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('commitments.*') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Meu Compromisso</a>
+                            @endif
                             @if ($authUser && !$authUser->isAdmin())
                                 <a href="{{ route('contributions.index', ['mine' => 1]) }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('contributions.index') && request()->query('mine') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">Minhas Contribuições</a>
                             @endif
@@ -298,8 +365,8 @@
                             @endif
                             @if ($authUser && $authUser->hasPermission('menu_contributions_all'))
                                 <a href="{{ route('contributions.index') }}" class="block py-2 text-sm transition-all duration-200 {{ request()->routeIs('contributions.index') && !request()->query('mine') ? 'text-orange-500 font-bold' : 'text-slate-500 hover:text-slate-300' }}">
-                                    @if ($authUser->isAdmin() || $authUser->isComissaoObra()) Todas
-                                    @elseif ($authUser->isResponsavelPacote()) Dos Meus Pacotes
+                                    @if ($authUser->isAdmin() || ($hasEdificar && $authUser->isComissaoObra())) Todas
+                                    @elseif ($hasEdificar && $authUser->isResponsavelPacote()) Dos Meus Pacotes
                                     @elseif ($authUser->isPastorZona()) Da Zona
                                     @elseif ($authUser->isSupervisor()) Da Supervisão @elseif($authUser->isLider()) Da Célula @else Geral @endif
                                 </a>
@@ -415,6 +482,7 @@
                 <span class="sidebar-text ml-4 font-bold tracking-tight">Relatório Trimestral</span>
             </a>
         </div>
+        @endif
         @endif
     </nav>
 

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ServiceIndividualOffering extends Model
+class ServiceIndividualOffering extends CongregationModel
 {
     use \Illuminate\Database\Eloquent\Factories\HasFactory;
 

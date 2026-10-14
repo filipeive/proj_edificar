@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Discipleship extends Model
+class Discipleship extends CongregationModel
 {
     protected $fillable = [
         'cell_id',

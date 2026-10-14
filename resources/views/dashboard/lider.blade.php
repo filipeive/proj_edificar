@@ -19,79 +19,79 @@
                 </div>
             </div>
         @else
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-5">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="bg-orange-50 dark:bg-orange-950/20 p-3 rounded-xl text-orange-600 dark:text-orange-400">
-                            <i class="bi bi-diagram-3-fill text-xl"></i>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-3 sm:p-4 md:p-5">
+                    <div class="flex items-center justify-between mb-2.5 sm:mb-4">
+                        <div class="bg-orange-50 dark:bg-orange-950/20 p-2 sm:p-2.5 md:p-3 rounded-lg sm:rounded-xl text-orange-600 dark:text-orange-400">
+                            <i class="bi bi-diagram-3-fill text-base sm:text-lg md:text-xl"></i>
                         </div>
-                        <span class="text-[9px] font-black uppercase tracking-widest text-gray-400">Gestão</span>
+                        <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-gray-400">Gestão</span>
                     </div>
-                    <p class="text-xs font-bold uppercase tracking-wider text-gray-400">Células Geridas</p>
-                    <p class="text-2xl font-black text-gray-900 dark:text-white mt-1">{{ $cells->count() }}</p>
+                    <p class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-gray-400">Células Geridas</p>
+                    <p class="text-lg sm:text-xl md:text-2xl font-black text-gray-900 dark:text-white mt-0.5 sm:mt-1">{{ $cells->count() }}</p>
                 </div>
 
-                <div class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-5">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="bg-sky-50 dark:bg-sky-950/20 p-3 rounded-xl text-sky-600 dark:text-sky-400">
-                            <i class="bi bi-people-fill text-xl"></i>
+                <div class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-3 sm:p-4 md:p-5">
+                    <div class="flex items-center justify-between mb-2.5 sm:mb-4">
+                        <div class="bg-sky-50 dark:bg-sky-950/20 p-2 sm:p-2.5 md:p-3 rounded-lg sm:rounded-xl text-sky-600 dark:text-sky-400">
+                            <i class="bi bi-people-fill text-base sm:text-lg md:text-xl"></i>
                         </div>
-                        <span class="text-[9px] font-black uppercase tracking-widest text-gray-400">Comunidade</span>
+                        <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-gray-400">Comunidade</span>
                     </div>
-                    <p class="text-xs font-bold uppercase tracking-wider text-gray-400">Membros Ativos</p>
-                    <p class="text-2xl font-black text-gray-900 dark:text-white mt-1">{{ $totalMembers }}</p>
+                    <p class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-gray-400">Membros Ativos</p>
+                    <p class="text-lg sm:text-xl md:text-2xl font-black text-gray-900 dark:text-white mt-0.5 sm:mt-1">{{ $totalMembers }}</p>
                 </div>
 
-                <div class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-5">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="bg-emerald-50 dark:bg-emerald-950/20 p-3 rounded-xl text-emerald-600 dark:text-emerald-400">
-                            <i class="bi bi-cash-coin text-xl"></i>
+                <div class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-3 sm:p-4 md:p-5">
+                    <div class="flex items-center justify-between mb-2.5 sm:mb-4">
+                        <div class="bg-emerald-50 dark:bg-emerald-950/20 p-2 sm:p-2.5 md:p-3 rounded-lg sm:rounded-xl text-emerald-600 dark:text-emerald-400">
+                            <i class="bi bi-cash-coin text-base sm:text-lg md:text-xl"></i>
                         </div>
-                        <span class="text-[9px] font-black uppercase tracking-widest text-gray-400">Financeiro</span>
+                        <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-gray-400">Financeiro</span>
                     </div>
-                    <p class="text-xs font-bold uppercase tracking-wider text-gray-400">Total do Período</p>
-                    <p class="text-2xl font-black text-gray-900 dark:text-white mt-1">{{ number_format($total, 2, ',', '.') }} MT</p>
+                    <p class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-gray-400">Total do Período</p>
+                    <p class="text-base sm:text-xl md:text-2xl font-black text-gray-900 dark:text-white mt-0.5 sm:mt-1">{{ number_format($total, 2, ',', '.') }} MT</p>
                 </div>
 
-                <div class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-5">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="bg-violet-50 dark:bg-violet-950/20 p-3 rounded-xl text-violet-600 dark:text-violet-400">
-                            <i class="bi bi-percent text-xl"></i>
+                <div class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-3 sm:p-4 md:p-5">
+                    <div class="flex items-center justify-between mb-2.5 sm:mb-4">
+                        <div class="bg-violet-50 dark:bg-violet-950/20 p-2 sm:p-2.5 md:p-3 rounded-lg sm:rounded-xl text-violet-600 dark:text-violet-400">
+                            <i class="bi bi-percent text-base sm:text-lg md:text-xl"></i>
                         </div>
-                        <span class="text-[9px] font-black uppercase tracking-widest text-gray-400">Participação</span>
+                        <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-gray-400">Participação</span>
                     </div>
-                    <p class="text-xs font-bold uppercase tracking-wider text-gray-400">Contribuição</p>
-                    <p class="text-2xl font-black text-gray-900 dark:text-white mt-1">{{ $percentage }}%</p>
-                    <div class="w-full bg-gray-100 dark:bg-zinc-800 h-1.5 rounded-full mt-3 overflow-hidden">
+                    <p class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-gray-400">Contribuição</p>
+                    <p class="text-lg sm:text-xl md:text-2xl font-black text-gray-900 dark:text-white mt-0.5 sm:mt-1">{{ $percentage }}%</p>
+                    <div class="w-full bg-gray-100 dark:bg-zinc-800 h-1.5 rounded-full mt-2 sm:mt-3 overflow-hidden">
                         <div class="bg-violet-500 h-full rounded-full" style="width: {{ $percentage }}%"></div>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 overflow-hidden">
-                <div class="px-6 py-5 border-b border-gray-50 dark:border-zinc-850 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 overflow-hidden">
+                <div class="px-4 sm:px-6 py-3.5 sm:py-5 border-b border-gray-50 dark:border-zinc-850 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                     <div>
-                        <h3 class="text-base font-black text-gray-900 dark:text-white tracking-tight">Células sob sua liderança</h3>
-                        <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Ações e indicadores separados por célula.</p>
+                        <h3 class="text-sm sm:text-base font-black text-gray-900 dark:text-white tracking-tight">Células sob sua liderança</h3>
+                        <p class="text-[11px] sm:text-xs text-gray-500 dark:text-zinc-400 mt-0.5 sm:mt-1">Ações e indicadores separados por célula.</p>
                     </div>
                     <a href="{{ route('cells.index') }}"
-                        class="inline-flex items-center justify-center gap-2 bg-gray-900 dark:bg-white text-white dark:text-zinc-900 px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-orange-600 dark:hover:bg-orange-500 dark:hover:text-white transition-all">
+                        class="inline-flex items-center justify-center gap-2 bg-gray-900 dark:bg-white text-white dark:text-zinc-900 px-3.5 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest hover:bg-orange-600 dark:hover:bg-orange-500 dark:hover:text-white transition-all">
                         <i class="bi bi-grid-3x3-gap-fill"></i>
                         Ver Gestão
                     </a>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 p-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 p-3.5 sm:p-5">
                     @foreach($cellCards as $managedCell)
-                        <div class="border border-gray-100 dark:border-zinc-850 rounded-2xl p-5 bg-gray-50/40 dark:bg-zinc-950/20">
-                            <div class="flex items-start justify-between gap-4">
+                        <div class="border border-gray-100 dark:border-zinc-850 rounded-xl sm:rounded-2xl p-3.5 sm:p-5 bg-gray-50/40 dark:bg-zinc-950/20">
+                            <div class="flex items-start justify-between gap-3 sm:gap-4">
                                 <div class="min-w-0">
-                                    <p class="text-[10px] font-black uppercase tracking-widest text-orange-600 dark:text-orange-400">{{ $managedCell['type'] }}</p>
-                                    <h4 class="text-lg font-black text-gray-900 dark:text-white mt-1 truncate">{{ $managedCell['name'] }}</h4>
-                                    <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1 truncate">
+                                    <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-orange-600 dark:text-orange-400">{{ $managedCell['type'] }}</p>
+                                    <h4 class="text-base sm:text-lg font-black text-gray-900 dark:text-white mt-0.5 sm:mt-1 truncate">{{ $managedCell['name'] }}</h4>
+                                    <p class="text-[11px] sm:text-xs text-gray-500 dark:text-zinc-400 mt-0.5 sm:mt-1 truncate">
                                         {{ $managedCell['supervision'] ?? 'Sem supervisão' }} @if($managedCell['zone']) / {{ $managedCell['zone'] }} @endif
                                     </p>
                                 </div>
-                                <span class="flex-shrink-0 w-10 h-10 rounded-xl bg-white dark:bg-zinc-900 text-orange-600 dark:text-orange-400 flex items-center justify-center shadow-sm">
+                                <span class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white dark:bg-zinc-900 text-orange-600 dark:text-orange-400 flex items-center justify-center shadow-sm text-sm sm:text-base">
                                     <i class="bi bi-people-fill"></i>
                                 </span>
                             </div>

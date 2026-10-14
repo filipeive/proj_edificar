@@ -4,8 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use App\Services\CongregationContext;
 
-class Setting extends Model
+class Setting extends CongregationModel
 {
     protected $fillable = ['key', 'value', 'type', 'group', 'is_public'];
 
@@ -14,7 +15,7 @@ class Setting extends Model
      */
     public static function get(string $key, $default = null)
     {
-        return Cache::remember("setting.{$key}", 3600, function () use ($key, $default) {
+        return Cache::remember(self::cacheKey($key), 3600, function () use ($key, $default) {
             $setting = self::where('key', $key)->first();
 
             if (!$setting) {
@@ -39,7 +40,7 @@ class Setting extends Model
             ]
         );
 
-        Cache::forget("setting.{$key}");
+        Cache::forget(self::cacheKey($key));
     }
 
     /**
@@ -79,11 +80,16 @@ class Setting extends Model
     public static function clearCache(): void
     {
         $settingKeys = self::query()->pluck('key')->map(function (string $key) {
-            return "setting.{$key}";
+            return self::cacheKey($key);
         })->all();
 
         foreach ($settingKeys as $cacheKey) {
             Cache::forget($cacheKey);
         }
+    }
+
+    private static function cacheKey(string $key): string
+    {
+        return 'setting.' . (app(CongregationContext::class)->id() ?? 'global') . ".{$key}";
     }
 }

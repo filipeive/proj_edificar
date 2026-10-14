@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ServiceZoneParticipation extends Model
+class ServiceZoneParticipation extends CongregationModel
 {
     use HasFactory;
 

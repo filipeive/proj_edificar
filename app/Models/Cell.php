@@ -4,11 +4,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Cell extends Model
+class Cell extends CongregationModel
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'type', 'supervision_id', 'leader_id', 'member_count'];
+    protected $fillable = ['name', 'type', 'supervision_id', 'leader_id', 'member_count', 'latitude', 'longitude'];
+
+    protected $casts = [
+        'latitude' => 'decimal:7',
+        'longitude' => 'decimal:7',
+    ];
 
     public const TYPE_MEMBROS = 'membros';
     public const TYPE_LIDERES = 'lideres';

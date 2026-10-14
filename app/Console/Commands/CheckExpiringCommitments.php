@@ -3,7 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Models\UserCommitment;
+use App\Models\Congregation;
 use App\Notifications\CommitmentExpiringNotification;
+use App\Services\CongregationContext;
 use Illuminate\Console\Command;
 
 class CheckExpiringCommitments extends Command
@@ -23,37 +25,41 @@ class CheckExpiringCommitments extends Command
      */
     public function handle()
     {
-        $this->info('🔍 Verificando compromissos próximos do vencimento...');
-
-        $expiringCommitments = UserCommitment::active()
-            ->whereNotNull('end_date')
-            ->where('end_date', '>', now())
-            ->where('end_date', '<=', now()->addDays(7))
-            ->with('user', 'package')
-            ->get();
-
-        if ($expiringCommitments->isEmpty()) {
-            $this->info('✅ Nenhum compromisso expirando nos próximos 7 dias.');
-            return Command::SUCCESS;
-        }
-
+        $context = app(CongregationContext::class);
         $count = 0;
-        foreach ($expiringCommitments as $commitment) {
-            $daysRemaining = $commitment->daysUntilExpiration();
-            
-            if ($daysRemaining && $daysRemaining <= 7) {
-                if ($commitment->user->wantsNotification('commitment_expiring')) {
-                    $commitment->user->notify(
-                        new CommitmentExpiringNotification($commitment, $daysRemaining)
-                    );
+
+        foreach (Congregation::where('is_active', true)->where('has_edificar_project', true)->get() as $congregation) {
+            $count += $context->run($congregation, function () use ($congregation) {
+                $this->info("🔍 Verificando compromissos: {$congregation->name}...");
+                $expiringCommitments = UserCommitment::active()
+                    ->whereNotNull('end_date')
+                    ->where('end_date', '>', now())
+                    ->where('end_date', '<=', now()->addDays(7))
+                    ->with('user', 'package')
+                    ->get();
+
+                $notified = 0;
+                foreach ($expiringCommitments as $commitment) {
+                    $daysRemaining = $commitment->daysUntilExpiration();
+                    if (!$daysRemaining || $daysRemaining > 7 || !$commitment->user?->wantsNotification('commitment_expiring')) {
+                        continue;
+                    }
+
+                    $commitment->user->notify(new CommitmentExpiringNotification($commitment, $daysRemaining));
+                    $this->line("📧 {$commitment->user->name} ({$daysRemaining} dias)");
+                    $notified++;
                 }
-                
-                $this->line("📧 Notificação enviada para {$commitment->user->name} ({$daysRemaining} dias)");
-                $count++;
-            }
+
+                return $notified;
+            });
         }
 
-        $this->info("✅ {$count} notificações enviadas com sucesso!");
+        if ($count === 0) {
+            $this->info('✅ Nenhum compromisso expirando nos próximos 7 dias.');
+        } else {
+            $this->info("✅ {$count} notificações enviadas no total.");
+        }
+
         return Command::SUCCESS;
     }
 }

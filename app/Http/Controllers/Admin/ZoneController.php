@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\ServiceZoneParticipation;
 use App\Models\QuarterlyReport;
 use App\Models\Visitor;
+use Illuminate\Validation\Rule;
+use App\Services\CongregationContext;
 
 class ZoneController
 {
@@ -157,11 +159,20 @@ class ZoneController
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|unique:zones|string|max:255',
+            'name' => ['required', 'string', 'max:255', Rule::unique('zones', 'name')->where('congregation_id', app(CongregationContext::class)->id())],
             'description' => 'nullable|string',
             'pastor_id' => 'nullable|exists:users,id',
             'show_in_teaching_services' => 'nullable|boolean',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
+            'boundary' => ['nullable', 'json', function ($attribute, $value, $fail) {
+                if (!$this->isValidBoundary($value)) {
+                    $fail('Desenhe um limite de zona válido usando um polígono fechado.');
+                }
+            }],
         ]);
+
+        $validated['boundary'] = filled($validated['boundary'] ?? null) ? json_decode($validated['boundary'], true) : null;
 
         Zone::create($validated);
 
@@ -196,16 +207,44 @@ class ZoneController
     public function update(Request $request, Zone $zone)
     {
         $validated = $request->validate([
-            'name' => "required|unique:zones,name,{$zone->id}|string|max:255",
+            'name' => ['required', 'string', 'max:255', Rule::unique('zones', 'name')->where('congregation_id', app(CongregationContext::class)->id())->ignore($zone->id)],
             'description' => 'nullable|string',
             'pastor_id' => 'nullable|exists:users,id',
             'show_in_teaching_services' => 'nullable|boolean',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
+            'boundary' => ['nullable', 'json', function ($attribute, $value, $fail) {
+                if (!$this->isValidBoundary($value)) {
+                    $fail('Desenhe um limite de zona válido usando um polígono fechado.');
+                }
+            }],
         ]);
+
+        $validated['boundary'] = filled($validated['boundary'] ?? null) ? json_decode($validated['boundary'], true) : null;
 
         $zone->update($validated);
 
         return redirect()->route('zones.index')
             ->with('success', 'Zona atualizada com sucesso!');
+    }
+
+    private function isValidBoundary(string $value): bool
+    {
+        $geometry = json_decode($value, true);
+        if (!is_array($geometry) || !in_array($geometry['type'] ?? null, ['Polygon', 'MultiPolygon'], true)) {
+            return false;
+        }
+
+        $coordinates = $geometry['coordinates'] ?? null;
+        if (!is_array($coordinates) || $coordinates === []) {
+            return false;
+        }
+
+        $firstRing = $geometry['type'] === 'Polygon'
+            ? ($coordinates[0] ?? [])
+            : ($coordinates[0][0] ?? []);
+
+        return is_array($firstRing) && count($firstRing) >= 4 && $firstRing[0] === end($firstRing);
     }
 
     public function destroy(Zone $zone)

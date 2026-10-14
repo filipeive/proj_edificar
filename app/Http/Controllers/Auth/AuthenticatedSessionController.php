@@ -8,6 +8,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use App\Models\Congregation;
+use App\Services\CongregationContext;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -16,7 +18,10 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): View
     {
-        return view('auth.login');
+        return view('auth.login', [
+            'congregations' => Congregation::where('is_active', true)->orderBy('name')->get(),
+            'currentCongregation' => app(CongregationContext::class)->get(),
+        ]);
     }
 
     /**
@@ -27,6 +32,10 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
+
+        if (! $request->boolean('remember')) {
+            \Illuminate\Support\Facades\Cookie::queue(\Illuminate\Support\Facades\Cookie::forget(\Illuminate\Support\Facades\Auth::guard('web')->getRecallerName()));
+        }
 
         // Record last login and log activity
         $user = auth()->user();

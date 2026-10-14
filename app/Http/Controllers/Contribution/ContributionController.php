@@ -205,16 +205,21 @@ class ContributionController
             $members = collect();
         }
 
-        // 2. Lógica para Pacotes de Compromisso (usada na view para info/seleção)
+        $hasEdificar = app(\App\Services\CongregationContext::class)->hasEdificar();
+
+        // 2. Lógica para Pacotes de Compromisso (apenas se módulo Edificar estiver ativo)
         $targetUserId = $request->query('user_id', $user->id);
 
-        $activeCommitment = UserCommitment::with('package')
-            ->where('user_id', $targetUserId)
-            ->where('start_date', '<=', now())
-            ->where(function ($query) {
-                $query->whereNull('end_date')->orWhere('end_date', '>', now());
-            })
-            ->latest('start_date')->first();
+        $activeCommitment = null;
+        if ($hasEdificar) {
+            $activeCommitment = UserCommitment::with('package')
+                ->where('user_id', $targetUserId)
+                ->where('start_date', '<=', now())
+                ->where(function ($query) {
+                    $query->whereNull('end_date')->orWhere('end_date', '>', now());
+                })
+                ->latest('start_date')->first();
+        }
 
         if ($activeCommitment) {
             $currentPackage = $activeCommitment->package;
@@ -229,7 +234,9 @@ class ContributionController
             ];
         }
 
-        if ($user->role === 'responsavel_pacote') {
+        if (!$hasEdificar) {
+            $packages = collect();
+        } elseif ($user->role === 'responsavel_pacote') {
             $packages = $user->managedPackages()->where('is_active', true)->orderBy('order')->get();
 
             // Se o usuário tiver um pacote atual que não está na lista gerenciada, adicioná-lo para que ele possa selecioná-lo
@@ -337,6 +344,9 @@ class ContributionController
             $proofPath = $request->file('proof_path')->store('contributions', 'public');
         }
 
+        $hasEdificar = app(\App\Services\CongregationContext::class)->hasEdificar();
+        $packageId = $hasEdificar ? ($validated['package_id'] ?? null) : null;
+
         $contribution = Contribution::create([
             'user_id' => $validated['user_id'],
             'cell_id' => $cell->id,
@@ -344,7 +354,7 @@ class ContributionController
             'zone_id' => $cell->supervision->zone_id, // Assume que supervisão tem zone_id
             'amount' => $validated['amount'],
             'contribution_date' => $validated['contribution_date'],
-            'package_id' => $validated['package_id'] ?? null,
+            'package_id' => $packageId,
             'proof_path' => $proofPath,
             'proof_message' => $validated['proof_message'] ?? null,
             'status' => 'pendente',

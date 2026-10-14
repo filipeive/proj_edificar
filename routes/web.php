@@ -112,6 +112,26 @@ Route::middleware('auth')->group(function () {
     Route::match(['get', 'post'], '/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
 
+    Route::prefix('national')->name('national.')->middleware('super.admin')->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\Admin\NationalDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/congregations', [\App\Http\Controllers\Admin\NationalDashboardController::class, 'congregations'])->name('congregations.index');
+        Route::get('/congregations/create', [\App\Http\Controllers\Admin\NationalDashboardController::class, 'create'])->name('congregations.create');
+        Route::post('/congregations', [\App\Http\Controllers\Admin\NationalDashboardController::class, 'store'])->name('congregations.store');
+        Route::get('/congregations/{congregation}', [\App\Http\Controllers\Admin\NationalDashboardController::class, 'show'])->name('congregations.show');
+        Route::get('/congregations/{congregation}/edit', [\App\Http\Controllers\Admin\NationalDashboardController::class, 'edit'])->name('congregations.edit');
+        Route::put('/congregations/{congregation}', [\App\Http\Controllers\Admin\NationalDashboardController::class, 'update'])->name('congregations.update');
+        Route::post('/congregations/{congregation}/admins', [\App\Http\Controllers\Admin\NationalDashboardController::class, 'addAdmin'])->name('congregations.admins.store');
+        Route::post('/congregations/{congregation}/admins/{adminUser}/reset-password', [\App\Http\Controllers\Admin\NationalDashboardController::class, 'resetAdminPassword'])->name('congregations.admins.reset-password');
+        Route::post('/congregations/{congregation}/admins/{adminUser}/toggle-status', [\App\Http\Controllers\Admin\NationalDashboardController::class, 'toggleAdminStatus'])->name('congregations.admins.toggle-status');
+        Route::get('/switch/local', [\App\Http\Controllers\Admin\NationalDashboardController::class, 'switchToLocal'])->name('switch.local');
+        Route::get('/switch/national', [\App\Http\Controllers\Admin\NationalDashboardController::class, 'switchToNational'])->name('switch.national');
+        Route::get('/congregations/{congregation}/services/report/pdf', [\App\Http\Controllers\Admin\NationalDashboardController::class, 'downloadServicesReportPdf'])->name('congregations.services.report-pdf');
+        Route::get('/congregations/{congregation}/services/{service}/pdf', [\App\Http\Controllers\Admin\NationalDashboardController::class, 'downloadServicePdf'])->name('congregations.services.pdf');
+        Route::get('/reports', [\App\Http\Controllers\Admin\NationalDashboardController::class, 'nationalReport'])->name('reports.index');
+        Route::get('/reports/export', [\App\Http\Controllers\Admin\NationalDashboardController::class, 'exportNationalReport'])->name('reports.export');
+        Route::get('/reports/export/pdf', [\App\Http\Controllers\Admin\NationalDashboardController::class, 'exportNationalPdf'])->name('reports.export.pdf');
+    });
+
     // Dashboard Admin
     Route::match(['get', 'post'], '/admin/dashboard', AdminDashboardController::class)
         ->middleware('role:super_admin,admin,pastor_senior')
@@ -293,8 +313,8 @@ Route::middleware('auth')->group(function () {
         });
     });
 
-    // Gestão de Pacotes (Acesso Expandido)
-    Route::prefix('admin')->middleware('role:super_admin,admin,secretaria,comissao_obra,responsavel_pacote,pastor_senior')->group(function () {
+    // Gestão de Pacotes (Acesso Expandido - apenas congregações com módulo Edificar)
+    Route::prefix('admin')->middleware(['role:super_admin,admin,secretaria,comissao_obra,responsavel_pacote,pastor_senior', 'module.edificar'])->group(function () {
         Route::post('packages/{package}/assign', [PackageController::class, 'assignMember'])->name('packages.assign');
         Route::post('packages/{package}/update-member', [PackageController::class, 'updateMember'])->name('packages.update-member');
         Route::post('packages/{package}/bulk-sms', [PackageController::class, 'sendBulkSms'])->name('packages.send-bulk-sms');
@@ -317,12 +337,12 @@ Route::middleware('auth')->group(function () {
 
     // Rota de FORMULÁRIO GET para atribuir/modificar o compromisso de OUTRO usuário
     Route::get('users/{user}/commitment/set', [\App\Http\Controllers\CommitmentController::class, 'showSetCommitmentForm'])
-        ->middleware('role:super_admin,admin,pastor_zona,supervisor') // Apenas quem pode gerir
+        ->middleware(['role:super_admin,admin,pastor_zona,supervisor', 'module.edificar']) // Apenas quem pode gerir
         ->name('users.commitment.set');
 
     // Rota de PROCESSAMENTO POST para salvar a atribuição de compromisso
     Route::post('users/{user}/commitment/assign', [\App\Http\Controllers\CommitmentController::class, 'assignCommitment'])
-        ->middleware('role:super_admin,admin,pastor_zona,supervisor')
+        ->middleware(['role:super_admin,admin,pastor_zona,supervisor', 'module.edificar'])
         ->name('users.commitment.assign');
     // Validar contribuições
     Route::prefix('contributions')->middleware('role:super_admin,admin,pastor_zona,comissao_obra')->group(function () {
@@ -373,7 +393,8 @@ Route::middleware('auth')->group(function () {
             ->name('contributions.receipt');
     });
     // ===== PACOTES DE COMPROMISSO ROUTES =====
-    Route::prefix('commitments')->middleware('not.admin')->group(function () {
+    // ===== PACOTES DE COMPROMISSO ROUTES =====
+    Route::prefix('commitments')->middleware(['module.edificar', 'not.admin'])->group(function () {
 
         // Listar pacotes disponíveis
         Route::get('/', [CommitmentController::class, 'index'])
@@ -436,7 +457,7 @@ Route::middleware('auth')->group(function () {
     // Quarterly Reports management handled by resource route at 392
     // Edificar Dashboard
     Route::get('project-edificar/dashboard', [\App\Http\Controllers\Admin\EdificarDashboardController::class, 'index'])
-        ->middleware('role:super_admin,admin,comissao_obra,pastor_senior,administracao')
+        ->middleware(['role:super_admin,admin,comissao_obra,pastor_senior,administracao', 'module.edificar'])
         ->name('edificar.dashboard');
 
     // ===== EVENTOS E CERIMÓNIAS (EVENTS) ROUTES =====
@@ -453,6 +474,8 @@ Route::middleware('auth')->group(function () {
     // ===== PAINEL FINANCEIRO (FINANCIAL DASHBOARD) ROUTES =====
     // ===== PAINEL FINANCEIRO (FINANCIAL DASHBOARD) ROUTES =====
     Route::get('financial-dashboard', [\App\Http\Controllers\FinancialDashboardController::class, 'index'])->name('financial.dashboard');
+    Route::get('financial-dashboard/export/pdf', [\App\Http\Controllers\FinancialDashboardController::class, 'exportPdf'])->name('financial.dashboard.export.pdf');
+    Route::get('financial-dashboard/export/excel', [\App\Http\Controllers\FinancialDashboardController::class, 'exportExcel'])->name('financial.dashboard.export.excel');
 
     // Requisitions Routes
     Route::post('requisitions/{requisition}/approve', [\App\Http\Controllers\Admin\RequisitionController::class, 'approve'])->name('requisitions.approve');

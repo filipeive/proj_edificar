@@ -90,7 +90,7 @@ class CourseController extends Controller
             'registration_deadline' => 'nullable|date',
         ]);
 
-        $validated['slug'] = Str::slug($validated['name']);
+        $validated['slug'] = $this->availableSlug($validated['name']);
         $validated['registration_open'] = true; // Default to open for new courses
 
         Course::create($validated);
@@ -246,10 +246,25 @@ class CourseController extends Controller
         ]);
 
         if ($course->name !== $validated['name']) {
-            $validated['slug'] = Str::slug($validated['name']);
+            $validated['slug'] = $this->availableSlug($validated['name'], $course->id);
         }
 
         $course->update($validated);
+    {
+        $baseSlug = Str::slug($name);
+        $slug = $baseSlug;
+        $suffix = 2;
+        $congregationId = app(CongregationContext::class)->id();
+
+        while (Course::where('slug', $slug)
+            ->where('congregation_id', $congregationId)
+            ->when($ignoreId, fn($query) => $query->where('id', '!=', $ignoreId))
+            ->exists()) {
+            $slug = $baseSlug . '-' . $suffix++;
+        }
+
+        return $slug;
+    }
 
         return redirect()->route('courses.index')->with('success', 'Curso atualizado com sucesso!');
     }

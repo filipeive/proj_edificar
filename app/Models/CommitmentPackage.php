@@ -4,7 +4,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class CommitmentPackage extends Model
+class CommitmentPackage extends CongregationModel
 {
     use HasFactory;
 

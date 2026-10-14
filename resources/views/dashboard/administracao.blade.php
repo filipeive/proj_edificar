@@ -7,25 +7,25 @@
 @section('content')
     <div class="space-y-6 md:space-y-8">
         <!-- Top Stats         <!-- Top Stats -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
             <!-- Card: Total Cultos -->
             <div
-                class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-6 group hover:shadow-md transition-all duration-300">
-                <div class="flex items-center justify-between mb-4">
+                class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-3 sm:p-4 md:p-6 group hover:shadow-md transition-all duration-300">
+                <div class="flex items-center justify-between mb-2.5 sm:mb-4">
                     <div
-                        class="bg-orange-50 dark:bg-orange-950/20 p-3.5 rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
+                        class="bg-orange-50 dark:bg-orange-950/20 p-2 sm:p-2.5 md:p-3.5 rounded-lg sm:rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
                         <i
-                            class="bi bi-journal-text text-orange-600 dark:text-orange-400 text-xl group-hover:text-white transition-colors duration-300"></i>
+                            class="bi bi-journal-text text-orange-600 dark:text-orange-400 text-base sm:text-lg md:text-xl group-hover:text-white transition-colors duration-300"></i>
                     </div>
                     <span
-                        class="text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Cultos</span>
+                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Cultos</span>
                 </div>
                 <div>
-                    <p class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-wider">Total Registados
+                    <p class="text-gray-400 dark:text-gray-500 text-[10px] sm:text-xs font-bold uppercase tracking-wider">Total Registados
                     </p>
-                    <p class="text-2xl font-black text-gray-900 dark:text-white mt-1 tracking-tight">{{ $totalServices }}
+                    <p class="text-lg sm:text-xl md:text-2xl font-black text-gray-900 dark:text-white mt-0.5 sm:mt-1 tracking-tight">{{ $totalServices }}
                     </p>
-                    <div class="flex items-center mt-3 text-[10px] font-bold text-gray-400">
+                    <div class="flex items-center mt-1.5 sm:mt-3 text-[9px] sm:text-[10px] font-bold text-gray-400 truncate">
                         Último em: {{ $latestService ? $latestService->date->format('d/m/Y') : 'N/A' }}
                     </div>
                 </div>
@@ -33,21 +33,21 @@
 
             <!-- Card: Média Participação -->
             <div
-                class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-6 group hover:shadow-md transition-all duration-300">
-                <div class="flex items-center justify-between mb-4">
+                class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-3 sm:p-4 md:p-6 group hover:shadow-md transition-all duration-300">
+                <div class="flex items-center justify-between mb-2.5 sm:mb-4">
                     <div
-                        class="bg-orange-50 dark:bg-orange-950/20 p-3.5 rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
+                        class="bg-orange-50 dark:bg-orange-950/20 p-2 sm:p-2.5 md:p-3.5 rounded-lg sm:rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
                         <i
-                            class="bi bi-graph-up-arrow text-orange-600 dark:text-orange-400 text-xl group-hover:text-white transition-colors duration-300"></i>
+                            class="bi bi-graph-up-arrow text-orange-600 dark:text-orange-400 text-base sm:text-lg md:text-xl group-hover:text-white transition-colors duration-300"></i>
                     </div>
                     <span
-                        class="text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Presença</span>
+                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Presença</span>
                 </div>
                 <div>
-                    <p class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-wider">Média Membros/Vis.</p>
-                    <p class="text-2xl font-black text-gray-900 dark:text-white mt-1 tracking-tight">{{ $avgMembers }} /
+                    <p class="text-gray-400 dark:text-gray-500 text-[10px] sm:text-xs font-bold uppercase tracking-wider">Média Membros/Vis.</p>
+                    <p class="text-lg sm:text-xl md:text-2xl font-black text-gray-900 dark:text-white mt-0.5 sm:mt-1 tracking-tight">{{ $avgMembers }} /
                         {{ $avgVisitors }}</p>
-                    <div class="flex items-center mt-3 text-[10px] font-bold text-orange-500">
+                    <div class="flex items-center mt-1.5 sm:mt-3 text-[9px] sm:text-[10px] font-bold text-orange-500 truncate">
                         <i class="bi bi-person-check-fill mr-1"></i> Participação Consolidada
                     </div>
                 </div>
@@ -55,21 +55,21 @@
 
             <!-- Card: Total Visitantes -->
             <div
-                class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-6 group hover:shadow-md transition-all duration-300">
-                <div class="flex items-center justify-between mb-4">
+                class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-3 sm:p-4 md:p-6 group hover:shadow-md transition-all duration-300">
+                <div class="flex items-center justify-between mb-2.5 sm:mb-4">
                     <div
-                        class="bg-orange-50 dark:bg-orange-950/20 p-3.5 rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
+                        class="bg-orange-50 dark:bg-orange-950/20 p-2 sm:p-2.5 md:p-3.5 rounded-lg sm:rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
                         <i
-                            class="bi bi-person-heart text-orange-600 dark:text-orange-400 text-xl group-hover:text-white transition-colors duration-300"></i>
+                            class="bi bi-person-heart text-orange-600 dark:text-orange-400 text-base sm:text-lg md:text-xl group-hover:text-white transition-colors duration-300"></i>
                     </div>
                     <span
-                        class="text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Visitantes</span>
+                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Visitantes</span>
                 </div>
                 <div>
-                    <p class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-wider">Novas Visitas</p>
-                    <p class="text-2xl font-black text-gray-900 dark:text-white mt-1 tracking-tight">{{ $totalVisitors }}
+                    <p class="text-gray-400 dark:text-gray-500 text-[10px] sm:text-xs font-bold uppercase tracking-wider">Novas Visitas</p>
+                    <p class="text-lg sm:text-xl md:text-2xl font-black text-gray-900 dark:text-white mt-0.5 sm:mt-1 tracking-tight">{{ $totalVisitors }}
                     </p>
-                    <div class="flex items-center mt-3 text-[10px] font-bold text-orange-500">
+                    <div class="flex items-center mt-1.5 sm:mt-3 text-[9px] sm:text-[10px] font-bold text-orange-500 truncate">
                         {{ $pendingVisitors }} Pendentes
                     </div>
                 </div>
@@ -77,22 +77,22 @@
 
             <!-- Card: Taxa Integração -->
             <div
-                class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-6 group hover:shadow-md transition-all duration-300">
-                <div class="flex items-center justify-between mb-4">
+                class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-3 sm:p-4 md:p-6 group hover:shadow-md transition-all duration-300">
+                <div class="flex items-center justify-between mb-2.5 sm:mb-4">
                     <div
-                        class="bg-orange-50 dark:bg-orange-950/20 p-3.5 rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
+                        class="bg-orange-50 dark:bg-orange-950/20 p-2 sm:p-2.5 md:p-3.5 rounded-lg sm:rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
                         <i
-                            class="bi bi-check-circle-fill text-orange-600 dark:text-orange-400 text-xl group-hover:text-white transition-colors duration-300"></i>
+                            class="bi bi-check-circle-fill text-orange-600 dark:text-orange-400 text-base sm:text-lg md:text-xl group-hover:text-white transition-colors duration-300"></i>
                     </div>
                     <span
-                        class="text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Integração</span>
+                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Integração</span>
                 </div>
                 <div>
-                    <p class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-wider">Taxa de Sucesso
+                    <p class="text-gray-400 dark:text-gray-500 text-[10px] sm:text-xs font-bold uppercase tracking-wider">Taxa de Sucesso
                     </p>
-                    <p class="text-2xl font-black text-gray-900 dark:text-white mt-1 tracking-tight">
+                    <p class="text-lg sm:text-xl md:text-2xl font-black text-gray-900 dark:text-white mt-0.5 sm:mt-1 tracking-tight">
                         {{ $integrationRate }}%</p>
-                    <div class="flex items-center mt-3 text-[10px] font-bold text-green-500">
+                    <div class="flex items-center mt-1.5 sm:mt-3 text-[9px] sm:text-[10px] font-bold text-green-500 truncate">
                         <i class="bi bi-heart-fill mr-1"></i> {{ $integratedVisitors }} Integrados
                     </div>
                 </div>

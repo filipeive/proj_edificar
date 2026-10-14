@@ -8,19 +8,37 @@ use App\Models\QuarterlyReportEvent;
 use App\Models\Supervision;
 use App\Models\User;
 use App\Models\Zone;
+use App\Models\Congregation;
+use App\Services\CongregationContext;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ImportQuarterlyReportsBulk extends Command
 {
-    protected $signature = 'reports:import-bulk {file} {--dry-run}';
+    protected $signature = 'reports:import-bulk {file} {--congregation= : Slug da congregação de destino (padrão: Life Church)} {--dry-run}';
     protected $description = 'Importa relatórios trimestrais do IV Trimestre de 2025 a partir de um Excel';
 
     public function handle()
     {
         $filePath = $this->argument('file');
         $dryRun = $this->option('dry-run');
+
+        $congregation = Congregation::where('is_active', true)
+            ->when($this->option('congregation'), fn($query, $slug) => $query->where('slug', $slug))
+            ->where(function ($query) {
+                if (!$this->option('congregation')) {
+                    $query->where('is_primary', true);
+                }
+            })
+            ->first();
+
+        if (!$congregation) {
+            $this->error('Congregação de destino não encontrada ou inativa.');
+            return self::FAILURE;
+        }
+
+        app(CongregationContext::class)->set($congregation);
 
         if (!file_exists($filePath)) {
             $this->error("Arquivo não encontrado: $filePath");

@@ -9,7 +9,7 @@ use Laravel\Breeze\Features;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, NormalizesMozPhone, \App\Models\Concerns\LogsActivity, \Laravel\Sanctum\HasApiTokens;
+    use HasFactory, Notifiable, NormalizesMozPhone, \App\Models\Concerns\LogsActivity, \App\Models\Concerns\BelongsToCongregation, \Laravel\Sanctum\HasApiTokens;
 
     protected $fillable = [
         'name',
@@ -415,6 +415,12 @@ class User extends Authenticatable
      */
     public function hasPermission(string $permission): bool
     {
+        // Se a congregação atual não tem o módulo Projeto Edificar, bloqueia permissões do módulo
+        $hasEdificar = app(\App\Services\CongregationContext::class)->hasEdificar();
+        if (!$hasEdificar && in_array($permission, ['dashboard_edificar', 'dashboard_packages', 'menu_packages'], true)) {
+            return false;
+        }
+
         // Hard deny: responsável de pacote não deve aceder ao inventário
         if ($permission === 'menu_inventory' && $this->isResponsavelPacote()) {
             return false;
