@@ -255,7 +255,7 @@
                         </div>
 
                         <div class="absolute top-4 right-4 md:top-6 md:right-6 flex flex-col items-end gap-2">
-                            {!! $visitor->status_badge !!}
+                            <x-visitor-status-badge :status="$visitor->contact_status" />
                         </div>
 
                         <div
@@ -425,7 +425,7 @@
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 text-center">
-                                        {!! $visitor->status_badge !!}
+                                        <x-visitor-status-badge :status="$visitor->contact_status" />
                                     </td>
                                     <td class="px-6 py-4">
                                         <div class="flex items-center justify-center gap-2">

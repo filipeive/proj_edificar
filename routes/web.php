@@ -25,32 +25,23 @@ require __DIR__.'/auth.php';
 
 // Welcome & Root Routes
 Route::match(['get', 'post'], '/', [\App\Http\Controllers\WelcomeController::class, 'index'])->name('welcome');
+Route::match(['get', 'post'], '/edificar', [\App\Http\Controllers\WelcomeController::class, 'index']);
 Route::match(['get', 'post'], '/welcome', [\App\Http\Controllers\WelcomeController::class, 'landing'])->name('welcome.landing');
 
 // Public Course Enrollment
 Route::get('/cursos/{course:slug}/inscricao', [\App\Http\Controllers\PublicCourseController::class, 'register'])->name('public.courses.register');
-Route::post('/cursos/{course:slug}/inscricao', [\App\Http\Controllers\PublicCourseController::class, 'store'])
-    ->middleware('throttle:10,1')
-    ->name('public.courses.store');
+Route::post('/cursos/{course:slug}/inscricao', [\App\Http\Controllers\PublicCourseController::class, 'store'])->middleware('throttle:10,1')->name('public.courses.store');
 Route::get('/inscricao-casais', [\App\Http\Controllers\PublicCourseController::class, 'showCasaisForm'])->name('public.courses.casais');
-Route::post('/inscricao-casais', [\App\Http\Controllers\PublicCourseController::class, 'storeCasaisEnrollment'])
-    ->middleware('throttle:10,1')
-    ->name('public.courses.casais.store');
+Route::post('/inscricao-casais', [\App\Http\Controllers\PublicCourseController::class, 'storeCasaisEnrollment'])->middleware('throttle:10,1')->name('public.courses.casais.store');
 Route::get('/inscricao-pre-marital', [\App\Http\Controllers\PublicFormController::class, 'showPreMaritalForm'])->name('public.forms.pre-marital');
-Route::post('/inscricao-pre-marital', [\App\Http\Controllers\PublicFormController::class, 'storePreMarital'])
-    ->middleware('throttle:10,1')
-    ->name('public.forms.pre-marital.store');
+Route::post('/inscricao-pre-marital', [\App\Http\Controllers\PublicFormController::class, 'storePreMarital'])->middleware('throttle:10,1')->name('public.forms.pre-marital.store');
 
 // Ministerial Forms (Dynamic Slug)
 Route::get('/inscricao/{slug}', [\App\Http\Controllers\PublicFormController::class, 'showMinisterialForm'])->name('public.forms.ministerial');
-Route::post('/inscricao/ministerial', [\App\Http\Controllers\PublicFormController::class, 'storeMinisterialForm'])
-    ->middleware('throttle:10,1')
-    ->name('public.forms.ministerial.store');
+Route::post('/inscricao/ministerial', [\App\Http\Controllers\PublicFormController::class, 'storeMinisterialForm'])->middleware('throttle:10,1')->name('public.forms.ministerial.store');
 
 Route::get('/relatorio-trimestral', [\App\Http\Controllers\PublicFormController::class, 'showQuarterlyReportForm'])->name('public.reports.quarterly');
-Route::post('/relatorio-trimestral', [\App\Http\Controllers\PublicFormController::class, 'storeQuarterlyReport'])
-    ->middleware('throttle:10,1')
-    ->name('public.reports.quarterly.store');
+Route::post('/relatorio-trimestral', [\App\Http\Controllers\PublicFormController::class, 'storeQuarterlyReport'])->middleware('throttle:10,1')->name('public.reports.quarterly.store');
 
 // Setup Wizard Routes (No authentication required)
 Route::prefix('setup')->group(function () {

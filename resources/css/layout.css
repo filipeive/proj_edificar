@@ -1022,3 +1022,298 @@ form.flex input {
     background: #1e3a5f;
     color: #93c5fd;
 }
+
+/* ============================================
+   9. UNIFIED NATIONAL UI DESIGN SYSTEM (ALL VIEWS)
+   Normalizes typography, cards, buttons, inputs,
+   tables, and spacing across all views to match
+   the National Management UI without altering
+   any application functionality.
+   ============================================ */
+
+/* 9.1 Card & Container Border Radii & Shadows (rounded-xl = 0.75rem, shadow-sm) */
+main .rounded-\[3rem\],
+main .rounded-\[2\.5rem\],
+main .rounded-\[2rem\],
+main .rounded-\[1\.75rem\],
+main .rounded-\[1\.5rem\],
+main .rounded-3xl,
+main .rounded-2xl {
+    border-radius: 0.75rem !important;
+}
+
+main .shadow-2xl,
+main .shadow-xl,
+main .shadow-lg {
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+/* 9.2 Proportional Typography Scale (matching National Dashboard) */
+main h1,
+main .text-5xl:not(.bi),
+main .text-4xl:not(.bi),
+main .text-3xl:not(.bi) {
+    font-size: 1.15rem !important;
+    line-height: 1.3 !important;
+    letter-spacing: -0.02em !important;
+}
+
+main .text-2xl:not(.bi) {
+    font-size: 1.05rem !important;
+    line-height: 1.35 !important;
+}
+
+main h2,
+main .text-xl:not(.bi) {
+    font-size: 0.9375rem !important;
+    line-height: 1.4 !important;
+}
+
+main h3,
+main .text-lg:not(.bi) {
+    font-size: 0.875rem !important;
+    line-height: 1.4 !important;
+}
+
+@media (min-width: 640px) {
+    main h1,
+    main .text-5xl:not(.bi),
+    main .text-4xl:not(.bi),
+    main .text-3xl:not(.bi) {
+        font-size: 1.375rem !important;
+        line-height: 1.3 !important;
+    }
+
+    main .text-2xl:not(.bi) {
+        font-size: 1.25rem !important;
+        line-height: 1.35 !important;
+    }
+
+    main h2,
+    main .text-xl:not(.bi) {
+        font-size: 1.0625rem !important;
+        line-height: 1.4 !important;
+    }
+
+    main h3,
+    main .text-lg:not(.bi) {
+        font-size: 0.9375rem !important;
+        line-height: 1.4 !important;
+    }
+}
+
+/* 9.3 Icon Sizing & Icon Containers */
+main i.bi.text-5xl,
+main i.bi.text-4xl,
+main i.bi.text-3xl {
+    font-size: 1.25rem !important;
+}
+
+main i.bi.text-2xl {
+    font-size: 1.05rem !important;
+}
+
+main .w-20.h-20:not(.rounded-full),
+main .w-16.h-16:not(.rounded-full),
+main .w-14.h-14:not(.rounded-full),
+main .w-12.h-12:not(.rounded-full) {
+    width: 2.25rem !important;
+    height: 2.25rem !important;
+    border-radius: 0.5rem !important;
+}
+
+/* 9.4 Card & Section Paddings & Spacing (p-3.5 sm:p-5, space-y-5) */
+main .p-12,
+main .p-10,
+main .p-8,
+main .p-7,
+main .p-6 {
+    padding: 0.875rem !important;
+}
+
+main .px-12,
+main .px-10,
+main .px-8,
+main .px-6 {
+    padding-left: 0.875rem !important;
+    padding-right: 0.875rem !important;
+}
+
+main .py-12,
+main .py-10,
+main .py-8,
+main .py-6 {
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+}
+
+main .space-y-12 > :not([hidden]) ~ :not([hidden]),
+main .space-y-10 > :not([hidden]) ~ :not([hidden]),
+main .space-y-8 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 1.125rem !important;
+}
+
+main .gap-12,
+main .gap-10,
+main .gap-8,
+main .gap-6 {
+    gap: 0.75rem !important;
+}
+
+main .mb-12,
+main .mb-10,
+main .mb-8 {
+    margin-bottom: 1.125rem !important;
+}
+
+@media (min-width: 640px) {
+    main .p-12,
+    main .p-10,
+    main .p-8,
+    main .p-7,
+    main .p-6,
+    main .md\:p-12,
+    main .md\:p-10,
+    main .md\:p-8,
+    main .lg\:p-12,
+    main .lg\:p-10,
+    main .lg\:p-8 {
+        padding: 1.25rem !important;
+    }
+
+    main .px-12,
+    main .px-10,
+    main .px-8,
+    main .px-6,
+    main .md\:px-8,
+    main .md\:px-10 {
+        padding-left: 1.25rem !important;
+        padding-right: 1.25rem !important;
+    }
+
+    main .py-12,
+    main .py-10,
+    main .py-8,
+    main .py-6 {
+        padding-top: 0.9375rem !important;
+        padding-bottom: 0.9375rem !important;
+    }
+
+    main .space-y-12 > :not([hidden]) ~ :not([hidden]),
+    main .space-y-10 > :not([hidden]) ~ :not([hidden]),
+    main .space-y-8 > :not([hidden]) ~ :not([hidden]),
+    main .md\:space-y-8 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: 1.25rem !important;
+    }
+
+    main .gap-12,
+    main .gap-10,
+    main .gap-8,
+    main .gap-6,
+    main .md\:gap-8,
+    main .md\:gap-6 {
+        gap: 1rem !important;
+    }
+
+    main .mb-12,
+    main .mb-10,
+    main .mb-8,
+    main .md\:mb-8 {
+        margin-bottom: 1.25rem !important;
+    }
+}
+
+/* 9.5 Buttons & Action Links (rounded-lg = 0.5rem, px-3 py-1.5 sm:py-2, text-xs sm:text-sm) */
+main button:not(.rounded-full):not(.action-icon),
+main a[class*="bg-"]:not(.rounded-full):not(.action-icon):not(.grid *):not(.block) {
+    border-radius: 0.5rem !important;
+}
+
+main a.px-10,
+main a.px-8,
+main a.px-6,
+main a.px-5,
+main button.px-10,
+main button.px-8,
+main button.px-6,
+main button.px-5,
+main a.py-5,
+main a.py-4,
+main a.py-3\.5,
+main a.py-3,
+main button.py-5,
+main button.py-4,
+main button.py-3\.5,
+main button.py-3 {
+    padding: 0.4375rem 0.875rem !important;
+    font-size: 0.75rem !important;
+    line-height: 1.25rem !important;
+    border-radius: 0.5rem !important;
+}
+
+@media (min-width: 640px) {
+    main a.px-10,
+    main a.px-8,
+    main a.px-6,
+    main a.px-5,
+    main button.px-10,
+    main button.px-8,
+    main button.px-6,
+    main button.px-5,
+    main a.py-5,
+    main a.py-4,
+    main a.py-3\.5,
+    main a.py-3,
+    main button.py-5,
+    main button.py-4,
+    main button.py-3\.5,
+    main button.py-3 {
+        padding: 0.5rem 1rem !important;
+        font-size: 0.8125rem !important;
+    }
+}
+
+/* 9.6 Form Inputs, Selects & TomSelect (height 38px, rounded-lg, text-xs sm:text-sm) */
+main input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]):not([type="range"]),
+main select,
+form.grid select,
+form.grid input[type="text"],
+form.grid input[type="date"],
+form.grid input[type="search"],
+form.grid button[type="submit"],
+form.flex select,
+form.flex input[type="text"],
+form.flex input[type="date"],
+form.flex input[type="search"],
+form.flex button[type="submit"],
+form.grid .ts-wrapper .ts-control,
+form.flex .ts-wrapper .ts-control,
+.ts-wrapper .ts-control {
+    height: 38px !important;
+    min-height: 38px !important;
+    padding-top: 0.375rem !important;
+    padding-bottom: 0.375rem !important;
+    font-size: 0.8125rem !important;
+    border-radius: 0.5rem !important;
+}
+
+main textarea {
+    border-radius: 0.5rem !important;
+    font-size: 0.8125rem !important;
+    padding: 0.5rem 0.75rem !important;
+}
+
+/* 9.7 Tables (matching National Management tables) */
+main table thead th {
+    padding: 0.625rem 1rem !important;
+    font-size: 0.625rem !important;
+    font-weight: 800 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+}
+
+main table tbody td {
+    padding: 0.6875rem 1rem !important;
+    font-size: 0.8125rem !important;
+}
+

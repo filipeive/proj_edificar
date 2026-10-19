@@ -12,181 +12,106 @@
 @section('page-subtitle', 'Visão geral de todas as atividades e contribuições Eclesiásticas')
 
 @section('content')
-    <div class="space-y-6 md:space-y-8">
-        <!-- QW-05: Métricas agora visíveis em mobile (era hidden md:grid) -->
-        <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-6 mb-6 md:mb-8">
-            <!-- Card: Membros Ativos -->
-            <div
-                class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-3 sm:p-4 md:p-6 hover:shadow-md transition-all duration-300 group">
-                <div class="flex items-center justify-between mb-2 sm:mb-3 md:mb-4">
-                    <div
-                        class="bg-orange-50 dark:bg-orange-950/20 p-2 sm:p-2.5 md:p-3.5 rounded-lg sm:rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
-                        <i
-                            class="bi bi-people-fill text-orange-600 dark:text-orange-400 text-base sm:text-lg md:text-xl group-hover:text-white transition-colors duration-300"></i>
-                    </div>
-                    <span
-                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Comunidade</span>
-                </div>
-                <div>
-                    <p class="text-gray-400 dark:text-gray-500 text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">Membros Ativos
-                    </p>
-                    <p class="text-lg sm:text-xl md:text-2xl font-black text-gray-900 dark:text-white mt-0.5 sm:mt-1 tracking-tight truncate">{{ $totalMembers }}
-                    </p>
-                    <div class="flex items-center mt-1.5 sm:mt-2.5 md:mt-3 text-[9px] sm:text-[10px]">
-                        <span class="text-orange-500 dark:text-orange-400 font-bold flex items-center">
-                            <i class="bi bi-graph-up mr-1 text-xs"></i> Crescendo
-                        </span>
-                        <span class="text-gray-400 dark:text-gray-500 ml-1 truncate">este mês</span>
-                    </div>
-                </div>
+    <div class="space-y-5 sm:space-y-6">
+        <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 sm:gap-4">
+            <div>
+                <p class="text-[10px] sm:text-xs font-black uppercase tracking-[0.18em] text-orange-700">Gestão Local da Congregação</p>
+                <h1 class="mt-0.5 sm:mt-1 text-xl sm:text-2xl font-black text-gray-950 dark:text-white tracking-tight">Panorama Eclesiástico</h1>
+                <p class="mt-0.5 sm:mt-1 text-xs sm:text-sm text-gray-500 dark:text-zinc-400">Indicadores do mês corrente, células, eventos e atividades.</p>
             </div>
+            <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 w-full sm:w-auto">
+                @if(app(\App\Services\CongregationContext::class)->hasEdificar())
+                    <a href="{{ route('edificar.dashboard') }}" class="inline-flex justify-center items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-white hover:bg-zinc-800 shadow-sm">
+                        <i class="bi bi-bricks text-orange-400"></i> <span>Painel Edificar</span>
+                    </a>
+                @endif
+                <a href="{{ route('services.create') }}" class="inline-flex justify-center items-center gap-1.5 rounded-lg border border-gray-300 bg-white dark:bg-zinc-900 dark:border-zinc-700 px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-gray-700 dark:text-zinc-200 hover:bg-gray-50 shadow-sm">
+                    <i class="bi bi-journal-plus text-orange-700"></i> <span>Novo Culto</span>
+                </a>
+                <a href="{{ route('users.create') }}" class="inline-flex justify-center items-center gap-1.5 rounded-lg bg-orange-700 px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-white hover:bg-orange-800 shadow-sm">
+                    <i class="bi bi-person-plus"></i> <span>Novo Membro</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- Indicadores Principais (Estilo Gestão Nacional) -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+            <!-- Card: Membros Ativos -->
+            <article class="rounded-xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/30 p-3 sm:p-4 shadow-sm">
+                <div class="flex items-center justify-between gap-2">
+                    <p class="text-[11px] sm:text-xs font-bold text-gray-500 dark:text-zinc-400 truncate">Membros Ativos</p>
+                    <i class="bi bi-people text-orange-700 text-sm sm:text-base"></i>
+                </div>
+                <p class="mt-1 text-lg sm:text-2xl font-black text-gray-950 dark:text-white tracking-tight truncate">{{ $totalMembers }}</p>
+                <p class="text-[10px] sm:text-[11px] text-gray-400 dark:text-zinc-500 mt-0.5 truncate"><i class="bi bi-graph-up text-orange-600 mr-1"></i>Comunidade ativa</p>
+            </article>
 
             <!-- Card: Total Dízimos/Ofertas -->
-            <div
-                class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-3 sm:p-4 md:p-6 hover:shadow-md transition-all duration-300 group">
-                <div class="flex items-center justify-between mb-2 sm:mb-3 md:mb-4">
-                    <div
-                        class="bg-orange-50 dark:bg-orange-950/20 p-2 sm:p-2.5 md:p-3.5 rounded-lg sm:rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
-                        <i
-                            class="bi bi-cash-coin text-orange-600 dark:text-orange-400 text-base sm:text-lg md:text-xl group-hover:text-white transition-colors duration-300"></i>
-                    </div>
-                    <span
-                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Eclesiástico</span>
+            <article class="rounded-xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/30 p-3 sm:p-4 shadow-sm">
+                <div class="flex items-center justify-between gap-2">
+                    <p class="text-[11px] sm:text-xs font-bold text-gray-500 dark:text-zinc-400 truncate">Dízimos e Ofertas</p>
+                    <i class="bi bi-cash-coin text-emerald-700 text-sm sm:text-base"></i>
                 </div>
-                <div>
-                    <p class="text-gray-400 dark:text-gray-500 text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">Dízimos e Ofertas
-                    </p>
-                    <p class="text-base sm:text-xl md:text-2xl font-black text-gray-900 dark:text-white mt-0.5 sm:mt-1 tracking-tight truncate">
-                        {{ number_format($totalContributed, 2, ',', '.') }} MT
-                    </p>
-                    <div class="flex items-center mt-1.5 sm:mt-2.5 md:mt-3 text-[9px] sm:text-[10px]">
-                        @if($totalContributed == 0)
-                            <span class="text-yellow-600 dark:text-yellow-400 font-bold flex items-center">
-                                <i class="bi bi-info-circle mr-1 text-xs"></i> Sem registos
-                            </span>
-                        @else
-                            <span class="text-gray-400 dark:text-gray-500 truncate">Total do Mês</span>
-                        @endif
-                    </div>
-                </div>
-            </div>
+                <p class="mt-1 text-base sm:text-xl font-black text-emerald-700 dark:text-emerald-400 tracking-tight truncate">
+                    {{ number_format($totalContributed, 2, ',', '.') }} MT
+                </p>
+                <p class="text-[10px] sm:text-[11px] text-gray-400 dark:text-zinc-500 mt-0.5 truncate">
+                    {{ $totalContributed == 0 ? 'Sem registos no mês' : 'Total eclesiástico do mês' }}
+                </p>
+            </article>
 
             <!-- Card: Próximos Eventos -->
-            <div
-                class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-3 sm:p-4 md:p-6 hover:shadow-md transition-all duration-300 group">
-                <div class="flex items-center justify-between mb-2 sm:mb-3 md:mb-4">
-                    <div
-                        class="bg-orange-50 dark:bg-orange-950/20 p-2 sm:p-2.5 md:p-3.5 rounded-lg sm:rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
-                        <i
-                            class="bi bi-calendar-event-fill text-orange-600 dark:text-orange-400 text-base sm:text-lg md:text-xl group-hover:text-white transition-colors duration-300"></i>
-                    </div>
-                    <span
-                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Agenda</span>
+            <article class="rounded-xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/30 p-3 sm:p-4 shadow-sm">
+                <div class="flex items-center justify-between gap-2">
+                    <p class="text-[11px] sm:text-xs font-bold text-gray-500 dark:text-zinc-400 truncate">Próximos Eventos</p>
+                    <i class="bi bi-calendar-event text-blue-700 text-sm sm:text-base"></i>
                 </div>
-                <div>
-                    <p class="text-gray-400 dark:text-gray-500 text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">Próximos Eventos
-                    </p>
-                    <p class="text-lg sm:text-xl md:text-2xl font-black text-gray-900 dark:text-white mt-0.5 sm:mt-1 tracking-tight truncate">
-                        {{ count($upcomingEvents) }}</p>
-                    <a href="{{ route('events.index') }}"
-                        class="inline-flex items-center mt-1.5 sm:mt-2.5 md:mt-3 text-[8px] sm:text-[9px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest hover:text-orange-700 dark:hover:text-orange-300 truncate">
-                        Ver Calendário <i class="bi bi-arrow-right ml-1"></i>
-                    </a>
-                </div>
-            </div>
+                <p class="mt-1 text-lg sm:text-2xl font-black text-gray-950 dark:text-white tracking-tight truncate">{{ count($upcomingEvents) }}</p>
+                <a href="{{ route('events.index') }}" class="inline-flex items-center text-[10px] sm:text-[11px] font-bold text-orange-800 dark:text-orange-400 hover:underline mt-0.5 truncate">
+                    Ver calendário <i class="bi bi-arrow-right ml-1"></i>
+                </a>
+            </article>
 
             <!-- Card: Cultos Recentes -->
-            <div
-                class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-3 sm:p-4 md:p-6 hover:shadow-md transition-all duration-300 group">
-                <div class="flex items-center justify-between mb-2 sm:mb-3 md:mb-4">
-                    <div
-                        class="bg-orange-50 dark:bg-orange-950/20 p-2 sm:p-2.5 md:p-3.5 rounded-lg sm:rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
-                        <i
-                            class="bi bi-journal-bookmark-fill text-orange-600 dark:text-orange-400 text-base sm:text-lg md:text-xl group-hover:text-white transition-colors duration-300"></i>
-                    </div>
-                    <span
-                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Cultos</span>
+            <article class="rounded-xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/30 p-3 sm:p-4 shadow-sm">
+                <div class="flex items-center justify-between gap-2">
+                    <p class="text-[11px] sm:text-xs font-bold text-gray-500 dark:text-zinc-400 truncate">Relatórios de Cultos</p>
+                    <i class="bi bi-journal-bookmark text-amber-700 text-sm sm:text-base"></i>
                 </div>
-                <div>
-                    <p class="text-gray-400 dark:text-gray-500 text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">Relatórios</p>
-                    <p class="text-lg sm:text-xl md:text-2xl font-black text-gray-900 dark:text-white mt-0.5 sm:mt-1 tracking-tight truncate">
-                        {{ count($recentServices) }}</p>
-                    <a href="{{ route('services.index') }}"
-                        class="inline-flex items-center mt-1.5 sm:mt-2.5 md:mt-3 text-[8px] sm:text-[9px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest hover:text-orange-700 dark:hover:text-orange-300 truncate">
-                        Ver Todos <i class="bi bi-arrow-right ml-1"></i>
-                    </a>
-                </div>
-            </div>
+                <p class="mt-1 text-lg sm:text-2xl font-black text-gray-950 dark:text-white tracking-tight truncate">{{ count($recentServices) }}</p>
+                <a href="{{ route('services.index') }}" class="inline-flex items-center text-[10px] sm:text-[11px] font-bold text-orange-800 dark:text-orange-400 hover:underline mt-0.5 truncate">
+                    Ver todos <i class="bi bi-arrow-right ml-1"></i>
+                </a>
+            </article>
         </div>
 
-            <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3 md:gap-4 mb-6 md:mb-8">
-                @if(app(\App\Services\CongregationContext::class)->hasEdificar())
-                <!-- Link to Edificar Dashboard -->
-                <a href="{{ route('edificar.dashboard') }}"
-                    class="bg-zinc-950 dark:bg-zinc-900 border border-zinc-950 dark:border-zinc-850 hover:bg-zinc-900 dark:hover:bg-zinc-800/80 transition-all p-2.5 sm:p-3.5 md:p-4 rounded-xl sm:rounded-2xl text-center group shadow-sm hover:shadow-md">
-                    <div
-                        class="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-orange-500 rounded-lg md:rounded-xl flex items-center justify-center text-white mx-auto mb-1.5 sm:mb-2 md:mb-3 group-hover:scale-110 transition-transform duration-300">
-                        <i class="bi bi-bricks text-sm sm:text-base md:text-lg"></i>
-                    </div>
-                    <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-white truncate block">Painel Edificar</span>
-                </a>
-                @endif
-
-                <!-- Novo Evento -->
-                <a href="{{ route('events.create') }}"
-                    class="bg-white dark:bg-zinc-900/30 p-2.5 sm:p-3.5 md:p-4 rounded-xl sm:rounded-2xl border border-gray-100 dark:border-zinc-850 shadow-sm hover:shadow-md transition-all text-center group">
-                    <div
-                        class="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-orange-50 dark:bg-orange-950/20 rounded-lg md:rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 mx-auto mb-1.5 sm:mb-2 md:mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
-                        <i class="bi bi-calendar-plus text-sm sm:text-base md:text-lg"></i>
-                    </div>
-                    <span
-                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-gray-500 dark:text-zinc-400 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors truncate block">Novo Evento</span>
-                </a>
-
-                <!-- Novo Culto -->
-                <a href="{{ route('services.create') }}"
-                    class="bg-white dark:bg-zinc-900/30 p-2.5 sm:p-3.5 md:p-4 rounded-xl sm:rounded-2xl border border-gray-100 dark:border-zinc-850 shadow-sm hover:shadow-md transition-all text-center group">
-                    <div
-                        class="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-orange-50 dark:bg-orange-950/20 rounded-lg md:rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 mx-auto mb-1.5 sm:mb-2 md:mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
-                        <i class="bi bi-journal-plus text-sm sm:text-base md:text-lg"></i>
-                    </div>
-                    <span
-                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-gray-500 dark:text-zinc-400 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors truncate block">Novo Culto</span>
-                </a>
-
-                <!-- Novo Membro -->
-                <a href="{{ route('users.create') }}"
-                    class="bg-white dark:bg-zinc-900/30 p-2.5 sm:p-3.5 md:p-4 rounded-xl sm:rounded-2xl border border-gray-100 dark:border-zinc-850 shadow-sm hover:shadow-md transition-all text-center group">
-                    <div
-                        class="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-orange-50 dark:bg-orange-950/20 rounded-lg md:rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 mx-auto mb-1.5 sm:mb-2 md:mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
-                        <i class="bi bi-person-plus text-sm sm:text-base md:text-lg"></i>
-                    </div>
-                    <span
-                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-gray-500 dark:text-zinc-400 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors truncate block">Novo Membro</span>
-                </a>
-
-                <!-- Nova Célula -->
-                <a href="{{ route('cells.create') }}"
-                    class="bg-white dark:bg-zinc-900/30 p-2.5 sm:p-3.5 md:p-4 rounded-xl sm:rounded-2xl border border-gray-100 dark:border-zinc-850 shadow-sm hover:shadow-md transition-all text-center group">
-                    <div
-                        class="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-orange-50 dark:bg-orange-950/20 rounded-lg md:rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 mx-auto mb-1.5 sm:mb-2 md:mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
-                        <i class="bi bi-diagram-3 text-sm sm:text-base md:text-lg"></i>
-                    </div>
-                    <span
-                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-gray-500 dark:text-zinc-400 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors truncate block">Nova Célula</span>
-                </a>
-
-                <!-- Relatório Trimestral -->
-                <a href="{{ route('quarterly-reports.create') }}"
-                    class="bg-white dark:bg-zinc-900/30 p-2.5 sm:p-3.5 md:p-4 rounded-xl sm:rounded-2xl border border-gray-100 dark:border-zinc-850 shadow-sm hover:shadow-md transition-all text-center group">
-                    <div
-                        class="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-orange-50 dark:bg-orange-950/20 rounded-lg md:rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 mx-auto mb-1.5 sm:mb-2 md:mb-3 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
-                        <i class="bi bi-file-earmark-bar-graph text-sm sm:text-base md:text-lg"></i>
-                    </div>
-                    <span
-                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-gray-500 dark:text-zinc-400 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors truncate block">Relatório</span>
-                </a>
-            </div>
+        <!-- Ações Rápidas Compactas -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
+            <a href="{{ route('events.create') }}" class="flex items-center gap-2.5 rounded-xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/30 p-3 shadow-sm hover:bg-gray-50 transition-colors">
+                <div class="w-8 h-8 rounded-lg bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400 flex items-center justify-center shrink-0">
+                    <i class="bi bi-calendar-plus text-sm"></i>
+                </div>
+                <span class="text-xs font-bold text-gray-800 dark:text-zinc-200 truncate">Novo Evento</span>
+            </a>
+            <a href="{{ route('cells.create') }}" class="flex items-center gap-2.5 rounded-xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/30 p-3 shadow-sm hover:bg-gray-50 transition-colors">
+                <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 flex items-center justify-center shrink-0">
+                    <i class="bi bi-diagram-3 text-sm"></i>
+                </div>
+                <span class="text-xs font-bold text-gray-800 dark:text-zinc-200 truncate">Nova Célula</span>
+            </a>
+            <a href="{{ route('quarterly-reports.create') }}" class="flex items-center gap-2.5 rounded-xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/30 p-3 shadow-sm hover:bg-gray-50 transition-colors">
+                <div class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                    <i class="bi bi-file-earmark-bar-graph text-sm"></i>
+                </div>
+                <span class="text-xs font-bold text-gray-800 dark:text-zinc-200 truncate">Relatório Trimestral</span>
+            </a>
+            <a href="{{ route('visitors.index') }}" class="flex items-center gap-2.5 rounded-xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/30 p-3 shadow-sm hover:bg-gray-50 transition-colors">
+                <div class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 flex items-center justify-center shrink-0">
+                    <i class="bi bi-person-hearts text-sm"></i>
+                </div>
+                <span class="text-xs font-bold text-gray-800 dark:text-zinc-200 truncate">Visitantes</span>
+            </a>
+        </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             <!-- Members by Zone -->
             <x-card title="Membros por Zona">

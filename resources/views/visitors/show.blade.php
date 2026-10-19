@@ -237,7 +237,7 @@
                     <div class="p-6 text-center border-b border-gray-50">
                         <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Status Atual</p>
                         <div class="inline-block transform scale-110">
-                            {!! $visitor->status_badge !!}
+                            <x-visitor-status-badge :status="$visitor->contact_status" />
                         </div>
                     </div>
                     @if($visitor->contacted_at)

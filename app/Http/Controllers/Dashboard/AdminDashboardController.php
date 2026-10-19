@@ -41,55 +41,31 @@ class AdminDashboardController
             ->count();
 
         // 1. Members per Zone (Requested Change)
-        $zones = Zone::withCount(['supervisions', 'cells'])->get(); // Eager load counts if relationships exist on Zone (Need to check model)
-        // Zone model might NOT have 'cells' relation directly (Zone -> Supervision -> Cell).
-        // I will calculate manually to be safe or assuming relations exist.
+        $zones = Zone::withCount(['supervisions', 'cells'])->get();
 
-        $zoneStats = []; // Reusing name but for Members
-        $zoneStructures = []; // New chart data: Cells & Supervisions
+        $membersPerZone = User::where('users.role', 'membro')
+            ->where('users.is_active', true)
+            ->whereNotNull('users.cell_id')
+            ->join('cells', 'users.cell_id', '=', 'cells.id')
+            ->join('supervisions', 'cells.supervision_id', '=', 'supervisions.id')
+            ->selectRaw('supervisions.zone_id, count(users.id) as total')
+            ->groupBy('supervisions.zone_id')
+            ->pluck('total', 'supervisions.zone_id');
 
-        foreach ($zones as $zone) {
-            // Count Members in this Zone
-            // Zone hasMany Supervisions? Supervision hasMany Cells? Cell hasMany Members?
-            // Or Zone hasMany Users through relations? 
-            // Often efficient to query User where zone_id (if exists) or via cell.
-            // Assuming User doesn't have direct zone_id (it's on Cell->Supervision->Zone).
-            // Let's check Zone model if I can. But for now I'll assume standard nested relation.
-            // Actually, Contribution has zone_id, but User? 
-            // I'll filter Users who belong to a cell in a supervision in this zone.
-
-            // To be faster/easier:
-            // $zoneMembers = User::whereHas('cell.supervision', fn($q) => $q->where('zone_id', $zone->id))->count();
-
-            // However, let's look at `User.php`: `getZoneId()` exists.
-            // I'll try to use the relationships if they exist.
-            // Zone -> hasMany Supervisions.
-            // Supervision -> hasMany Cells.
-            // Cell -> hasMany Members (User).
-
-            $membersCount = User::whereHas('cell.supervision', function ($q) use ($zone) {
-                $q->where('zone_id', $zone->id);
-            })->where('role', 'membro')->where('is_active', true)->count();
-
-            $zoneStats[] = [
+        $zoneStats = $zones->map(function ($zone) use ($membersPerZone) {
+            return [
                 'name' => $zone->name,
-                'total' => $membersCount, // "Total" here means Members
+                'total' => (int) ($membersPerZone->get($zone->id) ?? 0),
             ];
+        });
 
-            $supervisionsCount = $zone->supervisions()->count();
-            // Cells: Zone->Supervisions->Cells
-            $cellsCount = Cell::whereHas('supervision', function ($q) use ($zone) {
-                $q->where('zone_id', $zone->id);
-            })->count();
-
-            $zoneStructures[] = [
+        $zoneStructures = $zones->map(function ($zone) {
+            return [
                 'name' => $zone->name,
-                'supervisions' => $supervisionsCount,
-                'cells' => $cellsCount,
+                'supervisions' => (int) $zone->supervisions_count,
+                'cells' => (int) $zone->cells_count,
             ];
-        }
-        $zoneStats = collect($zoneStats);
-        $zoneStructures = collect($zoneStructures);
+        });
 
         $mapZones = Zone::with('supervisions.cells')->get()->map(function (Zone $zone) {
             return [
@@ -108,27 +84,36 @@ class AdminDashboardController
         })->values();
 
 
-        // Top Cells (Ecclesiastical Only)
-        $topCells = Cell::with('supervision')
-            ->get()
-            ->map(function ($cell) use ($monthStart, $monthEnd) {
-                $totalCell = Contribution::where('cell_id', $cell->id)
-                    ->whereBetween('contribution_date', [$monthStart, $monthEnd])
-                    ->where('status', 'verificada')
-                    ->whereNull('package_id')
-                    ->sum('amount');
+        // Top Cells (Ecclesiastical Only) - Optimized with eager relationships and aggregations
+        $cellContributions = Contribution::whereBetween('contribution_date', [$monthStart, $monthEnd])
+            ->where('status', 'verificada')
+            ->whereNull('package_id')
+            ->whereNotNull('cell_id')
+            ->selectRaw('cell_id, sum(amount) as total')
+            ->groupBy('cell_id')
+            ->pluck('total', 'cell_id');
 
-                $membersContributedCount = User::where('cell_id', $cell->id)
-                    ->whereHas('contributions', function ($q) use ($monthStart, $monthEnd) {
-                        $q->whereBetween('contribution_date', [$monthStart, $monthEnd])
-                            ->where('status', 'verificada')
-                            ->whereNull('package_id');
-                    })->count();
+        $cellContributedMembers = User::whereNotNull('cell_id')
+            ->whereHas('contributions', function ($q) use ($monthStart, $monthEnd) {
+                $q->whereBetween('contribution_date', [$monthStart, $monthEnd])
+                    ->where('status', 'verificada')
+                    ->whereNull('package_id');
+            })
+            ->selectRaw('cell_id, count(id) as total')
+            ->groupBy('cell_id')
+            ->pluck('total', 'cell_id');
+
+        $topCells = Cell::with('supervision')
+            ->withCount(['members' => fn($q) => $q->where('is_active', true)])
+            ->get()
+            ->map(function ($cell) use ($cellContributions, $cellContributedMembers) {
+                $totalCell = (float) ($cellContributions->get($cell->id) ?? 0);
+                $membersContributedCount = (int) ($cellContributedMembers->get($cell->id) ?? 0);
 
                 return [
                     'name' => $cell->name,
                     'total' => $totalCell,
-                    'members' => $cell->getMembersCount(),
+                    'members' => (int) $cell->members_count,
                     'contributed' => $membersContributedCount,
                 ];
             })

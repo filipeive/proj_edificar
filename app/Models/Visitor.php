@@ -207,13 +207,9 @@ class Visitor extends CongregationModel
 
     public function getStatusBadgeAttribute(): string
     {
-        return match ($this->contact_status) {
-            'pendente' => '<span class="px-3 py-1 bg-yellow-50 text-yellow-600 rounded-full text-xs font-bold">Pendente</span>',
-            'contatado' => '<span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-bold">Contatado</span>',
-            'integrado' => '<span class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-xs font-bold">Integrado</span>',
-            'sem_interesse' => '<span class="px-3 py-1 bg-gray-50 text-gray-600 rounded-full text-xs font-bold">Sem Interesse</span>',
-            default => '<span class="px-3 py-1 bg-gray-50 text-gray-600 rounded-full text-xs font-bold">Desconhecido</span>',
-        };
+        return view('components.visitor-status-badge', [
+            'status' => $this->contact_status,
+        ])->render();
     }
 
     /**

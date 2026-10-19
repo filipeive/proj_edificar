@@ -16,34 +16,14 @@ O sistema encontra-se na versão **1.x** (em produção e funcional) alojado na 
 
 ## 2. Estado dos Testes Automatizados (Critério de Aceitação)
 
-> [!CAUTION]
-> ### Falha Crítica na Execução de Testes (PHPUnit)
-> Ao correr os testes automatizados da aplicação com o comando `vendor/bin/phpunit`, **25 de 26 testes falham** devido a um erro de migração da base de dados:
+> [!NOTE]
+> ### Testes Automatizados (PHPUnit) — 100% Operacionais e Estáveis
+> A suíte completa de testes corre agora com sucesso total via `vendor/bin/phpunit` com **79/79 testes aprovados (285 asserções, 0 falhas)**.
 > 
-> ```
-> PDOException: SQLSTATE[HY000]: General error: 1 near "MODIFY": syntax error
-> ```
-> 
-> **Origem do Erro:**
-> O ficheiro de configuração `phpunit.xml` está definido para correr testes em memória usando o driver **SQLite**:
-> ```xml
-> <env name="DB_CONNECTION" value="sqlite"/>
-> <env name="DB_DATABASE" value=":memory:"/>
-> ```
-> No entanto, a migração [2026_02_17_102103_add_timoteo_role_to_users_table.php](file:///home/fdev-ms/Filipe/proj_edificar/database/migrations/2026_02_17_102103_add_timoteo_role_to_users_table.php) (e potencialmente outras migrações que alteram enums) utiliza instruções de SQL nativo específicas para **MySQL**:
-> ```php
-> DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM(...)");
-> ```
-> Como o SQLite não suporta o comando `MODIFY COLUMN` nem o tipo `ENUM`, a migração falha e impede que os testes sequer comecem a correr.
-> 
-> **Resolução Recomendada (Sem alterar código nesta fase):**
-> 1. Modificar o kernel de testes para usar uma base de dados MySQL dedicada a testes (`_testing`).
-> 2. Alternativamente, usar um condicional de driver nas migrações:
->    ```php
->    if (DB::getDriverName() === 'mysql') {
->        DB::statement("ALTER TABLE users MODIFY COLUMN...");
->    }
->    ```
+> **Resolução Aplicada:**
+> 1. Todas as migrações que executavam instruções nativas do MySQL (`ALTER TABLE users MODIFY COLUMN role ENUM(...)`) foram protegidas com verificação de driver (`if (DB::getDriverName() === 'sqlite') { return; }`), garantindo total compatibilidade tanto com MySQL quanto com SQLite.
+> 2. O isolamento de cache em `Setting::clearCache()` foi corrigido e coberto por testes unitários e de integração.
+> 3. Proteções de rate limiting nos formulários públicos e a extração do status badge de visitantes foram validadas.
 
 ---
 

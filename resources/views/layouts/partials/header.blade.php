@@ -3,39 +3,39 @@
     $role = $authUser->role ?? 'membro';
 @endphp
 
-<header class="bg-white border-b border-gray-200 px-4 md:px-8 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] shadow-sm sticky top-0 z-30">
+<header class="bg-white border-b border-gray-200 px-3.5 md:px-6 py-2.5 pt-[max(0.625rem,env(safe-area-inset-top))] shadow-sm sticky top-0 z-30">
     <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-3 flex-1 min-w-0">
+        <div class="flex items-center space-x-2.5 flex-1 min-w-0">
             <!-- Mobile Menu Button -->
             <button @click="mobileSidebarOpen = true"
                 aria-label="Abrir Menu"
-                class="md:hidden text-gray-700 hover:text-orange-600 p-2 hover:bg-orange-50 rounded-xl transition-colors flex-shrink-0">
-                <i class="bi bi-list text-2xl"></i>
+                class="md:hidden text-gray-700 hover:text-orange-600 p-1.5 hover:bg-orange-50 rounded-lg transition-colors flex-shrink-0">
+                <i class="bi bi-list text-xl"></i>
             </button>
 
             <!-- Mobile Page Title -->
             <div class="md:hidden min-w-0 flex-1">
-                <h2 class="text-base font-extrabold text-gray-900 truncate">@yield('page-title', 'Dashboard')</h2>
+                <h2 class="text-sm font-black text-gray-950 truncate tracking-tight">@yield('page-title', 'Dashboard')</h2>
             </div>
 
             <!-- Desktop Sidebar Toggle -->
             <button @click="sidebarOpen = !sidebarOpen"
-                class="hidden md:flex text-gray-600 hover:text-gray-800 p-2 hover:bg-gray-100 rounded-lg transition-colors mr-2">
-                <i class="bi bi-list text-2xl"></i>
+                class="hidden md:flex text-gray-600 hover:text-gray-800 p-1.5 hover:bg-gray-100 rounded-lg transition-colors mr-1.5">
+                <i class="bi bi-list text-xl"></i>
             </button>
 
             <div class="hidden md:block">
-                <h2 class="text-xl md:text-2xl font-bold text-gray-800">@yield('page-title', 'Dashboard')</h2>
-                <p class="text-xs md:text-sm text-gray-500 mt-0.5">@yield('page-subtitle', 'Bem-vindo ao Portal Life Church')</p>
+                <h2 class="text-base md:text-lg font-black text-gray-950 tracking-tight">@yield('page-title', 'Dashboard')</h2>
+                <p class="text-[11px] md:text-xs text-gray-500">@yield('page-subtitle', 'Bem-vindo ao Portal Life Church')</p>
             </div>
 
             <!-- Search Bar (Desktop) -->
-            <div class="hidden lg:flex flex-1 max-w-md ml-8 search-container">
+            <div class="hidden lg:flex flex-1 max-w-sm ml-6 search-container">
                 <div class="relative w-full">
                     <input type="text" id="searchInput" placeholder="Pesquisar membros, contribuições..."
-                        class="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-zinc-900/60 border border-gray-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 dark:text-zinc-100 placeholder-gray-400 dark:placeholder-zinc-500 transition-all"
+                        class="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm bg-gray-50 dark:bg-zinc-900/60 border border-gray-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 dark:text-zinc-100 placeholder-gray-400 dark:placeholder-zinc-500 transition-all"
                         oninput="debouncedDesktopSearch(this.value)">
-                    <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
 
                     <!-- Search Results Dropdown -->
                     <div id="searchResults" class="search-results hidden"></div>

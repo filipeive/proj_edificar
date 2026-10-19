@@ -11,6 +11,10 @@ return new class extends Migration {
      */
     public function up(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('membro','lider_celula','supervisor','pastor_zona','admin','secretaria','tesouraria','pastor','pastor_senior','comissao_obra','responsavel_pacote', 'timoteo') DEFAULT 'membro'");
     }
 
@@ -19,6 +23,10 @@ return new class extends Migration {
      */
     public function down(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('membro','lider_celula','supervisor','pastor_zona','admin','secretaria','tesouraria','pastor','pastor_senior','comissao_obra','responsavel_pacote') DEFAULT 'membro'");
     }
 };

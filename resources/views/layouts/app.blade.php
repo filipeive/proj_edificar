@@ -86,7 +86,7 @@
             @include('layouts.partials.header')
 
             <!-- Main Yield -->
-            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 pb-28 md:p-8 md:pb-8 lg:p-12">
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-3.5 pb-24 sm:p-5 sm:pb-8 lg:p-6">
                 @yield('content')
             </main>
         </div>

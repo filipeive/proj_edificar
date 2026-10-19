@@ -64,6 +64,13 @@ class UserCommitment extends CongregationModel
     // NOVOS HELPERS DE CAMPANHA
     public function getTotalContributed()
     {
+        if ($this->relationLoaded('user') && $this->user && $this->user->relationLoaded('contributions')) {
+            return $this->user->contributions
+                ->where('package_id', $this->package_id)
+                ->where('status', 'verificada')
+                ->sum('amount');
+        }
+
         return Contribution::where('user_id', $this->user_id)
             ->where('package_id', $this->package_id)
             ->where('status', 'verificada')
@@ -102,6 +109,13 @@ class UserCommitment extends CongregationModel
 
     public function getTotalPending()
     {
+        if ($this->relationLoaded('user') && $this->user && $this->user->relationLoaded('contributions')) {
+            return $this->user->contributions
+                ->where('package_id', $this->package_id)
+                ->where('status', 'pendente')
+                ->sum('amount');
+        }
+
         return Contribution::where('user_id', $this->user_id)
             ->where('package_id', $this->package_id)
             ->where('status', 'pendente')
@@ -110,6 +124,13 @@ class UserCommitment extends CongregationModel
 
     public function getTotalCanceled()
     {
+        if ($this->relationLoaded('user') && $this->user && $this->user->relationLoaded('contributions')) {
+            return $this->user->contributions
+                ->where('package_id', $this->package_id)
+                ->where('status', 'cancelada')
+                ->sum('amount');
+        }
+
         return Contribution::where('user_id', $this->user_id)
             ->where('package_id', $this->package_id)
             ->where('status', 'cancelada')
