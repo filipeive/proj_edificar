@@ -5,23 +5,21 @@
 @section('page-subtitle', 'Acompanhamento e integração de novos visitantes')
 
 @section('header-actions')
-    <div class="flex items-center gap-2">
-        <a href="https://chat.whatsapp.com/DxAf8sMvMDYDDhrIV1wRxC" target="_blank"
-            class="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700 shadow-sm hover:bg-emerald-100 transition-colors">
-            <i class="bi bi-whatsapp text-xs"></i>
-            <span class="hidden sm:inline">Grupo Supervisores</span>
-        </a>
-        <a href="{{ route('visitors.export', request()->all()) }}"
-            class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
-            <i class="bi bi-file-earmark-excel text-emerald-600 text-xs"></i>
-            <span class="hidden sm:inline">Exportar</span>
-        </a>
-        <a href="{{ route('visitors.create') }}"
-            class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition-colors">
-            <i class="bi bi-person-plus-fill text-xs"></i>
-            <span>Novo Visitante</span>
-        </a>
-    </div>
+    <a href="https://chat.whatsapp.com/DxAf8sMvMDYDDhrIV1wRxC" target="_blank"
+        class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 transition-colors"
+        title="Grupo WhatsApp">
+        <i class="bi bi-whatsapp text-sm"></i>
+    </a>
+    <a href="{{ route('visitors.export', request()->all()) }}"
+        class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 hover:bg-gray-50 transition-colors"
+        title="Exportar">
+        <i class="bi bi-file-earmark-excel text-emerald-600 text-sm"></i>
+    </a>
+    <a href="{{ route('visitors.create') }}"
+        class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-orange-700 text-white hover:bg-orange-800 shadow-sm transition-colors"
+        title="Novo Visitante">
+        <i class="bi bi-person-plus-fill text-sm"></i>
+    </a>
 @endsection
 
 @section('content')
@@ -43,7 +41,33 @@
         }
     }"
     x-init="$watch('view', value => localStorage.setItem('visitors_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('visitors_view') || 'list')"
-    @resize.window.debounce.500ms="updateView()" class="space-y-5">
+    @resize.window.debounce.500ms="updateView()" class="space-y-4">
+
+        <!-- Header da Página (Desktop) -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+                <span class="text-[10px] sm:text-xs font-black uppercase tracking-[0.18em] text-orange-700">Comunhão & Integração</span>
+                <h1 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white tracking-tight">Gestão de Visitantes</h1>
+                <p class="text-xs text-gray-500 dark:text-zinc-400 font-medium">Acompanhamento e integração de novos visitantes da igreja.</p>
+            </div>
+            <div class="hidden md:flex items-center gap-2">
+                <a href="https://chat.whatsapp.com/DxAf8sMvMDYDDhrIV1wRxC" target="_blank"
+                    class="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-300 shadow-sm hover:bg-emerald-100 transition-colors">
+                    <i class="bi bi-whatsapp text-xs"></i>
+                    <span>Grupo Supervisores</span>
+                </a>
+                <a href="{{ route('visitors.export', request()->all()) }}"
+                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-xs font-bold text-gray-700 dark:text-zinc-200 shadow-sm hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors">
+                    <i class="bi bi-file-earmark-excel text-emerald-600 text-xs"></i>
+                    <span>Exportar Excel</span>
+                </a>
+                <a href="{{ route('visitors.create') }}"
+                    class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition-colors">
+                    <i class="bi bi-person-plus-fill text-xs"></i>
+                    <span>Novo Visitante</span>
+                </a>
+            </div>
+        </div>
 
         <!-- KPI Cards Grid -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">

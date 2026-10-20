@@ -16,19 +16,17 @@
 @endsection
 
 @section('header-actions')
-    <div class="flex items-center gap-2">
-        @if($userRole !== 'secretaria')
-            <a href="{{ route('members.create') }}"
-                class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition-colors">
-                <i class="bi bi-person-plus-fill text-xs"></i>
-                <span>Novo Membro</span>
-            </a>
-        @endif
-    </div>
+    @if($userRole !== 'secretaria')
+        <a href="{{ route('members.create') }}"
+            class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-orange-700 text-white hover:bg-orange-800 shadow-sm transition-colors"
+            title="Novo Membro">
+            <i class="bi bi-person-plus-fill text-sm"></i>
+        </a>
+    @endif
 @endsection
 
 @section('content')
-    <div class="space-y-5"
+    <div class="space-y-4"
         x-data="{
             view: window.innerWidth < 768 ? 'grid' : (localStorage.getItem('members_view') || 'list'),
             selected: [],
@@ -44,6 +42,24 @@
             }
         }"
         x-init="$watch('view', value => localStorage.setItem('members_view', value))">
+
+        <!-- Header da Página (Desktop) -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+                <span class="text-[10px] sm:text-xs font-black uppercase tracking-[0.18em] text-orange-700">Membros & Discipulado</span>
+                <h1 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white tracking-tight">Gestão de Membros</h1>
+                <p class="text-xs text-gray-500 dark:text-zinc-400 font-medium">Cadastro, células e acompanhamento dos membros da igreja.</p>
+            </div>
+            @if($userRole !== 'secretaria')
+                <div class="hidden md:flex items-center gap-2">
+                    <a href="{{ route('members.create') }}"
+                        class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition-colors">
+                        <i class="bi bi-person-plus-fill text-xs"></i>
+                        <span>Novo Membro</span>
+                    </a>
+                </div>
+            @endif
+        </div>
 
         <!-- KPI Cards Grid -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">

@@ -5,16 +5,14 @@
 @section('page-subtitle', 'Gestão, alocação e relatórios de inscritos via formulário público')
 
 @section('header-actions')
-    <div class="flex items-center gap-2">
-        <a href="{{ route('couple-enrollments.export-pdf', request()->all()) }}"
-            class="action-icon text-gray-600 hover:text-rose-600 hover:bg-rose-50" title="Exportar PDF">
-            <i class="bi bi-file-earmark-pdf"></i>
-        </a>
-        <a href="{{ route('couple-enrollments.export', request()->all()) }}"
-            class="action-icon text-gray-600 hover:text-emerald-600 hover:bg-emerald-50" title="Exportar CSV">
-            <i class="bi bi-file-earmark-spreadsheet"></i>
-        </a>
-    </div>
+    <a href="{{ route('couple-enrollments.export-pdf', request()->all()) }}"
+        class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-rose-600 hover:bg-gray-50 transition-colors" title="Exportar PDF">
+        <i class="bi bi-file-earmark-pdf text-sm"></i>
+    </a>
+    <a href="{{ route('couple-enrollments.export', request()->all()) }}"
+        class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-emerald-600 hover:bg-gray-50 transition-colors" title="Exportar CSV">
+        <i class="bi bi-file-earmark-spreadsheet text-sm"></i>
+    </a>
 @endsection
 
 @section('content')

@@ -5,26 +5,22 @@
 @section('page-subtitle', 'Gestão de reuniões e atas das células')
 
 @section('header-actions')
-    <div class="flex items-center gap-2">
-        <a href="{{ route('cell-meetings.export', request()->all()) }}"
-            class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors"
-            title="Exportar para Excel">
-            <i class="bi bi-file-earmark-excel text-emerald-600 text-xs"></i>
-            <span class="hidden sm:inline">Exportar</span>
+    <a href="{{ route('cell-meetings.export', request()->all()) }}"
+        class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 hover:bg-gray-50 transition-colors"
+        title="Exportar para Excel">
+        <i class="bi bi-file-earmark-excel text-emerald-600 text-sm"></i>
+    </a>
+    @if(auth()->user()->isAdmin() || auth()->user()->can('create', App\Models\CellMeeting::class))
+        <a href="{{ route('cell-meetings.create') }}"
+            class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-orange-700 text-white hover:bg-orange-800 shadow-sm transition-colors"
+            title="Novo Encontro">
+            <i class="bi bi-plus-lg text-sm"></i>
         </a>
-        @if(auth()->user()->isAdmin() || auth()->user()->can('create', App\Models\CellMeeting::class))
-            <a href="{{ route('cell-meetings.create') }}"
-                class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition-colors"
-                title="Novo Encontro">
-                <i class="bi bi-plus-lg text-xs"></i>
-                <span>Novo Encontro</span>
-            </a>
-        @endif
-    </div>
+    @endif
 @endsection
 
 @section('content')
-    <div class="space-y-5" 
+    <div class="space-y-4" 
         x-data="{ 
             view: window.innerWidth < 768 ? 'grid' : 'list',
             selectedIds: [],
@@ -38,6 +34,38 @@
                 this.allSelected = !this.allSelected;
                 if (this.allSelected) {
                     this.selectedIds = Array.from(document.querySelectorAll('.item-checkbox')).map(cb => cb.value);
+                } else {
+                    this.selectedIds = [];
+                }
+            }
+        }"
+        x-init="$watch('view', value => localStorage.setItem('cell_meetings_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('cell_meetings_view') || 'list')"
+        @resize.window.debounce.500ms="updateView()">
+
+        <!-- Header da Página (Desktop) -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+                <span class="text-[10px] sm:text-xs font-black uppercase tracking-[0.18em] text-orange-700">Comunhão & Discipulado</span>
+                <h1 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white tracking-tight">Encontros de Célula</h1>
+                <p class="text-xs text-gray-500 dark:text-zinc-400 font-medium">Gestão de reuniões semanais, presenças e atas das células.</p>
+            </div>
+            <div class="hidden md:flex items-center gap-2">
+                <a href="{{ route('cell-meetings.export', request()->all()) }}"
+                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-xs font-bold text-gray-700 dark:text-zinc-200 shadow-sm hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors"
+                    title="Exportar para Excel">
+                    <i class="bi bi-file-earmark-excel text-emerald-600 text-xs"></i>
+                    <span>Exportar Excel</span>
+                </a>
+                @if(auth()->user()->isAdmin() || auth()->user()->can('create', App\Models\CellMeeting::class))
+                    <a href="{{ route('cell-meetings.create') }}"
+                        class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition-colors"
+                        title="Novo Encontro">
+                        <i class="bi bi-plus-lg text-xs"></i>
+                        <span>Novo Encontro</span>
+                    </a>
+                @endif
+            </div>
+        </div>
                 } else {
                     this.selectedIds = [];
                 }

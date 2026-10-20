@@ -9,21 +9,11 @@
         $canManageClasses = !auth()->user()->isPastorZona();
     @endphp
     @if($canManageClasses)
-        <div class="flex items-center gap-2">
-            <a href="{{ route('course-classes.export-all') }}"
-                class="action-icon text-gray-600 hover:text-emerald-600 hover:bg-emerald-50" title="Exportar Excel">
-                <i class="bi bi-file-earmark-spreadsheet"></i>
-            </a>
-            <a href="{{ route('course-classes.export-all-pdf', request()->all()) }}"
-                class="action-icon text-gray-600 hover:text-rose-600 hover:bg-rose-50" title="Exportar PDF">
-                <i class="bi bi-file-earmark-pdf"></i>
-            </a>
-            <a href="{{ route('course-classes.create', ['course_id' => request('course_id')]) }}"
-                class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-3 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition">
-                <i class="bi bi-plus-lg"></i>
-                <span class="hidden sm:inline">Nova Turma</span>
-            </a>
-        </div>
+        <a href="{{ route('course-classes.create', ['course_id' => request('course_id')]) }}"
+            class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-orange-700 text-white hover:bg-orange-800 shadow-sm transition-colors"
+            title="Nova Turma">
+            <i class="bi bi-plus-lg text-sm"></i>
+        </a>
     @endif
 @endsection
 

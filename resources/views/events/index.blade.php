@@ -5,27 +5,24 @@
 @section('page-subtitle', 'Gestão de cultos, batismos e celebrações especiais')
 
 @section('header-actions')
-    <div class="flex items-center gap-2">
-        @if(auth()->user()->role === 'admin')
-            <a href="{{ route('event-types.index') }}"
-                class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors"
-                title="Tipos de Eventos">
-                <i class="bi bi-gear-fill text-xs text-orange-700"></i>
-                <span class="hidden sm:inline">Tipos</span>
-            </a>
-        @endif
-        @can('create', App\Models\Event::class)
-            <a href="{{ route('events.create') }}"
-                class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition-colors">
-                <i class="bi bi-calendar-plus text-xs"></i>
-                <span>Novo Evento</span>
-            </a>
-        @endcan
-    </div>
+    @if(auth()->user()->role === 'admin')
+        <a href="{{ route('event-types.index') }}"
+            class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 hover:bg-gray-50"
+            title="Tipos de Eventos">
+            <i class="bi bi-gear-fill text-sm text-orange-700"></i>
+        </a>
+    @endif
+    @can('create', App\Models\Event::class)
+        <a href="{{ route('events.create') }}"
+            class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-orange-700 text-white hover:bg-orange-800 shadow-sm"
+            title="Novo Evento">
+            <i class="bi bi-calendar-plus text-sm"></i>
+        </a>
+    @endcan
 @endsection
 
 @section('content')
-    <div class="space-y-5" x-data="{ 
+    <div class="space-y-4" x-data="{ 
             view: window.innerWidth < 768 ? 'grid' : 'list',
             selected: [],
             updateView() {
@@ -44,6 +41,32 @@
         }"
         x-init="$watch('view', value => { if(value !== 'calendar') localStorage.setItem('events_view', value) }); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('events_view') || 'list')"
         @resize.window.debounce.500ms="updateView()">
+
+        <!-- Header da Página (Desktop) -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+                <span class="text-[10px] sm:text-xs font-black uppercase tracking-[0.18em] text-orange-700">Agenda & Cerimônias</span>
+                <h1 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white tracking-tight">Eventos e Cerimônias</h1>
+                <p class="text-xs text-gray-500 dark:text-zinc-400 font-medium">Gestão de cultos, batismos e celebrações especiais da igreja.</p>
+            </div>
+            <div class="hidden md:flex items-center gap-2">
+                @if(auth()->user()->role === 'admin')
+                    <a href="{{ route('event-types.index') }}"
+                        class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-xs font-bold text-gray-700 dark:text-zinc-200 shadow-sm hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors"
+                        title="Tipos de Eventos">
+                        <i class="bi bi-gear-fill text-xs text-orange-700"></i>
+                        <span>Tipos</span>
+                    </a>
+                @endif
+                @can('create', App\Models\Event::class)
+                    <a href="{{ route('events.create') }}"
+                        class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition-colors">
+                        <i class="bi bi-calendar-plus text-xs"></i>
+                        <span>Novo Evento</span>
+                    </a>
+                @endcan
+            </div>
+        </div>
 
         <!-- Filter Bar -->
         <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">

@@ -5,17 +5,15 @@
 @section('page-subtitle', 'Gestão de casamentos e eventos matrimoniais')
 
 @section('header-actions')
-    <div class="flex items-center gap-2">
-        <a href="{{ route('weddings.pdf', ['year' => now()->year]) }}" target="_blank"
-            class="action-icon text-gray-600 hover:text-orange-600 hover:bg-orange-50" title="Exportar PDF do Ano">
-            <i class="bi bi-file-earmark-pdf"></i>
-        </a>
-        <a href="{{ route('weddings.create') }}"
-            class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-3 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition">
-            <i class="bi bi-plus-lg"></i>
-            <span class="hidden sm:inline">Novo Casamento</span>
-        </a>
-    </div>
+    <a href="{{ route('weddings.pdf', ['year' => now()->year]) }}" target="_blank"
+        class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 hover:bg-gray-50 transition-colors" title="Exportar PDF do Ano">
+        <i class="bi bi-file-earmark-pdf text-sm"></i>
+    </a>
+    <a href="{{ route('weddings.create') }}"
+        class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-orange-700 text-white hover:bg-orange-800 shadow-sm transition-colors"
+        title="Novo Casamento">
+        <i class="bi bi-plus-lg text-sm"></i>
+    </a>
 @endsection
 
 @section('content')
@@ -101,6 +99,12 @@
                     <i class="bi bi-calendar-week mr-1"></i> Calendário
                 </button>
             </div>
+
+            <a href="{{ route('weddings.pdf', ['year' => now()->year]) }}" target="_blank"
+                class="hidden sm:inline-flex items-center gap-1.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-xs font-bold text-gray-700 dark:text-zinc-200 shadow-sm hover:bg-gray-50 dark:hover:bg-zinc-700 transition">
+                <i class="bi bi-file-earmark-pdf text-rose-600"></i>
+                <span>PDF {{ now()->year }}</span>
+            </a>
 
             <a href="{{ route('weddings.create') }}"
                 class="hidden sm:inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition">
