@@ -175,7 +175,7 @@
             <div x-show="modalOpen"
                 x-cloak
                 @keydown.escape.window="modalOpen = false"
-                class="fixed inset-0 z-50 overflow-y-auto"
+                class="fixed inset-0 z-[9999] overflow-y-auto"
                 aria-labelledby="modal-title" role="dialog" aria-modal="true">
                 
                 <div class="fixed inset-0 bg-gray-950/70 backdrop-blur-sm transition-opacity" @click="modalOpen = false"></div>
@@ -451,4 +451,26 @@
         });
     });
 </script>
+@endpush
+
+@push('styles')
+<style>
+    .custom-congregation-pin {
+        background: transparent !important;
+        border: none !important;
+    }
+    .leaflet-popup-content-wrapper {
+        border-radius: 16px !important;
+        box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.1) !important;
+        border: 1px solid rgba(226, 232, 240, 0.8) !important;
+        padding: 0 !important;
+    }
+    .leaflet-popup-content {
+        margin: 12px 14px !important;
+        line-height: 1.4 !important;
+    }
+    .leaflet-popup-tip-container {
+        margin-top: -1px;
+    }
+</style>
 @endpush

@@ -17,6 +17,16 @@ const defaultCenter = [-17.8786, 36.8883];
 const tileLayerUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 const tileAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
 
+function escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 function createMap(element, center, zoom) {
     const map = L.map(element).setView(center, zoom);
     L.tileLayer(tileLayerUrl, {
@@ -130,19 +140,19 @@ function initializeDisplayMap(element) {
             const polygon = L.geoJSON(boundary, {
                 style: { color: '#0f766e', weight: 2, fillColor: '#14b8a6', fillOpacity: 0.14 },
             }).addTo(map);
-            polygon.bindPopup(`<strong>${L.Util.escapeHTML(zone.name)}</strong>`);
+            polygon.bindPopup(`<strong>${escapeHtml(zone.name)}</strong>`);
             bounds.push(polygon.getBounds());
         } else if (zone.latitude !== null && zone.longitude !== null) {
             const marker = L.circleMarker([zone.latitude, zone.longitude], {
                 radius: 8, color: '#0f766e', fillColor: '#14b8a6', fillOpacity: 0.9,
-            }).addTo(map).bindPopup(`<strong>Zona: ${L.Util.escapeHTML(zone.name)}</strong>`);
+            }).addTo(map).bindPopup(`<strong>Zona: ${escapeHtml(zone.name)}</strong>`);
             bounds.push(marker.getLatLng());
         }
 
         (zone.cells || []).forEach((cell) => {
             const marker = L.circleMarker([cell.latitude, cell.longitude], {
                 radius: 6, color: '#1d4ed8', fillColor: '#60a5fa', fillOpacity: 0.95,
-            }).addTo(map).bindPopup(`<strong>Célula: ${L.Util.escapeHTML(cell.name)}</strong><br>${L.Util.escapeHTML(zone.name)}`);
+            }).addTo(map).bindPopup(`<strong>Célula: ${escapeHtml(cell.name)}</strong><br>${escapeHtml(zone.name)}`);
             bounds.push(marker.getLatLng());
         });
     });
@@ -167,7 +177,7 @@ function createCongregationPin(congregation) {
                 </div>
                 <div style="width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:7px solid ${color};margin-top:-2px;"></div>
                 <div style="margin-top:2px;background:#0f172a;color:#ffffff;font-size:9px;font-weight:800;padding:1px 6px;border-radius:4px;white-space:nowrap;letter-spacing:0.3px;box-shadow:0 1px 3px rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.25);">
-                    ${isPrimary ? '★ SEDE' : L.Util.escapeHTML(label)}
+                    ${isPrimary ? '★ SEDE' : escapeHtml(label)}
                 </div>
             </div>
         `,
@@ -179,110 +189,124 @@ function createCongregationPin(congregation) {
 
 function initializeNationalCongregationMap(element) {
     const payloadElement = document.getElementById(element.dataset.mapData);
-    const payload = payloadElement ? JSON.parse(payloadElement.textContent) : { congregations: [] };
+    let payload = { congregations: [] };
+    if (payloadElement && payloadElement.textContent) {
+        try {
+            payload = JSON.parse(payloadElement.textContent);
+        } catch (e) {
+            console.error('Erro ao ler dados do mapa nacional:', e);
+        }
+    }
+
+    const congregations = Array.isArray(payload.congregations) ? payload.congregations : [];
     const map = createMap(element, [-18.6656, 35.5295], 6);
     const bounds = [];
     const markersMap = {};
 
     window.__nationalMapInstance = map;
-    window.__nationalCongregations = payload.congregations || [];
-
-    payload.congregations.forEach((congregation) => {
-        const isPrimary = Boolean(congregation.is_primary);
-        const color = congregation.color || (isPrimary ? '#d97706' : '#059669');
-        const icon = createCongregationPin(congregation);
-
-        const marker = L.marker([congregation.latitude, congregation.longitude], {
-            icon,
-            title: congregation.name,
-            riseOnHover: true,
-        }).addTo(map);
-
-        markersMap[congregation.id] = marker;
-
-        const safeName = L.Util.escapeHTML(congregation.name);
-        const pastorName = L.Util.escapeHTML(congregation.pastor_name || 'Gabinete Pastoral');
-        const pastorRole = L.Util.escapeHTML(congregation.pastor_role || 'Pastor');
-        const pastorPhone = L.Util.escapeHTML(congregation.pastor_phone || 'Não registado');
-        const pastorEmail = L.Util.escapeHTML(congregation.pastor_email || 'Não registado');
-        const local = L.Util.escapeHTML(congregation.city || congregation.address || 'Moçambique');
-
-        const statusBadge = congregation.is_active
-            ? '<span style="background:#dcfce7;color:#166534;font-size:10px;font-weight:800;padding:2px 8px;border-radius:9999px;">Ativa</span>'
-            : '<span style="background:#f3f4f6;color:#4b5563;font-size:10px;font-weight:800;padding:2px 8px;border-radius:9999px;">Inativa</span>';
-
-        const primaryBadge = congregation.is_primary
-            ? '<span style="background:#fef3c7;color:#92400e;font-size:10px;font-weight:900;padding:2px 8px;border-radius:9999px;border:1px solid #fde68a;">★ SEDE NACIONAL</span>'
-            : '';
-
-        const edificarBadge = congregation.has_edificar
-            ? '<span style="background:#e0f2fe;color:#0369a1;font-size:10px;font-weight:800;padding:2px 8px;border-radius:9999px;">Projeto Edificar</span>'
-            : '';
-
-        const popupContent = `
-            <div style="min-width:240px;max-width:280px;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;color:#1e293b;line-height:1.45;">
-                <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:6px;">
-                    ${primaryBadge}
-                    ${statusBadge}
-                    ${edificarBadge}
-                </div>
-                <h4 style="margin:2px 0 6px 0;font-size:14px;font-weight:800;color:#0f172a;letter-spacing:-0.01em;">${safeName}</h4>
-                <div style="font-size:11px;color:#475569;margin-bottom:8px;background:#f8fafc;padding:8px 10px;border-radius:8px;border:1px solid #e2e8f0;">
-                    <div><strong>${pastorRole}:</strong> ${pastorName}</div>
-                    <div><strong>Contacto:</strong> ${pastorPhone}</div>
-                    <div><strong>Email:</strong> ${pastorEmail}</div>
-                    <div><strong>Local:</strong> ${local}</div>
-                </div>
-                <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;text-align:center;margin-bottom:10px;background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;padding:6px 4px;">
-                    <div>
-                        <div style="font-size:13px;font-weight:800;color:#0f172a;">${congregation.users_count}</div>
-                        <div style="font-size:9px;text-transform:uppercase;color:#64748b;font-weight:700;">Membros</div>
-                    </div>
-                    <div style="border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;">
-                        <div style="font-size:13px;font-weight:800;color:#0f172a;">${congregation.zones_count}</div>
-                        <div style="font-size:9px;text-transform:uppercase;color:#64748b;font-weight:700;">Zonas</div>
-                    </div>
-                    <div>
-                        <div style="font-size:13px;font-weight:800;color:#0f172a;">${congregation.cells_count}</div>
-                        <div style="font-size:9px;text-transform:uppercase;color:#64748b;font-weight:700;">Células</div>
-                    </div>
-                </div>
-                <div style="display:flex;flex-direction:column;gap:6px;">
-                    <button type="button" onclick="window.__openCongregationModal(${congregation.id})" style="width:100%;text-align:center;background:${color};color:#ffffff;border:none;padding:7px 12px;border-radius:20px;font-weight:800;font-size:11px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.15);display:flex;align-items:center;justify-content:center;gap:6px;">
-                        <span>Ver Ficha Completa &rarr;</span>
-                    </button>
-                    <a href="${congregation.show_url}" style="width:100%;text-align:center;background:#059669;color:#ffffff;text-decoration:none;padding:7px 12px;border-radius:20px;font-weight:800;font-size:11px;display:block;">
-                        Acessar Congregação &rarr;
-                    </a>
-                </div>
-            </div>
-        `;
-
-        marker.bindPopup(popupContent);
-        bounds.push(marker.getLatLng());
-    });
+    window.__nationalCongregations = congregations;
+    window.__nationalMarkersMap = markersMap;
 
     window.__focusCongregation = function(id) {
-        const target = (payload.congregations || []).find((c) => c.id === id);
+        const target = congregations.find((c) => Number(c.id) === Number(id));
         if (!target) return;
-        map.flyTo([target.latitude, target.longitude], 12, { animate: true, duration: 1 });
-        const m = markersMap[id];
+        map.flyTo([target.latitude, target.longitude], 12, { animate: true, duration: 1.2 });
+        const m = markersMap[target.id];
         if (m) {
-            m.openPopup();
+            setTimeout(() => m.openPopup(), 600);
         }
     };
 
     window.__openCongregationModal = function(id) {
-        const target = (payload.congregations || []).find((c) => c.id === id);
+        const target = congregations.find((c) => Number(c.id) === Number(id));
         if (target) {
             window.dispatchEvent(new CustomEvent('congregation-modal-open', { detail: target }));
         }
     };
 
+    congregations.forEach((congregation) => {
+        try {
+            const isPrimary = Boolean(congregation.is_primary);
+            const color = congregation.color || (isPrimary ? '#d97706' : '#059669');
+            const icon = createCongregationPin(congregation);
+
+            const marker = L.marker([congregation.latitude, congregation.longitude], {
+                icon,
+                title: congregation.name,
+                riseOnHover: true,
+            }).addTo(map);
+
+            markersMap[congregation.id] = marker;
+
+            const safeName = escapeHtml(congregation.name);
+            const pastorName = escapeHtml(congregation.pastor_name || 'Gabinete Pastoral');
+            const pastorRole = escapeHtml(congregation.pastor_role || 'Pastor');
+            const pastorPhone = escapeHtml(congregation.pastor_phone || 'Não registado');
+            const pastorEmail = escapeHtml(congregation.pastor_email || 'Não registado');
+            const local = escapeHtml(congregation.city || congregation.address || 'Moçambique');
+
+            const statusBadge = congregation.is_active
+                ? '<span style="background:#dcfce7;color:#166534;font-size:10px;font-weight:800;padding:2px 8px;border-radius:9999px;">Ativa</span>'
+                : '<span style="background:#f3f4f6;color:#4b5563;font-size:10px;font-weight:800;padding:2px 8px;border-radius:9999px;">Inativa</span>';
+
+            const primaryBadge = congregation.is_primary
+                ? '<span style="background:#fef3c7;color:#92400e;font-size:10px;font-weight:900;padding:2px 8px;border-radius:9999px;border:1px solid #fde68a;">★ SEDE NACIONAL</span>'
+                : '';
+
+            const edificarBadge = congregation.has_edificar
+                ? '<span style="background:#e0f2fe;color:#0369a1;font-size:10px;font-weight:800;padding:2px 8px;border-radius:9999px;">Projeto Edificar</span>'
+                : '';
+
+            const popupContent = `
+                <div style="min-width:240px;max-width:280px;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;color:#1e293b;line-height:1.45;">
+                    <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:6px;">
+                        ${primaryBadge}
+                        ${statusBadge}
+                        ${edificarBadge}
+                    </div>
+                    <h4 style="margin:2px 0 6px 0;font-size:14px;font-weight:800;color:#0f172a;letter-spacing:-0.01em;">${safeName}</h4>
+                    <div style="font-size:11px;color:#475569;margin-bottom:8px;background:#f8fafc;padding:8px 10px;border-radius:8px;border:1px solid #e2e8f0;">
+                        <div><strong>${pastorRole}:</strong> ${pastorName}</div>
+                        <div><strong>Contacto:</strong> ${pastorPhone}</div>
+                        <div><strong>Email:</strong> ${pastorEmail}</div>
+                        <div><strong>Local:</strong> ${local}</div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;text-align:center;margin-bottom:10px;background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;padding:6px 4px;">
+                        <div>
+                            <div style="font-size:13px;font-weight:800;color:#0f172a;">${congregation.users_count}</div>
+                            <div style="font-size:9px;text-transform:uppercase;color:#64748b;font-weight:700;">Membros</div>
+                        </div>
+                        <div style="border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;">
+                            <div style="font-size:13px;font-weight:800;color:#0f172a;">${congregation.zones_count}</div>
+                            <div style="font-size:9px;text-transform:uppercase;color:#64748b;font-weight:700;">Zonas</div>
+                        </div>
+                        <div>
+                            <div style="font-size:13px;font-weight:800;color:#0f172a;">${congregation.cells_count}</div>
+                            <div style="font-size:9px;text-transform:uppercase;color:#64748b;font-weight:700;">Células</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:6px;">
+                        <button type="button" onclick="window.__openCongregationModal(${congregation.id})" style="width:100%;text-align:center;background:${color};color:#ffffff;border:none;padding:7px 12px;border-radius:20px;font-weight:800;font-size:11px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.15);display:flex;align-items:center;justify-content:center;gap:6px;">
+                            <span>Ver Ficha Completa &rarr;</span>
+                        </button>
+                        <a href="${congregation.show_url}" style="width:100%;text-align:center;background:#059669;color:#ffffff;text-decoration:none;padding:7px 12px;border-radius:20px;font-weight:800;font-size:11px;display:block;">
+                            Acessar Congregação &rarr;
+                        </a>
+                    </div>
+                </div>
+            `;
+
+            marker.bindPopup(popupContent);
+            bounds.push(marker.getLatLng());
+        } catch (err) {
+            console.error('Erro ao adicionar congregação ao mapa:', congregation, err);
+        }
+    });
+
     setTimeout(() => {
         map.invalidateSize();
         if (bounds.length > 0) {
-            map.fitBounds(L.latLngBounds(bounds), { padding: [40, 40], maxZoom: 9 });
+            map.fitBounds(L.latLngBounds(bounds), { padding: [50, 50], maxZoom: 8 });
         }
     }, 250);
 
