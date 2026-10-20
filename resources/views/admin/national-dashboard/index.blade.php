@@ -144,7 +144,8 @@
 
             <!-- Container do Mapa Leaflet -->
             <div id="national-congregation-map" data-national-congregation-map data-map-data="national-congregation-map-data"
-                class="w-full h-[450px] rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-gray-100 shadow-inner"
+                class="w-full h-[450px] rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-gray-100 shadow-inner relative z-0 isolate"
+                style="z-index: 0; isolation: isolate;"
                 aria-label="Mapa de localização das congregações nacionais"></div>
             <script id="national-congregation-map-data" type="application/json">@json(['congregations' => $mapCongregations])</script>
 
@@ -455,6 +456,11 @@
 
 @push('styles')
 <style>
+    #national-congregation-map,
+    .leaflet-container {
+        z-index: 0 !important;
+        isolation: isolate !important;
+    }
     .custom-congregation-pin {
         background: transparent !important;
         border: none !important;

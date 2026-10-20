@@ -14,5 +14,10 @@
         background-repeat: no-repeat;
         background-size: 1.5em 1.5em;
     }
+
+    .leaflet-container {
+        z-index: 0 !important;
+        isolation: isolate !important;
+    }
 }
 

@@ -3,7 +3,7 @@
     $role = $authUser->role ?? 'membro';
 @endphp
 
-<header class="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-3.5 md:px-5 py-2 pt-[max(0.5rem,env(safe-area-inset-top))] shadow-sm sticky top-0 z-30 transition-colors">
+<header class="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-3.5 md:px-5 py-2 pt-[max(0.5rem,env(safe-area-inset-top))] shadow-sm sticky top-0 z-[1000] transition-colors">
     <div class="flex items-center justify-between gap-3">
         <div class="flex items-center space-x-2.5 flex-1 min-w-0">
             <!-- Mobile Menu Button -->

@@ -68,7 +68,7 @@
         </div>
 
         <!-- Mobile Sidebar -->
-        <div class="md:hidden fixed inset-0 z-50 flex mobile-sidebar" x-show="mobileSidebarOpen" x-cloak>
+        <div class="md:hidden fixed inset-0 z-[1050] flex mobile-sidebar" x-show="mobileSidebarOpen" x-cloak>
             <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="mobileSidebarOpen = false"
                 x-transition.opacity></div>
             <div class="relative w-[256px] h-full" x-show="mobileSidebarOpen"
