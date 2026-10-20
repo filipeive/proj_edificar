@@ -152,7 +152,15 @@ class ZoneController
     public function create(): View
     {
         // Encontra todos os usuários que são elegíveis para serem Pastores de Zona
-        $pastors = User::where('role', 'pastor_zona')->orderBy('name')->get();
+        $pastors = User::whereIn('role', [
+            'pastor_zona',
+            'subpastor_zona',
+            'pastor',
+            'subpastor',
+            'pastor_senior',
+            'admin',
+            'super_admin',
+        ])->orderBy('name')->get();
         return view('admin.zones.create', ['pastors' => $pastors]);
     }
 
@@ -200,7 +208,15 @@ class ZoneController
     public function edit(Zone $zone): View
     {
         // Encontra todos os usuários que são elegíveis para serem Pastores de Zona
-        $pastors = User::where('role', 'pastor_zona')->orderBy('name')->get();
+        $pastors = User::whereIn('role', [
+            'pastor_zona',
+            'subpastor_zona',
+            'pastor',
+            'subpastor',
+            'pastor_senior',
+            'admin',
+            'super_admin',
+        ])->orderBy('name')->get();
         return view('admin.zones.edit', ['zone' => $zone, 'pastors' => $pastors]);
     }
 

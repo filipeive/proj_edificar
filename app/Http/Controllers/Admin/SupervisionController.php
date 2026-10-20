@@ -108,15 +108,29 @@ class SupervisionController
         }
 
         $zones = $zonesQuery->orderBy('name')->get();
-        $supervisors = \App\Models\User::where('role', 'supervisor')
-            ->orWhere(function ($query) {
-                $query->whereIn('role', ['super_admin', 'admin']) // Allow admins for testing/fallback
-                    ->orWhere('role', 'pastor_zona');
-            })->orderBy('name')->get();
+        $supervisors = \App\Models\User::whereIn('role', [
+            'supervisor',
+            'sub_supervisor',
+            'pastor_zona',
+            'subpastor_zona',
+            'pastor',
+            'subpastor',
+            'pastor_senior',
+            'admin',
+            'super_admin',
+        ])->orderBy('name')->get();
 
-        $subSupervisors = \App\Models\User::whereIn('role', ['lider_celula', 'timoteo', 'sub_supervisor'])
-            ->orderBy('name')
-            ->get();
+        $subSupervisors = \App\Models\User::whereIn('role', [
+            'lider_celula',
+            'timoteo',
+            'sub_supervisor',
+            'supervisor',
+            'pastor_zona',
+            'subpastor_zona',
+            'pastor',
+            'subpastor',
+            'pastor_senior',
+        ])->orderBy('name')->get();
 
         return view('admin.supervisions.create', [
             'zones' => $zones,
@@ -138,7 +152,9 @@ class SupervisionController
         $supervision = Supervision::create($validated);
 
         if (!empty($validated['sub_supervisor_id'])) {
-            \App\Models\User::where('id', $validated['sub_supervisor_id'])->update(['role' => 'sub_supervisor']);
+            \App\Models\User::where('id', $validated['sub_supervisor_id'])
+                ->whereIn('role', ['lider_celula', 'timoteo', 'membro'])
+                ->update(['role' => 'sub_supervisor']);
         }
 
         return redirect()->route('supervisions.index')
@@ -181,15 +197,29 @@ class SupervisionController
         }
 
         $zones = $zonesQuery->orderBy('name')->get();
-        $supervisors = \App\Models\User::where('role', 'supervisor')
-            ->orWhere(function ($query) {
-                $query->whereIn('role', ['super_admin', 'admin'])
-                    ->orWhere('role', 'pastor_zona');
-            })->orderBy('name')->get();
+        $supervisors = \App\Models\User::whereIn('role', [
+            'supervisor',
+            'sub_supervisor',
+            'pastor_zona',
+            'subpastor_zona',
+            'pastor',
+            'subpastor',
+            'pastor_senior',
+            'admin',
+            'super_admin',
+        ])->orderBy('name')->get();
 
-        $subSupervisors = \App\Models\User::whereIn('role', ['lider_celula', 'timoteo', 'sub_supervisor'])
-            ->orderBy('name')
-            ->get();
+        $subSupervisors = \App\Models\User::whereIn('role', [
+            'lider_celula',
+            'timoteo',
+            'sub_supervisor',
+            'supervisor',
+            'pastor_zona',
+            'subpastor_zona',
+            'pastor',
+            'subpastor',
+            'pastor_senior',
+        ])->orderBy('name')->get();
 
         return view('admin.supervisions.edit', [
             'supervision' => $supervision,
@@ -212,7 +242,9 @@ class SupervisionController
         $supervision->update($validated);
 
         if (!empty($validated['sub_supervisor_id'])) {
-            \App\Models\User::where('id', $validated['sub_supervisor_id'])->update(['role' => 'sub_supervisor']);
+            \App\Models\User::where('id', $validated['sub_supervisor_id'])
+                ->whereIn('role', ['lider_celula', 'timoteo', 'membro'])
+                ->update(['role' => 'sub_supervisor']);
         }
 
         return redirect()->route('supervisions.index')
