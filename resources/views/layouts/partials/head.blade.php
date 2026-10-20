@@ -53,6 +53,9 @@
                 notificationsRead: "{{ route('notifications.read') }}",
                 notificationsUnreadCount: "{{ route('notifications.unread-count') }}",
                 usersShowTemplate: "{{ route('users.show', ['user' => '__ID__']) }}",
+                cellsShowTemplate: "{{ route('cells.show', ['cell' => '__ID__']) }}",
+                supervisionsShowTemplate: "{{ route('supervisions.show', ['supervision' => '__ID__']) }}",
+                zonesShowTemplate: "{{ route('zones.show', ['zone' => '__ID__']) }}",
                 contributionsShowTemplate: "{{ route('contributions.show', ['contribution' => '__ID__']) }}"
             }
         };

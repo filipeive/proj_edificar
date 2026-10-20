@@ -32,7 +32,7 @@
             <!-- Search Bar (Desktop) -->
             <div class="hidden lg:flex flex-1 max-w-sm ml-6 search-container">
                 <div class="relative w-full">
-                    <input type="text" id="searchInput" placeholder="Pesquisar membros, contribuições..."
+                    <input type="text" id="searchInput" placeholder="Pesquisar células, supervisões, zonas, membros..."
                         class="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm bg-gray-50 dark:bg-zinc-900/60 border border-gray-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 dark:text-zinc-100 placeholder-gray-400 dark:placeholder-zinc-500 transition-all"
                         oninput="debouncedDesktopSearch(this.value)">
                     <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
@@ -167,7 +167,7 @@
     <!-- Mobile Search Input -->
     <div id="mobileSearchInput" class="lg:hidden mt-4 search-container hidden fade-in">
         <div class="relative w-full">
-            <input type="text" placeholder="Pesquisar..."
+            <input type="text" placeholder="Pesquisar células, supervisões, zonas, membros..."
                 class="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-zinc-900/60 border border-gray-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 dark:text-zinc-100 placeholder-gray-400 dark:placeholder-zinc-500 transition-all"
                 oninput="debouncedMobileSearch(this.value)">
             <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>

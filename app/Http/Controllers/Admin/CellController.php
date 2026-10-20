@@ -83,6 +83,11 @@ class CellController
                     $q->where('name', 'LIKE', '%'.$searchTerm.'%');
                 });
 
+                // Busca por nome da supervisão
+                $query->orWhereHas('supervision', function ($q) use ($searchTerm) {
+                    $q->where('name', 'LIKE', '%'.$searchTerm.'%');
+                });
+
                 // Busca por nome da zona (JOIN necessário)
                 $query->orWhereHas('supervision.zone', function ($q) use ($searchTerm) {
                     $q->where('name', 'LIKE', '%'.$searchTerm.'%');

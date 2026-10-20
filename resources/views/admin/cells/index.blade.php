@@ -120,7 +120,7 @@
                     <div class="relative group">
                         <i class="bi bi-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors"></i>
                         <input type="text" name="search" data-live-search="manual" value="{{ request('search') }}"
-                            placeholder="Célula, líder ou zona..."
+                            placeholder="Célula, líder, supervisão ou zona..."
                             class="w-full pl-12 pr-6 py-3 bg-white border-transparent focus:ring-4 focus:ring-blue-100 rounded-xl text-sm font-bold transition-all"
                             @input.debounce.500ms="$el.form.submit()">
                     </div>

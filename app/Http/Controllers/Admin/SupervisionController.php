@@ -90,6 +90,9 @@ class SupervisionController
                     })
                     ->orWhereHas('supervisor', function ($qs) use ($search) {
                         $qs->where('name', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('cells', function ($qc) use ($search) {
+                        $qc->where('name', 'LIKE', "%{$search}%");
                     });
             });
         }

@@ -160,7 +160,7 @@ export function handleSearch(query, isMobile = false) {
 
     if (!targetResults) return;
 
-    if (query.length < 3) {
+    if (query.trim().length < 2) {
         targetResults.classList.add('hidden');
         return;
     }
@@ -198,6 +198,26 @@ export function handleSearch(query, isMobile = false) {
                             html += `<a href="${userLink}" class="block p-3 hover:bg-gray-100 text-sm text-gray-800 transition">
                             <i class="bi bi-person-circle mr-2 text-blue-500"></i>${item.name} 
                             <span class="text-xs text-gray-500 ml-1">(${item.role})</span>
+                        </a>`;
+                        } else if (category === 'Células') {
+                            const cellLink = window.AppConfig.routes.cellsShowTemplate.replace('__ID__', item.id);
+                            const subtitle = [item.supervision_name, item.zone_name].filter(Boolean).join(' • ');
+                            html += `<a href="${cellLink}" class="block p-3 hover:bg-gray-100 text-sm text-gray-800 transition">
+                            <i class="bi bi-people-fill mr-2 text-orange-500"></i>${item.name}
+                            ${subtitle ? `<span class="text-xs text-gray-500 block ml-6">${subtitle}</span>` : ''}
+                        </a>`;
+                        } else if (category === 'Supervisões') {
+                            const supLink = window.AppConfig.routes.supervisionsShowTemplate.replace('__ID__', item.id);
+                            const subtitle = [item.supervisor_name ? `Sup: ${item.supervisor_name}` : null, item.zone_name].filter(Boolean).join(' • ');
+                            html += `<a href="${supLink}" class="block p-3 hover:bg-gray-100 text-sm text-gray-800 transition">
+                            <i class="bi bi-diagram-3-fill mr-2 text-indigo-500"></i>${item.name}
+                            ${subtitle ? `<span class="text-xs text-gray-500 block ml-6">${subtitle}</span>` : ''}
+                        </a>`;
+                        } else if (category === 'Zonas') {
+                            const zoneLink = window.AppConfig.routes.zonesShowTemplate.replace('__ID__', item.id);
+                            html += `<a href="${zoneLink}" class="block p-3 hover:bg-gray-100 text-sm text-gray-800 transition">
+                            <i class="bi bi-geo-alt-fill mr-2 text-emerald-500"></i>${item.name}
+                            ${item.pastor_name ? `<span class="text-xs text-gray-500 block ml-6">Pr. ${item.pastor_name}</span>` : ''}
                         </a>`;
                         } else if (category === 'Contribuições') {
                             const date = new Date(item.contribution_date).toLocaleDateString('pt-PT');

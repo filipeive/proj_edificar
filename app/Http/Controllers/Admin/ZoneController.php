@@ -112,8 +112,12 @@ class ZoneController
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where('name', 'LIKE', "%$search%")
-                ->orWhereHas('pastor', fn($q) => $q->where('name', 'LIKE', "%$search%"));
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%$search%")
+                    ->orWhereHas('pastor', fn ($qp) => $qp->where('name', 'LIKE', "%$search%"))
+                    ->orWhereHas('supervisions', fn ($qs) => $qs->where('name', 'LIKE', "%$search%"))
+                    ->orWhereHas('supervisions.cells', fn ($qc) => $qc->where('name', 'LIKE', "%$search%"));
+            });
         }
 
         $zones = $query->paginate(8)->withQueryString();
