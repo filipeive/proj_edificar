@@ -16,6 +16,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class CellController
@@ -147,7 +148,12 @@ class CellController
         $this->authorize('create', Cell::class);
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('cells', 'name')->where(fn ($q) => $q->where('supervision_id', $request->input('supervision_id'))),
+            ],
             'type' => 'required|in:membros,lideres,supervisores,pastores_zona,pastores',
             'supervision_id' => 'required|exists:supervisions,id',
             'leader_id' => 'required|exists:users,id',
@@ -155,6 +161,8 @@ class CellController
             'longitude' => 'nullable|numeric|between:-180,180',
             'timoteos' => 'nullable|array',
             'timoteos.*' => 'exists:users,id',
+        ], [
+            'name.unique' => 'Já existe uma célula com este nome nesta supervisão.',
         ]);
 
         $leader = User::findOrFail($validated['leader_id']);
@@ -303,7 +311,14 @@ class CellController
         $this->authorize('update', $cell);
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('cells', 'name')
+                    ->where(fn ($q) => $q->where('supervision_id', $request->input('supervision_id')))
+                    ->ignore($cell->id),
+            ],
             'type' => 'required|in:membros,lideres,supervisores,pastores_zona,pastores',
             'supervision_id' => 'required|exists:supervisions,id',
             'leader_id' => 'required|exists:users,id',
@@ -311,6 +326,8 @@ class CellController
             'longitude' => 'nullable|numeric|between:-180,180',
             'timoteos' => 'nullable|array',
             'timoteos.*' => 'exists:users,id',
+        ], [
+            'name.unique' => 'Já existe uma célula com este nome nesta supervisão.',
         ]);
 
         $leader = User::findOrFail($validated['leader_id']);
