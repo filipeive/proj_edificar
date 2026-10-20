@@ -239,36 +239,38 @@ class CellController
         $supervisionId = $cell->supervision_id;
 
         $leadersQuery = User::query()
-            ->where(function ($q) use ($zoneId) {
-                $q->where('role', 'lider_celula')
-                    ->whereHas('cell.supervision', function ($q2) use ($zoneId) {
-                        if ($zoneId) {
-                            $q2->where('zone_id', $zoneId);
-                        }
-                    });
-            })
-            ->orWhere(function ($q) use ($cell) {
-                $q->where('role', 'timoteo')
-                    ->where('cell_id', $cell->id);
-            })
-            ->orWhere(function ($q) use ($supervisionId) {
-                $q->where('role', 'supervisor')
-                    ->whereHas('supervisedSupervisions', function ($q2) use ($supervisionId) {
-                        $q2->where('id', $supervisionId);
-                    });
-            })
-            ->orWhere(function ($q) use ($supervisionId) {
-                $q->where('role', 'sub_supervisor')
-                    ->whereHas('subSupervisedSupervisions', function ($q2) use ($supervisionId) {
-                        $q2->where('id', $supervisionId);
-                    });
-            })
-            ->orWhere(function ($q) use ($zoneId) {
-                $q->whereIn('role', ['pastor_zona', 'pastor'])
-                    ->whereIn('id', Zone::where('id', $zoneId)->whereNotNull('pastor_id')->pluck('pastor_id'));
-            })
-            ->orWhere(function ($q) {
-                $q->where('role', 'pastor_senior');
+            ->where(function ($query) use ($cell, $zoneId, $supervisionId) {
+                $query->where(function ($q) use ($zoneId) {
+                    $q->where('role', 'lider_celula')
+                        ->whereHas('cell.supervision', function ($q2) use ($zoneId) {
+                            if ($zoneId) {
+                                $q2->where('zone_id', $zoneId);
+                            }
+                        });
+                })
+                ->orWhere(function ($q) use ($cell) {
+                    $q->where('role', 'timoteo')
+                        ->where('cell_id', $cell->id);
+                })
+                ->orWhere(function ($q) use ($supervisionId) {
+                    $q->where('role', 'supervisor')
+                        ->whereHas('supervisedSupervisions', function ($q2) use ($supervisionId) {
+                            $q2->where('id', $supervisionId);
+                        });
+                })
+                ->orWhere(function ($q) use ($supervisionId) {
+                    $q->where('role', 'sub_supervisor')
+                        ->whereHas('subSupervisedSupervisions', function ($q2) use ($supervisionId) {
+                            $q2->where('id', $supervisionId);
+                        });
+                })
+                ->orWhere(function ($q) use ($zoneId) {
+                    $q->whereIn('role', ['pastor_zona', 'subpastor_zona'])
+                        ->whereIn('id', Zone::where('id', $zoneId)->whereNotNull('pastor_id')->pluck('pastor_id'));
+                })
+                ->orWhere(function ($q) {
+                    $q->whereIn('role', ['pastor', 'subpastor', 'pastor_senior', 'admin', 'super_admin']);
+                });
             });
 
         $leaders = $leadersQuery->get();
@@ -345,12 +347,18 @@ class CellController
             // Set cell_id and role for new timoteo list
             if (! $newTimoteoIds->isEmpty()) {
                 User::whereIn('id', $newTimoteoIds)
-                    ->where('role', '!=', 'lider_celula')
-                    ->where('role', '!=', 'supervisor')
-                    ->where('role', '!=', 'sub_supervisor')
-                    ->where('role', '!=', 'pastor_zona')
-                    ->where('role', '!=', 'pastor')
-                    ->where('role', '!=', 'pastor_senior')
+                    ->whereNotIn('role', [
+                        'lider_celula',
+                        'supervisor',
+                        'sub_supervisor',
+                        'pastor_zona',
+                        'subpastor_zona',
+                        'pastor',
+                        'subpastor',
+                        'pastor_senior',
+                        'admin',
+                        'super_admin',
+                    ])
                     ->update(['cell_id' => $cell->id, 'role' => 'timoteo']);
             }
 
@@ -449,25 +457,25 @@ class CellController
                         });
                 });
 
-                // Pastores de Zona / Pastores (da zona, ou todos sem contexto geográfico)
+                // Pastores de Zona (da zona, ou todos sem contexto geográfico)
                 $q->orWhere(function ($q2) use ($zoneId) {
-                    $q2->whereIn('role', ['pastor_zona', 'pastor'])
+                    $q2->whereIn('role', ['pastor_zona', 'subpastor_zona'])
                         ->when($zoneId, function ($q3) use ($zoneId) {
                             $q3->whereIn('id', Zone::where('id', $zoneId)->whereNotNull('pastor_id')->pluck('pastor_id'));
                         });
                 });
 
-                // Pastor Sénior
+                // Pastor, Subpastor, Pastor Sénior e Admin
                 $q->orWhere(function ($q2) {
-                    $q2->where('role', 'pastor_senior');
+                    $q2->whereIn('role', ['pastor', 'subpastor', 'pastor_senior', 'admin', 'super_admin']);
                 });
             });
 
         $allowedRoles = match ($cellType) {
-            Cell::TYPE_LIDERES => ['supervisor', 'sub_supervisor', 'pastor_zona', 'pastor', 'pastor_senior'],
-            Cell::TYPE_SUPERVISORES => ['pastor_zona', 'pastor', 'pastor_senior'],
-            Cell::TYPE_PASTORES_ZONA => ['pastor_senior'],
-            Cell::TYPE_PASTORES => ['pastor_senior'],
+            Cell::TYPE_LIDERES => ['supervisor', 'sub_supervisor', 'pastor_zona', 'subpastor_zona', 'pastor', 'subpastor', 'pastor_senior', 'admin', 'super_admin'],
+            Cell::TYPE_SUPERVISORES => ['pastor_zona', 'subpastor_zona', 'pastor', 'subpastor', 'pastor_senior', 'admin', 'super_admin'],
+            Cell::TYPE_PASTORES_ZONA => ['pastor', 'subpastor', 'pastor_senior', 'admin', 'super_admin'],
+            Cell::TYPE_PASTORES => ['pastor', 'subpastor', 'pastor_senior', 'admin', 'super_admin'],
             // Na criação (sem célula existente) mantém-se apenas líderes de célula para o tipo padrão
             default => $cell ? null : ['lider_celula'],
         };
@@ -600,10 +608,10 @@ class CellController
 
         $valid = match ($cellType) {
             Cell::TYPE_MEMBROS => true,
-            Cell::TYPE_LIDERES => in_array($role, ['supervisor', 'sub_supervisor', 'pastor_zona', 'pastor', 'pastor_senior']),
-            Cell::TYPE_SUPERVISORES => in_array($role, ['pastor_zona', 'pastor', 'pastor_senior']),
-            Cell::TYPE_PASTORES_ZONA => in_array($role, ['pastor_senior']),
-            Cell::TYPE_PASTORES => in_array($role, ['pastor_senior']),
+            Cell::TYPE_LIDERES => in_array($role, ['supervisor', 'sub_supervisor', 'pastor_zona', 'subpastor_zona', 'pastor', 'subpastor', 'pastor_senior', 'admin', 'super_admin']),
+            Cell::TYPE_SUPERVISORES => in_array($role, ['pastor_zona', 'subpastor_zona', 'pastor', 'subpastor', 'pastor_senior', 'admin', 'super_admin']),
+            Cell::TYPE_PASTORES_ZONA => in_array($role, ['pastor', 'subpastor', 'pastor_senior', 'admin', 'super_admin']),
+            Cell::TYPE_PASTORES => in_array($role, ['pastor', 'subpastor', 'pastor_senior', 'admin', 'super_admin']),
             default => true,
         };
 

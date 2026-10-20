@@ -142,4 +142,53 @@ class CellTypeValidationTest extends TestCase
         $this->assertContains('pastor_senior', $roles);
         $this->assertNotContains('membro', $roles);
     }
+
+    public function test_pastores_zona_cell_accepts_pastor_subpastor_pastor_senior_and_admin_as_leader(): void
+    {
+        $pastor = User::create([
+            'name' => 'Pastor Geral',
+            'email' => 'pastor_geral_' . uniqid() . '@example.com',
+            'password' => bcrypt('password123'),
+            'role' => 'pastor',
+            'is_active' => true,
+        ]);
+
+        $subpastor = User::create([
+            'name' => 'Subpastor Geral',
+            'email' => 'subpastor_geral_' . uniqid() . '@example.com',
+            'password' => bcrypt('password123'),
+            'role' => 'subpastor',
+            'is_active' => true,
+        ]);
+
+        $response = $this->getJson(route('cells.eligible-leaders', [
+            'cell_type' => Cell::TYPE_PASTORES_ZONA,
+            'supervision_id' => $this->supervision->id,
+        ]));
+
+        $response->assertOk();
+        $leaderIds = collect($response->json())->pluck('id')->all();
+
+        $this->assertContains($pastor->id, $leaderIds);
+        $this->assertContains($subpastor->id, $leaderIds);
+        $this->assertContains($this->pastorSenior->id, $leaderIds);
+        $this->assertContains($this->admin->id, $leaderIds);
+        $this->assertNotContains($this->liderCelula->id, $leaderIds);
+
+        foreach ([$pastor, $subpastor, $this->pastorSenior, $this->admin] as $leaderUser) {
+            $storeResponse = $this->post(route('cells.store'), [
+                'name' => 'Célula Pastores Zona - ' . $leaderUser->role,
+                'type' => Cell::TYPE_PASTORES_ZONA,
+                'supervision_id' => $this->supervision->id,
+                'leader_id' => $leaderUser->id,
+            ]);
+
+            $storeResponse->assertSessionHas('success');
+            $this->assertDatabaseHas('cells', [
+                'name' => 'Célula Pastores Zona - ' . $leaderUser->role,
+                'type' => Cell::TYPE_PASTORES_ZONA,
+                'leader_id' => $leaderUser->id,
+            ]);
+        }
+    }
 }
