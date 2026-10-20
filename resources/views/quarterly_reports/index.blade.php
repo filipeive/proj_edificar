@@ -7,271 +7,256 @@
 @section('header-actions')
     <div class="md:hidden">
         <a href="{{ route('quarterly-reports.create') }}"
-            class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100">
-            <i class="bi bi-plus-circle text-2xl"></i>
+            class="inline-flex items-center justify-center rounded-lg bg-orange-700 p-2 text-white shadow-sm hover:bg-orange-800 transition">
+            <i class="bi bi-plus-lg text-base"></i>
         </a>
     </div>
 @endsection
 
 @section('content')
-    <div class="w-full space-y-6" x-data="{ 
-                    view: window.innerWidth < 768 ? 'grid' : 'list',
-                    selected: [],
-                    showCharts: window.innerWidth >= 768,
-                    updateView() {
-                        if (window.innerWidth < 768 && this.view === 'list') {
-                            this.view = 'grid';
-                        }
-                    },
-                    toggleAll() {
-                        const allIds = {{ Js::from($reports->pluck('id')) }};
-                        if (this.selected.length === allIds.length) {
-                            this.selected = [];
-                        } else {
-                            this.selected = allIds;
-                        }
-                    },
-                    deleteSelected() {
-                        document.getElementById('bulk-delete-form').submit();
-                    }
-                }"
-        x-init="$watch('view', value => localStorage.setItem('quarterly_reports_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('quarterly_reports_view') || 'list')"
-        @resize.window.debounce.500ms="updateView()">
+    <div class="w-full space-y-5" x-data="{ 
+        view: window.innerWidth < 768 ? 'grid' : 'list',
+        selected: [],
+        showCharts: window.innerWidth >= 768,
+        updateView() {
+            if (window.innerWidth < 768 && this.view === 'list') {
+                this.view = 'grid';
+            }
+        },
+        toggleAll() {
+            const allIds = {{ Js::from($reports->pluck('id')) }};
+            if (this.selected.length === allIds.length) {
+                this.selected = [];
+            } else {
+                this.selected = allIds;
+            }
+        },
+        deleteSelected() {
+            document.getElementById('bulk-delete-form').submit();
+        }
+    }"
+    x-init="$watch('view', value => localStorage.setItem('quarterly_reports_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('quarterly_reports_view') || 'list')"
+    @resize.window.debounce.500ms="updateView()">
 
-        <!-- Analytics Dashboard (Hidden on Mobile) -->
-        <div class="hidden md:grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div
-                class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-all group relative overflow-hidden">
-                <div
-                    class="absolute top-0 right-0 w-32 h-32 bg-blue-50/50 dark:bg-blue-900/10 rounded-full -mr-16 -mt-16 group-hover:bg-blue-600/10 transition-colors">
-                </div>
-                <div class="relative">
-                    <div class="flex items-center justify-between mb-4">
-                        <div
-                            class="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-xl group-hover:bg-blue-600 transition-colors shadow-sm">
-                            <i
-                                class="bi bi-people-fill text-blue-600 dark:text-blue-400 text-xl group-hover:text-white transition-colors"></i>
-                        </div>
-                    </div>
-                    <p class="text-gray-400 dark:text-gray-500 text-[10px] font-black uppercase tracking-[0.2em]">Membros
-                        Atuais</p>
-                    <p class="text-2xl font-black text-gray-900 dark:text-white mt-1 tracking-tight">
-                        {{ number_format($totalMembers) }}
-                    </p>
-                </div>
+        <!-- Page Header (National Style) -->
+        <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 sm:gap-4">
+            <div>
+                <p class="text-[10px] sm:text-xs font-black uppercase tracking-[0.18em] text-orange-700">Gestão Eclesiástica</p>
+                <h1 class="mt-0.5 sm:mt-1 text-xl sm:text-2xl font-black text-gray-950 tracking-tight">Relatórios Trimestrais</h1>
+                <p class="mt-0.5 sm:mt-1 text-xs sm:text-sm text-gray-500">Indicadores trimestrais de células, discipulado, salvações e batismos por supervisão.</p>
             </div>
-
-            <div
-                class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-all group relative overflow-hidden">
-                <div
-                    class="absolute top-0 right-0 w-32 h-32 bg-purple-50/50 dark:bg-purple-900/10 rounded-full -mr-16 -mt-16 group-hover:bg-purple-600/10 transition-colors">
-                </div>
-                <div class="relative">
-                    <div class="flex items-center justify-between mb-4">
-                        <div
-                            class="bg-purple-50 dark:bg-purple-900/30 p-3 rounded-xl group-hover:bg-purple-600 transition-colors shadow-sm">
-                            <i
-                                class="bi bi-diagram-3-fill text-purple-600 dark:text-purple-400 text-xl group-hover:text-white transition-colors"></i>
-                        </div>
-                    </div>
-                    <p class="text-gray-400 dark:text-gray-500 text-[10px] font-black uppercase tracking-[0.2em]">Células
-                        Ativas</p>
-                    <p class="text-2xl font-black text-gray-900 dark:text-white mt-1 tracking-tight">
-                        {{ number_format($totalCells) }}
-                    </p>
-                </div>
-            </div>
-
-            <div
-                class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-all group relative overflow-hidden">
-                <div
-                    class="absolute top-0 right-0 w-32 h-32 bg-green-50/50 dark:bg-green-900/10 rounded-full -mr-16 -mt-16 group-hover:bg-green-600/10 transition-colors">
-                </div>
-                <div class="relative">
-                    <div class="flex items-center justify-between mb-4">
-                        <div
-                            class="bg-green-50 dark:bg-green-900/30 p-3 rounded-xl group-hover:bg-green-600 transition-colors shadow-sm">
-                            <i
-                                class="bi bi-heart-fill text-green-600 dark:text-green-400 text-xl group-hover:text-white transition-colors"></i>
-                        </div>
-                    </div>
-                    <p class="text-gray-400 dark:text-gray-500 text-[10px] font-black uppercase tracking-[0.2em]">Salvações
-                        (Acum.)</p>
-                    <p class="text-2xl font-black text-gray-900 dark:text-white mt-1 tracking-tight">
-                        {{ number_format($totalSaved) }}
-                    </p>
-                </div>
-            </div>
-
-            <div
-                class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-all group relative overflow-hidden">
-                <div
-                    class="absolute top-0 right-0 w-32 h-32 bg-orange-50/50 dark:bg-orange-900/10 rounded-full -mr-16 -mt-16 group-hover:bg-orange-600/10 transition-colors">
-                </div>
-                <div class="relative">
-                    <div class="flex items-center justify-between mb-4">
-                        <div
-                            class="bg-orange-50 dark:bg-orange-900/30 p-3 rounded-xl group-hover:bg-orange-600 transition-colors shadow-sm">
-                            <i
-                                class="bi bi-droplet-fill text-orange-600 dark:text-orange-400 text-xl group-hover:text-white transition-colors"></i>
-                        </div>
-                    </div>
-                    <p class="text-gray-400 dark:text-gray-500 text-[10px] font-black uppercase tracking-[0.2em]">Batismos
-                        (Acum.)</p>
-                    <p class="text-2xl font-black text-gray-900 dark:text-white mt-1 tracking-tight">
-                        {{ number_format($totalBaptized) }}
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Charts Section (Hidden on Mobile) -->
-        <div x-show="showCharts" class="hidden md:block space-y-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div
-                    class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                    <h3
-                        class="text-sm font-black text-gray-900 dark:text-white mb-6 uppercase tracking-widest flex items-center gap-2">
-                        <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
-                        Crescimento de Membros
-                    </h3>
-                    <div class="h-[220px] relative">
-                        <canvas id="membersChart"></canvas>
-                    </div>
-                </div>
-
-                <div
-                    class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                    <h3
-                        class="text-sm font-black text-gray-900 dark:text-white mb-6 uppercase tracking-widest flex items-center gap-2">
-                        <span class="w-1.5 h-1.5 rounded-full bg-purple-600"></span>
-                        Multiplicação de Células
-                    </h3>
-                    <div class="h-[220px] relative">
-                        <canvas id="cellsChart"></canvas>
-                    </div>
-                </div>
-
-                <div
-                    class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                    <h3
-                        class="text-sm font-black text-gray-900 dark:text-white mb-6 uppercase tracking-widest flex items-center gap-2">
-                        <span class="w-1.5 h-1.5 rounded-full bg-green-600"></span>
-                        Salvações por Trimestre
-                    </h3>
-                    <div class="h-[220px] relative">
-                        <canvas id="savedChart"></canvas>
-                    </div>
-                </div>
-
-                <div
-                    class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                    <h3
-                        class="text-sm font-black text-gray-900 dark:text-white mb-6 uppercase tracking-widest flex items-center gap-2">
-                        <span class="w-1.5 h-1.5 rounded-full bg-orange-600"></span>
-                        Batismos por Trimestre
-                    </h3>
-                    <div class="h-[220px] relative">
-                        <canvas id="baptizedChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Search & Filters -->
-        <div
-            class="bg-white dark:bg-gray-800 p-4 md:p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-            <form action="{{ route('quarterly-reports.index') }}" method="GET" class="flex flex-col md:flex-row gap-3">
-                <!-- Search -->
-                <div class="flex-1 relative group">
-                    <i
-                        class="bi bi-search absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors"></i>
-                    <input type="text" name="search" value="{{ request('search') }}"
-                        placeholder="Pesquisar por supervisor ou zona..."
-                        class="w-full pl-12 pr-5 py-2.5 bg-gray-50/50 dark:bg-gray-700/50 border-transparent focus:bg-white dark:focus:bg-gray-700 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl text-sm font-bold transition-all">
-                </div>
-
-                <!-- Filters -->
-                <div class="flex flex-wrap gap-3">
-                    <select name="year"
-                        class="bg-gray-50/50 dark:bg-gray-700/50 border-transparent focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl text-xs font-black uppercase tracking-widest px-4 py-2.5 custom-select">
-                        <option value="">Todos os Anos</option>
-                        @for($y = date('Y'); $y >= 2024; $y--)
-                            <option value="{{ $y }}" @selected(request('year') == $y)>{{ $y }}</option>
-                        @endfor
-                    </select>
-
-                    <select name="quarter"
-                        class="bg-gray-50/50 dark:bg-gray-700/50 border-transparent focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl text-xs font-black uppercase tracking-widest px-4 py-2.5 custom-select">
-                        <option value="">Todos os Trimestres</option>
-                        @for($q = 1; $q <= 4; $q++)
-                            <option value="{{ $q }}" @selected(request('quarter') == $q)>{{ $q }}º Trimestre</option>
-                        @endfor
-                    </select>
-
-                    <button type="submit"
-                        class="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition shadow-lg shadow-blue-100 dark:shadow-none">
-                        Filtrar
-                    </button>
-
-                    @if(request()->anyFilled(['search', 'year', 'quarter']))
-                        <a href="{{ route('quarterly-reports.index') }}"
-                            class="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-4 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-600 transition flex items-center">
-                            Limpar
-                        </a>
-                    @endif
-                </div>
-            </form>
-        </div>
-
-        <!-- Bulk Actions & View Switcher -->
-        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <div x-show="selected.length > 0" class="flex items-center gap-4" x-cloak x-transition>
-                    <span
-                        class="text-xs font-black uppercase tracking-widest text-blue-600 bg-blue-50 dark:bg-blue-900/30 px-4 py-2 rounded-full">
-                        <span x-text="selected.length"></span> selecionados
-                    </span>
-                    @can('deleteAny', App\Models\QuarterlyReport::class)
-                        <button @click="if(confirm('Deseja excluir os relatórios selecionados?')) deleteSelected()"
-                            class="bg-red-50 text-red-600 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all border border-red-100">
-                            <i class="bi bi-trash3-fill mr-2"></i> Excluir Massa
-                        </button>
-                    @endcan
-                </div>
-
-                <div class="flex bg-gray-100 dark:bg-gray-700 p-1.5 rounded-2xl">
-                    <button @click="view = 'list'"
-                        :class="view === 'list' ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-md' : 'text-gray-400 dark:text-gray-400'"
-                        class="px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
-                        <i class="bi bi-list-ul mr-2"></i> Lista
-                    </button>
-                    <button @click="view = 'grid'"
-                        :class="view === 'grid' ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-md' : 'text-gray-400 dark:text-gray-400'"
-                        class="px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
-                        <i class="bi bi-grid-fill mr-2"></i> Grid
-                    </button>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-4">
+            <div class="flex flex-wrap items-center gap-2">
+                <button type="button" @click="showCharts = !showCharts"
+                    class="inline-flex justify-center items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 sm:py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 shadow-sm">
+                    <i class="bi" :class="showCharts ? 'bi-eye-slash' : 'bi-bar-chart-line'"></i>
+                    <span x-text="showCharts ? 'Ocultar gráficos' : 'Ver gráficos'"></span>
+                </button>
                 <a href="{{ route('quarterly-reports.export-pdf', request()->query()) }}"
-                    class="bg-white dark:bg-gray-800 text-red-600 border border-red-100 dark:border-red-800 px-4 py-2.5 rounded-xl hover:bg-red-600 hover:text-white transition-all font-black text-[10px] uppercase tracking-widest flex items-center">
-                    <i class="bi bi-file-earmark-pdf mr-2"></i> PDF
+                    class="inline-flex justify-center items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-1.5 sm:py-2 text-xs font-bold text-red-700 hover:bg-red-50 shadow-sm">
+                    <i class="bi bi-file-earmark-pdf"></i> <span>PDF</span>
                 </a>
                 <a href="{{ route('quarterly-reports.export', request()->query()) }}"
-                    class="bg-white dark:bg-gray-800 text-green-600 border border-green-100 dark:border-green-800 px-4 py-2.5 rounded-xl hover:bg-green-600 hover:text-white transition-all font-black text-[10px] uppercase tracking-widest flex items-center">
-                    <i class="bi bi-file-earmark-spreadsheet mr-2"></i> Excel
+                    class="inline-flex justify-center items-center gap-1.5 rounded-lg border border-green-200 bg-white px-3 py-1.5 sm:py-2 text-xs font-bold text-green-800 hover:bg-green-50 shadow-sm">
+                    <i class="bi bi-file-earmark-spreadsheet"></i> <span>Excel</span>
                 </a>
                 <a href="{{ route('quarterly-reports.create') }}"
-                    class="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition shadow-lg shadow-blue-100 dark:shadow-none">
-                    <i class="bi bi-plus-lg mr-2"></i> Novo Relatório
+                    class="inline-flex justify-center items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-white hover:bg-orange-800 shadow-sm">
+                    <i class="bi bi-plus-lg"></i> <span>Novo Relatório</span>
                 </a>
+            </div>
+        </header>
+
+        <!-- Summary KPI Cards (National Style) -->
+        <section aria-label="Indicadores trimestrais">
+            <h3 class="text-[11px] sm:text-xs font-black uppercase tracking-wider text-gray-500 mb-2">Resumo Consolidado</h3>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+                <article class="rounded-xl border border-gray-200 bg-white p-3 sm:p-4 shadow-sm">
+                    <div class="flex items-center justify-between gap-2">
+                        <p class="text-[11px] sm:text-xs font-bold text-gray-500 truncate">Membros Atuais</p>
+                        <i class="bi bi-people text-blue-700 text-sm sm:text-base"></i>
+                    </div>
+                    <p class="mt-1 text-lg sm:text-2xl font-black text-gray-950 tracking-tight tabular-nums">{{ number_format($totalMembers) }}</p>
+                    <p class="text-[10px] sm:text-[11px] text-gray-400 mt-0.5 truncate">Último trimestre registado</p>
+                </article>
+
+                <article class="rounded-xl border border-gray-200 bg-white p-3 sm:p-4 shadow-sm">
+                    <div class="flex items-center justify-between gap-2">
+                        <p class="text-[11px] sm:text-xs font-bold text-gray-500 truncate">Células Ativas</p>
+                        <i class="bi bi-diagram-3 text-indigo-700 text-sm sm:text-base"></i>
+                    </div>
+                    <p class="mt-1 text-lg sm:text-2xl font-black text-gray-950 tracking-tight tabular-nums">{{ number_format($totalCells) }}</p>
+                    <p class="text-[10px] sm:text-[11px] text-gray-400 mt-0.5 truncate">Unidades em funcionamento</p>
+                </article>
+
+                <article class="rounded-xl border border-gray-200 bg-white p-3 sm:p-4 shadow-sm">
+                    <div class="flex items-center justify-between gap-2">
+                        <p class="text-[11px] sm:text-xs font-bold text-gray-500 truncate">Salvações (Acum.)</p>
+                        <i class="bi bi-heart-pulse text-emerald-700 text-sm sm:text-base"></i>
+                    </div>
+                    <p class="mt-1 text-lg sm:text-2xl font-black text-emerald-700 tracking-tight tabular-nums">{{ number_format($totalSaved) }}</p>
+                    <p class="text-[10px] sm:text-[11px] text-gray-400 mt-0.5 truncate">Decisões contabilizadas</p>
+                </article>
+
+                <article class="rounded-xl border border-gray-200 bg-white p-3 sm:p-4 shadow-sm">
+                    <div class="flex items-center justify-between gap-2">
+                        <p class="text-[11px] sm:text-xs font-bold text-gray-500 truncate">Batismos (Acum.)</p>
+                        <i class="bi bi-droplet text-orange-700 text-sm sm:text-base"></i>
+                    </div>
+                    <p class="mt-1 text-lg sm:text-2xl font-black text-orange-700 tracking-tight tabular-nums">{{ number_format($totalBaptized) }}</p>
+                    <p class="text-[10px] sm:text-[11px] text-gray-400 mt-0.5 truncate">Batismos em águas</p>
+                </article>
+            </div>
+        </section>
+
+        <!-- Charts Section (National Style) -->
+        <section x-show="showCharts" x-transition class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <article class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+                <div class="flex items-center justify-between gap-3 mb-3">
+                    <div>
+                        <h2 class="text-sm font-black text-gray-900">Crescimento de Membros</h2>
+                        <p class="text-xs text-gray-500">Evolução por trimestre</p>
+                    </div>
+                    <span class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-blue-700">
+                        <span class="h-2 w-2 rounded-full bg-blue-600"></span> Membros
+                    </span>
+                </div>
+                <div class="h-52 relative">
+                    <canvas id="membersChart"></canvas>
+                </div>
+            </article>
+
+            <article class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+                <div class="flex items-center justify-between gap-3 mb-3">
+                    <div>
+                        <h2 class="text-sm font-black text-gray-900">Multiplicação de Células</h2>
+                        <p class="text-xs text-gray-500">Total de células ativas por trimestre</p>
+                    </div>
+                    <span class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-indigo-700">
+                        <span class="h-2 w-2 rounded-full bg-indigo-600"></span> Células
+                    </span>
+                </div>
+                <div class="h-52 relative">
+                    <canvas id="cellsChart"></canvas>
+                </div>
+            </article>
+
+            <article class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+                <div class="flex items-center justify-between gap-3 mb-3">
+                    <div>
+                        <h2 class="text-sm font-black text-gray-900">Salvações por Trimestre</h2>
+                        <p class="text-xs text-gray-500">Novas decisões registadas</p>
+                    </div>
+                    <span class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-emerald-700">
+                        <span class="h-2 w-2 rounded-full bg-emerald-600"></span> Salvações
+                    </span>
+                </div>
+                <div class="h-52 relative">
+                    <canvas id="savedChart"></canvas>
+                </div>
+            </article>
+
+            <article class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+                <div class="flex items-center justify-between gap-3 mb-3">
+                    <div>
+                        <h2 class="text-sm font-black text-gray-900">Batismos por Trimestre</h2>
+                        <p class="text-xs text-gray-500">Batismos realizados no período</p>
+                    </div>
+                    <span class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-orange-700">
+                        <span class="h-2 w-2 rounded-full bg-orange-600"></span> Batismos
+                    </span>
+                </div>
+                <div class="h-52 relative">
+                    <canvas id="baptizedChart"></canvas>
+                </div>
+            </article>
+        </section>
+
+        <!-- Search, Filters & View Switcher -->
+        <div class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm space-y-3">
+            <form action="{{ route('quarterly-reports.index') }}" method="GET" class="flex flex-col lg:flex-row lg:items-end gap-3">
+                <div class="flex-1">
+                    <label class="mb-1 block text-[10px] font-black uppercase tracking-wider text-gray-500">Pesquisar</label>
+                    <div class="relative">
+                        <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                        <input type="text" name="search" value="{{ request('search') }}"
+                            placeholder="Supervisor, supervisão ou zona..."
+                            class="w-full rounded-lg border border-gray-300 pl-8 pr-3 py-2 text-xs sm:text-sm font-medium text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-end gap-2.5">
+                    <div>
+                        <label class="mb-1 block text-[10px] font-black uppercase tracking-wider text-gray-500">Ano</label>
+                        <select name="year" data-searchable="false"
+                            class="w-full sm:w-auto rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm font-semibold text-gray-700">
+                            <option value="">Todos os Anos</option>
+                            @for($y = date('Y'); $y >= 2024; $y--)
+                                <option value="{{ $y }}" @selected(request('year') == $y)>{{ $y }}</option>
+                            @endfor
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block text-[10px] font-black uppercase tracking-wider text-gray-500">Trimestre</label>
+                        <select name="quarter" data-searchable="false"
+                            class="w-full sm:w-auto rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm font-semibold text-gray-700">
+                            <option value="">Todos os Trimestres</option>
+                            @for($q = 1; $q <= 4; $q++)
+                                <option value="{{ $q }}" @selected(request('quarter') == $q)>{{ $q }}º Trimestre</option>
+                            @endfor
+                        </select>
+                    </div>
+
+                    <div class="col-span-2 sm:col-span-1 flex items-center gap-2">
+                        <button type="submit"
+                            class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-gray-900 px-4 py-2 text-xs font-bold text-white hover:bg-gray-800 transition">
+                            <i class="bi bi-funnel"></i> Filtrar
+                        </button>
+
+                        @if(request()->anyFilled(['search', 'year', 'quarter']))
+                            <a href="{{ route('quarterly-reports.index') }}"
+                                class="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-bold text-gray-600 hover:bg-gray-100 transition">
+                                Limpar
+                            </a>
+                        @endif
+                    </div>
+                </div>
+            </form>
+
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-gray-100">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-semibold text-gray-500">
+                        {{ $reports->total() }} {{ $reports->total() === 1 ? 'relatório encontrado' : 'relatórios encontrados' }}
+                    </span>
+                    <div x-show="selected.length > 0" class="flex items-center gap-2" x-cloak x-transition>
+                        <span class="rounded-full bg-orange-50 border border-orange-200 px-2.5 py-0.5 text-[11px] font-bold text-orange-800">
+                            <span x-text="selected.length"></span> selecionado(s)
+                        </span>
+                        @can('deleteAny', App\Models\QuarterlyReport::class)
+                            <button type="button" @click="if(confirm('Deseja excluir os relatórios selecionados?')) deleteSelected()"
+                                class="inline-flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-bold text-red-700 hover:bg-red-600 hover:text-white transition">
+                                <i class="bi bi-trash3"></i> Excluir
+                            </button>
+                        @endcan
+                    </div>
+                </div>
+
+                <div class="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-0.5">
+                    <button type="button" @click="view = 'list'"
+                        :class="view === 'list' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-800'"
+                        class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-bold transition">
+                        <i class="bi bi-list-ul"></i> Lista
+                    </button>
+                    <button type="button" @click="view = 'grid'"
+                        :class="view === 'grid' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-800'"
+                        class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-bold transition">
+                        <i class="bi bi-grid"></i> Cards
+                    </button>
+                </div>
             </div>
         </div>
 
-        <form id="bulk-delete-form" action="{{ route('quarterly-reports.bulk-destroy') }}" method="POST"
-            style="display: none;">
+        <form id="bulk-delete-form" action="{{ route('quarterly-reports.bulk-destroy') }}" method="POST" class="hidden">
             @csrf
             @method('DELETE')
             <template x-for="id in selected">
@@ -279,264 +264,191 @@
             </template>
         </form>
 
-        <!-- LIST VIEW -->
-        <div x-show="view === 'list'" x-cloak x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-            class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full table-compact">
-                    <thead>
-                        <tr class="bg-gray-50/50 dark:bg-gray-700/50">
-                            <th class="px-5 py-4 text-center w-10">
-                                <input type="checkbox" @click="toggleAll()"
-                                    :checked="selected.length === {{ $reports->count() }} && {{ $reports->count() }} > 0"
-                                    class="rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 w-5 h-5 transition-all cursor-pointer">
-                            </th>
-                            <th
-                                class="px-6 py-4 text-left text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
-                                Período</th>
-                            <th
-                                class="px-6 py-4 text-left text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
-                                Zona / Supervisão</th>
-                            <th
-                                class="px-6 py-4 text-left text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
-                                Supervisor</th>
-                            <th
-                                class="px-6 py-4 text-center text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
-                                Métricas</th>
-                            <th
-                                class="px-6 py-4 text-center text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
-                                Estado</th>
-                            <th
-                                class="px-6 py-4 text-right text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
-                                Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-50 dark:divide-gray-700">
-                        @forelse($reports as $report)
-                            <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors group">
-                                <td class="px-5 py-4 text-center">
-                                    <input type="checkbox" :value="{{ $report->id }}" x-model="selected"
-                                        class="rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 w-5 h-5 transition-all cursor-pointer">
-                                </td>
-                                <td class="px-6 py-5">
-                                    <div class="flex flex-col">
-                                        <span
-                                            class="text-sm font-black text-gray-900 dark:text-white leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                                            {{ $report->quarter }}º Trimestre / {{ $report->year }}
-                                        </span>
-                                        <span
-                                            class="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">Relatório
-                                            Periódico</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-5">
-                                    <div class="flex flex-col">
-                                        <span
-                                            class="text-sm font-bold text-gray-900 dark:text-white leading-tight">{{ $report->zone->name }}</span>
-                                        <span
-                                            class="text-[10px] text-gray-400 dark:text-gray-500 font-medium uppercase">{{ $report->supervision->name ?? '-' }}</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-5">
-                                    <div class="flex items-center gap-3">
-                                        <div
-                                            class="w-9 h-9 rounded-xl bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center text-gray-500 dark:text-gray-400 font-black text-[11px] shadow-sm border border-white dark:border-gray-600">
-                                            {{ substr($report->supervisor->name, 0, 1) }}
-                                        </div>
-                                        <span
-                                            class="text-xs font-bold text-gray-700 dark:text-gray-300">{{ $report->supervisor->name }}</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-5 text-center">
-                                    <div class="flex justify-center gap-4">
-                                        <div class="flex flex-col items-center">
-                                            <span
-                                                class="text-sm font-black text-gray-900 dark:text-white">{{ $report->cells_count }}</span>
-                                            <span
-                                                class="text-[8px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest">Células</span>
-                                        </div>
-                                        <div class="flex flex-col items-center">
-                                            <span
-                                                class="text-sm font-black text-blue-600 dark:text-blue-400">{{ $report->members_count }}</span>
-                                            <span
-                                                class="text-[8px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest">Membros</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-5 text-center">
-                                    <span
-                                        class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm
-                                                                                                                                                    {{ $report->status == 'submitted' ? 'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 border-green-100 dark:border-green-800' : 'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 border-yellow-100 dark:border-yellow-800' }}">
-                                        {{ $report->status == 'submitted' ? 'Submetido' : 'Rascunho' }}
+        <!-- LIST VIEW (National Table Style) -->
+        <section x-show="view === 'list'" x-cloak class="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-gray-50 text-[10px] font-black uppercase tracking-wider text-gray-500 border-b border-gray-200">
+                    <tr>
+                        <th class="px-3.5 py-3 text-center w-9">
+                            <input type="checkbox" @click="toggleAll()"
+                                :checked="selected.length === {{ $reports->count() }} && {{ $reports->count() }} > 0"
+                                class="rounded border-gray-300 text-orange-600 focus:ring-orange-500 w-4 h-4 cursor-pointer">
+                        </th>
+                        <th class="px-4 py-3">Período</th>
+                        <th class="px-4 py-3">Zona / Supervisão</th>
+                        <th class="px-4 py-3">Supervisor</th>
+                        <th class="px-4 py-3 text-right">Células</th>
+                        <th class="px-4 py-3 text-right">Membros</th>
+                        <th class="px-4 py-3 text-right">Salvações</th>
+                        <th class="px-4 py-3 text-right">Batismos</th>
+                        <th class="px-4 py-3 text-center">Estado</th>
+                        <th class="px-4 py-3 text-right">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @forelse($reports as $report)
+                        <tr class="hover:bg-gray-50/70 transition-colors">
+                            <td class="px-3.5 py-3 text-center">
+                                <input type="checkbox" :value="{{ $report->id }}" x-model="selected"
+                                    class="rounded border-gray-300 text-orange-600 focus:ring-orange-500 w-4 h-4 cursor-pointer">
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <a href="{{ route('quarterly-reports.show', $report) }}" class="font-bold text-gray-900 hover:text-orange-700 hover:underline">
+                                    {{ $report->quarter }}º Trimestre / {{ $report->year }}
+                                </a>
+                                <span class="block text-[11px] text-gray-400">
+                                    {{ $report->submitted_at ? $report->submitted_at->format('d/m/Y') : $report->created_at->format('d/m/Y') }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3">
+                                <div class="font-semibold text-gray-900">{{ $report->zone->name ?? 'N/A' }}</div>
+                                <div class="text-xs text-gray-500">{{ $report->supervision->name ?? 'Sem supervisão' }}</div>
+                            </td>
+                            <td class="px-4 py-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-orange-50 text-[11px] font-black text-orange-700 border border-orange-200/60">
+                                        {{ strtoupper(substr($report->supervisor->name ?? 'S', 0, 1)) }}
                                     </span>
-                                </td>
-                                <td class="px-6 py-5 text-right">
-                                    <div
-                                        class="flex items-center justify-end gap-2 opacity-70 hover:opacity-100 transition-all duration-300">
-                                        <a href="{{ route('quarterly-reports.show', $report) }}" title="Detalhes"
-                                            class="action-icon bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white shadow-sm">
-                                            <i class="bi bi-eye-fill"></i>
+                                    <span class="text-xs font-semibold text-gray-700">{{ $report->supervisor->name ?? 'N/A' }}</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 text-right tabular-nums font-semibold text-gray-800">{{ number_format($report->cells_count) }}</td>
+                            <td class="px-4 py-3 text-right tabular-nums font-bold text-blue-700">{{ number_format($report->members_count) }}</td>
+                            <td class="px-4 py-3 text-right tabular-nums font-semibold text-emerald-700">{{ number_format($report->saved_count) }}</td>
+                            <td class="px-4 py-3 text-right tabular-nums font-semibold text-orange-700">{{ number_format($report->baptized_count) }}</td>
+                            <td class="px-4 py-3 text-center whitespace-nowrap">
+                                <span class="rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase {{ $report->status === 'submitted' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800' }}">
+                                    {{ $report->status === 'submitted' ? 'Submetido' : 'Rascunho' }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-right whitespace-nowrap">
+                                <div class="inline-flex items-center justify-end gap-1.5">
+                                    <a href="{{ route('quarterly-reports.show', $report) }}"
+                                        class="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-bold text-gray-700 hover:border-orange-300 hover:text-orange-800 hover:bg-orange-50/50 shadow-sm transition"
+                                        title="Ver detalhes">
+                                        <i class="bi bi-eye text-orange-700"></i> <span class="hidden xl:inline">Detalhes</span>
+                                    </a>
+                                    @can('update', $report)
+                                        <a href="{{ route('quarterly-reports.edit', $report) }}"
+                                            class="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white p-1.5 text-xs text-gray-600 hover:border-blue-300 hover:text-blue-700 hover:bg-blue-50/50 shadow-sm transition"
+                                            title="Editar">
+                                            <i class="bi bi-pencil-square"></i>
                                         </a>
-                                        @can('update', $report)
-                                            <a href="{{ route('quarterly-reports.edit', $report) }}"
-                                                class="action-icon bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 hover:bg-orange-600 hover:text-white dark:hover:bg-orange-600 dark:hover:text-white shadow-sm"
-                                                title="Editar">
-                                                <i class="bi bi-pencil-square"></i>
-                                            </a>
-                                        @endcan
-                                        @can('delete', $report)
-                                            <form action="{{ route('quarterly-reports.destroy', $report) }}" method="POST"
-                                                id="delete-report-{{ $report->id }}">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="button"
-                                                    onclick="confirmDelete('delete-report-{{ $report->id }}', 'Deseja excluir este relatório?')"
-                                                    class="action-icon bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white dark:hover:bg-red-600 dark:hover:text-white shadow-sm"
-                                                    title="Excluir">
-                                                    <i class="bi bi-trash-fill"></i>
-                                                </button>
-                                            </form>
-                                        @endcan
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="px-8 py-14 text-center">
-                                    <div class="flex flex-col items-center gap-4 text-gray-300 dark:text-gray-600">
-                                        <i class="bi bi-file-earmark-break text-7xl"></i>
-                                        <p class="font-bold text-base text-gray-400 dark:text-gray-500">Nenhum relatório
-                                            trimestral
-                                            encontrado.</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                                    @endcan
+                                    @can('delete', $report)
+                                        <form action="{{ route('quarterly-reports.destroy', $report) }}" method="POST"
+                                            id="delete-report-{{ $report->id }}" class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button"
+                                                onclick="confirmDelete('delete-report-{{ $report->id }}', 'Deseja excluir este relatório?')"
+                                                class="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white p-1.5 text-xs text-red-600 hover:border-red-300 hover:bg-red-50 shadow-sm transition"
+                                                title="Excluir">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    @endcan
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="10" class="px-4 py-12 text-center text-gray-500">
+                                <i class="bi bi-file-earmark-bar-graph text-3xl text-gray-300 block mb-2"></i>
+                                Nenhum relatório trimestral encontrado para os filtros selecionados.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </section>
 
-        <!-- GRID VIEW -->
-        <div x-show="view === 'grid'" x-cloak x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <!-- GRID VIEW (National Card Style) -->
+        <section x-show="view === 'grid'" x-cloak class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
             @forelse($reports as $report)
-                <div
-                    class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-lg hover:-translate-y-0.5 transition-all group overflow-hidden flex flex-col compact-card">
-                    <!-- Card Header -->
-                    <div class="p-5 pb-0 flex justify-between items-start relative">
-                        <div class="absolute top-5 right-5">
-                            <input type="checkbox" :value="{{ $report->id }}" x-model="selected"
-                                class="rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 w-5 h-5 transition-all cursor-pointer shadow-sm">
-                        </div>
-                        <div class="flex flex-col">
-                            <span
-                                class="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] mb-1">{{ $report->quarter }}º
-                                Trimestre</span>
-                            <h3 class="text-base font-black text-gray-900 leading-tight dark:text-white">{{ $report->year }}</h3>
-                        </div>
-                        <span
-                            class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm mr-10
-                                                                                                                                                            {{ $report->status == 'submitted' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-yellow-50 text-yellow-600 border-yellow-100' }}">
-                            {{ $report->status == 'submitted' ? 'Submetido' : 'Rascunho' }}
-                        </span>
-                    </div>
-
-                    <!-- Location info -->
-                    <div class="px-6 pt-4">
-                        <div class="flex items-center gap-3 bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                            <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-blue-600 shadow-sm">
-                                <i class="bi bi-geo-alt-fill"></i>
-                            </div>
-                            <div class="flex flex-col">
-                                <span class="text-xs font-black text-gray-900">{{ $report->zone->name }}</span>
-                                <span
-                                    class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{{ $report->supervision->name ?? 'Sem Supervisão' }}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Metrics -->
-                    <div class="p-5 grid grid-cols-2 gap-2.5">
-                        <div class="p-4 bg-blue-50/30 rounded-2xl border border-blue-50 flex flex-col items-center">
-                            <span class="text-xl font-black text-blue-600">{{ $report->members_count }}</span>
-                            <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Membros</span>
-                        </div>
-                        <div class="p-4 bg-purple-50/30 rounded-2xl border border-purple-50 flex flex-col items-center">
-                            <span class="text-xl font-black text-purple-600">{{ $report->cells_count }}</span>
-                            <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Células</span>
-                        </div>
-                        <div class="p-4 bg-green-50/30 rounded-2xl border border-green-50 flex flex-col items-center">
-                            <span class="text-xl font-black text-green-600">{{ $report->saved_count }}</span>
-                            <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Salvações</span>
-                        </div>
-                        <div class="p-4 bg-orange-50/30 rounded-2xl border border-orange-50 flex flex-col items-center">
-                            <span class="text-xl font-black text-orange-600">{{ $report->baptized_count }}</span>
-                            <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Batismos</span>
-                        </div>
-                    </div>
-
-                    <div class="mt-auto">
-                        <!-- Supervisor -->
-                        <div class="px-5 py-3.5 border-t border-gray-50 flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div
-                                    class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 text-[10px] font-black">
-                                    {{ substr($report->supervisor->name, 0, 1) }}
-                                </div>
-                                <div class="flex flex-col">
-                                    <span
-                                        class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Supervisor</span>
-                                    <span class="text-xs font-bold text-gray-700">{{ $report->supervisor->name }}</span>
+                <article class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:border-gray-300 transition flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-start justify-between gap-2 pb-3 border-b border-gray-100">
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" :value="{{ $report->id }}" x-model="selected"
+                                    class="rounded border-gray-300 text-orange-600 focus:ring-orange-500 w-4 h-4 cursor-pointer">
+                                <div>
+                                    <span class="text-[10px] font-black uppercase tracking-wider text-orange-700">{{ $report->quarter }}º Trimestre • {{ $report->year }}</span>
+                                    <h3 class="text-sm font-black text-gray-950 leading-snug">{{ $report->supervision->name ?? 'Sem Supervisão' }}</h3>
+                                    <p class="text-xs text-gray-500"><i class="bi bi-geo-alt text-gray-400 mr-1"></i>{{ $report->zone->name ?? 'N/A' }}</p>
                                 </div>
                             </div>
+                            <span class="rounded-full px-2 py-0.5 text-[10px] font-black uppercase {{ $report->status === 'submitted' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800' }}">
+                                {{ $report->status === 'submitted' ? 'Submetido' : 'Rascunho' }}
+                            </span>
                         </div>
 
-                        <!-- Card Actions -->
-                        <div class="p-3.5 bg-gray-50/50 border-t border-gray-50 flex gap-2">
+                        <div class="grid grid-cols-4 gap-1.5 my-3 text-center">
+                            <div class="rounded-lg bg-gray-50 p-2 border border-gray-100">
+                                <span class="block text-sm font-black text-blue-700 tabular-nums">{{ $report->members_count }}</span>
+                                <span class="block text-[9px] font-bold uppercase text-gray-400">Membros</span>
+                            </div>
+                            <div class="rounded-lg bg-gray-50 p-2 border border-gray-100">
+                                <span class="block text-sm font-black text-indigo-700 tabular-nums">{{ $report->cells_count }}</span>
+                                <span class="block text-[9px] font-bold uppercase text-gray-400">Células</span>
+                            </div>
+                            <div class="rounded-lg bg-gray-50 p-2 border border-gray-100">
+                                <span class="block text-sm font-black text-emerald-700 tabular-nums">{{ $report->saved_count }}</span>
+                                <span class="block text-[9px] font-bold uppercase text-gray-400">Salvos</span>
+                            </div>
+                            <div class="rounded-lg bg-gray-50 p-2 border border-gray-100">
+                                <span class="block text-sm font-black text-orange-700 tabular-nums">{{ $report->baptized_count }}</span>
+                                <span class="block text-[9px] font-bold uppercase text-gray-400">Batismos</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <span class="inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-gray-100 text-[10px] font-black text-gray-600">
+                                {{ strtoupper(substr($report->supervisor->name ?? 'S', 0, 1)) }}
+                            </span>
+                            <span class="text-xs font-semibold text-gray-600 truncate">{{ $report->supervisor->name ?? 'N/A' }}</span>
+                        </div>
+
+                        <div class="flex items-center gap-1.5 flex-shrink-0">
                             <a href="{{ route('quarterly-reports.show', $report) }}"
-                                class="flex-1 bg-white text-blue-600 py-2.5 rounded-xl border border-blue-100 hover:bg-blue-600 hover:text-white transition-all font-black text-[10px] uppercase tracking-widest text-center shadow-sm">
-                                Visualizar
+                                class="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-bold text-gray-700 hover:border-orange-300 hover:text-orange-800 shadow-sm transition">
+                                <i class="bi bi-eye text-orange-700"></i> Ver
                             </a>
                             @can('update', $report)
                                 <a href="{{ route('quarterly-reports.edit', $report) }}"
-                                    class="w-12 h-12 bg-white text-orange-600 rounded-xl border border-orange-100 hover:bg-orange-600 hover:text-white transition-all flex items-center justify-center shadow-sm">
+                                    class="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white p-1.5 text-xs text-gray-600 hover:border-blue-300 hover:text-blue-700 shadow-sm transition"
+                                    title="Editar">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
                             @endcan
                             @can('delete', $report)
                                 <form action="{{ route('quarterly-reports.destroy', $report) }}" method="POST"
-                                    id="grid-delete-{{ $report->id }}" class="contents">
+                                    id="grid-delete-{{ $report->id }}" class="inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="button"
                                         onclick="confirmDelete('grid-delete-{{ $report->id }}', 'Deseja excluir este relatório?')"
-                                        class="w-12 h-12 bg-white text-red-600 rounded-xl border border-red-100 hover:bg-red-600 hover:text-white transition-all flex items-center justify-center shadow-sm">
-                                        <i class="bi bi-trash-fill"></i>
+                                        class="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white p-1.5 text-xs text-red-600 hover:border-red-300 hover:bg-red-50 shadow-sm transition"
+                                        title="Excluir">
+                                        <i class="bi bi-trash"></i>
                                     </button>
                                 </form>
                             @endcan
                         </div>
                     </div>
-                </div>
+                </article>
             @empty
-                <div class="col-span-full bg-white rounded-2xl p-10 border border-gray-100 text-center">
-                    <div class="flex flex-col items-center gap-4 text-gray-300">
-                        <i class="bi bi-file-earmark-break text-7xl"></i>
-                        <p class="font-bold text-base text-gray-400">Nenhum relatório trimestral encontrado.</p>
-                    </div>
+                <div class="col-span-full rounded-xl border border-gray-200 bg-white p-8 text-center text-gray-500">
+                    Nenhum relatório trimestral encontrado.
                 </div>
             @endforelse
-        </div>
+        </section>
 
-        <!-- Pagination -->
         @if($reports->hasPages())
-            <div class="flex justify-center mt-10">
-                <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                    {{ $reports->links() }}
-                </div>
+            <div class="pt-2">
+                {{ $reports->links() }}
             </div>
         @endif
     </div>
@@ -553,7 +465,6 @@
                 }
             };
 
-            // Members Chart
             new Chart(document.getElementById('membersChart'), {
                 type: 'line',
                 data: {
@@ -561,17 +472,16 @@
                     datasets: [{
                         label: 'Membros',
                         data: @json($membersData),
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        borderWidth: 3,
+                        borderColor: '#1d4ed8',
+                        backgroundColor: 'rgba(29, 78, 216, 0.08)',
+                        borderWidth: 2.5,
                         fill: true,
-                        tension: 0.4
+                        tension: 0.35
                     }]
                 },
                 options: chartOptions
             });
 
-            // Cells Chart
             new Chart(document.getElementById('cellsChart'), {
                 type: 'bar',
                 data: {
@@ -579,14 +489,13 @@
                     datasets: [{
                         label: 'Células',
                         data: @json($cellsData),
-                        backgroundColor: 'rgba(168, 85, 247, 0.8)',
-                        borderRadius: 8
+                        backgroundColor: 'rgba(79, 70, 229, 0.8)',
+                        borderRadius: 6
                     }]
                 },
                 options: chartOptions
             });
 
-            // Saved Chart
             new Chart(document.getElementById('savedChart'), {
                 type: 'bar',
                 data: {
@@ -594,14 +503,13 @@
                     datasets: [{
                         label: 'Salvações',
                         data: @json($savedData),
-                        backgroundColor: 'rgba(34, 197, 94, 0.8)',
-                        borderRadius: 8
+                        backgroundColor: 'rgba(5, 150, 105, 0.8)',
+                        borderRadius: 6
                     }]
                 },
                 options: chartOptions
             });
 
-            // Baptized Chart
             new Chart(document.getElementById('baptizedChart'), {
                 type: 'line',
                 data: {
@@ -609,11 +517,11 @@
                     datasets: [{
                         label: 'Batismos',
                         data: @json($baptizedData),
-                        borderColor: '#f97316',
-                        backgroundColor: 'rgba(249, 115, 22, 0.1)',
-                        borderWidth: 3,
+                        borderColor: '#c2410c',
+                        backgroundColor: 'rgba(194, 65, 12, 0.08)',
+                        borderWidth: 2.5,
                         fill: true,
-                        tension: 0.4
+                        tension: 0.35
                     }]
                 },
                 options: chartOptions

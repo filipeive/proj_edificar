@@ -31,6 +31,7 @@ class QuarterlyReportController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->whereHas('supervisor', fn ($sq) => $sq->where('name', 'LIKE', "%$search%"))
+                    ->orWhereHas('supervision', fn ($spq) => $spq->where('name', 'LIKE', "%$search%"))
                     ->orWhereHas('zone', fn ($zq) => $zq->where('name', 'LIKE', "%$search%"));
             });
         }
