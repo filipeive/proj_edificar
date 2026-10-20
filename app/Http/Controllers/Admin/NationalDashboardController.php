@@ -40,27 +40,74 @@ class NationalDashboardController
 
         $this->attachCongregationCounts($congregations->getCollection());
 
+        $palette = [
+            '#d97706', // Âmbar Sede
+            '#059669', // Esmeralda / Verde
+            '#2563eb', // Azul Real
+            '#7c3aed', // Púrpura / Violeta
+            '#db2777', // Rosa
+            '#0891b2', // Ciano
+            '#ea580c', // Laranja
+            '#4f46e5', // Índigo
+            '#16a34a', // Verde Claro
+            '#dc2626', // Carmim
+        ];
+
         $mapCongregations = Congregation::query()
+            ->with(['admins' => fn($q) => $q->whereIn('role', ['admin', 'pastor_senior'])])
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
+            ->orderByDesc('is_primary')
             ->orderBy('name')
             ->get();
         $this->attachCongregationCounts($mapCongregations);
-        $mapCongregations = $mapCongregations->map(fn(Congregation $congregation) => [
-            'id' => $congregation->id,
-            'name' => $congregation->name,
-            'slug' => $congregation->slug,
-            'latitude' => (float) $congregation->latitude,
-            'longitude' => (float) $congregation->longitude,
-            'is_active' => $congregation->is_active,
-            'is_primary' => $congregation->is_primary,
-            'has_edificar' => (bool) $congregation->has_edificar_project,
-            'users_count' => $congregation->users_count,
-            'zones_count' => $congregation->zones_count,
-            'cells_count' => $congregation->cells_count,
-            'show_url' => route('national.congregations.show', $congregation),
-            'edit_url' => route('national.congregations.edit', $congregation),
-        ])->values();
+
+        $mapCongregations = $mapCongregations->values()->map(function (Congregation $congregation, int $index) use ($palette) {
+            $pastor = $congregation->admins->firstWhere('role', 'pastor_senior') ?? $congregation->admins->first();
+            $color = $congregation->is_primary ? '#d97706' : ($palette[$index % count($palette)] ?? '#059669');
+
+            $city = null;
+            if (is_array($congregation->settings)) {
+                $city = $congregation->settings['city'] ?? $congregation->settings['address'] ?? null;
+            }
+            if (!$city) {
+                if (stripos($congregation->name, 'Maputo') !== false) {
+                    $city = 'Maputo';
+                } elseif (stripos($congregation->name, 'Quelimane') !== false) {
+                    $city = 'Quelimane';
+                } elseif (stripos($congregation->name, 'Beira') !== false) {
+                    $city = 'Beira';
+                } elseif (stripos($congregation->name, 'Nampula') !== false) {
+                    $city = 'Nampula';
+                } else {
+                    $city = $congregation->is_primary ? 'Quelimane' : 'Moçambique';
+                }
+            }
+
+            return [
+                'id' => $congregation->id,
+                'name' => $congregation->name,
+                'slug' => $congregation->slug,
+                'latitude' => (float) $congregation->latitude,
+                'longitude' => (float) $congregation->longitude,
+                'is_active' => (bool) $congregation->is_active,
+                'is_primary' => (bool) $congregation->is_primary,
+                'has_edificar' => (bool) $congregation->has_edificar_project,
+                'color' => $color,
+                'users_count' => (int) ($congregation->users_count ?? 0),
+                'zones_count' => (int) ($congregation->zones_count ?? 0),
+                'cells_count' => (int) ($congregation->cells_count ?? 0),
+                'pastor_name' => $pastor ? $pastor->name : 'Gabinete Pastoral',
+                'pastor_role' => $pastor ? ($pastor->role === 'pastor_senior' ? 'Pastor Sênior' : 'Administrador') : 'Liderança',
+                'pastor_phone' => $pastor?->phone ?? 'Não registado',
+                'pastor_email' => $pastor?->email ?? 'Não registado',
+                'domain' => $congregation->domain ?? ($congregation->subdomain ? $congregation->subdomain . '.*' : 'Domínio Geral'),
+                'city' => $city,
+                'address' => is_array($congregation->settings) && !empty($congregation->settings['address']) ? $congregation->settings['address'] : $city,
+                'show_url' => route('national.congregations.show', $congregation),
+                'edit_url' => route('national.congregations.edit', $congregation),
+            ];
+        })->values();
 
         $activeIds = Congregation::where('is_active', true)->pluck('id');
         $statsRows = collect($this->congregationReportRows($periodStart, $periodEnd))

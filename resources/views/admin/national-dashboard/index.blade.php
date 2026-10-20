@@ -117,24 +117,170 @@
             </div>
         </section>
 
-        <section class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+        <section class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:bg-gray-900 dark:border-gray-800"
+            x-data="{
+                modalOpen: false,
+                selectedCongregation: {},
+                init() {
+                    window.addEventListener('congregation-modal-open', (event) => {
+                        this.selectedCongregation = event.detail || {};
+                        this.modalOpen = true;
+                    });
+                }
+            }">
             <div class="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                    <h2 class="text-sm font-black text-gray-900">Mapa nacional das congregações</h2>
-                    <p class="text-xs text-gray-500">Localização administrativa de cada congregação. Selecione um marcador para detalhes.</p>
+                    <h2 class="text-sm font-black text-gray-900 dark:text-white flex items-center gap-2">
+                        <i class="bi bi-geo-alt-fill text-orange-600"></i> Mapa Nacional das Congregações
+                    </h2>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Distribuição geográfica oficial das igrejas. Clique em qualquer marcador para ficha completa.</p>
                 </div>
-                <div class="flex items-center gap-4 text-[10px] font-bold uppercase tracking-wider text-gray-500">
-                    <span class="inline-flex items-center gap-2"><span class="h-3 w-3 rounded-full bg-green-700"></span>Ativa</span>
-                    <span class="inline-flex items-center gap-2"><span class="h-3 w-3 rounded-full bg-gray-500"></span>Inativa</span>
+                <div class="flex flex-wrap items-center gap-3 text-[11px] font-bold text-gray-600 dark:text-gray-300">
+                    <span class="inline-flex items-center gap-1.5"><span class="h-3 w-3 rounded-full bg-amber-500 border-2 border-white shadow-sm"></span> Sede Principal</span>
+                    <span class="inline-flex items-center gap-1.5"><span class="h-3 w-3 rounded-full bg-emerald-600 border-2 border-white shadow-sm"></span> Congregação Ativa</span>
+                    <span class="inline-flex items-center gap-1.5"><span class="h-3 w-3 rounded-full bg-gray-400 border-2 border-white shadow-sm"></span> Inativa</span>
                 </div>
             </div>
+
+            <!-- Container do Mapa Leaflet -->
             <div id="national-congregation-map" data-national-congregation-map data-map-data="national-congregation-map-data"
-                class="w-full h-[420px] rounded-lg border border-gray-200 overflow-hidden bg-gray-100"
+                class="w-full h-[450px] rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-gray-100 shadow-inner"
                 aria-label="Mapa de localização das congregações nacionais"></div>
             <script id="national-congregation-map-data" type="application/json">@json(['congregations' => $mapCongregations])</script>
-            @if($mapCongregations->isEmpty())
-                <p class="mt-3 text-xs text-gray-500">Ainda não há congregações com coordenadas registadas. Marque a sede no formulário de edição de cada congregação.</p>
+
+            <!-- Barra de Seleção Rápida de Congregações -->
+            @if($mapCongregations->isNotEmpty())
+                <div class="mt-3.5 flex flex-wrap items-center gap-2 border-t border-gray-100 dark:border-gray-800 pt-3">
+                    <span class="text-xs font-bold text-gray-500 dark:text-gray-400 mr-1 flex items-center gap-1">
+                        <i class="bi bi-compass"></i> Focar:
+                    </span>
+                    @foreach($mapCongregations as $mc)
+                        <button type="button"
+                            onclick="window.__focusCongregation({{ $mc['id'] }})"
+                            class="inline-flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80 px-3 py-1.5 text-xs font-bold text-gray-800 dark:text-gray-200 shadow-sm hover:border-orange-400 hover:bg-orange-50/50 dark:hover:bg-gray-800 transition">
+                            <span class="h-2.5 w-2.5 rounded-full shrink-0 shadow-sm" style="background-color: {{ $mc['color'] }};"></span>
+                            <span>{{ $mc['name'] }}</span>
+                            @if($mc['is_primary'])
+                                <span class="rounded bg-amber-100 dark:bg-amber-950/80 px-1.5 py-0.2 text-[9px] font-black uppercase text-amber-800 dark:text-amber-300">SEDE</span>
+                            @endif
+                            <span class="text-[10px] text-gray-500 font-semibold">({{ $mc['users_count'] }} memb.)</span>
+                        </button>
+                    @endforeach
+                </div>
+            @else
+                <p class="mt-3 text-xs text-gray-500">Ainda não há congregações com coordenadas registadas. Adicione as coordenadas no formulário de edição de cada congregação.</p>
             @endif
+
+            <!-- Modal Rico de Descrição da Congregação (Estilo Visionários) -->
+            <div x-show="modalOpen"
+                x-cloak
+                @keydown.escape.window="modalOpen = false"
+                class="fixed inset-0 z-50 overflow-y-auto"
+                aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                
+                <div class="fixed inset-0 bg-gray-950/70 backdrop-blur-sm transition-opacity" @click="modalOpen = false"></div>
+
+                <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                    <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-gray-100 dark:bg-gray-900 dark:border-gray-800"
+                        @click.outside="modalOpen = false">
+                        
+                        <!-- Header com Gradiente Colorido -->
+                        <div class="p-6 text-white relative"
+                            :style="'background: linear-gradient(135deg, ' + (selectedCongregation.color || '#ea580c') + ', #0f172a)'">
+                            <button type="button" @click="modalOpen = false"
+                                class="absolute top-4 right-4 rounded-full bg-black/30 text-white hover:bg-black/50 p-2 transition">
+                                <i class="bi bi-x-lg text-xs"></i>
+                            </button>
+                            <div class="flex items-center gap-2 mb-2 flex-wrap">
+                                <span x-show="selectedCongregation.is_primary"
+                                    class="rounded-full bg-amber-400 text-amber-950 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider shadow-sm">
+                                    ★ Sede Nacional
+                                </span>
+                                <span x-show="selectedCongregation.has_edificar"
+                                    class="rounded-full bg-sky-300 text-sky-950 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider shadow-sm">
+                                    Projeto Edificar
+                                </span>
+                                <span class="rounded-full bg-white/20 text-white px-2.5 py-0.5 text-[10px] font-bold backdrop-blur-xs"
+                                    x-text="selectedCongregation.is_active ? 'Ativa' : 'Inativa'"></span>
+                            </div>
+                            <h3 class="text-xl font-black tracking-tight" x-text="selectedCongregation.name"></h3>
+                            <p class="text-xs text-white/80 mt-1 flex items-center gap-1.5">
+                                <i class="bi bi-geo-alt-fill text-amber-300"></i>
+                                <span x-text="selectedCongregation.city || 'Moçambique'"></span>
+                                <span class="text-white/40">•</span>
+                                <span class="font-mono text-[11px]" x-text="(selectedCongregation.latitude || '') + ', ' + (selectedCongregation.longitude || '')"></span>
+                            </p>
+                        </div>
+
+                        <!-- Corpo do Modal -->
+                        <div class="p-6 space-y-5">
+                            <!-- Métricas Rápidas -->
+                            <div class="grid grid-cols-3 gap-3 text-center">
+                                <div class="rounded-xl bg-gray-50 dark:bg-gray-800 p-3 border border-gray-100 dark:border-gray-700">
+                                    <div class="text-xl font-black text-gray-900 dark:text-white" x-text="selectedCongregation.users_count"></div>
+                                    <div class="text-[10px] font-bold uppercase text-gray-500">Membros</div>
+                                </div>
+                                <div class="rounded-xl bg-gray-50 dark:bg-gray-800 p-3 border border-gray-100 dark:border-gray-700">
+                                    <div class="text-xl font-black text-gray-900 dark:text-white" x-text="selectedCongregation.zones_count"></div>
+                                    <div class="text-[10px] font-bold uppercase text-gray-500">Zonas</div>
+                                </div>
+                                <div class="rounded-xl bg-gray-50 dark:bg-gray-800 p-3 border border-gray-100 dark:border-gray-700">
+                                    <div class="text-xl font-black text-gray-900 dark:text-white" x-text="selectedCongregation.cells_count"></div>
+                                    <div class="text-[10px] font-bold uppercase text-gray-500">Células</div>
+                                </div>
+                            </div>
+
+                            <!-- Liderança e Contactos -->
+                            <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-4 space-y-2.5 text-xs text-gray-700 dark:text-gray-300 bg-gray-50/50 dark:bg-gray-800/40">
+                                <div class="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-700">
+                                    <span class="font-bold text-gray-500 flex items-center gap-1.5">
+                                        <i class="bi bi-person-badge text-orange-600"></i> Liderança:
+                                    </span>
+                                    <span class="font-black text-gray-900 dark:text-white" x-text="selectedCongregation.pastor_name"></span>
+                                </div>
+                                <div class="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-700">
+                                    <span class="font-bold text-gray-500 flex items-center gap-1.5">
+                                        <i class="bi bi-telephone text-orange-600"></i> Contacto:
+                                    </span>
+                                    <a :href="'tel:' + selectedCongregation.pastor_phone"
+                                        class="font-semibold text-orange-700 dark:text-orange-400 hover:underline"
+                                        x-text="selectedCongregation.pastor_phone"></a>
+                                </div>
+                                <div class="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-700">
+                                    <span class="font-bold text-gray-500 flex items-center gap-1.5">
+                                        <i class="bi bi-envelope text-orange-600"></i> Email:
+                                    </span>
+                                    <a :href="'mailto:' + selectedCongregation.pastor_email"
+                                        class="font-semibold text-orange-700 dark:text-orange-400 hover:underline"
+                                        x-text="selectedCongregation.pastor_email"></a>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-gray-500 flex items-center gap-1.5">
+                                        <i class="bi bi-globe text-orange-600"></i> Acesso Web / Domínio:
+                                    </span>
+                                    <span class="font-medium text-gray-600 dark:text-gray-400" x-text="selectedCongregation.domain"></span>
+                                </div>
+                            </div>
+
+                            <!-- Botões de Ação -->
+                            <div class="flex flex-col sm:flex-row items-center gap-2 pt-2">
+                                <a :href="selectedCongregation.show_url"
+                                    class="w-full sm:flex-1 inline-flex justify-center items-center gap-2 rounded-xl bg-orange-700 px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition">
+                                    <i class="bi bi-speedometer2"></i> Painel da Congregação &rarr;
+                                </a>
+                                <a :href="selectedCongregation.edit_url"
+                                    class="w-full sm:w-auto inline-flex justify-center items-center gap-1.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2.5 text-xs font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 shadow-sm transition">
+                                    <i class="bi bi-pencil-square"></i> Editar
+                                </a>
+                                <button type="button" @click="modalOpen = false"
+                                    class="w-full sm:w-auto inline-flex justify-center items-center rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-2.5 text-xs font-bold text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                                    Fechar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <section class="grid grid-cols-1 xl:grid-cols-3 gap-4">
