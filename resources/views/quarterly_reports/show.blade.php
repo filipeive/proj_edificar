@@ -45,6 +45,12 @@
             </div>
 
             <div class="hidden md:flex flex-wrap items-center gap-2">
+                @if($quarterlyReport->supervision_id)
+                    <a href="{{ route('quarterly-reports.index', ['zone_id' => $quarterlyReport->zone_id, 'supervision_id' => $quarterlyReport->supervision_id]) }}"
+                        class="inline-flex items-center gap-1.5 rounded-lg border border-orange-200 bg-orange-50 px-3.5 py-2 text-xs font-bold text-orange-800 hover:bg-orange-100 shadow-sm transition">
+                        <i class="bi bi-graph-up-arrow"></i> Histórico da Supervisão
+                    </a>
+                @endif
                 @can('update', $quarterlyReport)
                     <a href="{{ route('quarterly-reports.edit', $quarterlyReport) }}"
                         class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-2 text-xs font-bold text-white hover:bg-orange-800 shadow-sm transition">
@@ -58,33 +64,68 @@
             </div>
         </header>
 
+        <!-- Supervision Period Switcher -->
+        @if(isset($supervisionReports) && $supervisionReports->count() > 1)
+            <div class="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 shadow-sm">
+                <span class="text-xs font-bold text-gray-500">
+                    <i class="bi bi-clock-history text-orange-700 mr-1"></i> Outros períodos de <strong class="text-gray-800">{{ $quarterlyReport->supervision->name ?? 'Supervisão' }}</strong>:
+                </span>
+                <div class="flex flex-wrap items-center gap-1.5">
+                    @foreach($supervisionReports as $sRep)
+                        <a href="{{ route('quarterly-reports.show', $sRep) }}"
+                            class="rounded-lg px-2.5 py-1 text-xs font-bold transition {{ $sRep->id === $quarterlyReport->id ? 'bg-gray-900 text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-orange-50 hover:text-orange-800' }}">
+                            {{ $sRep->quarter }}º Trim / {{ $sRep->year }}
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
         <!-- Primary KPI Grid (National Style) -->
         <section aria-label="Métricas de crescimento e estrutura">
-            <h3 class="text-[11px] sm:text-xs font-black uppercase tracking-wider text-gray-500 mb-2">Métricas de Crescimento e Estrutura</h3>
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <h3 class="text-[11px] sm:text-xs font-black uppercase tracking-wider text-gray-500">Métricas de Crescimento e Estrutura</h3>
+                @if(isset($previousReport) && $previousReport)
+                    <span class="text-[11px] font-semibold text-gray-500">
+                        Comparado com <strong class="text-gray-800">{{ $previousReport->quarter }}º Trim / {{ $previousReport->year }}</strong>
+                    </span>
+                @endif
+            </div>
             @php
                 $stats = [
-                    ['label' => 'Pastores', 'value' => $quarterlyReport->pastors_count, 'icon' => 'bi-person-workspace', 'color' => 'text-rose-700'],
-                    ['label' => 'Supervisores', 'value' => $quarterlyReport->supervisors_count, 'icon' => 'bi-person-check', 'color' => 'text-purple-700'],
-                    ['label' => 'Líderes Ativos', 'value' => $quarterlyReport->leaders_count, 'icon' => 'bi-person-badge', 'color' => 'text-blue-700'],
-                    ['label' => 'Timóteos (Aux.)', 'value' => $quarterlyReport->timoteos_count, 'icon' => 'bi-award', 'color' => 'text-indigo-700'],
-                    ['label' => 'Células Totais', 'value' => $quarterlyReport->cells_count, 'icon' => 'bi-diagram-3', 'color' => 'text-indigo-700'],
-                    ['label' => 'Membros', 'value' => $quarterlyReport->members_count, 'icon' => 'bi-people', 'color' => 'text-emerald-700'],
-                    ['label' => 'Visitantes', 'value' => $quarterlyReport->visitors_count, 'icon' => 'bi-person-plus', 'color' => 'text-amber-700'],
-                    ['label' => 'Participantes', 'value' => $quarterlyReport->participants_count, 'icon' => 'bi-graph-up', 'color' => 'text-orange-700'],
-                    ['label' => 'Salvações', 'value' => $quarterlyReport->saved_count, 'icon' => 'bi-heart-pulse', 'color' => 'text-rose-700'],
-                    ['label' => 'Multiplicações', 'value' => $quarterlyReport->cell_multiplications_count, 'icon' => 'bi-arrows-angle-expand', 'color' => 'text-teal-700'],
-                    ['label' => 'Líderes Discip.', 'value' => $quarterlyReport->disciplined_leaders_count, 'icon' => 'bi-shield-exclamation', 'color' => 'text-gray-700'],
-                    ['label' => 'Células Fechadas', 'value' => $quarterlyReport->closed_cells_count, 'icon' => 'bi-x-octagon', 'color' => 'text-gray-600'],
+                    ['label' => 'Pastores', 'field' => 'pastors_count', 'value' => $quarterlyReport->pastors_count, 'icon' => 'bi-person-workspace', 'color' => 'text-rose-700', 'invert' => false],
+                    ['label' => 'Supervisores', 'field' => 'supervisors_count', 'value' => $quarterlyReport->supervisors_count, 'icon' => 'bi-person-check', 'color' => 'text-purple-700', 'invert' => false],
+                    ['label' => 'Líderes Ativos', 'field' => 'leaders_count', 'value' => $quarterlyReport->leaders_count, 'icon' => 'bi-person-badge', 'color' => 'text-blue-700', 'invert' => false],
+                    ['label' => 'Timóteos (Aux.)', 'field' => 'timoteos_count', 'value' => $quarterlyReport->timoteos_count, 'icon' => 'bi-award', 'color' => 'text-indigo-700', 'invert' => false],
+                    ['label' => 'Células Totais', 'field' => 'cells_count', 'value' => $quarterlyReport->cells_count, 'icon' => 'bi-diagram-3', 'color' => 'text-indigo-700', 'invert' => false],
+                    ['label' => 'Membros', 'field' => 'members_count', 'value' => $quarterlyReport->members_count, 'icon' => 'bi-people', 'color' => 'text-emerald-700', 'invert' => false],
+                    ['label' => 'Visitantes', 'field' => 'visitors_count', 'value' => $quarterlyReport->visitors_count, 'icon' => 'bi-person-plus', 'color' => 'text-amber-700', 'invert' => false],
+                    ['label' => 'Participantes', 'field' => 'participants_count', 'value' => $quarterlyReport->participants_count, 'icon' => 'bi-graph-up', 'color' => 'text-orange-700', 'invert' => false],
+                    ['label' => 'Salvações', 'field' => 'saved_count', 'value' => $quarterlyReport->saved_count, 'icon' => 'bi-heart-pulse', 'color' => 'text-rose-700', 'invert' => false],
+                    ['label' => 'Multiplicações', 'field' => 'cell_multiplications_count', 'value' => $quarterlyReport->cell_multiplications_count, 'icon' => 'bi-arrows-angle-expand', 'color' => 'text-teal-700', 'invert' => false],
+                    ['label' => 'Líderes Discip.', 'field' => 'disciplined_leaders_count', 'value' => $quarterlyReport->disciplined_leaders_count, 'icon' => 'bi-shield-exclamation', 'color' => 'text-gray-700', 'invert' => true],
+                    ['label' => 'Células Fechadas', 'field' => 'closed_cells_count', 'value' => $quarterlyReport->closed_cells_count, 'icon' => 'bi-x-octagon', 'color' => 'text-gray-600', 'invert' => true],
                 ];
             @endphp
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3">
                 @foreach($stats as $stat)
+                    @php
+                        $diff = isset($previousReport) && $previousReport ? ((int)$stat['value'] - (int)$previousReport->{$stat['field']}) : null;
+                        $good = !$stat['invert'];
+                    @endphp
                     <article class="rounded-xl border border-gray-200 bg-white p-3 sm:p-3.5 shadow-sm">
                         <div class="flex items-center justify-between gap-2">
                             <p class="text-[11px] font-bold text-gray-500 truncate">{{ $stat['label'] }}</p>
                             <i class="bi {{ $stat['icon'] }} {{ $stat['color'] }} text-sm"></i>
                         </div>
-                        <p class="mt-1 text-lg sm:text-xl font-black text-gray-950 tracking-tight tabular-nums">{{ number_format($stat['value']) }}</p>
+                        <div class="mt-1 flex items-baseline justify-between gap-1">
+                            <p class="text-lg sm:text-xl font-black text-gray-950 tracking-tight tabular-nums">{{ number_format($stat['value']) }}</p>
+                            @if($diff !== null && $diff !== 0)
+                                <span class="rounded-full px-1.5 py-0.5 text-[10px] font-black tabular-nums {{ ($diff > 0 && $good) || ($diff < 0 && !$good) ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700' }}">
+                                    {{ $diff > 0 ? '+' : '' }}{{ $diff }}
+                                </span>
+                            @endif
+                        </div>
                     </article>
                 @endforeach
             </div>
@@ -98,9 +139,14 @@
                     <div class="flex items-center justify-between gap-2 pb-3 mb-4 border-b border-gray-100">
                         <div>
                             <h2 class="text-sm font-black text-gray-900">Avaliação de Saúde Ministerial</h2>
-                            <p class="text-xs text-gray-500">Indicadores qualitativos avaliados pelo supervisor</p>
+                            <p class="text-xs text-gray-500">Indicadores qualitativos avaliados pelo supervisor ({{ $quarterlyReport->health_total_score }}/36 pts)</p>
                         </div>
-                        <span class="rounded-md bg-gray-100 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-gray-600">Escala 0 a 3</span>
+                        <div class="flex items-center gap-2">
+                            <span class="rounded-md px-2.5 py-1 text-xs font-black {{ $quarterlyReport->health_percentage >= 75 ? 'bg-emerald-100 text-emerald-800' : ($quarterlyReport->health_percentage >= 50 ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800') }}">
+                                Saúde: {{ $quarterlyReport->health_percentage }}%
+                            </span>
+                            <span class="rounded-md bg-gray-100 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-gray-600">Escala 0 a 3</span>
+                        </div>
                     </div>
 
                     @php

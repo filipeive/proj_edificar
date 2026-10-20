@@ -15,10 +15,19 @@ class QuarterlyReportExport implements FromCollection, WithHeadings, WithStyles,
 
     protected $quarter;
 
-    public function __construct($year = null, $quarter = null)
+    protected $zoneId;
+
+    protected $supervisionId;
+
+    protected $search;
+
+    public function __construct($year = null, $quarter = null, $zoneId = null, $supervisionId = null, $search = null)
     {
         $this->year = $year;
         $this->quarter = $quarter;
+        $this->zoneId = $zoneId;
+        $this->supervisionId = $supervisionId;
+        $this->search = $search;
     }
 
     public function collection()
@@ -30,6 +39,20 @@ class QuarterlyReportExport implements FromCollection, WithHeadings, WithStyles,
         }
         if ($this->quarter) {
             $query->where('quarter', $this->quarter);
+        }
+        if ($this->zoneId) {
+            $query->where('zone_id', $this->zoneId);
+        }
+        if ($this->supervisionId) {
+            $query->where('supervision_id', $this->supervisionId);
+        }
+        if ($this->search) {
+            $search = $this->search;
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('supervisor', fn ($sq) => $sq->where('name', 'LIKE', "%$search%"))
+                    ->orWhereHas('supervision', fn ($spq) => $spq->where('name', 'LIKE', "%$search%"))
+                    ->orWhereHas('zone', fn ($zq) => $zq->where('name', 'LIKE', "%$search%"));
+            });
         }
 
         return $query->get()

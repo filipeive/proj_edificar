@@ -75,4 +75,42 @@ class QuarterlyReport extends CongregationModel
     {
         return $this->hasMany(QuarterlyReportEvent::class);
     }
+
+    public static function healthMetricsMap(): array
+    {
+        return [
+            'discipleship_score' => 'Discipulado',
+            'evangelism_strategy' => 'Estratégia de Evangelismo',
+            'consolidation_growth' => 'Consolidação e Crescimento',
+            'pastoral_score' => 'Cuidado Pastoral',
+            'visitation_routine' => 'Rotina de Visitação',
+            'leader_support' => 'Apoio aos Líderes',
+            'cell_participation_score' => 'Participação nas Células',
+            'service_participation_score' => 'Participação nos Cultos',
+            'tadium_participation' => 'Participação no TADEL',
+            'communion_in_cells_score' => 'Comunhão nas Células',
+            'relationship_building_score' => 'Construção de Relacionamentos',
+            'prayer_intercession_score' => 'Oração e Intercessão',
+        ];
+    }
+
+    public function getHealthTotalScoreAttribute(): int
+    {
+        $total = 0;
+        foreach (array_keys(self::healthMetricsMap()) as $field) {
+            $total += (int) ($this->{$field} ?? 0);
+        }
+
+        return $total;
+    }
+
+    public function getHealthAverageAttribute(): float
+    {
+        return round($this->health_total_score / 12, 1);
+    }
+
+    public function getHealthPercentageAttribute(): int
+    {
+        return (int) round(($this->health_total_score / 36) * 100);
+    }
 }
