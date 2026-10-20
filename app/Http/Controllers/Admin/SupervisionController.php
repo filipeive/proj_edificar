@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use App\Models\Cell;
 use App\Models\Contribution;
 
@@ -145,11 +146,18 @@ class SupervisionController
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('supervisions', 'name')->where(fn ($q) => $q->where('zone_id', $request->input('zone_id'))),
+            ],
             'zone_id' => 'required|exists:zones,id',
             'supervisor_id' => 'nullable|exists:users,id',
             'sub_supervisor_id' => 'nullable|exists:users,id',
             'description' => 'nullable|string',
+        ], [
+            'name.unique' => 'Já existe uma supervisão com este nome nesta zona.',
         ]);
 
         $supervision = Supervision::create($validated);
@@ -235,11 +243,20 @@ class SupervisionController
     public function update(Request $request, Supervision $supervision)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('supervisions', 'name')
+                    ->where(fn ($q) => $q->where('zone_id', $request->input('zone_id')))
+                    ->ignore($supervision->id),
+            ],
             'zone_id' => 'required|exists:zones,id',
             'supervisor_id' => 'nullable|exists:users,id',
             'sub_supervisor_id' => 'nullable|exists:users,id',
             'description' => 'nullable|string',
+        ], [
+            'name.unique' => 'Já existe uma supervisão com este nome nesta zona.',
         ]);
 
         $supervision->update($validated);
@@ -302,7 +319,42 @@ class SupervisionController
             'zone_id' => 'required|exists:zones,id',
         ]);
 
-        $supervision->update($validated);
+        $targetZoneId = (int) $validated['zone_id'];
+
+        $existingSupervision = Supervision::where('zone_id', $targetZoneId)
+            ->where('name', $supervision->name)
+            ->where('id', '!=', $supervision->id)
+            ->first();
+
+        if ($existingSupervision) {
+            DB::transaction(function () use ($supervision, $existingSupervision, $targetZoneId) {
+                foreach ($supervision->cells as $cell) {
+                    $cellCollision = Cell::where('name', $cell->name)
+                        ->where('supervision_id', $existingSupervision->id)
+                        ->exists();
+
+                    $cell->update([
+                        'name' => $cellCollision ? $cell->name . ' (Mesclada)' : $cell->name,
+                        'supervision_id' => $existingSupervision->id,
+                    ]);
+                }
+
+                $supervision->contributions()->update([
+                    'supervision_id' => $existingSupervision->id,
+                    'zone_id' => $targetZoneId,
+                ]);
+
+                $supervision->delete();
+            });
+
+            return redirect()->route('zones.show', $targetZoneId)
+                ->with('success', "A supervisão '{$supervision->name}' foi unificada com a supervisão já existente de mesmo nome na zona de destino!");
+        }
+
+        DB::transaction(function () use ($supervision, $targetZoneId) {
+            $supervision->update(['zone_id' => $targetZoneId]);
+            $supervision->contributions()->update(['zone_id' => $targetZoneId]);
+        });
 
         return back()->with('success', 'Supervisão transferida com sucesso para a nova zona!');
     }

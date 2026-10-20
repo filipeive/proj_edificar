@@ -735,7 +735,21 @@ class CellController
             'supervision_id' => 'required|exists:supervisions,id',
         ]);
 
-        $cell->update(['supervision_id' => $validated['supervision_id']]);
+        $targetSupervisionId = (int) $validated['supervision_id'];
+
+        $exists = Cell::where('name', $cell->name)
+            ->where('supervision_id', $targetSupervisionId)
+            ->where('id', '!=', $cell->id)
+            ->exists();
+
+        if ($exists) {
+            $cell->update([
+                'name' => $cell->name . ' (Transferida)',
+                'supervision_id' => $targetSupervisionId,
+            ]);
+        } else {
+            $cell->update(['supervision_id' => $targetSupervisionId]);
+        }
 
         return back()->with('success', 'Célula transferida de supervisão com sucesso!');
     }

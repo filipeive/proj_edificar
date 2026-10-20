@@ -266,6 +266,24 @@ class UserController
         $this->validateRoleAssignment($validated['role']);
 
         $oldRole = $user->role;
+
+        if ($oldRole !== $validated['role']) {
+            // Se o papel mudou, limpar permissões customizadas antigas para assumir o padrão do novo papel
+            $validated['menu_permissions'] = null;
+        } elseif (isset($validated['menu_permissions']) && is_array($validated['menu_permissions'])) {
+            // Guardar menu_permissions apenas se diferir do padrão do papel atual
+            $differsFromRoleDefault = false;
+            foreach ($validated['menu_permissions'] as $permKey => $permVal) {
+                if ((bool) $permVal !== $user->hasRoleDefaultPermission($permKey)) {
+                    $differsFromRoleDefault = true;
+                    break;
+                }
+            }
+            if (! $differsFromRoleDefault) {
+                $validated['menu_permissions'] = null;
+            }
+        }
+
         $user->update($validated);
 
         // Log activity

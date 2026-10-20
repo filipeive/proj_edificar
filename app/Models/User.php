@@ -48,6 +48,15 @@ class User extends Authenticatable
         ];
     }
 
+    protected static function booted(): void
+    {
+        static::updating(function (User $user) {
+            if ($user->isDirty('role') && ! $user->isDirty('menu_permissions')) {
+                $user->menu_permissions = null;
+            }
+        });
+    }
+
     public function setPhoneAttribute($value): void
     {
         $this->attributes['phone'] = $this->normalizeMozPhone($value);
@@ -432,10 +441,24 @@ class User extends Authenticatable
         }
 
         $perms = $this->menu_permissions ?? [];
+        $hasAnyEnabledCustomPerm = ! empty(array_filter($perms, fn ($v) => (bool) $v));
 
-        // If explicitly defined in custom permissions, return that
-        if (array_key_exists($permission, $perms)) {
+        // If explicitly defined in custom permissions (and not an all-zero accidental snapshot), return that
+        if ($hasAnyEnabledCustomPerm && array_key_exists($permission, $perms)) {
             return (bool) $perms[$permission];
+        }
+
+        return $this->hasRoleDefaultPermission($permission);
+    }
+
+    public function hasRoleDefaultPermission(string $permission): bool
+    {
+        if ($permission === 'menu_inventory' && $this->isResponsavelPacote()) {
+            return false;
+        }
+
+        if ($this->isAdmin() || $this->isPastorSenior()) {
+            return true;
         }
 
         // Check for role-based overrides in Settings
