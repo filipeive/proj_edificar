@@ -91,6 +91,39 @@
                     <i class="bi bi-arrow-left"></i>
                     <span>Voltar</span>
                 </a>
+
+                @if($contribution->status === 'pendente' && auth()->id() === $contribution->user_id)
+                    <a href="{{ route('contributions.edit', $contribution) }}"
+                        class="inline-flex justify-center items-center gap-1.5 rounded-lg border border-orange-200 bg-orange-50 px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-orange-700 hover:bg-orange-100 shadow-sm">
+                        <i class="bi bi-pencil-square"></i>
+                        <span>Editar</span>
+                    </a>
+                @endif
+
+                @if($canManage && $contribution->status === 'pendente')
+                    <form action="{{ route('contributions.verify', $contribution) }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit"
+                            class="inline-flex justify-center items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-emerald-700 hover:bg-emerald-100 shadow-sm">
+                            <i class="bi bi-patch-check"></i>
+                            <span>Validar</span>
+                        </button>
+                    </form>
+
+                    <button type="button" onclick="document.getElementById('rejectModal').classList.remove('hidden')"
+                        class="inline-flex justify-center items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-amber-700 hover:bg-amber-100 shadow-sm">
+                        <i class="bi bi-x-circle"></i>
+                        <span>Rejeitar</span>
+                    </button>
+                @endif
+
+                @if(($canDelete ?? false))
+                    <button type="button" onclick="document.getElementById('deleteModal').classList.remove('hidden')"
+                        class="inline-flex justify-center items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-red-600 hover:bg-red-100 shadow-sm">
+                        <i class="bi bi-trash3"></i>
+                        <span>Eliminar</span>
+                    </button>
+                @endif
             </div>
         </header>
 

@@ -35,6 +35,34 @@
 
 @section('content')
     <div class="space-y-5">
+        <!-- Top Navigation & Action Bar (Desktop) -->
+        <div class="hidden md:flex items-center justify-between gap-3">
+            <a href="{{ route('visitors.index') }}"
+                class="inline-flex items-center gap-1.5 text-xs font-bold text-gray-600 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-orange-400 transition">
+                <i class="bi bi-arrow-left"></i>
+                <span>Voltar para Visitantes</span>
+            </a>
+            <div class="flex items-center gap-2">
+                @if($visitor->isPending())
+                    <form method="POST" action="{{ route('visitors.mark-contacted', $visitor) }}" class="inline">
+                        @csrf
+                        <button type="submit"
+                            class="inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700 shadow-sm hover:bg-blue-100 transition-colors">
+                            <i class="bi bi-telephone-plus text-xs"></i>
+                            <span>Marcar Contatado</span>
+                        </button>
+                    </form>
+                @endif
+                @if(in_array(Auth::user()->role, ['super_admin', 'admin', 'secretaria', 'pastor_senior', 'pastor', 'pastor_zona']))
+                    <a href="{{ route('visitors.edit', $visitor) }}"
+                        class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition-colors">
+                        <i class="bi bi-pencil-square text-xs"></i>
+                        <span>Editar Visitante</span>
+                    </a>
+                @endif
+            </div>
+        </div>
+
         <!-- Executive Banner -->
         <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -59,7 +87,7 @@
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2 self-start sm:self-auto">
+                <div class="flex flex-wrap items-center gap-2 self-start sm:self-auto">
                     @if($visitor->zone)
                         <span class="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700 border border-blue-200">
                             <i class="bi bi-geo text-xs"></i> {{ $visitor->zone->name }}
@@ -69,6 +97,21 @@
                         <span class="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 border border-emerald-200">
                             <i class="bi bi-house text-xs"></i> {{ $visitor->cell->name }}
                         </span>
+                    @endif
+                    @if($visitor->isPending())
+                        <form method="POST" action="{{ route('visitors.mark-contacted', $visitor) }}" class="inline sm:hidden">
+                            @csrf
+                            <button type="submit"
+                                class="inline-flex items-center gap-1 rounded-md border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700 shadow-sm hover:bg-blue-100 transition-colors">
+                                <i class="bi bi-telephone-plus text-xs"></i> Contatar
+                            </button>
+                        </form>
+                    @endif
+                    @if(in_array(Auth::user()->role, ['super_admin', 'admin', 'secretaria', 'pastor_senior', 'pastor', 'pastor_zona']))
+                        <a href="{{ route('visitors.edit', $visitor) }}"
+                            class="inline-flex sm:hidden items-center gap-1 rounded-md bg-orange-700 px-2.5 py-1 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition-colors">
+                            <i class="bi bi-pencil-square text-xs"></i> Editar
+                        </a>
                     @endif
                 </div>
             </div>

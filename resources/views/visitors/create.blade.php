@@ -14,6 +14,15 @@
 
 @section('content')
     <div class="space-y-5">
+        <!-- Top Navigation (Desktop) -->
+        <div class="hidden md:flex items-center justify-between gap-3">
+            <a href="{{ route('visitors.index') }}"
+                class="inline-flex items-center gap-1.5 text-xs font-bold text-gray-600 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-orange-400 transition">
+                <i class="bi bi-arrow-left"></i>
+                <span>Voltar para Visitantes</span>
+            </a>
+        </div>
+
         <!-- Executive Header Card -->
         <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
             <div class="flex items-center gap-3">

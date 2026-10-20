@@ -38,6 +38,40 @@
 
 @section('content')
     <div class="space-y-5">
+        <!-- Top Navigation & Action Bar (Desktop) -->
+        <div class="hidden md:flex items-center justify-between gap-3">
+            <a href="{{ route('members.index') }}"
+                class="inline-flex items-center gap-1.5 text-xs font-bold text-gray-600 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-orange-400 transition">
+                <i class="bi bi-arrow-left"></i>
+                <span>Voltar para Membros</span>
+            </a>
+            <div class="flex items-center gap-2">
+                @if($userRole !== 'secretaria' && $member->id !== auth()->user()->id)
+                    <a href="{{ route('members.edit', $member) }}"
+                        class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3.5 py-1.5 text-xs font-bold text-gray-700 dark:text-zinc-200 shadow-sm hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors"
+                        title="Editar perfil">
+                        <i class="bi bi-pencil-square text-orange-700 dark:text-orange-400"></i>
+                        <span>Editar</span>
+                    </a>
+                    <form method="POST" action="{{ route('members.destroy', $member) }}" onsubmit="return confirm('Tem certeza que deseja excluir este membro? Esta ação não pode ser revertida.')" class="inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit"
+                            class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/40 px-3 py-1.5 text-xs font-bold text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/60 transition-colors"
+                            title="Eliminar Membro">
+                            <i class="bi bi-trash"></i>
+                            <span>Eliminar</span>
+                        </button>
+                    </form>
+                @endif
+                <a href="{{ route('contributions.create', ['user_id' => $member->id]) }}"
+                    class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition-colors">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>Nova Oferta</span>
+                </a>
+            </div>
+        </div>
+
         <!-- Executive Banner -->
         <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

@@ -24,6 +24,22 @@
         meetingType: '{{ old('meeting_type', $cellMeeting->meeting_type) }}',
         selectedRoles: ['admin', 'pastor', 'pastor_senior', 'pastor_zona', 'supervisor', 'sub_supervisor', 'lider_celula', 'timoteo']
     }">
+        <!-- Top Navigation & Action Bar (Desktop) -->
+        <div class="hidden md:flex items-center justify-between gap-3">
+            <a href="{{ route('cell-meetings.index') }}"
+                class="inline-flex items-center gap-1.5 text-xs font-bold text-gray-600 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-orange-400 transition">
+                <i class="bi bi-arrow-left"></i>
+                <span>Voltar para Encontros</span>
+            </a>
+            <div class="flex items-center gap-2">
+                <a href="{{ route('cell-meetings.show', $cellMeeting) }}"
+                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3.5 py-1.5 text-xs font-bold text-gray-700 dark:text-zinc-200 shadow-sm hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors">
+                    <i class="bi bi-eye text-xs text-orange-700 dark:text-orange-400"></i>
+                    <span>Ver Detalhes</span>
+                </a>
+            </div>
+        </div>
+
         <!-- Executive Header Card -->
         <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
             <div class="flex items-center gap-3">

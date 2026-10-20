@@ -21,6 +21,22 @@
 
 @section('content')
     <div class="space-y-5">
+        <!-- Top Navigation & Action Bar (Desktop) -->
+        <div class="hidden md:flex items-center justify-between gap-3">
+            <a href="{{ route('zones.index') }}"
+                class="inline-flex items-center gap-1.5 text-xs font-bold text-gray-600 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-orange-400 transition">
+                <i class="bi bi-arrow-left"></i>
+                <span>Voltar para Zonas</span>
+            </a>
+            <div class="flex items-center gap-2">
+                <a href="{{ route('zones.merge', $zone) }}"
+                    class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/40 px-3.5 py-1.5 text-xs font-bold text-red-600 dark:text-red-400 shadow-sm hover:bg-red-100 dark:hover:bg-red-900/60 transition-colors">
+                    <i class="bi bi-intersect text-xs"></i>
+                    <span>Mesclar Zona</span>
+                </a>
+            </div>
+        </div>
+
         <!-- Executive Header Card -->
         <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
             <div class="flex items-center gap-3">

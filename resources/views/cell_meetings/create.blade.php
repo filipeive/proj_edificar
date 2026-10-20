@@ -17,6 +17,15 @@
         meetingType: '{{ old('meeting_type', ($isCellRestricted ?? false) ? 'normal' : 'normal') }}',
         selectedRoles: ['admin', 'pastor', 'pastor_senior', 'pastor_zona', 'supervisor', 'sub_supervisor', 'lider_celula', 'timoteo']
     }">
+        <!-- Top Navigation (Desktop) -->
+        <div class="hidden md:flex items-center justify-between gap-3">
+            <a href="{{ route('cell-meetings.index') }}"
+                class="inline-flex items-center gap-1.5 text-xs font-bold text-gray-600 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-orange-400 transition">
+                <i class="bi bi-arrow-left"></i>
+                <span>Voltar para Encontros</span>
+            </a>
+        </div>
+
         <!-- Executive Header Card -->
         <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
             <div class="flex items-center gap-3">

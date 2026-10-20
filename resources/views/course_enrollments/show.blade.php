@@ -48,6 +48,16 @@
                     </li>
                 </ol>
             </nav>
+            @if(auth()->user()->role === 'admin' || auth()->user()->role === 'pastor')
+                <div class="flex items-center gap-2">
+                    <a href="{{ route('course-enrollments.edit', $enrollment) }}"
+                        class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition-colors"
+                        title="Editar Matrícula">
+                        <i class="bi bi-pencil-square"></i>
+                        <span>Editar Matrícula</span>
+                    </a>
+                </div>
+            @endif
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">

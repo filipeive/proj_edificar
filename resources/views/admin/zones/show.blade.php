@@ -45,6 +45,40 @@
             this.showTransferModal = true;
         }
     }">
+        <!-- Top Navigation & Action Bar (Desktop) -->
+        <div class="hidden md:flex items-center justify-between gap-3">
+            <a href="{{ route('zones.index') }}"
+                class="inline-flex items-center gap-1.5 text-xs font-bold text-gray-600 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-orange-400 transition">
+                <i class="bi bi-arrow-left"></i>
+                <span>Voltar para Zonas</span>
+            </a>
+            <div class="flex items-center gap-2">
+                <a href="{{ route('supervisions.create') }}?zone_id={{ $zone->id }}"
+                    class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition-colors">
+                    <i class="bi bi-plus-lg text-xs"></i>
+                    <span>Nova Supervisão</span>
+                </a>
+                <a href="{{ route('zones.edit', $zone) }}"
+                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3.5 py-1.5 text-xs font-bold text-gray-700 dark:text-zinc-200 shadow-sm hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors"
+                    title="Configurar zona">
+                    <i class="bi bi-pencil-square text-xs text-orange-700 dark:text-orange-400"></i>
+                    <span>Configurar</span>
+                </a>
+                @if($zone->supervisions->count() === 0)
+                    <form action="{{ route('zones.destroy', $zone) }}" method="POST" id="delete-zone-desktop-{{ $zone->id }}" class="inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="button" onclick="confirmDelete('delete-zone-desktop-{{ $zone->id }}', 'Deseja excluir esta zona?')"
+                            class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/40 px-3 py-1.5 text-xs font-bold text-red-600 dark:text-red-400 shadow-sm hover:bg-red-100 dark:hover:bg-red-900/60 transition-colors"
+                            title="Excluir Zona">
+                            <i class="bi bi-trash text-xs"></i>
+                            <span>Excluir</span>
+                        </button>
+                    </form>
+                @endif
+            </div>
+        </div>
+
         <!-- Executive Banner -->
         <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">

@@ -37,6 +37,17 @@
                 } else {
                     this.selectedIds = [];
                 }
+            },
+            toggleSelection(id) {
+                if (this.selectedIds.includes(id)) {
+                    this.selectedIds = this.selectedIds.filter(i => i !== id);
+                    this.allSelected = false;
+                } else {
+                    this.selectedIds.push(id);
+                    if (this.selectedIds.length === document.querySelectorAll('.item-checkbox').length) {
+                        this.allSelected = true;
+                    }
+                }
             }
         }"
         x-init="$watch('view', value => localStorage.setItem('cell_meetings_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('cell_meetings_view') || 'list')"
@@ -66,24 +77,6 @@
                 @endif
             </div>
         </div>
-                } else {
-                    this.selectedIds = [];
-                }
-            },
-            toggleSelection(id) {
-                if (this.selectedIds.includes(id)) {
-                    this.selectedIds = this.selectedIds.filter(i => i !== id);
-                    this.allSelected = false;
-                } else {
-                    this.selectedIds.push(id);
-                    if (this.selectedIds.length === document.querySelectorAll('.item-checkbox').length) {
-                        this.allSelected = true;
-                    }
-                }
-            }
-        }"
-        x-init="$watch('view', value => localStorage.setItem('cell_meetings_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('cell_meetings_view') || 'list')"
-        @resize.window.debounce.500ms="updateView()">
 
         <!-- Stats Overview -->
         @if(isset($stats))

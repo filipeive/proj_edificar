@@ -42,6 +42,43 @@
 
 @section('content')
     <div class="space-y-5">
+        <!-- Top Navigation & Action Bar (Desktop) -->
+        <div class="hidden md:flex items-center justify-between gap-3">
+            <a href="{{ route('cell-meetings.index') }}"
+                class="inline-flex items-center gap-1.5 text-xs font-bold text-gray-600 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-orange-400 transition">
+                <i class="bi bi-arrow-left"></i>
+                <span>Voltar para Encontros</span>
+            </a>
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="toggleEmailModal()"
+                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3.5 py-1.5 text-xs font-bold text-gray-700 dark:text-zinc-200 shadow-sm hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors"
+                    title="Enviar por email">
+                    <i class="bi bi-envelope text-blue-600 text-xs"></i>
+                    <span>Email</span>
+                </button>
+                <a href="{{ route('cell-meetings.pdf', $cellMeeting) }}"
+                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3.5 py-1.5 text-xs font-bold text-gray-700 dark:text-zinc-200 shadow-sm hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors"
+                    title="Exportar PDF">
+                    <i class="bi bi-file-earmark-pdf text-red-600 text-xs"></i>
+                    <span>PDF</span>
+                </a>
+                <a href="{{ route('cell-meetings.export', ['meeting_id' => $cellMeeting->id]) }}"
+                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3.5 py-1.5 text-xs font-bold text-gray-700 dark:text-zinc-200 shadow-sm hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors"
+                    title="Exportar Excel">
+                    <i class="bi bi-file-earmark-excel text-emerald-600 text-xs"></i>
+                    <span>Excel</span>
+                </a>
+                @can('update', $cellMeeting)
+                    <a href="{{ route('cell-meetings.edit', $cellMeeting) }}"
+                        class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition-colors"
+                        title="Editar">
+                        <i class="bi bi-pencil-square text-xs"></i>
+                        <span>Editar</span>
+                    </a>
+                @endcan
+            </div>
+        </div>
+
         <!-- Executive Banner -->
         <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">

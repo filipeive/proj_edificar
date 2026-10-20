@@ -54,6 +54,47 @@
         }
     }" @open-zone-transfer-modal.window="showZoneTransferModal = true">
 
+        <!-- Top Navigation & Action Bar (Desktop) -->
+        <div class="hidden md:flex items-center justify-between gap-3">
+            <a href="{{ route('supervisions.index') }}"
+                class="inline-flex items-center gap-1.5 text-xs font-bold text-gray-600 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-orange-400 transition">
+                <i class="bi bi-arrow-left"></i>
+                <span>Voltar para Supervisões</span>
+            </a>
+            <div class="flex items-center gap-2">
+                <a href="{{ route('cells.create') }}?supervision_id={{ $supervision->id }}"
+                    class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition-colors"
+                    title="Criar célula">
+                    <i class="bi bi-plus-lg text-xs"></i>
+                    <span>Criar Célula</span>
+                </a>
+                <a href="{{ route('supervisions.edit', $supervision) }}"
+                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3.5 py-1.5 text-xs font-bold text-gray-700 dark:text-zinc-200 shadow-sm hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors"
+                    title="Editar estrutura">
+                    <i class="bi bi-pencil-square text-xs text-orange-700 dark:text-orange-400"></i>
+                    <span>Editar</span>
+                </a>
+                @if(auth()->user()->isAdmin() || auth()->user()->isSecretaria())
+                    <button type="button" @click="$dispatch('open-zone-transfer-modal')"
+                        class="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/40 px-3.5 py-1.5 text-xs font-bold text-amber-700 dark:text-amber-400 shadow-sm hover:bg-amber-100 dark:hover:bg-amber-900/60 transition-colors">
+                        <i class="bi bi-arrow-left-right text-xs"></i>
+                        <span>Transferir Zona</span>
+                    </button>
+                @endif
+                @if($supervision->cells->count() == 0)
+                    <form action="{{ route('supervisions.destroy', $supervision) }}" method="POST" id="delete-supervision-desktop-{{ $supervision->id }}" class="inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="button" onclick="confirmDelete('delete-supervision-desktop-{{ $supervision->id }}', 'Deseja excluir esta supervisão?')" title="Eliminar"
+                            class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/40 px-3 py-1.5 text-xs font-bold text-red-600 dark:text-red-400 shadow-sm hover:bg-red-100 dark:hover:bg-red-900/60 transition-colors">
+                            <i class="bi bi-trash text-xs"></i>
+                            <span>Eliminar</span>
+                        </button>
+                    </form>
+                @endif
+            </div>
+        </div>
+
         <!-- Executive Banner -->
         <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
