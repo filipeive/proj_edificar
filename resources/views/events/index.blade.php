@@ -162,7 +162,7 @@
                                 </td>
                                 <td class="px-4 py-2.5 text-center">
                                     <span class="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-bold text-blue-700">
-                                        {{ $event->participants->count() }}
+                                        {{ $event->participants_count ?? 0 }}
                                     </span>
                                 </td>
                                 <td class="px-4 py-2.5 text-right whitespace-nowrap">
