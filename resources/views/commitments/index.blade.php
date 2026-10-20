@@ -5,51 +5,60 @@
 @section('page-subtitle', 'Escolha seu nível de compromisso mensal')
 
 @section('content')
-{{-- errors --}}
+<div class="space-y-5">
+    <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 sm:gap-4">
+        <div>
+            <p class="text-[10px] sm:text-xs font-black uppercase tracking-[0.18em] text-orange-700">Projeto Edificar</p>
+            <h1 class="mt-0.5 text-xl sm:text-2xl font-black text-gray-950 tracking-tight">Pacotes de Compromisso</h1>
+            <p class="mt-0.5 text-xs sm:text-sm text-gray-500">Escolha seu nível de compromisso mensal</p>
+        </div>
+    </header>
 
-@if ($errors->any())
-    <div class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-        <h3 class="font-bold text-red-800 mb-2">
-            <i class="bi bi-exclamation-triangle-fill mr-2"></i>Ocorreram alguns erros:
+    @if ($errors->any())
+        <div class="bg-red-50 border border-red-200 rounded-xl p-3.5 sm:p-4">
+            <h3 class="text-xs sm:text-sm font-bold text-red-800 mb-1.5">
+                <i class="bi bi-exclamation-triangle-fill mr-1.5"></i>Ocorreram alguns erros:
+            </h3>
+            <ul class="list-disc list-inside text-red-700 text-xs sm:text-sm">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <div class="rounded-xl border border-blue-200 bg-blue-50 p-4 shadow-sm">
+        <h3 class="text-xs sm:text-sm font-black text-blue-900 mb-1">
+            <i class="bi bi-info-circle mr-1.5"></i>Como Funciona?
         </h3>
-        <ul class="list-disc list-inside text-red-700 text-sm">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
+        <p class="text-blue-800 text-xs sm:text-sm">
+            Escolha um pacote de compromisso mensal. Você pode contribuir qualquer valor dentro do intervalo do seu pacote.
+            Pode alterar seu pacote a qualquer momento.
+        </p>
     </div>
-@endif
-<div class="mb-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-    <h3 class="font-bold text-blue-800 mb-2">
-        <i class="bi bi-info-circle mr-2"></i>Como Funciona?
-    </h3>
-    <p class="text-blue-700 text-sm">
-        Escolha um pacote de compromisso mensal. Você pode contribuir qualquer valor dentro do intervalo do seu pacote.
-        Pode alterar seu pacote a qualquer momento.
-    </p>
-</div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-    @foreach($packages as $package)
-    <div
-        class="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition @if($currentCommitment && $currentCommitment->package_id === $package->id) ring-2 ring-blue-500 @endif">
-        <div class="p-6">
-            <h3 class="text-lg font-bold text-gray-800 mb-2">{{ $package->name }}</h3>
-            <div class="mb-4">
-                <p class="text-3xl font-bold text-blue-600">
-                    {{ number_format($package->min_amount, 0) }}
-                </p>
-                <p class="text-sm text-gray-500">
-                    até
-                    @if($package->max_amount)
-                        {{ number_format($package->max_amount, 0) }}
-                    @else
-                        ∞
-                    @endif
-                    MT
-                </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+        @foreach($packages as $package)
+        <div
+            class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm hover:border-gray-300 transition flex flex-col justify-between @if($currentCommitment && $currentCommitment->package_id === $package->id) ring-2 ring-orange-600 border-orange-600 @endif">
+            <div>
+                <h3 class="text-sm sm:text-base font-black text-gray-950 mb-2">{{ $package->name }}</h3>
+                <div class="mb-3">
+                    <p class="text-xl sm:text-2xl font-black text-orange-700 tracking-tight">
+                        {{ number_format($package->min_amount, 0) }}
+                    </p>
+                    <p class="text-xs text-gray-500 font-semibold">
+                        até
+                        @if($package->max_amount)
+                            {{ number_format($package->max_amount, 0) }}
+                        @else
+                            ∞
+                        @endif
+                        MT
+                    </p>
+                </div>
+                <p class="text-xs text-gray-600 mb-4">{{ $package->description }}</p>
             </div>
-            <p class="text-xs text-gray-600 mb-6">{{ $package->description }}</p>
             @php($isActive = $currentCommitment && $currentCommitment->package_id === $package->id)
 
             <form action="{{ route('commitments.choose') }}" method="POST" class="w-full">
@@ -57,10 +66,10 @@
                 <input type="hidden" name="package_id" value="{{ $package->id }}">
                 <button type="button"
                     onclick="confirmCommitmentChange(this.form, '{{ $package->name }}', '{{ number_format($package->min_amount, 2, ',', '.') }}', {{ $isActive ? 'true' : 'false' }})"
-                    class="w-full px-4 py-2 rounded-2xl transition text-xs font-black uppercase tracking-widest {{ $isActive ? 'bg-green-600 hover:bg-green-700 text-white cursor-default' : 'bg-blue-600 hover:bg-blue-700 text-white' }}">
+                    class="w-full px-3.5 py-2 rounded-lg transition text-xs font-bold {{ $isActive ? 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-default' : 'bg-orange-700 hover:bg-orange-800 text-white shadow-sm' }}">
                     @if($isActive)
                         <span class="inline-flex items-center">
-                            <i class="bi bi-check-lg mr-2"></i> Pacote Atual
+                            <i class="bi bi-check-lg mr-1.5"></i> Pacote Atual
                         </span>
                     @else
                         Mudar para este Pacote
@@ -68,8 +77,8 @@
                 </button>
             </form>
         </div>
+        @endforeach
     </div>
-    @endforeach
 </div>
 
 @push('scripts')

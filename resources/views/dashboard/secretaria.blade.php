@@ -5,177 +5,177 @@
 @section('page-subtitle', 'Administração e gestão eclesiástica')
 
 @section('content')
-    <div class="space-y-6 md:space-y-8">
-        <div class="space-y-8">
-            <!-- Stats Grid -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <!-- Total Membros -->
-                <div class="bg-white dark:bg-zinc-900/30 p-3 sm:p-4 md:p-6 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 flex flex-col justify-center group">
-                    <div
-                        class="flex items-center gap-2 text-[8px] sm:text-[9px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-[0.2em] mb-1.5 sm:mb-2">
-                        <i class="bi bi-people-fill"></i>
-                        <span>Membros</span>
-                    </div>
-                    <p class="text-lg sm:text-xl md:text-2xl font-black text-gray-900 dark:text-white tracking-tight">{{ $totalMembers }}</p>
-                    <div class="mt-2 sm:mt-3">
-                        <a href="{{ route('members.index') }}"
-                            class="text-[9px] sm:text-[10px] font-bold text-gray-400 dark:text-gray-500 hover:text-orange-600 dark:hover:text-orange-400 transition-colors flex items-center">
-                            Ver todos <i class="bi bi-arrow-right ml-1"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Total Células -->
-                <div class="bg-white dark:bg-zinc-900/30 p-3 sm:p-4 md:p-6 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 flex flex-col justify-center group">
-                    <div
-                        class="flex items-center gap-2 text-[8px] sm:text-[9px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-[0.2em] mb-1.5 sm:mb-2">
-                        <i class="bi bi-diagram-3-fill"></i>
-                        <span>Células</span>
-                    </div>
-                    <p class="text-lg sm:text-xl md:text-2xl font-black text-gray-900 dark:text-white tracking-tight">{{ $totalCells }}</p>
-                    <div class="mt-2 sm:mt-3">
-                        <a href="{{ route('cells.index') }}"
-                            class="text-[9px] sm:text-[10px] font-bold text-gray-400 dark:text-gray-500 hover:text-orange-600 dark:hover:text-orange-400 transition-colors flex items-center">
-                            Ver todas <i class="bi bi-arrow-right ml-1"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Atalho Cultos -->
-                <a href="{{ route('services.create') }}"
-                    class="group bg-zinc-950 p-3 sm:p-4 md:p-6 rounded-xl sm:rounded-2xl shadow-md text-white relative overflow-hidden flex flex-col justify-center hover:scale-[1.02] transition-all border border-zinc-900">
-                    <div class="relative z-10">
-                        <div
-                            class="flex items-center gap-2 text-[8px] sm:text-[9px] font-black text-orange-400 uppercase tracking-[0.2em] mb-1.5 sm:mb-2">
-                            <i class="bi bi-plus-lg"></i>
-                            <span>Novo Culto</span>
-                        </div>
-                        <p
-                            class="text-sm sm:text-base md:text-lg font-black tracking-tight group-hover:text-orange-400 transition-colors">
-                            Lançar Relatório</p>
-                    </div>
-                    <i
-                        class="bi bi-church absolute -right-3 -bottom-3 text-5xl sm:text-7xl text-white/5 group-hover:text-orange-500/10 group-hover:scale-110 transition-all duration-300"></i>
+    <div class="space-y-5">
+        <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 sm:gap-4">
+            <div>
+                <p class="text-[10px] sm:text-xs font-black uppercase tracking-[0.18em] text-orange-700">Secretaria Eclesiástica</p>
+                <h1 class="mt-0.5 text-xl sm:text-2xl font-black text-gray-950 tracking-tight">Visão Geral da Secretaria</h1>
+                <p class="mt-0.5 text-xs sm:text-sm text-gray-500">Gestão de membros, células, relatórios de cultos e agenda de eventos.</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <a href="{{ route('events.create') }}" class="inline-flex justify-center items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 shadow-sm">
+                    <i class="bi bi-calendar-plus text-orange-700"></i> <span>Agendar Evento</span>
                 </a>
-
-                <!-- Atalho Eventos -->
-                <a href="{{ route('events.create') }}"
-                    class="group bg-orange-600 p-3 sm:p-4 md:p-6 rounded-xl sm:rounded-2xl shadow-md text-white relative overflow-hidden flex flex-col justify-center hover:scale-[1.02] transition-all">
-                    <div class="relative z-10">
-                        <div
-                            class="flex items-center gap-2 text-[8px] sm:text-[9px] font-black text-orange-200 uppercase tracking-[0.2em] mb-1.5 sm:mb-2">
-                            <i class="bi bi-calendar-plus"></i>
-                            <span>Novo Evento</span>
-                        </div>
-                        <p
-                            class="text-sm sm:text-base md:text-lg font-black tracking-tight group-hover:text-orange-100 transition-colors">
-                            Agendar Evento</p>
-                    </div>
-                    <i
-                        class="bi bi-calendar-event absolute -right-3 -bottom-3 text-5xl sm:text-7xl text-white/10 group-hover:scale-110 transition-all duration-300"></i>
+                <a href="{{ route('services.create') }}" class="inline-flex justify-center items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-2 text-xs font-bold text-white hover:bg-orange-800 shadow-sm">
+                    <i class="bi bi-plus-lg"></i> <span>Novo Culto</span>
                 </a>
             </div>
+        </header>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
-                <!-- Próximos Eventos -->
-                <div class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-4 sm:p-6 md:p-8">
-                    <div class="flex items-center justify-between mb-4 sm:mb-8">
-                        <h3 class="text-sm sm:text-base font-bold text-gray-900 dark:text-white tracking-tight">Próximos Eventos</h3>
-                        <a href="{{ route('events.index') }}"
-                            class="text-[9px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest hover:text-orange-700 dark:hover:text-orange-300">Gerir Todos</a>
-                    </div>
-                    <div class="space-y-4 sm:space-y-6">
-                        @forelse($upcomingEvents as $event)
-                            <div class="flex items-center space-x-3 sm:space-x-6 group">
-                                <div
-                                    class="bg-gray-50 dark:bg-zinc-850 px-3 py-2 sm:px-4 sm:py-3 rounded-xl sm:rounded-2xl text-center min-w-[55px] sm:min-w-[70px] group-hover:bg-orange-600 group-hover:text-white transition-colors">
-                                    <span class="block text-base sm:text-xl font-black leading-none text-gray-900 dark:text-white group-hover:text-white">{{ $event->date->format('d') }}</span>
-                                    <span
-                                        class="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-400 group-hover:text-white">{{ $event->date->translatedFormat('M') }}</span>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <h4 class="font-black text-gray-900 dark:text-white group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors text-xs sm:text-sm truncate">
-                                        {{ $event->name }}</h4>
-                                    <p class="text-[11px] sm:text-xs text-gray-500 dark:text-zinc-400 flex items-center mt-0.5 sm:mt-1 truncate">
-                                        <i class="bi bi-geo-alt mr-1"></i> {{ $event->location ?? 'Local a definir' }}
-                                        @if($event->end_date)
-                                            <span class="ml-1.5 sm:ml-2 px-1.5 sm:px-2 py-0.5 bg-orange-50 dark:bg-orange-950/20 text-orange-655 dark:text-orange-400 rounded text-[8px] sm:text-[9px] font-bold">Até {{ $event->end_date->format('d/m/Y') }}</span>
-                                        @endif
-                                    </p>
-                                </div>
-                                <a href="{{ route('events.edit', $event) }}"
-                                    class="px-2.5 sm:px-3 py-1 bg-gray-100 dark:bg-zinc-850 rounded-full text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:bg-orange-50 dark:hover:bg-orange-950/20 hover:text-orange-600 dark:hover:text-orange-400 transition-colors flex-shrink-0">
-                                    Editar
-                                </a>
-                            </div>
-                        @empty
-                            <p class="text-center text-gray-450 dark:text-zinc-500 py-8 sm:py-10 text-xs font-bold uppercase tracking-wider">Nenhum evento agendado.</p>
-                        @endforelse
-                    </div>
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+            <!-- Total Membros -->
+            <article class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm">
+                <div class="flex items-center justify-between gap-2">
+                    <p class="text-[11px] sm:text-xs font-bold text-gray-500 truncate">Membros</p>
+                    <i class="bi bi-people text-orange-700 text-sm sm:text-base"></i>
                 </div>
+                <p class="mt-1 text-lg sm:text-2xl font-black text-gray-950 tracking-tight tabular-nums">{{ $totalMembers }}</p>
+                <a href="{{ route('members.index') }}" class="inline-flex items-center text-[10px] sm:text-[11px] font-bold text-orange-800 hover:underline mt-0.5">
+                    Ver todos <i class="bi bi-arrow-right ml-1"></i>
+                </a>
+            </article>
 
-                <!-- Últimos Cultos -->
-                <div class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-4 sm:p-6 md:p-8">
-                    <div class="flex items-center justify-between mb-4 sm:mb-8">
-                        <h3 class="text-sm sm:text-base font-bold text-gray-900 dark:text-white tracking-tight">Últimos Cultos</h3>
-                        <a href="{{ route('services.index') }}"
-                            class="text-[9px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest hover:text-orange-700 dark:hover:text-orange-300">Ver Histórico</a>
-                    </div>
-                    <div class="space-y-4 sm:space-y-6">
-                        @forelse($recentServices as $service)
-                            <div
-                                class="flex items-center justify-between group border-b border-gray-50 dark:border-zinc-850 last:border-0 pb-3 sm:pb-4 last:pb-0">
-                                <div class="flex items-center gap-3 sm:gap-4 min-w-0">
-                                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-orange-50 dark:bg-orange-950/20 text-orange-600 dark:text-orange-400 flex items-center justify-center flex-shrink-0 text-sm sm:text-lg">
-                                        <i class="bi bi-church-fill"></i>
-                                    </div>
-                                    <div class="min-w-0">
-                                        <p class="text-xs sm:text-sm font-bold text-gray-900 dark:text-white group-hover:text-orange-600 transition-colors truncate">
-                                            {{ $service->topic ?? 'Culto de Celebração' }}</p>
-                                        <p class="text-[10px] sm:text-xs text-gray-400 dark:text-zinc-500 truncate">{{ $service->date->format('d/m/Y') }} •
-                                            <span class="font-bold text-gray-700 dark:text-zinc-350">{{ $service->attendance_total }}</span> pessoas
-                                        </p>
-                                    </div>
-                                </div>
-                                <a href="{{ route('services.show', $service) }}" class="text-gray-300 dark:text-zinc-700 hover:text-orange-600 dark:hover:text-orange-400 transition-colors flex-shrink-0 ml-2">
-                                    <i class="bi bi-chevron-right"></i>
-                                </a>
-                            </div>
-                        @empty
-                            <p class="text-center text-gray-450 dark:text-zinc-500 py-8 sm:py-10 text-xs font-bold uppercase tracking-wider">Nenhum relatório de culto recente.</p>
-                        @endforelse
-                    </div>
+            <!-- Total Células -->
+            <article class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm">
+                <div class="flex items-center justify-between gap-2">
+                    <p class="text-[11px] sm:text-xs font-bold text-gray-500 truncate">Células</p>
+                    <i class="bi bi-diagram-3 text-blue-700 text-sm sm:text-base"></i>
                 </div>
-            </div>
+                <p class="mt-1 text-lg sm:text-2xl font-black text-gray-950 tracking-tight tabular-nums">{{ $totalCells }}</p>
+                <a href="{{ route('cells.index') }}" class="inline-flex items-center text-[10px] sm:text-[11px] font-bold text-orange-800 hover:underline mt-0.5">
+                    Ver todas <i class="bi bi-arrow-right ml-1"></i>
+                </a>
+            </article>
 
-            <!-- Novos Membros -->
-            <div class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-4 sm:p-6 md:p-8">
-                <div class="flex items-center justify-between mb-4 sm:mb-8">
-                    <h3 class="text-sm sm:text-base font-bold text-gray-900 dark:text-white tracking-tight">Novos Membros</h3>
-                    <div class="flex gap-2 sm:gap-3">
-                        <a href="{{ route('members.create') }}"
-                            class="text-[9px] font-black text-gray-450 dark:text-zinc-500 uppercase tracking-widest hover:text-orange-600 dark:hover:text-orange-400">
-                            <i class="bi bi-plus-lg mr-1"></i> Novo
-                        </a>
-                    </div>
+            <!-- Atalho Cultos -->
+            <a href="{{ route('services.create') }}"
+                class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm hover:bg-gray-50 transition-colors flex flex-col justify-between">
+                <div class="flex items-center justify-between gap-2">
+                    <p class="text-[11px] sm:text-xs font-bold text-gray-500 truncate">Novo Culto</p>
+                    <i class="bi bi-journal-plus text-emerald-700 text-sm sm:text-base"></i>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-4">
-                    @forelse($recentMembers as $member)
-                        <div class="flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 hover:bg-gray-50 dark:hover:bg-zinc-900/40 rounded-xl sm:rounded-2xl transition-colors border border-transparent hover:border-gray-100 dark:hover:border-zinc-800">
-                            <div
-                                class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-orange-50 dark:bg-orange-950/20 flex items-center justify-center text-[10px] sm:text-xs font-black text-orange-600 dark:text-orange-400 flex-shrink-0">
-                                {{ substr($member->name, 0, 1) }}
+                <div>
+                    <p class="mt-1 text-sm sm:text-base font-black text-gray-950 tracking-tight">Lançar Relatório</p>
+                    <p class="text-[10px] sm:text-[11px] text-gray-400 mt-0.5 truncate">Registar celebração</p>
+                </div>
+            </a>
+
+            <!-- Atalho Eventos -->
+            <a href="{{ route('events.create') }}"
+                class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm hover:bg-gray-50 transition-colors flex flex-col justify-between">
+                <div class="flex items-center justify-between gap-2">
+                    <p class="text-[11px] sm:text-xs font-bold text-gray-500 truncate">Novo Evento</p>
+                    <i class="bi bi-calendar-plus text-amber-700 text-sm sm:text-base"></i>
+                </div>
+                <div>
+                    <p class="mt-1 text-sm sm:text-base font-black text-gray-950 tracking-tight">Agendar Evento</p>
+                    <p class="text-[10px] sm:text-[11px] text-gray-400 mt-0.5 truncate">Calendário da igreja</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- Próximos Eventos -->
+            <section class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+                <div class="flex items-center justify-between gap-3 mb-4">
+                    <div>
+                        <h3 class="text-sm font-black text-gray-900">Próximos Eventos</h3>
+                        <p class="text-xs text-gray-500">Programação agendada</p>
+                    </div>
+                    <a href="{{ route('events.index') }}" class="text-xs font-bold text-orange-800 hover:underline">Gerir Todos</a>
+                </div>
+                <div class="space-y-3">
+                    @forelse($upcomingEvents as $event)
+                        <div class="flex items-center gap-3 border-b border-gray-100 pb-3 last:border-0 last:pb-0">
+                            <div class="bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-lg text-center min-w-[54px]">
+                                <span class="block text-base font-black leading-none text-gray-900 tabular-nums">{{ $event->date->format('d') }}</span>
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-gray-500">{{ $event->date->translatedFormat('M') }}</span>
                             </div>
-                            <div class="min-w-0">
-                                <p class="text-xs font-bold text-gray-900 dark:text-white truncate">{{ $member->name }}</p>
-                                <p class="text-[9px] sm:text-[10px] text-gray-400 dark:text-zinc-550">{{ $member->created_at->diffForHumans() }}</p>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-bold text-gray-900 text-xs sm:text-sm truncate">
+                                    {{ $event->name }}
+                                </h4>
+                                <p class="text-[11px] text-gray-500 flex items-center mt-0.5 truncate">
+                                    <i class="bi bi-geo-alt mr-1"></i> {{ $event->location ?? 'Local a definir' }}
+                                    @if($event->end_date)
+                                        <span class="ml-2 px-1.5 py-0.5 bg-orange-50 text-orange-800 rounded text-[9px] font-bold">Até {{ $event->end_date->format('d/m/Y') }}</span>
+                                    @endif
+                                </p>
                             </div>
+                            <a href="{{ route('events.edit', $event) }}"
+                                class="rounded-lg border border-gray-300 bg-white px-2.5 py-1 text-xs font-bold text-gray-700 hover:bg-gray-50 shrink-0">
+                                Editar
+                            </a>
                         </div>
                     @empty
-                        <p class="text-center text-gray-400 dark:text-zinc-500 col-span-full py-4 text-xs font-bold uppercase tracking-wider">Nenhum membro novo recentemente.</p>
+                        <p class="text-center text-gray-500 py-6 text-xs">Nenhum evento agendado.</p>
                     @endforelse
                 </div>
-            </div>
+            </section>
+
+            <!-- Últimos Cultos -->
+            <section class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+                <div class="flex items-center justify-between gap-3 mb-4">
+                    <div>
+                        <h3 class="text-sm font-black text-gray-900">Últimos Cultos</h3>
+                        <p class="text-xs text-gray-500">Relatórios de celebrações</p>
+                    </div>
+                    <a href="{{ route('services.index') }}" class="text-xs font-bold text-orange-800 hover:underline">Ver Histórico</a>
+                </div>
+                <div class="space-y-3">
+                    @forelse($recentServices as $service)
+                        <div class="flex items-center justify-between gap-3 border-b border-gray-100 pb-3 last:border-0 last:pb-0">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-8 h-8 rounded-lg bg-orange-50 text-orange-700 flex items-center justify-center shrink-0 text-sm">
+                                    <i class="bi bi-journal-text"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-xs sm:text-sm font-bold text-gray-900 truncate">
+                                        {{ $service->topic ?? 'Culto de Celebração' }}
+                                    </p>
+                                    <p class="text-[11px] text-gray-500 truncate tabular-nums">
+                                        {{ $service->date->format('d/m/Y') }} • <span class="font-bold text-gray-800">{{ $service->attendance_total }}</span> pessoas
+                                    </p>
+                                </div>
+                            </div>
+                            <a href="{{ route('services.show', $service) }}" class="text-xs font-bold text-orange-800 hover:underline shrink-0">
+                                Detalhes
+                            </a>
+                        </div>
+                    @empty
+                        <p class="text-center text-gray-500 py-6 text-xs">Nenhum relatório de culto recente.</p>
+                    @endforelse
+                </div>
+            </section>
         </div>
+
+        <!-- Novos Membros -->
+        <section class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+            <div class="flex items-center justify-between gap-3 mb-4">
+                <div>
+                    <h3 class="text-sm font-black text-gray-900">Novos Membros</h3>
+                    <p class="text-xs text-gray-500">Registos recentes na congregação</p>
+                </div>
+                <a href="{{ route('members.create') }}" class="inline-flex items-center gap-1 rounded-lg bg-orange-700 px-3 py-1.5 text-xs font-bold text-white hover:bg-orange-800">
+                    <i class="bi bi-plus-lg"></i> Novo Membro
+                </a>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                @forelse($recentMembers as $member)
+                    <div class="flex items-center gap-2.5 p-2.5 bg-gray-50 rounded-xl border border-gray-200/80">
+                        <div class="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center text-xs font-black text-orange-800 shrink-0">
+                            {{ substr($member->name, 0, 1) }}
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-xs font-bold text-gray-900 truncate">{{ $member->name }}</p>
+                            <p class="text-[10px] text-gray-500">{{ $member->created_at->diffForHumans() }}</p>
+                        </div>
+                    </div>
+                @empty
+                    <p class="text-center text-gray-500 col-span-full py-6 text-xs">Nenhum membro novo recentemente.</p>
+                @endforelse
+            </div>
+        </section>
     </div>
 @endsection

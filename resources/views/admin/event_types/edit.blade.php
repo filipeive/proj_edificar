@@ -5,44 +5,53 @@
 @section('page-subtitle', 'Atualizar categoria de evento')
 
 @section('content')
-    <div class="max-w-2xl mx-auto">
-        <a href="{{ route('event-types.index') }}"
-            class="text-gray-500 hover:text-gray-700 mb-6 inline-flex items-center transition">
-            <i class="bi bi-arrow-left mr-2"></i> Voltar
+<div class="space-y-5 max-w-2xl mx-auto">
+    <div class="flex items-center justify-between">
+        <a href="{{ route('event-types.index') }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-gray-600 hover:text-orange-700 transition">
+            <i class="bi bi-arrow-left"></i>
+            <span>Voltar para Tipos</span>
         </a>
-
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <form action="{{ route('event-types.update', $eventType) }}" method="POST" class="p-6 md:p-8 space-y-6">
-                @csrf
-                @method('PUT')
-
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Nome do Tipo <span
-                            class="text-red-500">*</span></label>
-                    <input type="text" name="name" value="{{ old('name', $eventType->name) }}" required
-                        class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
-                    @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Descrição</label>
-                    <textarea name="description" rows="3"
-                        class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">{{ old('description', $eventType->description) }}</textarea>
-                </div>
-
-                <div class="flex items-center">
-                    <input type="checkbox" name="is_active" id="is_active" value="1" {{ old('is_active', $eventType->is_active) ? 'checked' : '' }}
-                        class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 h-5 w-5">
-                    <label for="is_active" class="ml-2 text-sm text-gray-700 font-medium">Ativo</label>
-                </div>
-
-                <div class="pt-4 flex justify-end">
-                    <button type="submit"
-                        class="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition shadow-lg">
-                        Atualizar Tipo
-                    </button>
-                </div>
-            </form>
-        </div>
     </div>
+
+    <form action="{{ route('event-types.update', $eventType) }}" method="POST" class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+        @csrf
+        @method('PUT')
+
+        <div class="border-b border-gray-100 bg-gray-50/60 px-4 py-3 sm:px-5">
+            <p class="text-[10px] font-black uppercase tracking-wider text-orange-700">Edição de Categoria</p>
+            <h2 class="text-sm font-bold text-gray-900">{{ $eventType->name }}</h2>
+        </div>
+
+        <div class="p-4 sm:p-5 space-y-4">
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">Nome do Tipo <span class="text-red-500">*</span></label>
+                <input type="text" name="name" value="{{ old('name', $eventType->name) }}" required
+                    class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500">
+                @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">Descrição</label>
+                <textarea name="description" rows="3"
+                    class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500">{{ old('description', $eventType->description) }}</textarea>
+            </div>
+
+            <div class="flex items-center gap-2 pt-1">
+                <input type="checkbox" name="is_active" id="is_active" value="1" {{ old('is_active', $eventType->is_active) ? 'checked' : '' }}
+                    class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                <label for="is_active" class="text-xs font-bold text-gray-700 cursor-pointer">Tipo Ativo</label>
+            </div>
+        </div>
+
+        <div class="bg-gray-50 px-4 py-3 sm:px-5 border-t border-gray-200 flex items-center justify-end gap-2">
+            <a href="{{ route('event-types.index') }}" class="rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 transition">
+                Cancelar
+            </a>
+            <button type="submit" class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition">
+                <i class="bi bi-check-lg"></i>
+                <span>Atualizar Tipo</span>
+            </button>
+        </div>
+    </form>
+</div>
 @endsection

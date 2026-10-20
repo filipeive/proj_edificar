@@ -5,48 +5,51 @@
 @section('page-subtitle', 'Atualizar informações do registro financeiro')
 
 @section('content')
-    <div class="max-w-3xl mx-auto space-y-6">
-        <div class="flex items-center gap-4">
-            <a href="{{ route('expenses.index') }}"
-                class="w-10 h-10 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-gray-500 hover:text-red-500 transition-colors">
-                <i class="bi bi-arrow-left"></i>
-            </a>
+    <div class="max-w-3xl mx-auto space-y-5">
+        <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 sm:gap-4">
             <div>
-                <h1 class="text-2xl font-black text-gray-900 tracking-tight">Editar Despesa</h1>
-                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Atualizar registro</p>
+                <p class="text-[10px] sm:text-xs font-black uppercase tracking-[0.18em] text-orange-700">Tesouraria & Finanças</p>
+                <h1 class="mt-0.5 text-xl sm:text-2xl font-black text-gray-950 tracking-tight">Editar Despesa</h1>
+                <p class="mt-0.5 text-xs sm:text-sm text-gray-500">Atualizar informações do registro financeiro</p>
             </div>
-        </div>
+            <div>
+                <a href="{{ route('expenses.index') }}"
+                    class="inline-flex justify-center items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-gray-700 hover:bg-gray-50 shadow-sm">
+                    <i class="bi bi-arrow-left"></i> <span>Voltar</span>
+                </a>
+            </div>
+        </header>
 
         <form action="{{ route('expenses.update', $expense->id) }}" method="POST"
-            class="bg-white p-6 md:p-8 rounded-[2.5rem] shadow-sm border border-gray-100 space-y-6">
+            class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm space-y-4">
             @csrf
             @method('PUT')
 
-            <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Descrição</label>
+            <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1.5">Descrição</label>
                 <input type="text" name="description" value="{{ $expense->description }}" required
-                    class="w-full px-5 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-red-500 focus:ring-4 focus:ring-red-500/10 rounded-2xl transition-all font-bold text-gray-900 placeholder-gray-400">
+                    class="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 rounded-lg transition-all font-bold text-gray-900 placeholder-gray-400">
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-2">
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Valor (MT)</label>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1.5">Valor (MT)</label>
                     <input type="number" name="amount" value="{{ $expense->amount }}" step="0.01" min="0.01" required
-                        class="w-full px-5 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-red-500 focus:ring-4 focus:ring-red-500/10 rounded-2xl transition-all font-bold text-gray-900">
+                        class="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 rounded-lg transition-all font-bold text-gray-900">
                 </div>
 
-                <div class="space-y-2">
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Data</label>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1.5">Data</label>
                     <input type="date" name="date" value="{{ $expense->date->format('Y-m-d') }}" required
-                        class="w-full px-5 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-red-500 focus:ring-4 focus:ring-red-500/10 rounded-2xl transition-all font-bold text-gray-900">
+                        class="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 rounded-lg transition-all font-bold text-gray-900">
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-2">
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Categoria</label>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1.5">Categoria</label>
                     <select name="category" required
-                        class="w-full px-5 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-red-500 focus:ring-4 focus:ring-red-500/10 rounded-2xl transition-all font-bold text-gray-900 appearance-none custom-select">
+                        class="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 rounded-lg transition-all font-bold text-gray-900 appearance-none custom-select">
                         <option value="Operacional" {{ $expense->category == 'Operacional' ? 'selected' : '' }}>Custos
                             Operacionais</option>
                         <option value="Material" {{ $expense->category == 'Material' ? 'selected' : '' }}>Material de Consumo
@@ -59,10 +62,10 @@
                     </select>
                 </div>
 
-                <div class="space-y-2">
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Âmbito</label>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1.5">Âmbito</label>
                     <select name="scope" required
-                        class="w-full px-5 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-red-500 focus:ring-4 focus:ring-red-500/10 rounded-2xl transition-all font-bold text-gray-900 appearance-none custom-select">
+                        class="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 rounded-lg transition-all font-bold text-gray-900 appearance-none custom-select">
                         <option value="eclesiastico" {{ ($expense->scope ?? 'eclesiastico') == 'eclesiastico' ? 'selected' : '' }}>Eclesiástico (Igreja)</option>
                         <option value="edificar" {{ ($expense->scope ?? 'eclesiastico') == 'edificar' ? 'selected' : '' }}>
                             Projeto Edificar</option>
@@ -70,9 +73,13 @@
                 </div>
             </div>
 
-            <div class="pt-4 flex justify-end">
+            <div class="pt-3 border-t border-gray-200 flex justify-end gap-2">
+                <a href="{{ route('expenses.index') }}"
+                    class="px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded-lg font-bold text-xs sm:text-sm hover:bg-gray-50 shadow-sm">
+                    Cancelar
+                </a>
                 <button type="submit"
-                    class="bg-red-600 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-700 transition-all shadow-lg shadow-red-200">
+                    class="bg-orange-700 text-white px-5 py-2 rounded-lg font-bold text-xs sm:text-sm hover:bg-orange-800 transition-all shadow-sm">
                     Atualizar Despesa
                 </button>
             </div>

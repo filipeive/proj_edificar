@@ -2,30 +2,29 @@
 
 @section('title', 'Encontros de Célula - Portal Life Church')
 @section('page-title', 'Encontros de Célula')
-@section('page-subtitle', 'Gestão de Reuniões e Atas')
+@section('page-subtitle', 'Gestão de reuniões e atas das células')
 
 @section('header-actions')
-    <div class="flex items-center gap-3 md:hidden">
+    <div class="flex items-center gap-2">
         <a href="{{ route('cell-meetings.export', request()->all()) }}"
-            class="flex items-center gap-2 px-4 md:px-6 py-2.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-black text-[10px] uppercase tracking-widest rounded-xl border border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all shadow-sm"
+            class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors"
             title="Exportar para Excel">
-            <i class="bi bi-file-earmark-excel-fill text-xl md:text-2xl"></i>
-            <span class="hidden md:inline">Exportar</span>
+            <i class="bi bi-file-earmark-excel text-emerald-600 text-xs"></i>
+            <span class="hidden sm:inline">Exportar</span>
         </a>
-
         @if(auth()->user()->isAdmin() || auth()->user()->can('create', App\Models\CellMeeting::class))
             <a href="{{ route('cell-meetings.create') }}"
-                class="flex items-center gap-2 px-4 md:px-6 py-2.5 bg-blue-600 text-white font-black text-[10px] uppercase tracking-widest rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20"
+                class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition-colors"
                 title="Novo Encontro">
-                <i class="bi bi-plus-lg text-xl md:text-2xl"></i>
-                <span class="hidden md:inline">Novo Encontro</span>
+                <i class="bi bi-plus-lg text-xs"></i>
+                <span>Novo Encontro</span>
             </a>
         @endif
     </div>
 @endsection
 
 @section('content')
-    <div class="space-y-6" 
+    <div class="space-y-5" 
         x-data="{ 
             view: window.innerWidth < 768 ? 'grid' : 'list',
             selectedIds: [],
@@ -57,78 +56,72 @@
         }"
         x-init="$watch('view', value => localStorage.setItem('cell_meetings_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('cell_meetings_view') || 'list')"
         @resize.window.debounce.500ms="updateView()">
-         <!-- Stats Overview -->
+
+        <!-- Stats Overview -->
         @if(isset($stats))
-        <div class="hidden md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-lg group">
-                <div class="flex items-center gap-5">
-                    <div class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center text-xl group-hover:bg-blue-600 group-hover:text-white transition-all">
-                        <i class="bi bi-calendar-check"></i>
-                    </div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm flex items-center justify-between">
                     <div>
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Encontros</p>
-                        <p class="text-2xl font-black text-gray-900 dark:text-white tracking-tighter">{{ $stats['total_meetings'] }}</p>
+                        <p class="text-[10px] font-bold uppercase tracking-wider text-gray-500">Total Encontros</p>
+                        <p class="mt-1 text-2xl font-black text-gray-900 tracking-tight">{{ $stats['total_meetings'] }}</p>
+                    </div>
+                    <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50 text-orange-700">
+                        <i class="bi bi-calendar-check text-lg"></i>
                     </div>
                 </div>
-            </div>
 
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-lg group">
-                <div class="flex items-center gap-5">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center text-xl group-hover:bg-emerald-600 group-hover:text-white transition-all">
-                        <i class="bi bi-people"></i>
-                    </div>
+                <div class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm flex items-center justify-between">
                     <div>
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Participação Total</p>
-                        <p class="text-2xl font-black text-gray-900 dark:text-white tracking-tighter">{{ number_format($stats['total_attendance'], 0, ',', '.') }}</p>
+                        <p class="text-[10px] font-bold uppercase tracking-wider text-gray-500">Participação Total</p>
+                        <p class="mt-1 text-2xl font-black text-emerald-700 tracking-tight">{{ number_format($stats['total_attendance'], 0, ',', '.') }}</p>
+                    </div>
+                    <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
+                        <i class="bi bi-people text-lg"></i>
                     </div>
                 </div>
-            </div>
 
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-lg group">
-                <div class="flex items-center gap-5">
-                    <div class="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-900/30 text-purple-600 flex items-center justify-center text-xl group-hover:bg-purple-600 group-hover:text-white transition-all">
-                        <i class="bi bi-graph-up-arrow"></i>
-                    </div>
+                <div class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm flex items-center justify-between">
                     <div>
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Média / Encontro</p>
-                        <p class="text-2xl font-black text-gray-900 dark:text-white tracking-tighter">{{ $stats['avg_attendance'] }}</p>
+                        <p class="text-[10px] font-bold uppercase tracking-wider text-gray-500">Média / Encontro</p>
+                        <p class="mt-1 text-2xl font-black text-purple-700 tracking-tight">{{ $stats['avg_attendance'] }}</p>
+                    </div>
+                    <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-50 text-purple-700">
+                        <i class="bi bi-graph-up-arrow text-lg"></i>
                     </div>
                 </div>
-            </div>
 
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-lg group flex flex-col justify-between">
-                <div class="flex items-center gap-5 mb-4">
-                    <div class="w-12 h-12 rounded-xl bg-orange-50 dark:bg-orange-900/30 text-orange-600 flex items-center justify-center text-xl group-hover:bg-orange-600 group-hover:text-white transition-all">
-                        <i class="bi bi-file-earmark-excel"></i>
-                    </div>
+                <div class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm flex items-center justify-between">
                     <div>
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Backup Excel</p>
-                        <p class="text-xl font-black text-gray-900 dark:text-white tracking-tighter">Exportar Lista</p>
+                        <p class="text-[10px] font-bold uppercase tracking-wider text-gray-500">Relatório Excel</p>
+                        <a href="{{ route('cell-meetings.export', request()->all()) }}" 
+                           class="mt-1 inline-flex items-center gap-1 text-xs font-bold text-orange-700 hover:text-orange-800">
+                            <span>Descarregar Lista</span>
+                            <i class="bi bi-download text-[11px]"></i>
+                        </a>
+                    </div>
+                    <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-700">
+                        <i class="bi bi-file-earmark-excel text-lg"></i>
                     </div>
                 </div>
-                <a href="{{ route('cell-meetings.export', request()->all()) }}" 
-                   class="w-full bg-gray-900 dark:bg-black text-white text-[10px] font-black uppercase tracking-widest py-3 rounded-xl text-center hover:bg-emerald-600 transition-all">
-                   Gerar Relatório
-                </a>
             </div>
-        </div>
         @endif
+
         <!-- Filter Bar -->
-        <div class="bg-white dark:bg-gray-800 p-5 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
-            <form action="{{ route('cell-meetings.index') }}" method="GET" class="flex flex-col xl:flex-row xl:items-end gap-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-8 gap-3 flex-1">
-                    <div class="text-black dark:text-white">
-                        <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Pesquisar</label>
-                        <div class="relative group">
-                            <i class="bi bi-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors"></i>
+        <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+            <form action="{{ route('cell-meetings.index') }}" method="GET" class="space-y-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2.5">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Pesquisar</label>
+                        <div class="relative">
+                            <i class="bi bi-search absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
                             <input type="text" name="search" value="{{ request('search') }}" placeholder="Tema, líder..."
-                                class="w-full pl-14 pr-6 py-3 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white">
+                                class="w-full rounded-lg border-gray-300 pl-7 pr-3 py-1.5 text-xs focus:border-orange-500 focus:ring-orange-500">
                         </div>
                     </div>
 
-                    <div class="text-black dark:text-white">
-                        <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Célula</label>
-                        <select name="cell_id" class="searchable-select w-full py-3 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white" data-label="Célula">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Célula</label>
+                        <select name="cell_id" class="w-full rounded-lg border-gray-300 px-2 py-1.5 text-xs focus:border-orange-500 focus:ring-orange-500">
                             <option value="">Todas</option>
                             @foreach($cells as $cell)
                                 <option value="{{ $cell->id }}" {{ request('cell_id') == $cell->id ? 'selected' : '' }}>{{ $cell->name }}</option>
@@ -136,9 +129,9 @@
                         </select>
                     </div>
 
-                    <div class="text-black dark:text-white">
-                        <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Supervisão</label>
-                        <select name="supervision_id" class="searchable-select w-full py-3 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white" data-label="Supervisão">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Supervisão</label>
+                        <select name="supervision_id" class="w-full rounded-lg border-gray-300 px-2 py-1.5 text-xs focus:border-orange-500 focus:ring-orange-500">
                             <option value="">Todas</option>
                             @foreach($supervisions as $sup)
                                 <option value="{{ $sup->id }}" {{ request('supervision_id') == $sup->id ? 'selected' : '' }}>{{ $sup->name }}</option>
@@ -146,9 +139,9 @@
                         </select>
                     </div>
 
-                    <div class="text-black dark:text-white">
-                        <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Zona</label>
-                        <select name="zone_id" class="searchable-select w-full py-3 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white" data-label="Zona">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Zona</label>
+                        <select name="zone_id" class="w-full rounded-lg border-gray-300 px-2 py-1.5 text-xs focus:border-orange-500 focus:ring-orange-500">
                             <option value="">Todas</option>
                             @foreach($zones as $zone)
                                 <option value="{{ $zone->id }}" {{ request('zone_id') == $zone->id ? 'selected' : '' }}>{{ $zone->name }}</option>
@@ -156,9 +149,9 @@
                         </select>
                     </div>
 
-                    <div class="text-black dark:text-white">
-                        <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Tipo</label>
-                        <select name="meeting_type" class="w-full py-3 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Tipo</label>
+                        <select name="meeting_type" class="w-full rounded-lg border-gray-300 px-2 py-1.5 text-xs focus:border-orange-500 focus:ring-orange-500">
                             <option value="">Todos</option>
                             <option value="normal" {{ request('meeting_type') == 'normal' ? 'selected' : '' }}>Célula</option>
                             <option value="leadership" {{ request('meeting_type') == 'leadership' ? 'selected' : '' }}>Liderança</option>
@@ -168,177 +161,141 @@
                         </select>
                     </div>
 
-                    <div class="text-black dark:text-white">
-                        <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Data Início</label>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Data Início</label>
                         <input type="date" name="date_start" value="{{ request('date_start') }}"
-                            class="w-full py-3 px-4 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white">
+                            class="w-full rounded-lg border-gray-300 px-2 py-1.5 text-xs focus:border-orange-500 focus:ring-orange-500">
                     </div>
 
-                    <div class="text-black dark:text-white">
-                        <label class="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Data Fim</label>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Data Fim</label>
                         <input type="date" name="date_end" value="{{ request('date_end') }}"
-                            class="w-full py-3 px-4 bg-gray-50/50 dark:bg-gray-900/50 border-transparent focus:bg-white dark:focus:bg-gray-900 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 rounded-2xl font-bold text-sm transition-all text-black dark:text-white">
+                            class="w-full rounded-lg border-gray-300 px-2 py-1.5 text-xs focus:border-orange-500 focus:ring-orange-500">
                     </div>
+                </div>
 
-                    <div class="flex gap-2 text-black dark:text-white items-end">
-                        <button type="submit" class="flex-1 bg-gray-900 dark:bg-black text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 transition-all flex items-center justify-center gap-2 py-3">
-                            <i class="bi bi-filter"></i> Filtrar
+                <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+                    <div class="flex items-center gap-1.5">
+                        <button type="submit" class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-orange-800 transition-colors shadow-sm">
+                            <i class="bi bi-filter text-xs"></i> Filtrar
                         </button>
                         @if(request()->anyFilled(['search', 'cell_id', 'supervision_id', 'zone_id', 'meeting_type', 'date_start', 'date_end']))
-                            <a href="{{ route('cell-meetings.index') }}" class="w-12 h-12 bg-gray-100 dark:bg-gray-700 text-gray-500 rounded-2xl hover:bg-red-50 hover:text-red-600 transition-all flex items-center justify-center">
-                                <i class="bi bi-x-lg"></i>
+                            <a href="{{ route('cell-meetings.index') }}" class="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50">
+                                <i class="bi bi-x-lg text-xs"></i> Limpar
                             </a>
                         @endif
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="flex items-center rounded-lg border border-gray-200 p-0.5 bg-gray-50">
+                            <button type="button" @click="view = 'list'"
+                                :class="view === 'list' ? 'bg-white text-gray-900 shadow-sm font-bold' : 'text-gray-500 hover:text-gray-900'"
+                                class="rounded-md px-2 py-1 text-xs transition-colors">
+                                <i class="bi bi-list-ul"></i>
+                            </button>
+                            <button type="button" @click="view = 'grid'"
+                                :class="view === 'grid' ? 'bg-white text-gray-900 shadow-sm font-bold' : 'text-gray-500 hover:text-gray-900'"
+                                class="rounded-md px-2 py-1 text-xs transition-colors">
+                                <i class="bi bi-grid-fill"></i>
+                            </button>
+                        </div>
+                        <span class="text-xs text-gray-500 font-semibold">{{ $meetings->total() }} registros</span>
                     </div>
                 </div>
             </form>
         </div>
 
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div class="flex flex-wrap items-center gap-3">
-                <div class="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-xl items-center shadow-inner">
-                    <button @click="view = 'list'"
-                        :class="view === 'list' ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-md' : 'text-gray-400 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'"
-                        class="px-5 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-300">
-                        <i class="bi bi-list-ul mr-2 text-sm"></i> Lista
-                    </button>
-                    <button @click="view = 'grid'"
-                        :class="view === 'grid' ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-md' : 'text-gray-400 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'"
-                        class="px-5 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-300">
-                        <i class="bi bi-grid-fill mr-2 text-sm"></i> Grid
-                    </button>
-                </div>
-                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 dark:bg-gray-900 px-4 py-2 rounded-full border border-gray-100 dark:border-gray-700">
-                    {{ $meetings->total() }} Registros
-                </span>
-            </div>
-
-            <div class="hidden md:flex items-center gap-3">
-                <a href="{{ route('cell-meetings.export', request()->all()) }}"
-                    class="flex items-center gap-2 px-4 md:px-6 py-2.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-black text-[10px] uppercase tracking-widest rounded-xl border border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all shadow-sm"
-                    title="Exportar para Excel">
-                    <i class="bi bi-file-earmark-excel-fill text-xl md:text-2xl"></i>
-                    <span class="hidden md:inline">Exportar</span>
-                </a>
-
-                @if(auth()->user()->isAdmin() || auth()->user()->can('create', App\Models\CellMeeting::class))
-                    <a href="{{ route('cell-meetings.create') }}"
-                        class="flex items-center gap-2 px-4 md:px-6 py-2.5 bg-blue-600 text-white font-black text-[10px] uppercase tracking-widest rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20"
-                        title="Novo Encontro">
-                        <i class="bi bi-plus-lg text-xl md:text-2xl"></i>
-                        <span class="hidden md:inline">Novo Encontro</span>
-                    </a>
-                @endif
-            </div>
-        </div>
-
         <!-- List View -->
-        <div x-show="view === 'list'" x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-            class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div x-show="view === 'list'" class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full table-compact">
-                    <thead>
-                        <tr class="bg-gray-50/50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
-                            <th class="px-6 py-4 text-left">
-                                <label class="flex items-center cursor-pointer">
-                                    <input type="checkbox" @click="toggleSelectAll()" :checked="allSelected"
-                                        class="w-5 h-5 text-blue-600 border-gray-200 rounded-lg focus:ring-blue-500/20 transition-all">
-                                </label>
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-gray-50 text-[10px] uppercase font-black tracking-wider text-gray-500 border-b border-gray-200">
+                        <tr>
+                            <th class="px-4 py-2.5 w-8">
+                                <input type="checkbox" @click="toggleSelectAll()" :checked="allSelected"
+                                    class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
                             </th>
-                            <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Data / Local</th>
-                            <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Responsável / Tema</th>
-                            <th class="px-6 py-4 text-center text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Participação</th>
-                            <th class="px-6 py-4 text-center text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Tipo</th>
-                            <th class="px-6 py-4 text-right text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Ações</th>
+                            <th class="px-4 py-2.5">Data / Tipo</th>
+                            <th class="px-4 py-2.5">Célula / Estrutura</th>
+                            <th class="px-4 py-2.5">Líder / Tema</th>
+                            <th class="px-4 py-2.5 text-center">Presenças</th>
+                            <th class="px-4 py-2.5 text-center">Decisões</th>
+                            <th class="px-4 py-2.5 text-right">Ações</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50 dark:divide-gray-700">
+                    <tbody class="divide-y divide-gray-100">
                         @forelse($meetings as $meeting)
-                            <tr class="group hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-colors duration-200">
-                                <td class="px-6 py-5">
-                                    <label class="flex items-center cursor-pointer">
-                                        <input type="checkbox" value="{{ $meeting->id }}" x-model="selectedIds"
-                                            class="item-checkbox w-5 h-5 text-blue-600 border-gray-200 rounded-lg focus:ring-blue-500/20 transition-all">
-                                    </label>
+                            <tr class="hover:bg-gray-50/70 transition-colors">
+                                <td class="px-4 py-2.5">
+                                    <input type="checkbox" value="{{ $meeting->id }}" x-model="selectedIds"
+                                        class="item-checkbox rounded border-gray-300 text-orange-600 focus:ring-orange-500">
                                 </td>
-                                <td class="px-6 py-5">
-                                    <div class="flex flex-col">
-                                        <span class="text-sm font-black text-gray-900 dark:text-white leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors tooltip" title="Ver Detalhes">
-                                            <a href="{{ route('cell-meetings.show', $meeting) }}">{{ $meeting->meeting_date->format('d/m/Y') }}</a>
-                                        </span>
-                                        <span class="text-[10px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest mt-0.5">
-                                            {{ $meeting->cell?->name ?? $meeting->zone?->name ?? $meeting->supervision?->name ?? $meeting->meeting_type_label }}
-                                        </span>
-                                    </div>
+                                <td class="px-4 py-2.5 whitespace-nowrap">
+                                    <p class="font-bold text-gray-900">{{ $meeting->meeting_date->format('d/m/Y') }}</p>
+                                    @php
+                                        $typeStyles = [
+                                            'normal' => 'bg-emerald-50 text-emerald-700',
+                                            'leadership' => 'bg-purple-50 text-purple-700',
+                                            'supervision' => 'bg-amber-50 text-amber-700',
+                                            'zone' => 'bg-blue-50 text-blue-700',
+                                        ];
+                                        $style = $typeStyles[$meeting->meeting_type] ?? 'bg-gray-100 text-gray-700';
+                                    @endphp
+                                    <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider {{ $style }}">
+                                        @switch($meeting->meeting_type)
+                                            @case('leadership') Liderança @break
+                                            @case('supervision') Supervisão @break
+                                            @case('zone') Zona @break
+                                            @default Célula
+                                        @endswitch
+                                    </span>
                                 </td>
-                                <td class="px-6 py-5">
-                                    <div class="flex flex-col">
-                                        <div class="flex items-center gap-2">
-                                            @if($meeting->leader)
-                                                <div class="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 flex items-center justify-center text-[10px] font-black">
-                                                    {{ substr($meeting->leader->name, 0, 1) }}
-                                                </div>
-                                                <span class="text-sm font-bold text-gray-900 dark:text-white leading-tight">{{ $meeting->leader->name }}</span>
-                                            @else
-                                                <span class="text-sm font-bold text-gray-400 dark:text-gray-500 italic">N/A</span>
-                                            @endif
-                                        </div>
-                                        <span class="text-[10px] text-gray-400 dark:text-gray-500 italic mt-1 line-clamp-1 truncate max-w-[200px]" title="{{ $meeting->theme }}">
-                                            {{ $meeting->theme ?? 'Sem tema registrado' }}
-                                        </span>
-                                    </div>
+                                <td class="px-4 py-2.5">
+                                    <span class="font-bold text-gray-900 block truncate max-w-xs">
+                                        {{ $meeting->cell?->name ?? $meeting->zone?->name ?? $meeting->supervision?->name ?? $meeting->meeting_type_label }}
+                                    </span>
+                                    @if($meeting->cell && $meeting->cell->supervision)
+                                        <span class="text-[10px] text-gray-400 block truncate">{{ $meeting->cell->supervision->name }}</span>
+                                    @endif
                                 </td>
-                                <td class="px-6 py-5 text-center">
-                                    <div class="inline-flex flex-col items-center bg-gray-50 dark:bg-gray-900 px-4 py-2 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-inner group-hover:bg-white dark:group-hover:bg-gray-800 transition-all">
-                                        <span class="text-lg font-black text-gray-900 dark:text-white tracking-tighter">
-                                            {{ $meeting->adults_count + $meeting->children_count + $meeting->visitors_count }}
-                                        </span>
-                                        <span class="text-[8px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-[0.15em]">Total</span>
-                                    </div>
+                                <td class="px-4 py-2.5">
+                                    <span class="font-semibold text-gray-800 block truncate">{{ $meeting->leader?->name ?? '-' }}</span>
+                                    <span class="text-[11px] text-gray-500 italic block truncate max-w-xs">{{ $meeting->theme ?? 'Sem tema cadastrado' }}</span>
                                 </td>
-                                <td class="px-6 py-5 text-center">
-                                        @php
-                                            $typeStyles = [
-                                                'normal' => 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800',
-                                                'leadership' => 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-800',
-                                                'supervision' => 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-100 dark:border-amber-800',
-                                                'zone' => 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-800',
-                                                'general' => 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-800',
-                                                'other' => 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-100 dark:border-gray-700',
-                                            ];
-                                            $style = $typeStyles[$meeting->meeting_type] ?? 'bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 border-gray-100 dark:border-gray-600';
-                                        @endphp
-                                        <span class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border {{ $style }} shadow-sm">
-                                            @switch($meeting->meeting_type)
-                                                @case('leadership') Liderança @break
-                                                @case('supervision') Supervisão @break
-                                                @case('zone') Zona @break
-                                                @case('general') Geral @break
-                                                @case('other') Especial @break
-                                                @default Célula
-                                            @endswitch
-                                        </span>
+                                <td class="px-4 py-2.5 text-center">
+                                    <span class="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-bold text-blue-700">
+                                        {{ $meeting->adults_count + $meeting->children_count + $meeting->visitors_count }}
+                                    </span>
                                 </td>
-                                <td class="px-6 py-5 text-right">
-                                    <div class="flex items-center justify-end gap-2">
-                                        <a href="{{ route('cell-meetings.show', $meeting) }}" title="Detalhes"
-                                            class="action-icon bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white dark:hover:text-white shadow-sm">
-                                            <i class="bi bi-eye-fill"></i>
+                                <td class="px-4 py-2.5 text-center">
+                                    @if($meeting->decisions)
+                                        <span class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">SIM</span>
+                                    @else
+                                        <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-bold text-gray-500">NÃO</span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-2.5 text-right whitespace-nowrap">
+                                    <div class="flex items-center justify-end gap-1">
+                                        <a href="{{ route('cell-meetings.show', $meeting) }}"
+                                            class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                                            title="Ver detalhes">
+                                            <i class="bi bi-eye text-xs"></i>
                                         </a>
                                         @can('update', $meeting)
                                             <a href="{{ route('cell-meetings.edit', $meeting) }}"
-                                                class="action-icon bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 hover:bg-orange-500 dark:hover:bg-orange-500 hover:text-white dark:hover:text-white shadow-sm" title="Editar">
-                                                <i class="bi bi-pencil-square"></i>
+                                                class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-200 text-gray-500 hover:border-orange-300 hover:text-orange-700 hover:bg-orange-50 transition-colors"
+                                                title="Editar">
+                                                <i class="bi bi-pencil-square text-xs"></i>
                                             </a>
                                         @endcan
                                         @can('delete', $meeting)
-                                            <button type="button" @click="confirmDelete('delete-meeting-{{ $meeting->id }}', 'Deseja excluir este encontro?')"
-                                                class="action-icon bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 hover:bg-red-600 dark:hover:bg-red-600 hover:text-white dark:hover:text-white shadow-sm" title="Excluir">
-                                                <i class="bi bi-trash-fill"></i>
-                                            </button>
-                                            <form action="{{ route('cell-meetings.destroy', $meeting) }}" method="POST" id="delete-meeting-{{ $meeting->id }}" class="hidden">
-                                                @csrf @method('DELETE')
+                                            <form action="{{ route('cell-meetings.destroy', $meeting) }}" method="POST" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" onclick="return confirm('Deseja eliminar este encontro?')"
+                                                    class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-200 text-gray-400 hover:border-red-300 hover:text-red-600 hover:bg-red-50 transition-colors"
+                                                    title="Eliminar">
+                                                    <i class="bi bi-trash text-xs"></i>
+                                                </button>
                                             </form>
                                         @endcan
                                     </div>
@@ -346,16 +303,8 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="px-10 py-24 text-center">
-                                    <div class="flex flex-col items-center gap-6 text-gray-300 dark:text-gray-600 animate-pulse">
-                                        <div class="w-24 h-24 rounded-[2rem] bg-gray-50 dark:bg-gray-900 flex items-center justify-center text-5xl">
-                                            <i class="bi bi-calendar-x"></i>
-                                        </div>
-                                        <div>
-                                            <p class="font-black text-lg text-gray-400 dark:text-gray-500 uppercase tracking-widest">Nenhum encontro localizado</p>
-                                            <p class="text-xs font-bold text-gray-300 dark:text-gray-600 mt-2">Tente ajustar os filtros ou pesquisar por outro termo.</p>
-                                        </div>
-                                    </div>
+                                <td colspan="7" class="px-4 py-10 text-center text-xs text-gray-400 italic">
+                                    Nenhum encontro localizado com os filtros selecionados.
                                 </td>
                             </tr>
                         @endforelse
@@ -365,119 +314,66 @@
         </div>
 
         <!-- Grid View -->
-        <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div x-show="view === 'grid'" style="display: none;" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             @foreach($meetings as $meeting)
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col group hover:shadow-lg hover:shadow-blue-600/5 transition-all duration-300 relative overflow-hidden active:scale-95 compact-card">
-                    <div class="absolute top-6 right-6 flex flex-col items-end gap-2 z-10">
-                        <label class="flex items-center cursor-pointer mb-2">
-                            <input type="checkbox" value="{{ $meeting->id }}" x-model="selectedIds"
-                                class="item-checkbox w-5 h-5 text-blue-600 border-gray-100 dark:border-gray-700 rounded-lg focus:ring-blue-500/20 transition-all bg-gray-50 dark:bg-gray-900 shadow-inner">
-                        </label>
-                        @php
-                            $typeStyles = [
-                                'normal' => 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800',
-                                'leadership' => 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-800',
-                                'supervision' => 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-100 dark:border-amber-800',
-                                'zone' => 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-800',
-                            ];
-                            $style = $typeStyles[$meeting->meeting_type] ?? 'bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 border-gray-100 dark:border-gray-600';
-                        @endphp
-                        <span class="px-4 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest border {{ $style }} shadow-sm backdrop-blur-sm">
-                            @switch($meeting->meeting_type)
-                                @case('leadership') Lider @break
-                                @case('supervision') Sup @break
-                                @case('zone') Zona @break
-                                @default Célula
-                            @endswitch
-                        </span>
-                    </div>
-
-                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-black text-2xl group-hover:from-blue-600 group-hover:to-blue-700 group-hover:text-white transition-all duration-500 mb-5 shadow-inner">
-                        <i class="bi bi-calendar-week"></i>
-                    </div>
-
-                    <div class="mb-4 space-y-1">
-                        <h4 class="text-lg font-black text-gray-900 dark:text-white leading-none tracking-tighter group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
-                            {{ $meeting->meeting_date->format('d/m/Y') }}
+                <div class="rounded-xl border border-gray-200 bg-white p-3.5 shadow-sm hover:border-orange-300 transition-colors flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-orange-50 text-orange-700 border border-orange-200/50">
+                                {{ $meeting->meeting_date->format('d/m/Y') }}
+                            </span>
+                            <span class="text-[10px] font-bold uppercase text-gray-400">
+                                {{ $meeting->meeting_type }}
+                            </span>
+                        </div>
+                        <h4 class="text-xs font-black text-gray-900 line-clamp-1">
+                            {{ $meeting->cell?->name ?? $meeting->zone?->name ?? $meeting->supervision?->name ?? $meeting->meeting_type_label }}
                         </h4>
-                        <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] line-clamp-1">{{ $meeting->cell?->name ?? $meeting->zone?->name ?? $meeting->supervision?->name ?? $meeting->meeting_type_label }}</p>
+                        <p class="text-[11px] text-gray-500 line-clamp-1 mt-0.5">Líder: {{ $meeting->leader?->name ?? '-' }}</p>
+                        @if($meeting->theme)
+                            <p class="text-[11px] text-gray-400 italic line-clamp-1 mt-0.5">"{{ $meeting->theme }}"</p>
+                        @endif
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3 mb-5">
-                        <div class="bg-gray-50 dark:bg-gray-900/50 p-3 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-inner">
-                            <span class="block text-[8px] font-black uppercase text-gray-400 dark:text-gray-500 tracking-widest mb-1">Participação</span>
-                            <span class="text-xl font-black text-gray-900 dark:text-white tracking-tighter">{{ $meeting->adults_count + $meeting->children_count + $meeting->visitors_count }}</span>
-                        </div>
-                        <div class="bg-gray-50 dark:bg-gray-900/50 p-3 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-inner">
-                            <span class="block text-[8px] font-black uppercase text-gray-400 dark:text-gray-500 tracking-widest mb-1">Decisões</span>
-                            <span class="text-xl font-black text-emerald-600 dark:text-emerald-400 tracking-tighter">{{ $meeting->decisions ? 'SIM' : 'NÃO' }}</span>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-2 mt-auto pt-4 border-t border-gray-50 dark:border-gray-700/50">
-                        <a href="{{ route('cell-meetings.show', $meeting) }}"
-                            class="flex-1 bg-gray-900 dark:bg-black text-white py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 dark:hover:bg-blue-600 transition-all flex items-center justify-center gap-2 active:scale-95 shadow-lg shadow-gray-200 dark:shadow-none">
-                            <i class="bi bi-eye text-base"></i> Abrir
-                        </a>
-                        @can('update', $meeting)
-                            <a href="{{ route('cell-meetings.edit', $meeting) }}"
-                                class="w-12 h-12 bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 flex items-center justify-center rounded-xl hover:bg-orange-500 hover:text-white dark:hover:bg-orange-500 dark:hover:text-white transition-all shadow-sm active:scale-95">
-                                <i class="bi bi-pencil-square text-lg"></i>
+                    <div class="pt-3 border-t border-gray-100 mt-3 flex items-center justify-between text-xs">
+                        <span class="text-gray-500">Presenças: <strong class="text-blue-700">{{ $meeting->adults_count + $meeting->children_count + $meeting->visitors_count }}</strong></span>
+                        <div class="flex items-center gap-1">
+                            <a href="{{ route('cell-meetings.show', $meeting) }}"
+                                class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-200 text-gray-500 hover:bg-gray-100">
+                                <i class="bi bi-eye text-xs"></i>
                             </a>
-                        @endcan
-                        @can('delete', $meeting)
-                            <form action="{{ route('cell-meetings.destroy', $meeting) }}" method="POST" class="inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit"
-                                    class="w-12 h-12 bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 flex items-center justify-center rounded-xl hover:bg-red-500 hover:text-white dark:hover:bg-red-500 dark:hover:text-white transition-all shadow-sm active:scale-95">
-                                    <i class="bi bi-trash text-lg"></i>
-                                </button>
-                            </form>
-                        @endcan
+                            @can('update', $meeting)
+                                <a href="{{ route('cell-meetings.edit', $meeting) }}"
+                                    class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-200 text-gray-500 hover:text-orange-700 hover:bg-orange-50">
+                                    <i class="bi bi-pencil-square text-xs"></i>
+                                </a>
+                            @endcan
+                        </div>
                     </div>
                 </div>
             @endforeach
         </div>
 
-        <!-- Paginação -->
         @if($meetings->hasPages())
-            <div class="mt-12">
+            <div class="border-t border-gray-200 pt-3">
                 {{ $meetings->links() }}
             </div>
         @endif
 
         <!-- Bulk Action Bar -->
-        <div x-show="selectedIds.length > 0" x-transition:enter="transition-all ease-out duration-500"
-            x-transition:enter-start="opacity-0 translate-y-24" x-transition:enter-end="opacity-100 translate-y-0"
-            x-transition:leave="transition-all ease-in duration-300" x-transition:leave-start="opacity-100 translate-y-0"
-            x-transition:leave-end="opacity-0 translate-y-24"
-            class="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-6">
-            <div class="bg-gray-900 dark:bg-black p-4 rounded-3xl shadow-xl border border-white/10 backdrop-blur-xl flex items-center justify-between gap-4 overflow-hidden relative">
-                <div class="absolute inset-0 bg-blue-600/5 -skew-x-12 translate-x-1/2"></div>
-                <div class="relative flex items-center gap-6">
-                    <div class="w-12 h-12 bg-blue-600 text-white rounded-xl flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/20">
-                        <span x-text="selectedIds.length"></span>
-                    </div>
-                    <div>
-                        <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest leading-none mb-1">Registros Selecionados</p>
-                        <p class="text-white font-bold text-sm">Ações em Massa Disponíveis</p>
-                    </div>
-                </div>
-                <div class="relative flex items-center gap-3">
-                    @can('deleteAny', App\Models\CellMeeting::class)
-                        <button type="button" @click="confirmAction('Eliminar Registos', 'Tem certeza que deseja eliminar ' + selectedIds.length + ' encontros selecionados?', 'warning', 'Sim, Eliminar', 'bulk-delete-form')"
-                            class="px-6 py-3 bg-red-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-red-700 transition-all flex items-center gap-2 active:scale-95 shadow-lg shadow-red-600/20">
-                            <i class="bi bi-trash3-fill"></i> Eliminar
-                        </button>
-                    @endcan
-                    <button @click="selectedIds = []; allSelected = false" class="text-gray-400 hover:text-white p-4 transition-colors">
-                        <i class="bi bi-x-lg"></i>
-                    </button>
-                </div>
-            </div>
+        <div x-show="selectedIds.length > 0" x-cloak
+            class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 rounded-xl bg-gray-900 text-white px-4 py-2.5 shadow-xl flex items-center gap-3 border border-gray-700 text-xs">
+            <span class="font-bold"><span x-text="selectedIds.length"></span> selecionado(s)</span>
+            <div class="h-4 w-px bg-gray-700"></div>
+            @can('deleteAny', App\Models\CellMeeting::class)
+                <button type="button" @click="confirmAction('Eliminar Registos', 'Tem certeza que deseja eliminar ' + selectedIds.length + ' encontros selecionados?', 'warning', 'Sim, Eliminar', 'bulk-delete-form')"
+                    class="inline-flex items-center gap-1 rounded-md bg-red-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-red-700">
+                    <i class="bi bi-trash text-xs"></i> Eliminar
+                </button>
+            @endcan
+            <button @click="selectedIds = []; allSelected = false" class="text-gray-400 hover:text-white ml-1">
+                <i class="bi bi-x-lg"></i>
+            </button>
         </div>
 
         <form action="{{ route('cell-meetings.bulk-destroy') }}" method="POST" id="bulk-delete-form" class="hidden">

@@ -4,64 +4,55 @@
 @section('page-title', 'Editar Célula')
 
 @section('content')
-    <div class="w-full">
-        <!-- Header Card -->
-        <div class="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-gray-100 relative overflow-hidden">
-            <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                <div class="space-y-2">
-                    <div class="flex items-center gap-2 text-[10px] font-black text-blue-600 uppercase tracking-[0.2em]">
-                        <i class="bi bi-pencil-square"></i>
-                        <span>Configurações da Unidade</span>
-                    </div>
-                    <h1 class="text-4xl font-black text-gray-900 tracking-tighter uppercase">{{ $cell->name }}</h1>
-                    <p class="text-gray-500 font-medium">Ajuste as informações principais e a equipe de liderança</p>
-                </div>
-                <div class="flex gap-3">
-                    <a href="{{ route('cells.show', $cell) }}"
-                        class="px-6 py-3 rounded-2xl bg-gray-50 text-gray-500 font-black text-[10px] uppercase tracking-widest hover:bg-gray-100 transition-all border border-gray-100">
-                        <i class="bi bi-speedometer2 mr-2"></i> Dashboard
-                    </a>
-                </div>
+    <div class="space-y-5">
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 sm:gap-4">
+            <div>
+                <p class="text-[10px] sm:text-xs font-black uppercase tracking-[0.18em] text-orange-700">Configurações da Unidade</p>
+                <h1 class="mt-0.5 text-xl sm:text-2xl font-black text-gray-950 tracking-tight">{{ $cell->name }}</h1>
+                <p class="mt-0.5 text-xs sm:text-sm text-gray-500">Ajuste as informações principais e a equipe de liderança</p>
             </div>
-            <!-- Decorative background element -->
-            <div class="absolute -right-12 -bottom-12 text-[12rem] text-gray-50 opacity-50 rotate-12">
-                <i class="bi bi-layers"></i>
+            <div class="flex gap-2">
+                <a href="{{ route('cells.show', $cell) }}"
+                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 sm:py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 shadow-sm transition">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
             </div>
-        </div>
+        </header>
 
-        <form action="{{ route('cells.update', $cell) }}" method="POST" class="space-y-8">
+        <form action="{{ route('cells.update', $cell) }}" method="POST" class="space-y-5">
             @csrf
             @method('PUT')
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <!-- Main Info Section -->
-                <div class="bg-white rounded-[2.5rem] p-8 md:p-10 shadow-sm border border-gray-100 space-y-8">
-                    <div class="flex items-center gap-3 border-b border-gray-50 pb-6">
-                        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg">
+                <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm space-y-4">
+                    <div class="flex items-center gap-2.5 border-b border-gray-100 pb-3">
+                        <div class="w-8 h-8 rounded-lg bg-orange-50 text-orange-700 flex items-center justify-center text-sm">
                             <i class="bi bi-info-circle-fill"></i>
                         </div>
-                        <h3 class="text-xl font-black text-gray-900 tracking-tight">Informações Básicas</h3>
+                        <h3 class="text-sm font-black text-gray-900">Informações Básicas</h3>
                     </div>
 
-                    <div class="space-y-6">
-                        <div class="space-y-2">
+                    <div class="space-y-3.5">
+                        <div>
                             <label for="name"
-                                class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Nome da
+                                class="mb-1 block text-[10px] font-black text-gray-500 uppercase tracking-wider">Nome da
                                 Célula</label>
                             <input type="text" name="name" id="name"
-                                class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all @error('name') border-red-500 @enderror"
+                                class="w-full px-3 py-2 bg-white border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 rounded-lg text-xs sm:text-sm font-semibold text-gray-900 transition-all @error('name') border-red-500 @enderror"
                                 value="{{ old('name', $cell->name) }}" required>
                             @error('name')
-                                <p class="text-red-500 text-[10px] font-bold mt-1 ml-1">{{ $message }}</p>
+                                <p class="text-red-500 text-[10px] font-bold mt-1">{{ $message }}</p>
                             @enderror
                          </div>
 
-                        <div class="space-y-2">
+                        <div>
                             <label for="type"
-                                class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Tipo de
+                                class="mb-1 block text-[10px] font-black text-gray-500 uppercase tracking-wider">Tipo de
                                 Célula</label>
                             <select name="type" id="type"
-                                class="searchable-select custom-select w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all @error('type') border-red-500 @enderror"
+                                class="searchable-select custom-select w-full px-3 py-2 bg-white border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 rounded-lg text-xs sm:text-sm font-semibold text-gray-900 transition-all @error('type') border-red-500 @enderror"
                                 required>
                                 <option value="membros" {{ old('type', $cell->type) == 'membros' ? 'selected' : '' }}>Célula de Membros</option>
                                 <option value="lideres" {{ old('type', $cell->type) == 'lideres' ? 'selected' : '' }}>Célula de Líderes</option>
@@ -70,16 +61,16 @@
                                 <option value="pastores" {{ old('type', $cell->type) == 'pastores' ? 'selected' : '' }}>Célula de Pastores</option>
                             </select>
                             @error('type')
-                                <p class="text-red-500 text-[10px] font-bold mt-1 ml-1">{{ $message }}</p>
+                                <p class="text-red-500 text-[10px] font-bold mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <div class="space-y-2">
+                        <div>
                             <label for="supervision_id"
-                                class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Supervisão
+                                class="mb-1 block text-[10px] font-black text-gray-500 uppercase tracking-wider">Supervisão
                                 Pertencente</label>
                             <select name="supervision_id" id="supervision_id"
-                                class="searchable-select custom-select w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl text-sm font-bold transition-all @error('supervision_id') border-red-500 @enderror"
+                                class="searchable-select custom-select w-full px-3 py-2 bg-white border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 rounded-lg text-xs sm:text-sm font-semibold text-gray-900 transition-all @error('supervision_id') border-red-500 @enderror"
                                 required>
                                 @foreach($supervisions as $supervision)
                                     <option value="{{ $supervision->id }}" @selected(old('supervision_id', $cell->supervision_id) == $supervision->id)>
@@ -88,29 +79,29 @@
                                 @endforeach
                             </select>
                             @error('supervision_id')
-                                <p class="text-red-500 text-[10px] font-bold mt-1 ml-1">{{ $message }}</p>
+                                <p class="text-red-500 text-[10px] font-bold mt-1">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
                 </div>
 
                 <!-- Leadership Team Section -->
-                <div class="bg-gray-900 rounded-[2.5rem] p-8 md:p-10 shadow-xl border border-gray-800 space-y-8 text-white">
-                    <div class="flex items-center gap-3 border-b border-white/5 pb-6">
+                <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm space-y-4">
+                    <div class="flex items-center gap-2.5 border-b border-gray-100 pb-3">
                         <div
-                            class="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center text-lg shadow-lg shadow-orange-500/10">
+                            class="w-8 h-8 rounded-lg bg-orange-50 text-orange-700 flex items-center justify-center text-sm">
                             <i class="bi bi-person-badge-fill"></i>
                         </div>
-                        <h3 class="text-xl font-black text-white tracking-tight">Equipe de Liderança</h3>
+                        <h3 class="text-sm font-black text-gray-900">Equipe de Liderança</h3>
                     </div>
 
-                    <div class="space-y-6">
-                        <div class="space-y-2">
+                    <div class="space-y-3.5">
+                        <div>
                             <label for="leader_id"
-                                class="text-[10px] font-black text-gray-500 uppercase tracking-widest pl-1">Líder
+                                class="mb-1 block text-[10px] font-black text-gray-500 uppercase tracking-wider">Líder
                                 Principal</label>
                             <select name="leader_id" id="leader_id"
-                                class="searchable-select custom-select w-full px-6 py-4 bg-white/5 border-transparent focus:bg-white/10 focus:ring-4 focus:ring-blue-500/20 rounded-2xl text-sm font-bold transition-all text-white @error('leader_id') border-red-500 @enderror"
+                                class="searchable-select custom-select w-full px-3 py-2 bg-white border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 rounded-lg text-xs sm:text-sm font-semibold text-gray-900 transition-all @error('leader_id') border-red-500 @enderror"
                                 required>
                                 @foreach($leaders as $leader)
                                     <option value="{{ $leader->id }}" @selected(old('leader_id', $cell->leader_id) == $leader->id)>
@@ -119,17 +110,17 @@
                                 @endforeach
                             </select>
                             @error('leader_id')
-                                <p class="text-red-400 text-[10px] font-bold mt-1 ml-1">{{ $message }}</p>
+                                <p class="text-red-500 text-[10px] font-bold mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <div class="space-y-2">
+                        <div>
                             <label for="timoteos"
-                                class="text-[10px] font-black text-gray-500 uppercase tracking-widest pl-1">Auxiliares
+                                class="mb-1 block text-[10px] font-black text-gray-500 uppercase tracking-wider">Auxiliares
                                 (Timóteos)</label>
                             @php $assignedTimoteoIds = $cell->timoteos->pluck('id')->toArray(); @endphp
                             <select name="timoteos[]" id="timoteos"
-                                class="searchable-select custom-select w-full px-6 py-4 bg-white/5 border-transparent focus:bg-white/10 focus:ring-4 focus:ring-orange-500/20 rounded-2xl text-sm font-bold transition-all text-white"
+                                class="searchable-select custom-select w-full px-3 py-2 bg-white border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 rounded-lg text-xs sm:text-sm font-semibold text-gray-900 transition-all"
                                 multiple>
                                 @foreach($timoteos as $timoteo)
                                     <option value="{{ $timoteo->id }}" @selected(in_array($timoteo->id, old('timoteos', $assignedTimoteoIds)))>
@@ -137,7 +128,7 @@
                                     </option>
                                 @endforeach
                             </select>
-                            <p class="text-[9px] text-gray-500 mt-2 italic px-1">
+                            <p class="text-[11px] text-gray-500 mt-1.5">
                                 <i class="bi bi-info-circle mr-1"></i> Timóteos têm as mesmas permissões que o líder para
                                 esta célula.
                             </p>
@@ -146,17 +137,19 @@
                 </div>
             </div>
 
-            <x-location-map id="cell-location-map" :latitude="$cell->latitude" :longitude="$cell->longitude" />
+            <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+                <x-location-map id="cell-location-map" :latitude="$cell->latitude" :longitude="$cell->longitude" />
+            </div>
 
             <!-- Footer Actions -->
-            <div class="flex flex-col md:flex-row gap-4 pt-4">
+            <div class="flex flex-wrap gap-2.5 pt-1">
                 <button type="submit"
-                    class="flex-1 bg-blue-600 text-white px-8 py-5 rounded-[2rem] hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-500/20 flex items-center justify-center gap-2 group">
+                    class="inline-flex justify-center items-center gap-1.5 rounded-lg bg-orange-700 px-5 py-2 text-xs sm:text-sm font-bold text-white hover:bg-orange-800 shadow-sm transition">
+                    <i class="bi bi-check2-circle"></i>
                     <span>Guardar Alterações</span>
-                    <i class="bi bi-check2-circle text-lg group-hover:scale-110 transition-transform"></i>
                 </button>
                 <a href="{{ route('cells.index') }}"
-                    class="md:w-48 bg-white text-gray-500 border border-gray-100 px-8 py-5 rounded-[2rem] hover:bg-gray-50 transition-all font-black text-xs uppercase tracking-widest text-center">
+                    class="inline-flex justify-center items-center rounded-lg border border-gray-300 bg-white px-5 py-2 text-xs sm:text-sm font-bold text-gray-700 hover:bg-gray-50 shadow-sm transition">
                     Cancelar
                 </a>
             </div>

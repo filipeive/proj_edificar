@@ -8,19 +8,19 @@
     $baseClasses = 'animate-pulse bg-zinc-200 dark:bg-zinc-800 rounded';
     
     $typeClasses = match($type) {
-        'avatar' => 'w-12 h-12 rounded-full shrink-0',
+        'avatar' => 'w-10 h-10 rounded-full shrink-0',
         'circle' => 'rounded-full shrink-0',
-        'rect' => 'w-full h-32 rounded-2xl',
-        'card' => 'w-full p-6 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-[2.5rem] shadow-sm space-y-4',
-        'table' => 'w-full space-y-4',
+        'rect' => 'w-full h-24 rounded-xl',
+        'card' => 'w-full p-4 sm:p-5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-sm space-y-3',
+        'table' => 'w-full space-y-3',
         default => 'h-4 w-full rounded-lg' // text
     };
 @endphp
 
 @if ($type === 'card')
     <div class="{{ $typeClasses }} {{ $class }}">
-        <div class="flex items-center space-x-4">
-            <div class="w-12 h-12 rounded-2xl bg-zinc-200 dark:bg-zinc-800 animate-pulse"></div>
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-zinc-200 dark:bg-zinc-800 animate-pulse"></div>
             <div class="flex-1 space-y-2">
                 <div class="h-4 bg-zinc-200 dark:bg-zinc-800 rounded animate-pulse w-1/3"></div>
                 <div class="h-3 bg-zinc-200 dark:bg-zinc-800 rounded animate-pulse w-1/2"></div>

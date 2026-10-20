@@ -27,7 +27,7 @@
     <style>
         .ts-dropdown { z-index: 12000 !important; }
     </style>
-    <div class="space-y-6" x-data="{ 
+    <div class="space-y-5" x-data="{ 
                                 view: window.innerWidth < 768 ? 'grid' : 'list', 
                                 search: '',
                                 selected: [], 
@@ -36,54 +36,48 @@
                                     this.selected = this.selectAll ? {{ $commitmentUserIds }} : [];
                                 }
                             }">
-        <!-- New Compact Header -->
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div class="flex items-center gap-4">
-                <a href="{{ route('packages.index') }}"
-                    class="w-10 h-10 rounded-xl bg-white text-gray-400 flex items-center justify-center hover:bg-blue-50 hover:text-blue-600 transition-all shadow-sm border border-gray-100">
-                    <i class="bi bi-arrow-left text-xl"></i>
-                </a>
-                <div>
-                    <h1 class="text-2xl font-black text-gray-900 tracking-tight">{{ $package->name }}</h1>
-                    <div class="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">
-                        <span>Gestão de Membros</span>
-                        <span class="w-1 h-1 rounded-full bg-gray-300"></span>
-                        <span
-                            class="{{ $package->is_active ? 'text-green-500' : 'text-red-500' }}">{{ $package->is_active ? 'Ativo' : 'Inativo' }}</span>
-                    </div>
+        <!-- Page Header -->
+        <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 sm:gap-4">
+            <div>
+                <p class="text-[10px] sm:text-xs font-black uppercase tracking-[0.18em] text-orange-700">
+                    <a href="{{ route('packages.index') }}" class="hover:underline">Pacotes</a> • Gestão de Membros
+                </p>
+                <div class="mt-0.5 flex flex-wrap items-center gap-2">
+                    <h1 class="text-xl sm:text-2xl font-black text-gray-950 tracking-tight">{{ $package->name }}</h1>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border {{ $package->is_active ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200' }}">
+                        {{ $package->is_active ? 'Ativo' : 'Inativo' }}
+                    </span>
                 </div>
+                <p class="mt-0.5 text-xs sm:text-sm text-gray-500">Acompanhamento de compromissos e contribuições do pacote</p>
             </div>
 
-            <div class="hidden md:flex items-center gap-2" x-data="exportPanel()" x-init="init()">
+            <div class="hidden md:flex flex-wrap items-center gap-2" x-data="exportPanel()" x-init="init()">
                 @if($package->whatsapp_link)
                     <a href="{{ $package->whatsapp_link }}" target="_blank"
-                        class="px-4 py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-all text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                        class="px-3 py-1.5 sm:py-2 bg-green-50 text-green-700 border border-green-200 rounded-lg hover:bg-green-100 transition-all text-xs font-bold flex items-center gap-1.5 shadow-sm">
                         <i class="bi bi-whatsapp"></i> WhatsApp
                     </a>
                 @endif
-                <div class="h-8 w-px bg-gray-200 mx-1"></div>
 
                 {{-- Date Pickers --}}
                 <input type="date" x-model="startDate"
-                    class="px-2 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg text-[10px] font-bold">
-                <span class="text-gray-400 text-[10px] font-bold">a</span>
+                    class="px-2.5 py-1.5 bg-white border border-gray-300 text-gray-700 rounded-lg text-xs font-bold">
+                <span class="text-gray-400 text-xs font-bold">a</span>
                 <input type="date" x-model="endDate"
-                    class="px-2 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg text-[10px] font-bold">
-
-                <div class="h-8 w-px bg-gray-200 mx-1"></div>
+                    class="px-2.5 py-1.5 bg-white border border-gray-300 text-gray-700 rounded-lg text-xs font-bold">
 
                 {{-- Excel Export --}}
                 <a :href="'{{ route('packages.export', $package) }}' + '?start_date=' + startDate + '&end_date=' + endDate"
-                    class="px-3 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-all text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                    class="px-3 py-1.5 sm:py-2 bg-white border border-green-200 text-green-800 rounded-lg hover:bg-green-50 transition-all text-xs font-bold flex items-center gap-1.5 shadow-sm">
                     <i class="bi bi-file-earmark-excel"></i> Excel
                 </a>
 
                 {{-- PDF Export --}}
-                <form :action="'{{ route('packages.export-pdf', $package) }}'" method="GET" class="flex items-center gap-1">
+                <form :action="'{{ route('packages.export-pdf', $package) }}'" method="GET" class="flex items-center gap-1.5">
                     <input type="hidden" name="start_date" :value="startDate">
                     <input type="hidden" name="end_date" :value="endDate">
                     <select name="export_status"
-                        class="px-2 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg text-[10px] font-black uppercase tracking-widest">
+                        class="px-2.5 py-1.5 bg-white border border-gray-300 text-gray-700 rounded-lg text-xs font-bold">
                         <option value="all">Todos</option>
                         <option value="pending">Pendentes</option>
                         <option value="partial">Parciais</option>
@@ -91,7 +85,7 @@
                         <option value="surplus">Acréscimo</option>
                     </select>
                     <select name="sort_by"
-                        class="px-2 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg text-[10px] font-black uppercase tracking-widest">
+                        class="px-2.5 py-1.5 bg-white border border-gray-300 text-gray-700 rounded-lg text-xs font-bold">
                         <option value="name_asc">Nome A-Z</option>
                         <option value="name_desc">Nome Z-A</option>
                         <option value="committed_desc">Compromisso</option>
@@ -99,102 +93,99 @@
                         <option value="progress_desc">Progresso</option>
                     </select>
                     <button type="submit"
-                        class="px-3 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-all text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                        class="px-3 py-1.5 sm:py-2 bg-white border border-red-200 text-red-700 rounded-lg hover:bg-red-50 transition-all text-xs font-bold flex items-center gap-1.5 shadow-sm">
                         <i class="bi bi-file-earmark-pdf"></i> PDF
                     </button>
                 </form>
 
                 {{-- WhatsApp Export --}}
                 <button @click="copyWhatsapp()" :disabled="loadingWa"
-                    class="px-3 py-2 bg-green-50 text-green-600 border border-green-200 rounded-lg hover:bg-green-100 transition-all text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                    class="px-3 py-1.5 sm:py-2 bg-green-50 text-green-700 border border-green-200 rounded-lg hover:bg-green-100 transition-all text-xs font-bold flex items-center gap-1.5 shadow-sm">
                     <i class="bi" :class="loadingWa ? 'bi-hourglass-split animate-spin' : copied ? 'bi-check2' : 'bi-whatsapp'"></i>
                     <span x-text="copied ? 'Copiado!' : 'Lista WA'"></span>
                 </button>
 
                 @if(!auth()->user()->isResponsavelPacote())
                     <a href="{{ route('packages.edit', $package) }}"
-                        class="px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all text-xs font-bold uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-gray-200">
+                        class="px-3.5 py-1.5 sm:py-2 bg-orange-700 text-white rounded-lg hover:bg-orange-800 transition-all text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow-sm">
                         <i class="bi bi-pencil-square"></i> Editar
                     </a>
                 @endif
             </div>
-        </div>
+        </header>
 
         <!-- Top Stats Bar (Horizontal) -->
-        <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-2.5 sm:gap-3">
             <!-- Global Confirmed Amount -->
-            <div class="bg-gradient-to-br from-green-500 to-green-600 p-5 rounded-2xl shadow-lg shadow-green-200 border border-green-400 flex flex-col justify-between text-white">
-                <span class="text-[10px] font-black text-green-100 uppercase tracking-widest">Valor Confirmado</span>
-                <div class="flex items-end justify-between mt-2">
-                    <span class="text-xl font-black">{{ number_format($package->getTotalConfirmedAmount(), 2, ',', '.') }}</span>
-                    <span class="text-[10px] font-bold text-green-100 mb-1">MT</span>
+            <article class="rounded-xl border border-gray-200 bg-white p-3 sm:p-4 shadow-sm flex flex-col justify-between">
+                <span class="text-[11px] sm:text-xs font-bold text-gray-500">Valor Confirmado</span>
+                <div class="flex items-end justify-between mt-1">
+                    <span class="text-base sm:text-xl font-black text-emerald-700 tracking-tight">{{ number_format($package->getTotalConfirmedAmount(), 2, ',', '.') }}</span>
+                    <span class="text-[10px] font-bold text-emerald-700 mb-0.5">MT</span>
                 </div>
-            </div>
+            </article>
 
             <!-- Min Amount -->
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
-                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Valor Mínimo</span>
-                <div class="flex items-end justify-between mt-2">
-                    <span
-                        class="text-xl font-black text-gray-900">{{ number_format($package->min_amount, 2, ',', '.') }}</span>
-                    <span class="text-[10px] font-bold text-gray-400 mb-1">MT</span>
+            <article class="rounded-xl border border-gray-200 bg-white p-3 sm:p-4 shadow-sm flex flex-col justify-between">
+                <span class="text-[11px] sm:text-xs font-bold text-gray-500">Valor Mínimo</span>
+                <div class="flex items-end justify-between mt-1">
+                    <span class="text-base sm:text-xl font-black text-gray-950 tracking-tight">{{ number_format($package->min_amount, 2, ',', '.') }}</span>
+                    <span class="text-[10px] font-bold text-gray-400 mb-0.5">MT</span>
                 </div>
-            </div>
+            </article>
 
             <!-- Max Amount -->
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
-                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Valor Máximo</span>
-                <div class="flex items-end justify-between mt-2">
-                    <span class="text-xl font-black text-gray-900">
+            <article class="rounded-xl border border-gray-200 bg-white p-3 sm:p-4 shadow-sm flex flex-col justify-between">
+                <span class="text-[11px] sm:text-xs font-bold text-gray-500">Valor Máximo</span>
+                <div class="flex items-end justify-between mt-1">
+                    <span class="text-base sm:text-xl font-black text-gray-950 tracking-tight">
                         @if($package->max_amount)
                             {{ number_format($package->max_amount, 2, ',', '.') }}
                         @else
                             ∞
                         @endif
                     </span>
-                    <span class="text-[10px] font-bold text-gray-400 mb-1">MT</span>
+                    <span class="text-[10px] font-bold text-gray-400 mb-0.5">MT</span>
                 </div>
-            </div>
+            </article>
 
             <!-- Active Members -->
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
-                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Membros Ativos</span>
-                <div class="flex items-end justify-between mt-2">
-                    <span class="text-xl font-black text-blue-600">{{ $package->getActiveMembersCount() }}</span>
-                    <div class="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
-                        <i class="bi bi-people-fill text-xs"></i>
-                    </div>
+            <article class="rounded-xl border border-gray-200 bg-white p-3 sm:p-4 shadow-sm flex flex-col justify-between">
+                <span class="text-[11px] sm:text-xs font-bold text-gray-500">Membros Ativos</span>
+                <div class="flex items-end justify-between mt-1">
+                    <span class="text-base sm:text-xl font-black text-blue-700 tracking-tight">{{ $package->getActiveMembersCount() }}</span>
+                    <i class="bi bi-people text-blue-700 text-sm"></i>
                 </div>
-            </div>
+            </article>
 
             <!-- Responsavel -->
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
-                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Responsável</span>
-                <div class="mt-2">
-                    <span class="text-sm font-bold text-gray-900 line-clamp-1">{{ $package->getResponsavelName() }}</span>
+            <article class="rounded-xl border border-gray-200 bg-white p-3 sm:p-4 shadow-sm flex flex-col justify-between">
+                <span class="text-[11px] sm:text-xs font-bold text-gray-500">Responsável</span>
+                <div class="mt-1">
+                    <span class="text-xs sm:text-sm font-black text-gray-950 line-clamp-1">{{ $package->getResponsavelName() }}</span>
                 </div>
-            </div>
+            </article>
         </div>
 
         <!-- Main Content Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
             <!-- Left Column: Members List (Span 2) -->
-            <div class="lg:col-span-2 space-y-6">
+            <div class="lg:col-span-2 space-y-4">
                 <!-- Toolbar -->
                 <div
-                    class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-3">
                     <form action="{{ route('packages.show', $package) }}" method="GET"
                         class="w-full sm:w-auto flex flex-col sm:flex-row gap-2">
                         <div class="relative w-full sm:w-64">
-                            <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
                             <input type="text" name="search" value="{{ request('search') }}"
                                 placeholder="Pesquisar membro..."
-                                class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-blue-500 rounded-xl text-sm font-bold transition-all"
+                                class="w-full pl-8 pr-3 py-2 text-xs sm:text-sm rounded-lg border border-gray-300 font-semibold text-gray-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
                                 onchange="this.form.submit()">
                         </div>
                         <select name="campaign_status"
-                            class="w-full sm:w-44 px-3.5 py-2.5 bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-blue-500 rounded-xl text-xs font-black uppercase tracking-widest custom-select"
+                            class="w-full sm:w-44 rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm font-semibold text-gray-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 custom-select"
                             onchange="this.form.submit()">
                             <option value="">Todos Estados</option>
                             <option value="pending" @selected(request('campaign_status') === 'pending')>Pendente</option>
@@ -204,7 +195,7 @@
                         </select>
                         @if(request()->filled('search') || request()->filled('campaign_status'))
                             <a href="{{ route('packages.show', $package) }}"
-                                class="inline-flex items-center justify-center px-3.5 py-2.5 rounded-xl bg-gray-100 text-gray-500 hover:bg-gray-200 transition-all text-xs font-black uppercase tracking-widest">
+                                class="inline-flex items-center justify-center px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-all text-xs font-bold">
                                 Limpar
                             </a>
                         @endif
@@ -213,8 +204,8 @@
                     <div class="flex items-center gap-2 w-full sm:w-auto">
                         <!-- Bulk Actions -->
                         <div x-show="selected.length > 0" x-transition
-                            class="flex items-center gap-2 bg-red-50 px-3 py-1.5 rounded-lg border border-red-100 mr-auto sm:mr-0">
-                            <span class="text-[10px] font-black uppercase text-red-600"
+                            class="flex items-center gap-2 bg-red-50 px-3 py-1.5 rounded-lg border border-red-200 mr-auto sm:mr-0">
+                            <span class="text-[10px] font-black uppercase text-red-700"
                                 x-text="selected.length + ' selecionado(s)'"></span>
                             <form action="{{ route('packages.members.bulk-remove', $package) }}" method="POST"
                                 onsubmit="return confirm('Tem certeza que deseja remover os membros selecionados?');">
@@ -222,22 +213,22 @@
                                 <template x-for="id in selected" :key="id">
                                     <input type="hidden" name="user_ids[]" :value="id">
                                 </template>
-                                <button type="submit" class="text-red-500 hover:text-red-700 p-1">
+                                <button type="submit" class="text-red-600 hover:text-red-800 p-1">
                                     <i class="bi bi-trash-fill"></i>
                                 </button>
                             </form>
                         </div>
 
                         <!-- View Toggles -->
-                        <div class="flex bg-gray-100 p-1 rounded-lg ml-auto">
+                        <div class="flex bg-gray-100 p-1 rounded-lg border border-gray-200 ml-auto">
                             <button @click="view = 'list'"
-                                :class="view === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
-                                class="w-8 h-8 rounded-md flex items-center justify-center transition-all">
+                                :class="view === 'list' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
+                                class="w-8 h-8 rounded-md flex items-center justify-center transition-all text-xs">
                                 <i class="bi bi-list-ul"></i>
                             </button>
                             <button @click="view = 'grid'"
-                                :class="view === 'grid' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
-                                class="w-8 h-8 rounded-md flex items-center justify-center transition-all">
+                                :class="view === 'grid' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
+                                class="w-8 h-8 rounded-md flex items-center justify-center transition-all text-xs">
                                 <i class="bi bi-grid-fill"></i>
                             </button>
                         </div>
@@ -246,23 +237,23 @@
 
                 <!-- List View -->
                 <div x-show="view === 'list'" x-transition
-                    class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+                    class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full table-compact">
-                            <thead>
-                                <tr class="bg-gray-50/50">
-                                    <th class="px-6 py-4 w-10">
+                            <thead class="bg-gray-50 text-[10px] font-black uppercase tracking-wider text-gray-500 border-b border-gray-200">
+                                <tr>
+                                    <th class="px-4 py-3 w-10">
                                         <input type="checkbox" x-model="selectAll" @change="updateSelection()"
-                                            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                            class="rounded border-gray-300 text-orange-700 focus:ring-orange-500">
                                     </th>
-                                    <th class="px-6 py-4 text-left">Membro</th>
-                                    <th class="px-6 py-4 text-left">Valor</th>
-                                    <th class="px-6 py-4 text-left hidden sm:table-cell">Célula</th>
-                                    <th class="px-6 py-4 text-center">Estado Campanha</th>
-                                    <th class="px-6 py-4 text-right">Ações</th>
+                                    <th class="px-4 py-3 text-left">Membro</th>
+                                    <th class="px-4 py-3 text-left">Valor</th>
+                                    <th class="px-4 py-3 text-left hidden sm:table-cell">Célula</th>
+                                    <th class="px-4 py-3 text-center">Estado Campanha</th>
+                                    <th class="px-4 py-3 text-right">Ações</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-50">
+                            <tbody class="divide-y divide-gray-100 text-sm">
                                 @forelse($commitments as $commitment)
                                     <tr class="hover:bg-gray-50/50 transition-colors"
                                         x-show="!search || '{{ $commitment->user->name }}'.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(search.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')) || '{{ $commitment->user->phone }}'.includes(search)">
@@ -557,18 +548,18 @@
                 </div>
 
                 <!-- Right Column: Actions & Form (Span 1) -->
-                <div class="lg:col-span-1 space-y-6">
+                <div class="lg:col-span-1 space-y-4">
 
                     <!-- Add Member Box -->
-                    <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-gray-100">
-                        <h3 class="text-xs font-black text-gray-900 uppercase tracking-widest mb-4">Adicionar Membro</h3>
-                        <form action="{{ route('packages.assign', $package) }}" method="POST" class="space-y-4" 
+                    <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+                        <h3 class="text-xs font-black text-gray-900 uppercase tracking-wider mb-3">Adicionar Membro</h3>
+                        <form action="{{ route('packages.assign', $package) }}" method="POST" class="space-y-3" 
                               x-data="{ selectedUserPackage: '' }">
                             @csrf
                             <div>
                                 <select name="user_id" required 
                                         @change="selectedUserPackage = $event.target.options[$event.target.selectedIndex].dataset.currentPackage || ''"
-                                        class="w-full bg-gray-50 border-none rounded-xl py-2.5 px-3 text-sm font-bold text-gray-900 appearance-none custom-select">
+                                        class="w-full bg-white border border-gray-300 rounded-lg py-2 px-3 text-xs sm:text-sm font-bold text-gray-900 appearance-none custom-select">
                                     <option value="">Selecionar...</option>
                                     @foreach($users as $user)
                                         @php $currentCommitment = $user->commitments->first(); @endphp
@@ -581,12 +572,12 @@
                             </div>
                             
                             <template x-if="selectedUserPackage">
-                                <div class="p-3 bg-orange-50 border border-orange-100 rounded-xl">
+                                <div class="p-3 bg-orange-50 border border-orange-200 rounded-lg">
                                     <div class="flex gap-2">
-                                        <i class="bi bi-exclamation-triangle-fill text-orange-500 text-sm"></i>
+                                        <i class="bi bi-exclamation-triangle-fill text-orange-600 text-xs"></i>
                                         <div>
                                             <p class="text-[10px] font-bold text-orange-800 uppercase tracking-tight">Membro já Comprometido</p>
-                                            <p class="text-[9px] text-orange-700 leading-tight mt-0.5">
+                                            <p class="text-[11px] text-orange-700 leading-tight mt-0.5">
                                                 Este membro já está no pacote <strong x-text="selectedUserPackage"></strong>. 
                                                 Ao adicionar aqui, ele será movido para este novo pacote.
                                             </p>
@@ -595,11 +586,11 @@
                                 </div>
                             </template>
                             <div>
-                                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Valor (MT)</label>
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Valor (MT)</label>
                                 <input type="number" name="committed_amount" value="{{ $package->min_amount }}" step="0.01" required
-                                    class="w-full bg-gray-50 border-none rounded-xl py-2.5 px-3 text-sm font-bold text-gray-900">
+                                    class="w-full bg-white border border-gray-300 rounded-lg py-2 px-3 text-xs sm:text-sm font-bold text-gray-900">
                             </div>
-                            <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
+                            <button type="submit" class="w-full py-2.5 bg-orange-700 text-white rounded-lg font-bold text-xs sm:text-sm hover:bg-orange-800 transition-all shadow-sm">
                                 Adicionar
                             </button>
                         </form>
@@ -607,19 +598,19 @@
                         <!-- Quick add button -->
                         @if(auth()->user()->isAdmin() || auth()->user()->isComissaoObra() || auth()->user()->isResponsavelPacote())
                             <button type="button" @click="$dispatch('open-quick-member-modal')"
-                                class="w-full mt-3 py-3 bg-blue-50 text-blue-600 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-100 transition-all">
+                                class="w-full mt-2.5 py-2 border border-gray-300 bg-white text-gray-700 rounded-lg font-bold text-xs hover:bg-gray-50 transition-all shadow-sm">
                                 Novo Membro Rápido
                             </button>
                         @endif
                     </div>
 
                     <!-- Bulk Communication -->
-                    <div class="bg-gradient-to-br from-blue-600 to-blue-700 p-6 rounded-[2rem] shadow-lg shadow-blue-200 text-white">
-                        <h3 class="text-xs font-black uppercase tracking-widest mb-4 text-blue-100">Comunicação</h3>
+                    <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+                        <h3 class="text-xs font-black uppercase tracking-wider mb-3 text-gray-900">Comunicação</h3>
 
-                        <div class="space-y-3">
+                        <div class="space-y-2">
                             <button onclick="copyToClipboard('{{ $package->whatsapp_template ?? 'Paz do Senhor!' }}', 'Copiado!', this)"
-                                class="w-full py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all">
+                                class="w-full py-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-lg font-bold text-xs flex items-center justify-center gap-2 transition-all">
                                 <i class="bi bi-clipboard"></i> Copiar Msg
                             </button>
 
@@ -627,22 +618,22 @@
                                 @csrf
                                 <button type="button" 
                                     onclick="confirmAction('Enviar SMS para todos?', 'Disparar SMS').then(r => { if(r.isConfirmed) this.closest('form').submit(); })"
-                                    class="w-full py-3 bg-white text-blue-600 rounded-xl font-bold text-xs flex items-center justify-center gap-2 hover:bg-blue-50 transition-all shadow-lg">
+                                    class="w-full py-2 bg-orange-700 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-2 hover:bg-orange-800 transition-all shadow-sm">
                                     <i class="bi bi-chat-dots-fill"></i> SMS em Massa
                                 </button>
                             </form>
 
                             <button onclick="copyToClipboard('{{ $commitmentPhones }}', 'Contactos copiados!', this)"
-                                class="w-full py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all">
+                                class="w-full py-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-lg font-bold text-xs flex items-center justify-center gap-2 transition-all">
                                 <i class="bi bi-person-lines-fill"></i> Copiar Contactos
                             </button>
                         </div>
                     </div>
 
                     <!-- Description Card -->
-                    <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-gray-100">
-                         <h3 class="text-xs font-black text-gray-900 uppercase tracking-widest mb-2">Sobre</h3>
-                         <p class="text-xs text-gray-500 leading-relaxed">
+                    <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+                         <h3 class="text-xs font-black text-gray-900 uppercase tracking-wider mb-1.5">Sobre</h3>
+                         <p class="text-xs text-gray-600 leading-relaxed">
                             {{ $package->description ?? 'Sem descrição.' }}
                          </p>
                     </div>

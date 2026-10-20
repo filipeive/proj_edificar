@@ -4,129 +4,114 @@
 @section('page-title', 'Ficha Guia')
 
 @section('content')
-<div class="w-full px-4 md:px-10 space-y-8 animate-In" x-data="{ activeTab: '{{ request('tab', 'attendance') }}', saving: false }">
-    <!-- Header Card -->
-    <div class="bg-zinc-950 rounded-2xl p-6 md:p-8 shadow-md border border-zinc-900 relative overflow-hidden text-white">
-        <div class="absolute top-0 right-0 w-32 h-32 bg-orange-600/10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
-        <div class="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-            <div class="space-y-4">
-                <div class="flex items-center gap-3">
-                    <a href="{{ route('cells.show', $cell) }}" 
-                        class="w-10 h-10 rounded-xl bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 flex items-center justify-center transition-all border border-white/5">
-                        <i class="bi bi-arrow-left"></i>
-                    </a>
-                    <div class="space-y-1">
-                        <div class="flex items-center gap-2 text-[9px] font-black text-orange-500 uppercase tracking-[0.2em]">
-                            <i class="bi bi-calendar-check-fill"></i>
-                            <span>Ficha Guia de Participação</span>
-                        </div>
-                        <h1 class="text-2xl font-black tracking-tight uppercase">{{ $cell->name }}</h1>
-                    </div>
-                </div>
-                
-                <!-- Leadership Info -->
-                <div class="flex flex-wrap gap-3 pt-1">
-                    @if($cell->leader)
-                        <div class="flex items-center gap-2 bg-orange-500/10 px-3.5 py-1.5 rounded-xl border border-orange-500/10">
-                            <i class="bi bi-person-badge text-orange-400"></i>
-                            <span class="text-[9px] font-black uppercase text-gray-300 tracking-wider">Líder: <span class="text-white">{{ $cell->leader->name }}</span></span>
-                        </div>
-                    @endif
-                    @foreach($cell->timoteos as $timoteo)
-                        <div class="flex items-center gap-2 bg-zinc-800 px-3.5 py-1.5 rounded-xl border border-zinc-700/50">
-                            <i class="bi bi-person-hearts text-orange-450"></i>
-                            <span class="text-[9px] font-black uppercase text-gray-300 tracking-wider">Auxiliar: <span class="text-white">{{ $timoteo->name }}</span></span>
-                        </div>
-                    @endforeach
-                </div>
+<div class="w-full space-y-5 animate-In" x-data="{ activeTab: '{{ request('tab', 'attendance') }}', saving: false }">
+    <!-- Header -->
+    <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 sm:gap-4">
+        <div>
+            <p class="text-[10px] sm:text-xs font-black uppercase tracking-[0.18em] text-orange-700">Ficha Guia de Participação</p>
+            <div class="mt-0.5 flex flex-wrap items-center gap-2">
+                <a href="{{ route('cells.show', $cell) }}" class="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-2.5 py-1 text-xs font-bold text-gray-700 hover:bg-gray-50 shadow-sm">
+                    <i class="bi bi-arrow-left mr-1"></i> Voltar
+                </a>
+                <h1 class="text-xl sm:text-2xl font-black text-gray-950 tracking-tight">{{ $cell->name }}</h1>
             </div>
-
-            <div class="bg-white/5 p-3 rounded-xl border border-white/5 backdrop-blur-md w-full lg:w-auto">
-                <form action="{{ route('cells.attendance', $cell) }}" method="GET" class="flex flex-col sm:flex-row items-stretch sm:items-end gap-2">
-                    <div class="grid grid-cols-2 gap-2 w-full sm:w-auto">
-                        <div class="flex flex-col gap-1">
-                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Mês</label>
-                            <select name="month" data-searchable="false" class="h-[44px] bg-white/10 border border-white/10 text-white rounded-lg text-xs font-black uppercase tracking-widest focus:ring-2 focus:ring-orange-500 focus:border-orange-500 custom-select px-4 cursor-pointer appearance-none">
-                                @foreach(range(1, 12) as $m)
-                                    <option value="{{ $m }}" {{ $month == $m ? 'selected' : '' }}>
-                                        {{ Carbon\Carbon::createFromDate(null, $m, 1)->translatedFormat('F') }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Ano</label>
-                            <select name="year" data-searchable="false" class="h-[44px] bg-white/10 border border-white/10 text-white rounded-lg text-xs font-black uppercase tracking-widest focus:ring-2 focus:ring-orange-500 focus:border-orange-500 custom-select px-4 cursor-pointer appearance-none">
-                                @foreach(range(now()->year - 1, now()->year + 1) as $y)
-                                    <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <button type="submit" class="h-[44px] w-full sm:w-auto bg-orange-600 hover:bg-orange-700 text-white px-6 rounded-lg transition-all font-black text-xs uppercase tracking-widest">
-                        Filtrar
-                    </button>
-                    <a href="{{ route('cells.attendance.pdf', ['cell' => $cell->id, 'month' => $month, 'year' => $year]) }}"
-                        class="h-[44px] w-full sm:w-auto bg-white/10 hover:bg-white/15 text-white px-6 rounded-lg transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 border border-white/10">
-                        <i class="bi bi-file-earmark-pdf"></i>
-                        Exportar
-                    </a>
-                </form>
+            <div class="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-500">
+                @if($cell->leader)
+                    <span class="inline-flex items-center gap-1 rounded-md bg-orange-50 border border-orange-200 px-2 py-0.5 text-[11px] font-bold text-orange-800">
+                        <i class="bi bi-person-badge"></i> Líder: {{ $cell->leader->name }}
+                    </span>
+                @endif
+                @foreach($cell->timoteos as $timoteo)
+                    <span class="inline-flex items-center gap-1 rounded-md bg-gray-100 border border-gray-200 px-2 py-0.5 text-[11px] font-bold text-gray-700">
+                        <i class="bi bi-person-hearts"></i> Auxiliar: {{ $timoteo->name }}
+                    </span>
+                @endforeach
             </div>
         </div>
-    </div>
+
+        <div class="rounded-xl border border-gray-200 bg-white p-3 shadow-sm w-full md:w-auto">
+            <form action="{{ route('cells.attendance', $cell) }}" method="GET" class="flex flex-col sm:flex-row items-stretch sm:items-end gap-2">
+                <div class="grid grid-cols-2 gap-2 w-full sm:w-auto">
+                    <div>
+                        <label class="mb-1 block text-[10px] font-black text-gray-500 uppercase tracking-wider">Mês</label>
+                        <select name="month" data-searchable="false" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-800 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 custom-select cursor-pointer">
+                            @foreach(range(1, 12) as $m)
+                                <option value="{{ $m }}" {{ $month == $m ? 'selected' : '' }}>
+                                    {{ Carbon\Carbon::createFromDate(null, $m, 1)->translatedFormat('F') }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="mb-1 block text-[10px] font-black text-gray-500 uppercase tracking-wider">Ano</label>
+                        <select name="year" data-searchable="false" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-800 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 custom-select cursor-pointer">
+                            @foreach(range(now()->year - 1, now()->year + 1) as $y)
+                                <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="rounded-lg bg-gray-900 hover:bg-gray-800 text-white px-3.5 py-1.5 text-xs font-bold transition shadow-sm">
+                    Filtrar
+                </button>
+                <a href="{{ route('cells.attendance.pdf', ['cell' => $cell->id, 'month' => $month, 'year' => $year]) }}"
+                    class="rounded-lg border border-red-200 bg-white hover:bg-red-50 text-red-700 px-3.5 py-1.5 text-xs font-bold transition shadow-sm flex items-center justify-center gap-1.5">
+                    <i class="bi bi-file-earmark-pdf"></i>
+                    Exportar
+                </a>
+            </form>
+        </div>
+    </header>
 
     <!-- Alpine.js Tabs Navigation -->
-    <div class="border-b border-gray-200 dark:border-zinc-800 overflow-x-auto scrollbar-none">
-        <nav class="-mb-px flex space-x-4 sm:space-x-6 flex-nowrap" aria-label="Tabs">
-            <button 
-                @click="activeTab = 'attendance'" 
-                :class="activeTab === 'attendance' ? 'border-orange-500 text-orange-600 dark:text-orange-400' : 'border-transparent text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:border-gray-300'"
-                class="whitespace-nowrap py-4 px-1 border-b-2 font-black text-xs uppercase tracking-wider transition-all">
-                <i class="bi bi-calendar-check mr-1 sm:mr-2"></i>
-                <span class="hidden sm:inline">Controle de Presença</span>
-                <span class="sm:hidden">Presença</span>
-            </button>
-            <button 
-                @click="activeTab = 'decisions'" 
-                :class="activeTab === 'decisions' ? 'border-orange-500 text-orange-600 dark:text-orange-400' : 'border-transparent text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:border-gray-300'"
-                class="whitespace-nowrap py-4 px-1 border-b-2 font-black text-xs uppercase tracking-wider transition-all">
-                <i class="bi bi-stars mr-1 sm:mr-2"></i>
-                <span class="hidden sm:inline">Visitas e Decisões</span>
-                <span class="sm:hidden">Visitas</span>
-            </button>
-            <button
-                @click="activeTab = 'baptisms'"
-                :class="activeTab === 'baptisms' ? 'border-orange-500 text-orange-600 dark:text-orange-400' : 'border-transparent text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:border-gray-300'"
-                class="whitespace-nowrap py-4 px-1 border-b-2 font-black text-xs uppercase tracking-wider transition-all">
-                <i class="bi bi-droplet-fill mr-1 sm:mr-2"></i>
-                <span class="hidden sm:inline">Baptismos</span>
-                <span class="sm:hidden">Bapt.</span>
-            </button>
-            <button
-                @click="activeTab = 'discipleship'"
-                :class="activeTab === 'discipleship' ? 'border-orange-500 text-orange-600 dark:text-orange-400' : 'border-transparent text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:border-gray-300'"
-                class="whitespace-nowrap py-4 px-1 border-b-2 font-black text-xs uppercase tracking-wider transition-all">
-                <i class="bi bi-mortarboard mr-1 sm:mr-2"></i>
-                <span class="hidden sm:inline">Acompanhamento & Discipulado</span>
-                <span class="sm:hidden">Discipulado</span>
-            </button>
-        </nav>
+    <div class="inline-flex flex-wrap items-center gap-1 rounded-xl border border-gray-200 bg-white p-1 shadow-sm w-full sm:w-fit overflow-x-auto scrollbar-none">
+        <button 
+            @click="activeTab = 'attendance'" 
+            :class="activeTab === 'attendance' ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'"
+            class="whitespace-nowrap py-1.5 px-3 rounded-lg font-bold text-xs transition-all">
+            <i class="bi bi-calendar-check mr-1"></i>
+            <span class="hidden sm:inline">Controle de Presença</span>
+            <span class="sm:hidden">Presença</span>
+        </button>
+        <button 
+            @click="activeTab = 'decisions'" 
+            :class="activeTab === 'decisions' ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'"
+            class="whitespace-nowrap py-1.5 px-3 rounded-lg font-bold text-xs transition-all">
+            <i class="bi bi-stars mr-1"></i>
+            <span class="hidden sm:inline">Visitas e Decisões</span>
+            <span class="sm:hidden">Visitas</span>
+        </button>
+        <button
+            @click="activeTab = 'baptisms'"
+            :class="activeTab === 'baptisms' ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'"
+            class="whitespace-nowrap py-1.5 px-3 rounded-lg font-bold text-xs transition-all">
+            <i class="bi bi-droplet-fill mr-1"></i>
+            <span class="hidden sm:inline">Baptismos</span>
+            <span class="sm:hidden">Bapt.</span>
+        </button>
+        <button
+            @click="activeTab = 'discipleship'"
+            :class="activeTab === 'discipleship' ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'"
+            class="whitespace-nowrap py-1.5 px-3 rounded-lg font-bold text-xs transition-all">
+            <i class="bi bi-mortarboard mr-1"></i>
+            <span class="hidden sm:inline">Acompanhamento & Discipulado</span>
+            <span class="sm:hidden">Discipulado</span>
+        </button>
     </div>
 
     <!-- Tab Contents -->
     <div>
         <!-- TAB 1: ATTENDANCE -->
-        <div x-show="activeTab === 'attendance'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6">
-            <div class="bg-white dark:bg-zinc-900/30 rounded-2xl shadow-sm border border-gray-150 dark:border-zinc-850 overflow-hidden">
-                <div class="bg-gray-50 dark:bg-zinc-850/50 border-b border-gray-150 dark:border-zinc-850 p-6 flex justify-between items-center">
-                    <h3 class="text-xs font-black text-gray-800 dark:text-zinc-200 uppercase tracking-widest flex items-center gap-2">
-                        <i class="bi bi-table"></i> Controle de Presença - {{ Carbon\Carbon::createFromDate($year, $month, 1)->translatedFormat('F') }} / {{ $year }}
+        <div x-show="activeTab === 'attendance'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-4">
+            <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+                <div class="bg-gray-50 border-b border-gray-200 p-4 flex justify-between items-center">
+                    <h3 class="text-xs font-black text-gray-800 uppercase tracking-wider flex items-center gap-2">
+                        <i class="bi bi-table text-orange-700"></i> Controle de Presença - {{ Carbon\Carbon::createFromDate($year, $month, 1)->translatedFormat('F') }} / {{ $year }}
                     </h3>
-                    <div class="hidden md:flex gap-4 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-zinc-500">
-                        <span class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 rounded-md bg-orange-500"></div> Célula</span>
-                        <span class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 rounded-md bg-zinc-800 dark:bg-zinc-700"></div> Culto</span>
-                        <span class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 rounded-md bg-orange-600/35"></div> Doutrina</span>
+                    <div class="hidden md:flex gap-4 text-[10px] font-bold uppercase tracking-wider text-gray-500">
+                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-orange-500"></span> Célula</span>
+                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-zinc-800"></span> Culto</span>
+                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-orange-600/35"></span> Doutrina</span>
                     </div>
                 </div>
 

@@ -1,126 +1,128 @@
 @extends('layouts.app')
 
+@section('title', 'Mesclar Zona - Portal Life Church')
 @section('page-title', 'Mesclar Zona')
-@section('page-subtitle', 'Transfira dados e exclua zonas duplicadas com segurança.')
+@section('page-subtitle', 'Transfira dados e exclua zonas duplicadas com segurança')
+
+@section('header-actions')
+    <a href="{{ route('zones.index') }}"
+        class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
+        <i class="bi bi-arrow-left text-xs"></i>
+        <span>Voltar</span>
+    </a>
+@endsection
 
 @section('content')
-    <div class="w-full space-y-8">
-        <!-- Header Card -->
-        <div class="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-sm border border-gray-100 relative overflow-hidden group">
-            <div
-                class="absolute top-0 right-0 w-64 h-64 bg-red-50/50 rounded-full -mr-32 -mt-32 transition-transform group-hover:scale-110 duration-700">
-            </div>
-
-            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-                <div class="flex flex-col md:flex-row items-center gap-8 text-center md:text-left">
-                    <div
-                        class="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-red-500 to-red-700 text-white flex items-center justify-center text-4xl shadow-2xl shadow-red-100">
-                        <i class="bi bi-intersect"></i>
-                    </div>
-                    <div>
-                        <div
-                            class="flex items-center justify-center md:justify-start gap-2 text-xs font-bold text-red-600 uppercase tracking-widest mb-2">
-                            <a href="{{ route('zones.index') }}" class="hover:underline">Zonas</a>
-                            <i class="bi bi-chevron-right text-[10px]"></i>
-                            <span>Mesclar</span>
-                        </div>
-                        <h1 class="text-3xl font-black text-gray-900 tracking-tight uppercase">Mesclar Zona</h1>
-                        <p class="text-gray-500 font-medium tracking-tight">Zona de Origem (será excluída): <span
-                                class="text-red-600 font-black italic">{{ $sourceZone->name }}</span></p>
-                    </div>
+    <div class="space-y-5">
+        <!-- Executive Header Card -->
+        <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-red-50 text-red-600">
+                    <i class="bi bi-intersect text-xl"></i>
                 </div>
-
-                <a href="{{ route('zones.index') }}"
-                    class="group flex items-center bg-gray-50 text-gray-500 px-6 py-4 rounded-2xl hover:bg-gray-100 transition-all font-bold text-xs uppercase tracking-widest">
-                    <i class="bi bi-arrow-left text-lg mr-2 group-hover:-translate-x-1 transition-transform"></i>
-                    Cancelar
-                </a>
+                <div>
+                    <span class="text-[10px] font-black uppercase tracking-wider text-red-600">Fusão Estrutural</span>
+                    <h1 class="text-lg font-black text-gray-900 tracking-tight">Mesclar Zona</h1>
+                    <p class="text-xs text-gray-500">
+                        Zona de Origem (será eliminada após transferir vínculos): <strong class="text-gray-900">{{ $sourceZone->name }}</strong>
+                    </p>
+                </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <!-- Source Summary -->
-            <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-8 border-b border-gray-100 bg-gray-50">
-                    <h3 class="font-bold text-gray-900 text-lg">Resumo da Transferência</h3>
-                    <p class="text-gray-500 text-sm">Estes itens serão movidos para a nova zona.</p>
+            <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+                <div class="px-4 py-3 border-b border-gray-200 bg-gray-50/60">
+                    <h3 class="text-xs font-black uppercase tracking-wider text-gray-900">Resumo da Transferência</h3>
+                    <p class="text-[11px] text-gray-500">Estes itens serão realocados para a nova zona de destino.</p>
                 </div>
-                <div class="p-8 space-y-4">
-                    <div class="flex items-center justify-between p-4 bg-blue-50 rounded-xl">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
-                                <i class="bi bi-people-fill"></i>
+                <div class="p-4 space-y-2.5">
+                    <div class="flex items-center justify-between p-3 bg-blue-50/60 border border-blue-100 rounded-lg">
+                        <div class="flex items-center gap-2.5">
+                            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 text-blue-700">
+                                <i class="bi bi-diagram-3-fill text-xs"></i>
                             </div>
-                            <span class="font-bold text-gray-700">Supervisões</span>
+                            <span class="text-xs font-bold text-gray-800">Supervisões</span>
                         </div>
-                        <span class="text-2xl font-black text-blue-600">{{ $sourceZone->supervisions()->count() }}</span>
+                        <span class="text-lg font-black text-blue-700">{{ $sourceZone->supervisions()->count() }}</span>
                     </div>
 
-                    <div class="flex items-center justify-between p-4 bg-green-50 rounded-xl">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-green-100 text-green-600 flex items-center justify-center">
-                                <i class="bi bi-cash-stack"></i>
+                    <div class="flex items-center justify-between p-3 bg-emerald-50/60 border border-emerald-100 rounded-lg">
+                        <div class="flex items-center gap-2.5">
+                            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+                                <i class="bi bi-cash-stack text-xs"></i>
                             </div>
-                            <span class="font-bold text-gray-700">Contribuições</span>
+                            <span class="text-xs font-bold text-gray-800">Contribuições</span>
                         </div>
-                        <span class="text-2xl font-black text-green-600">{{ $sourceZone->contributions()->count() }}</span>
+                        <span class="text-lg font-black text-emerald-700">{{ $sourceZone->contributions()->count() }}</span>
                     </div>
 
-                    <div class="flex items-center justify-between p-4 bg-purple-50 rounded-xl">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-10 h-10 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center">
-                                <i class="bi bi-calendar-event"></i>
+                    <div class="flex items-center justify-between p-3 bg-purple-50/60 border border-purple-100 rounded-lg">
+                        <div class="flex items-center gap-2.5">
+                            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 text-purple-700">
+                                <i class="bi bi-calendar-event text-xs"></i>
                             </div>
-                            <span class="font-bold text-gray-700">Eventos</span>
+                            <span class="text-xs font-bold text-gray-800">Eventos</span>
                         </div>
-                        <span class="text-2xl font-black text-purple-600">{{ $sourceZone->events()->count() }}</span>
+                        <span class="text-lg font-black text-purple-700">{{ $sourceZone->events()->count() }}</span>
                     </div>
 
-                    <div class="flex items-center justify-between p-4 bg-orange-50 rounded-xl">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-10 h-10 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center">
-                                <i class="bi bi-file-text"></i>
+                    <div class="flex items-center justify-between p-3 bg-orange-50/60 border border-orange-100 rounded-lg">
+                        <div class="flex items-center gap-2.5">
+                            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-100 text-orange-700">
+                                <i class="bi bi-file-earmark-text text-xs"></i>
                             </div>
-                            <span class="font-bold text-gray-700">Relatórios</span>
+                            <span class="text-xs font-bold text-gray-800">Relatórios</span>
                         </div>
-                        <span
-                            class="text-2xl font-black text-orange-600">{{ $sourceZone->quarterlyReports()->count() }}</span>
+                        <span class="text-lg font-black text-orange-700">{{ $sourceZone->quarterlyReports()->count() }}</span>
                     </div>
                 </div>
             </div>
 
             <!-- Merge Form -->
-            <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-8 border-b border-gray-100 bg-gray-50">
-                    <h3 class="font-bold text-gray-900 text-lg">Selecionar Destino</h3>
-                    <p class="text-gray-500 text-sm">Escolha para onde os dados serão enviados.</p>
+            <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden flex flex-col justify-between">
+                <div>
+                    <div class="px-4 py-3 border-b border-gray-200 bg-gray-50/60">
+                        <h3 class="text-xs font-black uppercase tracking-wider text-gray-900">Selecionar Destino</h3>
+                        <p class="text-[11px] text-gray-500">Escolha para onde todos os dados serão enviados.</p>
+                    </div>
+                    <form action="{{ route('zones.process-merge', $sourceZone) }}" method="POST" id="merge-zone-form" class="p-4 space-y-4">
+                        @csrf
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-gray-700">
+                                Zona de Destino <span class="text-red-500">*</span>
+                            </label>
+                            <select name="target_zone_id" required
+                                class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-red-500 focus:ring-red-500">
+                                <option value="">Selecione a zona receptora...</option>
+                                @foreach($availableZones as $zone)
+                                    <option value="{{ $zone->id }}">{{ $zone->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="rounded-lg border border-amber-200 bg-amber-50/70 p-3 text-xs text-amber-900 space-y-1">
+                            <p class="font-bold flex items-center gap-1.5">
+                                <i class="bi bi-exclamation-triangle-fill text-amber-600"></i> Atenção à Ação Irreversível
+                            </p>
+                            <p class="text-[11px] text-amber-800">
+                                Todos os registros acima serão migrados permanentemente para a zona de destino e a zona <strong>{{ $sourceZone->name }}</strong> será apagada.
+                            </p>
+                        </div>
+                    </form>
                 </div>
-                <form action="{{ route('zones.process-merge', $sourceZone) }}" method="POST" class="p-8 space-y-6">
-                    @csrf
-
-                    <div class="space-y-2">
-                        <label class="text-xs font-bold text-gray-500 uppercase tracking-wider">Zona de Destino</label>
-                        <select name="target_zone_id" required
-                            class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-lg rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-4">
-                            <option value="">Selecione uma zona...</option>
-                            @foreach($targetZones as $zone)
-                                <option value="{{ $zone->id }}">{{ $zone->name }}</option>
-                            @endforeach
-                        </select>
-                        <p class="text-xs text-gray-400">Todos os dados serão movidos para esta zona e a zona <span
-                                class="font-bold">{{ $sourceZone->name }}</span> será excluída permanentemente.</p>
-                    </div>
-
-                    <div class="pt-4">
-                        <button type="submit"
-                            class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-red-100 hover:shadow-red-200 flex items-center justify-center gap-2">
-                            <i class="bi bi-arrow-left-right"></i>
-                            Confirmar Mesclagem e Exclusão
-                        </button>
-                    </div>
-                </form>
+                <div class="flex items-center justify-end gap-2 p-4 border-t border-gray-100 bg-gray-50/50">
+                    <a href="{{ route('zones.index') }}"
+                        class="rounded-lg border border-gray-200 px-3.5 py-2 text-xs font-bold text-gray-700 hover:bg-gray-100 transition-colors">
+                        Cancelar
+                    </a>
+                    <button type="submit" form="merge-zone-form"
+                        class="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-red-700 transition-colors">
+                        <i class="bi bi-check-lg text-xs"></i>
+                        <span>Confirmar e Mesclar</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>

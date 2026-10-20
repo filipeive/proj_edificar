@@ -2,529 +2,344 @@
 
 @section('title', 'Visitantes - Portal Life Church')
 @section('page-title', 'Gestão de Visitantes')
-@section('page-subtitle', 'Acompanhamento e integração de visitantes')
+@section('page-subtitle', 'Acompanhamento e integração de novos visitantes')
+
+@section('header-actions')
+    <div class="flex items-center gap-2">
+        <a href="https://chat.whatsapp.com/DxAf8sMvMDYDDhrIV1wRxC" target="_blank"
+            class="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700 shadow-sm hover:bg-emerald-100 transition-colors">
+            <i class="bi bi-whatsapp text-xs"></i>
+            <span class="hidden sm:inline">Grupo Supervisores</span>
+        </a>
+        <a href="{{ route('visitors.export', request()->all()) }}"
+            class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
+            <i class="bi bi-file-earmark-excel text-emerald-600 text-xs"></i>
+            <span class="hidden sm:inline">Exportar</span>
+        </a>
+        <a href="{{ route('visitors.create') }}"
+            class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition-colors">
+            <i class="bi bi-person-plus-fill text-xs"></i>
+            <span>Novo Visitante</span>
+        </a>
+    </div>
+@endsection
 
 @section('content')
-    <style>
-        [x-cloak] {
-            display: none !important;
-        }
-    </style>
     <div x-data="{ 
-                        view: window.innerWidth < 768 ? 'grid' : 'list',
-                        selected: [],
-                        updateView() {
-                            if (window.innerWidth < 768 && this.view === 'list') {
-                                this.view = 'grid'; 
-                            }
-                        },
-                        toggleAll() {
-                            // We need to get all IDs. Since we are in Blade, we can inject them.
-                            // However, with pagination, 'Select All' usually means 'Select All on Page'.
-                            const allIds = {{ Js::from($visitors->pluck('id')) }};
-                            if (this.selected.length === allIds.length) {
-                                this.selected = [];
-                            } else {
-                                this.selected = allIds;
-                            }
-                        }
-                    }"
-        x-init="$watch('view', value => localStorage.setItem('visitors_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('visitors_view') || 'list')"
-        @resize.window.debounce.500ms="updateView()" x-cloak class="space-y-6">
+        view: window.innerWidth < 768 ? 'grid' : 'list',
+        selected: [],
+        updateView() {
+            if (window.innerWidth < 768 && this.view === 'list') {
+                this.view = 'grid'; 
+            }
+        },
+        toggleAll() {
+            const allIds = {{ Js::from($visitors->pluck('id')) }};
+            if (this.selected.length === allIds.length) {
+                this.selected = [];
+            } else {
+                this.selected = allIds;
+            }
+        }
+    }"
+    x-init="$watch('view', value => localStorage.setItem('visitors_view', value)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('visitors_view') || 'list')"
+    @resize.window.debounce.500ms="updateView()" class="space-y-5">
 
-        <!-- Bulk Action Bar -->
-        <div x-show="selected.length > 0" x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 -translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-            x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0"
-            x-transition:leave-end="opacity-0 -translate-y-4"
-            class="fixed top-24 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
-            <div
-                class="bg-gray-900 text-white rounded-xl shadow-xl p-3.5 flex items-center gap-4 pointer-events-auto border border-gray-700/50 backdrop-blur-md bg-opacity-90">
-                <div class="flex items-center gap-3 pl-2">
-                    <span class="bg-blue-600 text-xs font-black px-2.5 py-1 rounded-lg" x-text="selected.length"></span>
-                    <span class="text-sm font-medium">selecionados</span>
+        <!-- KPI Cards Grid -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-gray-500">Total Visitantes</p>
+                    <p class="mt-1 text-2xl font-black text-gray-900 tracking-tight">{{ $stats['total'] }}</p>
                 </div>
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50 text-orange-700">
+                    <i class="bi bi-people text-lg"></i>
+                </div>
+            </div>
 
-                <div class="h-8 w-px bg-gray-700"></div>
+            <div class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-gray-500">Pendentes</p>
+                    <p class="mt-1 text-2xl font-black text-amber-700 tracking-tight">{{ $stats['pending'] }}</p>
+                </div>
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50 text-amber-700">
+                    <i class="bi bi-clock-history text-lg"></i>
+                </div>
+            </div>
 
-                <div class="flex items-center gap-2">
-                    <button @click="selected = []"
-                        class="px-4 py-2 text-xs font-bold uppercase tracking-wider text-gray-400 hover:text-white transition-colors">
-                        Cancelar
-                    </button>
-                    @if(auth()->user()->role === 'admin')
-                        <form method="POST" action="{{ route('visitors.bulk-delete') }}" @submit.prevent="
-                                                        Swal.fire({
-                                                            title: 'Confirmação de Remoção',
-                                                            text: 'Deseja remover os ' + selected.length + ' visitantes selecionados?',
-                                                            icon: 'warning',
-                                                            showCancelButton: true,
-                                                            confirmButtonColor: '#d33',
-                                                            cancelButtonColor: '#3085d6',
-                                                            confirmButtonText: 'Sim, remover!',
-                                                            cancelButtonText: 'Cancelar'
-                                                        }).then((result) => {
-                                                            if (result.isConfirmed) {
-                                                                $el.submit();
-                                                            }
-                                                        })
-                                                      ">
-                            @csrf
-                            <template x-for="id in selected" :key="id">
-                                <input type="hidden" name="visitor_ids[]" :value="id">
-                            </template>
-                            <button type="submit"
-                                class="bg-red-600 hover:bg-red-700 text-white px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-red-600/20 flex items-center gap-2">
-                                <i class="bi bi-trash-fill"></i> Excluir
-                            </button>
-                        </form>
-                    @endif
+            <div class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-gray-500">Contatados</p>
+                    <p class="mt-1 text-2xl font-black text-blue-700 tracking-tight">{{ $stats['contacted'] }}</p>
+                </div>
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-700">
+                    <i class="bi bi-telephone text-lg"></i>
+                </div>
+            </div>
+
+            <div class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-gray-500">Integrados</p>
+                    <p class="mt-1 text-2xl font-black text-emerald-700 tracking-tight">{{ $stats['integrated'] }}</p>
+                </div>
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
+                    <i class="bi bi-check2-circle text-lg"></i>
                 </div>
             </div>
         </div>
 
-        @section('header-actions')
-            <div class="md:hidden">
-                <a href="{{ route('visitors.create') }}"
-                    class="text-gray-600 hover:text-blue-600 p-2.5 hover:bg-blue-50 rounded-xl transition-all duration-300 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center shadow-lg shadow-blue-600/20">
-                    <i class="bi bi-person-plus-fill text-2xl"></i>
-                </a>
-            </div>
-        @endsection
-
-        <!-- Estatísticas -->
-        <div class="hidden md:grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
-            <div
-                class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 transition-colors">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-xl">
-                        <i class="bi bi-people-fill text-blue-600 dark:text-blue-400 text-2xl"></i>
+        <!-- Filter Bar -->
+        <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+            <form method="GET" action="{{ route('visitors.index') }}" class="space-y-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 items-end">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Buscar</label>
+                        <div class="relative">
+                            <i class="bi bi-search absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                            <input type="text" name="search" value="{{ request('search') }}"
+                                class="w-full rounded-lg border-gray-300 pl-7 pr-3 py-1.5 text-xs focus:border-orange-500 focus:ring-orange-500"
+                                placeholder="Nome, telefone, bairro...">
+                        </div>
                     </div>
-                    <span
-                        class="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Total</span>
-                </div>
-                <p class="text-2xl font-black text-gray-900 dark:text-white">{{ $stats['total'] }}</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Visitantes cadastrados</p>
-            </div>
 
-            <div
-                class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 transition-colors">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="bg-yellow-50 dark:bg-yellow-900/30 p-3 rounded-xl">
-                        <i class="bi bi-clock-history text-yellow-600 dark:text-yellow-400 text-2xl"></i>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Status</label>
+                        <select name="status" class="w-full rounded-lg border-gray-300 px-2 py-1.5 text-xs focus:border-orange-500 focus:ring-orange-500">
+                            <option value="">Todos</option>
+                            <option value="pendente" {{ request('status') == 'pendente' ? 'selected' : '' }}>Pendente</option>
+                            <option value="contatado" {{ request('status') == 'contatado' ? 'selected' : '' }}>Contatado</option>
+                            <option value="integrado" {{ request('status') == 'integrado' ? 'selected' : '' }}>Integrado</option>
+                            <option value="sem_interesse" {{ request('status') == 'sem_interesse' ? 'selected' : '' }}>Sem Interesse</option>
+                        </select>
                     </div>
-                    <span
-                        class="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Pendentes</span>
-                </div>
-                <p class="text-2xl font-black text-yellow-600 dark:text-yellow-400">{{ $stats['pending'] }}</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Aguardando contato</p>
-            </div>
 
-            <div
-                class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 transition-colors">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-xl">
-                        <i class="bi bi-telephone-fill text-blue-600 dark:text-blue-400 text-2xl"></i>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Zona</label>
+                        <select name="zone_id" class="w-full rounded-lg border-gray-300 px-2 py-1.5 text-xs focus:border-orange-500 focus:ring-orange-500">
+                            <option value="">Todas</option>
+                            @foreach($zones as $zone)
+                                <option value="{{ $zone->id }}" {{ request('zone_id') == $zone->id ? 'selected' : '' }}>
+                                    {{ $zone->name }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
-                    <span
-                        class="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Contatados</span>
-                </div>
-                <p class="text-2xl font-black text-blue-600 dark:text-blue-400">{{ $stats['contacted'] }}</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Já foram contatados</p>
-            </div>
 
-            <div
-                class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 transition-colors">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="bg-green-50 dark:bg-green-900/30 p-3 rounded-xl">
-                        <i class="bi bi-check-circle-fill text-green-600 dark:text-green-400 text-2xl"></i>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Data Início</label>
+                        <input type="date" name="date_from" value="{{ request('date_from') }}"
+                            class="w-full rounded-lg border-gray-300 px-2 py-1.5 text-xs focus:border-orange-500 focus:ring-orange-500">
                     </div>
-                    <span
-                        class="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Integrados</span>
-                </div>
-                <p class="text-2xl font-black text-green-600 dark:text-green-400">{{ $stats['integrated'] }}</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Integrados em células</p>
-            </div>
-        </div>
 
-        <!-- Filtros e Ações -->
-        <div
-            class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 mb-6 transition-colors">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-4">
-                <h3 class="text-lg font-black text-gray-900 dark:text-white">Filtros</h3>
-                <div class="flex gap-3">
-                    <div
-                        class="hidden md:flex bg-gray-50 dark:bg-gray-700 p-1 rounded-2xl border border-gray-100 dark:border-gray-600 mr-2">
-                        <button @click="view = 'list'"
-                            :class="view === 'list' ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-400 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'"
-                            class="px-3.5 py-2 rounded-xl transition-all duration-300 flex items-center gap-2 text-xs font-black uppercase tracking-widest">
-                            <i class="bi bi-list-ul text-sm"></i>
-                            <span>Lista</span>
+                    <div class="flex items-center gap-1.5">
+                        <button type="submit" class="inline-flex items-center gap-1 rounded-lg bg-orange-700 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-orange-800 transition-colors shadow-sm">
+                            <i class="bi bi-filter text-xs"></i> Filtrar
                         </button>
-                        <button @click="view = 'grid'"
-                            :class="view === 'grid' ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-400 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'"
-                            class="px-3.5 py-2 rounded-xl transition-all duration-300 flex items-center gap-2 text-xs font-black uppercase tracking-widest">
-                            <i class="bi bi-grid-fill text-sm"></i>
-                            <span>Grelha</span>
+                        <a href="{{ route('visitors.index') }}" class="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50">
+                            <i class="bi bi-x-lg text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+                    <span class="text-xs text-gray-500 font-semibold">{{ $visitors->total() }} visitantes encontrados</span>
+                    <div class="flex items-center rounded-lg border border-gray-200 p-0.5 bg-gray-50">
+                        <button type="button" @click="view = 'list'"
+                            :class="view === 'list' ? 'bg-white text-gray-900 shadow-sm font-bold' : 'text-gray-500 hover:text-gray-900'"
+                            class="rounded-md px-2 py-1 text-xs transition-colors">
+                            <i class="bi bi-list-ul"></i>
+                        </button>
+                        <button type="button" @click="view = 'grid'"
+                            :class="view === 'grid' ? 'bg-white text-gray-900 shadow-sm font-bold' : 'text-gray-500 hover:text-gray-900'"
+                            class="rounded-md px-2 py-1 text-xs transition-colors">
+                            <i class="bi bi-grid-fill"></i>
                         </button>
                     </div>
-                    <div class="flex gap-1 btn-group">
-                        <a href="https://chat.whatsapp.com/DxAf8sMvMDYDDhrIV1wRxC" target="_blank"
-                            class="bg-[#25D366] text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#128C7E] transition-all flex items-center">
-                            <i class="bi bi-whatsapp mr-2"></i>Grupo Supervisores
-                        </a>
-                        <a href="{{ route('visitors.export', request()->all()) }}"
-                            class="bg-green-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-green-700 transition-all">
-                            <i class="bi bi-file-earmark-excel mr-2"></i>Exportar Excel
-                        </a>
-                        <a href="{{ route('visitors.create') }}"
-                            class="hidden md:flex bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all items-center">
-                            <i class="bi bi-plus-lg mr-2"></i>Novo
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <form method="GET" action="{{ route('visitors.index') }}" class="grid grid-cols-1 md:grid-cols-5 gap-3">
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Buscar</label>
-                    <input type="text" name="search" data-live-search="ajax" value="{{ request('search') }}"
-                        class="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
-                        placeholder="Nome, telefone, bairro...">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Status</label>
-                    <select name="status"
-                        class="searchable-select w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white custom-select" data-label="Status">
-                        <option value="">Todos</option>
-                        <option value="pendente" {{ request('status') == 'pendente' ? 'selected' : '' }}>Pendente</option>
-                        <option value="contatado" {{ request('status') == 'contatado' ? 'selected' : '' }}>Contatado</option>
-                        <option value="integrado" {{ request('status') == 'integrado' ? 'selected' : '' }}>Integrado</option>
-                        <option value="sem_interesse" {{ request('status') == 'sem_interesse' ? 'selected' : '' }}>Sem Interesse</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Zona</label>
-                    <select name="zone_id"
-                        class="searchable-select w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white custom-select" data-label="Zona">
-                        <option value="">Todas</option>
-                        @foreach($zones as $zone)
-                            <option value="{{ $zone->id }}" {{ request('zone_id') == $zone->id ? 'selected' : '' }}>
-                                {{ $zone->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Data Início</label>
-                    <input type="date" name="date_from" value="{{ request('date_from') }}"
-                        class="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                </div>
-
-                <div class="flex items-end gap-2">
-                    <button type="submit"
-                        class="flex-1 bg-orange-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-orange-700 transition-all">
-                        <i class="bi bi-search mr-2"></i>Filtrar
-                    </button>
-                    <a href="{{ route('visitors.index') }}"
-                        class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-3.5 py-2 rounded-xl font-bold text-xs hover:bg-gray-200 dark:hover:bg-gray-600 transition-all">
-                        <i class="bi bi-x-lg"></i>
-                    </a>
                 </div>
             </form>
         </div>
 
-        <!-- Listagem -->
-        <div class="relative">
-            <!-- Grid View -->
-            <div x-show="view === 'grid'" x-transition:enter="transition ease-out duration-300"
-                x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-                class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                @forelse($visitors as $visitor)
-                    <div class="bg-white dark:bg-gray-800 p-4 md:p-5 rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col group hover:shadow-lg transition-all duration-300 relative compact-card"
-                        :class="{'ring-2 ring-blue-500 bg-blue-50/10 dark:bg-blue-900/10': selected.includes({{ $visitor->id }})}">
-
-                        <div class="absolute top-4 left-4 z-10">
+        <!-- List View -->
+        <div x-show="view === 'list'" class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-gray-50 text-[10px] uppercase font-black tracking-wider text-gray-500 border-b border-gray-200">
+                        <tr>
                             @if(auth()->user()->role === 'admin')
-                                <input type="checkbox" value="{{ $visitor->id }}" x-model="selected"
-                                    class="w-5 h-5 rounded-lg border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 cursor-pointer shadow-sm bg-white dark:bg-gray-700">
+                                <th class="px-4 py-2.5 w-8">
+                                    <input type="checkbox" @click="toggleAll()"
+                                        :checked="selected.length === {{ $visitors->count() }} && selected.length > 0"
+                                        class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                                </th>
                             @endif
-                        </div>
-
-                        <div class="absolute top-4 right-4 md:top-6 md:right-6 flex flex-col items-end gap-2">
-                            <x-visitor-status-badge :status="$visitor->contact_status" />
-                        </div>
-
-                        <div
-                            class="w-10 h-10 md:w-14 md:h-14 rounded-2xl bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center font-black text-lg md:text-2xl group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 mb-3 md:mb-4 mt-2 ml-4">
-                            {{ strtoupper(substr($visitor->name, 0, 1)) }}
-                        </div>
-
-                        <div class="mb-4">
-                            <h4
-                                class="text-base font-black text-gray-900 dark:text-white leading-tight mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
-                                {{ $visitor->name }}
-                            </h4>
-                            <p class="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">
-                                @if($visitor->age) {{ $visitor->age }} anos @endif
-                                @if($visitor->gender) • {{ ucfirst($visitor->gender) }} @endif
-                            </p>
-                        </div>
-
-                        <div class="space-y-3 mb-5 flex-1">
-                            @if($visitor->phone)
-                                <div class="flex items-center gap-3 text-gray-500 dark:text-gray-400">
-                                    <div
-                                        class="w-8 h-8 rounded-lg bg-gray-50 dark:bg-gray-700 flex items-center justify-center text-sm">
-                                        <i class="bi bi-telephone text-blue-500 dark:text-blue-400"></i>
-                                    </div>
-                                    <span class="text-sm font-bold">{{ $visitor->phone }}</span>
-                                </div>
-                            @endif
-
-                            <div class="flex items-center gap-3 text-gray-500 dark:text-gray-400">
-                                <div
-                                    class="w-8 h-8 rounded-lg bg-gray-50 dark:bg-gray-700 flex items-center justify-center text-sm">
-                                    <i class="bi bi-calendar-event text-orange-500 dark:text-orange-400"></i>
-                                </div>
-                                <div class="flex flex-col">
-                                    <span class="text-xs font-black uppercase text-gray-900 dark:text-white">Visita:
-                                        {{ $visitor->visit_date->format('d/m/Y') }}</span>
-                                    <span
-                                        class="text-[10px] text-gray-400 font-medium">{{ $visitor->visit_date->diffForHumans() }}</span>
-                                </div>
-                            </div>
-
-                            @if($visitor->zone)
-                                <div class="flex items-center gap-3 text-gray-500 dark:text-gray-400">
-                                    <div
-                                        class="w-8 h-8 rounded-lg bg-gray-50 dark:bg-gray-700 flex items-center justify-center text-sm font-bold">
-                                        <i class="bi bi-geo-alt text-red-500 dark:text-red-400"></i>
-                                    </div>
-                                    <span class="text-xs font-black uppercase text-gray-900 dark:text-white">
-                                        {{ $visitor->zone->name }}
-                                    </span>
-                                </div>
-                            @endif
-
-                            @if($visitor->neighborhood)
-                                <div class="flex items-center gap-3 text-gray-500 dark:text-gray-400">
-                                    <i class="bi bi-house-door text-[10px] ml-2"></i>
-                                    <span class="text-[10px] font-medium italic">{{ $visitor->neighborhood }}</span>
-                                </div>
-                            @endif
-                        </div>
-
-                        <div class="flex gap-2">
-                            <a href="{{ route('visitors.show', $visitor) }}"
-                                class="flex-1 bg-gray-900 dark:bg-black text-white text-center py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition-all shadow-lg hover:shadow-blue-200 active:scale-95 flex items-center justify-center gap-2">
-                                <i class="bi bi-eye"></i> Ver
-                            </a>
-                            @if(in_array(auth()->user()->role, ['super_admin', 'admin', 'secretaria', 'pastor_senior', 'pastor', 'pastor_zona']))
-                                <a href="{{ route('visitors.edit', $visitor) }}"
-                                    class="flex-1 bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-300 text-center py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2">
-                                    <i class="bi bi-pencil"></i> Editar
-                                </a>
-                            @endif
-                        </div>
-                    </div>
-                @empty
-                    <div
-                        class="col-span-full py-14 bg-white dark:bg-gray-800 rounded-3xl border border-dashed border-gray-200 dark:border-gray-700 flex flex-col items-center gap-4 text-gray-300 dark:text-gray-600">
-                        <i class="bi bi-inbox text-6xl"></i>
-                        <p class="font-bold text-lg">Nenhum visitante encontrado</p>
-                    </div>
-                @endforelse
-            </div>
-
-            <!-- List View -->
-            <div x-show="view === 'list'" x-transition:enter="transition ease-out duration-300"
-                x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-                class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full table-compact">
-                        <thead>
-                            <tr
-                                class="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 border-b border-gray-100 dark:border-gray-700">
+                            <th class="px-4 py-2.5">Visitante</th>
+                            <th class="px-4 py-2.5">Contato</th>
+                            <th class="px-4 py-2.5">Data Visita</th>
+                            <th class="px-4 py-2.5">Culto</th>
+                            <th class="px-4 py-2.5">Zona</th>
+                            <th class="px-4 py-2.5 text-center">Status</th>
+                            <th class="px-4 py-2.5 text-right">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        @forelse($visitors as $visitor)
+                            <tr class="hover:bg-gray-50/70 transition-colors"
+                                :class="{'bg-orange-50/40': selected.includes({{ $visitor->id }})}">
                                 @if(auth()->user()->role === 'admin')
-                                    <th class="px-6 py-4 text-left w-10">
-                                        <input type="checkbox" @click="toggleAll()"
-                                            :checked="selected.length === {{ $visitors->count() }} && selected.length > 0"
-                                            class="rounded-lg border-gray-300 dark:border-gray-600 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5 bg-white dark:bg-gray-700">
-                                    </th>
+                                    <td class="px-4 py-2.5">
+                                        <input type="checkbox" value="{{ $visitor->id }}" x-model="selected"
+                                            class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                                    </td>
                                 @endif
-                                <th class="px-6 py-4 text-left">Visitante</th>
-                                <th class="px-6 py-4 text-left">Contato</th>
-                                <th class="px-6 py-4 text-left">Data Visita</th>
-                                <th class="px-6 py-4 text-left">Culto</th>
-                                <th class="px-6 py-4 text-left">Zona</th>
-                                <th class="px-6 py-4 text-center">Status</th>
-                                <th class="px-6 py-4 text-center">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-50 dark:divide-gray-700">
-                            @forelse($visitors as $visitor)
-                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                                    @if(auth()->user()->role === 'admin')
-                                        <td class="px-6 py-4 relative">
-                                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 opacity-0 transition-opacity"
-                                                :class="{'opacity-100': selected.includes({{ $visitor->id }})}"></div>
-                                            <input type="checkbox" value="{{ $visitor->id }}" x-model="selected"
-                                                class="rounded-lg border-gray-300 dark:border-gray-600 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all cursor-pointer w-5 h-5 bg-white dark:bg-gray-700">
-                                        </td>
-                                    @endif
-                                    <td class="px-6 py-4">
+                                <td class="px-4 py-2.5">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-orange-50 font-bold text-orange-700 text-xs shrink-0">
+                                            {{ strtoupper(substr($visitor->name, 0, 1)) }}
+                                        </div>
                                         <div>
-                                            <p class="font-bold text-gray-900 dark:text-gray-100">{{ $visitor->name }}</p>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                            <a href="{{ route('visitors.show', $visitor) }}" class="font-bold text-gray-900 hover:text-orange-700 transition-colors">
+                                                {{ $visitor->name }}
+                                            </a>
+                                            <span class="text-[10px] text-gray-400 block">
                                                 @if($visitor->age) {{ $visitor->age }} anos @endif
                                                 @if($visitor->gender) • {{ ucfirst($visitor->gender) }} @endif
-                                            </p>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div>
-                                            @if($visitor->phone)
-                                                <p class="text-sm text-gray-900 dark:text-gray-200"><i
-                                                        class="bi bi-telephone mr-1"></i>{{ $visitor->phone }}</p>
-                                            @endif
-                                            @if($visitor->neighborhood)
-                                                <p class="text-xs text-gray-500 dark:text-gray-400"><i
-                                                        class="bi bi-geo-alt mr-1"></i>{{ $visitor->neighborhood }}</p>
-                                            @endif
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <p class="text-sm font-bold text-gray-900 dark:text-gray-200">
-                                            {{ $visitor->visit_date->format('d/m/Y') }}
-                                        </p>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400">
-                                            {{ $visitor->visit_date->diffForHumans() }}</p>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        @if($visitor->service)
-                                            <p class="text-sm text-gray-900 dark:text-gray-200">
-                                                {{ $visitor->service->service_type }}</p>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">
-                                                {{ $visitor->service->date->format('d/m/Y') }}</p>
-                                        @else
-                                            <span class="text-xs text-gray-400 dark:text-gray-600">Não informado</span>
-                                        @endif
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        @if($visitor->zone)
-                                            <span
-                                                class="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-xs font-bold">
-                                                {{ $visitor->zone->name }}
                                             </span>
-                                        @else
-                                            <span class="text-xs text-gray-400 dark:text-gray-600">Não atribuído</span>
-                                        @endif
-                                    </td>
-                                    <td class="px-6 py-4 text-center">
-                                        <x-visitor-status-badge :status="$visitor->contact_status" />
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center justify-center gap-2">
-                                            <a href="{{ route('visitors.show', $visitor) }}"
-                                                class="action-icon text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-gray-700"
-                                                title="Ver detalhes">
-                                                <i class="bi bi-eye-fill"></i>
-                                            </a>
-                                            @if(in_array(auth()->user()->role, ['super_admin', 'admin', 'secretaria', 'pastor_senior', 'pastor', 'pastor_zona']))
-                                                <a href="{{ route('visitors.edit', $visitor) }}"
-                                                    class="action-icon text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 hover:bg-orange-50 dark:hover:bg-gray-700"
-                                                    title="Editar">
-                                                    <i class="bi bi-pencil-fill"></i>
-                                                </a>
-                                            @endif
-                                            @if(auth()->user()->role === 'admin')
-                                                <form id="list-delete-visitor-{{ $visitor->id }}"
-                                                    action="{{ route('visitors.destroy', $visitor) }}" method="POST" class="inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="button"
-                                                        onclick="confirmDelete('list-delete-visitor-{{ $visitor->id }}')"
-                                                        class="action-icon text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-gray-700"
-                                                        title="Eliminar">
-                                                        <i class="bi bi-trash-fill"></i>
-                                                    </button>
-                                                </form>
-                                            @endif
                                         </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="8" class="px-6 py-12 text-center text-gray-400 dark:text-gray-500">
-                                        <i class="bi bi-inbox text-4xl mb-4 block"></i>
-                                        <p class="font-bold">Nenhum visitante encontrado</p>
-                                        <p class="text-sm mt-2">Cadastre o primeiro visitante para começar</p>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-2.5">
+                                    <span class="text-gray-900 block truncate">{{ $visitor->phone ?: 'Sem telefone' }}</span>
+                                    @if($visitor->neighborhood)
+                                        <span class="text-[10px] text-gray-400 block truncate">{{ $visitor->neighborhood }}</span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-2.5 whitespace-nowrap">
+                                    <span class="font-semibold text-gray-900 block">{{ $visitor->visit_date->format('d/m/Y') }}</span>
+                                    <span class="text-[10px] text-gray-400 block">{{ $visitor->visit_date->diffForHumans() }}</span>
+                                </td>
+                                <td class="px-4 py-2.5">
+                                    @if($visitor->service)
+                                        <span class="text-gray-900 block truncate">{{ $visitor->service->service_type }}</span>
+                                        <span class="text-[10px] text-gray-400 block">{{ $visitor->service->date->format('d/m/Y') }}</span>
+                                    @else
+                                        <span class="text-gray-400 italic">Não informado</span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-2.5">
+                                    @if($visitor->zone)
+                                        <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700">
+                                            {{ $visitor->zone->name }}
+                                        </span>
+                                    @else
+                                        <span class="text-gray-400 italic">Pendente</span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-2.5 text-center">
+                                    <x-visitor-status-badge :status="$visitor->contact_status" />
+                                </td>
+                                <td class="px-4 py-2.5 text-right whitespace-nowrap">
+                                    <div class="flex items-center justify-end gap-1">
+                                        <a href="{{ route('visitors.show', $visitor) }}"
+                                            class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-200 text-gray-400 hover:border-gray-300 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                                            title="Ver detalhes">
+                                            <i class="bi bi-eye text-xs"></i>
+                                        </a>
+                                        @if(in_array(auth()->user()->role, ['super_admin', 'admin', 'secretaria', 'pastor_senior', 'pastor', 'pastor_zona']))
+                                            <a href="{{ route('visitors.edit', $visitor) }}"
+                                                class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-200 text-gray-400 hover:border-orange-300 hover:text-orange-700 hover:bg-orange-50 transition-colors"
+                                                title="Editar">
+                                                <i class="bi bi-pencil-square text-xs"></i>
+                                            </a>
+                                        @endif
+                                        @if(auth()->user()->role === 'admin')
+                                            <form id="list-delete-visitor-{{ $visitor->id }}"
+                                                action="{{ route('visitors.destroy', $visitor) }}" method="POST" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button"
+                                                    onclick="confirmDelete('list-delete-visitor-{{ $visitor->id }}')"
+                                                    class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-200 text-gray-400 hover:border-red-300 hover:text-red-600 hover:bg-red-50 transition-colors"
+                                                    title="Eliminar">
+                                                    <i class="bi bi-trash text-xs"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="8" class="px-4 py-8 text-center text-xs text-gray-400 italic">
+                                    Nenhum visitante encontrado.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
+        </div>
 
+        <!-- Grid View -->
+        <div x-show="view === 'grid'" style="display: none;" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            @forelse($visitors as $visitor)
+                <div class="rounded-xl border border-gray-200 bg-white p-3.5 shadow-sm hover:border-orange-300 transition-colors flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <x-visitor-status-badge :status="$visitor->contact_status" />
+                            <span class="text-[10px] font-bold text-gray-400">{{ $visitor->visit_date->format('d/m/Y') }}</span>
+                        </div>
+                        <h4 class="text-xs font-bold text-gray-900 truncate">{{ $visitor->name }}</h4>
+                        <p class="text-[11px] text-gray-500 truncate mt-0.5">{{ $visitor->phone ?: 'Sem telefone' }}</p>
+                        @if($visitor->zone)
+                            <p class="text-[10px] text-blue-700 font-bold truncate mt-0.5">{{ $visitor->zone->name }}</p>
+                        @endif
+                    </div>
+
+                    <div class="flex items-center gap-1.5 pt-3 border-t border-gray-100 mt-3">
+                        <a href="{{ route('visitors.show', $visitor) }}"
+                            class="flex-1 text-center py-1 rounded-md bg-gray-50 text-gray-700 hover:bg-gray-100 text-xs font-bold border border-gray-200">
+                            Ver
+                        </a>
+                        @if(in_array(auth()->user()->role, ['super_admin', 'admin', 'secretaria', 'pastor_senior', 'pastor', 'pastor_zona']))
+                            <a href="{{ route('visitors.edit', $visitor) }}"
+                                class="inline-flex h-6 w-6 items-center justify-center rounded-md border border-gray-200 text-gray-500 hover:text-orange-700">
+                                <i class="bi bi-pencil text-[11px]"></i>
+                            </a>
+                        @endif
+                    </div>
+                </div>
+            @empty
+                <div class="col-span-full rounded-xl border border-dashed border-gray-200 p-8 text-center text-xs text-gray-400 italic">
+                    Nenhum visitante encontrado.
+                </div>
+            @endforelse
         </div>
 
         @if($visitors->hasPages())
-            <div class="mt-4">
+            <div class="border-t border-gray-200 pt-3">
                 {{ $visitors->links() }}
             </div>
         @endif
+
+        <!-- Floating Bulk Bar -->
+        <div x-show="selected.length > 0" x-cloak
+            class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 rounded-xl bg-gray-900 text-white px-4 py-2.5 shadow-xl flex items-center gap-3 border border-gray-700 text-xs">
+            <span class="font-bold"><span x-text="selected.length"></span> selecionado(s)</span>
+            <div class="h-4 w-px bg-gray-700"></div>
+            @if(auth()->user()->role === 'admin')
+                <form method="POST" action="{{ route('visitors.bulk-delete') }}" onsubmit="return confirm('Tem certeza que deseja excluir os visitantes selecionados?')" class="inline">
+                    @csrf
+                    <template x-for="id in selected" :key="id">
+                        <input type="hidden" name="visitor_ids[]" :value="id">
+                    </template>
+                    <button type="submit" class="inline-flex items-center gap-1 rounded-md bg-red-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-red-700">
+                        <i class="bi bi-trash text-xs"></i> Excluir
+                    </button>
+                </form>
+            @endif
+            <button @click="selected = []" class="text-gray-400 hover:text-white ml-1">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
     </div>
-
-    <!-- Dynamic Search Script (Kept as it is useful for AJAX search outside Alpine scope) -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const searchInput = document.querySelector('input[name="search"]');
-            const filterForm = searchInput && searchInput.closest('form');
-
-            if (searchInput && filterForm) {
-                let timeout = null;
-                searchInput.addEventListener('input', function () {
-                    clearTimeout(timeout);
-                    timeout = setTimeout(function () {
-                        const formData = new FormData(filterForm);
-                        const params = new URLSearchParams(formData);
-
-                        document.body.style.cursor = 'wait';
-
-                        fetch(`${filterForm.action}?${params.toString()}`, {
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest'
-                            }
-                        })
-                            .then(response => response.text())
-                            .then(html => {
-                                const parser = new DOMParser();
-                                const doc = parser.parseFromString(html, 'text/html');
-
-                                // We need to be careful with Alpine.js re-initialization if we swap HTML.
-                                // The valid approach when using Alpine and AJAX replacements is to let standard navigation handle it 
-                                // OR use Livewire. Since we are using standard Laravel + Alpine, full HTML replacement risks breaking Alpine x-data.
-                                // However, in this case, we are only replacing the INNER content of grids/lists, 
-                                // but we wrapped everything in x-data in the parent div.
-                                // So replacing inner content is generally safe IF the replaced content doesn't contain the x-data root.
-
-                                // Actually, simpler approach for now to avoid Alpine breakage: 
-                                // Just submit the form normally? No, the user likes the "dynamic" feel.
-                                // Let's try to just submit form on debounce as done in Member's index.
-                                // In Member's index we used: @input.debounce.500ms="$el.form.submit()"
-                                // This causes a full page reload but is safe and reliable.
-
-                                // Let's switch to the standard submit approach to match Members index and avoid Alpine complexity with AJAX.
-                                filterForm.submit();
-                            });
-                    }, 500);
-                });
-            }
-        });
-    </script>
 @endsection

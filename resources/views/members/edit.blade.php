@@ -1,53 +1,67 @@
 @extends('layouts.app')
 
-@section('title', 'Editar Membro / Líder')
+@section('title', 'Editar Membro / Líder - Portal Life Church')
 @section('page-title', 'Editar Registo')
 @section('page-subtitle', $member->name)
 
+@section('header-actions')
+    <div class="flex items-center gap-2">
+        <a href="{{ route('members.show', ['member' => $member->id]) }}" 
+            class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
+            <i class="bi bi-eye text-xs"></i>
+            <span>Ver Detalhes</span>
+        </a>
+        <a href="{{ route('members.index') }}"
+            class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
+            <i class="bi bi-arrow-left text-xs"></i>
+            <span>Voltar</span>
+        </a>
+    </div>
+@endsection
+
 @section('content')
-<div class="grid grid-max-w-3xl mx-auto">
-    <div class="bg-white rounded-lg shadow-lg p-8">
-        <form action="{{ route('members.update', ['member' => $member->id]) }}" method="POST">
+    <div class="space-y-5">
+        <!-- Executive Header Card -->
+        <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50 text-orange-700">
+                    <i class="bi bi-person-gear text-xl"></i>
+                </div>
+                <div>
+                    <span class="text-[10px] font-black uppercase tracking-wider text-orange-700">Edição de Membro</span>
+                    <h1 class="text-lg font-black text-gray-900 tracking-tight">{{ $member->name }}</h1>
+                    <p class="text-xs text-gray-500">Atualize dados cadastrais, cargo e alocação de célula</p>
+                </div>
+            </div>
+        </div>
+
+        <form action="{{ route('members.update', ['member' => $member->id]) }}" method="POST" class="space-y-4">
             @csrf
             @method('PUT')
 
-            <!-- Aviso -->
-            <div class="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded">
-                <div class="flex items-start">
-                    <i class="bi bi-exclamation-triangle text-yellow-600 text-xl mr-3 mt-1"></i>
-                    <p class="text-sm text-yellow-800">
-                        <strong>Atenção:</strong> Esta tela permite atualizar dados pessoais e hierarquia (Célula/Supervisão). A senha deve ser alterada pelo próprio usuário ou por um Admin no perfil completo.
-                    </p>
-                </div>
-            </div>
-
             <!-- Dados Pessoais -->
-            <div class="mb-8 pb-6 border-b border-gray-200">
-                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                    <i class="bi bi-person-vcard mr-2"></i>Dados Pessoais
-                </h3>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-                    <!-- Nome -->
-                    <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+            <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm space-y-3">
+                <h3 class="text-xs font-black uppercase tracking-wider text-gray-900">1. Dados Pessoais e Função</h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                        <label for="name" class="block text-xs font-bold text-gray-700">
                             Nome Completo <span class="text-red-500">*</span>
                         </label>
                         <input type="text" name="name" id="name" required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 @error('name') border-red-500 @enderror"
+                            class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 @error('name') border-red-500 @enderror"
                             value="{{ old('name', $member->name) }}" placeholder="Nome Completo">
                         @error('name')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <!-- Cargo / Role -->
-                    <div>
-                        <label for="role" class="block text-sm font-medium text-gray-700 mb-2">
+                    <div class="space-y-1">
+                        <label for="role" class="block text-xs font-bold text-gray-700">
                             Cargo / Função <span class="text-red-500">*</span>
                         </label>
                         <select name="role" id="role" required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 custom-select @error('role') border-red-500 @enderror">
+                            class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 @error('role') border-red-500 @enderror">
                             @foreach($allowedRoles as $role)
                                 <option value="{{ $role }}" {{ old('role', $member->role) == $role ? 'selected' : '' }}>
                                     {{ ucfirst(str_replace('_', ' ', $role)) }}
@@ -55,97 +69,83 @@
                             @endforeach
                         </select>
                         @error('role')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
-                </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Telefone -->
-                    <div>
-                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
-                            Telefone
-                        </label>
+                    <div class="space-y-1">
+                        <label for="phone" class="block text-xs font-bold text-gray-700">Telefone</label>
                         <input type="tel" name="phone" id="phone"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500"
                             value="{{ old('phone', $member->phone) }}" placeholder="823562000">
                     </div>
-                </div>
 
-                <!-- Email (CORREÇÃO APLICADA AQUI) -->
-                <div class="mt-4">
-                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                        Email
-                    </label>
-                    
-                    {{-- Campo visível (READONLY) para exibição --}}
-                    <input type="email" 
-                        class="w-full px-4 py-2 border border-gray-300 bg-gray-100 rounded-lg"
-                        value="{{ $member->email }}" readonly>
-                        
-                    {{-- Campo oculto (HIDDEN) para enviar o valor ao servidor --}}
-                    <input type="hidden" name="email" value="{{ $member->email }}"> 
-
-                    <p class="text-xs text-gray-500 mt-1">O email não pode ser alterado através deste formulário contextual.</p>
+                    <div class="space-y-1">
+                        <label class="block text-xs font-bold text-gray-700">Email (Não editável)</label>
+                        <input type="email" class="w-full rounded-lg border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-500 cursor-not-allowed"
+                            value="{{ $member->email }}" readonly>
+                        <input type="hidden" name="email" value="{{ $member->email }}">
+                    </div>
                 </div>
             </div>
 
-            <!-- Hierarquia (Célula) -->
-            <div class="mb-8 pb-6 border-b border-gray-200">
-                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                    <i class="bi bi-diagram-3 mr-2"></i>Atribuição de Célula
-                </h3>
-                
-                <label for="cell_id" class="block text-sm font-medium text-gray-700 mb-2">
-                    <i class="bi bi-people-fill mr-2"></i>Nova Célula <span class="text-red-500">*</span>
-                </label>
-                <select name="cell_id" id="cell_id" required
-                    class="searchable-select w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 custom-select @error('cell_id') border-red-500 @enderror" data-label="Célula">
-                    <option value="">-- Selecione a célula --</option>
-                    @foreach($availableCells as $cell)
-                        <option value="{{ $cell->id }}" {{ old('cell_id', $member->cell_id) == $cell->id ? 'selected' : '' }}>
-                            {{ $cell->name }} ({{ $cell->type_label }})
-                            @if($cell->supervision)
-                                - {{ $cell->supervision->name }}
-                                @if($cell->supervision->zone)
-                                    / {{ $cell->supervision->zone->name }}
+            <!-- Célula -->
+            <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm space-y-3">
+                <h3 class="text-xs font-black uppercase tracking-wider text-gray-900">2. Atribuição de Célula</h3>
+
+                <div class="space-y-1">
+                    <label for="cell_id" class="block text-xs font-bold text-gray-700">
+                        Célula Vinculada <span class="text-red-500">*</span>
+                    </label>
+                    <select name="cell_id" id="cell_id" required
+                        class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 @error('cell_id') border-red-500 @enderror">
+                        <option value="">-- Selecione a célula --</option>
+                        @foreach($availableCells as $cell)
+                            <option value="{{ $cell->id }}" {{ old('cell_id', $member->cell_id) == $cell->id ? 'selected' : '' }}>
+                                {{ $cell->name }} ({{ $cell->type_label }})
+                                @if($cell->supervision)
+                                    - {{ $cell->supervision->name }}
+                                    @if($cell->supervision->zone)
+                                        / {{ $cell->supervision->zone->name }}
+                                    @endif
                                 @endif
-                            @endif
-                        </option>
-                    @endforeach
-                </select>
-                @error('cell_id')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                @enderror
-                <p class="text-xs text-gray-500 mt-1">A célula atual é: **{{ $member->cell->name ?? 'N/A' }}**</p>
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('cell_id')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                    <p class="text-[11px] text-gray-400 mt-1">Célula atual: <strong>{{ $member->cell->name ?? 'Nenhuma' }}</strong></p>
+                </div>
             </div>
 
             <!-- Status -->
-            <div class="mb-6">
-                 <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                    <i class="bi bi-activity mr-2"></i>Status do Membro
-                </h3>
-                <label for="is_active" class="flex items-center space-x-3">
-                    <input type="hidden" name="is_active" value="0"> {{-- Hidden field para garantir que 0 é enviado se unchecked --}}
-                    <input type="checkbox" name="is_active" id="is_active" value="1"
-                        class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                        {{ old('is_active', $member->is_active) ? 'checked' : '' }}>
-                    <span class="text-sm font-medium text-gray-700">Membro Ativo (Pode contribuir e aceder ao sistema)</span>
-                </label>
+            <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-gray-900">Status do Membro</p>
+                        <p class="text-[11px] text-gray-500">Membro ativo pode aceder ao portal e ter presenças registradas</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="hidden" name="is_active" value="0">
+                        <input type="checkbox" name="is_active" value="1" 
+                            class="sr-only peer" {{ old('is_active', $member->is_active) ? 'checked' : '' }}>
+                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-600"></div>
+                    </label>
+                </div>
             </div>
 
-            <!-- Botões -->
-            <div class="flex gap-4 mt-6">
-                <button type="submit" 
-                    class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-bold shadow-md">
-                    <i class="bi bi-save mr-2"></i>Salvar Alterações
-                </button>
-                <a href="{{ route('members.show', ['member' => $member->id]) }}" 
-                    class="flex-1 bg-gray-200 text-gray-800 px-6 py-3 rounded-lg hover:bg-gray-300 transition font-bold text-center shadow-md">
-                    <i class="bi bi-arrow-left mr-2"></i>Voltar
+            <div class="flex items-center justify-end gap-2 pt-2">
+                <a href="{{ route('members.show', ['member' => $member->id]) }}"
+                    class="rounded-lg border border-gray-200 px-3.5 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors">
+                    Cancelar
                 </a>
+                <button type="submit" 
+                    class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition-colors">
+                    <i class="bi bi-check-lg text-xs"></i>
+                    <span>Salvar Alterações</span>
+                </button>
             </div>
         </form>
     </div>
-</div>
 @endsection

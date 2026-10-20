@@ -4,128 +4,112 @@
 @section('page-title', 'Editar Zona')
 @section('page-subtitle', 'Atualizar informações da área pastoral ' . $zone->name)
 
+@section('header-actions')
+    <div class="flex items-center gap-2">
+        <a href="{{ route('zones.index') }}"
+            class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
+            <i class="bi bi-arrow-left text-xs"></i>
+            <span>Voltar</span>
+        </a>
+        <a href="{{ route('zones.merge', $zone) }}"
+            class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-bold text-red-600 shadow-sm hover:bg-red-100 transition-colors">
+            <i class="bi bi-intersect text-xs"></i>
+            <span>Mesclar</span>
+        </a>
+    </div>
+@endsection
+
 @section('content')
-    <div class="w-full space-y-8">
-        <!-- Header Card -->
-        <div class="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-sm border border-gray-100 relative overflow-hidden group">
-            <div
-                class="absolute top-0 right-0 w-64 h-64 bg-blue-50/50 rounded-full -mr-32 -mt-32 transition-transform group-hover:scale-110 duration-700">
-            </div>
-
-            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-                <div class="flex flex-col md:flex-row items-center gap-8 text-center md:text-left">
-                    <div
-                        class="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-blue-500 to-blue-700 text-white flex items-center justify-center text-4xl shadow-2xl shadow-blue-100">
-                        <i class="bi bi-diagram-3-fill"></i>
-                    </div>
-                    <div>
-                        <div
-                            class="flex items-center justify-center md:justify-start gap-2 text-xs font-bold text-blue-600 uppercase tracking-widest mb-2">
-                            <a href="{{ route('zones.index') }}" class="hover:underline">Zonas</a>
-                            <i class="bi bi-chevron-right text-[10px]"></i>
-                            <span>Editar Zona</span>
-                        </div>
-                        <h1 class="text-3xl font-black text-gray-900 tracking-tight uppercase">Editar Zona</h1>
-                        <p class="text-gray-500 font-medium tracking-tight">Atualizar informações da área pastoral <span
-                                class="text-blue-600 font-black italic">{{ $zone->name }}</span></p>
-                    </div>
+    <div class="space-y-5">
+        <!-- Executive Header Card -->
+        <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50 text-orange-700">
+                    <i class="bi bi-geo-alt text-xl"></i>
                 </div>
-
-                <div class="flex items-center gap-3">
-                    <a href="{{ route('zones.merge', $zone) }}"
-                        class="group flex items-center bg-red-50 text-red-600 px-6 py-4 rounded-2xl hover:bg-red-100 transition-all font-bold text-xs uppercase tracking-widest border border-red-100">
-                        <i class="bi bi-intersect text-lg mr-2"></i>
-                        Mesclar
-                    </a>
-                    <a href="{{ route('zones.index') }}"
-                        class="group flex items-center bg-gray-50 text-gray-500 px-6 py-4 rounded-2xl hover:bg-gray-100 transition-all font-bold text-xs uppercase tracking-widest">
-                        <i class="bi bi-arrow-left text-lg mr-2 group-hover:-translate-x-1 transition-transform"></i>
-                        Cancelar
-                    </a>
+                <div>
+                    <span class="text-[10px] font-black uppercase tracking-wider text-orange-700">Edição de Zona</span>
+                    <h1 class="text-lg font-black text-gray-900 tracking-tight">{{ $zone->name }}</h1>
+                    <p class="text-xs text-gray-500">Atualize as informações e limites territoriais desta zona pastoral</p>
                 </div>
             </div>
         </div>
-        <!-- Form -->
-        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-            <form action="{{ route('zones.update', $zone) }}" method="POST" class="p-8 md:p-12 space-y-8">
+
+        <!-- Form Card -->
+        <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+            <form action="{{ route('zones.update', $zone) }}" method="POST" class="p-4 sm:p-6 space-y-4">
                 @csrf
                 @method('PUT')
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Nome da Zona -->
-                    <div class="space-y-2">
-                        <label for="name" class="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">Nome da
-                            Zona</label>
-                        <div class="relative">
-                            <i class="bi bi-map absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                            <input type="text" name="name" id="name"
-                                class="w-full pl-12 pr-4 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-medium text-gray-700 placeholder-gray-400 @error('name') border-red-500 @enderror"
-                                value="{{ old('name', $zone->name) }}" required>
-                        </div>
+                    <div class="space-y-1">
+                        <label for="name" class="block text-xs font-bold text-gray-700">
+                            Nome da Zona <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="name" id="name"
+                            class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 @error('name') border-red-500 @enderror"
+                            value="{{ old('name', $zone->name) }}" required>
                         @error('name')
-                            <p class="text-red-500 text-xs mt-1 ml-1">{{ $message }}</p>
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <!-- Seleção do Pastor de Zona -->
-                    <div class="space-y-2">
-                        <label for="pastor_id"
-                            class="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">Pastor de Zona</label>
-                        <div class="relative">
-                            <i class="bi bi-person-badge absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                            <select name="pastor_id" id="pastor_id"
-                                class="w-full pl-12 pr-4 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-medium text-gray-700 appearance-none custom-select @error('pastor_id') border-red-500 @enderror">
-                                <option value="">A definir futuramente</option>
-                                @foreach ($pastors as $pastor)
-                                    <option value="{{ $pastor->id }}" @selected(old('pastor_id', $zone->pastor_id) == $pastor->id)>
-                                        {{ $pastor->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                    <div class="space-y-1">
+                        <label for="pastor_id" class="block text-xs font-bold text-gray-700">
+                            Pastor de Zona (Opcional)
+                        </label>
+                        <select name="pastor_id" id="pastor_id"
+                            class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 @error('pastor_id') border-red-500 @enderror">
+                            <option value="">A definir futuramente</option>
+                            @foreach ($pastors as $pastor)
+                                <option value="{{ $pastor->id }}" @selected(old('pastor_id', $zone->pastor_id) == $pastor->id)>
+                                    {{ $pastor->name }}
+                                </option>
+                            @endforeach
+                        </select>
                         @error('pastor_id')
-                            <p class="text-red-500 text-xs mt-1 ml-1">{{ $message }}</p>
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
 
-                <div class="space-y-2">
-                    <label for="description"
-                        class="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">Descrição Detalhada</label>
-                    <textarea name="description" id="description" rows="4"
+                <!-- Descrição -->
+                <div class="space-y-1">
+                    <label for="description" class="block text-xs font-bold text-gray-700">Descrição Detalhada</label>
+                    <textarea name="description" id="description" rows="3"
                         placeholder="Detalhes sobre a cobertura geográfica ou características da zona..."
-                        class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-medium text-gray-700 placeholder-gray-400 resize-none">{{ old('description', $zone->description) }}</textarea>
+                        class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 resize-none">{{ old('description', $zone->description) }}</textarea>
                 </div>
 
+                <div class="pt-2">
                     <x-location-map id="zone-location-map" mode="area" :latitude="$zone->latitude" :longitude="$zone->longitude" :boundary="$zone->boundary" />
+                </div>
 
                 <!-- Zone Visibility in Teaching Services -->
-                <div
-                    class="px-8 py-6 bg-blue-50/30 rounded-3xl border border-blue-100/50 flex items-center justify-between">
+                <div class="flex items-center justify-between p-3.5 bg-gray-50 rounded-lg border border-gray-200">
                     <div>
-                        <p class="text-sm font-black text-gray-900">Visível em Cultos de Ensino</p>
-                        <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">Habilita esta zona na
-                            ficha de presença de quarta-feira</p>
+                        <p class="text-xs font-bold text-gray-900">Visível em Cultos de Ensino</p>
+                        <p class="text-[11px] text-gray-500">Habilita esta zona na ficha de presença de quarta-feira</p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="hidden" name="show_in_teaching_services" value="0">
-                        <input type="checkbox" name="show_in_teaching_services" value="1" class="sr-only peer"
-                            @checked(old('show_in_teaching_services', $zone->show_in_teaching_services ?? true))>
-                        <div
-                            class="w-14 h-7 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-600">
-                        </div>
+                        <input type="checkbox" name="show_in_teaching_service" value="1" 
+                            class="sr-only peer" @checked(old('show_in_teaching_service', $zone->show_in_teaching_service ?? false))>
+                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-600"></div>
                     </label>
                 </div>
 
-                <div class="flex flex-col md:flex-row gap-4 pt-4">
-                    <button type="submit"
-                        class="flex-1 bg-blue-600 text-white px-8 py-4 rounded-2xl hover:bg-blue-700 transition-all duration-300 font-black shadow-lg shadow-blue-200">
-                        <i class="bi bi-save-fill mr-2"></i>Salvar Alterações
-                    </button>
+                <div class="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
                     <a href="{{ route('zones.index') }}"
-                        class="flex-1 bg-gray-50 text-gray-500 px-8 py-4 rounded-2xl hover:bg-gray-100 transition-all duration-300 font-bold text-center">
+                        class="rounded-lg border border-gray-200 px-3.5 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors">
                         Cancelar
                     </a>
+                    <button type="submit"
+                        class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition-colors">
+                        <i class="bi bi-check-lg text-xs"></i>
+                        <span>Atualizar Zona</span>
+                    </button>
                 </div>
             </form>
         </div>

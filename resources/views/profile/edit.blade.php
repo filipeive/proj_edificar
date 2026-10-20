@@ -1,107 +1,96 @@
 @extends('layouts.app')
 
 @section('title', 'Meu Perfil - Portal Life Church')
-@section('page-title', 'Meu Perfil')
-@section('page-subtitle', 'Gestão de informações pessoais e segurança')
 
 @section('content')
-    <div class="w-full">
-        <!-- Header Profile Card -->
-        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-10 overflow-hidden relative group">
-            <div
-                class="absolute top-0 right-0 w-96 h-96 bg-blue-50/30 rounded-full -mr-48 -mt-48 transition-transform group-hover:scale-110 duration-700">
-            </div>
-
-            <div class="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-10">
-                <div
-                    class="w-32 h-32 rounded-[2.5rem] bg-gradient-to-br from-blue-600 to-blue-800 text-white flex items-center justify-center font-black text-5xl shadow-2xl shadow-blue-100 group-hover:rotate-6 transition-transform">
+<div class="space-y-4">
+    <!-- Header Executivo -->
+    <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 text-white flex items-center justify-center font-black text-xl shadow-sm">
                     {{ strtoupper(substr($user->name, 0, 1)) }}
                 </div>
-
-                <div class="flex-1 space-y-4 text-center md:text-left">
-                    <div class="flex flex-wrap justify-center md:justify-start items-center gap-4">
-                        <h1 class="text-4xl font-black text-gray-900 tracking-tighter">{{ $user->name }}</h1>
-                        <span
-                            class="px-4 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-100">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] sm:text-xs font-black uppercase tracking-[0.18em] text-orange-700">Conta de Usuário</span>
+                        <span class="inline-flex items-center rounded-md bg-orange-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-orange-700 border border-orange-200">
                             {{ str_replace('_', ' ', $user->role) }}
                         </span>
                     </div>
-                    <p class="text-lg font-bold text-gray-400">{{ $user->email }}</p>
-
-                    <div class="flex flex-wrap justify-center md:justify-start gap-3">
-                        @if($user->cell)
-                            <div
-                                class="flex items-center gap-2 px-6 py-2 bg-indigo-50 text-indigo-600 rounded-2xl text-xs font-black uppercase tracking-widest border border-indigo-100">
-                                <i class="bi bi-geo-alt-fill"></i> Célula: {{ $user->cell->name }}
-                            </div>
-                        @endif
-                        <div
-                            class="flex items-center gap-2 px-6 py-2 bg-gray-50 text-gray-500 rounded-2xl text-xs font-black uppercase tracking-widest border border-gray-100">
-                            <i class="bi bi-calendar-check-fill"></i> Desde: {{ $user->created_at->format('d/m/Y') }}
-                        </div>
-                    </div>
+                    <h1 class="text-lg sm:text-xl font-bold text-gray-900 tracking-tight">{{ $user->name }}</h1>
+                    <p class="text-xs text-gray-500 font-medium">{{ $user->email }}</p>
                 </div>
             </div>
-        </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Edit Profile Form -->
-            <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-8 border-b border-gray-50 bg-gray-50/30">
-                    <h2 class="text-xl font-black text-gray-900 flex items-center gap-3">
-                        <i class="bi bi-person-gear text-blue-600"></i>
-                        Informações Pessoais
-                    </h2>
+            <div class="flex flex-wrap items-center gap-2">
+                @if($user->cell)
+                    <span class="inline-flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50/60 px-2.5 py-1 text-xs font-bold text-indigo-700">
+                        <i class="bi bi-geo-alt-fill text-indigo-500"></i> Célula: {{ $user->cell->name }}
+                    </span>
+                @endif
+                <span class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-600">
+                    <i class="bi bi-calendar-check text-gray-400"></i> Membro desde {{ $user->created_at->format('d/m/Y') }}
+                </span>
+                <span class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-mono font-medium text-gray-500">
+                    ID #{{ str_pad($user->id, 6, '0', STR_PAD_LEFT) }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grid de Formulários -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- Edit Profile Form -->
+        <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden flex flex-col justify-between">
+            <div>
+                <div class="border-b border-gray-100 bg-gray-50/75 px-4 py-3 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="bi bi-person-gear text-orange-600 text-sm"></i>
+                        <h2 class="text-xs font-black uppercase tracking-wider text-gray-700">Informações Pessoais</h2>
+                    </div>
+                    <span class="text-[10px] text-gray-400 font-medium">Dados de contato</span>
                 </div>
-                <div class="p-10">
+
+                <div class="p-4 sm:p-5">
                     @php
                         $notificationPrefs = array_merge(
                             \App\Models\User::notificationPreferenceDefaults(),
                             $user->notification_preferences ?? []
                         );
                     @endphp
-                    <form action="{{ route('profile.update') }}" method="POST" id="profileUpdateForm" class="space-y-6">
+                    <form action="{{ route('profile.update') }}" method="POST" id="profileUpdateForm" class="space-y-4">
                         @csrf
                         @method('PATCH')
 
-                        <div class="space-y-2">
-                            <label for="name"
-                                class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Nome
-                                Completo</label>
+                        <div>
+                            <label for="name" class="block text-xs font-bold text-gray-700 mb-1">Nome Completo</label>
                             <input type="text" name="name" id="name" required
-                                class="w-full h-14 bg-gray-50 border-none rounded-2xl px-6 font-bold text-gray-700 focus:ring-2 focus:ring-blue-500 transition-all"
-                                value="{{ $user->name }}">
+                                class="w-full rounded-lg border-gray-300 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500"
+                                value="{{ old('name', $user->name) }}">
                         </div>
 
-                        <div class="space-y-2">
-                            <label for="email"
-                                class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Endereço de
-                                Email</label>
-                            <input type="email" name="email" id="email" required
-                                class="w-full h-14 bg-gray-50 border-none rounded-2xl px-6 font-bold text-gray-700 focus:ring-2 focus:ring-blue-500 transition-all"
-                                value="{{ $user->email }}">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label for="email" class="block text-xs font-bold text-gray-700 mb-1">Endereço de E-mail</label>
+                                <input type="email" name="email" id="email" required
+                                    class="w-full rounded-lg border-gray-300 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500"
+                                    value="{{ old('email', $user->email) }}">
+                            </div>
+
+                            <div>
+                                <label for="phone" class="block text-xs font-bold text-gray-700 mb-1">Telefone / WhatsApp</label>
+                                <input type="tel" name="phone" id="phone"
+                                    class="w-full rounded-lg border-gray-300 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500"
+                                    value="{{ old('phone', $user->phone) }}" placeholder="Ex: 840000000">
+                            </div>
                         </div>
 
-                        <div class="space-y-2">
-                            <label for="phone"
-                                class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Telefone /
-                                WhatsApp</label>
-                            <input type="tel" name="phone" id="phone"
-                                class="w-full h-14 bg-gray-50 border-none rounded-2xl px-6 font-bold text-gray-700 focus:ring-2 focus:ring-blue-500 transition-all"
-                                value="{{ $user->phone }}" placeholder="Ex: 840000000">
-                        </div>
-
-                        <button type="submit"
-                            class="w-full h-16 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95 flex items-center justify-center gap-3">
-                            <i class="bi bi-save2-fill text-lg"></i>
-                            Atualizar Meus Dados
-                        </button>
-
-                        <div class="pt-6 border-t border-gray-100">
-                            <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                <i class="bi bi-bell-fill text-orange-500"></i> Preferências de Notificação
-                            </h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div class="pt-3 border-t border-gray-100">
+                            <label class="block text-xs font-black uppercase tracking-wider text-gray-700 mb-2">
+                                <i class="bi bi-bell-fill text-orange-500 mr-1"></i> Preferências de Notificação
+                            </label>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1">
                                 @php
                                     $prefLabels = [
                                         'contribution_created' => 'Contribuição criada',
@@ -114,123 +103,116 @@
                                         'commitment_chosen' => 'Compromisso escolhido',
                                         'commitment_expiring' => 'Compromisso a expirar',
                                         'member_created' => 'Conta criada',
-                                        'member_added_to_cell' => 'Membro adicionado à célula',
+                                        'member_added_to_cell' => 'Adicionado à célula',
                                         'user_promoted' => 'Promoção de cargo',
                                     ];
                                 @endphp
 
                                 @foreach($prefLabels as $key => $label)
-                                    <label class="flex items-center justify-between gap-3 bg-gray-50 border border-gray-100 rounded-2xl px-4 py-3">
-                                        <span class="text-xs font-bold text-gray-600 uppercase tracking-widest">{{ $label }}</span>
+                                    <label class="flex items-center justify-between gap-2 rounded-lg border border-gray-200 bg-gray-50/60 px-3 py-2 text-xs hover:bg-gray-100/70 transition-colors cursor-pointer">
+                                        <span class="font-medium text-gray-700 text-[11px]">{{ $label }}</span>
                                         <input type="hidden" name="notification_preferences[{{ $key }}]" value="0">
                                         <input type="checkbox" name="notification_preferences[{{ $key }}]" value="1"
-                                            class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                            class="rounded border-gray-300 text-orange-600 focus:ring-orange-500 h-4 w-4"
                                             {{ old("notification_preferences.$key", $notificationPrefs[$key] ?? true) ? 'checked' : '' }}>
                                     </label>
                                 @endforeach
                             </div>
                         </div>
+
+                        <div class="pt-3 flex justify-end">
+                            <button type="submit"
+                                class="inline-flex items-center gap-1.5 rounded-lg bg-orange-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-orange-700 transition-colors">
+                                <i class="bi bi-check2"></i>
+                                Salvar Alterações
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
+        </div>
 
-            <!-- Update Password Form -->
-            <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-8 border-b border-gray-50 bg-gray-50/30">
-                    <h2 class="text-xl font-black text-gray-900 flex items-center gap-3">
-                        <i class="bi bi-shield-lock-fill text-orange-600"></i>
-                        Segurança da Conta
-                    </h2>
+        <!-- Update Password Form -->
+        <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden flex flex-col justify-between">
+            <div>
+                <div class="border-b border-gray-100 bg-gray-50/75 px-4 py-3 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="bi bi-shield-lock text-gray-700 text-sm"></i>
+                        <h2 class="text-xs font-black uppercase tracking-wider text-gray-700">Segurança da Conta</h2>
+                    </div>
+                    <span class="text-[10px] text-gray-400 font-medium">Troca de credenciais</span>
                 </div>
-                <div class="p-10">
-                    <form action="{{ route('password.update') }}" method="POST" id="passwordUpdateForm" class="space-y-6">
+
+                <div class="p-4 sm:p-5">
+                    <form action="{{ route('password.update') }}" method="POST" id="passwordUpdateForm" class="space-y-4">
                         @csrf
                         @method('put')
 
-                        <div class="space-y-2">
-                            <label for="current_password"
-                                class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Senha
-                                Atual</label>
+                        <div>
+                            <label for="current_password" class="block text-xs font-bold text-gray-700 mb-1">Senha Atual</label>
                             <input type="password" name="current_password" id="current_password" required
-                                class="w-full h-14 bg-gray-50 border-none rounded-2xl px-6 font-bold text-gray-700 focus:ring-2 focus:ring-orange-500 transition-all"
+                                class="w-full rounded-lg border-gray-300 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500"
                                 placeholder="••••••••">
                         </div>
 
-                        <div class="space-y-2">
-                            <label for="password"
-                                class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Nova
-                                Senha</label>
+                        <div>
+                            <label for="password" class="block text-xs font-bold text-gray-700 mb-1">Nova Senha</label>
                             <input type="password" name="password" id="password" required
-                                class="w-full h-14 bg-gray-50 border-none rounded-2xl px-6 font-bold text-gray-700 focus:ring-2 focus:ring-orange-500 transition-all"
-                                placeholder="Mínimo 8 caracteres">
+                                class="w-full rounded-lg border-gray-300 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500"
+                                placeholder="Mínimo de 8 caracteres">
                         </div>
 
-                        <div class="space-y-2">
-                            <label for="password_confirmation"
-                                class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Confirmar Nova
-                                Senha</label>
+                        <div>
+                            <label for="password_confirmation" class="block text-xs font-bold text-gray-700 mb-1">Confirmar Nova Senha</label>
                             <input type="password" name="password_confirmation" id="password_confirmation" required
-                                class="w-full h-14 bg-gray-50 border-none rounded-2xl px-6 font-bold text-gray-700 focus:ring-2 focus:ring-orange-500 transition-all"
-                                placeholder="Confirme sua nova senha">
+                                class="w-full rounded-lg border-gray-300 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500"
+                                placeholder="Confirme a nova senha">
                         </div>
 
-                        <button type="button"
-                            onclick="confirmAction('Alterar Senha', 'Tem certeza que deseja alterar sua senha?', 'question', 'Sim, alterar', 'passwordUpdateForm')"
-                            class="w-full h-16 bg-gray-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-black transition-all active:scale-95 flex items-center justify-center gap-3">
-                            <i class="bi bi-key-fill text-lg"></i>
-                            Redefinir Senha
-                        </button>
+                        <div class="rounded-lg bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800 flex items-start gap-2">
+                            <i class="bi bi-info-circle-fill text-amber-600 mt-0.5"></i>
+                            <div>
+                                <p class="font-bold">Recomendações de segurança:</p>
+                                <p class="text-[11px] text-amber-700 mt-0.5">Crie uma senha forte combinando letras maiúsculas, números e símbolos especiais.</p>
+                            </div>
+                        </div>
+
+                        <div class="pt-3 flex justify-end">
+                            <button type="button"
+                                onclick="confirmAction('Alterar Senha', 'Tem certeza que deseja alterar sua senha?', 'question', 'Sim, alterar', 'passwordUpdateForm')"
+                                class="inline-flex items-center gap-1.5 rounded-lg bg-gray-900 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-black transition-colors">
+                                <i class="bi bi-key"></i>
+                                Redefinir Senha
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
-
-        <!-- System Intelligence Footer -->
-        <div
-            class="bg-gray-50 rounded-[2.5rem] p-10 border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div class="flex items-center gap-6">
-                <div
-                    class="w-16 h-16 rounded-3xl bg-white shadow-sm flex items-center justify-center text-2xl text-blue-600 border border-gray-100">
-                    <i class="bi bi-fingerprint"></i>
-                </div>
-                <div>
-                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-tight">Identificador de
-                        Sistema</p>
-                    <p class="text-xl font-mono font-black text-gray-900 tracking-tighter">
-                        #{{ str_pad($user->id, 8, '0', STR_PAD_LEFT) }}</p>
-                </div>
-            </div>
-
-            <div class="flex gap-4">
-                <a href="{{ route('dashboard') }}"
-                    class="px-8 py-4 bg-white text-gray-500 rounded-2xl font-black text-xs uppercase tracking-widest border border-gray-200 hover:bg-gray-100 transition-all">
-                    Voltar ao Portal
-                </a>
-            </div>
-        </div>
     </div>
+</div>
 
-    @if (session('status') === 'profile-updated')
-        <script>
-            window.addEventListener('load', () => {
-                showSuccess('Suas informações foram atualizadas com sucesso!');
-            });
-        </script>
-    @endif
+@if (session('status') === 'profile-updated')
+    <script>
+        window.addEventListener('load', () => {
+            showSuccess('Suas informações foram atualizadas com sucesso!');
+        });
+    </script>
+@endif
 
-    @if (session('status') === 'password-updated')
-        <script>
-            window.addEventListener('load', () => {
-                showSuccess('Sua senha foi alterada com sucesso!');
-            });
-        </script>
-    @endif
+@if (session('status') === 'password-updated')
+    <script>
+        window.addEventListener('load', () => {
+            showSuccess('Sua senha foi alterada com sucesso!');
+        });
+    </script>
+@endif
 
-    @if ($errors->any())
-        <script>
-            window.addEventListener('load', () => {
-                showError('Não foi possível processar sua solicitação. Verifique os dados inseridos.');
-            });
-        </script>
-    @endif
+@if ($errors->any())
+    <script>
+        window.addEventListener('load', () => {
+            showError('Não foi possível processar sua solicitação. Verifique os dados inseridos.');
+        });
+    </script>
+@endif
 @endsection

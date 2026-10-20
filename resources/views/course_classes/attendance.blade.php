@@ -5,178 +5,142 @@
 @section('page-subtitle', $courseClass->name . ' - ' . ($meeting->topic ?? 'Encontro ' . $meeting->meeting_number))
 
 @section('content')
-    <div class="container-fluid">
-        <div class="mb-6">
-            <a href="{{ route('course-classes.show', $courseClass) }}"
-                class="text-gray-500 hover:text-gray-700 flex items-center">
-                <i class="bi bi-arrow-left mr-2"></i> Voltar para a turma
-            </a>
-        </div>
+<div class="space-y-5 max-w-4xl mx-auto">
+    <div class="flex items-center justify-between">
+        <a href="{{ route('course-classes.show', $courseClass) }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-gray-600 hover:text-orange-700 transition">
+            <i class="bi bi-arrow-left"></i>
+            <span>Voltar para a Turma</span>
+        </a>
+    </div>
 
-        <div class="w-full">
-            <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-8 border-b border-gray-100 bg-gray-50/50">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h4 class="text-xl font-black text-gray-900">
-                                {{ $meeting->topic ?? 'Encontro ' . $meeting->meeting_number }}</h4>
-                            <p class="text-sm font-bold text-gray-500 uppercase tracking-widest">
-                                {{ $meeting->date->format('d/m/Y') }}</p>
-                        </div>
-                        <div class="text-right">
-                            <span
-                                class="bg-blue-100 text-blue-800 px-4 py-1 rounded-full text-xs font-black uppercase tracking-widest">
-                                {{ $courseClass->enrollments_count }} Inscritos
-                            </span>
-                        </div>
-                    </div>
-                </div>
+    <form action="{{ route('course-classes.attendance.store', [$courseClass, $meeting]) }}" method="POST"
+        class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+        @csrf
 
-                <form action="{{ route('course-classes.attendance.store', [$courseClass, $meeting]) }}" method="POST">
-                    @csrf
-                    <div class="p-0">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-white border-b border-gray-100">
-                                    <th class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                        Inscrito</th>
-                                    <th
-                                        class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">
-                                        Presença</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-50">
-                                @php
-                                    $hasEnrollments = $courseClass->courseEnrollments->count() || $courseClass->coupleEnrollments->count();
-                                @endphp
-                                @if($hasEnrollments)
-                                    @foreach($courseClass->courseEnrollments as $enrollment)
-                                        @php
-                                            $attendance = $meeting->attendances->where('enrollable_type', \App\Models\CourseEnrollment::class)->where('enrollable_id', $enrollment->id)->first();
-                                            $currentStatus = $attendance ? $attendance->status : 'absent';
-                                        @endphp
-                                        <tr class="hover:bg-gray-50/50 transition-colors">
-                                            <td class="px-8 py-6">
-                                                @if($enrollment->malePartner && $enrollment->femalePartner)
-                                                    <div class="font-bold text-gray-900">{{ $enrollment->malePartner->name }} & {{ $enrollment->femalePartner->name }}</div>
-                                                    <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">CASAL</div>
-                                                @else
-                                                    <div class="font-bold text-gray-900">{{ $enrollment->user->name ?? 'N/A' }}</div>
-                                                    <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">INDIVIDUAL</div>
-                                                @endif
-                                            </td>
-                                            <td class="px-8 py-6">
-                                                <div class="flex justify-center space-x-4">
-                                                    <label class="flex flex-col items-center cursor-pointer group">
-                                                        <input type="radio" name="attendance[{{ $enrollment->id }}]"
-                                                            value="present" {{ $currentStatus == 'present' ? 'checked' : '' }}
-                                                            class="hidden peer">
-                                                        <div
-                                                            class="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-400 peer-checked:border-green-500 peer-checked:bg-green-500 peer-checked:text-white transition group-hover:border-green-200">
-                                                            <i class="bi bi-check-lg text-2xl"></i>
-                                                        </div>
-                                                        <span
-                                                            class="text-[8px] font-black uppercase tracking-widest mt-1 text-gray-400 peer-checked:text-green-600">Presente</span>
-                                                    </label>
-
-                                                    <label class="flex flex-col items-center cursor-pointer group">
-                                                        <input type="radio" name="attendance[{{ $enrollment->id }}]"
-                                                            value="absent" {{ $currentStatus == 'absent' ? 'checked' : '' }}
-                                                            class="hidden peer">
-                                                        <div
-                                                            class="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-400 peer-checked:border-red-500 peer-checked:bg-red-500 peer-checked:text-white transition group-hover:border-red-200">
-                                                            <i class="bi bi-x-lg text-2xl"></i>
-                                                        </div>
-                                                        <span
-                                                            class="text-[8px] font-black uppercase tracking-widest mt-1 text-gray-400 peer-checked:text-red-600">Falta</span>
-                                                    </label>
-
-                                                    <label class="flex flex-col items-center cursor-pointer group">
-                                                        <input type="radio" name="attendance[{{ $enrollment->id }}]"
-                                                            value="justified" {{ $currentStatus == 'justified' ? 'checked' : '' }}
-                                                            class="hidden peer">
-                                                        <div
-                                                            class="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-400 peer-checked:border-amber-500 peer-checked:bg-amber-500 peer-checked:text-white transition group-hover:border-amber-200">
-                                                            <i class="bi bi-info-lg text-2xl"></i>
-                                                        </div>
-                                                        <span
-                                                            class="text-[8px] font-black uppercase tracking-widest mt-1 text-gray-400 peer-checked:text-amber-600">Justif.</span>
-                                                    </label>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-
-                                    @foreach($courseClass->coupleEnrollments as $enrollment)
-                                        @php
-                                            $attendance = $meeting->attendances->where('enrollable_type', \App\Models\CoupleEnrollment::class)->where('enrollable_id', $enrollment->id)->first();
-                                            $currentStatus = $attendance ? $attendance->status : 'absent';
-                                        @endphp
-                                        <tr class="hover:bg-gray-50/50 transition-colors">
-                                            <td class="px-8 py-6">
-                                                <div class="font-bold text-gray-900">{{ $enrollment->husband_name }} & {{ $enrollment->wife_name }}</div>
-                                                <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">CASAL (FORMULÁRIO)</div>
-                                            </td>
-                                            <td class="px-8 py-6">
-                                                <div class="flex justify-center space-x-4">
-                                                    <label class="flex flex-col items-center cursor-pointer group">
-                                                        <input type="radio" name="attendance_couple[{{ $enrollment->id }}]"
-                                                            value="present" {{ $currentStatus == 'present' ? 'checked' : '' }}
-                                                            class="hidden peer">
-                                                        <div
-                                                            class="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-400 peer-checked:border-green-500 peer-checked:bg-green-500 peer-checked:text-white transition group-hover:border-green-200">
-                                                            <i class="bi bi-check-lg text-2xl"></i>
-                                                        </div>
-                                                        <span
-                                                            class="text-[8px] font-black uppercase tracking-widest mt-1 text-gray-400 peer-checked:text-green-600">Presente</span>
-                                                    </label>
-
-                                                    <label class="flex flex-col items-center cursor-pointer group">
-                                                        <input type="radio" name="attendance_couple[{{ $enrollment->id }}]"
-                                                            value="absent" {{ $currentStatus == 'absent' ? 'checked' : '' }}
-                                                            class="hidden peer">
-                                                        <div
-                                                            class="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-400 peer-checked:border-red-500 peer-checked:bg-red-500 peer-checked:text-white transition group-hover:border-red-200">
-                                                            <i class="bi bi-x-lg text-2xl"></i>
-                                                        </div>
-                                                        <span
-                                                            class="text-[8px] font-black uppercase tracking-widest mt-1 text-gray-400 peer-checked:text-red-600">Falta</span>
-                                                    </label>
-
-                                                    <label class="flex flex-col items-center cursor-pointer group">
-                                                        <input type="radio" name="attendance_couple[{{ $enrollment->id }}]"
-                                                            value="justified" {{ $currentStatus == 'justified' ? 'checked' : '' }}
-                                                            class="hidden peer">
-                                                        <div
-                                                            class="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-400 peer-checked:border-amber-500 peer-checked:bg-amber-500 peer-checked:text-white transition group-hover:border-amber-200">
-                                                            <i class="bi bi-info-lg text-2xl"></i>
-                                                        </div>
-                                                        <span
-                                                            class="text-[8px] font-black uppercase tracking-widest mt-1 text-gray-400 peer-checked:text-amber-600">Justif.</span>
-                                                    </label>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                @else
-                                    <tr>
-                                        <td colspan="2" class="px-8 py-10 text-center text-gray-400 italic">
-                                            Nenhum inscrito nesta turma.
-                                        </td>
-                                    </tr>
-                                @endif
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="p-8 bg-gray-50 border-t border-gray-100 flex justify-end">
-                        <button type="submit"
-                            class="bg-blue-600 text-white px-10 py-3 rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-blue-600/20 hover:bg-blue-700 transition transform hover:-translate-y-1">
-                            Salvar Presenças
-                        </button>
-                    </div>
-                </form>
+        <div class="border-b border-gray-100 bg-gray-50/60 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+                <p class="text-[10px] font-black uppercase tracking-wider text-orange-700">Chamada do Encontro</p>
+                <h2 class="text-sm sm:text-base font-bold text-gray-900 mt-0.5">{{ $meeting->topic ?? 'Encontro ' . $meeting->meeting_number }}</h2>
+                <p class="text-xs text-gray-500">{{ $meeting->date->format('d/m/Y') }}</p>
+            </div>
+            <div>
+                <span class="inline-flex items-center rounded-full bg-orange-100 px-2.5 py-1 text-xs font-bold text-orange-800">
+                    {{ $courseClass->enrollments_count }} Inscritos
+                </span>
             </div>
         </div>
-    </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-gray-200 bg-gray-50/75 text-[10px] font-black uppercase tracking-wider text-gray-500">
+                        <th class="px-4 py-3">Inscrito</th>
+                        <th class="px-4 py-3 text-center">Presença</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 text-xs sm:text-sm">
+                    @php
+                        $hasEnrollments = $courseClass->courseEnrollments->count() || $courseClass->coupleEnrollments->count();
+                    @endphp
+                    @if($hasEnrollments)
+                        @foreach($courseClass->courseEnrollments as $enrollment)
+                            @php
+                                $attendance = $meeting->attendances->where('enrollable_type', \App\Models\CourseEnrollment::class)->where('enrollable_id', $enrollment->id)->first();
+                                $currentStatus = $attendance ? $attendance->status : 'absent';
+                            @endphp
+                            <tr class="hover:bg-gray-50/60 transition">
+                                <td class="px-4 py-3">
+                                    @if($enrollment->malePartner && $enrollment->femalePartner)
+                                        <div class="font-bold text-gray-900">{{ $enrollment->malePartner->name }} & {{ $enrollment->femalePartner->name }}</div>
+                                        <div class="text-[10px] text-gray-400 font-bold uppercase">Casal</div>
+                                    @else
+                                        <div class="font-bold text-gray-900">{{ $enrollment->user->name ?? 'N/A' }}</div>
+                                        <div class="text-[10px] text-gray-400 font-bold uppercase">Individual</div>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center justify-center gap-3">
+                                        <label class="flex items-center gap-1.5 cursor-pointer">
+                                            <input type="radio" name="attendance[{{ $enrollment->id }}]" value="present"
+                                                {{ $currentStatus == 'present' ? 'checked' : '' }}
+                                                class="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300">
+                                            <span class="text-xs font-bold text-emerald-700">Presente</span>
+                                        </label>
+
+                                        <label class="flex items-center gap-1.5 cursor-pointer">
+                                            <input type="radio" name="attendance[{{ $enrollment->id }}]" value="absent"
+                                                {{ $currentStatus == 'absent' ? 'checked' : '' }}
+                                                class="h-4 w-4 text-rose-600 focus:ring-rose-500 border-gray-300">
+                                            <span class="text-xs font-bold text-rose-700">Falta</span>
+                                        </label>
+
+                                        <label class="flex items-center gap-1.5 cursor-pointer">
+                                            <input type="radio" name="attendance[{{ $enrollment->id }}]" value="justified"
+                                                {{ $currentStatus == 'justified' ? 'checked' : '' }}
+                                                class="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300">
+                                            <span class="text-xs font-bold text-amber-700">Justificada</span>
+                                        </label>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+
+                        @foreach($courseClass->coupleEnrollments as $enrollment)
+                            @php
+                                $attendance = $meeting->attendances->where('enrollable_type', \App\Models\CoupleEnrollment::class)->where('enrollable_id', $enrollment->id)->first();
+                                $currentStatus = $attendance ? $attendance->status : 'absent';
+                            @endphp
+                            <tr class="hover:bg-gray-50/60 transition">
+                                <td class="px-4 py-3">
+                                    <div class="font-bold text-gray-900">{{ $enrollment->husband_name }} & {{ $enrollment->wife_name }}</div>
+                                    <div class="text-[10px] text-gray-400 font-bold uppercase">Casal (Formulário)</div>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center justify-center gap-3">
+                                        <label class="flex items-center gap-1.5 cursor-pointer">
+                                            <input type="radio" name="attendance_couple[{{ $enrollment->id }}]" value="present"
+                                                {{ $currentStatus == 'present' ? 'checked' : '' }}
+                                                class="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300">
+                                            <span class="text-xs font-bold text-emerald-700">Presente</span>
+                                        </label>
+
+                                        <label class="flex items-center gap-1.5 cursor-pointer">
+                                            <input type="radio" name="attendance_couple[{{ $enrollment->id }}]" value="absent"
+                                                {{ $currentStatus == 'absent' ? 'checked' : '' }}
+                                                class="h-4 w-4 text-rose-600 focus:ring-rose-500 border-gray-300">
+                                            <span class="text-xs font-bold text-rose-700">Falta</span>
+                                        </label>
+
+                                        <label class="flex items-center gap-1.5 cursor-pointer">
+                                            <input type="radio" name="attendance_couple[{{ $enrollment->id }}]" value="justified"
+                                                {{ $currentStatus == 'justified' ? 'checked' : '' }}
+                                                class="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300">
+                                            <span class="text-xs font-bold text-amber-700">Justificada</span>
+                                        </label>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    @else
+                        <tr>
+                            <td colspan="2" class="px-4 py-8 text-center text-xs text-gray-400">
+                                Nenhum aluno matriculado nesta turma.
+                            </td>
+                        </tr>
+                    @endif
+                </tbody>
+            </table>
+        </div>
+
+        <div class="bg-gray-50 px-4 py-3 sm:px-5 border-t border-gray-200 flex items-center justify-end gap-2">
+            <a href="{{ route('course-classes.show', $courseClass) }}" class="rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 transition">
+                Cancelar
+            </a>
+            <button type="submit" class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition">
+                <i class="bi bi-check-lg"></i>
+                <span>Salvar Presenças</span>
+            </button>
+        </div>
+    </form>
+</div>
 @endsection

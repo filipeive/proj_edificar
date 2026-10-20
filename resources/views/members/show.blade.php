@@ -1,255 +1,256 @@
 @extends('layouts.app')
 
-@section('title', 'Detalhes do Membro')
+@section('title', 'Detalhes do Membro - Portal Life Church')
 @section('page-title', $member->name)
 @section('page-subtitle', 'Informações completas do membro')
 
 @section('header-actions')
-    <div class="flex items-center gap-2 md:hidden">
+    <div class="flex items-center gap-2">
+        <a href="{{ route('members.index') }}"
+            class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
+            <i class="bi bi-arrow-left text-xs"></i>
+            <span>Voltar</span>
+        </a>
         @if($userRole !== 'secretaria' && $member->id !== auth()->user()->id)
             <a href="{{ route('members.edit', $member) }}"
-                class="action-icon text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors"
                 title="Editar perfil">
-                <i class="bi bi-pencil-square"></i>
+                <i class="bi bi-pencil-square text-xs text-orange-700"></i>
+                <span class="hidden sm:inline">Editar</span>
             </a>
+            <form method="POST" action="{{ route('members.destroy', $member) }}" onsubmit="return confirm('Tem certeza que deseja excluir este membro? Esta ação não pode ser revertida.')" class="inline">
+                @csrf
+                @method('DELETE')
+                <button type="submit"
+                    class="inline-flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs font-bold text-red-600 hover:bg-red-100 transition-colors"
+                    title="Eliminar Membro">
+                    <i class="bi bi-trash text-xs"></i>
+                </button>
+            </form>
         @endif
         <a href="{{ route('contributions.create', ['user_id' => $member->id]) }}"
-            class="action-icon text-gray-600 hover:text-green-600 hover:bg-green-50"
-            title="Nova oferta">
-            <i class="bi bi-plus-circle"></i>
+            class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition-colors">
+            <i class="bi bi-plus-lg text-xs"></i>
+            <span class="hidden sm:inline">Nova Oferta</span>
         </a>
-        <a href="{{ route('members.index') }}"
-            class="action-icon text-gray-600 hover:text-gray-600 hover:bg-gray-50"
-            title="Lista de Membros">
-            <i class="bi bi-list"></i>
-        </a>
-        {{-- delete --}}
-        <form method="POST" action="{{ route('members.destroy', $member) }}" onsubmit="return confirm('Tem certeza que deseja excluir este membro? Esta ação não pode ser revertida.')">
-            @csrf
-            @method('DELETE')
-            <button type="submit"
-                class="action-icon text-red-600 hover:text-red-600 hover:bg-red-50"
-                title="Eliminar Membro">
-                <i class="bi bi-trash"></i>
-            </button>
-        </form>
     </div>
 @endsection
 
 @section('content')
-    <div class="space-y-8">
-        <!-- Desktop Actions -->
-        <div class="hidden md:flex items-center justify-end gap-3">
-            @if($userRole !== 'secretaria' && $member->id !== auth()->user()->id)
-                <a href="{{ route('members.edit', $member) }}"
-                    class="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-xs font-black uppercase tracking-wider text-gray-700 transition hover:border-amber-500 hover:text-amber-600">
-                    <i class="bi bi-pencil-square"></i> Editar Perfil
-                </a>
-                <form method="POST" action="{{ route('members.destroy', $member) }}" onsubmit="return confirm('Tem certeza que deseja excluir este membro? Esta ação não pode ser revertida.')">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit"
-                        class="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-red-600 transition hover:border-red-600 hover:bg-red-600 hover:text-white">
-                        <i class="bi bi-trash"></i> Eliminar Membro
-                    </button>
-                </form>
-            @endif
-            <a href="{{ route('contributions.create', ['user_id' => $member->id]) }}"
-                class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white transition hover:bg-blue-700 shadow-lg shadow-blue-100">
-                <i class="bi bi-plus-lg"></i> Nova Oferta
-            </a>
-        </div>
-
-        <!-- Header & Profile Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <!-- Profile Info -->
-            <div class="lg:col-span-2 bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6 md:p-10 flex flex-col md:flex-row items-center gap-6 md:gap-8">
-                <div class="w-24 h-24 md:w-32 md:h-32 rounded-[2rem] md:rounded-[2.5rem] bg-blue-50 text-blue-600 flex items-center justify-center font-black text-4xl md:text-5xl shadow-lg shadow-blue-50">
-                    {{ strtoupper(substr($member->name, 0, 1)) }}
-                </div>
-                <div class="space-y-3 text-center md:text-left flex-1">
-                    <div class="flex flex-col md:flex-row items-center gap-2 md:gap-3">
-                        <h1 class="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter">{{ $member->name }}</h1>
-                        @if($member->is_active)
-                            <span class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-black uppercase tracking-widest">Ativo</span>
-                        @else
-                            <span class="px-3 py-1 bg-red-50 text-red-600 rounded-full text-[10px] font-black uppercase tracking-widest">Inativo</span>
-                        @endif
-                        
-                        @if($member->role === 'lider_celula')
-                            <span class="px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-purple-100">Líder</span>
-                        @elseif($member->role === 'timoteo')
-                            <span class="px-3 py-1 bg-orange-50 text-orange-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-orange-100">Timóteo</span>
-                        @else
-                            <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-100">Membro</span>
-                        @endif
+    <div class="space-y-5">
+        <!-- Executive Banner -->
+        <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div class="flex items-center gap-3.5">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-50 font-black text-orange-700 text-lg border border-orange-200/50">
+                        {{ strtoupper(substr($member->name, 0, 1)) }}
                     </div>
-                    <p class="text-gray-400 font-medium flex items-center justify-center md:justify-start gap-2 text-sm">
-                        <i class="bi bi-envelope-fill"></i> {{ $member->email }}
-                    </p>
-                    <div class="flex flex-col md:flex-row justify-center md:justify-start gap-4 md:gap-6 pt-2">
-                        <div class="flex flex-col">
-                            <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Membro desde</span>
-                            <span class="text-sm font-bold text-gray-700">{{ $member->created_at->format('d/m/Y') }}</span>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">{{ $member->name }}</h1>
+                            @if($member->is_active)
+                                <span class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">Ativo</span>
+                            @else
+                                <span class="inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-bold text-red-600">Inativo</span>
+                            @endif
                         </div>
-                        <div class="hidden md:block w-px bg-gray-100"></div>
-                        <div class="flex flex-col">
-                            <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Contacto</span>
-                            <span class="text-sm font-bold text-gray-700">{{ $member->phone ?? 'Indisponível' }}</span>
+                        <div class="flex flex-wrap items-center gap-3 text-xs text-gray-500 mt-0.5">
+                            <span class="inline-flex items-center gap-1"><i class="bi bi-envelope text-gray-400"></i> {{ $member->email }}</span>
+                            @if($member->phone)
+                                <span class="inline-flex items-center gap-1"><i class="bi bi-telephone text-gray-400"></i> {{ $member->phone }}</span>
+                            @endif
+                            <span class="inline-flex items-center gap-1"><i class="bi bi-calendar3 text-gray-400"></i> Desde {{ $member->created_at->format('d/m/Y') }}</span>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Stats Cards -->
-            <div class="lg:col-span-2 grid grid-cols-4 gap-4">
-                <!-- Total Contribuído -->
-                <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6 flex flex-col justify-center text-center group hover:bg-green-50 transition-colors">
-                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] mb-2 group-hover:text-green-400">Total Contribuído</p>
-                    <p class="text-3xl md:text-4xl font-black text-green-600 tracking-tighter">
-                        {{ number_format($member->contributions->where('status', 'verificada')->sum('amount'), 0, ',', '.') }}<span class="text-xs ml-1 uppercase">MT</span>
-                    </p>
-                    <p class="text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-widest">{{ $member->contributions->where('status', 'verificada')->count() }} Doações</p>
+                <div class="flex items-center gap-2">
+                    @if($member->role === 'lider_celula')
+                        <span class="inline-flex items-center rounded-md bg-purple-50 px-2.5 py-1 text-xs font-bold text-purple-700 border border-purple-200">
+                            <i class="bi bi-person-badge mr-1"></i> Líder de Célula
+                        </span>
+                    @elseif($member->role === 'timoteo')
+                        <span class="inline-flex items-center rounded-md bg-orange-50 px-2.5 py-1 text-xs font-bold text-orange-700 border border-orange-200">
+                            <i class="bi bi-star mr-1"></i> Timóteo
+                        </span>
+                    @else
+                        <span class="inline-flex items-center rounded-md bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700 border border-blue-200">
+                            <i class="bi bi-person mr-1"></i> Membro
+                        </span>
+                    @endif
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div class="lg:col-span-2 space-y-8">
-                <!-- Compromissos Card -->
-                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="p-8 border-b border-gray-50 flex items-center justify-between">
-                        <h2 class="text-xl font-black text-gray-900 flex items-center gap-3">
-                            <i class="bi bi-shield-check text-blue-600"></i>
-                            Compromissos do Reino
-                        </h2>
+        <!-- KPI Cards Grid -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-gray-500">Total Contribuído</p>
+                    <p class="mt-1 text-2xl font-black text-emerald-700 tracking-tight">
+                        {{ number_format($member->contributions->where('status', 'verificada')->sum('amount'), 0, ',', '.') }} <span class="text-xs font-bold text-gray-400">MT</span>
+                    </p>
+                </div>
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
+                    <i class="bi bi-cash-stack text-lg"></i>
+                </div>
+            </div>
+
+            <div class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-gray-500">Doações Verificadas</p>
+                    <p class="mt-1 text-2xl font-black text-gray-900 tracking-tight">
+                        {{ $member->contributions->where('status', 'verificada')->count() }}
+                    </p>
+                </div>
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-700">
+                    <i class="bi bi-check2-all text-lg"></i>
+                </div>
+            </div>
+
+            <div class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-gray-500">Compromissos</p>
+                    <p class="mt-1 text-2xl font-black text-purple-700 tracking-tight">
+                        {{ $member->commitments->whereNull('end_date')->count() }}
+                    </p>
+                </div>
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-50 text-purple-700">
+                    <i class="bi bi-award text-lg"></i>
+                </div>
+            </div>
+
+            <div class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-gray-500">Célula</p>
+                    <p class="mt-1 text-sm font-black text-gray-900 truncate">
+                        {{ $member->cell->name ?? 'Sem célula' }}
+                    </p>
+                </div>
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50 text-orange-700">
+                    <i class="bi bi-house-door text-lg"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <!-- Coluna Principal (Compromissos & Histórico) -->
+            <div class="lg:col-span-2 space-y-5">
+                <!-- Compromissos -->
+                <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+                    <div class="border-b border-gray-200 px-4 py-3 bg-gray-50/60">
+                        <h3 class="text-xs font-black uppercase tracking-wider text-gray-900">Compromissos do Reino</h3>
                     </div>
-                    <div class="p-8 space-y-4">
+                    <div class="p-4 space-y-2">
                         @forelse($member->commitments as $commitment)
-                            <div class="flex items-center justify-between p-6 rounded-[2rem] {{ $commitment->end_date === null ? 'bg-blue-50 border border-blue-100' : 'bg-gray-50 opacity-60' }}">
-                                <div class="flex items-center gap-5">
-                                    <div class="w-12 h-12 rounded-2xl bg-white text-blue-600 flex items-center justify-center shadow-sm">
-                                        <i class="bi bi-star-fill text-2xl"></i>
+                            <div class="flex items-center justify-between p-3 rounded-lg border {{ $commitment->end_date === null ? 'border-orange-200 bg-orange-50/40' : 'border-gray-200 bg-gray-50/50' }}">
+                                <div class="flex items-center gap-3">
+                                    <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-white border border-gray-200 text-orange-700">
+                                        <i class="bi bi-shield-check text-sm"></i>
                                     </div>
                                     <div>
-                                        <p class="text-lg font-black text-gray-900 tracking-tight">{{ $commitment->package->name ?? 'Compromisso Personalizado' }}</p>
-                                        <p class="text-xs font-medium text-gray-400">Iniciado em {{ $commitment->start_date->format('d/m/Y') }}</p>
+                                        <p class="text-xs font-bold text-gray-900">{{ $commitment->package->name ?? 'Compromisso Personalizado' }}</p>
+                                        <p class="text-[11px] text-gray-400">Iniciado em {{ $commitment->start_date->format('d/m/Y') }}</p>
                                     </div>
                                 </div>
-                                <span class="px-4 py-2 {{ $commitment->end_date === null ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500' }} rounded-xl text-[10px] font-black uppercase tracking-widest">
+                                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold {{ $commitment->end_date === null ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-500' }}">
                                     {{ $commitment->end_date === null ? 'Ativo' : 'Encerrado' }}
                                 </span>
                             </div>
                         @empty
-                            <div class="py-10 text-center text-gray-400 italic font-medium">Nenhum compromisso histórico.</div>
+                            <div class="py-6 text-center text-xs text-gray-400 italic">Nenhum compromisso registrado.</div>
                         @endforelse
                     </div>
                 </div>
 
-                <!-- Recent Contributions Table -->
-                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="p-8 border-b border-gray-50 flex items-center justify-between">
-                        <h2 class="text-xl font-black text-gray-900 flex items-center gap-3">
-                            <i class="bi bi-clock-history text-green-600"></i>
-                            Histórico de Ofertas
-                        </h2>
-                        <a href="{{ route('contributions.index', ['user_id' => $member->id]) }}" class="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">Ver Todas</a>
+                <!-- Histórico de Ofertas Recentes -->
+                <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+                    <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3 bg-gray-50/60">
+                        <h3 class="text-xs font-black uppercase tracking-wider text-gray-900">Histórico de Ofertas</h3>
+                        <a href="{{ route('contributions.index', ['user_id' => $member->id]) }}" class="text-xs font-bold text-orange-700 hover:underline">
+                            Ver Todas
+                        </a>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead>
-                                <tr class="bg-gray-50/50">
-                                    <th class="px-8 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Data</th>
-                                    <th class="px-8 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Valor</th>
-                                    <th class="px-8 py-4 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Estado</th>
-                                    <th class="px-8 py-4 text-right"></th>
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-gray-50 text-[10px] uppercase font-black tracking-wider text-gray-500 border-b border-gray-200">
+                                <tr>
+                                    <th class="px-4 py-2.5">Data</th>
+                                    <th class="px-4 py-2.5">Valor</th>
+                                    <th class="px-4 py-2.5 text-center">Estado</th>
+                                    <th class="px-4 py-2.5 text-right">Ação</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-50">
-                                @foreach($member->contributions as $contribution)
-                                    <tr class="hover:bg-gray-50/50 transition-colors">
-                                        <td class="px-8 py-5 text-sm font-bold text-gray-900">{{ $contribution->contribution_date->format('d/m/Y') }}</td>
-                                        <td class="px-8 py-5 text-sm font-black text-green-600">{{ number_format($contribution->amount, 0, ',', '.') }} MT</td>
-                                        <td class="px-8 py-5 text-center">
+                            <tbody class="divide-y divide-gray-100">
+                                @forelse($member->contributions as $contribution)
+                                    <tr class="hover:bg-gray-50/70 transition-colors">
+                                        <td class="px-4 py-2.5 font-bold text-gray-900">{{ $contribution->contribution_date->format('d/m/Y') }}</td>
+                                        <td class="px-4 py-2.5 font-bold text-emerald-700">{{ number_format($contribution->amount, 0, ',', '.') }} MT</td>
+                                        <td class="px-4 py-2.5 text-center">
                                             @if($contribution->status === 'verificada')
-                                                <span class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[9px] font-black uppercase tracking-tighter">Ok</span>
+                                                <span class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">Verificada</span>
                                             @else
-                                                <span class="px-3 py-1 bg-yellow-50 text-yellow-600 rounded-full text-[9px] font-black uppercase tracking-tighter">{{ $contribution->status }}</span>
+                                                <span class="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700">{{ $contribution->status }}</span>
                                             @endif
                                         </td>
-                                        <td class="px-8 py-5 text-right">
-                                            <a href="{{ route('contributions.show', $contribution) }}" class="text-gray-300 hover:text-blue-600 transition-colors">
-                                                <i class="bi bi-chevron-right text-lg"></i>
+                                        <td class="px-4 py-2.5 text-right">
+                                            <a href="{{ route('contributions.show', $contribution) }}" class="inline-flex h-6 w-6 items-center justify-center rounded-md border border-gray-200 text-gray-400 hover:text-gray-900 hover:bg-gray-50">
+                                                <i class="bi bi-chevron-right text-[11px]"></i>
                                             </a>
                                         </td>
                                     </tr>
-                                @endforeach
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="px-4 py-6 text-center text-xs text-gray-400 italic">Nenhuma oferta registrada.</td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- Hierarchy Column -->
-            <div class="space-y-6">
-                <!-- Location Info -->
-                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
-                    <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-6">Alocação Estrutural</h3>
+            <!-- Coluna Lateral (Hierarquia Estrutural) -->
+            <div class="space-y-5">
+                <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
+                    <h3 class="text-xs font-black uppercase tracking-wider text-gray-900">Alocação Estrutural</h3>
                     @if($member->cell)
-                        <div class="space-y-4">
-                            <!-- Célula -->
-                            <div class="flex items-center gap-4 group cursor-pointer" onclick="window.location='{{ route('cells.show', $member->cell) }}'">
-                                <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-black group-hover:bg-blue-600 group-hover:text-white transition-all">
-                                    <i class="bi bi-people-fill"></i>
-                                </div>
+                        <div class="space-y-2.5 text-xs">
+                            <div class="flex items-center justify-between p-2.5 rounded-lg border border-gray-200 bg-gray-50/50">
                                 <div>
-                                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Célula</p>
-                                    <p class="text-sm font-black text-gray-900">{{ $member->cell->name }}</p>
-                                    <span class="inline-block mt-1 px-2 py-0.5 rounded border text-[9px] font-black uppercase tracking-widest {{ $member->cell->type_badge_classes }}">
-                                        {{ $member->cell->type_label }}
-                                    </span>
+                                    <span class="text-[10px] font-bold uppercase text-gray-400 block">Célula</span>
+                                    <a href="{{ route('cells.show', $member->cell) }}" class="font-bold text-gray-900 hover:text-orange-700">
+                                        {{ $member->cell->name }}
+                                    </a>
                                 </div>
+                                <span class="rounded px-1.5 py-0.5 text-[9px] font-black uppercase {{ $member->cell->type_badge_classes }}">
+                                    {{ $member->cell->type_label }}
+                                </span>
                             </div>
-                            <!-- Supervisão -->
+
                             @if($member->cell->supervision)
-                                <div class="flex items-center gap-4 group cursor-pointer" onclick="window.location='{{ route('supervisions.show', $member->cell->supervision) }}'">
-                                    <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center font-black group-hover:bg-purple-600 group-hover:text-white transition-all">
-                                        <i class="bi bi-diagram-3-fill"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Supervisão</p>
-                                        <p class="text-sm font-black text-gray-900">{{ $member->cell->supervision->name }}</p>
-                                    </div>
+                                <div class="p-2.5 rounded-lg border border-gray-200 bg-gray-50/50">
+                                    <span class="text-[10px] font-bold uppercase text-gray-400 block">Supervisão</span>
+                                    <a href="{{ route('supervisions.show', $member->cell->supervision) }}" class="font-bold text-gray-900 hover:text-orange-700">
+                                        {{ $member->cell->supervision->name }}
+                                    </a>
                                 </div>
                             @endif
-                            <!-- Zona -->
+
                             @if($member->cell->supervision && $member->cell->supervision->zone)
-                                <div class="flex items-center gap-4 group cursor-pointer" onclick="window.location='{{ route('zones.show', $member->cell->supervision->zone) }}'">
-                                    <div class="w-12 h-12 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center font-black group-hover:bg-green-600 group-hover:text-white transition-all">
-                                        <i class="bi bi-geo-alt-fill"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Zona Pastoral</p>
-                                        <p class="text-sm font-black text-gray-900">{{ $member->cell->supervision->zone->name }}</p>
-                                    </div>
+                                <div class="p-2.5 rounded-lg border border-gray-200 bg-gray-50/50">
+                                    <span class="text-[10px] font-bold uppercase text-gray-400 block">Zona Pastoral</span>
+                                    <a href="{{ route('zones.show', $member->cell->supervision->zone) }}" class="font-bold text-gray-900 hover:text-orange-700">
+                                        {{ $member->cell->supervision->zone->name }}
+                                    </a>
                                 </div>
                             @endif
                         </div>
                     @else
-                        <div class="py-6 text-center text-red-400 italic text-sm font-medium">Sem alocação definida.</div>
+                        <p class="text-xs text-amber-700 bg-amber-50 p-2.5 rounded-lg border border-amber-200">
+                            Membro sem alocação de célula definida.
+                        </p>
                     @endif
-                </div>
-
-                <!-- Support Card -->
-                <div class="bg-gradient-to-br from-blue-900 to-indigo-900 rounded-[2.5rem] shadow-xl p-8 text-white relative overflow-hidden">
-                    <div class="relative z-10 space-y-5">
-                        <p class="text-[10px] font-black text-blue-300 uppercase tracking-[0.2em]">Assistance</p>
-                        <p class="text-sm font-medium leading-relaxed">Este membro faz parte do corpo de cristo. Ajude-o a permanecer firme em sua caminhada.</p>
-                        <button class="w-full py-4 bg-white/10 hover:bg-white/20 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all">
-                            Enviar Mensagem
-                        </button>
-                    </div>
-                    <i class="bi bi-chat-heart-fill absolute -right-4 -bottom-4 text-9xl text-white opacity-5"></i>
                 </div>
             </div>
         </div>

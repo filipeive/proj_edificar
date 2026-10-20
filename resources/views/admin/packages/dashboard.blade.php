@@ -5,192 +5,179 @@
 @section('page-subtitle', 'Visão consolidada dos seus pacotes atribuídos')
 
 @section('header-actions')
-    <div class="flex items-center gap-3 md:hidden">
+    <div class="flex items-center gap-2 md:hidden">
         @if($packages->isNotEmpty())
             <a href="{{ route('contributions.create') }}?package_id={{ $packages->first()->id }}" 
-               class="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-all font-bold text-sm flex items-center gap-2 shadow-lg shadow-blue-100">
-                <i class="bi bi-plus-circle"></i>
+               class="inline-flex items-center justify-center rounded-lg bg-orange-700 p-2 text-white shadow-sm hover:bg-orange-800 transition">
+                <i class="bi bi-plus-circle text-base"></i>
             </a>
         @endif
         <a href="{{ route('contributions.index') }}" 
-           class="bg-white text-gray-700 border border-gray-100 px-6 py-3 rounded-xl hover:bg-gray-50 transition-all font-bold text-sm flex items-center gap-2 shadow-sm">
-            <i class="bi bi-clock-history"></i>
+           class="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white p-2 text-gray-700 shadow-sm hover:bg-gray-50 transition">
+            <i class="bi bi-clock-history text-base"></i>
         </a>
     </div>
 @endsection
 
 @section('content')
-    <div class="container-fluid space-y-6 md:space-y-8">
+    <div class="space-y-5">
+        <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 sm:gap-4">
+            <div>
+                <p class="text-[10px] sm:text-xs font-black uppercase tracking-[0.18em] text-orange-700">Projecto Edificar</p>
+                <h1 class="mt-0.5 text-xl sm:text-2xl font-black text-gray-950 tracking-tight">Painel de Gestão de Pacotes</h1>
+                <p class="mt-0.5 text-xs sm:text-sm text-gray-500">Visão consolidada dos pacotes atribuídos, compromissos e contribuições.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+                <a href="{{ route('packages.index') }}"
+                    class="inline-flex justify-center items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 shadow-sm">
+                    <i class="bi bi-people text-orange-700"></i> <span>Gerir Pacotes</span>
+                </a>
+                <a href="{{ route('contributions.index') }}"
+                    class="inline-flex justify-center items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 shadow-sm">
+                    <i class="bi bi-list-check text-emerald-700"></i> <span>Histórico</span>
+                </a>
+                @if($packages->isNotEmpty())
+                    <a href="{{ route('packages.export', $packages->first()) }}"
+                        class="inline-flex justify-center items-center gap-1.5 rounded-lg border border-green-200 bg-white px-3.5 py-2 text-xs font-bold text-green-800 hover:bg-green-50 shadow-sm">
+                        <i class="bi bi-file-earmark-arrow-down"></i> <span>Exportar</span>
+                    </a>
+                @endif
+                <a href="{{ route('contributions.create') }}"
+                    class="inline-flex justify-center items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-2 text-xs font-bold text-white hover:bg-orange-800 shadow-sm">
+                    <i class="bi bi-plus-lg"></i> <span>Registar</span>
+                </a>
+            </div>
+        </header>
+
         <!-- Stats Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                        <i class="bi bi-people-fill text-2xl"></i>
-                    </div>
-                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">MembrosAtivos</span>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+            <article class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm">
+                <div class="flex items-center justify-between gap-2">
+                    <p class="text-[11px] sm:text-xs font-bold text-gray-500 truncate">Membros Ativos</p>
+                    <i class="bi bi-people text-blue-700 text-sm sm:text-base"></i>
                 </div>
-                <p class="text-4xl font-black text-gray-900 tracking-tighter">{{ $stats['total_members'] }}</p>
-                <div class="mt-4 flex items-center gap-2 text-xs font-bold text-gray-400">
-                    <i class="bi bi-bookmark-check text-blue-500"></i> Compromissos Vigentes
-                </div>
-            </div>
+                <p class="mt-1 text-lg sm:text-2xl font-black text-gray-950 tracking-tight tabular-nums">{{ $stats['total_members'] }}</p>
+                <p class="text-[10px] sm:text-[11px] text-gray-400 mt-0.5 truncate">Compromissos vigentes</p>
+            </article>
 
-            <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="w-12 h-12 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center">
-                        <i class="bi bi-cash-stack text-2xl"></i>
-                    </div>
-                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">ArrecadaçãoTotal</span>
+            <article class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm">
+                <div class="flex items-center justify-between gap-2">
+                    <p class="text-[11px] sm:text-xs font-bold text-gray-500 truncate">Arrecadação Total</p>
+                    <i class="bi bi-cash-stack text-emerald-700 text-sm sm:text-base"></i>
                 </div>
-                <p class="text-3xl font-black text-gray-900 tracking-tighter">{{ number_format($stats['total_contributions'], 2, ',', '.') }} <small class="text-xs">MT</small></p>
-                <div class="mt-4 flex items-center gap-2 text-xs font-bold text-gray-400">
-                    <i class="bi bi-calendar-check text-green-500"></i> Histórico Global
-                </div>
-            </div>
+                <p class="mt-1 text-lg sm:text-2xl font-black text-emerald-700 tracking-tight tabular-nums">{{ number_format($stats['total_contributions'], 2, ',', '.') }} MT</p>
+                <p class="text-[10px] sm:text-[11px] text-gray-400 mt-0.5 truncate">Histórico global</p>
+            </article>
 
-            <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center">
-                        <i class="bi bi-calendar-event text-2xl"></i>
-                    </div>
-                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">MêsAtual</span>
+            <article class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm">
+                <div class="flex items-center justify-between gap-2">
+                    <p class="text-[11px] sm:text-xs font-bold text-gray-500 truncate">Mês Atual</p>
+                    <i class="bi bi-calendar-event text-orange-700 text-sm sm:text-base"></i>
                 </div>
-                <p class="text-4xl font-black text-gray-900 tracking-tighter">{{ number_format($stats['monthly_contributions'], 2, ',', '.') }} <small class="text-xs">MT</small></p>
-                <div class="mt-4 flex items-center gap-2 text-xs font-bold text-gray-400">
-                    <i class="bi bi-graph-up text-orange-500"></i> Previsto em Crescimento
-                </div>
-            </div>
+                <p class="mt-1 text-lg sm:text-2xl font-black text-gray-950 tracking-tight tabular-nums">{{ number_format($stats['monthly_contributions'], 2, ',', '.') }} MT</p>
+                <p class="text-[10px] sm:text-[11px] text-gray-400 mt-0.5 truncate">Arrecadado no mês</p>
+            </article>
 
-            <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="w-12 h-12 rounded-2xl bg-yellow-50 text-yellow-600 flex items-center justify-center">
-                        <i class="bi bi-shield-lock text-2xl"></i>
-                    </div>
-                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Pendentes</span>
+            <article class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm">
+                <div class="flex items-center justify-between gap-2">
+                    <p class="text-[11px] sm:text-xs font-bold text-gray-500 truncate">Pendentes</p>
+                    <i class="bi bi-shield-lock text-amber-700 text-sm sm:text-base"></i>
                 </div>
-                <p class="text-4xl font-black text-gray-900 tracking-tighter">{{ $stats['pending_contributions'] }}</p>
-                <div class="mt-4 flex items-center gap-2 text-xs font-bold text-gray-400">
-                    <i class="bi bi-clock-history text-yellow-500"></i> Aguardando Validação
-                </div>
-            </div>
+                <p class="mt-1 text-lg sm:text-2xl font-black text-amber-700 tracking-tight tabular-nums">{{ $stats['pending_contributions'] }}</p>
+                <p class="text-[10px] sm:text-[11px] text-gray-400 mt-0.5 truncate">Aguardando validação</p>
+            </article>
         </div>
 
-        <!-- Quick Actions -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-            <a href="{{ route('contributions.create') }}" class="bg-white p-5 md:p-6 rounded-3xl md:rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-2 md:gap-3 hover:shadow-lg transition-all group">
-                <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all">
-                    <i class="bi bi-plus-lg text-xl md:text-2xl"></i>
-                </div>
-                <span class="text-[9px] md:text-[10px] font-black text-gray-900 uppercase tracking-widest">Registrar</span>
-            </a>
-            
-            <a href="{{ route('contributions.index') }}" class="bg-white p-5 md:p-6 rounded-3xl md:rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-2 md:gap-3 hover:shadow-lg transition-all group">
-                <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center group-hover:bg-green-600 group-hover:text-white transition-all">
-                    <i class="bi bi-list-check text-xl md:text-2xl"></i>
-                </div>
-                <span class="text-[9px] md:text-[10px] font-black text-gray-900 uppercase tracking-widest">Histórico</span>
-            </a>
-
-              
-            <a href="{{ route('packages.index') }}" class="bg-white p-5 md:p-6 rounded-3xl md:rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-2 md:gap-3 hover:shadow-lg transition-all group">
-                <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-all">
-                    <i class="bi bi-people text-xl md:text-2xl"></i>
-                </div>
-                <span class="text-[9px] md:text-[10px] font-black text-gray-900 uppercase tracking-widest">Gerenciar</span>
-            </a>
-            
-            @if($packages->isNotEmpty())
-            <a href="{{ route('packages.export', $packages->first()) }}" class="bg-white p-5 md:p-6 rounded-3xl md:rounded-[2rem] border border-gray-100 flex flex-col items-center justify-center gap-2 md:gap-3 hover:shadow-lg transition-all group">
-                <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-all">
-                    <i class="bi bi-file-earmark-arrow-down text-xl md:text-2xl"></i>
-                </div>
-                <span class="text-[9px] md:text-[10px] font-black text-gray-900 uppercase tracking-widest">Exportar</span>
-            </a>
-            @endif
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <!-- Gráfico de Evolução -->
-            <div class="lg:col-span-8">
-                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 h-full">
-                    <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-10 flex items-center gap-2">
-                        <i class="bi bi-graph-up text-blue-600"></i>
-                        Evolução Financeira (Últimos 6 meses)
-                    </h3>
-                    <div class="aspect-[16/9] relative">
-                        <canvas id="revenueTrendChart"></canvas>
-                    </div>
+            <section class="lg:col-span-2 rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+                <div class="mb-4">
+                    <h3 class="text-sm font-black text-gray-900">Evolução Financeira (Últimos 6 meses)</h3>
+                    <p class="text-xs text-gray-500">Tendência mensal de arrecadação</p>
                 </div>
-            </div>
+                <div class="h-64 relative">
+                    <canvas id="revenueTrendChart"></canvas>
+                </div>
+            </section>
 
             <!-- Meus Pacotes -->
-            <div class="lg:col-span-4">
-                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 h-full">
-                    <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-8">Meus Pacotes Geridos</h3>
-                    <div class="space-y-4">
-                        @foreach($packages as $package)
-                            <div class="group p-4 rounded-2xl bg-gray-50 border border-gray-100 hover:bg-white hover:shadow-lg transition-all compact-card">
-                                <div class="flex justify-between items-start mb-2">
-                                    <h4 class="font-bold text-gray-900 line-clamp-1">{{ $package->name }}</h4>
-                                    <span class="px-2 py-0.5 rounded-lg bg-blue-100 text-blue-700 text-[10px] font-black uppercase tracking-widest">{{ $package->getActiveMembersCount() }} Membros</span>
-                                </div>
-                                <div class="flex items-center gap-2 text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                                    <i class="bi bi-cash"></i> {{ number_format($package->getTotalContributionsThisMonth(), 2, ',', '.') }} MT este mês
-                                </div>
-                                <div class="mt-4 pt-4 border-t border-gray-100 flex gap-2">
-                                    <a href="{{ route('packages.show', $package) }}" class="flex-1 py-2 bg-white rounded-xl text-center text-[10px] font-black uppercase tracking-widest border border-gray-100 hover:bg-blue-600 hover:text-white transition-all shadow-sm">Detalhes</a>
-                                    <a href="{{ route('packages.export', $package) }}" title="Exportar"
-                                        class="action-icon bg-white text-gray-400 border border-gray-100 hover:text-green-600 shadow-sm"><i class="bi bi-file-earmark-excel"></i></a>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
+            <section class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+                <div class="mb-4">
+                    <h3 class="text-sm font-black text-gray-900">Meus Pacotes Geridos</h3>
+                    <p class="text-xs text-gray-500">Pacotes sob sua responsabilidade</p>
                 </div>
-            </div>
+                <div class="space-y-3">
+                    @foreach($packages as $package)
+                        <div class="p-3.5 rounded-xl bg-gray-50 border border-gray-200/80">
+                            <div class="flex justify-between items-start gap-2 mb-1.5">
+                                <h4 class="text-xs sm:text-sm font-bold text-gray-900 truncate">{{ $package->name }}</h4>
+                                <span class="shrink-0 px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 text-[10px] font-black uppercase">
+                                    {{ $package->getActiveMembersCount() }} Membros
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-1.5 text-xs text-gray-600 font-semibold tabular-nums">
+                                <i class="bi bi-cash text-emerald-700"></i> {{ number_format($package->getTotalContributionsThisMonth(), 2, ',', '.') }} MT este mês
+                            </div>
+                            <div class="mt-3 pt-2.5 border-t border-gray-200 flex gap-2">
+                                <a href="{{ route('packages.show', $package) }}"
+                                    class="flex-1 rounded-lg border border-gray-300 bg-white py-1.5 text-center text-xs font-bold text-gray-700 hover:bg-gray-50 transition shadow-sm">
+                                    Detalhes
+                                </a>
+                                <a href="{{ route('packages.export', $package) }}" title="Exportar"
+                                    class="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-bold text-green-700 hover:bg-green-50 shadow-sm">
+                                    <i class="bi bi-file-earmark-excel"></i>
+                                </a>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </section>
         </div>
 
         <!-- Atividade Recente -->
-        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-            <div class="p-8 border-b border-gray-50 flex items-center justify-between">
-                <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Contribuições Recentes</h3>
-                <a href="{{ route('contributions.index') }}" class="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">Ver Todas</a>
+        <section class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+            <div class="p-4 sm:p-5 border-b border-gray-200 flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-black text-gray-900">Contribuições Recentes</h3>
+                    <p class="text-xs text-gray-500">Últimos lançamentos nos pacotes geridos</p>
+                </div>
+                <a href="{{ route('contributions.index') }}" class="text-xs font-bold text-orange-800 hover:underline">Ver Todas</a>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-left table-compact">
-                    <thead>
-                        <tr class="bg-gray-50/50">
-                            <th class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Data</th>
-                            <th class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Contribuinte</th>
-                            <th class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Pacote</th>
-                            <th class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Valor</th>
-                            <th class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Status</th>
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-gray-50 text-[10px] font-black uppercase tracking-wider text-gray-500 border-b border-gray-200">
+                        <tr>
+                            <th class="px-4 py-3">Data</th>
+                            <th class="px-4 py-3">Contribuinte</th>
+                            <th class="px-4 py-3">Pacote</th>
+                            <th class="px-4 py-3 text-right">Valor</th>
+                            <th class="px-4 py-3 text-center">Status</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50">
+                    <tbody class="divide-y divide-gray-100 text-sm">
                         @foreach($recentContributions as $contribution)
-                            <tr class="hover:bg-gray-50/50 transition-colors group">
-                                <td class="px-8 py-5">
-                                    <p class="text-sm font-bold text-gray-900">{{ $contribution->contribution_date->format('d/m/Y') }}</p>
-                                    <p class="text-[10px] text-gray-400 uppercase">{{ $contribution->created_at->diffForHumans() }}</p>
+                            <tr class="hover:bg-gray-50/80 transition-colors">
+                                <td class="px-4 py-3">
+                                    <p class="text-xs sm:text-sm font-bold text-gray-900 tabular-nums">{{ $contribution->contribution_date->format('d/m/Y') }}</p>
+                                    <p class="text-[10px] text-gray-400">{{ $contribution->created_at->diffForHumans() }}</p>
                                 </td>
-                                <td class="px-8 py-5">
-                                    <p class="text-sm font-black text-gray-900 leading-none">{{ $contribution->user->name ?? 'Doador Externo' }}</p>
-                                    <p class="text-[10px] text-gray-400 font-bold uppercase mt-1 line-clamp-1">{{ $contribution->member_name }}</p>
+                                <td class="px-4 py-3">
+                                    <p class="text-xs sm:text-sm font-bold text-gray-900">{{ $contribution->user->name ?? 'Doador Externo' }}</p>
+                                    <p class="text-[11px] text-gray-500 truncate">{{ $contribution->member_name }}</p>
                                 </td>
-                                <td class="px-8 py-5">
-                                    <span class="text-xs font-bold text-gray-600 line-clamp-1">{{ $contribution->package->name }}</span>
+                                <td class="px-4 py-3">
+                                    <span class="text-xs font-semibold text-gray-600">{{ $contribution->package->name }}</span>
                                 </td>
-                                <td class="px-8 py-5">
-                                    <span class="text-sm font-black text-blue-600">{{ number_format($contribution->amount, 2, ',', '.') }} MT</span>
+                                <td class="px-4 py-3 text-right">
+                                    <span class="text-xs sm:text-sm font-black text-gray-950 tabular-nums">{{ number_format($contribution->amount, 2, ',', '.') }} MT</span>
                                 </td>
-                                <td class="px-8 py-5 text-center">
+                                <td class="px-4 py-3 text-center">
                                     @if($contribution->status === 'verificada')
-                                        <span class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-green-100">Verificada</span>
+                                        <span class="px-2 py-0.5 bg-green-100 text-green-800 rounded-full text-[10px] font-black uppercase">Verificada</span>
                                     @elseif($contribution->status === 'pendente')
-                                        <span class="px-3 py-1 bg-yellow-50 text-yellow-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-yellow-100">Pendente</span>
+                                        <span class="px-2 py-0.5 bg-amber-100 text-amber-800 rounded-full text-[10px] font-black uppercase">Pendente</span>
                                     @else
-                                        <span class="px-3 py-1 bg-red-50 text-red-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-red-100">Rejeitada</span>
+                                        <span class="px-2 py-0.5 bg-red-100 text-red-800 rounded-full text-[10px] font-black uppercase">Rejeitada</span>
                                     @endif
                                 </td>
                             </tr>
@@ -198,7 +185,7 @@
                     </tbody>
                 </table>
             </div>
-        </div>
+        </section>
     </div>
 
     @push('scripts')
@@ -241,6 +228,4 @@
             });
         </script>
     @endpush
-    </div>
-    </div>
 @endsection

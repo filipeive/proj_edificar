@@ -16,13 +16,13 @@
         default => 'shadow-sm'
     };
 
-    $paddingClasses = $compact ? 'p-3 sm:p-4' : 'p-3.5 sm:p-5';
+    $paddingClasses = $compact ? 'p-3 sm:p-4' : 'p-4 sm:p-5';
 @endphp
 
 <div {{ $attributes->merge(['class' => "$baseClasses $variantClasses"]) }}>
     <!-- Header -->
     @if (isset($header) || $title || $subtitle)
-        <div class="px-3.5 sm:px-5 py-3 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between flex-wrap gap-2.5">
+        <div class="px-4 sm:px-5 py-3 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between flex-wrap gap-2.5">
             @if (isset($header))
                 {{ $header }}
             @else
@@ -45,7 +45,7 @@
 
     <!-- Footer -->
     @if (isset($footer))
-        <div class="px-3.5 sm:px-5 py-2.5 bg-gray-50/60 dark:bg-zinc-950/20 border-t border-gray-200 dark:border-zinc-800 rounded-b-xl">
+        <div class="px-4 sm:px-5 py-2.5 bg-gray-50/60 dark:bg-zinc-950/20 border-t border-gray-200 dark:border-zinc-800 rounded-b-xl">
             {{ $footer }}
         </div>
     @endif

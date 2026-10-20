@@ -1,43 +1,55 @@
 @extends('layouts.app')
 
-@section('title', 'Editar Encontro de Célula')
+@section('title', 'Editar Encontro de Célula - Portal Life Church')
 @section('page-title', 'Editar Encontro')
 @section('page-subtitle', 'Atualize os dados da reunião da célula')
 
+@section('header-actions')
+    <div class="flex items-center gap-2">
+        <a href="{{ route('cell-meetings.show', $cellMeeting) }}"
+            class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
+            <i class="bi bi-eye text-xs"></i>
+            <span>Ver Detalhes</span>
+        </a>
+        <a href="{{ route('cell-meetings.index') }}"
+            class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
+            <i class="bi bi-arrow-left text-xs"></i>
+            <span>Voltar</span>
+        </a>
+    </div>
+@endsection
+
 @section('content')
-    <div class="space-y-8" x-data="{ 
+    <div class="space-y-5" x-data="{ 
         meetingType: '{{ old('meeting_type', $cellMeeting->meeting_type) }}',
         selectedRoles: ['admin', 'pastor', 'pastor_senior', 'pastor_zona', 'supervisor', 'sub_supervisor', 'lider_celula', 'timoteo']
     }">
-        <div class="mb-6">
-            <a href="{{ route('cell-meetings.index') }}"
-                class="text-blue-600 hover:text-blue-800 flex items-center transition font-bold">
-                <i class="bi bi-arrow-left mr-2 font-black"></i> Voltar para Lista
-            </a>
+        <!-- Executive Header Card -->
+        <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50 text-orange-700">
+                    <i class="bi bi-pencil-square text-xl"></i>
+                </div>
+                <div>
+                    <span class="text-[10px] font-black uppercase tracking-wider text-orange-700">Atualização de Ata</span>
+                    <h1 class="text-lg font-black text-gray-900 tracking-tight">Editar Encontro</h1>
+                    <p class="text-xs text-gray-500">Atualize os detalhes, métricas e presenças da reunião realizada</p>
+                </div>
+            </div>
         </div>
 
         <form action="{{ route('cell-meetings.update', $cellMeeting) }}" method="POST"
-            class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+            class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
             @csrf
             @method('PUT')
 
-            <div class="p-8 md:p-12 space-y-12">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-gray-50 pb-8">
-                    <div class="space-y-1">
-                        <div class="flex items-center gap-2 text-xs font-bold text-blue-600 uppercase tracking-widest mb-1">
-                            <i class="bi bi-people-fill"></i>
-                            <span>Comunhão</span>
-                        </div>
-                        <h1 class="text-3xl font-black text-gray-900 tracking-tight">Editar Encontro</h1>
-                        <p class="text-gray-500 font-medium">Atualize os detalhes da reunião realizada</p>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="p-4 sm:p-6 space-y-5">
+                <!-- Seção 1: Configuração Principal -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div>
-                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Tipo de Encontro *</label>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Tipo de Encontro <span class="text-red-500">*</span></label>
                         <select name="meeting_type" x-model="meetingType" required
-                            class="w-full rounded-2xl border-gray-100 bg-gray-50/50 focus:ring-blue-500 focus:border-blue-500 font-bold py-3">
+                            class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500">
                             <option value="normal">Reunião de Célula</option>
                             <option value="leadership">Reunião de Liderança</option>
                             <option value="supervision">Reunião de Supervisão</option>
@@ -45,13 +57,13 @@
                             <option value="general">Reunião Geral</option>
                             <option value="other">Outro / Especial</option>
                         </select>
-                        @error('meeting_type') <p class="text-red-500 text-[10px] font-bold mt-2 uppercase tracking-tighter">{{ $message }}</p> @enderror
+                        @error('meeting_type') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
-                    <div x-show="meetingType === 'normal'" x-transition>
-                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Célula *</label>
+                    <div x-show="meetingType === 'normal'">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Célula <span class="text-red-500">*</span></label>
                         <select name="cell_id"
-                            class="w-full rounded-2xl border-gray-100 bg-gray-50/50 focus:ring-blue-500 focus:border-blue-500 font-bold py-3"
+                            class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500"
                             :required="meetingType === 'normal'">
                             <option value="">Selecione a célula</option>
                             @foreach($cells as $cell)
@@ -60,13 +72,13 @@
                                 </option>
                             @endforeach
                         </select>
-                        @error('cell_id') <p class="text-red-500 text-[10px] font-bold mt-2 uppercase tracking-tighter">{{ $message }}</p> @enderror
+                        @error('cell_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
-                    <div x-show="meetingType === 'zone'" x-transition>
-                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Zona *</label>
+                    <div x-show="meetingType === 'zone'" style="display: none;">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Zona <span class="text-red-500">*</span></label>
                         <select name="zone_id"
-                            class="w-full rounded-2xl border-gray-100 bg-gray-50/50 focus:ring-blue-500 focus:border-blue-500 font-bold py-3"
+                            class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500"
                             :required="meetingType === 'zone'">
                             <option value="">Selecione a zona</option>
                             @foreach($zones as $zone)
@@ -75,13 +87,13 @@
                                 </option>
                             @endforeach
                         </select>
-                        @error('zone_id') <p class="text-red-500 text-[10px] font-bold mt-2 uppercase tracking-tighter">{{ $message }}</p> @enderror
+                        @error('zone_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
-                    <div x-show="meetingType === 'supervision'" x-transition>
-                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Supervisão *</label>
+                    <div x-show="meetingType === 'supervision'" style="display: none;">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Supervisão <span class="text-red-500">*</span></label>
                         <select name="supervision_id"
-                            class="w-full rounded-2xl border-gray-100 bg-gray-50/50 focus:ring-blue-500 focus:border-blue-500 font-bold py-3"
+                            class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500"
                             :required="meetingType === 'supervision'">
                             <option value="">Selecione a supervisão</option>
                             @foreach($supervisions as $sup)
@@ -90,22 +102,20 @@
                                 </option>
                             @endforeach
                         </select>
-                        @error('supervision_id') <p class="text-red-500 text-[10px] font-bold mt-2 uppercase tracking-tighter">{{ $message }}</p> @enderror
+                        @error('supervision_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <div>
-                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Data *</label>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Data do Encontro <span class="text-red-500">*</span></label>
                         <input type="date" name="meeting_date" value="{{ old('meeting_date', $cellMeeting->meeting_date->format('Y-m-d')) }}" required
-                            class="w-full rounded-2xl border-gray-100 bg-gray-50/50 focus:ring-blue-500 focus:border-blue-500 font-bold py-3">
-                        @error('meeting_date') <p class="text-red-500 text-[10px] font-bold mt-2 uppercase tracking-tighter">{{ $message }}</p> @enderror
+                            class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500">
+                        @error('meeting_date') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
-                </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div class="lg:col-span-2">
-                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Líder do Encontro *</label>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Líder do Encontro <span class="text-red-500">*</span></label>
                         <select name="leader_id" required
-                            class="w-full rounded-2xl border-gray-100 bg-gray-50/50 focus:ring-blue-500 focus:border-blue-500 font-bold py-3">
+                            class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500">
                             <option value="">Selecione o líder</option>
                             @foreach($leaders as $leader)
                                 <option value="{{ $leader->id }}" {{ old('leader_id', $cellMeeting->leader_id) == $leader->id ? 'selected' : '' }}>
@@ -113,44 +123,46 @@
                                 </option>
                             @endforeach
                         </select>
-                        @error('leader_id') <p class="text-red-500 text-[10px] font-bold mt-2 uppercase tracking-tighter">{{ $message }}</p> @enderror
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Tema do Estudo</label>
-                        <input type="text" name="theme" value="{{ old('theme', $cellMeeting->theme) }}"
-                            placeholder="Ex: Vida no Espírito"
-                            class="w-full rounded-2xl border-gray-100 bg-gray-50/50 focus:ring-blue-500 focus:border-blue-500 font-bold py-3 px-4">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Texto Bíblico</label>
-                        <input type="text" name="biblical_text" value="{{ old('biblical_text', $cellMeeting->biblical_text) }}"
-                            placeholder="Ex: Salmos 23:1"
-                            class="w-full rounded-2xl border-gray-100 bg-gray-50/50 focus:ring-blue-500 focus:border-blue-500 font-bold py-3 px-4">
+                        @error('leader_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
-                <!-- Participants Section (Visible only for non-normal meetings) -->
-                <div x-show="meetingType !== 'normal'" x-transition.fade class="space-y-6">
-                    <div class="p-8 bg-orange-50/50 rounded-[2.5rem] border border-orange-100">
-                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                            <h5 class="text-xs font-black uppercase tracking-widest text-orange-600 flex items-center">
-                                <i class="bi bi-person-badge-fill mr-2"></i> Registro de Participantes (Oficiais)
+                <!-- Seção 2: Tema e Texto -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-gray-100">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Tema do Estudo</label>
+                        <input type="text" name="theme" value="{{ old('theme', $cellMeeting->theme) }}"
+                            placeholder="Ex: Vida no Espírito"
+                            class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Texto Bíblico</label>
+                        <input type="text" name="biblical_text" value="{{ old('biblical_text', $cellMeeting->biblical_text) }}"
+                            placeholder="Ex: Salmos 23:1"
+                            class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500">
+                    </div>
+                </div>
+
+                <!-- Seção 3: Participantes Oficiais (para Reuniões de Liderança, Supervisão ou Zona) -->
+                <div x-show="meetingType !== 'normal'" style="display: none;" class="space-y-3 pt-2 border-t border-gray-100">
+                    <div class="rounded-lg border border-orange-200 bg-orange-50/50 p-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                            <h5 class="text-xs font-black uppercase tracking-wider text-orange-900 flex items-center gap-1.5">
+                                <i class="bi bi-person-badge text-orange-700"></i> Participantes Oficiais Presentes
                             </h5>
-                            
-                            <div class="flex flex-wrap gap-2">
+                            <div class="flex flex-wrap gap-1">
                                 <template x-for="role in [
-                                    {id: 'pastor_senior', label: 'Pastor Senior'},
+                                    {id: 'pastor_senior', label: 'Senior'},
                                     {id: 'pastor', label: 'Pastores'},
-                                    {id: 'pastor_zona', label: 'Coordenação'},
-                                    {id: 'supervisor', label: 'Supervisores'},
+                                    {id: 'pastor_zona', label: 'Zona'},
+                                    {id: 'supervisor', label: 'Sup'},
                                     {id: 'sub_supervisor', label: 'Sub-Sup'},
                                     {id: 'lider_celula', label: 'Líderes'},
                                     {id: 'timoteo', label: 'Timóteos'}
                                 ]">
-                                    <label class="inline-flex items-center px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter transition-all cursor-pointer border"
-                                        :class="selectedRoles.includes(role.id) ? 'bg-orange-600 text-white border-orange-600' : 'bg-white text-orange-600 border-orange-200 hover:border-orange-400'">
+                                    <label class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase transition-colors cursor-pointer border"
+                                        :class="selectedRoles.includes(role.id) ? 'bg-orange-700 text-white border-orange-700' : 'bg-white text-gray-700 border-gray-200 hover:border-orange-400'">
                                         <input type="checkbox" :value="role.id" x-model="selectedRoles" class="hidden">
                                         <span x-text="role.label"></span>
                                     </label>
@@ -158,20 +170,19 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-h-96 overflow-y-auto p-2">
-                            @php
-                                $currentParticipants = $cellMeeting->participants->pluck('id')->toArray();
-                            @endphp
+                        @php
+                            $currentParticipants = $cellMeeting->participants->pluck('id')->toArray();
+                        @endphp
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 max-h-64 overflow-y-auto p-1 bg-white rounded-lg border border-orange-100">
                             @foreach($allLeaders as $official)
                                 <label x-show="selectedRoles.includes('{{ $official->role }}') || ['admin', 'pastor_senior', 'pastor'].includes('{{ $official->role }}')" 
-                                    x-transition.fade
-                                    class="flex items-center p-4 bg-white rounded-2xl border border-orange-100 hover:border-orange-300 transition-all cursor-pointer group shadow-sm">
+                                    class="flex items-center p-2 rounded hover:bg-orange-50/50 cursor-pointer border border-transparent hover:border-orange-200">
                                     <input type="checkbox" name="participants[]" value="{{ $official->id }}"
                                         {{ in_array($official->id, $currentParticipants) ? 'checked' : '' }}
-                                        class="w-5 h-5 text-orange-600 border-gray-200 rounded-lg focus:ring-orange-500">
-                                    <div class="ml-3">
-                                        <p class="text-xs font-black text-gray-800 group-hover:text-orange-700">{{ $official->name }}</p>
-                                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{{ $official->role }}</p>
+                                        class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                                    <div class="ml-2 min-w-0">
+                                        <p class="text-xs font-bold text-gray-900 truncate">{{ $official->name }}</p>
+                                        <p class="text-[10px] text-gray-400 uppercase truncate">{{ $official->role }}</p>
                                     </div>
                                 </label>
                             @endforeach
@@ -179,99 +190,103 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Ata do Encontro (Resumo Formal)</label>
-                        <textarea name="minutes" rows="10" placeholder="Descreva os pontos abordados, decisões tomadas e orientações dadas..."
-                            class="w-full rounded-[2rem] border-gray-100 bg-gray-50/50 focus:ring-orange-500 focus:border-orange-500 font-medium p-6">{{ old('minutes', $cellMeeting->minutes) }}</textarea>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Ata do Encontro (Resumo Formal)</label>
+                        <textarea name="minutes" rows="4" placeholder="Descreva os pontos abordados, deliberações e orientações..."
+                            class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500">{{ old('minutes', $cellMeeting->minutes) }}</textarea>
                     </div>
                 </div>
-                <div x-show="meetingType === 'normal'" x-transition.fade class="space-y-8">
+
+                <!-- Seção 4: Chamada de Membros (para Reunião de Célula) -->
+                <div x-show="meetingType === 'normal'" class="space-y-3 pt-2 border-t border-gray-100">
                     @if($members->count() > 0)
-                        <div class="bg-blue-50/50 p-8 rounded-[2.5rem] border border-blue-100">
-                            <h5 class="text-xs font-black uppercase tracking-widest text-blue-600 mb-6 flex items-center">
-                                <i class="bi bi-check2-square mr-2"></i> Chamada da Célula
+                        <div class="rounded-lg border border-gray-200 bg-gray-50/60 p-4">
+                            <h5 class="text-xs font-black uppercase tracking-wider text-gray-900 mb-3 flex items-center gap-1.5">
+                                <i class="bi bi-check2-square text-orange-700"></i> Chamada da Célula
                             </h5>
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
                                 @foreach($members as $member)
                                     @php
                                         $attendance = $attendances->get($member->id);
                                         $isPresent = $attendance ? $attendance->status : true;
                                         $reason = $attendance ? $attendance->reason : '';
                                     @endphp
-                                    <div class="bg-white rounded-2xl border border-blue-100 p-6 shadow-sm hover:border-blue-300 transition-all" x-data="{ isPresent: {{ $isPresent ? 'true' : 'false' }} }">
-                                        <div class="flex items-center justify-between gap-4">
-                                            <label class="flex items-center cursor-pointer group flex-1">
+                                    <div class="rounded-lg border border-gray-200 bg-white p-3 shadow-xs space-y-2" x-data="{ isPresent: {{ $isPresent ? 'true' : 'false' }} }">
+                                        <div class="flex items-center justify-between gap-2">
+                                            <label class="flex items-center cursor-pointer min-w-0 flex-1">
                                                 <input type="checkbox" name="present_members[]" value="{{ $member->id }}" x-model="isPresent"
-                                                    class="w-6 h-6 text-blue-600 border-gray-200 rounded-lg focus:ring-blue-500">
-                                                <span class="ml-4 font-bold text-gray-700 group-hover:text-blue-700">{{ $member->name }}</span>
+                                                    class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                                                <span class="ml-2 text-xs font-bold text-gray-900 truncate">{{ $member->name }}</span>
                                             </label>
-                                            <div class="flex items-center gap-2">
-                                                <span x-show="isPresent" class="text-[10px] font-black text-green-500 uppercase tracking-widest bg-green-50 px-3 py-1 rounded-full border border-green-100">Presente</span>
-                                                <span x-show="!isPresent" class="text-[10px] font-black text-red-400 uppercase tracking-widest bg-red-50 px-3 py-1 rounded-full border border-red-100">Ausente</span>
-                                            </div>
+                                            <span x-show="isPresent" class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">Presente</span>
+                                            <span x-show="!isPresent" class="inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-bold text-red-600">Ausente</span>
                                         </div>
-                                        <div x-show="!isPresent" x-transition class="mt-4 pt-4 border-t border-gray-50">
-                                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Justificação da Ausência</label>
-                                            <input type="text" name="reasons[{{ $member->id }}]" value="{{ $reason }}" placeholder="Ex: Doença, Trabalho..."
-                                                class="w-full text-xs font-bold bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-blue-100 rounded-xl py-2 px-3 transition-all">
+                                        <div x-show="!isPresent" style="display: none;" class="pt-2 border-t border-gray-100">
+                                            <input type="text" name="reasons[{{ $member->id }}]" value="{{ $reason }}" placeholder="Motivo da ausência..."
+                                                class="w-full rounded-md border-gray-200 px-2 py-1 text-[11px] focus:border-orange-500 focus:ring-orange-500">
                                         </div>
                                     </div>
                                 @endforeach
                             </div>
                         </div>
                     @else
-                        <div class="p-8 bg-gray-50 rounded-[2.5rem] border border-dashed border-gray-200 text-center">
-                            <i class="bi bi-info-circle text-2xl text-gray-400 mb-2 block"></i>
-                            <p class="text-gray-500 font-medium">Selecione uma célula para carregar a lista de membros.</p>
+                        <div class="rounded-lg border border-dashed border-gray-200 p-6 text-center text-xs text-gray-400 italic">
+                            Selecione uma célula para carregar a lista de chamada dos membros.
                         </div>
                     @endif
                 </div>
 
-                <div class="bg-gray-50/50 p-8 rounded-[2.5rem] border border-gray-100">
-                    <h5 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-8">Participação e Decisões</h5>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-                        <div class="text-center space-y-4">
-                            <label class="block text-xs font-black text-gray-400 uppercase tracking-widest">Adultos</label>
+                <!-- Seção 5: Números e Contagens -->
+                <div class="rounded-lg border border-gray-200 bg-gray-50/60 p-4">
+                    <h5 class="text-xs font-black uppercase tracking-wider text-gray-900 mb-3">Contagem de Participantes</h5>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="space-y-1">
+                            <label class="block text-xs font-bold text-gray-700 text-center">Adultos Presentes</label>
                             <input type="number" name="adults_count" id="adults_count"
                                 value="{{ old('adults_count', $cellMeeting->adults_count) }}" min="0" required
-                                class="w-32 mx-auto rounded-2xl border-gray-100 bg-white focus:ring-blue-500 focus:border-blue-500 text-center text-3xl font-black py-4 shadow-sm">
+                                class="w-full rounded-lg border-gray-300 px-3 py-2 text-base font-black text-center text-gray-900 focus:border-orange-500 focus:ring-orange-500">
                         </div>
 
-                        <div class="text-center space-y-4">
-                            <label class="block text-xs font-black text-gray-400 uppercase tracking-widest">Crianças</label>
+                        <div class="space-y-1">
+                            <label class="block text-xs font-bold text-gray-700 text-center">Crianças Presentes</label>
                             <input type="number" name="children_count" value="{{ old('children_count', $cellMeeting->children_count) }}" min="0" required
-                                class="w-32 mx-auto rounded-2xl border-gray-100 bg-white focus:ring-blue-500 focus:border-blue-500 text-center text-3xl font-black py-4 shadow-sm">
+                                class="w-full rounded-lg border-gray-300 px-3 py-2 text-base font-black text-center text-gray-900 focus:border-orange-500 focus:ring-orange-500">
                         </div>
 
-                        <div class="text-center space-y-4">
-                            <label class="block text-xs font-black text-gray-400 uppercase tracking-widest">Visitantes</label>
+                        <div class="space-y-1">
+                            <label class="block text-xs font-bold text-gray-700 text-center">Visitantes</label>
                             <input type="number" name="visitors_count" value="{{ old('visitors_count', $cellMeeting->visitors_count) }}" min="0" required
-                                class="w-32 mx-auto rounded-2xl border-gray-100 bg-white focus:ring-blue-500 focus:border-blue-500 text-center text-3xl font-black py-4 shadow-sm">
+                                class="w-full rounded-lg border-gray-300 px-3 py-2 text-base font-black text-center text-gray-900 focus:border-orange-500 focus:ring-orange-500">
                         </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div>
-                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Decisões (Corações para Jesus)</label>
+                <!-- Seção 6: Decisões e Observações -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-gray-100">
+                    <div class="space-y-1">
+                        <label class="block text-xs font-bold text-gray-700">Decisões (Corações para Jesus)</label>
                         <textarea name="decisions" rows="3" placeholder="Nomes das pessoas que entregaram a vida hoje..."
-                            class="w-full rounded-[1.5rem] border-gray-100 bg-gray-50/50 focus:ring-blue-500 focus:border-blue-500 font-bold p-4">{{ old('decisions', $cellMeeting->decisions) }}</textarea>
+                            class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 resize-none">{{ old('decisions', $cellMeeting->decisions) }}</textarea>
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Observações (Opcional)</label>
-                        <textarea name="observations" rows="3" placeholder="Algo especial que queira compartilhar..."
-                            class="w-full rounded-[1.5rem] border-gray-100 bg-gray-50/50 focus:ring-blue-500 focus:border-blue-500 font-bold p-4">{{ old('observations', $cellMeeting->observations) }}</textarea>
+                    <div class="space-y-1">
+                        <label class="block text-xs font-bold text-gray-700">Observações Pastorais (Opcional)</label>
+                        <textarea name="observations" rows="3" placeholder="Algo relevante sobre o encontro..."
+                            class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 resize-none">{{ old('observations', $cellMeeting->observations) }}</textarea>
                     </div>
                 </div>
-            </div>
 
-            <div class="px-8 md:px-12 py-8 bg-gray-50 border-t border-gray-50 flex justify-end">
-                <button type="submit"
-                    class="bg-blue-600 hover:bg-blue-700 text-white font-black px-12 py-4 rounded-2xl shadow-xl shadow-blue-100 transition-all transform hover:-translate-y-1">
-                    <i class="bi bi-check-lg mr-2 text-2xl"></i> ATUALIZAR ENCONTRO
-                </button>
+                <div class="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
+                    <a href="{{ route('cell-meetings.show', $cellMeeting) }}"
+                        class="rounded-lg border border-gray-200 px-3.5 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors">
+                        Cancelar
+                    </a>
+                    <button type="submit"
+                        class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition-colors">
+                        <i class="bi bi-check-lg text-xs"></i>
+                        <span>Atualizar Encontro</span>
+                    </button>
+                </div>
             </div>
         </form>
-    </div>
     </div>
 @endsection

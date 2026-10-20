@@ -5,210 +5,165 @@
 @section('page-subtitle', 'Visão geral da Zona ' . $zoneName)
 
 @section('content')
-    <div class="space-y-6 md:space-y-8">
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-            <!-- Zona Info -->
-            <div
-                class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-3 sm:p-4 md:p-6 hover:shadow-md transition-all duration-300 group">
-                <div class="flex items-center justify-between mb-2.5 sm:mb-4">
-                    <div
-                        class="bg-orange-50 dark:bg-orange-950/20 p-2 sm:p-2.5 md:p-3.5 rounded-lg sm:rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
-                        <i
-                            class="bi bi-geo-alt-fill text-orange-600 dark:text-orange-400 text-base sm:text-lg md:text-xl group-hover:text-white transition-colors duration-300"></i>
-                    </div>
-                    <span
-                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Localização</span>
-                </div>
-                <div>
-                    <p class="text-gray-400 dark:text-gray-500 text-[10px] sm:text-xs font-bold uppercase tracking-wider">Zona</p>
-                    <p class="text-lg sm:text-xl md:text-2xl font-black text-gray-900 dark:text-white mt-0.5 sm:mt-1 tracking-tight truncate">{{ $zoneName }}</p>
-                    <p class="text-[9px] sm:text-[10px] text-gray-400 dark:text-gray-500 mt-1 sm:mt-2 font-bold uppercase tracking-widest">
-                        {{ $supervisions->count() }} Supervisões
-                    </p>
-                </div>
+    <div class="space-y-5">
+        <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 sm:gap-4">
+            <div>
+                <p class="text-[10px] sm:text-xs font-black uppercase tracking-[0.18em] text-orange-700">Pastorado de Zona</p>
+                <h1 class="mt-0.5 text-xl sm:text-2xl font-black text-gray-950 tracking-tight">Zona {{ $zoneName }}</h1>
+                <p class="mt-0.5 text-xs sm:text-sm text-gray-500">Acompanhamento de supervisões, células, reuniões e contribuições da zona.</p>
             </div>
+            <div class="flex flex-wrap gap-2">
+                <a href="{{ route('cells.index') }}" class="inline-flex justify-center items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 shadow-sm">
+                    <i class="bi bi-people text-orange-700"></i> <span>Listar Células</span>
+                </a>
+                <a href="{{ route('reports.zone') }}" class="inline-flex justify-center items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-2 text-xs font-bold text-white hover:bg-orange-800 shadow-sm">
+                    <i class="bi bi-file-earmark-bar-graph"></i> <span>Relatório da Zona</span>
+                </a>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+            <!-- Zona Info -->
+            <article class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm">
+                <div class="flex items-center justify-between gap-2">
+                    <p class="text-[11px] sm:text-xs font-bold text-gray-500 truncate">Zona</p>
+                    <i class="bi bi-geo-alt text-orange-700 text-sm sm:text-base"></i>
+                </div>
+                <p class="mt-1 text-lg sm:text-2xl font-black text-gray-950 tracking-tight truncate">{{ $zoneName }}</p>
+                <p class="text-[10px] sm:text-[11px] text-gray-400 mt-0.5 truncate">{{ $supervisions->count() }} Supervisões</p>
+            </article>
 
             <!-- Total Membros -->
-            <div
-                class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-3 sm:p-4 md:p-6 hover:shadow-md transition-all duration-300 group">
-                <div class="flex items-center justify-between mb-2.5 sm:mb-4">
-                    <div
-                        class="bg-orange-50 dark:bg-orange-950/20 p-2 sm:p-2.5 md:p-3.5 rounded-lg sm:rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
-                        <i
-                            class="bi bi-people-fill text-orange-600 dark:text-orange-400 text-base sm:text-lg md:text-xl group-hover:text-white transition-colors duration-300"></i>
-                    </div>
-                    <span
-                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Dimensão</span>
+            <article class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm">
+                <div class="flex items-center justify-between gap-2">
+                    <p class="text-[11px] sm:text-xs font-bold text-gray-500 truncate">Membros</p>
+                    <i class="bi bi-people text-blue-700 text-sm sm:text-base"></i>
                 </div>
-                <div>
-                    <p class="text-gray-400 dark:text-gray-500 text-[10px] sm:text-xs font-bold uppercase tracking-wider">Membros</p>
-                    <p class="text-lg sm:text-xl md:text-2xl font-black text-gray-900 dark:text-white mt-0.5 sm:mt-1 tracking-tight">{{ $totalMembers }}</p>
-                    <p class="text-[9px] sm:text-[10px] text-gray-400 dark:text-gray-500 mt-1 sm:mt-2 font-bold uppercase tracking-widest">Membros Ativos</p>
-                </div>
-            </div>
+                <p class="mt-1 text-lg sm:text-2xl font-black text-gray-950 tracking-tight tabular-nums">{{ $totalMembers }}</p>
+                <p class="text-[10px] sm:text-[11px] text-gray-400 mt-0.5 truncate">Membros ativos</p>
+            </article>
 
             <!-- Total Arrecadado -->
-            <div
-                class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-3 sm:p-4 md:p-6 hover:shadow-md transition-all duration-300 group">
-                <div class="flex items-center justify-between mb-2.5 sm:mb-4">
-                    <div
-                        class="bg-orange-50 dark:bg-orange-950/20 p-2 sm:p-2.5 md:p-3.5 rounded-lg sm:rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
-                        <i
-                            class="bi bi-cash-coin text-orange-600 dark:text-orange-400 text-base sm:text-lg md:text-xl group-hover:text-white transition-colors duration-300"></i>
-                    </div>
-                    <span
-                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Financeiro</span>
+            <article class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm">
+                <div class="flex items-center justify-between gap-2">
+                    <p class="text-[11px] sm:text-xs font-bold text-gray-500 truncate">Total da Zona</p>
+                    <i class="bi bi-cash-coin text-emerald-700 text-sm sm:text-base"></i>
                 </div>
-                <div>
-                    <p class="text-gray-400 dark:text-gray-500 text-[10px] sm:text-xs font-bold uppercase tracking-wider">Total da Zona</p>
-                    <p class="text-base sm:text-xl md:text-2xl font-black text-gray-900 dark:text-white mt-0.5 sm:mt-1 tracking-tight">
-                        {{ number_format($total, 2, ',', '.') }} MT
-                    </p>
-                    <p class="text-[9px] sm:text-[10px] text-gray-400 dark:text-gray-500 mt-1 sm:mt-2 font-bold uppercase tracking-widest">Este Mês</p>
-                </div>
-            </div>
+                <p class="mt-1 text-lg sm:text-2xl font-black text-emerald-700 tracking-tight tabular-nums">
+                    {{ number_format($total, 2, ',', '.') }} MT
+                </p>
+                <p class="text-[10px] sm:text-[11px] text-gray-400 mt-0.5 truncate">Este mês</p>
+            </article>
 
             <!-- Desempenho -->
-            <div
-                class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-3 sm:p-4 md:p-6 hover:shadow-md transition-all duration-300 group">
-                <div class="flex items-center justify-between mb-2.5 sm:mb-4">
-                    <div
-                        class="bg-orange-50 dark:bg-orange-950/20 p-2 sm:p-2.5 md:p-3.5 rounded-lg sm:rounded-xl group-hover:bg-orange-600 transition-colors duration-300">
-                        <i
-                            class="bi bi-grid-3x3-gap-fill text-orange-600 dark:text-orange-400 text-base sm:text-lg md:text-xl group-hover:text-white transition-colors duration-300"></i>
-                    </div>
-                    <span
-                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Estrutura</span>
+            <article class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm">
+                <div class="flex items-center justify-between gap-2">
+                    <p class="text-[11px] sm:text-xs font-bold text-gray-500 truncate">Células</p>
+                    <i class="bi bi-grid-3x3-gap text-indigo-700 text-sm sm:text-base"></i>
                 </div>
-                <div>
-                    <p class="text-gray-400 dark:text-gray-500 text-[10px] sm:text-xs font-bold uppercase tracking-wider">Células</p>
-                    <p class="text-lg sm:text-xl md:text-2xl font-black text-gray-900 dark:text-white mt-0.5 sm:mt-1 tracking-tight">
-                        {{ $zone->cells()->count() }}</p>
-                    <div class="flex items-center mt-1 sm:mt-2 text-[9px] sm:text-[10px]">
-                        <span class="text-orange-500 dark:text-orange-400 font-bold flex items-center">
-                            <i class="bi bi-activity mr-1"></i> Ativas
-                        </span>
-                    </div>
-                </div>
-            </div>
+                <p class="mt-1 text-lg sm:text-2xl font-black text-gray-950 tracking-tight tabular-nums">{{ $zone->cells()->count() }}</p>
+                <p class="text-[10px] sm:text-[11px] text-orange-700 font-semibold mt-0.5 truncate">
+                    <i class="bi bi-activity mr-1"></i> Ativas
+                </p>
+            </article>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <!-- Gráfico de Arrecadação -->
-            <div
-                class="lg:col-span-2 bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-4 sm:p-6 md:p-8">
-                <div class="flex items-center justify-between mb-4 sm:mb-8">
+            <section class="lg:col-span-2 rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+                <div class="flex items-center justify-between gap-3 mb-4">
                     <div>
-                        <h3 class="text-sm sm:text-base font-bold text-gray-900 dark:text-white tracking-tight">Histórico Financeiro</h3>
-                        <p class="text-[9px] sm:text-[10px] text-gray-405 dark:text-zinc-500 font-bold uppercase tracking-widest mt-0.5 sm:mt-1">
-                            Últimos 6 Meses (MT)
-                        </p>
+                        <h3 class="text-sm font-black text-gray-900">Histórico Financeiro</h3>
+                        <p class="text-xs text-gray-500">Últimos 6 Meses (MT)</p>
                     </div>
-                    <div class="flex items-center gap-1.5 sm:gap-2">
-                        <span class="w-2 sm:w-2.5 h-2 sm:h-2.5 bg-orange-600 rounded-full"></span>
-                        <span
-                            class="text-[8px] sm:text-[9px] font-black text-gray-450 dark:text-zinc-400 uppercase tracking-widest">Contribuições</span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 bg-orange-600 rounded-full"></span>
+                        <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Contribuições</span>
                     </div>
                 </div>
-                <div class="w-full h-[220px] sm:h-[300px]">
+                <div class="w-full h-64 relative">
                     <canvas id="financialChart"></canvas>
                 </div>
-            </div>
+            </section>
 
-            <!-- Ações Rápidas -->
-            <div class="space-y-4 sm:space-y-6">
-                <div
-                    class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-4 sm:p-6 md:p-8">
-                    <h3 class="text-base sm:text-lg font-black text-gray-900 dark:text-white tracking-tight mb-4 sm:mb-6">
-                        Ações Rápidas</h3>
-                    <div class="grid grid-cols-1 gap-2.5 sm:gap-4">
+            <!-- Ações Rápidas & Status -->
+            <div class="space-y-4">
+                <section class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+                    <h3 class="text-sm font-black text-gray-900 mb-3">Ações Rápidas</h3>
+                    <div class="grid grid-cols-1 gap-2.5">
                         <a href="{{ route('reports.zone') }}"
-                            class="flex items-center p-3 sm:p-4 bg-gray-50 dark:bg-zinc-850 rounded-xl sm:rounded-2xl hover:bg-orange-600 group transition-all duration-300 border border-transparent hover:border-orange-500/20">
-                            <div
-                                class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white dark:bg-zinc-900 flex items-center justify-center text-orange-600 dark:text-orange-400 mr-3 sm:mr-4 shadow-sm group-hover:bg-orange-700 group-hover:text-white transition-colors">
-                                <i class="bi bi-file-earmark-pdf text-base sm:text-lg"></i>
+                            class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200/80 hover:bg-orange-50 hover:border-orange-200 transition-colors">
+                            <div class="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-orange-700 shrink-0">
+                                <i class="bi bi-file-earmark-pdf text-sm"></i>
                             </div>
-                            <span
-                                class="text-xs sm:text-sm font-black text-gray-700 dark:text-zinc-200 group-hover:text-white transition-colors">Relatório da Zona</span>
+                            <span class="text-xs font-bold text-gray-800">Relatório da Zona</span>
                         </a>
                         <a href="{{ route('cells.index') }}"
-                            class="flex items-center p-3 sm:p-4 bg-gray-50 dark:bg-zinc-850 rounded-xl sm:rounded-2xl hover:bg-orange-600 group transition-all duration-300 border border-transparent hover:border-orange-500/20">
-                            <div
-                                class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white dark:bg-zinc-900 flex items-center justify-center text-orange-600 dark:text-orange-400 mr-3 sm:mr-4 shadow-sm group-hover:bg-orange-700 group-hover:text-white transition-colors">
-                                <i class="bi bi-people text-base sm:text-lg"></i>
+                            class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200/80 hover:bg-orange-50 hover:border-orange-200 transition-colors">
+                            <div class="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-orange-700 shrink-0">
+                                <i class="bi bi-people text-sm"></i>
                             </div>
-                            <span
-                                class="text-xs sm:text-sm font-black text-gray-700 dark:text-zinc-200 group-hover:text-white transition-colors">Listar Células</span>
+                            <span class="text-xs font-bold text-gray-800">Listar Células</span>
                         </a>
                         <a href="{{ route('contributions.index') }}"
-                            class="flex items-center p-3 sm:p-4 bg-gray-50 dark:bg-zinc-850 rounded-xl sm:rounded-2xl hover:bg-orange-600 group transition-all duration-300 border border-transparent hover:border-orange-500/20">
-                            <div
-                                class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white dark:bg-zinc-900 flex items-center justify-center text-orange-600 dark:text-orange-400 mr-3 sm:mr-4 shadow-sm group-hover:bg-orange-700 group-hover:text-white transition-colors">
-                                <i class="bi bi-cash-coin text-base sm:text-lg"></i>
+                            class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200/80 hover:bg-orange-50 hover:border-orange-200 transition-colors">
+                            <div class="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-orange-700 shrink-0">
+                                <i class="bi bi-cash-coin text-sm"></i>
                             </div>
-                            <span
-                                class="text-xs sm:text-sm font-black text-gray-700 dark:text-zinc-200 group-hover:text-white transition-colors">Contribuições</span>
+                            <span class="text-xs font-bold text-gray-800">Contribuições</span>
                         </a>
                     </div>
-                </div>
+                </section>
 
-                <div class="bg-zinc-950 rounded-xl sm:rounded-2xl shadow-xl p-5 sm:p-8 text-white relative overflow-hidden border border-zinc-900">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-orange-600/10 rounded-full -mr-16 -mt-16 blur-3xl font-black">
-                    </div>
-                    <h3 class="text-sm sm:text-base font-black tracking-tight mb-2 sm:mb-3 relative z-10">Status da Zona</h3>
-                    <p class="text-xs text-gray-400 leading-relaxed mb-4 sm:mb-5 relative z-10">
-                        A zona <span class="text-orange-500 font-bold">{{ $zoneName }}</span> está a operar com <span
-                            class="text-white font-bold">{{ $supervisions->count() }}</span> supervisões.
+                <section class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+                    <h3 class="text-sm font-black text-gray-900 mb-1.5">Status da Zona</h3>
+                    <p class="text-xs text-gray-600 leading-relaxed mb-3">
+                        A zona <span class="text-orange-700 font-bold">{{ $zoneName }}</span> está a operar com <span class="text-gray-950 font-bold">{{ $supervisions->count() }}</span> supervisões.
                     </p>
-                    <div class="flex items-center space-x-2 relative z-10">
-                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
-                        <span class="text-[9px] font-black uppercase tracking-widest text-green-500">Sistema Online</span>
+                    <div class="inline-flex items-center gap-1.5 rounded-full bg-green-50 border border-green-200 px-2.5 py-0.5">
+                        <span class="w-1.5 h-1.5 bg-green-600 rounded-full"></span>
+                        <span class="text-[10px] font-black uppercase tracking-wider text-green-800">Sistema Online</span>
                     </div>
-                </div>
+                </section>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <!-- Supervisões da Zona -->
-            <div
-                class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 overflow-hidden">
-                <div
-                    class="px-4 sm:px-6 py-3.5 sm:py-5 border-b border-gray-50 dark:border-zinc-850 flex items-center justify-between">
-                    <h3 class="text-sm sm:text-base font-bold text-gray-900 dark:text-white tracking-tight">Supervisões</h3>
-                    <a href="{{ route('supervisions.index') }}"
-                        class="text-[10px] sm:text-xs font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest hover:text-orange-700 dark:hover:text-orange-300">Ver Todas</a>
+            <section class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+                <div class="p-4 sm:p-5 border-b border-gray-200 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-black text-gray-900">Supervisões</h3>
+                        <p class="text-xs text-gray-500">Desempenho por supervisão</p>
+                    </div>
+                    <a href="{{ route('supervisions.index') }}" class="text-xs font-bold text-orange-800 hover:underline">Ver Todas</a>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead>
-                            <tr
-                                class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 border-b border-gray-50 dark:border-zinc-850">
-                                <th class="px-3 sm:px-6 py-2.5 sm:py-4 text-left">Supervisão</th>
-                                <th class="px-3 sm:px-6 py-2.5 sm:py-4 text-center">Células</th>
-                                <th class="px-3 sm:px-6 py-2.5 sm:py-4 text-right">Total Arrecadado</th>
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-gray-50 text-[10px] font-black uppercase tracking-wider text-gray-500 border-b border-gray-200">
+                            <tr>
+                                <th class="px-4 py-3">Supervisão</th>
+                                <th class="px-4 py-3 text-center">Células</th>
+                                <th class="px-4 py-3 text-right">Total Arrecadado</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-50 dark:divide-zinc-850">
+                        <tbody class="divide-y divide-gray-100 text-sm">
                             @foreach($supervisions as $supervision)
-                                <tr class="hover:bg-gray-50 dark:hover:bg-zinc-900/40 transition-colors group">
-                                    <td class="px-3 sm:px-6 py-2.5 sm:py-4">
-                                        <div class="flex items-center">
-                                            <div
-                                                class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-orange-50 dark:bg-orange-950/20 text-orange-600 dark:text-orange-400 flex items-center justify-center font-black mr-2.5 sm:mr-4 group-hover:bg-orange-600 group-hover:text-white transition-all text-xs sm:text-sm">
+                                <tr class="hover:bg-gray-50/80 transition-colors">
+                                    <td class="px-4 py-3">
+                                        <div class="flex items-center gap-2.5">
+                                            <div class="w-8 h-8 rounded-lg bg-orange-50 text-orange-700 flex items-center justify-center font-black text-xs shrink-0">
                                                 {{ strtoupper(substr($supervision['name'], 0, 1)) }}
                                             </div>
-                                            <span
-                                                class="font-black text-gray-900 dark:text-white text-xs sm:text-sm">{{ $supervision['name'] }}</span>
+                                            <span class="font-bold text-gray-900 text-xs sm:text-sm">{{ $supervision['name'] }}</span>
                                         </div>
                                     </td>
-                                    <td class="px-3 sm:px-6 py-2.5 sm:py-4 text-center">
-                                        <span
-                                            class="px-2 sm:px-2.5 py-0.5 bg-gray-100 dark:bg-zinc-850 rounded-full text-[8px] sm:text-[9px] font-black text-gray-500 dark:text-gray-300 uppercase tracking-widest">
+                                    <td class="px-4 py-3 text-center">
+                                        <span class="px-2 py-0.5 bg-gray-100 rounded-full text-[10px] font-black text-gray-700 uppercase">
                                             {{ $supervision['cells'] }} Células
                                         </span>
                                     </td>
-                                    <td
-                                        class="px-3 sm:px-6 py-2.5 sm:py-4 text-right font-black text-green-600 dark:text-green-400 tracking-tight text-xs sm:text-sm">
+                                    <td class="px-4 py-3 text-right font-black text-emerald-700 text-xs sm:text-sm tabular-nums">
                                         {{ number_format($supervision['total'], 2, ',', '.') }} MT
                                     </td>
                                 </tr>
@@ -216,99 +171,86 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </section>
 
             <!-- Reuniões de Célula Recentes -->
-            <div
-                class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-4 sm:p-6 md:p-8">
-                <div class="flex items-center justify-between mb-4 sm:mb-8">
-                    <h3 class="text-sm sm:text-base font-bold text-gray-900 dark:text-white tracking-tight">Células: Reuniões Recentes</h3>
-                    <a href="{{ route('cell-meetings.index') }}"
-                        class="text-[10px] sm:text-xs font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest hover:text-orange-700 dark:hover:text-orange-300">Ver Todas</a>
+            <section class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+                <div class="flex items-center justify-between gap-3 mb-4">
+                    <div>
+                        <h3 class="text-sm font-black text-gray-900">Células: Reuniões Recentes</h3>
+                        <p class="text-xs text-gray-500">Encontros registados na zona</p>
+                    </div>
+                    <a href="{{ route('cell-meetings.index') }}" class="text-xs font-bold text-orange-800 hover:underline">Ver Todas</a>
                 </div>
-                <div class="space-y-4 sm:space-y-6">
+                <div class="space-y-3">
                     @forelse($recentCellMeetings as $meeting)
-                        <div class="flex items-center space-x-3 sm:space-x-6 group">
-                            <div
-                                class="bg-orange-50 dark:bg-orange-950/20 px-3 py-2 sm:px-4 sm:py-3 rounded-xl sm:rounded-2xl text-center min-w-[55px] sm:min-w-[70px] group-hover:bg-orange-600 group-hover:text-white transition-colors">
-                                <span
-                                    class="block text-base sm:text-xl font-black leading-none text-gray-900 dark:text-white group-hover:text-white">{{ $meeting->meeting_date->format('d') }}</span>
-                                <span
-                                    class="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 group-hover:text-white">{{ $meeting->meeting_date->translatedFormat('M') }}</span>
+                        <div class="flex items-center gap-3 border-b border-gray-100 pb-3 last:border-0 last:pb-0">
+                            <div class="bg-orange-50 border border-orange-200/60 px-3 py-1.5 rounded-lg text-center min-w-[54px]">
+                                <span class="block text-base font-black leading-none text-orange-900 tabular-nums">{{ $meeting->meeting_date->format('d') }}</span>
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-orange-700">{{ $meeting->meeting_date->translatedFormat('M') }}</span>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <h4
-                                    class="font-black text-gray-900 dark:text-white group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors leading-tight text-xs sm:text-sm truncate">
+                                <h4 class="font-bold text-gray-900 text-xs sm:text-sm truncate">
                                     {{ $meeting->cell->name }}
                                 </h4>
-                                <p
-                                    class="text-[9px] sm:text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest mt-0.5 sm:mt-1 truncate">
+                                <p class="text-[11px] text-gray-500 mt-0.5 truncate">
                                     Líder: {{ $meeting->leader->name ?? 'N/A' }}
                                 </p>
                             </div>
-                            <div class="text-right flex-shrink-0">
-                                <span
-                                    class="block font-black text-gray-900 dark:text-white text-xs sm:text-sm">{{ ($meeting->adults_count ?? 0) + ($meeting->children_count ?? 0) + ($meeting->visitors_count ?? 0) }}</span>
-                                <span
-                                    class="text-[8px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Total</span>
+                            <div class="text-right shrink-0">
+                                <span class="block font-black text-gray-950 text-xs sm:text-sm tabular-nums">{{ ($meeting->adults_count ?? 0) + ($meeting->children_count ?? 0) + ($meeting->visitors_count ?? 0) }}</span>
+                                <span class="text-[9px] font-bold uppercase text-gray-400">Total</span>
                             </div>
                         </div>
                     @empty
-                        <p
-                            class="text-center text-gray-400 dark:text-gray-550 py-8 sm:py-10 font-bold uppercase tracking-widest text-[9px] sm:text-[10px]">
-                            Nenhuma reunião registada recentemente.</p>
+                        <p class="text-center text-gray-500 py-6 text-xs">
+                            Nenhuma reunião registada recentemente.
+                        </p>
                     @endforelse
                 </div>
-            </div>
+            </section>
         </div>
 
-        <div class="grid grid-cols-1 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-8">
-            <!-- Próximos Eventos da Zona -->
-            <div
-                class="bg-white dark:bg-zinc-900/30 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-850 p-4 sm:p-6 md:p-8">
-                <div class="flex items-center justify-between mb-4 sm:mb-8">
-                    <h3 class="text-sm sm:text-base font-bold text-gray-900 dark:text-white tracking-tight">Próximos Eventos</h3>
-                    <a href="{{ route('events.index') }}"
-                        class="text-[10px] sm:text-xs font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest hover:text-orange-700 dark:hover:text-orange-300">Ver Todos</a>
+        <!-- Próximos Eventos da Zona -->
+        <section class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+            <div class="flex items-center justify-between gap-3 mb-4">
+                <div>
+                    <h3 class="text-sm font-black text-gray-900">Próximos Eventos</h3>
+                    <p class="text-xs text-gray-500">Programação para a zona</p>
                 </div>
-                <div class="space-y-4 sm:space-y-6">
-                    @forelse($upcomingEvents as $event)
-                        <div class="flex items-center space-x-3 sm:space-x-6 group">
-                            <div
-                                class="bg-gray-50 dark:bg-zinc-850 px-3 py-2 sm:px-4 sm:py-3 rounded-xl sm:rounded-2xl text-center min-w-[55px] sm:min-w-[70px] group-hover:bg-orange-600 group-hover:text-white transition-colors">
-                                <span
-                                    class="block text-base sm:text-xl font-black leading-none text-gray-900 dark:text-gray-100 group-hover:text-white">{{ $event->date->format('d') }}</span>
-                                <span
-                                    class="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-400 group-hover:text-white">{{ $event->date->translatedFormat('M') }}</span>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <h4
-                                    class="font-black text-gray-900 dark:text-white group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors text-xs sm:text-sm truncate">
-                                    {{ $event->name }}
-                                </h4>
-                                <p class="text-[11px] sm:text-xs text-gray-500 dark:text-zinc-400 flex items-center mt-0.5 sm:mt-1 truncate">
-                                    <i class="bi bi-geo-alt mr-1"></i> {{ $event->location ?? 'Local a definir' }}
-                                    @if($event->end_date)
-                                        <span
-                                            class="ml-1.5 sm:ml-2 px-1.5 sm:px-2 py-0.5 bg-orange-50 dark:bg-orange-950/20 text-orange-650 dark:text-orange-400 rounded text-[8px] sm:text-[9px] font-bold uppercase tracking-widest">Até
-                                            {{ $event->end_date->format('d/m/Y') }}</span>
-                                    @endif
-                                </p>
-                            </div>
-                            <span
-                                class="px-2 sm:px-3 py-0.5 sm:py-1 bg-gray-100 dark:bg-zinc-850 rounded-full text-[7px] sm:text-[8px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-300 flex-shrink-0">
-                                {{ $event->eventType->name ?? 'Evento' }}
-                            </span>
+                <a href="{{ route('events.index') }}" class="text-xs font-bold text-orange-800 hover:underline">Ver Todos</a>
+            </div>
+            <div class="space-y-3">
+                @forelse($upcomingEvents as $event)
+                    <div class="flex items-center gap-3 border-b border-gray-100 pb-3 last:border-0 last:pb-0">
+                        <div class="bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-lg text-center min-w-[54px]">
+                            <span class="block text-base font-black leading-none text-gray-900 tabular-nums">{{ $event->date->format('d') }}</span>
+                            <span class="text-[9px] font-bold uppercase tracking-wider text-gray-500">{{ $event->date->translatedFormat('M') }}</span>
                         </div>
-                    @empty
-                        <p
-                            class="text-center text-gray-400 dark:text-zinc-500 py-8 sm:py-10 font-bold uppercase tracking-widest text-[9px] sm:text-[10px]">
-                            Nenhum evento programado para esta zona.</p>
-                    @endforelse
-                </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-bold text-gray-900 text-xs sm:text-sm truncate">
+                                {{ $event->name }}
+                            </h4>
+                            <p class="text-[11px] text-gray-500 flex items-center mt-0.5 truncate">
+                                <i class="bi bi-geo-alt mr-1"></i> {{ $event->location ?? 'Local a definir' }}
+                                @if($event->end_date)
+                                    <span class="ml-2 px-1.5 py-0.5 bg-orange-50 text-orange-800 rounded text-[9px] font-bold uppercase">
+                                        Até {{ $event->end_date->format('d/m/Y') }}
+                                    </span>
+                                @endif
+                            </p>
+                        </div>
+                        <span class="px-2.5 py-0.5 bg-gray-100 rounded-full text-[9px] font-black uppercase text-gray-600 shrink-0">
+                            {{ $event->eventType->name ?? 'Evento' }}
+                        </span>
+                    </div>
+                @empty
+                    <p class="text-center text-gray-500 py-6 text-xs">
+                        Nenhum evento programado para esta zona.
+                    </p>
+                @endforelse
             </div>
-
-        </div>
+        </section>
     </div>
 @endsection
 
@@ -329,15 +271,15 @@
                         label: 'Contribuições (MT)',
                         data: @json($chartData['data']),
                         borderColor: 'rgba(249, 115, 22, 1)',
-                        borderWidth: 4,
+                        borderWidth: 3,
                         fill: true,
                         backgroundColor: gradient,
                         tension: 0.4,
                         pointBackgroundColor: 'rgba(249, 115, 22, 1)',
                         pointBorderColor: '#fff',
                         pointBorderWidth: 2,
-                        pointRadius: 6,
-                        pointHoverRadius: 8
+                        pointRadius: 4,
+                        pointHoverRadius: 6
                     }]
                 },
                 options: {
@@ -349,10 +291,10 @@
                         },
                         tooltip: {
                             backgroundColor: '#111827',
-                            titleFont: { size: 14, weight: 'bold' },
-                            bodyFont: { size: 13 },
-                            padding: 12,
-                            cornerRadius: 12,
+                            titleFont: { size: 13, weight: 'bold' },
+                            bodyFont: { size: 12 },
+                            padding: 10,
+                            cornerRadius: 8,
                             displayColors: false,
                             callbacks: {
                                 label: function (context) {
@@ -388,6 +330,7 @@
                         }
                     }
                 }
+            });
         });
     </script>
 @endpush

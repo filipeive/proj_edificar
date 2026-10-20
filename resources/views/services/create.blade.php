@@ -5,37 +5,37 @@
 @section('page-subtitle', 'Ficha de celebração e métricas ministeriais')
 
 @section('content')
-    <div class="space-y-8" x-data="{ 
-                                        guestPreacher: {{ old('preacher_name') ? 'true' : 'false' }}
-                                    }">
-        <!-- Header -->
-        <div
-            class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div class="space-y-5" x-data="{ 
+        guestPreacher: {{ old('preacher_name') ? 'true' : 'false' }}
+    }">
+        <!-- Page Header (National Style) -->
+        <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 sm:gap-4">
             <div>
-                <div class="flex items-center gap-2 text-xs font-bold text-blue-600 uppercase tracking-widest mb-2">
+                <div class="flex items-center gap-2 text-[10px] sm:text-xs font-black uppercase tracking-[0.18em] text-orange-700">
                     <a href="{{ route('services.index') }}" class="hover:underline">Cultos</a>
-                    <i class="bi bi-chevron-right text-[10px]"></i>
+                    <i class="bi bi-chevron-right text-[9px]"></i>
                     <span>Registrar Novo</span>
                 </div>
-                <h1 class="text-3xl font-black text-gray-900 tracking-tight">Ficha de Celebração</h1>
+                <h1 class="mt-0.5 text-xl sm:text-2xl font-black text-gray-950 tracking-tight">Ficha de Celebração</h1>
+                <p class="mt-0.5 text-xs sm:text-sm text-gray-500">Registo de participação, ofertas e dízimos do culto.</p>
             </div>
             <a href="{{ route('services.index') }}"
-                class="group flex items-center bg-gray-50 text-gray-500 px-6 py-3 rounded-2xl hover:bg-gray-100 transition-all font-bold">
-                <i class="bi bi-arrow-left text-lg mr-2 group-hover:-translate-x-1 transition-transform"></i>
-                Cancelar
+                class="inline-flex justify-center items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 sm:py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 shadow-sm">
+                <i class="bi bi-arrow-left"></i>
+                <span>Cancelar</span>
             </a>
-        </div>
+        </header>
 
-        <form action="{{ route('services.store') }}" method="POST" id="serviceForm" class="space-y-8 pb-12">
+        <form action="{{ route('services.store') }}" method="POST" id="serviceForm" class="space-y-5 pb-8">
             @csrf
 
             @if($errors->any())
-                <div class="bg-red-50 border-l-4 border-red-500 p-6 rounded-[2rem] shadow-sm mb-8">
-                    <div class="flex items-center mb-4">
-                        <i class="bi bi-exclamation-triangle-fill text-red-500 text-xl mr-3"></i>
-                        <h3 class="text-red-900 font-black uppercase tracking-widest text-sm">Erros de Validação</h3>
+                <div class="rounded-xl border border-red-200 bg-red-50 p-4 shadow-sm">
+                    <div class="flex items-center mb-2">
+                        <i class="bi bi-exclamation-triangle-fill text-red-600 text-base mr-2"></i>
+                        <h3 class="text-red-900 font-black uppercase tracking-wider text-xs">Erros de Validação</h3>
                     </div>
-                    <ul class="list-disc list-inside text-red-700 text-sm font-bold space-y-1">
+                    <ul class="list-disc list-inside text-red-700 text-xs font-semibold space-y-1">
                         @foreach($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
@@ -43,28 +43,25 @@
                 </div>
             @endif
 
-
             <!-- Section 1: Cabeçalho -->
-            <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-8 border-b border-gray-50 bg-gray-50/50">
-                    <h2 class="text-lg font-black text-gray-900 flex items-center gap-2">
+            <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+                <div class="px-4 py-3 border-b border-gray-200 bg-gray-50/50">
+                    <h2 class="text-sm font-black text-gray-900 flex items-center gap-2">
                         <i class="bi bi-info-circle text-blue-600"></i>
                         Informações Gerais
                     </h2>
                 </div>
-                <div class="p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Data do
-                            Culto</label>
+                <div class="p-4 sm:p-5 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black uppercase tracking-wider text-gray-500">Data do Culto</label>
                         <input type="date" name="date" value="{{ old('date', date('Y-m-d')) }}" required
-                            class="w-full px-5 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700">
+                            class="w-full px-3 py-2 bg-white border border-gray-300 focus:border-orange-600 focus:ring-2 focus:ring-orange-500/20 rounded-lg transition-all text-xs sm:text-sm font-semibold text-gray-700">
                     </div>
 
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Tipo de
-                            Celebração</label>
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black uppercase tracking-wider text-gray-500">Tipo de Celebração</label>
                         <select name="service_type" required x-model="serviceType"
-                            class="w-full px-5 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700 appearance-none custom-select">
+                            class="w-full px-3 py-2 bg-white border border-gray-300 focus:border-orange-600 focus:ring-2 focus:ring-orange-500/20 rounded-lg transition-all text-xs sm:text-sm font-semibold text-gray-700 custom-select">
                             <option value="1st">1º Culto</option>
                             <option value="2nd">2º Culto</option>
                             <option value="3rd">3º Culto</option>
@@ -73,12 +70,12 @@
                         </select>
                     </div>
 
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Pregador</label>
-                        <div class="space-y-4"
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black uppercase tracking-wider text-gray-500">Pregador</label>
+                        <div class="space-y-2"
                             x-effect="if (guestPreacher && $refs.preacherSelect) { $refs.preacherSelect.value = ''; }">
                             <select name="preacher_id" x-ref="preacherSelect"
-                                class="searchable-select w-full px-5 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700 appearance-none custom-select"
+                                class="searchable-select w-full px-3 py-2 bg-white border border-gray-300 focus:border-orange-600 focus:ring-2 focus:ring-orange-500/20 rounded-lg transition-all text-xs sm:text-sm font-semibold text-gray-700 custom-select"
                                 data-label="Pregador">
                                 <option value="">Selecione o pregador</option>
                                 @foreach($preachers as $preacher)
@@ -88,10 +85,9 @@
                                 @endforeach
                             </select>
 
-                            <label
-                                class="flex items-center gap-3 text-xs font-bold text-gray-500 uppercase tracking-widest">
+                            <label class="flex items-center gap-2 text-xs font-bold text-gray-600">
                                 <input type="checkbox" name="guest_preacher" value="1"
-                                    class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    class="w-4 h-4 rounded border-gray-300 text-orange-700 focus:ring-orange-600"
                                     x-model="guestPreacher">
                                 Pregador Convidado
                             </label>
@@ -99,104 +95,91 @@
                             <template x-if="guestPreacher">
                                 <input type="text" name="preacher_name" value="{{ old('preacher_name') }}"
                                     placeholder="Nome do pregador convidado"
-                                    class="w-full px-5 py-4 bg-blue-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700 placeholder-blue-300">
+                                    class="w-full px-3 py-2 bg-orange-50/50 border border-orange-200 focus:bg-white focus:border-orange-600 rounded-lg transition-all text-xs sm:text-sm font-semibold text-gray-700">
                             </template>
                         </div>
                     </div>
 
-                    <div class="md:col-span-3 space-y-2">
-                        <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Tema da
-                            Mensagem</label>
+                    <div class="md:col-span-3 space-y-1">
+                        <label class="text-[10px] font-black uppercase tracking-wider text-gray-500">Tema da Mensagem</label>
                         <input type="text" name="theme" value="{{ old('theme') }}"
                             placeholder="Qual o tema central do culto?"
-                            class="w-full px-5 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-bold text-gray-700 placeholder-gray-300">
+                            class="w-full px-3 py-2 bg-white border border-gray-300 focus:border-orange-600 focus:ring-2 focus:ring-orange-500/20 rounded-lg transition-all text-xs sm:text-sm font-semibold text-gray-700">
                     </div>
                 </div>
             </div>
 
             <!-- Section 2: Dados de Participação (O Quadro) -->
-            <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-8 border-b border-gray-50 bg-gray-50/50 flex items-center justify-between">
-                    <h2 class="text-lg font-black text-gray-900 flex items-center gap-2">
+            <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+                <div class="px-4 py-3 border-b border-gray-200 bg-gray-50/50 flex items-center justify-between">
+                    <h2 class="text-sm font-black text-gray-900 flex items-center gap-2">
                         <i class="bi bi-grid-3x3-gap text-purple-600"></i>
                         Dados de Participação
                     </h2>
-                    <div
-                        class="px-4 py-1.5 bg-purple-50 rounded-full text-[10px] font-black text-purple-600 uppercase tracking-widest">
+                    <div class="px-3 py-1 bg-purple-50 border border-purple-200 rounded-full text-xs font-black text-purple-700">
                         Total Geral: <span id="total_general_participation">0</span>
                     </div>
                 </div>
-                <div class="overflow-x-auto p-4 md:p-8">
-                    <table class="w-full border-separate border-spacing-2">
-                        <thead>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-gray-50 text-[10px] font-black uppercase tracking-wider text-gray-500 border-b border-gray-200">
                             <tr>
-                                <th class="p-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-left">
-                                    Descrição</th>
-                                <th
-                                    class="p-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center bg-gray-50 rounded-t-2xl">
-                                    Membros</th>
-                                <th
-                                    class="p-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center bg-gray-50 rounded-t-2xl">
-                                    Visitantes</th>
-                                <th
-                                    class="p-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center bg-gray-50 rounded-t-2xl">
-                                    Salvação</th>
-                                <th class="p-4 text-[10px] font-black text-blue-600 uppercase tracking-widest text-center">
-                                    Total</th>
+                                <th class="px-4 py-3">Descrição</th>
+                                <th class="px-4 py-3 text-center">Membros</th>
+                                <th class="px-4 py-3 text-center">Visitantes</th>
+                                <th class="px-4 py-3 text-center">Salvação</th>
+                                <th class="px-4 py-3 text-center text-blue-700">Total</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-50">
+                        <tbody class="divide-y divide-gray-100 text-sm">
                             <!-- Adultos -->
                             <tr class="group">
-                                <td class="p-4 font-black text-gray-900">Adultos</td>
-                                <td class="p-2 bg-gray-50/50 group-hover:bg-white transition-colors">
+                                <td class="px-4 py-3 font-black text-gray-900">Adultos</td>
+                                <td class="px-4 py-2">
                                     <input type="number" name="adults_members" value="{{ old('adults_members', 0) }}"
                                         min="0"
-                                        class="participation-input w-full bg-transparent border-transparent focus:ring-0 text-center font-black text-gray-700">
+                                        class="participation-input w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-blue-500 text-center font-bold text-gray-800">
                                 </td>
-                                <td class="p-2 bg-gray-50/50 group-hover:bg-white transition-colors">
+                                <td class="px-4 py-2">
                                     <input type="number" name="adults_visitors" value="{{ old('adults_visitors', 0) }}"
                                         min="0"
-                                        class="participation-input w-full bg-transparent border-transparent focus:ring-0 text-center font-black text-gray-700">
+                                        class="participation-input w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-blue-500 text-center font-bold text-gray-800">
                                 </td>
-                                <td class="p-2 bg-gray-50/50 group-hover:bg-white transition-colors">
+                                <td class="px-4 py-2">
                                     <input type="number" name="adults_salvations" value="{{ old('adults_salvations', 0) }}"
                                         min="0"
-                                        class="participation-input w-full bg-transparent border-transparent focus:ring-0 text-center font-black text-orange-600">
+                                        class="participation-input w-full px-2 py-1.5 bg-orange-50/50 border border-orange-200 rounded-lg focus:bg-white focus:border-orange-500 text-center font-bold text-orange-700">
                                 </td>
-                                <td class="p-4 text-center font-black text-blue-600" id="row_adults_total">0</td>
+                                <td class="px-4 py-3 text-center font-black text-blue-700" id="row_adults_total">0</td>
                             </tr>
                             <!-- Crianças -->
                             <tr class="group">
-                                <td class="p-4 font-black text-gray-900">Crianças</td>
-                                <td class="p-2 bg-gray-50/50 group-hover:bg-white transition-colors">
+                                <td class="px-4 py-3 font-black text-gray-900">Crianças</td>
+                                <td class="px-4 py-2">
                                     <input type="number" name="children_members" value="{{ old('children_members', 0) }}"
                                         min="0"
-                                        class="participation-input w-full bg-transparent border-transparent focus:ring-0 text-center font-black text-gray-700">
+                                        class="participation-input w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-blue-500 text-center font-bold text-gray-800">
                                 </td>
-                                <td class="p-2 bg-gray-50/50 group-hover:bg-white transition-colors">
+                                <td class="px-4 py-2">
                                     <input type="number" name="children_visitors" value="{{ old('children_visitors', 0) }}"
                                         min="0"
-                                        class="participation-input w-full bg-transparent border-transparent focus:ring-0 text-center font-black text-gray-700">
+                                        class="participation-input w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-blue-500 text-center font-bold text-gray-800">
                                 </td>
-                                <td class="p-2 bg-gray-50/50 group-hover:bg-white transition-colors">
+                                <td class="px-4 py-2">
                                     <input type="number" name="children_salvations"
                                         value="{{ old('children_salvations', 0) }}" min="0"
-                                        class="participation-input w-full bg-transparent border-transparent focus:ring-0 text-center font-black text-orange-600">
+                                        class="participation-input w-full px-2 py-1.5 bg-orange-50/50 border border-orange-200 rounded-lg focus:bg-white focus:border-orange-500 text-center font-bold text-orange-700">
                                 </td>
-                                <td class="p-4 text-center font-black text-blue-600" id="row_children_total">0</td>
+                                <td class="px-4 py-3 text-center font-black text-blue-700" id="row_children_total">0</td>
                             </tr>
                         </tbody>
-                        <tfoot>
-                            <tr class="bg-gray-900 text-white rounded-2xl overflow-hidden">
-                                <td class="p-6 font-black uppercase tracking-widest text-[10px] rounded-l-[1.5rem]">Total
-                                    Geral</td>
-                                <td class="p-6 text-center font-black" id="col_members_total">0</td>
-                                <td class="p-6 text-center font-black" id="col_visitors_total">0</td>
-                                <td class="p-6 text-center font-black text-orange-400" id="col_salvations_total">0</td>
-                                <td class="p-6 text-center font-black bg-blue-600 rounded-r-[1.5rem]"
-                                    id="grand_total_display">0
-                                </td>
+                        <tfoot class="bg-gray-900 text-white text-xs">
+                            <tr>
+                                <td class="px-4 py-3 font-black uppercase tracking-wider">Total Geral</td>
+                                <td class="px-4 py-3 text-center font-black" id="col_members_total">0</td>
+                                <td class="px-4 py-3 text-center font-black" id="col_visitors_total">0</td>
+                                <td class="px-4 py-3 text-center font-black text-orange-400" id="col_salvations_total">0</td>
+                                <td class="px-4 py-3 text-center font-black bg-blue-600 text-sm" id="grand_total_display">0</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -204,132 +187,122 @@
             </div>
 
             <!-- Section 3: Ofertas e Dízimos -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
                 <!-- Ofertas -->
-                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="p-8 border-b border-gray-50 bg-gray-50/50 flex items-center justify-between">
-                        <h2 class="text-lg font-black text-gray-900 flex items-center gap-2">
-                            <i class="bi bi-wallet2 text-green-600"></i>
+                <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+                    <div class="px-4 py-3 border-b border-gray-200 bg-gray-50/50 flex items-center justify-between">
+                        <h2 class="text-sm font-black text-gray-900 flex items-center gap-2">
+                            <i class="bi bi-wallet2 text-emerald-600"></i>
                             Ofertas
                         </h2>
                     </div>
-                    <div class="p-8 space-y-4">
+                    <div class="p-4 sm:p-5 space-y-3">
                         @foreach($offeringTypes as $index => $type)
-                            <div
-                                class="flex items-center gap-4 bg-gray-50 p-4 rounded-2xl transition-all hover:bg-white hover:shadow-md border border-transparent hover:border-green-100 group">
+                            <div class="flex items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-200">
                                 <div class="flex-1">
-                                    <p
-                                        class="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-green-600 transition-colors">
-                                        {{ $type->name }}
-                                    </p>
+                                    <p class="text-xs font-bold text-gray-700">{{ $type->name }}</p>
                                 </div>
-                                <div class="relative w-40">
+                                <div class="relative w-36">
                                     <input type="hidden" name="offerings[{{ $index }}][offering_type_id]"
                                         value="{{ $type->id }}">
                                     <input type="number" step="0.01" name="offerings[{{ $index }}][amount]"
-                                        class="offering-input w-full pl-8 pr-4 py-2 bg-white rounded-xl border-gray-200 focus:border-green-500 focus:ring-green-500/10 font-black text-right text-gray-700"
+                                        class="offering-input w-full pl-8 pr-3 py-1.5 bg-white rounded-lg border border-gray-300 focus:border-emerald-600 text-xs sm:text-sm font-black text-right text-gray-800"
                                         value="{{ old("offerings.{$index}.amount", 0) }}">
-                                    <span
-                                        class="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-400">MT</span>
+                                    <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-400">MT</span>
                                 </div>
                             </div>
                         @endforeach
 
-                        <div class="space-y-4 pt-4 mt-8 border-t border-gray-50">
-                            <div class="flex items-center gap-4 group">
+                        <div class="space-y-3 pt-3 mt-4 border-t border-gray-200">
+                            <div class="flex items-center gap-3">
                                 <div class="flex-1">
-                                    <p class="text-[10px] font-black text-orange-600 uppercase tracking-widest">Ofert.
-                                        Especial</p>
-                                    <p class="text-[9px] text-gray-400 italic">Ex: Campanhas, Semeadeira, etc.</p>
+                                    <p class="text-xs font-black text-orange-700 uppercase">Oferta Especial</p>
+                                    <p class="text-[10px] text-gray-500">Ex: Campanhas, Semeadeira, etc.</p>
                                 </div>
-                                <div class="relative w-40">
+                                <div class="relative w-36">
                                     <input type="number" step="0.01" name="special_offerings_total" id="special_offer_input"
-                                        class="w-full pl-8 pr-4 py-2 bg-orange-50 border-transparent focus:bg-white focus:border-orange-500 focus:ring-orange-500/10 rounded-xl font-black text-right text-orange-700 transition-all"
+                                        class="w-full pl-8 pr-3 py-1.5 bg-orange-50 border border-orange-200 focus:bg-white focus:border-orange-600 rounded-lg text-xs sm:text-sm font-black text-right text-orange-800"
                                         value="{{ old('special_offerings_total', 0) }}">
-                                    <span
-                                        class="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-orange-400">MT</span>
+                                    <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-orange-600">MT</span>
                                 </div>
                             </div>
-                            <div
-                                class="p-6 bg-green-600 rounded-[1.5rem] flex items-center justify-between text-white shadow-lg shadow-green-100">
-                                <span class="text-xs font-black uppercase tracking-widest">Total de Ofertas</span>
-                                <span class="text-2xl font-black" id="total_offerings_display">0,00 MT</span>
+                            <div class="p-3.5 bg-emerald-700 rounded-lg flex items-center justify-between text-white">
+                                <span class="text-xs font-black uppercase tracking-wider">Total de Ofertas</span>
+                                <span class="text-lg font-black" id="total_offerings_display">0,00 MT</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Contribuições Individuais (Dízimos e Ofertas) -->
-                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden flex flex-col">
-                    <div class="p-8 border-b border-gray-50 bg-gray-50/50 flex items-center justify-between">
-                        <h2 class="text-lg font-black text-gray-900 flex items-center gap-2">
+                <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden flex flex-col">
+                    <div class="px-4 py-3 border-b border-gray-200 bg-gray-50/50 flex items-center justify-between">
+                        <h2 class="text-sm font-black text-gray-900 flex items-center gap-2">
                             <i class="bi bi-people text-blue-600"></i>
                             Contribuições Individuais
                         </h2>
                         <button type="button" @click="addContribution()" id="addContributionBtn"
-                            class="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl font-bold text-xs hover:bg-blue-600 hover:text-white transition-all flex items-center gap-2">
+                            class="px-3 py-1.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg font-bold text-xs hover:bg-blue-600 hover:text-white transition-all flex items-center gap-1.5">
                             <i class="bi bi-plus-lg"></i> Adicionar
                         </button>
                     </div>
-                    <div class="p-8 flex-1 space-y-4 max-h-[500px] overflow-y-auto" id="contributionsContainer">
+                    <div class="p-4 flex-1 space-y-3 max-h-[420px] overflow-y-auto" id="contributionsContainer">
                         <!-- Rows will be added here -->
                     </div>
-                    <div class="p-8 mt-auto bg-gray-50/50 border-t border-gray-50 space-y-3">
-                        <div class="flex justify-between items-center text-xs font-bold text-gray-500">
+                    <div class="p-4 mt-auto bg-gray-50 border-t border-gray-200 space-y-2">
+                        <div class="flex justify-between items-center text-xs font-bold text-gray-600">
                             <span>Total Dízimos:</span>
-                            <span id="total_tithes_display" class="text-blue-600">0,00 MT</span>
+                            <span id="total_tithes_display" class="text-blue-700">0,00 MT</span>
                         </div>
-                        <div class="flex justify-between items-center text-xs font-bold text-gray-500">
+                        <div class="flex justify-between items-center text-xs font-bold text-gray-600">
                             <span>Total Ofertas:</span>
-                            <span id="total_ind_offerings_display" class="text-orange-600">0,00 MT</span>
+                            <span id="total_ind_offerings_display" class="text-orange-700">0,00 MT</span>
                         </div>
-                        <div class="p-4 bg-gray-900 rounded-2xl flex items-center justify-between text-white shadow-lg">
-                            <span class="text-xs font-black uppercase tracking-widest">Total Geral</span>
-                            <span class="text-xl font-black" id="total_contributions_display">0,00 MT</span>
+                        <div class="p-3 bg-gray-900 rounded-lg flex items-center justify-between text-white">
+                            <span class="text-xs font-black uppercase tracking-wider">Total Geral</span>
+                            <span class="text-base font-black" id="total_contributions_display">0,00 MT</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Grand Financial Summary & Comments -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                <div class="lg:col-span-2 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8">
-                    <label
-                        class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1 mb-4 block">Comentários e
-                        Observações</label>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 items-start">
+                <div class="lg:col-span-2 rounded-xl border border-gray-200 bg-white shadow-sm p-4 sm:p-5">
+                    <label class="text-[10px] font-black uppercase tracking-wider text-gray-500 mb-2 block">Comentários e Observações</label>
                     <textarea name="observations" rows="6"
                         placeholder="Fale sobre o mover, testemunhos ou ocorrências do culto..."
-                        class="w-full px-6 py-4 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-[2rem] transition-all font-medium text-gray-700 placeholder-gray-300 resize-none">{{ old('observations') }}</textarea>
+                        class="w-full px-3.5 py-2.5 bg-white border border-gray-300 focus:border-orange-600 focus:ring-2 focus:ring-orange-500/20 rounded-lg transition-all text-xs sm:text-sm text-gray-700 resize-none">{{ old('observations') }}</textarea>
                 </div>
 
-                <div class="bg-blue-600 p-8 rounded-[2.5rem] text-white space-y-6 shadow-xl shadow-blue-200">
-                    <h3 class="text-lg font-black uppercase tracking-widest text-blue-200">Resumo Geral</h3>
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center border-b border-blue-500/50 pb-4">
-                            <span class="text-sm font-bold opacity-80">Ofertas Gerais</span>
-                            <span class="text-sm font-black" id="summary_offerings">0,00 MT</span>
+                <div class="bg-gray-900 p-5 rounded-xl text-white space-y-4 shadow-sm border border-gray-800">
+                    <h3 class="text-xs font-black uppercase tracking-wider text-orange-400">Resumo Geral</h3>
+                    <div class="space-y-2.5 text-xs">
+                        <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                            <span class="text-gray-400">Ofertas Gerais</span>
+                            <span class="font-bold" id="summary_offerings">0,00 MT</span>
                         </div>
-                        <div class="flex justify-between items-center border-b border-blue-500/50 pb-4">
-                            <span class="text-sm font-bold opacity-80">Dízimos</span>
-                            <span class="text-sm font-black" id="summary_tithes">0,00 MT</span>
+                        <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                            <span class="text-gray-400">Dízimos</span>
+                            <span class="font-bold" id="summary_tithes">0,00 MT</span>
                         </div>
-                        <div class="flex justify-between items-center border-b border-blue-500/50 pb-4">
-                            <span class="text-sm font-bold opacity-80">Ofertas Individuais</span>
-                            <span class="text-sm font-black" id="summary_ind_offerings">0,00 MT</span>
+                        <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                            <span class="text-gray-400">Ofertas Individuais</span>
+                            <span class="font-bold" id="summary_ind_offerings">0,00 MT</span>
                         </div>
-                        <div class="flex justify-between items-center border-b border-blue-500/50 pb-4">
-                            <span class="text-sm font-bold opacity-80">Especiais</span>
-                            <span class="text-sm font-black" id="summary_specials">0,00 MT</span>
+                        <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                            <span class="text-gray-400">Especiais</span>
+                            <span class="font-bold" id="summary_specials">0,00 MT</span>
                         </div>
-                        <div class="flex justify-between items-center pt-2 border-t border-blue-400 mt-2 pt-4">
-                            <span class="text-lg font-black tracking-tighter uppercase">Total Final</span>
-                            <span class="text-3xl font-black tabular-nums" id="summary_grand_total">0,00 MT</span>
+                        <div class="flex justify-between items-center pt-2">
+                            <span class="text-sm font-black uppercase">Total Final</span>
+                            <span class="text-xl font-black text-emerald-400 tabular-nums" id="summary_grand_total">0,00 MT</span>
                         </div>
                     </div>
 
                     <button type="submit"
-                        class="w-full py-5 bg-white text-blue-600 rounded-[1.5rem] font-black text-lg hover:bg-blue-50 transition-all shadow-xl shadow-blue-800/10 mt-4">
-                        REGISTRAR NO SISTEMA
+                        class="w-full py-3 bg-orange-700 text-white rounded-lg font-black text-xs sm:text-sm uppercase tracking-wider hover:bg-orange-800 transition-all shadow-sm mt-2">
+                        Registrar no Sistema
                     </button>
                 </div>
             </div>
@@ -338,36 +311,35 @@
 
     <!-- Template Unificado -->
     <template id="contributionRowTemplate">
-        <div
-            class="contribution-row space-y-2 p-4 bg-gray-50 rounded-2xl group relative border border-transparent hover:border-blue-100 transition-all">
-            <div class="flex items-center gap-3">
-                <div class="w-32">
+        <div class="contribution-row space-y-2 p-3 bg-gray-50 rounded-lg border border-gray-200 transition-all">
+            <div class="flex items-center gap-2">
+                <div class="w-28">
                     <select name="individual_contributions[INDEX][type]"
-                        class="contribution-type w-full px-3 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-blue-500 focus:ring-0 text-xs font-bold text-gray-700">
+                        class="contribution-type w-full px-2.5 py-1.5 bg-white border border-gray-300 rounded-lg text-xs font-bold text-gray-700">
                         <option value="offering">Oferta</option>
                         <option value="tithe">Dízimo</option>
                     </select>
                 </div>
                 <div class="flex-1 relative">
-                    <i class="bi bi-person absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-xs"></i>
+                    <i class="bi bi-person absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
                     <input type="text" name="individual_contributions[INDEX][member_name]"
                         placeholder="Nome do Contribuinte"
-                        class="w-full pl-8 pr-3 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-blue-500 focus:ring-0 text-sm font-bold text-gray-700">
+                        class="w-full pl-7 pr-2.5 py-1.5 bg-white border border-gray-300 rounded-lg text-xs font-semibold text-gray-700">
                 </div>
                 <div class="relative w-28">
                     <input type="number" step="0.01" name="individual_contributions[INDEX][amount]" placeholder="0.00"
-                        class="contribution-amount w-full pl-3 pr-8 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-blue-500 focus:ring-0 text-sm font-black text-right text-gray-900">
-                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-400">MT</span>
+                        class="contribution-amount w-full pl-2.5 pr-7 py-1.5 bg-white border border-gray-300 rounded-lg text-xs font-black text-right text-gray-900">
+                    <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] font-bold text-gray-400">MT</span>
                 </div>
                 <button type="button"
-                    class="remove-contribution text-gray-300 hover:text-red-500 transition-colors bg-white hover:bg-red-50 p-2 rounded-lg">
-                    <i class="bi bi-trash"></i>
+                    class="remove-contribution text-gray-400 hover:text-red-600 transition-colors bg-white hover:bg-red-50 p-1.5 rounded-lg border border-gray-200">
+                    <i class="bi bi-trash text-xs"></i>
                 </button>
             </div>
             <div class="relative">
-                <i class="bi bi-chat-left-text absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-xs"></i>
+                <i class="bi bi-chat-left-text absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
                 <input type="text" name="individual_contributions[INDEX][description]" placeholder="Observação (Opcional)"
-                    class="w-full pl-8 pr-4 py-2 bg-white border-transparent rounded-xl focus:bg-white focus:border-blue-500 focus:ring-0 text-xs font-medium text-gray-500 italic">
+                    class="w-full pl-7 pr-3 py-1.5 bg-white border border-gray-300 rounded-lg text-xs text-gray-600">
             </div>
         </div>
     </template>

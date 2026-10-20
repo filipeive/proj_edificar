@@ -5,230 +5,176 @@
 @section('page-subtitle', 'Atualizar dados do casal inscrito')
 
 @section('content')
-    <div class="w-full space-y-6">
-        <form action="{{ route('couple-enrollments.update', $coupleEnrollment) }}" method="POST"
-            class="bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700">
-            @csrf
-            @method('PUT')
+<div class="space-y-5 max-w-4xl mx-auto">
+    <div class="flex items-center justify-between">
+        <a href="{{ route('couple-enrollments.index') }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-gray-600 hover:text-orange-700 transition">
+            <i class="bi bi-arrow-left"></i>
+            <span>Voltar para Inscrições</span>
+        </a>
+        <a href="{{ route('couple-enrollments.show', $coupleEnrollment) }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-gray-500 hover:text-gray-900 transition">
+            <i class="bi bi-eye"></i>
+            <span>Ver Detalhes</span>
+        </a>
+    </div>
 
-            <h3
-                class="text-sm font-black text-gray-400 uppercase tracking-widest mb-6 border-b border-gray-100 dark:border-gray-700 pb-2">
-                Dados do Casal
-            </h3>
+    <form action="{{ route('couple-enrollments.update', $coupleEnrollment) }}" method="POST"
+        class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+        @csrf
+        @method('PUT')
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div class="space-y-2">
-                    <label class="text-[10px] uppercase font-bold text-gray-500 tracking-widest">Nome do Marido</label>
-                    <input type="text" name="husband_name"
-                        value="{{ old('husband_name', $coupleEnrollment->husband_name) }}" required
-                        class="w-full bg-gray-50 dark:bg-gray-900 border-none rounded-xl font-bold text-gray-800 dark:text-gray-200 focus:ring-orange-500">
-                </div>
+        <div class="border-b border-gray-100 bg-gray-50/60 px-4 py-3 sm:px-5">
+            <p class="text-[10px] font-black uppercase tracking-wider text-orange-700">Edição de Inscrição</p>
+            <h2 class="text-sm font-bold text-gray-900">{{ $coupleEnrollment->husband_name }} & {{ $coupleEnrollment->wife_name }}</h2>
+        </div>
 
-                <div class="space-y-2">
-                    <label class="text-[10px] uppercase font-bold text-gray-500 tracking-widest">Nome da Esposa</label>
-                    <input type="text" name="wife_name" value="{{ old('wife_name', $coupleEnrollment->wife_name) }}"
-                        required
-                        class="w-full bg-gray-50 dark:bg-gray-900 border-none rounded-xl font-bold text-gray-800 dark:text-gray-200 focus:ring-orange-500">
+        <div class="p-4 sm:p-5 space-y-4">
+            <!-- Nomes e Contatos -->
+            <div class="rounded-lg border border-gray-100 bg-gray-50/50 p-3 sm:p-4">
+                <p class="text-[10px] font-black uppercase tracking-wider text-orange-700 mb-3">Identificação do Casal</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">Nome do Marido *</label>
+                        <input type="text" name="husband_name" value="{{ old('husband_name', $coupleEnrollment->husband_name) }}" required
+                            class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 bg-white font-bold text-gray-800">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">Nome da Esposa *</label>
+                        <input type="text" name="wife_name" value="{{ old('wife_name', $coupleEnrollment->wife_name) }}" required
+                            class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 bg-white font-bold text-gray-800">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">Contato do Parceiro</label>
+                        <input type="text" name="husband_phone" value="{{ old('husband_phone', $coupleEnrollment->husband_phone) }}" placeholder="Ex: +258 84 000 0000"
+                            class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">Contato da Parceira</label>
+                        <input type="text" name="wife_phone" value="{{ old('wife_phone', $coupleEnrollment->wife_phone) }}" placeholder="Ex: +258 84 000 0000"
+                            class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 bg-white">
+                    </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div class="space-y-2">
-                    <label class="text-[10px] uppercase font-bold text-gray-500 tracking-widest">Contacto do
-                        Parceiro</label>
-                    <input type="text" name="husband_phone"
-                        value="{{ old('husband_phone', $coupleEnrollment->husband_phone) }}"
-                        class="w-full bg-gray-50 dark:bg-gray-900 border-none rounded-xl font-bold text-gray-800 dark:text-gray-200 focus:ring-orange-500"
-                        placeholder="Ex: +258 84 000 0000">
-                </div>
-
-                <div class="space-y-2">
-                    <label class="text-[10px] uppercase font-bold text-gray-500 tracking-widest">Contacto da
-                        Parceira</label>
-                    <input type="text" name="wife_phone" value="{{ old('wife_phone', $coupleEnrollment->wife_phone) }}"
-                        class="w-full bg-gray-50 dark:bg-gray-900 border-none rounded-xl font-bold text-gray-800 dark:text-gray-200 focus:ring-orange-500"
-                        placeholder="Ex: +258 84 000 0000">
-                </div>
-            </div>
-
+            <!-- Relacionamento e Endereços -->
             <div x-data="{ 
-                            relType: '{{ old('relationship_type', $coupleEnrollment->relationship_type) }}', 
-                            isMember: '{{ old('is_church_member', $coupleEnrollment->is_church_member) }}',
-                            zoneId: '{{ old('zone_id', $coupleEnrollment->zone_id) }}' || ( '{{ $coupleEnrollment->cell_zone }}' ? 'other' : '' )
-                        }" class="space-y-8 mt-6">
-                {{-- Address Section --}}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div
-                        class="space-y-3 p-5 bg-gray-50 dark:bg-gray-900/50 rounded-2xl border border-gray-100 dark:border-gray-700">
-                        <div class="flex items-center gap-2 mb-1">
-                            <i class="bi bi-geo-alt text-orange-500"></i>
-                            <label class="text-[10px] uppercase font-bold text-gray-500 tracking-widest">Endereço (Geral /
-                                Marido)</label>
-                        </div>
+                relType: '{{ old('relationship_type', $coupleEnrollment->relationship_type) }}', 
+                isMember: '{{ old('is_church_member', $coupleEnrollment->is_church_member) }}',
+                zoneId: '{{ old('zone_id', $coupleEnrollment->zone_id) }}' || ( '{{ $coupleEnrollment->cell_zone }}' ? 'other' : '' )
+            }" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">Endereço (Geral / Marido) *</label>
                         <input type="text" name="address" value="{{ old('address', $coupleEnrollment->address) }}" required
-                            class="w-full bg-white dark:bg-gray-900 border-none rounded-xl font-bold text-gray-800 dark:text-gray-200 focus:ring-orange-500 shadow-sm">
+                            class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 bg-white">
                     </div>
 
-                    <div class="space-y-3 p-5 bg-gray-50 dark:bg-gray-900/50 rounded-2xl border border-gray-100 dark:border-gray-700"
-                        x-show="relType === 'em_relacionamento' || relType === 'namoro' || relType === 'noivos'" x-transition>
-                        <div class="flex items-center gap-2 mb-1">
-                            <i class="bi bi-geo-alt-fill text-pink-500"></i>
-                            <label class="text-[10px] uppercase font-bold text-gray-500 tracking-widest">Endereço da
-                                Esposa</label>
-                        </div>
-                        <input type="text" name="wife_address"
-                            value="{{ old('wife_address', $coupleEnrollment->wife_address) }}"
-                            class="w-full bg-white dark:bg-gray-900 border-none rounded-xl font-bold text-gray-800 dark:text-gray-200 focus:ring-orange-500 shadow-sm">
+                    <div x-show="relType === 'em_relacionamento' || relType === 'namoro' || relType === 'noivos'" x-transition>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">Endereço da Esposa</label>
+                        <input type="text" name="wife_address" value="{{ old('wife_address', $coupleEnrollment->wife_address) }}"
+                            class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 bg-white">
                     </div>
-
-                    @if($coupleEnrollment->contacts)
-                        <div class="space-y-2 md:col-span-2 opacity-60">
-                            <label class="text-[10px] uppercase font-bold text-gray-500 tracking-widest">Contactos (legado:
-                                {{ $coupleEnrollment->contacts }})</label>
-                            <input type="hidden" name="contacts" value="{{ $coupleEnrollment->contacts }}">
-                        </div>
-                    @endif
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="space-y-2">
-                        <label class="text-[10px] uppercase font-bold text-gray-500 tracking-widest">Tipo de
-                            Relacionamento</label>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">Tipo de Relacionamento *</label>
                         <select name="relationship_type" required x-model="relType"
-                            class="w-full bg-gray-50 dark:bg-gray-900 border-none rounded-xl font-bold text-gray-800 dark:text-gray-200 focus:ring-orange-500">
-                            @foreach(['em_relacionamento', 'noivos', 'vivendo_maritalmente', 'casados'] as $type)
-                                <option value="{{ $type }}">
-                                    {{ ucfirst(str_replace('_', ' ', $type === 'em_relacionamento' ? 'em relacionamento' : ($type === 'namoro' ? 'em relacionamento' : $type))) }}
-                                </option>
+                            class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 bg-white">
+                            @foreach(['em_relacionamento' => 'Em Relacionamento', 'noivos' => 'Noivos', 'vivendo_maritalmente' => 'Vivendo Maritalmente', 'casados' => 'Casados'] as $val => $lbl)
+                                <option value="{{ $val }}" {{ old('relationship_type', $coupleEnrollment->relationship_type) == $val ? 'selected' : '' }}>{{ $lbl }}</option>
                             @endforeach
                         </select>
                     </div>
 
-                    <div class="space-y-2">
-                        <label class="text-[10px] uppercase font-bold text-gray-500 tracking-widest">Tempo Juntos
-                            (Anos)</label>
-                        <input type="number" name="years_together"
-                            value="{{ old('years_together', $coupleEnrollment->years_together) }}" required min="0" step="1"
-                            class="w-full bg-gray-50 dark:bg-gray-900 border-none rounded-xl font-bold text-gray-800 dark:text-gray-200 focus:ring-orange-500">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">Anos Juntos *</label>
+                        <input type="number" name="years_together" value="{{ old('years_together', $coupleEnrollment->years_together) }}" required min="0"
+                            class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 bg-white">
                     </div>
 
-                    <div class="space-y-2">
-                        <label class="text-[10px] uppercase font-bold text-gray-500 tracking-widest">Curso</label>
-                        <select name="course_id" required
-                            class="w-full bg-gray-50 dark:bg-gray-900 border-none rounded-xl font-bold text-gray-800 dark:text-gray-200 focus:ring-orange-500">
-                            @foreach($courses as $course)
-                                <option value="{{ $course->id }}" {{ old('course_id', $coupleEnrollment->course_id) == $course->id ? 'selected' : '' }}>
-                                    {{ $course->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">Data de Casamento Prevista</label>
+                        <input type="date" name="wedding_date" value="{{ old('wedding_date', $coupleEnrollment->wedding_date ? $coupleEnrollment->wedding_date->format('Y-m-d') : '') }}"
+                            class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 bg-white">
                     </div>
                 </div>
 
-                {{-- Church Membership Section --}}
-                <div class="space-y-6">
-                    <h3
-                        class="text-sm font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 dark:border-gray-700 pb-2">
-                        Pertença à Igreja
-                    </h3>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="flex items-center gap-3 p-5 bg-gray-50 dark:bg-gray-900/50 rounded-2xl cursor-pointer border-2 transition-all"
-                            :class="isMember == 'both' ? 'border-orange-500 bg-orange-50/10' : 'border-transparent opacity-60'"
-                            @click="isMember = 'both'">
-                            <input type="radio" name="is_church_member" value="both" x-model="isMember"
-                                class="w-5 h-5 text-orange-600 rounded-full focus:ring-orange-500 border-gray-300">
-                            <span
-                                class="text-[10px] font-black text-gray-700 dark:text-gray-300 uppercase tracking-widest">Ambos
-                                Membros</span>
+                <!-- Turma e Eclesiástico -->
+                <div class="rounded-lg border border-gray-100 bg-gray-50/50 p-3 sm:p-4 space-y-3">
+                    <p class="text-[10px] font-black uppercase tracking-wider text-orange-700">Alocação de Turma & Eclesiástico</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">Turma Alocada</label>
+                            <select name="course_class_id"
+                                class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 bg-white">
+                                <option value="">Sem Turma (Lista de Espera)</option>
+                                @foreach($classes as $cClass)
+                                    <option value="{{ $cClass->id }}" {{ old('course_class_id', $coupleEnrollment->course_class_id) == $cClass->id ? 'selected' : '' }}>
+                                        {{ $cClass->name }} ({{ $cClass->course->name ?? 'Curso' }})
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
 
-                        <div class="flex items-center gap-3 p-5 bg-gray-50 dark:bg-gray-900/50 rounded-2xl cursor-pointer border-2 transition-all"
-                            :class="isMember == 'one' ? 'border-orange-500 bg-orange-50/10' : 'border-transparent opacity-60'"
-                            @click="isMember = 'one'">
-                            <input type="radio" name="is_church_member" value="one" x-model="isMember"
-                                class="w-5 h-5 text-orange-600 rounded-full focus:ring-orange-500 border-gray-300">
-                            <span
-                                class="text-[10px] font-black text-gray-700 dark:text-gray-300 uppercase tracking-widest">1
-                                de nós</span>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">Membro da Igreja?</label>
+                            <select name="is_church_member" x-model="isMember"
+                                class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 bg-white">
+                                <option value="1">Sim</option>
+                                <option value="0">Não</option>
+                            </select>
                         </div>
 
-                        <div class="flex items-center gap-3 p-5 bg-gray-50 dark:bg-gray-900/50 rounded-2xl cursor-pointer border-2 transition-all"
-                            :class="isMember == 'none' ? 'border-gray-400 bg-gray-50/50' : 'border-transparent opacity-60'"
-                            @click="isMember = 'none'">
-                            <input type="radio" name="is_church_member" value="none" x-model="isMember"
-                                class="w-5 h-5 text-orange-600 rounded-full focus:ring-orange-500 border-gray-300">
-                            <span
-                                class="text-[10px] font-black text-gray-700 dark:text-gray-300 uppercase tracking-widest">Visitantes</span>
-                        </div>
-                    </div>
-
-                    <div x-show="isMember == 'both' || isMember == 'one'" x-transition
-                        class="space-y-6 bg-orange-50/5 p-6 rounded-[2rem] border border-orange-500/10">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="space-y-2">
-                                <label class="text-[10px] uppercase font-bold text-gray-500 tracking-widest">Zona de
-                                    Pertença</label>
-                                <select name="zone_id" x-model="zoneId"
-                                    class="w-full bg-white dark:bg-gray-900 border-none rounded-xl font-bold text-gray-800 dark:text-gray-200 focus:ring-orange-500 shadow-sm">
-                                    <option value="">Selecione a Zona</option>
-                                    @foreach($zones as $zone)
-                                        <option value="{{ $zone->id }}" {{ old('zone_id', $coupleEnrollment->zone_id) == $zone->id ? 'selected' : '' }}>{{ $zone->name }}</option>
-                                    @endforeach
-                                    <option value="other">Outra / Não listada</option>
-                                </select>
-                            </div>
-
-                            <div class="space-y-2" x-show="zoneId === 'other'" x-transition>
-                                <label class="text-[10px] uppercase font-bold text-gray-500 tracking-widest">Zona de Célula
-                                    (Especificar)</label>
-                                <input type="text" name="cell_zone"
-                                    value="{{ old('cell_zone', $coupleEnrollment->cell_zone) }}"
-                                    class="w-full bg-white dark:bg-gray-900 border-none rounded-xl font-bold text-gray-800 dark:text-gray-200 focus:ring-orange-500 shadow-sm">
-                            </div>
-
-                            <div class="space-y-2 md:col-span-2">
-                                <label class="text-[10px] uppercase font-bold text-gray-500 tracking-widest">Nome do
-                                    Líder</label>
-                                <input type="text" name="leader_name"
-                                    value="{{ old('leader_name', $coupleEnrollment->leader_name) }}"
-                                    class="w-full bg-white dark:bg-gray-900 border-none rounded-xl font-bold text-gray-800 dark:text-gray-200 focus:ring-orange-500 shadow-sm">
-                            </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">Zona de Pertença</label>
+                            <select name="zone_id" x-model="zoneId"
+                                class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 bg-white">
+                                <option value="">Selecione a Zona</option>
+                                @foreach($zones as $zone)
+                                    <option value="{{ $zone->id }}" {{ old('zone_id', $coupleEnrollment->zone_id) == $zone->id ? 'selected' : '' }}>{{ $zone->name }}</option>
+                                @endforeach
+                                <option value="other">Outra / Não listada</option>
+                            </select>
                         </div>
 
-                        <div
-                            class="flex items-center gap-3 p-5 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-2xl">
+                        <div x-show="zoneId === 'other'" x-transition>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">Zona de Célula (Especificar)</label>
+                            <input type="text" name="cell_zone" value="{{ old('cell_zone', $coupleEnrollment->cell_zone) }}"
+                                class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 bg-white">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">Nome do Líder</label>
+                            <input type="text" name="leader_name" value="{{ old('leader_name', $coupleEnrollment->leader_name) }}"
+                                class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 bg-white">
+                        </div>
+
+                        <div class="flex items-center gap-2 pt-4">
                             <input type="hidden" name="has_pastoral_recommendation" value="0">
                             <input type="checkbox" name="has_pastoral_recommendation" value="1" {{ old('has_pastoral_recommendation', $coupleEnrollment->has_pastoral_recommendation) ? 'checked' : '' }}
-                                class="w-6 h-6 text-orange-600 rounded focus:ring-orange-500 border-gray-300">
-                            <div class="flex flex-col">
-                                <label
-                                    class="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-widest">Recomendação
-                                    Pastoral?</label>
-                                <span class="text-[9px] text-gray-500 uppercase font-medium">Possui recomendação da
-                                    supervisão</span>
-                            </div>
+                                class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                            <label class="text-xs font-bold text-gray-700 cursor-pointer">Possui Recomendação Pastoral</label>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="space-y-2 mt-6">
-                <label class="text-[10px] uppercase font-bold text-gray-500 tracking-widest">Observações</label>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">Observações</label>
                 <textarea name="observations" rows="3"
-                    class="w-full bg-gray-50 dark:bg-gray-900 border-none rounded-xl font-bold text-gray-800 dark:text-gray-200 focus:ring-orange-500">{{ old('observations', $coupleEnrollment->observations) }}</textarea>
+                    class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 bg-white">{{ old('observations', $coupleEnrollment->observations) }}</textarea>
             </div>
+        </div>
 
-            <div class="flex items-center justify-end gap-4 mt-8 pt-6 border-t border-gray-100 dark:border-gray-700">
-                <a href="{{ route('couple-enrollments.index') }}"
-                    class="px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 font-bold uppercase text-xs rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                    Cancelar
-                </a>
-                <button type="submit"
-                    class="px-8 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-black uppercase text-xs rounded-xl hover:shadow-lg hover:shadow-orange-500/30 transition-all transform hover:-translate-y-0.5">
-                    Salvar Alterações
-                </button>
-            </div>
-        </form>
-    </div>
+        <div class="bg-gray-50 px-4 py-3 sm:px-5 border-t border-gray-200 flex items-center justify-end gap-2">
+            <a href="{{ route('couple-enrollments.index') }}" class="rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 transition">
+                Cancelar
+            </a>
+            <button type="submit" class="inline-flex items-center gap-1.5 rounded-lg bg-orange-700 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition">
+                <i class="bi bi-check-lg"></i>
+                <span>Salvar Alterações</span>
+            </button>
+        </div>
+    </form>
+</div>
 @endsection

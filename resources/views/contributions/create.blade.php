@@ -5,26 +5,40 @@
 @section('page-subtitle', 'Adicione uma nova contribuição')
 
 @section('content')
-    <div class="grid grid-max-w-3xl mx-auto">
-        <div class="bg-white rounded-lg shadow p-8">
+    <div class="space-y-5 max-w-3xl mx-auto">
+        <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 sm:gap-4">
+            <div>
+                <p class="text-[10px] sm:text-xs font-black uppercase tracking-[0.18em] text-orange-700">Tesouraria & Projeto Edificar</p>
+                <h1 class="mt-0.5 text-xl sm:text-2xl font-black text-gray-950 tracking-tight">Registar Contribuição</h1>
+                <p class="mt-0.5 text-xs sm:text-sm text-gray-500">Adicione uma nova contribuição ao sistema</p>
+            </div>
+            <div>
+                <a href="{{ route('contributions.index') }}"
+                    class="inline-flex justify-center items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-gray-700 hover:bg-gray-50 shadow-sm">
+                    <i class="bi bi-arrow-left"></i> <span>Voltar</span>
+                </a>
+            </div>
+        </header>
+
+        <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
             <form action="{{ route('contributions.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
-                <div class="mb-8 pb-8 border-b">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">
-                        <i class="bi bi-person-check mr-2"></i>Membro Contribuinte
+                <div class="mb-6 pb-6 border-b border-gray-200">
+                    <h3 class="text-xs sm:text-sm font-black uppercase tracking-wider text-gray-700 mb-3">
+                        <i class="bi bi-person-check mr-1.5 text-orange-700"></i>Membro Contribuinte
                     </h3>
 
                     @if($canRegisterForOthers)
 
-                        <div class="flex space-x-4 mb-6 p-3 bg-gray-50 rounded-lg">
+                        <div class="flex space-x-2 mb-4 p-1.5 bg-gray-100 rounded-lg border border-gray-200">
                             <button type="button" id="btnMyContribution"
-                                class="flex-1 py-2 rounded-lg font-semibold bg-blue-600 text-white transition hover:bg-blue-700"
+                                class="flex-1 py-2 rounded-md text-xs sm:text-sm font-bold bg-blue-600 text-white transition hover:bg-blue-700"
                                 onclick="toggleMemberSelection(false)">
                                 <i class="bi bi-person-fill"></i> Minha Contribuição
                             </button>
                             <button type="button" id="btnOtherMember"
-                                class="flex-1 py-2 rounded-lg font-semibold text-gray-700 bg-gray-200 transition hover:bg-gray-300"
+                                class="flex-1 py-2 rounded-md text-xs sm:text-sm font-bold text-gray-700 bg-gray-200 transition hover:bg-gray-300"
                                 onclick="toggleMemberSelection(true)">
                                 <i class="bi bi-people-fill"></i> Para Outro Membro
                             </button>
@@ -33,12 +47,12 @@
                         <input type="hidden" name="user_id" id="userIdHidden" value="{{ $currentUser->id }}">
 
                         <div id="memberSelectionBlock" class="hidden">
-                            <label for="user_id_select" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="user_id_select" class="block text-xs font-bold text-gray-700 mb-1.5">
                                 Selecione o Membro da
                                 {{ $currentUser->role === 'lider_celula' ? 'Célula' : ($currentUser->role === 'supervisor' ? 'Supervisão' : 'Zona') }}
                             </label>
                             <select id="user_id_select"
-                                class="searchable-select w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent custom-select @error('user_id') border-red-500 @enderror"
+                                class="searchable-select w-full px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent custom-select @error('user_id') border-red-500 @enderror"
                                 onchange="updateSelectedMemberInfo()" data-label="Membro">
                                 <option value="">-- Selecione um membro --</option>
                                 @foreach($members as $member)
@@ -51,44 +65,44 @@
                                 @endforeach
                             </select>
                             @error('user_id')
-                                <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                                <p class="text-red-500 text-xs mt-1.5">{{ $message }}</p>
                             @enderror
 
-                            <div id="memberInfo" class="mt-4 hidden bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                <div class="grid grid-cols-2 gap-4">
+                            <div id="memberInfo" class="mt-3 hidden bg-blue-50 border border-blue-200 rounded-lg p-3">
+                                <div class="grid grid-cols-2 gap-3">
                                     <div>
-                                        <p class="text-xs text-gray-500">Email</p>
-                                        <p id="memberEmail" class="font-medium text-gray-800"></p>
+                                        <p class="text-[11px] text-gray-500">Email</p>
+                                        <p id="memberEmail" class="text-xs sm:text-sm font-bold text-gray-800"></p>
                                     </div>
                                     <div>
-                                        <p class="text-xs text-gray-500">Célula</p>
-                                        <p id="memberCell" class="font-medium text-gray-800"></p>
+                                        <p class="text-[11px] text-gray-500">Célula</p>
+                                        <p id="memberCell" class="text-xs sm:text-sm font-bold text-gray-800"></p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     @else
-                        <p class="text-gray-700 font-semibold mb-2">Contribuição para: {{ $currentUser->name }}</p>
+                        <p class="text-gray-700 text-xs sm:text-sm font-semibold mb-2">Contribuição para: {{ $currentUser->name }}</p>
                         <input type="hidden" name="user_id" value="{{ $currentUser->id }}">
                     @endif
 
-                    <div class="mt-4 p-3 bg-gray-100 rounded-lg text-sm">
+                    <div class="mt-3 p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-xs sm:text-sm">
                         Registando contribuição para: <span id="summaryMemberDisplay"
-                            class="font-bold text-gray-800">{{ $currentUser->name }}</span>
+                            class="font-bold text-gray-900">{{ $currentUser->name }}</span>
                     </div>
                 </div>
 
-                <div class="mb-8">
-                    <h3 class="text-lg font-bold text-gray-800 mb-6">
-                        <i class="bi bi-cash-coin mr-2"></i>Dados da Contribuição
+                <div class="mb-6">
+                    <h3 class="text-xs sm:text-sm font-black uppercase tracking-wider text-gray-700 mb-4">
+                        <i class="bi bi-cash-coin mr-1.5 text-orange-700"></i>Dados da Contribuição
                     </h3>
 
                     @if($packages->isNotEmpty())
                         {{-- Informação do Pacote Atual --}}
-                        <div class="mb-6">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-gray-700 mb-1.5">
                                 Seu Compromisso Atual:
-                                <span class="font-semibold text-gray-800">
+                                <span class="font-black text-gray-900">
                                     {{ $currentPackage->name ?? 'Nenhum' }}
                                     @if($currentPackage->committed_amount > 0)
                                         (Comprometido: {{ number_format($currentPackage->committed_amount, 2, ',', '.') }} MT)
@@ -100,7 +114,7 @@
 
                             {{-- Seleção do Pacote (Apenas se precisar trocar o pacote na contribuição) --}}
                             <select name="package_id" id="package_id"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent custom-select @error('package_id') border-red-500 @enderror">
+                                class="w-full px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent custom-select @error('package_id') border-red-500 @enderror">
                                 <option value="">-- Selecione o Pacote Referente à Contribuição --</option>
                                 @foreach($packages as $package)
                                     <option value="{{ $package->id }}" @selected(old('package_id') == $package->id || ($preselectedPackageId == $package->id) || ($currentPackage->id ?? null) == $package->id)>
@@ -110,83 +124,83 @@
                                 @endforeach
                             </select>
                             @error('package_id')
-                                <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                                <p class="text-red-500 text-xs mt-1.5">{{ $message }}</p>
                             @enderror
                         </div>
                     @endif
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
-                            <label for="amount" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="amount" class="block text-xs font-bold text-gray-700 mb-1.5">
                                 Valor (MT) <span class="text-red-500">*</span>
                             </label>
                             <div class="relative">
-                                <span class="absolute left-4 top-3 text-gray-500 font-semibold">MT</span>
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-gray-500 font-bold">MT</span>
                                 <input type="number" name="amount" id="amount" step="0.01" min="0.01"
-                                    class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('amount') border-red-500 @enderror"
+                                    class="w-full pl-10 pr-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('amount') border-red-500 @enderror"
                                     placeholder="0.00" value="{{ old('amount') }}" required>
                             </div>
                             @error('amount')
-                                <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                                <p class="text-red-500 text-xs mt-1.5">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <div>
-                            <label for="contribution_date" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="contribution_date" class="block text-xs font-bold text-gray-700 mb-1.5">
                                 Data da Contribuição <span class="text-red-500">*</span>
                             </label>
                             <input type="date" name="contribution_date" id="contribution_date"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('contribution_date') border-red-500 @enderror"
+                                class="w-full px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('contribution_date') border-red-500 @enderror"
                                 value="{{ old('contribution_date', now()->format('Y-m-d')) }}" required>
                             @error('contribution_date')
-                                <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                                <p class="text-red-500 text-xs mt-1.5">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
 
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                        <p class="text-sm text-blue-700">
-                            <i class="bi bi-info-circle mr-2"></i>
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                        <p class="text-xs text-blue-700">
+                            <i class="bi bi-info-circle mr-1.5"></i>
                             <strong>Intervalo de Contribuições:</strong> Do dia 20 do mês anterior até ao dia 5 do mês atual
                         </p>
                     </div>
                 </div>
 
-                <div class="mb-8" x-data="{ proofType: 'file' }">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">
-                        <i class="bi bi-paperclip mr-2"></i>Comprovativo
+                <div class="mb-6" x-data="{ proofType: 'file' }">
+                    <h3 class="text-xs sm:text-sm font-black uppercase tracking-wider text-gray-700 mb-3">
+                        <i class="bi bi-paperclip mr-1.5 text-orange-700"></i>Comprovativo
                     </h3>
 
-                    <div class="flex p-1 bg-gray-100 rounded-xl mb-6">
+                    <div class="flex p-1 bg-gray-100 rounded-lg border border-gray-200 mb-4">
                         <button type="button" @click="proofType = 'file'"
                             :class="proofType === 'file' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500'"
-                            class="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2">
+                            class="flex-1 py-2 rounded-md text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5">
                             <i class="bi bi-file-earmark-arrow-up"></i> Ficheiro / Imagem
                         </button>
                         <button type="button" @click="proofType = 'message'"
                             :class="proofType === 'message' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500'"
-                            class="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2">
+                            class="flex-1 py-2 rounded-md text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5">
                             <i class="bi bi-chat-left-text"></i> Mensagem da Operadora
                         </button>
                     </div>
 
                     <div x-show="proofType === 'file'" x-transition:enter="transition ease-out duration-300"
                         x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
-                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/30 transition group"
+                        <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/30 transition group"
                             id="dropZone">
                             <input type="file" name="proof_path" id="proof_path" class="hidden"
                                 accept=".pdf,.jpg,.jpeg,.png">
                             <i
-                                class="bi bi-cloud-upload text-5xl text-gray-400 mb-3 block group-hover:text-blue-500 transition-colors"></i>
-                            <p class="text-gray-600 font-medium mb-1">Clique para enviar ou arraste o arquivo</p>
-                            <p class="text-sm text-gray-500">PDF, JPG, PNG (Máx. 5MB)</p>
+                                class="bi bi-cloud-upload text-3xl text-gray-400 mb-2 block group-hover:text-blue-500 transition-colors"></i>
+                            <p class="text-xs sm:text-sm text-gray-700 font-bold mb-0.5">Clique para enviar ou arraste o arquivo</p>
+                            <p class="text-xs text-gray-500">PDF, JPG, PNG (Máx. 5MB)</p>
                         </div>
-                        <div id="fileName" class="mt-4 hidden p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <div id="fileName" class="mt-3 hidden p-3 bg-green-50 border border-green-200 rounded-lg">
                             <div class="flex items-center">
-                                <i class="bi bi-check-circle text-green-600 text-2xl mr-3"></i>
+                                <i class="bi bi-check-circle text-green-600 text-xl mr-2.5"></i>
                                 <div>
-                                    <p class="text-sm text-green-600 font-medium">Arquivo selecionado:</p>
-                                    <p id="fileNameText" class="text-green-800 font-semibold"></p>
+                                    <p class="text-xs text-green-600 font-medium">Arquivo selecionado:</p>
+                                    <p id="fileNameText" class="text-xs sm:text-sm text-green-800 font-bold"></p>
                                 </div>
                             </div>
                         </div>
@@ -194,51 +208,51 @@
 
                     <div x-show="proofType === 'message'" x-transition:enter="transition ease-out duration-300"
                         x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
-                        <label for="proof_message" class="block text-sm font-medium text-gray-700 mb-2">Cole aqui a mensagem
+                        <label for="proof_message" class="block text-xs font-bold text-gray-700 mb-1.5">Cole aqui a mensagem
                             de confirmação completa</label>
-                        <textarea name="proof_message" id="proof_message" rows="5"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400"
+                        <textarea name="proof_message" id="proof_message" rows="4"
+                            class="w-full px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400"
                             placeholder="Ex: Ref: 123456789. Vocé enviou 1000.00 MT para..."></textarea>
-                        <p class="text-[10px] text-gray-400 mt-2 italic">* Use esta opção se não tiver o arquivo do
+                        <p class="text-[10px] text-gray-400 mt-1.5 italic">* Use esta opção se não tiver o arquivo do
                             comprovativo mas tiver a mensagem SMS da operadora.</p>
                     </div>
 
                     @error('proof_path')
-                        <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                        <p class="text-red-500 text-xs mt-1.5">{{ $message }}</p>
                     @enderror
                     @error('proof_message')
-                        <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                        <p class="text-red-500 text-xs mt-1.5">{{ $message }}</p>
                     @enderror
                 </div>
 
-                <div class="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-6 mb-8">
-                    <h4 class="font-bold text-gray-800 mb-3">
-                        <i class="bi bi-check2-square mr-2"></i>Resumo da Contribuição
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6">
+                    <h4 class="text-xs font-black uppercase tracking-wider text-gray-700 mb-2.5">
+                        <i class="bi bi-check2-square mr-1.5 text-orange-700"></i>Resumo da Contribuição
                     </h4>
-                    <div class="grid grid-cols-3 gap-4">
-                        <div class="bg-white rounded p-3">
-                            <p class="text-xs text-gray-500">Membro</p>
-                            <p id="summaryMember" class="font-bold text-gray-800 mt-1">{{ $currentUser->name }}</p>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="bg-white border border-gray-200 rounded-lg p-2.5">
+                            <p class="text-[10px] font-bold uppercase text-gray-400">Membro</p>
+                            <p id="summaryMember" class="text-xs sm:text-sm font-black text-gray-900 mt-0.5 truncate">{{ $currentUser->name }}</p>
                         </div>
-                        <div class="bg-white rounded p-3">
-                            <p class="text-xs text-gray-500">Valor</p>
-                            <p id="summaryAmount" class="font-bold text-green-600 mt-1">-</p>
+                        <div class="bg-white border border-gray-200 rounded-lg p-2.5">
+                            <p class="text-[10px] font-bold uppercase text-gray-400">Valor</p>
+                            <p id="summaryAmount" class="text-xs sm:text-sm font-black text-emerald-700 mt-0.5">-</p>
                         </div>
-                        <div class="bg-white rounded p-3">
-                            <p class="text-xs text-gray-500">Data</p>
-                            <p id="summaryDate" class="font-bold text-gray-800 mt-1">-</p>
+                        <div class="bg-white border border-gray-200 rounded-lg p-2.5">
+                            <p class="text-[10px] font-bold uppercase text-gray-400">Data</p>
+                            <p id="summaryDate" class="text-xs sm:text-sm font-black text-gray-900 mt-0.5">-</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex space-x-4">
+                <div class="flex gap-3">
                     <button type="submit"
-                        class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-bold text-lg">
-                        <i class="bi bi-check-circle mr-2"></i>Registar Contribuição
+                        class="flex-1 bg-orange-700 text-white px-4 py-2.5 rounded-lg hover:bg-orange-800 transition font-bold text-xs sm:text-sm shadow-sm">
+                        <i class="bi bi-check-circle mr-1.5"></i>Registar Contribuição
                     </button>
                     <a href="{{ route('contributions.index') }}"
-                        class="flex-1 bg-gray-200 text-gray-800 px-6 py-3 rounded-lg hover:bg-gray-300 transition font-bold text-lg text-center">
-                        <i class="bi bi-arrow-left mr-2"></i>Cancelar
+                        class="flex-1 border border-gray-300 bg-white text-gray-700 px-4 py-2.5 rounded-lg hover:bg-gray-50 transition font-bold text-xs sm:text-sm text-center shadow-sm">
+                        <i class="bi bi-arrow-left mr-1.5"></i>Cancelar
                     </a>
                 </div>
             </form>

@@ -4,238 +4,198 @@
 @section('page-title', 'Cadastrar Visitante')
 @section('page-subtitle', 'Registrar informações do visitante')
 
+@section('header-actions')
+    <a href="{{ route('visitors.index') }}"
+        class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
+        <i class="bi bi-arrow-left text-xs"></i>
+        <span>Voltar</span>
+    </a>
+@endsection
+
 @section('content')
-    <div class="w-full space-y-6">
-        <!-- Header Card -->
-        <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 relative overflow-hidden group">
-            <div
-                class="absolute top-0 right-0 w-64 h-64 bg-orange-50/50 rounded-full -mr-32 -mt-32 transition-transform group-hover:scale-110 duration-700">
-            </div>
-
-            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-                <div class="flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
-                    <div
-                        class="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-700 text-white flex items-center justify-center text-2xl shadow-lg shadow-orange-100">
-                        <i class="bi bi-person-plus-fill"></i>
-                    </div>
-                    <div>
-                        <div class="flex items-center justify-center md:justify-start gap-2 text-xs font-bold text-orange-600 uppercase tracking-widest mb-2">
-                            <a href="{{ route('visitors.index') }}" class="hover:underline">Visitantes</a>
-                            <i class="bi bi-chevron-right text-[10px]"></i>
-                            <span>Novo Cadastro</span>
-                        </div>
-                        <h1 class="text-2xl font-black text-gray-900 tracking-tight uppercase">Cadastrar Visitante</h1>
-                        <p class="text-gray-500 font-medium">Registe as informações para acompanhamento e integração</p>
-                    </div>
+    <div class="space-y-5">
+        <!-- Executive Header Card -->
+        <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50 text-orange-700">
+                    <i class="bi bi-person-plus text-xl"></i>
                 </div>
-
-                <a href="{{ route('visitors.index') }}"
-                    class="group flex items-center bg-gray-50 text-gray-500 px-5 py-3 rounded-xl hover:bg-gray-100 transition-all font-bold text-xs uppercase tracking-widest">
-                    <i class="bi bi-arrow-left text-lg mr-2 group-hover:-translate-x-1 transition-transform"></i>
-                    Cancelar
-                </a>
+                <div>
+                    <span class="text-[10px] font-black uppercase tracking-wider text-orange-700">Recepção e Integração</span>
+                    <h1 class="text-lg font-black text-gray-900 tracking-tight">Cadastrar Visitante</h1>
+                    <p class="text-xs text-gray-500">Registe os dados do visitante para acompanhamento e direcionamento à célula</p>
+                </div>
             </div>
         </div>
 
-        <form method="POST" action="{{ route('visitors.store') }}" class="space-y-6 pb-8">
+        <form method="POST" action="{{ route('visitors.store') }}" class="space-y-4">
             @csrf
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Left Column: Primary Content -->
-                <div class="lg:col-span-2 space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <!-- Coluna Esquerda: Dados do Visitante -->
+                <div class="lg:col-span-2 space-y-4">
                     <!-- Dados Pessoais -->
-                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                        <div class="p-6 border-b border-gray-50 bg-gray-50/30 flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-xl">
-                                <i class="bi bi-person-badge"></i>
-                            </div>
-                            <h3 class="text-base font-black text-gray-900 uppercase tracking-tight">Dados Pessoais</h3>
-                        </div>
-                        
-                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="md:col-span-2 space-y-2">
-                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nome Completo *</label>
+                    <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm space-y-3">
+                        <h3 class="text-xs font-black uppercase tracking-wider text-gray-900">1. Dados Pessoais</h3>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="sm:col-span-2 space-y-1">
+                                <label class="block text-xs font-bold text-gray-700">Nome Completo <span class="text-red-500">*</span></label>
                                 <input type="text" name="name" value="{{ old('name') }}" required
                                     placeholder="Ex: Manuel dos Santos"
-                                    class="w-full px-4 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl font-bold text-gray-700 transition-all @error('name') ring-2 ring-red-100 border-red-200 @enderror">
+                                    class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 @error('name') border-red-500 @enderror">
                                 @error('name')
-                                    <p class="text-red-500 text-[10px] font-black uppercase tracking-widest mt-1 ml-1">{{ $message }}</p>
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
 
-                            <div class="space-y-2">
-                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Idade</label>
+                            <div class="space-y-1">
+                                <label class="block text-xs font-bold text-gray-700">Idade</label>
                                 <input type="number" name="age" value="{{ old('age') }}" min="1" max="150"
-                                    class="w-full px-4 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl font-bold text-gray-700 transition-all @error('age') ring-2 ring-red-100 border-red-200 @enderror">
+                                    class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 @error('age') border-red-500 @enderror"
+                                    placeholder="Ex: 28">
                                 @error('age')
-                                    <p class="text-red-500 text-[10px] font-black uppercase tracking-widest mt-1 ml-1">{{ $message }}</p>
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
 
-                            <div class="space-y-2">
-                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Sexo</label>
+                            <div class="space-y-1">
+                                <label class="block text-xs font-bold text-gray-700">Sexo</label>
                                 <select name="gender"
-                                    class="w-full px-4 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl font-bold text-gray-700 transition-all custom-select @error('gender') ring-2 ring-red-100 border-red-200 @enderror">
+                                    class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 @error('gender') border-red-500 @enderror">
                                     <option value="">Selecione...</option>
                                     <option value="masculino" {{ old('gender') == 'masculino' ? 'selected' : '' }}>Masculino</option>
                                     <option value="feminino" {{ old('gender') == 'feminino' ? 'selected' : '' }}>Feminino</option>
                                 </select>
                                 @error('gender')
-                                    <p class="text-red-500 text-[10px] font-black uppercase tracking-widest mt-1 ml-1">{{ $message }}</p>
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
                         </div>
                     </div>
 
                     <!-- Contato e Localização -->
-                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                        <div class="p-6 border-b border-gray-50 bg-gray-50/30 flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center text-xl">
-                                <i class="bi bi-geo-alt-fill"></i>
-                            </div>
-                            <h3 class="text-base font-black text-gray-900 uppercase tracking-tight">Contato & Localização</h3>
-                        </div>
+                    <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm space-y-3">
+                        <h3 class="text-xs font-black uppercase tracking-wider text-gray-900">2. Contato e Localização</h3>
 
-                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="space-y-2">
-                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Telefone</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <label class="block text-xs font-bold text-gray-700">Telefone</label>
                                 <input type="text" name="phone" value="{{ old('phone') }}"
-                                    class="w-full px-4 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl font-bold text-gray-700 transition-all @error('phone') ring-2 ring-red-100 border-red-200 @enderror"
+                                    class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 @error('phone') border-red-500 @enderror"
                                     placeholder="84 123 4567">
                                 @error('phone')
-                                    <p class="text-red-500 text-[10px] font-black uppercase tracking-widest mt-1 ml-1">{{ $message }}</p>
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
 
-                            <div class="space-y-2">
-                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Bairro</label>
+                            <div class="space-y-1">
+                                <label class="block text-xs font-bold text-gray-700">Bairro</label>
                                 <input type="text" name="neighborhood" value="{{ old('neighborhood') }}"
-                                    class="w-full px-4 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl font-bold text-gray-700 transition-all @error('neighborhood') ring-2 ring-red-100 border-red-200 @enderror">
+                                    class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 @error('neighborhood') border-red-500 @enderror"
+                                    placeholder="Ex: Polana Caniço">
                                 @error('neighborhood')
-                                    <p class="text-red-500 text-[10px] font-black uppercase tracking-widest mt-1 ml-1">{{ $message }}</p>
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
 
-                            <div class="space-y-2">
-                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Cidade</label>
+                            <div class="space-y-1">
+                                <label class="block text-xs font-bold text-gray-700">Cidade</label>
                                 <input type="text" name="city" value="{{ old('city', 'Maputo') }}"
-                                    class="w-full px-4 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl font-bold text-gray-700 transition-all @error('city') ring-2 ring-red-100 border-red-200 @enderror">
+                                    class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 @error('city') border-red-500 @enderror">
                                 @error('city')
-                                    <p class="text-red-500 text-[10px] font-black uppercase tracking-widest mt-1 ml-1">{{ $message }}</p>
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
 
-                            <div class="space-y-2">
-                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Data da Visita *</label>
+                            <div class="space-y-1">
+                                <label class="block text-xs font-bold text-gray-700">Data da Visita <span class="text-red-500">*</span></label>
                                 <input type="date" name="visit_date" value="{{ old('visit_date', date('Y-m-d')) }}" required
-                                    class="w-full px-4 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl font-bold text-gray-700 transition-all @error('visit_date') ring-2 ring-red-100 border-red-200 @enderror">
+                                    class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 @error('visit_date') border-red-500 @enderror">
                                 @error('visit_date')
-                                    <p class="text-red-500 text-[10px] font-black uppercase tracking-widest mt-1 ml-1">{{ $message }}</p>
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
                         </div>
                     </div>
 
                     <!-- Observações -->
-                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                        <div class="p-6 border-b border-gray-50 bg-gray-50/30 flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-xl">
-                                <i class="bi bi-chat-left-text-fill"></i>
-                            </div>
-                            <h3 class="text-base font-black text-gray-900 uppercase tracking-tight">Observações</h3>
-                        </div>
-
-                        <div class="p-6 space-y-2">
-                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Notas adicionais</label>
-                            <textarea name="notes" rows="3"
-                                class="w-full px-4 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl font-bold text-gray-700 transition-all @error('notes') ring-2 ring-red-100 border-red-200 @enderror"
-                                placeholder="Informações adicionais sobre o visitante...">{{ old('notes') }}</textarea>
-                            @error('notes')
-                                <p class="text-red-500 text-[10px] font-black uppercase tracking-widest mt-1 ml-1">{{ $message }}</p>
-                            @enderror
-                        </div>
+                    <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm space-y-2">
+                        <label class="block text-xs font-bold text-gray-700">Observações e Notas</label>
+                        <textarea name="notes" rows="3"
+                            class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500 resize-none"
+                            placeholder="Informações adicionais sobre o visitante...">{{ old('notes') }}</textarea>
                     </div>
                 </div>
 
-                <!-- Right Column: Context & Metadata -->
-                <div class="space-y-6">
+                <!-- Coluna Direita: Contexto & Integração -->
+                <div class="space-y-4">
                     <!-- Culto e Convite -->
-                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100">
-                        <div class="p-6 border-b border-gray-50 bg-gray-50/30 flex items-center gap-3">
-                            <i class="bi bi-calendar-check text-blue-600"></i>
-                            <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Contexto da Visita</h3>
+                    <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm space-y-3">
+                        <h3 class="text-xs font-black uppercase tracking-wider text-gray-900">Contexto da Visita</h3>
+
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold text-gray-700">Culto Visitado</label>
+                            <select name="service_id"
+                                class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500">
+                                <option value="">Selecione...</option>
+                                @foreach($services as $service)
+                                    <option value="{{ $service->id }}" {{ old('service_id') == $service->id ? 'selected' : '' }}>
+                                        {{ $service->date->format('d/m/Y') }} - {{ $service->service_type }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
-                        <div class="p-6 space-y-5">
-                            <div class="space-y-2">
-                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Culto Visitado</label>
-                                <select name="service_id"
-                                    class="searchable-select w-full px-4 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl font-bold text-sm transition-all custom-select" data-label="Culto">
-                                    <option value="">Selecione...</option>
-                                    @foreach($services as $service)
-                                        <option value="{{ $service->id }}" {{ old('service_id') == $service->id ? 'selected' : '' }}>
-                                            {{ $service->date->format('d/m/Y') }} - {{ $service->service_type }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
 
-                            <div class="pt-4 border-t border-gray-50">
-                                <label class="flex items-center gap-3 p-4 bg-orange-50/50 rounded-2xl cursor-pointer hover:bg-orange-50 transition-colors group">
-                                    <input type="checkbox" name="invited_by_someone" id="invited_by_someone" value="1"
-                                        {{ old('invited_by_someone') ? 'checked' : '' }}
-                                        class="w-5 h-5 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
-                                        onchange="document.getElementById('inviter_name_field').classList.toggle('hidden', !this.checked)">
-                                    <span class="text-xs font-black text-gray-600 uppercase tracking-widest">Veio a convite de alguém?</span>
-                                </label>
+                        <div class="pt-3 border-t border-gray-100">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" name="invited_by_someone" id="invited_by_someone" value="1"
+                                    {{ old('invited_by_someone') ? 'checked' : '' }}
+                                    class="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                                    onchange="document.getElementById('inviter_name_field').classList.toggle('hidden', !this.checked)">
+                                <span class="text-xs font-bold text-gray-700">Veio a convite de alguém?</span>
+                            </label>
 
-                                <div id="inviter_name_field" class="{{ old('invited_by_someone') ? '' : 'hidden' }} mt-4 space-y-2">
-                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nome de quem convidou</label>
-                                    <input type="text" name="inviter_name" value="{{ old('inviter_name') }}"
-                                        class="w-full px-4 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl font-bold text-sm transition-all">
-                                </div>
+                            <div id="inviter_name_field" class="{{ old('invited_by_someone') ? '' : 'hidden' }} mt-2.5 space-y-1">
+                                <label class="block text-xs font-bold text-gray-700">Nome de quem convidou</label>
+                                <input type="text" name="inviter_name" value="{{ old('inviter_name') }}"
+                                    class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500"
+                                    placeholder="Ex: Irmão João">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Atribuição -->
-                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100">
-                        <div class="p-6 border-b border-gray-50 bg-gray-50/30 flex items-center gap-3">
-                            <i class="bi bi-diagram-3-fill text-purple-600"></i>
-                            <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Integração</h3>
-                        </div>
-                        <div class="p-6 space-y-5">
-                            <div class="space-y-2">
-                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Zona para Integração</label>
-                                <select name="zone_id" id="zone_select"
-                                    class="searchable-select w-full px-4 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl font-bold text-sm transition-all custom-select" data-label="Zona">
-                                    <option value="">Atribuir depois...</option>
-                                    @foreach($zones as $zone)
-                                        <option value="{{ $zone->id }}" {{ old('zone_id') == $zone->id ? 'selected' : '' }}>
-                                            {{ $zone->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+                    <!-- Atribuição Pastoral -->
+                    <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm space-y-3">
+                        <h3 class="text-xs font-black uppercase tracking-wider text-gray-900">Integração Pastoral</h3>
 
-                            <div class="space-y-2">
-                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Célula para Integração</label>
-                                <select name="cell_id" id="cell_select"
-                                    class="searchable-select w-full px-4 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl font-bold text-sm transition-all custom-select" data-label="Célula">
-                                    <option value="">Selecione a Zona Primeiro...</option>
-                                </select>
-                            </div>
-                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest text-center px-4 italic leading-relaxed">
-                                A atribuição de zona facilita o acompanhamento pelos pastores locais.
-                            </p>
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold text-gray-700">Zona para Integração</label>
+                            <select name="zone_id" id="zone_select"
+                                class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500">
+                                <option value="">Atribuir depois...</option>
+                                @foreach($zones as $zone)
+                                    <option value="{{ $zone->id }}" {{ old('zone_id') == $zone->id ? 'selected' : '' }}>
+                                        {{ $zone->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold text-gray-700">Célula para Integração</label>
+                            <select name="cell_id" id="cell_select"
+                                class="w-full rounded-lg border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-orange-500 focus:ring-orange-500">
+                                <option value="">Selecione a Zona Primeiro...</option>
+                            </select>
                         </div>
                     </div>
 
-                    <!-- Submit Card -->
-                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6">
+                    <div class="pt-2">
                         <button type="submit"
-                            class="w-full px-6 py-3.5 bg-gradient-to-r from-orange-600 to-orange-500 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] transform hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-orange-600/20 flex items-center justify-center gap-3">
-                            <i class="bi bi-check2-circle text-base"></i>
-                            Finalizar Registo
+                            class="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-orange-700 px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-orange-800 transition-colors">
+                            <i class="bi bi-check-lg text-sm"></i>
+                            <span>Finalizar Registo</span>
                         </button>
                     </div>
                 </div>
@@ -244,55 +204,44 @@
     </div>
 
     <script>
-        // Toggle inviter name field
-        document.getElementById('invited_by_someone').addEventListener('change', function() {
-            document.getElementById('inviter_name_field').classList.toggle('hidden', !this.checked);
-        });
-
-        // Dynamic Cell Loading
         document.addEventListener('DOMContentLoaded', function() {
             const zoneSelect = document.getElementById('zone_select');
             const cellSelect = document.getElementById('cell_select');
 
-            zoneSelect.addEventListener('change', async function() {
-                const zoneId = this.value;
-                const tomSelect = cellSelect.tomselect;
+            if (zoneSelect && cellSelect) {
+                zoneSelect.addEventListener('change', async function() {
+                    const zoneId = this.value;
+                    cellSelect.innerHTML = '<option value="">Carregando...</option>';
 
-                if (!zoneId) {
-                    if (tomSelect) {
-                        tomSelect.clear();
-                        tomSelect.clearOptions();
-                        tomSelect.addOption({value: '', text: 'Selecione a Zona Primeiro...'});
+                    if (!zoneId) {
+                        cellSelect.innerHTML = '<option value="">Selecione a Zona Primeiro...</option>';
+                        return;
                     }
-                    return;
-                }
 
-                try {
-                    const response = await fetch(`{{ route('visitors.cells-by-zone') }}?zone_id=${zoneId}`);
-                    const cells = await response.json();
+                    try {
+                        const response = await fetch(`{{ route('visitors.cells-by-zone') }}?zone_id=${zoneId}`);
+                        const cells = await response.json();
 
-                    if (tomSelect) {
-                        tomSelect.clear();
-                        tomSelect.clearOptions();
-                        
+                        cellSelect.innerHTML = '<option value="">Selecione a Célula...</option>';
                         if (cells.length > 0) {
                             cells.forEach(cell => {
-                                tomSelect.addOption({value: cell.id, text: `${cell.name} (${cell.type_label})`});
+                                const option = document.createElement('option');
+                                option.value = cell.id;
+                                option.textContent = `${cell.name} (${cell.type_label || 'Geral'})`;
+                                cellSelect.appendChild(option);
                             });
                         } else {
-                            tomSelect.addOption({value: '', text: 'Nenhuma célula nesta zona'});
+                            cellSelect.innerHTML = '<option value="">Nenhuma célula nesta zona</option>';
                         }
-                        
-                        tomSelect.refreshOptions(false);
+                    } catch (error) {
+                        console.error('Error loading cells:', error);
+                        cellSelect.innerHTML = '<option value="">Erro ao carregar células</option>';
                     }
-                } catch (error) {
-                    console.error('Error loading cells:', error);
-                }
-            });
+                });
 
-            // Initial trigger if zone is already selected (e.g., validation error)
-            if (zoneSelect.value) {
-                zoneSelect.dispatchEvent(new Event('change'));
+                if (zoneSelect.value) {
+                    zoneSelect.dispatchEvent(new Event('change'));
+                }
             }
         });
     </script>

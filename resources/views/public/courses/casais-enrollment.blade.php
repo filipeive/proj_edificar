@@ -3,142 +3,114 @@
 @section('title', 'Inscrição - Curso de Casais')
 
 @section('content')
-    <div class="min-h-screen bg-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative">
-        <!-- Background Elements -->
-        <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-            <div class="absolute -top-24 -left-24 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl"></div>
-            <div class="absolute bottom-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
-        </div>
-
-        <div class="max-w-2xl w-full space-y-8 relative z-10">
+    <div class="min-h-screen bg-gray-50 flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-2xl w-full space-y-5">
             <div class="text-center">
-                <a href="{{ route('welcome') }}" class="inline-block mb-6">
-                    <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-16 w-auto mx-auto">
+                <a href="{{ route('welcome') }}" class="inline-block mb-3">
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-12 w-auto mx-auto">
                 </a>
-                <h2 class="text-4xl font-black text-white tracking-tighter">Inscrição: Curso de Casais</h2>
-                <p class="mt-2 text-gray-400 font-medium uppercase tracking-widest text-xs">Portal Life Church -
-                    Fortalecendo Famílias</p>
+                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-orange-700">Portal Life Church • Fortalecendo Famílias</p>
+                <h1 class="mt-1 text-xl sm:text-2xl font-black text-gray-950 tracking-tight">Inscrição: Curso de Casais</h1>
             </div>
 
-            <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-8 md:p-12 shadow-2xl">
-                <form action="{{ route('public.courses.casais.store') }}" method="POST" class="space-y-6">
+            <div class="rounded-xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm">
+                <form action="{{ route('public.courses.casais.store') }}" method="POST" class="space-y-4">
                     @csrf
                     <input type="hidden" name="course_id" value="{{ $course->id }}">
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Nome do Esposo -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Nome
-                                do Noivo / Parceiro <span class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-wider mb-1">Nome do Noivo / Parceiro <span class="text-red-500">*</span></label>
                             <input type="text" name="husband_name" required
-                                class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition placeholder-gray-600"
+                                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
                                 placeholder="Nome completo">
                         </div>
 
-                        <!-- Nome da Esposa -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Nome
-                                da Noiva / Parceira <span class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-wider mb-1">Nome da Noiva / Parceira <span class="text-red-500">*</span></label>
                             <input type="text" name="wife_name" required
-                                class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition placeholder-gray-600"
+                                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
                                 placeholder="Nome completo">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Tipo de Relação -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Tipo
-                                de Relação <span class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-wider mb-1">Tipo de Relação <span class="text-red-500">*</span></label>
                             <select name="relationship_type" required
-                                class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition appearance-none">
-                                <option value="" class="bg-gray-900">Selecione...</option>
-                                <option value="em_relacionamento" class="bg-gray-900">Em relacionamento</option>
-                                <option value="noivos" class="bg-gray-900">Noivos</option>
-                                <option value="vivendo_maritalmente" class="bg-gray-900">Vivendo Maritalmente</option>
-                                <option value="casados" class="bg-gray-900">Casados (Reciclagem)</option>
+                                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20">
+                                <option value="">Selecione...</option>
+                                <option value="em_relacionamento">Em relacionamento</option>
+                                <option value="noivos">Noivos</option>
+                                <option value="vivendo_maritalmente">Vivendo Maritalmente</option>
+                                <option value="casados">Casados (Reciclagem)</option>
                             </select>
                         </div>
 
-                        <!-- Anos de Relacionamento -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Anos
-                                de Relacionamento <span class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-wider mb-1">Anos de Relacionamento <span class="text-red-500">*</span></label>
                             <input type="number" name="years_together" required min="0"
-                                class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition placeholder-gray-600"
+                                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
                                 placeholder="Ex: 5">
                         </div>
                     </div>
 
-                    <!-- Morada -->
                     <div>
-                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Morada
-                            <span class="text-red-500">*</span></label>
+                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-wider mb-1">Morada <span class="text-red-500">*</span></label>
                         <input type="text" name="address" required
-                            class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition placeholder-gray-600"
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
                             placeholder="Endereço completo">
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Contactos -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label
-                                class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Contactos
-                                <span class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-wider mb-1">Contactos <span class="text-red-500">*</span></label>
                             <input type="text" name="contacts" required
-                                class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition placeholder-gray-600"
+                                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
                                 placeholder="Telemóvel / WhatsApp">
                         </div>
 
-                        <!-- Zona de Célula -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Zona
-                                de Célula</label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-wider mb-1">Zona de Célula</label>
                             <input type="text" name="cell_zone"
-                                class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition placeholder-gray-600"
+                                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
                                 placeholder="Ex: Zona A">
                         </div>
                     </div>
 
-                    <!-- Líder / Supervisor -->
                     <div>
-                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Nome do
-                            Líder de Célula / Supervisor</label>
+                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-wider mb-1">Nome do Líder de Célula / Supervisor</label>
                         <input type="text" name="leader_name"
-                            class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition placeholder-gray-600"
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
                             placeholder="Nome do seu líder direto">
                     </div>
 
-                    <!-- Recomendação Pastoral -->
                     <div>
-                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Tem
-                            Recomendação da Pastoral? <span class="text-red-500">*</span></label>
-                        <div class="flex space-x-6">
-                            <label class="flex items-center space-x-3 cursor-pointer group">
+                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-wider mb-2">Tem Recomendação da Pastoral? <span class="text-red-500">*</span></label>
+                        <div class="flex space-x-5">
+                            <label class="flex items-center space-x-2 cursor-pointer">
                                 <input type="radio" name="has_pastoral_recommendation" value="1" required
-                                    class="w-5 h-5 text-orange-600 bg-white/5 border-white/10 focus:ring-orange-500">
-                                <span class="text-gray-300 group-hover:text-white transition">Sim</span>
+                                    class="w-4 h-4 text-orange-600 border-gray-300 focus:ring-orange-500">
+                                <span class="text-xs font-bold text-gray-700">Sim</span>
                             </label>
-                            <label class="flex items-center space-x-3 cursor-pointer group">
+                            <label class="flex items-center space-x-2 cursor-pointer">
                                 <input type="radio" name="has_pastoral_recommendation" value="0" required
-                                    class="w-5 h-5 text-orange-600 bg-white/5 border-white/10 focus:ring-orange-500">
-                                <span class="text-gray-300 group-hover:text-white transition">Não</span>
+                                    class="w-4 h-4 text-orange-600 border-gray-300 focus:ring-orange-500">
+                                <span class="text-xs font-bold text-gray-700">Não</span>
                             </label>
                         </div>
                     </div>
 
-                    <!-- Observações -->
                     <div>
-                        <label
-                            class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Observações</label>
+                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-wider mb-1">Observações</label>
                         <textarea name="observations" rows="3"
-                            class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition placeholder-gray-600"
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
                             placeholder="Alguma informação adicional?"></textarea>
                     </div>
 
-                    <div class="pt-4">
+                    <div class="pt-2">
                         <button type="submit"
-                            class="w-full bg-gradient-to-r from-orange-500 to-orange-700 text-white font-black py-5 rounded-2xl uppercase tracking-widest text-sm shadow-2xl shadow-orange-500/20 hover:scale-[1.02] transition-all duration-300">
+                            class="w-full rounded-lg bg-orange-700 px-4 py-2.5 text-xs sm:text-sm font-bold text-white shadow-sm hover:bg-orange-800 transition">
                             Finalizar Inscrição
                         </button>
                     </div>
@@ -147,8 +119,8 @@
 
             <div class="text-center">
                 <a href="{{ route('welcome') }}"
-                    class="text-gray-500 hover:text-white transition text-xs font-bold uppercase tracking-widest">
-                    <i class="bi bi-arrow-left mr-2"></i> Voltar para o Início
+                    class="text-gray-500 hover:text-gray-900 transition text-xs font-bold">
+                    <i class="bi bi-arrow-left mr-1"></i> Voltar para o Início
                 </a>
             </div>
         </div>

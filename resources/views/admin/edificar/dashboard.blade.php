@@ -5,316 +5,201 @@
 @section('page-subtitle', 'Acompanhamento financeiro e evolução da construção')
 
 @section('content')
-    <div class="min-h-screen bg-gray-100 dark:bg-[#05060f] p-4 md:p-8 -m-4 md:-m-8 transition-all duration-500">
+    <div class="space-y-5">
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;300;400;500;700;900&display=swap');
-
-            .font-outfit {
-                font-family: 'Outfit', sans-serif;
-            }
-
-            .glass-card {
-                background: var(--bg-secondary);
-                backdrop-filter: blur(20px);
-                border: 1px solid var(--border-color);
-                box-shadow: 0 10px 25px -5px var(--shadow);
-                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            }
-
-            [data-theme="dark"] .glass-card {
-                background: rgba(255, 255, 255, 0.02);
-                border: 1px solid rgba(255, 255, 255, 0.05);
-            }
-
-            .glass-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 20px 40px -10px var(--shadow);
-            }
-
-            .text-glow-blue {
-                text-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
-            }
-
-            .text-glow-green {
-                text-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
-            }
-
-            .text-glow-orange {
-                text-shadow: 0 0 20px rgba(249, 115, 22, 0.3);
-            }
-
-            [data-theme="dark"] .text-white-target {
-                color: white;
-            }
-
-            [data-theme="light"] .text-white-target {
-                color: var(--text-primary);
-            }
-
-            .custom-scrollbar::-webkit-scrollbar {
-                width: 4px;
-            }
-
-            .custom-scrollbar::-webkit-scrollbar-track {
-                background: transparent;
-            }
-
-            .custom-scrollbar::-webkit-scrollbar-thumb {
-                background: rgba(0, 0, 0, 0.1);
-                border-radius: 10px;
-            }
-
-            [data-theme="dark"] .custom-scrollbar::-webkit-scrollbar-thumb {
-                background: rgba(255, 255, 255, 0.1);
-            }
+            .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+            .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+            .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.12); border-radius: 10px; }
         </style>
 
-        <div class="w-full mx-auto space-y-8 font-outfit transition-all duration-500">
-            <!-- Header section with Title and Period -->
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                <div>
-                    <h2 class="text-4xl font-black tracking-tighter text-gray-900 dark:text-white">Evolução <span
-                            class="text-blue-500">Financeira</span></h2>
-                    <p class="text-gray-500 dark:text-gray-400 font-medium">Dados atualizados em tempo real para o Projecto
-                        Edificar</p>
-                </div>
-                <div
-                    class="flex items-center gap-3 px-4 py-2 bg-white dark:bg-white/5 rounded-2xl border border-gray-200 dark:border-white/10 backdrop-blur-sm shadow-sm">
-                    <i class="bi bi-calendar3 text-blue-500"></i>
-                    <span class="text-sm font-bold text-gray-700 dark:text-gray-200">{{ now()->translatedFormat('F Y') }}</span>
-                </div>
+        <!-- Header section with Title and Period -->
+        <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 sm:gap-4">
+            <div>
+                <p class="text-[10px] sm:text-xs font-black uppercase tracking-[0.18em] text-orange-700">Projecto Edificar</p>
+                <h1 class="mt-0.5 text-xl sm:text-2xl font-black text-gray-950 tracking-tight">Evolução Financeira da Obra</h1>
+                <p class="mt-0.5 text-xs sm:text-sm text-gray-500">Dados atualizados em tempo real para o fundo de construção ({{ now()->translatedFormat('F Y') }}).</p>
             </div>
-
-            <!-- Dashboard Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Total Arrecadado -->
-                <div class="glass-card p-8 rounded-[2rem] relative overflow-hidden group">
-                    <div class="flex flex-col h-full justify-between gap-6 relative z-10">
-                        <div
-                            class="w-14 h-14 rounded-2xl bg-blue-50 dark:bg-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-500/30">
-                            <i class="bi bi-bank2 text-2xl"></i>
-                        </div>
-                        <div>
-                            <p
-                                class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-1">
-                                Total Arrecadado</p>
-                            <h3 class="text-3xl font-black text-gray-900 dark:text-white">
-                                {{ number_format($totalArrecadado, 2, ',', '.') }} <span
-                                    class="text-sm font-bold text-blue-500">MT</span></h3>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Este Mês -->
-                <div class="glass-card p-8 rounded-[2rem] relative overflow-hidden group">
-                    <div class="flex flex-col h-full justify-between gap-6 relative z-10">
-                        <div
-                            class="w-14 h-14 rounded-2xl bg-green-50 dark:bg-green-500/20 flex items-center justify-center text-green-600 dark:text-green-400 border border-green-100 dark:border-green-500/30">
-                            <i class="bi bi-stars text-2xl"></i>
-                        </div>
-                        <div>
-                            <p
-                                class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-1">
-                                Este Mês</p>
-                            <h3 class="text-3xl font-black text-gray-900 dark:text-white">
-                                {{ number_format($arrecadadoMes, 2, ',', '.') }} <span
-                                    class="text-sm font-bold text-green-500">MT</span></h3>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Membros Ativos -->
-                <div class="glass-card p-8 rounded-[2rem] relative overflow-hidden group">
-                    <div class="flex flex-col h-full justify-between gap-6 relative z-10">
-                        <div
-                            class="w-14 h-14 rounded-2xl bg-purple-50 dark:bg-purple-500/20 flex items-center justify-center text-purple-600 dark:text-purple-400 border border-purple-100 dark:border-purple-500/30">
-                            <i class="bi bi-people-fill text-2xl"></i>
-                        </div>
-                        <div>
-                            <p
-                                class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-1">
-                                Compromissos</p>
-                            <h3 class="text-3xl font-black text-gray-900 dark:text-white">{{ $pacotes->sum('membros') }}
-                                <span class="text-sm font-bold text-purple-500">Membros Ativos</span></h3>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Pendentes -->
-                <div class="glass-card p-8 rounded-[2rem] relative overflow-hidden group">
-                    <div class="flex flex-col h-full justify-between gap-6 relative z-10">
-                        <div
-                            class="w-14 h-14 rounded-2xl bg-orange-50 dark:bg-orange-500/20 flex items-center justify-center text-orange-600 dark:text-orange-400 border border-orange-100 dark:border-orange-500/30">
-                            <i class="bi bi-clock-history text-2xl"></i>
-                        </div>
-                        <div>
-                            <p
-                                class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-1">
-                                Validação Pendente</p>
-                            <h3 class="text-3xl font-black text-gray-900 dark:text-white">{{ $pendingContributions }} <span
-                                    class="text-sm font-bold text-orange-500">Registos</span></h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
             @if($authUser->isComissaoObra() || $authUser->isAdmin())
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <a href="{{ route('contributions.create') }}"
-                        class="glass-card p-6 rounded-3xl flex items-center gap-4 hover:border-blue-500/50 group transition-all">
-                        <div
-                            class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-500 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm">
-                            <i class="bi bi-plus-lg text-xl"></i>
-                        </div>
-                        <span
-                            class="text-sm font-black text-gray-700 dark:text-gray-200 uppercase tracking-widest">Registrar</span>
-                    </a>
-
-                    <a href="{{ route('contributions.index', ['status' => 'pendente']) }}"
-                        class="glass-card p-6 rounded-3xl flex items-center gap-4 hover:border-orange-500/50 group transition-all">
-                        <div
-                            class="w-12 h-12 rounded-xl bg-orange-50 dark:bg-orange-500/10 text-orange-500 flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-all shadow-sm">
-                            <i class="bi bi-shield-check text-xl"></i>
-                        </div>
-                        <span
-                            class="text-sm font-black text-gray-700 dark:text-gray-200 uppercase tracking-widest leading-tight">Validar</span>
-                    </a>
-
-                    <a href="{{ route('reports.global') }}"
-                        class="glass-card p-6 rounded-3xl flex items-center gap-4 hover:border-green-500/50 group transition-all">
-                        <div
-                            class="w-12 h-12 rounded-xl bg-green-50 dark:bg-green-500/10 text-green-500 flex items-center justify-center group-hover:bg-green-600 group-hover:text-white transition-all shadow-sm">
-                            <i class="bi bi-file-earmark-bar-graph text-xl"></i>
-                        </div>
-                        <span
-                            class="text-sm font-black text-gray-700 dark:text-gray-200 uppercase tracking-widest">Relatórios</span>
-                    </a>
-
+                <div class="flex flex-wrap items-center gap-2">
                     <a href="{{ route('dashboard.admin') }}"
-                        class="glass-card p-6 rounded-3xl flex items-center gap-4 hover:border-gray-500/50 group transition-all">
-                        <div
-                            class="w-12 h-12 rounded-xl bg-gray-50 dark:bg-gray-500/10 text-gray-400 flex items-center justify-center group-hover:bg-gray-600 group-hover:text-white transition-all shadow-sm">
-                            <i class="bi bi-arrow-left text-xl"></i>
-                        </div>
-                        <span
-                            class="text-sm font-black text-gray-700 dark:text-gray-200 uppercase tracking-widest">Painel Geral</span>
+                        class="inline-flex justify-center items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 shadow-sm">
+                        <i class="bi bi-arrow-left"></i> <span>Painel Geral</span>
+                    </a>
+                    <a href="{{ route('reports.global') }}"
+                        class="inline-flex justify-center items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 shadow-sm">
+                        <i class="bi bi-file-earmark-bar-graph text-orange-700"></i> <span>Relatórios</span>
+                    </a>
+                    <a href="{{ route('contributions.index', ['status' => 'pendente']) }}"
+                        class="inline-flex justify-center items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 shadow-sm">
+                        <i class="bi bi-shield-check text-amber-700"></i> <span>Validar ({{ $pendingContributions }})</span>
+                    </a>
+                    <a href="{{ route('contributions.create') }}"
+                        class="inline-flex justify-center items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-2 text-xs font-bold text-white hover:bg-orange-800 shadow-sm">
+                        <i class="bi bi-plus-lg"></i> <span>Registar</span>
                     </a>
                 </div>
             @endif
+        </header>
 
-            <!-- Main Charts -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Evolution Chart -->
-                <div class="lg:col-span-2 glass-card p-8 rounded-[2.5rem] relative overflow-hidden">
-                    <div class="flex items-center justify-between mb-8">
-                        <h3 class="text-xl font-black text-gray-900 dark:text-white flex items-center gap-3">
-                            <i class="bi bi-soundwave text-blue-500 text-2xl"></i> Fluxo Mensal
-                        </h3>
-                        <div
-                            class="px-4 py-1.5 bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 rounded-full text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">
-                            EDIFICAR v1.1</div>
+        <!-- Dashboard Stats -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+            <!-- Total Arrecadado -->
+            <article class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm">
+                <div class="flex items-center justify-between gap-2">
+                    <p class="text-[11px] sm:text-xs font-bold text-gray-500 truncate">Total Arrecadado</p>
+                    <i class="bi bi-bank2 text-blue-700 text-sm sm:text-base"></i>
+                </div>
+                <p class="mt-1 text-lg sm:text-2xl font-black text-gray-950 tracking-tight tabular-nums">
+                    {{ number_format($totalArrecadado, 2, ',', '.') }} MT
+                </p>
+                <p class="text-[10px] sm:text-[11px] text-gray-400 mt-0.5 truncate">Acumulado geral</p>
+            </article>
+
+            <!-- Este Mês -->
+            <article class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm">
+                <div class="flex items-center justify-between gap-2">
+                    <p class="text-[11px] sm:text-xs font-bold text-gray-500 truncate">Este Mês</p>
+                    <i class="bi bi-stars text-emerald-700 text-sm sm:text-base"></i>
+                </div>
+                <p class="mt-1 text-lg sm:text-2xl font-black text-emerald-700 tracking-tight tabular-nums">
+                    {{ number_format($arrecadadoMes, 2, ',', '.') }} MT
+                </p>
+                <p class="text-[10px] sm:text-[11px] text-gray-400 mt-0.5 truncate">Período corrente</p>
+            </article>
+
+            <!-- Membros Ativos -->
+            <article class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm">
+                <div class="flex items-center justify-between gap-2">
+                    <p class="text-[11px] sm:text-xs font-bold text-gray-500 truncate">Compromissos</p>
+                    <i class="bi bi-people text-indigo-700 text-sm sm:text-base"></i>
+                </div>
+                <p class="mt-1 text-lg sm:text-2xl font-black text-gray-950 tracking-tight tabular-nums">
+                    {{ $pacotes->sum('membros') }}
+                </p>
+                <p class="text-[10px] sm:text-[11px] text-gray-400 mt-0.5 truncate">Membros ativos</p>
+            </article>
+
+            <!-- Pendentes -->
+            <article class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm">
+                <div class="flex items-center justify-between gap-2">
+                    <p class="text-[11px] sm:text-xs font-bold text-gray-500 truncate">Validação Pendente</p>
+                    <i class="bi bi-clock-history text-amber-700 text-sm sm:text-base"></i>
+                </div>
+                <p class="mt-1 text-lg sm:text-2xl font-black text-amber-700 tracking-tight tabular-nums">
+                    {{ $pendingContributions }}
+                </p>
+                <p class="text-[10px] sm:text-[11px] text-gray-400 mt-0.5 truncate">Registos em análise</p>
+            </article>
+        </div>
+
+        <!-- Main Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <!-- Evolution Chart -->
+            <section class="lg:col-span-2 rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+                <div class="flex items-center justify-between gap-3 mb-4">
+                    <div>
+                        <h3 class="text-sm font-black text-gray-900">Fluxo Mensal</h3>
+                        <p class="text-xs text-gray-500">Evolução histórica de arrecadação</p>
                     </div>
-                    <div class="h-[350px]">
-                        <canvas id="evolutionChart"></canvas>
-                    </div>
+                    <span class="px-2.5 py-0.5 bg-orange-50 text-orange-800 rounded-full text-[10px] font-black uppercase tracking-wider">
+                        Edificar
+                    </span>
+                </div>
+                <div class="h-64 relative">
+                    <canvas id="evolutionChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Package Performance -->
+            <section class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+                <div class="mb-4">
+                    <h3 class="text-sm font-black text-gray-900">Desempenho por Pacote</h3>
+                    <p class="text-xs text-gray-500">Realizado vs Meta mensal</p>
                 </div>
 
-                <!-- Package Performance -->
-                <div class="glass-card p-8 rounded-[2.5rem]">
-                    <h3 class="text-xl font-black text-gray-900 dark:text-white flex items-center gap-3 mb-8">
-                        <i class="bi bi-layers-half text-blue-500 text-2xl"></i> Desempenho / Pacote
-                    </h3>
-
-                    <div class="space-y-8 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                        @foreach($pacotes as $pacote)
-                            <div class="space-y-3 group">
-                                <div class="flex justify-between items-end">
-                                    <div class="flex flex-col">
-                                        <span
-                                            class="text-sm font-black text-gray-800 dark:text-white uppercase tracking-wider">{{ $pacote['name'] }}</span>
-                                        <span
-                                            class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{{ $pacote['membros'] }}
-                                            Membros</span>
-                                    </div>
-                                    <div class="text-right">
-                                        <div class="text-sm font-black text-blue-600 dark:text-blue-400">
-                                            {{ number_format($pacote['arrecadado'], 0, ',', '.') }} MT</div>
-                                        <div class="text-[10px] font-bold text-gray-500 dark:text-gray-600 uppercase">Meta:
-                                            {{ number_format($pacote['esperado'], 0, ',', '.') }} MT</div>
-                                    </div>
-                                </div>
-                                <div
-                                    class="relative w-full bg-gray-100 dark:bg-white/5 rounded-full h-3 p-[2px] overflow-hidden border border-gray-200 dark:border-white/5">
-                                    <div class="absolute inset-y-0 left-0 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-full transition-all duration-1000 group-hover:brightness-110"
-                                        style="width: {{ min($pacote['percentual'], 100) }}%">
-                                    </div>
-                                </div>
-                                <div class="flex justify-end">
-                                    <span
-                                        class="text-[11px] font-black @if($pacote['percentual'] >= 80) text-green-500 @elseif($pacote['percentual'] >= 40) text-blue-500 @else text-gray-400 @endif">
-                                        {{ $pacote['percentual'] }}%
-                                    </span>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-
-            <!-- Lower Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Zone Breakdown -->
-                <div class="glass-card p-8 rounded-[2.5rem]">
-                    <h3 class="text-xl font-black text-gray-900 dark:text-white flex items-center gap-3 mb-8">
-                        <i class="bi bi-geo-alt-fill text-orange-500 text-2xl"></i> Distribuição por Zona
-                    </h3>
-                    <div class="h-[300px]">
-                        <canvas id="zoneChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Top Células -->
-                <div class="glass-card p-8 rounded-[2.5rem]">
-                    <div class="flex items-center justify-between mb-8">
-                        <h3 class="text-xl font-black text-gray-900 dark:text-white flex items-center gap-3">
-                            <i class="bi bi-trophy-fill text-yellow-500 text-2xl"></i> Top Células
-                        </h3>
-                        <a href="{{ route('reports.cell') }}"
-                            class="text-[10px] font-black text-gray-400 hover:text-blue-500 uppercase tracking-widest transition-colors">Ver
-                            Todas <i class="bi bi-arrow-right"></i></a>
-                    </div>
-
-                    <div class="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                        @forelse($topCells as $index => $cell)
-                            <div
-                                class="flex items-center p-5 bg-gray-50 dark:bg-white/[0.03] rounded-2xl hover:bg-gray-100 dark:hover:bg-white/[0.08] hover:border-gray-200 dark:hover:border-white/10 border border-transparent transition-all group">
-                                <div
-                                    class="w-10 h-10 rounded-xl bg-white dark:bg-white/5 shadow-sm flex items-center justify-center font-black text-gray-400 md:mr-4 group-hover:bg-yellow-500 group-hover:text-white transition-all text-sm">
-                                    {{ $index + 1 }}
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <p class="font-bold text-gray-900 dark:text-white text-base truncate">{{ $cell['name'] }}</p>
-                                    <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Destaque
-                                        Edificar</p>
+                <div class="space-y-4 max-h-64 overflow-y-auto pr-1 custom-scrollbar">
+                    @foreach($pacotes as $pacote)
+                        <div class="space-y-1.5 border-b border-gray-100 pb-3 last:border-0 last:pb-0">
+                            <div class="flex justify-between items-end">
+                                <div>
+                                    <span class="text-xs font-bold text-gray-900">{{ $pacote['name'] }}</span>
+                                    <span class="block text-[10px] text-gray-500">{{ $pacote['membros'] }} Membros</span>
                                 </div>
                                 <div class="text-right">
-                                    <p class="font-black text-green-600 dark:text-green-400 text-lg tracking-tight">
-                                        {{ number_format($cell['total'], 0, ',', '.') }} <span
-                                            class="text-xs font-bold opacity-60">MT</span>
-                                    </p>
+                                    <div class="text-xs font-black text-gray-950 tabular-nums">
+                                        {{ number_format($pacote['arrecadado'], 0, ',', '.') }} MT
+                                    </div>
+                                    <div class="text-[10px] text-gray-400 tabular-nums">
+                                        Meta: {{ number_format($pacote['esperado'], 0, ',', '.') }} MT
+                                    </div>
                                 </div>
                             </div>
-                        @empty
-                            <div class="flex flex-col items-center justify-center py-12 opacity-40">
-                                <i class="bi bi-inbox text-4xl mb-2 text-gray-400"></i>
-                                <p class="text-xs font-bold uppercase tracking-widest text-gray-400">Sem movimentação este
-                                    mês</p>
+                            <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                                <div class="bg-orange-600 h-full rounded-full transition-all"
+                                    style="width: {{ min($pacote['percentual'], 100) }}%">
+                                </div>
                             </div>
-                        @endforelse
-                    </div>
+                            <div class="flex justify-end">
+                                <span class="text-[10px] font-black tabular-nums @if($pacote['percentual'] >= 80) text-emerald-700 @elseif($pacote['percentual'] >= 40) text-orange-700 @else text-gray-500 @endif">
+                                    {{ $pacote['percentual'] }}%
+                                </span>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
-            </div>
+            </section>
+        </div>
+
+        <!-- Lower Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- Zone Breakdown -->
+            <section class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+                <div class="mb-4">
+                    <h3 class="text-sm font-black text-gray-900">Distribuição por Zona</h3>
+                    <p class="text-xs text-gray-500">Contributo territorial para o projeto</p>
+                </div>
+                <div class="h-64 relative">
+                    <canvas id="zoneChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Top Células -->
+            <section class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+                <div class="flex items-center justify-between gap-3 mb-4">
+                    <div>
+                        <h3 class="text-sm font-black text-gray-900">Top Células</h3>
+                        <p class="text-xs text-gray-500">Destaques do período</p>
+                    </div>
+                    <a href="{{ route('reports.cell') }}" class="text-xs font-bold text-orange-800 hover:underline">
+                        Ver Todas
+                    </a>
+                </div>
+
+                <div class="space-y-2.5 max-h-64 overflow-y-auto pr-1 custom-scrollbar">
+                    @forelse($topCells as $index => $cell)
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-200/80">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-7 h-7 rounded-lg bg-white border border-gray-200 flex items-center justify-center font-black text-gray-700 text-xs shrink-0">
+                                    {{ $index + 1 }}
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="font-bold text-gray-900 text-xs sm:text-sm truncate">{{ $cell['name'] }}</p>
+                                    <p class="text-[10px] text-gray-500">Destaque Edificar</p>
+                                </div>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <p class="font-black text-emerald-700 text-sm tabular-nums">
+                                    {{ number_format($cell['total'], 0, ',', '.') }} MT
+                                </p>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="py-10 text-center">
+                            <p class="text-xs text-gray-500">Sem movimentação este mês</p>
+                        </div>
+                    @endforelse
+                </div>
+            </section>
         </div>
 
         <script>
@@ -324,7 +209,6 @@
                 const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
 
                 Chart.defaults.color = textColor;
-                Chart.defaults.font.family = "'Outfit', sans-serif";
                 Chart.defaults.font.weight = '600';
 
                 // Evolution Chart
@@ -341,7 +225,7 @@
                             label: 'Total Arrecadado',
                             data: {!! json_encode($evolucaoMensal->pluck('total')) !!},
                             borderColor: '#3b82f6',
-                            borderWidth: 4,
+                            borderWidth: 3,
                             pointBackgroundColor: '#fff',
                             pointBorderColor: '#3b82f6',
                             pointBorderWidth: 2,
@@ -363,8 +247,8 @@
                                 backgroundColor: isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)',
                                 titleColor: isDark ? '#fff' : '#111827',
                                 bodyColor: isDark ? '#94a3b8' : '#4b5563',
-                                padding: 12,
-                                borderRadius: 12,
+                                padding: 10,
+                                borderRadius: 8,
                                 displayColors: false,
                                 callbacks: {
                                     label: (context) => `Total: ${new Intl.NumberFormat('pt-MZ').format(context.raw)} MT`
@@ -395,10 +279,10 @@
                         labels: @json($zoneStats->pluck('name')),
                         datasets: [{
                             data: @json($zoneStats->pluck('total')),
-                            backgroundColor: 'rgba(249, 115, 22, 0.4)',
+                            backgroundColor: 'rgba(249, 115, 22, 0.75)',
                             borderColor: '#f97316',
                             borderWidth: 1,
-                            borderRadius: 8,
+                            borderRadius: 6,
                         }]
                     },
                     options: {

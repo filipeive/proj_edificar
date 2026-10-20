@@ -5,297 +5,194 @@
 @section('page-subtitle', 'Consolidação Geral de Métricas e Performance Financeira')
 
 @section('content')
-    <div class="min-h-screen bg-gray-100 dark:bg-[#05060f] p-4 md:p-8 -m-4 md:-m-8 transition-all duration-500">
-        <style>
-            @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;300;400;500;700;900&display=swap');
+    <div class="space-y-5">
+        <!-- Header Section -->
+        <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 sm:gap-4">
+            <div>
+                <p class="text-[10px] sm:text-xs font-black uppercase tracking-[0.18em] text-orange-700">Projecto Edificar</p>
+                <h1 class="mt-0.5 text-xl sm:text-2xl font-black text-gray-950 tracking-tight">Relatório Global</h1>
+                <p class="mt-0.5 text-xs sm:text-sm text-gray-500">Análise detalhada de contribuições, zonas e estrutura ministerial.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+                <a href="{{ route('reports.export.pdf', array_merge(['type' => 'global'], request()->query())) }}"
+                    class="inline-flex justify-center items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3.5 py-2 text-xs font-bold text-red-700 hover:bg-red-50 shadow-sm">
+                    <i class="bi bi-file-earmark-pdf"></i> <span>PDF</span>
+                </a>
+                <a href="{{ route('reports.export.excel', array_merge(['type' => 'global'], request()->query())) }}"
+                    class="inline-flex justify-center items-center gap-1.5 rounded-lg border border-green-200 bg-white px-3.5 py-2 text-xs font-bold text-green-800 hover:bg-green-50 shadow-sm">
+                    <i class="bi bi-file-earmark-spreadsheet"></i> <span>Excel</span>
+                </a>
+                <a href="{{ route('reports.export.excel', ['type' => 'structure']) }}"
+                    class="inline-flex justify-center items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-2 text-xs font-bold text-white hover:bg-orange-800 shadow-sm">
+                    <i class="bi bi-diagram-3"></i> <span>Estrutura</span>
+                </a>
+            </div>
+        </header>
 
-            .font-outfit {
-                font-family: 'Outfit', sans-serif;
-            }
-
-            .glass-card {
-                background: var(--bg-secondary);
-                backdrop-filter: blur(20px);
-                border: 1px solid var(--border-color);
-                box-shadow: 0 10px 25px -5px var(--shadow);
-                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            }
-
-            [data-theme="dark"] .glass-card {
-                background: rgba(255, 255, 255, 0.02);
-                border: 1px solid rgba(255, 255, 255, 0.05);
-            }
-
-            .glass-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 20px 40px -10px var(--shadow);
-            }
-
-            .custom-scrollbar::-webkit-scrollbar {
-                width: 4px;
-                height: 4px;
-            }
-
-            .custom-scrollbar::-webkit-scrollbar-track {
-                background: transparent;
-            }
-
-            .custom-scrollbar::-webkit-scrollbar-thumb {
-                background: rgba(0, 0, 0, 0.1);
-                border-radius: 10px;
-            }
-
-            [data-theme="dark"] .custom-scrollbar::-webkit-scrollbar-thumb {
-                background: rgba(255, 255, 255, 0.1);
-            }
-        </style>
-
-        <div class="w-full mx-auto space-y-8 font-outfit transition-all duration-500">
-            <!-- Header Section -->
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div>
-                    <h2 class="text-4xl font-black tracking-tighter text-gray-900 dark:text-white">Relatório <span
-                            class="text-blue-500">Global</span></h2>
-                    <p class="text-gray-500 dark:text-gray-400 font-medium">Análise detalhada de contribuições e zonas</p>
+        <!-- Filters Section -->
+        <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+            <form action="{{ route('reports.global') }}" method="GET"
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
+                <div class="lg:col-span-3">
+                    <label class="mb-1 block text-[10px] font-black uppercase tracking-wider text-gray-500">Data Início</label>
+                    <input type="date" name="start_date"
+                        value="{{ request('start_date', $startDate->format('Y-m-d')) }}"
+                        class="w-full rounded-lg border-gray-300 text-xs sm:text-sm py-2 px-3 font-semibold text-gray-800">
                 </div>
-                <div class="flex flex-wrap items-center gap-3">
-                    <a href="{{ route('reports.export.pdf', array_merge(['type' => 'global'], request()->query())) }}"
-                        class="px-5 py-3 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-2xl border border-red-100 dark:border-red-500/20 hover:bg-red-600 hover:text-white dark:hover:bg-red-600 dark:hover:text-white transition-all font-black text-xs uppercase tracking-widest flex items-center shadow-sm">
-                        <i class="bi bi-file-pdf mr-2 text-lg"></i> PDF
+                <div class="lg:col-span-3">
+                    <label class="mb-1 block text-[10px] font-black uppercase tracking-wider text-gray-500">Data Fim</label>
+                    <input type="date" name="end_date"
+                        value="{{ request('end_date', $endDate->format('Y-m-d')) }}"
+                        class="w-full rounded-lg border-gray-300 text-xs sm:text-sm py-2 px-3 font-semibold text-gray-800">
+                </div>
+                <div class="lg:col-span-2">
+                    <label class="mb-1 block text-[10px] font-black uppercase tracking-wider text-gray-500">Zona</label>
+                    <select name="zone_id"
+                        class="w-full rounded-lg border-gray-300 text-xs sm:text-sm py-2 px-3 font-semibold text-gray-800">
+                        <option value="">Todas</option>
+                        @foreach($allZones as $zone)
+                            <option value="{{ $zone->id }}" {{ request('zone_id') == $zone->id ? 'selected' : '' }}>
+                                {{ $zone->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="lg:col-span-2">
+                    <label class="mb-1 block text-[10px] font-black uppercase tracking-wider text-gray-500">Status</label>
+                    <select name="status"
+                        class="w-full rounded-lg border-gray-300 text-xs sm:text-sm py-2 px-3 font-semibold text-gray-800">
+                        <option value="">Todos</option>
+                        <option value="verificada" {{ request('status') == 'verificada' ? 'selected' : '' }}>Verificada</option>
+                        <option value="pendente" {{ request('status') == 'pendente' ? 'selected' : '' }}>Pendente</option>
+                        <option value="rejeitada" {{ request('status') == 'rejeitada' ? 'selected' : '' }}>Rejeitada</option>
+                    </select>
+                </div>
+                <div class="lg:col-span-2 flex items-center gap-2">
+                    <button type="submit"
+                        class="flex-1 rounded-lg bg-gray-900 px-3.5 py-2 text-xs font-bold text-white hover:bg-gray-800 transition shadow-sm">
+                        <i class="bi bi-funnel mr-1"></i> Filtrar
+                    </button>
+                    <a href="{{ route('reports.global') }}"
+                        class="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 shadow-sm"
+                        title="Limpar Filtros">
+                        <i class="bi bi-arrow-counterclockwise"></i>
                     </a>
-                    <a href="{{ route('reports.export.excel', array_merge(['type' => 'global'], request()->query())) }}"
-                        class="px-5 py-3 bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-400 rounded-2xl border border-green-100 dark:border-green-500/20 hover:bg-green-600 hover:text-white dark:hover:bg-green-600 dark:hover:text-white transition-all font-black text-xs uppercase tracking-widest flex items-center shadow-sm">
-                        <i class="bi bi-file-excel mr-2 text-lg"></i> Excel
-                    </a>
-                    <a href="{{ route('reports.export.excel', ['type' => 'structure']) }}"
-                        class="px-5 py-3 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-all font-black text-xs uppercase tracking-widest flex items-center shadow-lg shadow-blue-500/30">
-                        <i class="bi bi-diagram-3 mr-2 text-lg"></i> Estrutura
-                    </a>
                 </div>
-            </div>
-
-            <!-- Filters Section -->
-            <div class="glass-card p-6 md:p-8 rounded-[2rem]">
-                <form action="{{ route('reports.global') }}" method="GET"
-                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 items-end">
-                    <div class="lg:col-span-3 space-y-2">
-                        <label
-                            class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">Data
-                            Início</label>
-                        <div class="relative">
-                            <i
-                                class="bi bi-calendar-event absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
-                            <input type="date" name="start_date"
-                                value="{{ request('start_date', $startDate->format('Y-m-d')) }}"
-                                class="w-full pl-11 pr-5 py-3 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl text-gray-700 dark:text-gray-200 font-bold focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
-                        </div>
-                    </div>
-                    <div class="lg:col-span-3 space-y-2">
-                        <label
-                            class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">Data
-                            Fim</label>
-                        <div class="relative">
-                            <i
-                                class="bi bi-calendar-check absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
-                            <input type="date" name="end_date" value="{{ request('end_date', $endDate->format('Y-m-d')) }}"
-                                class="w-full pl-11 pr-5 py-3 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl text-gray-700 dark:text-gray-200 font-bold focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
-                        </div>
-                    </div>
-                    <div class="lg:col-span-2 space-y-2">
-                        <label
-                            class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">Zona</label>
-                        <div class="relative">
-                            <select name="zone_id"
-                                class="w-full px-5 py-3 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl text-gray-700 dark:text-gray-200 font-bold focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all appearance-none cursor-pointer">
-                                <option value="">Todas</option>
-                                @foreach($allZones as $zone)
-                                    <option value="{{ $zone->id }}" {{ request('zone_id') == $zone->id ? 'selected' : '' }}>
-                                        {{ $zone->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <i
-                                class="bi bi-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none text-xs"></i>
-                        </div>
-                    </div>
-                    <div class="lg:col-span-2 space-y-2">
-                        <label
-                            class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">Status</label>
-                        <div class="relative">
-                            <select name="status"
-                                class="w-full px-5 py-3 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl text-gray-700 dark:text-gray-200 font-bold focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all appearance-none cursor-pointer">
-                                <option value="">Todos</option>
-                                <option value="verificada" {{ request('status') == 'verificada' ? 'selected' : '' }}>
-                                    Verificada
-                                </option>
-                                <option value="pendente" {{ request('status') == 'pendente' ? 'selected' : '' }}>Pendente
-                                </option>
-                                <option value="rejeitada" {{ request('status') == 'rejeitada' ? 'selected' : '' }}>Rejeitada
-                                </option>
-                            </select>
-                            <i
-                                class="bi bi-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none text-xs"></i>
-                        </div>
-                    </div>
-                    <div class="lg:col-span-2 flex items-center gap-2">
-                        <button type="submit"
-                            class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-blue-500/20 h-[50px]">
-                            Filtrar
-                        </button>
-                        <a href="{{ route('reports.global') }}"
-                            class="w-[50px] h-[50px] flex items-center justify-center bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 rounded-2xl transition-all border border-transparent dark:border-white/5"
-                            title="Limpar Filtros">
-                            <i class="bi bi-arrow-counterclockwise text-xl"></i>
-                        </a>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Stats & Chart Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Total Card -->
-                <div class="glass-card p-8 rounded-[2.5rem] relative overflow-hidden group">
-                    <div
-                        class="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-700">
-                        <i class="bi bi-cash-stack text-9xl text-blue-500"></i>
-                    </div>
-                    <div class="relative z-10 flex flex-col h-full justify-between gap-8">
-                        <div>
-                            <div
-                                class="w-16 h-16 rounded-2xl bg-blue-50 dark:bg-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-500/30 mb-6">
-                                <i class="bi bi-wallet2 text-3xl"></i>
-                            </div>
-                            <h3 class="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">
-                                Total Filtrado</h3>
-                            <p class="text-5xl font-black text-gray-900 dark:text-white tracking-tighter">
-                                {{ number_format($total, 0, ',', '.') }}<span
-                                    class="text-2xl ml-2 text-blue-500 font-bold">MT</span>
-                            </p>
-                        </div>
-                        <div
-                            class="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/5 w-fit">
-                            <i class="bi bi-calendar-range text-gray-400"></i>
-                            <span class="text-xs font-bold text-gray-600 dark:text-gray-400">
-                                {{ $startDate->format('d/m/Y') }} — {{ $endDate->format('d/m/Y') }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chart Card -->
-                <div class="lg:col-span-2 glass-card p-8 rounded-[2.5rem] flex flex-col">
-                    <h3 class="text-xl font-black text-gray-900 dark:text-white flex items-center gap-3 mb-6">
-                        <i class="bi bi-pie-chart-fill text-orange-500 text-2xl"></i> Distribuição por Zona
-                    </h3>
-                    <div class="flex-1 min-h-[300px] relative">
-                        <canvas id="zoneChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Table Section -->
-            <div class="glass-card rounded-[2.5rem] overflow-hidden">
-                <div
-                    class="p-8 border-b border-gray-100 dark:border-white/5 flex flex-wrap items-center justify-between gap-4">
-                    <h3 class="text-xl font-black text-gray-900 dark:text-white flex items-center gap-3">
-                        <i class="bi bi-table text-purple-500 text-2xl"></i> Detalhamento
-                    </h3>
-                    <span
-                        class="px-4 py-1.5 bg-gray-100 dark:bg-white/5 rounded-full text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">
-                        {{ $contributions->count() }} Registros
-                    </span>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead>
-                            <tr class="bg-gray-50/50 dark:bg-white/[0.02] border-b border-gray-100 dark:border-white/5">
-                                <th
-                                    class="px-8 py-5 text-left text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
-                                    Doador</th>
-                                <th
-                                    class="px-8 py-5 text-left text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
-                                    Origem</th>
-                                <th
-                                    class="px-8 py-5 text-center text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
-                                    Status</th>
-                                <th
-                                    class="px-8 py-5 text-right text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
-                                    Valor</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100 dark:divide-white/5">
-                            @forelse($contributions as $contribution)
-                                <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors group">
-                                    <td class="px-8 py-5">
-                                        <div class="flex items-center gap-4">
-                                            <div
-                                                class="w-10 h-10 rounded-xl bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-300 flex items-center justify-center font-black text-sm group-hover:bg-blue-500 group-hover:text-white transition-all shadow-sm">
-                                                {{ substr($contribution->user->name, 0, 1) }}
-                                            </div>
-                                            <div class="flex flex-col">
-                                                <span
-                                                    class="text-sm font-bold text-gray-900 dark:text-white">{{ $contribution->user->name }}</span>
-                                                <span
-                                                    class="text-[10px] text-gray-400 uppercase tracking-widest">{{ $contribution->contribution_date->format('d/m/Y') }}</span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-8 py-5">
-                                        <div class="flex flex-col">
-                                            <span class="text-xs font-bold text-gray-700 dark:text-gray-300">
-                                                {{ $contribution->zone->name ?? 'N/A' }}
-                                            </span>
-                                            <span class="text-[10px] text-gray-400 uppercase tracking-wider">
-                                                {{ $contribution->user->cell->name ?? 'Sem Célula' }}
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td class="px-8 py-5 text-center">
-                                        @php
-                                            $statusClasses = match ($contribution->status) {
-                                                'verificada' => 'bg-green-50 text-green-600 border-green-100 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20',
-                                                'pendente' => 'bg-orange-50 text-orange-600 border-orange-100 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/20',
-                                                'rejeitada' => 'bg-red-50 text-red-600 border-red-100 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20',
-                                                default => 'bg-gray-50 text-gray-600 border-gray-100',
-                                            };
-                                        @endphp
-                                        <span
-                                            class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border {{ $statusClasses }}">
-                                            {{ $contribution->status }}
-                                        </span>
-                                    </td>
-                                    <td class="px-8 py-5 text-right">
-                                        <span class="text-sm font-black text-gray-900 dark:text-white">
-                                            {{ number_format($contribution->amount, 0, ',', '.') }} <span
-                                                class="text-[10px] text-gray-400 dark:text-gray-500 font-bold ml-0.5">MT</span>
-                                        </span>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="px-8 py-16 text-center">
-                                        <div class="flex flex-col items-center gap-3">
-                                            <div
-                                                class="w-16 h-16 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center text-gray-300 dark:text-gray-600">
-                                                <i class="bi bi-search text-3xl"></i>
-                                            </div>
-                                            <p
-                                                class="text-sm font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
-                                                Nenhum registro encontrado</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-                @if($contributions instanceof \Illuminate\Pagination\LengthAwarePaginator)
-                    <div class="p-6 border-t border-gray-100 dark:border-white/5">
-                        {{ $contributions->links() }}
-                    </div>
-                @endif
-            </div>
+            </form>
         </div>
+
+        <!-- Stats & Chart Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <!-- Total Card -->
+            <article class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between gap-2">
+                        <p class="text-[11px] sm:text-xs font-bold text-gray-500 truncate">Total Filtrado</p>
+                        <i class="bi bi-wallet2 text-emerald-700 text-sm sm:text-base"></i>
+                    </div>
+                    <p class="mt-2 text-2xl sm:text-3xl font-black text-gray-950 tracking-tight tabular-nums">
+                        {{ number_format($total, 0, ',', '.') }} <span class="text-sm font-bold text-emerald-700">MT</span>
+                    </p>
+                    <p class="text-xs text-gray-500 mt-1">Soma consolidada dos registos filtrados</p>
+                </div>
+                <div class="mt-4 pt-3 border-t border-gray-100 flex items-center gap-2 text-xs font-semibold text-gray-600 tabular-nums">
+                    <i class="bi bi-calendar-range text-orange-700"></i>
+                    <span>{{ $startDate->format('d/m/Y') }} — {{ $endDate->format('d/m/Y') }}</span>
+                </div>
+            </article>
+
+            <!-- Chart Card -->
+            <section class="lg:col-span-2 rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+                <div class="mb-4">
+                    <h3 class="text-sm font-black text-gray-900">Distribuição por Zona</h3>
+                    <p class="text-xs text-gray-500">Montante arrecadado por zona pastoral</p>
+                </div>
+                <div class="h-64 relative">
+                    <canvas id="zoneChart"></canvas>
+                </div>
+            </section>
+        </div>
+
+        <!-- Table Section -->
+        <section class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+            <div class="p-4 sm:p-5 border-b border-gray-200 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h3 class="text-sm font-black text-gray-900">Detalhamento de Contribuições</h3>
+                    <p class="text-xs text-gray-500">Lista de lançamentos no período</p>
+                </div>
+                <span class="px-2.5 py-0.5 bg-gray-100 rounded-full text-xs font-bold text-gray-600">
+                    {{ $contributions->count() }} Registos
+                </span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-gray-50 text-[10px] font-black uppercase tracking-wider text-gray-500 border-b border-gray-200">
+                        <tr>
+                            <th class="px-4 py-3">Doador</th>
+                            <th class="px-4 py-3">Origem</th>
+                            <th class="px-4 py-3 text-center">Status</th>
+                            <th class="px-4 py-3 text-right">Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 text-sm">
+                        @forelse($contributions as $contribution)
+                            <tr class="hover:bg-gray-50/80 transition-colors">
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="w-8 h-8 rounded-lg bg-gray-100 text-gray-700 flex items-center justify-center font-black text-xs shrink-0">
+                                            {{ substr($contribution->user->name, 0, 1) }}
+                                        </div>
+                                        <div class="flex flex-col">
+                                            <span class="text-xs sm:text-sm font-bold text-gray-900">{{ $contribution->user->name }}</span>
+                                            <span class="text-[11px] text-gray-500 tabular-nums">{{ $contribution->contribution_date->format('d/m/Y') }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex flex-col">
+                                        <span class="text-xs font-bold text-gray-800">
+                                            {{ $contribution->zone->name ?? 'N/A' }}
+                                        </span>
+                                        <span class="text-[11px] text-gray-500">
+                                            {{ $contribution->user->cell->name ?? 'Sem Célula' }}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    @php
+                                        $statusClasses = match ($contribution->status) {
+                                            'verificada' => 'bg-green-100 text-green-800',
+                                            'pendente' => 'bg-amber-100 text-amber-800',
+                                            'rejeitada' => 'bg-red-100 text-red-800',
+                                            default => 'bg-gray-100 text-gray-600',
+                                        };
+                                    @endphp
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase {{ $statusClasses }}">
+                                        {{ $contribution->status }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-right">
+                                    <span class="text-xs sm:text-sm font-black text-gray-950 tabular-nums">
+                                        {{ number_format($contribution->amount, 0, ',', '.') }} MT
+                                    </span>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="px-4 py-10 text-center text-xs text-gray-500">
+                                    Nenhum registo encontrado.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            @if($contributions instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                <div class="p-4 border-t border-gray-200">
+                    {{ $contributions->links() }}
+                </div>
+            @endif
+        </section>
 
         <!-- Chart Script -->
         <script>
@@ -305,7 +202,6 @@
                 const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
 
                 Chart.defaults.color = textColor;
-                Chart.defaults.font.family = "'Outfit', sans-serif";
                 Chart.defaults.font.weight = '600';
 
                 const ctx = document.getElementById('zoneChart').getContext('2d');
@@ -316,11 +212,11 @@
                         datasets: [{
                             label: 'Total Arrecadado',
                             data: @json($zoneStats->pluck('total')),
-                            backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                            backgroundColor: 'rgba(234, 88, 12, 0.85)',
                             borderColor: 'transparent',
                             borderRadius: 6,
-                            barThickness: 30,
-                            hoverBackgroundColor: '#2563eb'
+                            barThickness: 28,
+                            hoverBackgroundColor: '#c2410c'
                         }]
                     },
                     options: {
@@ -334,8 +230,8 @@
                                 backgroundColor: isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)',
                                 titleColor: isDark ? '#fff' : '#111827',
                                 bodyColor: isDark ? '#94a3b8' : '#4b5563',
-                                padding: 12,
-                                borderRadius: 12,
+                                padding: 10,
+                                borderRadius: 8,
                                 displayColors: false,
                                 callbacks: {
                                     label: (context) => `Total: ${new Intl.NumberFormat('pt-MZ').format(context.raw)} MT`
@@ -351,19 +247,13 @@
                                 },
                                 ticks: {
                                     callback: (value) => value >= 1000 ? `${value / 1000}k` : value,
-                                    font: {
-                                        size: 10
-                                    }
+                                    font: { size: 10 }
                                 }
                             },
                             x: {
-                                grid: {
-                                    display: false
-                                },
+                                grid: { display: false },
                                 ticks: {
-                                    font: {
-                                        size: 10
-                                    },
+                                    font: { size: 10 },
                                     maxRotation: 45,
                                     minRotation: 45
                                 }

@@ -15,56 +15,63 @@
 @endsection
 
 @section('content')
-    <div class="space-y-6">
-        <div class="bg-white rounded-[1.5rem] sm:rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-            <div class="px-6 py-5 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center">
-                        <i class="bi bi-exclamation-triangle-fill"></i>
+    <div class="space-y-5">
+        <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 sm:gap-4">
+            <div>
+                <p class="text-[10px] sm:text-xs font-black uppercase tracking-[0.18em] text-orange-700">Tesouraria & Validação</p>
+                <h1 class="mt-0.5 text-xl sm:text-2xl font-black text-gray-950 tracking-tight">Contribuições Pendentes</h1>
+                <p class="mt-0.5 text-xs sm:text-sm text-gray-500">{{ $contributions->total() }} contribuições aguardam validação</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+                <a href="{{ route('contributions.index', ['status' => 'pendente']) }}"
+                    class="inline-flex justify-center items-center gap-1.5 rounded-lg bg-orange-700 px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-white hover:bg-orange-800 shadow-sm">
+                    <i class="bi bi-arrow-clockwise"></i> <span>Atualizar</span>
+                </a>
+            </div>
+        </header>
+
+        <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+            <div class="px-4 py-3 border-b border-gray-200 bg-gray-50/50 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-orange-50 text-orange-700 border border-orange-200 flex items-center justify-center">
+                        <i class="bi bi-exclamation-triangle-fill text-xs"></i>
                     </div>
                     <div>
-                        <p class="text-xs font-black text-gray-400 uppercase tracking-widest">Pendentes</p>
-                        <p class="text-lg font-black text-gray-900">{{ $contributions->total() }} contribuições</p>
+                        <p class="text-xs font-black text-gray-900 uppercase tracking-wider">Registos Pendentes ({{ $contributions->total() }})</p>
                     </div>
-                </div>
-                <div class="hidden md:flex items-center gap-2">
-                    <a href="{{ route('contributions.index', ['status' => 'pendente']) }}"
-                        class="bg-orange-600 text-white px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-700 transition-all shadow-lg shadow-orange-100">
-                        <i class="bi bi-arrow-clockwise mr-2"></i>Atualizar
-                    </a>
                 </div>
             </div>
 
             <div class="overflow-x-auto">
                 <table class="w-full table-compact">
-                    <thead>
-                        <tr class="bg-gray-50/50">
-                            <th class="px-6 py-3 text-left text-[10px] font-black uppercase tracking-widest text-gray-400">Membro</th>
-                            <th class="hidden md:table-cell px-6 py-3 text-left text-[10px] font-black uppercase tracking-widest text-gray-400">Célula</th>
-                            <th class="px-6 py-3 text-left text-[10px] font-black uppercase tracking-widest text-gray-400">Valor</th>
-                            <th class="hidden md:table-cell px-6 py-3 text-left text-[10px] font-black uppercase tracking-widest text-gray-400">Data</th>
-                            <th class="px-6 py-3 text-right text-[10px] font-black uppercase tracking-widest text-gray-400">Ações</th>
+                    <thead class="bg-gray-50 text-[10px] font-black uppercase tracking-wider text-gray-500 border-b border-gray-200">
+                        <tr>
+                            <th class="px-4 py-3 text-left">Membro</th>
+                            <th class="hidden md:table-cell px-4 py-3 text-left">Célula</th>
+                            <th class="px-4 py-3 text-left">Valor</th>
+                            <th class="hidden md:table-cell px-4 py-3 text-left">Data</th>
+                            <th class="px-4 py-3 text-right">Ações</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="divide-y divide-gray-100 text-sm">
                         @forelse($contributions as $contribution)
-                            <tr class="border-t border-gray-100 hover:bg-gray-50/60">
-                                <td class="px-6 py-4">
+                            <tr class="hover:bg-gray-50/60">
+                                <td class="px-4 py-3">
                                     <div class="flex flex-col">
-                                        <span class="text-sm font-black text-gray-900 line-clamp-1">{{ $contribution->user->name }}</span>
-                                        <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Pendente</span>
+                                        <span class="text-xs sm:text-sm font-bold text-gray-900 line-clamp-1">{{ $contribution->user->name }}</span>
+                                        <span class="text-[10px] text-amber-600 font-bold uppercase tracking-wider">Pendente</span>
                                     </div>
                                 </td>
-                                <td class="hidden md:table-cell px-6 py-4 text-xs font-bold text-gray-600">
+                                <td class="hidden md:table-cell px-4 py-3 text-xs font-semibold text-gray-600">
                                     {{ $contribution->cell->name }}
                                 </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-sm font-black text-gray-900">{{ number_format($contribution->amount, 2, ',', '.') }} MT</span>
+                                <td class="px-4 py-3">
+                                    <span class="text-xs sm:text-sm font-black text-emerald-700">{{ number_format($contribution->amount, 2, ',', '.') }} MT</span>
                                 </td>
-                                <td class="hidden md:table-cell px-6 py-4 text-xs font-bold text-gray-500">
+                                <td class="hidden md:table-cell px-4 py-3 text-xs font-semibold text-gray-500">
                                     {{ $contribution->contribution_date->format('d/m/Y') }}
                                 </td>
-                                <td class="px-6 py-4 text-right">
+                                <td class="px-4 py-3 text-right">
                                     <div class="flex items-center justify-end gap-1">
                                         <a href="{{ route('admin.contributions.show', $contribution) }}"
                                             class="action-icon bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white shadow-sm"

@@ -1,106 +1,80 @@
 @extends('layouts.app')
 
+@section('title', 'Mesclar Supervisão - Portal Life Church')
 @section('page-title', 'Mesclar Supervisão')
 @section('page-subtitle', 'Transfira dados e exclua supervisões duplicadas com segurança.')
 
 @section('content')
-    <div class="w-full space-y-8">
-        <!-- Header Card -->
-        <div class="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-sm border border-gray-100 relative overflow-hidden group">
-            <div
-                class="absolute top-0 right-0 w-64 h-64 bg-red-50/50 rounded-full -mr-32 -mt-32 transition-transform group-hover:scale-110 duration-700">
+    <div class="space-y-5">
+        <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 sm:gap-4">
+            <div>
+                <p class="text-[10px] sm:text-xs font-black uppercase tracking-[0.18em] text-red-600">Ação de Manutenção</p>
+                <h1 class="mt-0.5 text-xl sm:text-2xl font-black text-gray-950 tracking-tight">Mesclar Supervisão</h1>
+                <p class="mt-0.5 text-xs sm:text-sm text-gray-500">
+                    Origem a ser excluída: <strong class="text-red-600">{{ $sourceSupervision->name }}</strong>
+                </p>
             </div>
-
-            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-                <div class="flex flex-col md:flex-row items-center gap-8 text-center md:text-left">
-                    <div
-                        class="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-red-500 to-red-700 text-white flex items-center justify-center text-4xl shadow-2xl shadow-red-100">
-                        <i class="bi bi-intersect"></i>
-                    </div>
-                    <div>
-                        <div
-                            class="flex items-center justify-center md:justify-start gap-2 text-xs font-bold text-red-600 uppercase tracking-widest mb-2">
-                            <a href="{{ route('supervisions.index') }}" class="hover:underline">Supervisões</a>
-                            <i class="bi bi-chevron-right text-[10px]"></i>
-                            <span>Mesclar</span>
-                        </div>
-                        <h1 class="text-3xl font-black text-gray-900 tracking-tight uppercase">Mesclar Supervisão</h1>
-                        <p class="text-gray-500 font-medium tracking-tight">Supervisão de Origem (será excluída): <span
-                                class="text-red-600 font-black italic">{{ $sourceSupervision->name }}</span></p>
-                    </div>
-                </div>
-
+            <div>
                 <a href="{{ route('supervisions.index') }}"
-                    class="group flex items-center bg-gray-50 text-gray-500 px-6 py-4 rounded-2xl hover:bg-gray-100 transition-all font-bold text-xs uppercase tracking-widest">
-                    <i class="bi bi-arrow-left text-lg mr-2 group-hover:-translate-x-1 transition-transform"></i>
-                    Cancelar
+                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 sm:py-2 text-xs font-bold text-gray-700 hover:bg-gray-50 shadow-sm transition">
+                    <i class="bi bi-arrow-left"></i> Cancelar
                 </a>
             </div>
-        </div>
+        </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <!-- Source Summary -->
-            <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-8 border-b border-gray-100 bg-gray-50">
-                    <h3 class="font-bold text-gray-900 text-lg">Resumo da Transferência</h3>
-                    <p class="text-gray-500 text-sm">Estes itens serão movidos para a nova supervisão.</p>
+            <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm space-y-3">
+                <div class="border-b border-gray-100 pb-2">
+                    <h3 class="font-bold text-sm text-gray-900">Resumo da Transferência</h3>
+                    <p class="text-xs text-gray-500">Estes itens serão movidos para a nova supervisão.</p>
                 </div>
-                <div class="p-8 space-y-4">
-                    <div class="flex items-center justify-between p-4 bg-blue-50 rounded-xl">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
-                                <i class="bi bi-grid-3x3-gap-fill"></i>
-                            </div>
-                            <span class="font-bold text-gray-700">Células</span>
+                <div class="grid grid-cols-2 gap-3 pt-1">
+                    <div class="flex items-center justify-between p-3 bg-blue-50/60 border border-blue-200/60 rounded-lg">
+                        <div class="flex items-center gap-2">
+                            <i class="bi bi-grid-3x3-gap-fill text-blue-600 text-sm"></i>
+                            <span class="text-xs font-bold text-gray-700">Células</span>
                         </div>
-                        <span class="text-2xl font-black text-blue-600">{{ $sourceSupervision->cells()->count() }}</span>
+                        <span class="text-lg font-black text-blue-700 tabular-nums">{{ $sourceSupervision->cells()->count() }}</span>
                     </div>
 
-                    <div class="flex items-center justify-between p-4 bg-green-50 rounded-xl">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-green-100 text-green-600 flex items-center justify-center">
-                                <i class="bi bi-cash-stack"></i>
-                            </div>
-                            <span class="font-bold text-gray-700">Contribuições</span>
+                    <div class="flex items-center justify-between p-3 bg-emerald-50/60 border border-emerald-200/60 rounded-lg">
+                        <div class="flex items-center gap-2">
+                            <i class="bi bi-cash-stack text-emerald-600 text-sm"></i>
+                            <span class="text-xs font-bold text-gray-700">Contribuições</span>
                         </div>
-                        <span
-                            class="text-2xl font-black text-green-600">{{ $sourceSupervision->contributions()->count() }}</span>
+                        <span class="text-lg font-black text-emerald-700 tabular-nums">{{ $sourceSupervision->contributions()->count() }}</span>
                     </div>
                 </div>
             </div>
 
             <!-- Merge Form -->
-            <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-8 border-b border-gray-100 bg-gray-50">
-                    <h3 class="font-bold text-gray-900 text-lg">Selecionar Destino</h3>
-                    <p class="text-gray-500 text-sm">Escolha para onde os dados serão enviados.</p>
+            <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm space-y-3">
+                <div class="border-b border-gray-100 pb-2">
+                    <h3 class="font-bold text-sm text-gray-900">Selecionar Destino</h3>
+                    <p class="text-xs text-gray-500">Escolha para onde os dados serão enviados.</p>
                 </div>
-                <form action="{{ route('supervisions.process-merge', $sourceSupervision) }}" method="POST"
-                    class="p-8 space-y-6">
+                <form action="{{ route('supervisions.process-merge', $sourceSupervision) }}" method="POST" class="space-y-4 pt-1">
                     @csrf
 
-                    <div class="space-y-2">
-                        <label class="text-xs font-bold text-gray-500 uppercase tracking-wider">Supervisão de
-                            Destino</label>
+                    <div>
+                        <label class="block text-[10px] font-black uppercase tracking-wider text-gray-500 mb-1">Supervisão de Destino</label>
                         <select name="target_supervision_id" required
-                            class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-lg rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-4">
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs sm:text-sm font-semibold text-gray-800 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
                             <option value="">Selecione uma supervisão...</option>
                             @foreach($targetSupervisions as $supervision)
                                 <option value="{{ $supervision->id }}">
-                                    {{ $supervision->name }}
-                                    ({{ $supervision->zone->name }})
+                                    {{ $supervision->name }} ({{ $supervision->zone->name }})
                                 </option>
                             @endforeach
                         </select>
-                        <p class="text-xs text-gray-400">Todos os dados serão movidos para esta supervisão e a supervisão
-                            <span class="font-bold">{{ $sourceSupervision->name }}</span> será excluída permanentemente.</p>
+                        <p class="text-[11px] text-gray-400 mt-1">Todos os dados serão movidos e a supervisão <span class="font-bold text-gray-600">{{ $sourceSupervision->name }}</span> será excluída permanentemente.</p>
                     </div>
 
-                    <div class="pt-4">
-                        <button type="submit"
-                            class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-red-100 hover:shadow-red-200 flex items-center justify-center gap-2">
-                            <i class="bi bi-arrow-left-right"></i>
-                            Confirmar Mesclagem e Exclusão
+                    <div class="pt-2">
+                        <button type="submit" onclick="return confirm('Tem certeza que deseja mesclar esta supervisão? Esta ação é irreversível.')"
+                            class="w-full inline-flex justify-center items-center gap-1.5 rounded-lg bg-red-600 px-4 py-2 text-xs font-bold text-white hover:bg-red-700 shadow-sm transition">
+                            <i class="bi bi-arrow-left-right"></i> Confirmar Mesclagem e Exclusão
                         </button>
                     </div>
                 </form>
