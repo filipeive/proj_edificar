@@ -112,7 +112,12 @@ class SmsCenterController extends Controller
      */
     public function index(Request $request)
     {
+        $user = auth()->user();
+        $isScoped = $this->shouldScopeByPastoralZone($user);
+        $userZoneName = null;
+
         $query = SmsMessage::with(['sender', 'recipientUser'])->latest();
+        $this->applyPastoralScope($query, $user);
 
         // Filtro por Status
         if ($request->filled('status')) {
@@ -141,8 +146,9 @@ class SmsCenterController extends Controller
 
         $messages = $query->paginate(20)->withQueryString();
 
-        // KPIs
+        // KPIs (também com escopo pastoral aplicado)
         $baseKpi = SmsMessage::query();
+        $this->applyPastoralScope($baseKpi, $user);
         $totalSent = (clone $baseKpi)->where('status', 'sent')->count();
         $totalFailed = (clone $baseKpi)->where('status', 'failed')->count();
         $totalPending = (clone $baseKpi)->where('status', 'pending')->count();
@@ -150,20 +156,41 @@ class SmsCenterController extends Controller
         $totalAll = $totalSent + $totalFailed + $totalPending;
         $successRate = ($totalSent + $totalFailed > 0) ? round(($totalSent / ($totalSent + $totalFailed)) * 100) : 100;
 
-        // Dados para o formulário de novo envio
-        $zones = Zone::orderBy('name')->get();
-        $supervisions = Supervision::with('zone')->orderBy('name')->get();
-        $cells = Cell::with(['supervision.zone', 'leader'])->orderBy('name')->get();
+        // Dados para o formulário de novo envio (escopados se pastor de zona)
+        if ($isScoped) {
+            $scope = $this->getPastoralScopeData($user);
+            $managedZoneIds = $scope['managedZoneIds'];
+            $zones = Zone::whereIn('id', $managedZoneIds)->orderBy('name')->get();
+            $userZoneName = $zones->pluck('name')->implode(', ');
+            $supervisions = Supervision::whereIn('id', $scope['supervisionIds'])->with('zone')->orderBy('name')->get();
+            $cells = Cell::whereIn('id', $scope['cellIds'])->with(['supervision.zone', 'leader'])->orderBy('name')->get();
 
-        // Contagens prévias
-        $counts = [
-            'all_members'      => User::where('is_active', true)->whereNotNull('phone')->where('phone', '!=', '')->count(),
-            'cell_leaders'     => User::whereIn('id', Cell::whereNotNull('leader_id')->pluck('leader_id'))->whereNotNull('phone')->where('phone', '!=', '')->count(),
-            'supervisors'      => User::whereIn('id', Supervision::whereNotNull('supervisor_id')->pluck('supervisor_id'))->whereNotNull('phone')->where('phone', '!=', '')->count(),
-            'pastors'          => User::whereIn('role', ['pastor', 'pastor_senior', 'pastor_zona'])->whereNotNull('phone')->where('phone', '!=', '')->count(),
-            'pending_visitors' => Visitor::pending()->whereNotNull('phone')->where('phone', '!=', '')->count(),
-            'all_visitors'     => Visitor::whereNotNull('phone')->where('phone', '!=', '')->count(),
-        ];
+            $counts = [
+                'all_members'      => User::whereIn('cell_id', $scope['cellIds'])->where('is_active', true)->whereNotNull('phone')->where('phone', '!=', '')->count(),
+                'cell_leaders'     => User::whereIn('id', Cell::whereIn('id', $scope['cellIds'])->whereNotNull('leader_id')->pluck('leader_id'))->whereNotNull('phone')->where('phone', '!=', '')->count(),
+                'supervisors'      => User::whereIn('id', Supervision::whereIn('id', $scope['supervisionIds'])->whereNotNull('supervisor_id')->pluck('supervisor_id'))->whereNotNull('phone')->where('phone', '!=', '')->count(),
+                'pastors'          => User::where('id', $user->id)->whereNotNull('phone')->where('phone', '!=', '')->count(),
+                'pending_visitors' => Visitor::where(function($q) use ($managedZoneIds, $scope) {
+                                          $q->whereIn('zone_id', $managedZoneIds)->orWhereIn('cell_id', $scope['cellIds']);
+                                      })->pending()->whereNotNull('phone')->where('phone', '!=', '')->count(),
+                'all_visitors'     => Visitor::where(function($q) use ($managedZoneIds, $scope) {
+                                          $q->whereIn('zone_id', $managedZoneIds)->orWhereIn('cell_id', $scope['cellIds']);
+                                      })->whereNotNull('phone')->where('phone', '!=', '')->count(),
+            ];
+        } else {
+            $zones = Zone::orderBy('name')->get();
+            $supervisions = Supervision::with('zone')->orderBy('name')->get();
+            $cells = Cell::with(['supervision.zone', 'leader'])->orderBy('name')->get();
+
+            $counts = [
+                'all_members'      => User::where('is_active', true)->whereNotNull('phone')->where('phone', '!=', '')->count(),
+                'cell_leaders'     => User::whereIn('id', Cell::whereNotNull('leader_id')->pluck('leader_id'))->whereNotNull('phone')->where('phone', '!=', '')->count(),
+                'supervisors'      => User::whereIn('id', Supervision::whereNotNull('supervisor_id')->pluck('supervisor_id'))->whereNotNull('phone')->where('phone', '!=', '')->count(),
+                'pastors'          => User::whereIn('role', ['pastor', 'pastor_senior', 'pastor_zona'])->whereNotNull('phone')->where('phone', '!=', '')->count(),
+                'pending_visitors' => Visitor::pending()->whereNotNull('phone')->where('phone', '!=', '')->count(),
+                'all_visitors'     => Visitor::whereNotNull('phone')->where('phone', '!=', '')->count(),
+            ];
+        }
 
         $driver = $this->smsService->getDriver();
         $gatewayInfo = [
@@ -184,6 +211,7 @@ class SmsCenterController extends Controller
             'messages',
             'totalSent',
             'totalFailed',
+            'totalPending',
             'totalToday',
             'totalAll',
             'successRate',
@@ -192,7 +220,9 @@ class SmsCenterController extends Controller
             'cells',
             'counts',
             'gatewayInfo',
-            'templates'
+            'templates',
+            'userZoneName',
+            'isScoped'
         ));
     }
 
@@ -273,6 +303,11 @@ class SmsCenterController extends Controller
      */
     public function updateTemplates(Request $request)
     {
+        if (!$request->user()->isAdmin() && !$request->user()->isPastorSenior()) {
+            return redirect()->route('sms.index', ['tab' => 'templates'])
+                ->with('error', 'Apenas a Administração ou Pastor Sénior podem alterar os modelos globais de SMS.');
+        }
+
         $templates = self::getDefaultTemplates();
         $updatedCount = 0;
 
@@ -296,6 +331,11 @@ class SmsCenterController extends Controller
      */
     public function resetTemplates(Request $request)
     {
+        if (!$request->user()->isAdmin() && !$request->user()->isPastorSenior()) {
+            return redirect()->route('sms.index', ['tab' => 'templates'])
+                ->with('error', 'Apenas a Administração ou Pastor Sénior podem restaurar os modelos globais de SMS.');
+        }
+
         $templates = self::getDefaultTemplates();
 
         if ($request->filled('template_id') && isset($templates[$request->template_id])) {
@@ -318,6 +358,10 @@ class SmsCenterController extends Controller
      */
     protected function resolveRecipients(Request $request): array
     {
+        $user = auth()->user();
+        $isScoped = $this->shouldScopeByPastoralZone($user);
+        $scope = $isScoped ? $this->getPastoralScopeData($user) : null;
+
         $target = $request->target_type;
         $recipients = [];
 
@@ -337,7 +381,11 @@ class SmsCenterController extends Controller
                 break;
 
             case 'all_members':
-                $users = User::where('is_active', true)->whereNotNull('phone')->where('phone', '!=', '')->get(['id', 'name', 'phone']);
+                $query = User::where('is_active', true)->whereNotNull('phone')->where('phone', '!=', '');
+                if ($isScoped) {
+                    $query->whereIn('cell_id', $scope['cellIds']);
+                }
+                $users = $query->get(['id', 'name', 'phone']);
                 foreach ($users as $u) {
                     $recipients[] = ['phone' => $u->phone, 'name' => $u->name, 'id' => $u->id, 'type' => 'membro'];
                 }
@@ -345,36 +393,46 @@ class SmsCenterController extends Controller
 
             case 'cell_members':
                 if ($request->filled('cell_id')) {
-                    $users = User::where('cell_id', $request->cell_id)->where('is_active', true)->whereNotNull('phone')->where('phone', '!=', '')->get(['id', 'name', 'phone']);
-                    foreach ($users as $u) {
-                        $recipients[] = ['phone' => $u->phone, 'name' => $u->name, 'id' => $u->id, 'type' => 'membro'];
+                    if (!$isScoped || $scope['cellIds']->contains((int)$request->cell_id)) {
+                        $users = User::where('cell_id', $request->cell_id)->where('is_active', true)->whereNotNull('phone')->where('phone', '!=', '')->get(['id', 'name', 'phone']);
+                        foreach ($users as $u) {
+                            $recipients[] = ['phone' => $u->phone, 'name' => $u->name, 'id' => $u->id, 'type' => 'membro'];
+                        }
                     }
                 }
                 break;
 
             case 'supervision_members':
                 if ($request->filled('supervision_id')) {
-                    $cellIds = Cell::where('supervision_id', $request->supervision_id)->pluck('id');
-                    $users = User::whereIn('cell_id', $cellIds)->where('is_active', true)->whereNotNull('phone')->where('phone', '!=', '')->get(['id', 'name', 'phone']);
-                    foreach ($users as $u) {
-                        $recipients[] = ['phone' => $u->phone, 'name' => $u->name, 'id' => $u->id, 'type' => 'membro'];
+                    if (!$isScoped || $scope['supervisionIds']->contains((int)$request->supervision_id)) {
+                        $cellIds = Cell::where('supervision_id', $request->supervision_id)->pluck('id');
+                        $users = User::whereIn('cell_id', $cellIds)->where('is_active', true)->whereNotNull('phone')->where('phone', '!=', '')->get(['id', 'name', 'phone']);
+                        foreach ($users as $u) {
+                            $recipients[] = ['phone' => $u->phone, 'name' => $u->name, 'id' => $u->id, 'type' => 'membro'];
+                        }
                     }
                 }
                 break;
 
             case 'zone_members':
                 if ($request->filled('zone_id')) {
-                    $supervisionIds = Supervision::where('zone_id', $request->zone_id)->pluck('id');
-                    $cellIds = Cell::whereIn('supervision_id', $supervisionIds)->pluck('id');
-                    $users = User::whereIn('cell_id', $cellIds)->where('is_active', true)->whereNotNull('phone')->where('phone', '!=', '')->get(['id', 'name', 'phone']);
-                    foreach ($users as $u) {
-                        $recipients[] = ['phone' => $u->phone, 'name' => $u->name, 'id' => $u->id, 'type' => 'membro'];
+                    if (!$isScoped || $scope['managedZoneIds']->contains((int)$request->zone_id)) {
+                        $supervisionIds = Supervision::where('zone_id', $request->zone_id)->pluck('id');
+                        $cellIds = Cell::whereIn('supervision_id', $supervisionIds)->pluck('id');
+                        $users = User::whereIn('cell_id', $cellIds)->where('is_active', true)->whereNotNull('phone')->where('phone', '!=', '')->get(['id', 'name', 'phone']);
+                        foreach ($users as $u) {
+                            $recipients[] = ['phone' => $u->phone, 'name' => $u->name, 'id' => $u->id, 'type' => 'membro'];
+                        }
                     }
                 }
                 break;
 
             case 'cell_leaders':
-                $leaderIds = Cell::whereNotNull('leader_id')->pluck('leader_id');
+                $leaderQuery = Cell::whereNotNull('leader_id');
+                if ($isScoped) {
+                    $leaderQuery->whereIn('id', $scope['cellIds']);
+                }
+                $leaderIds = $leaderQuery->pluck('leader_id');
                 $users = User::whereIn('id', $leaderIds)->whereNotNull('phone')->where('phone', '!=', '')->get(['id', 'name', 'phone']);
                 foreach ($users as $u) {
                     $recipients[] = ['phone' => $u->phone, 'name' => $u->name, 'id' => $u->id, 'type' => 'lider'];
@@ -382,7 +440,11 @@ class SmsCenterController extends Controller
                 break;
 
             case 'supervisors':
-                $supervisorIds = Supervision::whereNotNull('supervisor_id')->pluck('supervisor_id');
+                $superQuery = Supervision::whereNotNull('supervisor_id');
+                if ($isScoped) {
+                    $superQuery->whereIn('id', $scope['supervisionIds']);
+                }
+                $supervisorIds = $superQuery->pluck('supervisor_id');
                 $users = User::whereIn('id', $supervisorIds)->whereNotNull('phone')->where('phone', '!=', '')->get(['id', 'name', 'phone']);
                 foreach ($users as $u) {
                     $recipients[] = ['phone' => $u->phone, 'name' => $u->name, 'id' => $u->id, 'type' => 'supervisor'];
@@ -390,21 +452,33 @@ class SmsCenterController extends Controller
                 break;
 
             case 'pastors':
-                $users = User::whereIn('role', ['pastor', 'pastor_senior', 'pastor_zona'])->whereNotNull('phone')->where('phone', '!=', '')->get(['id', 'name', 'phone']);
+                $pastorQuery = User::whereIn('role', ['pastor', 'pastor_senior', 'pastor_zona'])->whereNotNull('phone')->where('phone', '!=', '');
+                if ($isScoped) {
+                    $pastorQuery->where('id', $user->id);
+                }
+                $users = $pastorQuery->get(['id', 'name', 'phone']);
                 foreach ($users as $u) {
                     $recipients[] = ['phone' => $u->phone, 'name' => $u->name, 'id' => $u->id, 'type' => 'pastor'];
                 }
                 break;
 
             case 'pending_visitors':
-                $visitors = Visitor::pending()->whereNotNull('phone')->where('phone', '!=', '')->get(['id', 'name', 'phone']);
+                $visitorQuery = Visitor::pending()->whereNotNull('phone')->where('phone', '!=', '');
+                if ($isScoped) {
+                    $visitorQuery->whereIn('id', $scope['visitorIds']);
+                }
+                $visitors = $visitorQuery->get(['id', 'name', 'phone']);
                 foreach ($visitors as $v) {
                     $recipients[] = ['phone' => $v->phone, 'name' => $v->name, 'id' => $v->id, 'type' => 'visitante'];
                 }
                 break;
 
             case 'all_visitors':
-                $visitors = Visitor::whereNotNull('phone')->where('phone', '!=', '')->get(['id', 'name', 'phone']);
+                $visitorQuery = Visitor::whereNotNull('phone')->where('phone', '!=', '');
+                if ($isScoped) {
+                    $visitorQuery->whereIn('id', $scope['visitorIds']);
+                }
+                $visitors = $visitorQuery->get(['id', 'name', 'phone']);
                 foreach ($visitors as $v) {
                     $recipients[] = ['phone' => $v->phone, 'name' => $v->name, 'id' => $v->id, 'type' => 'visitante'];
                 }
@@ -423,5 +497,79 @@ class SmsCenterController extends Controller
         }
 
         return $result;
+    }
+
+    /**
+     * Verifica se o usuário deve ter escopo restrito à sua zona (pastor de zona ou supervisor).
+     */
+    protected function shouldScopeByPastoralZone(?User $user = null): bool
+    {
+        $user = $user ?? auth()->user();
+        if (!$user) {
+            return false;
+        }
+
+        return ($user->isPastorZona() || $user->isSupervisor()) && !$user->isAdmin() && !$user->isPastorSenior();
+    }
+
+    /**
+     * Obtém IDs de zonas, supervisões, células, membros e visitantes sob gestão do pastor/supervisor.
+     */
+    protected function getPastoralScopeData(?User $user = null): array
+    {
+        $user = $user ?? auth()->user();
+        $managedZoneIds = $user->getManagedZoneIds();
+        $supervisionIds = Supervision::whereIn('zone_id', $managedZoneIds)->pluck('id');
+        $cellIds = Cell::whereIn('supervision_id', $supervisionIds)->pluck('id');
+
+        $visitorIds = Visitor::where(function ($q) use ($managedZoneIds, $cellIds) {
+            $q->whereIn('zone_id', $managedZoneIds)
+                ->orWhereIn('cell_id', $cellIds);
+        })->pluck('id');
+
+        $zoneUserIds = User::where(function ($q) use ($cellIds, $supervisionIds, $user) {
+            $q->whereIn('cell_id', $cellIds)
+                ->orWhereIn('id', Cell::whereIn('id', $cellIds)->whereNotNull('leader_id')->select('leader_id'))
+                ->orWhereIn('id', Supervision::whereIn('id', $supervisionIds)->whereNotNull('supervisor_id')->select('supervisor_id'))
+                ->orWhere('id', $user->id);
+        })->pluck('id');
+
+        return [
+            'managedZoneIds' => $managedZoneIds,
+            'supervisionIds' => $supervisionIds,
+            'cellIds'        => $cellIds,
+            'visitorIds'     => $visitorIds,
+            'zoneUserIds'    => $zoneUserIds,
+        ];
+    }
+
+    /**
+     * Aplica o escopo pastoral na consulta de mensagens SMS.
+     */
+    protected function applyPastoralScope($query, ?User $user = null): void
+    {
+        $user = $user ?? auth()->user();
+        if (!$this->shouldScopeByPastoralZone($user)) {
+            return;
+        }
+
+        $scope = $this->getPastoralScopeData($user);
+        $visitorIds = $scope['visitorIds'];
+        $zoneUserIds = $scope['zoneUserIds'];
+
+        $query->where(function ($q) use ($user, $visitorIds, $zoneUserIds) {
+            // Mensagens enviadas pelo próprio pastor/supervisor
+            $q->where('user_id', $user->id)
+                // Ou onde o destinatário é um membro/líder/supervisor ou ele próprio da sua zona
+                ->orWhere(function ($sub) use ($zoneUserIds) {
+                    $sub->whereNotNull('recipient_id')
+                        ->whereIn('recipient_id', $zoneUserIds);
+                })
+                // Ou mensagens da rede de visitantes vinculadas aos visitantes da sua zona
+                ->orWhere(function ($sub) use ($visitorIds) {
+                    $sub->where('reference_type', Visitor::class)
+                        ->whereIn('reference_id', $visitorIds);
+                });
+        });
     }
 }

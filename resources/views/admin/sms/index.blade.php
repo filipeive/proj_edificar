@@ -94,6 +94,11 @@
                 <div>
                     <div class="flex flex-wrap items-center gap-2">
                         <span class="text-[10px] font-black uppercase tracking-wider text-orange-700 dark:text-orange-400">Central Telefónica & Mensageria</span>
+                        @if(!empty($userZoneName))
+                            <span class="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/60 px-2.5 py-0.5 text-[10px] font-black text-orange-800 dark:text-orange-300 border border-orange-200 dark:border-orange-800/40">
+                                <i class="bi bi-geo-alt-fill text-[9px]"></i> Zona: {{ $userZoneName }}
+                            </span>
+                        @endif
                         @if($gatewayInfo['configured'])
                             <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/40">
                                 <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
