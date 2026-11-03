@@ -6,7 +6,7 @@
 
 @section('header-actions')
     @php
-        $canManageClasses = !auth()->user()->isPastorZona();
+        $canManageClasses = auth()->user()->isAdmin() || auth()->user()->isPastorSenior() || auth()->user()->isSecretaria() || auth()->user()->isCourseTeacher() || !auth()->user()->isPastorZona();
     @endphp
     @if($canManageClasses)
         <a href="{{ route('course-classes.create', ['course_id' => request('course_id')]) }}"

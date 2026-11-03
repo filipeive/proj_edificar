@@ -22,6 +22,9 @@
             </div>
         </header>
 
+        <!-- Turmas que Leciona (se for professor/formador) -->
+        @include('dashboard.partials.teacher-classes')
+
         @php
             $totalMembers = $cells->sum('members');
             $totalContributed = $cells->sum('contributed');

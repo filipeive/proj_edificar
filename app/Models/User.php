@@ -186,6 +186,38 @@ class User extends Authenticatable
                 })->exists();
     }
 
+    public function taughtClassesQuery()
+    {
+        return \App\Models\CourseClass::where(function ($q) {
+            $q->where('teacher_male_id', $this->id)
+                ->orWhere('teacher_female_id', $this->id)
+                ->orWhere('assistant_male_id', $this->id)
+                ->orWhere('assistant_female_id', $this->id);
+        });
+    }
+
+    public function getTaughtClasses()
+    {
+        return $this->taughtClassesQuery()
+            ->with(['course', 'teacherMale', 'teacherFemale', 'assistantMale', 'assistantFemale'])
+            ->withCount(['courseEnrollments', 'coupleEnrollments', 'meetings'])
+            ->latest()
+            ->get();
+    }
+
+    public function isTeacherOfClass($classId): bool
+    {
+        if (empty($classId)) {
+            return false;
+        }
+        return $this->taughtClassesQuery()->where('id', $classId)->exists();
+    }
+
+    public function isCourseTeacher(): bool
+    {
+        return $this->taughtClassesQuery()->exists();
+    }
+
     // ESCOPOS
     public function scopeActive($query)
     {
@@ -477,7 +509,7 @@ class User extends Authenticatable
             'menu_events' => true, // Default for most
             'menu_weddings' => $this->isAdmin() || $this->isSecretaria() || $this->isPastor(),
             'menu_visitors' => $this->isAdmin() || $this->isSecretaria() || $this->isPastorZona() || $this->isSupervisor() || $this->isPastor() || $this->isAdministracao(),
-            'menu_courses' => ($this->isAdmin() || $this->isPastor() || $this->isSecretaria() || $this->hasAnyCourseEnrollment() || $this->hasAvailableCourses()) && !$this->isAdministracao(),
+            'menu_courses' => ($this->isAdmin() || $this->isPastor() || $this->isSecretaria() || $this->hasAnyCourseEnrollment() || $this->isCourseTeacher() || $this->hasAvailableCourses()) && !$this->isAdministracao(),
             'menu_public_enrollments' => $this->isAdmin() || $this->isPastor() || $this->isSecretaria() || $this->isPastorSenior(),
             'menu_quarterly_reports' => $this->isAdmin() || $this->isPastor() || $this->isPastorZona() || $this->isSupervisor() || $this->isSubSupervisor(),
             'menu_inventory' => $this->isAdmin() || $this->isSecretaria() || $this->isEdificarManager() || $this->isTesouraria(),

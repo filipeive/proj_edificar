@@ -22,6 +22,9 @@
             </div>
         </header>
 
+        <!-- Turmas que Leciona (se for professor/formador) -->
+        @include('dashboard.partials.teacher-classes')
+
         <!-- Stats Grid -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
             <!-- Total Membros -->

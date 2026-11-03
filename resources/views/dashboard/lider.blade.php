@@ -22,6 +22,9 @@
             </div>
         </header>
 
+        <!-- Turmas que Leciona (se for professor/formador) -->
+        @include('dashboard.partials.teacher-classes')
+
         @if($cells->isEmpty())
             <div class="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
                 <div class="flex flex-col sm:flex-row sm:items-center gap-3.5">

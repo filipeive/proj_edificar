@@ -17,6 +17,7 @@
 @section('content')
 <div class="space-y-5" x-data="{
     activeTab: '{{ request('tab', 'history') }}',
+    view: window.innerWidth < 768 ? 'grid' : (localStorage.getItem('sms_view') || 'list'),
     targetType: 'all_members',
     messageText: '',
     selectedMessage: null,
@@ -65,7 +66,7 @@
                 this.calculatingCount = false;
             });
     }
-}">
+}" x-init="$watch('view', val => localStorage.setItem('sms_view', val)); view = window.innerWidth < 768 ? 'grid' : (localStorage.getItem('sms_view') || 'list')">
 
     <!-- Top Navigation & Breadcrumbs (Desktop) -->
     <div class="hidden md:flex items-center justify-between gap-3">
@@ -253,8 +254,32 @@
             </form>
         </div>
 
-        <!-- Messages Table Card -->
-        <div class="rounded-xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden">
+        <!-- View Toggle & Summary Bar -->
+        <div class="flex items-center justify-between gap-3 px-1">
+            <span class="text-xs font-bold text-gray-500 dark:text-zinc-400">
+                Total de envios: <strong class="text-gray-900 dark:text-white">{{ $messages->total() }}</strong>
+            </span>
+
+            <div class="inline-flex rounded-lg border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 p-0.5">
+                <button type="button" @click="view = 'list'"
+                    :class="view === 'list' ? 'bg-white dark:bg-zinc-900 text-gray-900 dark:text-white shadow-sm font-bold' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'"
+                    class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-md transition"
+                    title="Visualização em Lista">
+                    <i class="bi bi-list-ul"></i>
+                    <span class="hidden sm:inline">Lista</span>
+                </button>
+                <button type="button" @click="view = 'grid'"
+                    :class="view === 'grid' ? 'bg-white dark:bg-zinc-900 text-gray-900 dark:text-white shadow-sm font-bold' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'"
+                    class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-md transition"
+                    title="Visualização em Grelha">
+                    <i class="bi bi-grid-fill"></i>
+                    <span class="hidden sm:inline">Grelha</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 1. Vista em Tabela (List) -->
+        <div x-show="view === 'list'" class="rounded-xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-800 text-left text-xs">
                     <thead class="bg-gray-50/75 dark:bg-zinc-800/50 uppercase tracking-wider text-[10px] font-black text-gray-500 dark:text-zinc-400">
@@ -372,6 +397,107 @@
 
             @if($messages->hasPages())
                 <div class="p-4 border-t border-gray-100 dark:border-zinc-800">
+                    {{ $messages->links() }}
+                </div>
+            @endif
+        </div>
+
+        <!-- 2. Vista em Grelha (Grid Cards) -->
+        <div x-show="view === 'grid'" style="display: none;" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5">
+                @forelse($messages as $msg)
+                    <div class="rounded-xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 shadow-sm hover:border-orange-400 dark:hover:border-orange-500/50 hover:shadow-md transition-all flex flex-col justify-between group">
+                        <!-- Topo do Card -->
+                        <div>
+                            <!-- Status e Data -->
+                            <div class="flex items-center justify-between gap-2 mb-2.5">
+                                @if($msg->status === 'sent')
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 text-[10px] font-black text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/40">
+                                        <i class="bi bi-check2-circle"></i> Enviado
+                                    </span>
+                                @elseif($msg->status === 'failed')
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-red-50 dark:bg-red-950/40 px-2 py-0.5 text-[10px] font-black text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/40"
+                                        title="{{ $msg->error_message }}">
+                                        <i class="bi bi-x-circle"></i> Falha
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 text-[10px] font-black text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/40">
+                                        <i class="bi bi-clock-history"></i> Pendente
+                                    </span>
+                                @endif
+
+                                <span class="text-[10px] text-gray-400 dark:text-zinc-500" title="{{ $msg->created_at->format('d/m/Y H:i') }}">
+                                    {{ $msg->created_at->diffForHumans() }}
+                                </span>
+                            </div>
+
+                            <!-- Destinatário e Telefone -->
+                            <div class="mb-2">
+                                <h4 class="text-xs font-black text-gray-900 dark:text-white truncate">
+                                    {{ $msg->recipient_name ?? 'Destinatário Avulso' }}
+                                </h4>
+                                <div class="flex items-center justify-between gap-1 text-[11px] mt-0.5 font-mono text-gray-600 dark:text-zinc-300">
+                                    <span class="flex items-center gap-1">
+                                        <i class="bi bi-telephone text-[10px] text-gray-400"></i>
+                                        {{ $msg->phone }}
+                                    </span>
+                                    @if($msg->recipient_type)
+                                        <span class="text-[9px] uppercase font-bold text-gray-500 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-800 px-1 py-0.2 rounded">
+                                            {{ ucfirst($msg->recipient_type) }}
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <!-- Contexto -->
+                            <div class="mb-2.5">
+                                <span class="inline-flex items-center rounded-md bg-gray-100 dark:bg-zinc-800 px-2 py-0.5 text-[9px] font-bold text-gray-700 dark:text-zinc-300">
+                                    {{ $msg->context_label }}
+                                </span>
+                            </div>
+
+                            <!-- Mensagem Texto -->
+                            <div class="p-2.5 rounded-lg bg-gray-50 dark:bg-zinc-800/60 border border-gray-100 dark:border-zinc-800 cursor-pointer hover:bg-orange-50/50 dark:hover:bg-zinc-800 transition"
+                                @click="openMessage({{ Js::from($msg) }})">
+                                <p class="text-xs text-gray-700 dark:text-zinc-300 line-clamp-3 leading-relaxed">
+                                    {{ $msg->message }}
+                                </p>
+                                <div class="flex items-center justify-between text-[9px] text-gray-400 dark:text-zinc-500 mt-2 pt-1.5 border-t border-gray-100 dark:border-zinc-700/60 font-mono">
+                                    <span>{{ $msg->characters_count }} caracteres</span>
+                                    <span>{{ $msg->parts_count }} SMS</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rodapé de Ações do Card -->
+                        <div class="flex items-center justify-between pt-3 mt-3 border-t border-gray-100 dark:border-zinc-800 text-xs">
+                            <button type="button" @click="openMessage({{ Js::from($msg) }})"
+                                class="inline-flex items-center gap-1 font-bold text-gray-600 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-orange-400 text-xs transition">
+                                <i class="bi bi-eye"></i> Detalhes
+                            </button>
+
+                            <form method="POST" action="{{ route('sms.resend', $msg) }}" class="inline"
+                                onsubmit="return confirm('Deseja reenviar esta mensagem para {{ $msg->phone }}?')">
+                                @csrf
+                                <button type="submit"
+                                    class="inline-flex items-center gap-1 rounded-lg border border-orange-200 dark:border-orange-800/40 bg-orange-50 dark:bg-orange-950/30 px-2 py-1 text-[11px] font-bold text-orange-700 dark:text-orange-400 hover:bg-orange-100 transition"
+                                    title="Reenviar SMS">
+                                    <i class="bi bi-arrow-repeat"></i> Reenviar
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                @empty
+                    <div class="col-span-full rounded-xl border border-dashed border-gray-300 dark:border-zinc-700 p-8 text-center text-gray-400 dark:text-zinc-500 bg-white dark:bg-zinc-900">
+                        <i class="bi bi-inbox text-3xl mb-2 block"></i>
+                        <p class="font-bold text-sm">Nenhuma mensagem SMS encontrada.</p>
+                        <p class="text-xs">Os envios do sistema ou comunicados manuais serão listados aqui.</p>
+                    </div>
+                @endforelse
+            </div>
+
+            @if($messages->hasPages())
+                <div class="p-3 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800">
                     {{ $messages->links() }}
                 </div>
             @endif

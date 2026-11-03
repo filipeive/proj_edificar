@@ -4,7 +4,8 @@
 
 @section('content')
 @php
-    $isPastorZona = auth()->user()->isPastorZona();
+    $canManageThisClass = auth()->user()->isAdmin() || auth()->user()->isPastorSenior() || auth()->user()->isSecretaria() || auth()->user()->isTeacherOfClass($courseClass->id);
+    $isPastorZona = auth()->user()->isPastorZona() && !auth()->user()->isTeacherOfClass($courseClass->id);
     $statusClasses = [
         'em_andamento' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
         'concluida' => 'bg-blue-50 text-blue-700 border-blue-200',
@@ -69,7 +70,7 @@
                     class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-bold text-red-700 hover:bg-red-100 transition-colors">
                     <i class="bi bi-file-earmark-pdf"></i> PDF
                 </a>
-                @if(auth()->user()->isAdmin() || auth()->user()->isPastorSenior())
+                @if($canManageThisClass)
                     <a href="{{ route('course-classes.edit', $courseClass) }}"
                         class="inline-flex items-center gap-1.5 rounded-lg bg-orange-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-orange-700 transition-colors">
                         <i class="bi bi-pencil-square"></i> Editar
@@ -178,7 +179,7 @@
                         <span class="text-xs font-bold text-gray-700">Listagem de Alunos Inscritos</span>
                     </div>
 
-                    @if(auth()->user()->isAdmin() || auth()->user()->isPastorSenior())
+                    @if($canManageThisClass)
                         <button onclick="document.getElementById('enrollmentModal').classList.remove('hidden')"
                             class="inline-flex items-center gap-1.5 rounded-lg bg-orange-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-orange-700 transition-colors">
                             <i class="bi bi-person-plus-fill"></i> Matricular Aluno
@@ -252,7 +253,7 @@
                                     </td>
                                     <td class="py-2.5 px-3 text-right">
                                         <div class="inline-flex items-center gap-1">
-                                            @if(auth()->user()->isAdmin() || auth()->user()->isPastorSenior())
+                                            @if($canManageThisClass)
                                                 @if($student instanceof \App\Models\CourseEnrollment)
                                                     <a href="{{ route('course-enrollments.edit', $student) }}" class="rounded border border-gray-200 bg-white p-1 text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-colors" title="Editar">
                                                         <i class="bi bi-pencil text-xs"></i>
@@ -323,7 +324,7 @@
                             </div>
                         </div>
 
-                        @if(auth()->user()->isAdmin() || auth()->user()->isPastorSenior())
+                        @if($canManageThisClass)
                             <div class="flex items-center gap-2">
                                 <a href="{{ route('couple-enrollments.show', $enrollment) }}" class="rounded-lg border border-gray-200 bg-white p-1.5 text-gray-600 hover:text-purple-600 hover:bg-gray-50" title="Ver Detalhes">
                                     <i class="bi bi-eye text-xs"></i>
@@ -358,7 +359,7 @@
                             </div>
                         </div>
 
-                        @if(auth()->user()->isAdmin() || auth()->user()->isPastorSenior())
+                        @if($canManageThisClass)
                             <div class="flex items-center gap-2">
                                 <a href="{{ route('ministerial-enrollments.show', $enrollment) }}" class="rounded-lg border border-gray-200 bg-white p-1.5 text-gray-600 hover:text-blue-600 hover:bg-gray-50" title="Ver Detalhes">
                                     <i class="bi bi-eye text-xs"></i>
@@ -382,10 +383,12 @@
     <div x-show="activeTab === 'meetings'" x-cloak class="space-y-3">
         <div class="flex items-center justify-between">
             <span class="text-xs font-bold text-gray-700">Cronograma de Aulas e Chamadas</span>
-            <button onclick="document.getElementById('meetingModal').classList.remove('hidden')"
-                class="inline-flex items-center gap-1.5 rounded-lg bg-orange-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-orange-700 transition-colors">
-                <i class="bi bi-plus-lg"></i> Novo Encontro
-            </button>
+            @if($canManageThisClass)
+                <button onclick="document.getElementById('meetingModal').classList.remove('hidden')"
+                    class="inline-flex items-center gap-1.5 rounded-lg bg-orange-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-orange-700 transition-colors">
+                    <i class="bi bi-plus-lg"></i> Novo Encontro
+                </button>
+            @endif
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -408,7 +411,7 @@
                         </p>
                     </div>
 
-                    @if(!$isPastorZona)
+                    @if($canManageThisClass)
                         <div class="pt-3 mt-3 border-t border-gray-100 flex justify-end">
                             <a href="{{ route('course-classes.attendance', [$courseClass, $meeting]) }}"
                                 class="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-bold text-orange-700 hover:bg-orange-50 shadow-sm transition-colors">

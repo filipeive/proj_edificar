@@ -228,7 +228,7 @@
                                         @endif
                                         <a href="{{ route('ministerial-enrollments.index') }}" class="block py-1.5 text-xs transition-colors {{ request()->routeIs('ministerial-enrollments.*') ? 'text-orange-400 font-bold' : 'text-gray-400 hover:text-white' }}">Inscrições Individuais</a>
                                     @endif
-                                    @if ($authUser && ((!$authUser->isSupervisor() && !$authUser->isSecretaria() && !$authUser->isPastorZona()) || (($authUser->isSupervisor() || $authUser->isSecretaria() || $authUser->isPastorZona()) && $authUser->hasAnyCourseEnrollment())))
+                                    @if ($authUser && ($authUser->isAdmin() || $authUser->isPastorSenior() || $authUser->isCourseTeacher() || $authUser->hasAnyCourseEnrollment() || (!$authUser->isSupervisor() && !$authUser->isSecretaria() && !$authUser->isPastorZona())))
                                         <a href="{{ route('course-classes.index') }}" class="block py-1.5 text-xs transition-colors {{ request()->routeIs('course-classes.*') ? 'text-orange-400 font-bold' : 'text-gray-400 hover:text-white' }}">Turmas</a>
                                     @endif
                                     @if ($authUser && $authUser->isAdmin())

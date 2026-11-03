@@ -22,6 +22,9 @@
             </div>
         </header>
 
+        <!-- Turmas que Leciona (se for professor/formador) -->
+        @include('dashboard.partials.teacher-classes')
+
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
             <!-- Zona Info -->
             <article class="rounded-xl border border-gray-200 bg-white p-3.5 sm:p-4 shadow-sm">

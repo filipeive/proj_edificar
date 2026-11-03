@@ -34,6 +34,9 @@
             </div>
         </header>
 
+        <!-- Turmas que Leciona (se for professor/formador) -->
+        @include('dashboard.partials.teacher-classes')
+
         <!-- Indicadores Principais (Estilo Gestão Nacional) -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
             <!-- Card: Membros Ativos -->
