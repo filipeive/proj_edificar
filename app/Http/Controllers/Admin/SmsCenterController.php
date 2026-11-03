@@ -67,12 +67,12 @@ class SmsCenterController extends Controller
             'visitor_welcome_cell' => [
                 'id' => 'visitor_welcome_cell',
                 'key' => 'sms.template.visitor_welcome_cell',
-                'title' => 'Visitante: Boas-vindas com Célula',
+                'title' => 'Visitante: Boas-vindas pós-feedback (com Célula)',
                 'category' => 'visitor_welcome',
                 'category_label' => 'Boas-vindas & Acolhimento',
-                'description' => 'Enviado ao visitante dando as boas-vindas da igreja e indicando sua célula e líder.',
-                'default' => "Paz e graça, {visitante}! Foi uma alegria receber você na Life Church. Conectamos você à nossa Célula {celula}{lider_info}. Seja muito bem-vindo à nossa família!",
-                'tags' => ['{visitante}', '{celula}', '{lider_info}', '{lider}', '{lider_telefone}'],
+                'description' => 'Enviado ao visitante após o líder registrar feedback de contato ou integração, confirmando o acolhimento na célula.',
+                'default' => "Paz e graça, {visitante}! Que alegria termos falado consigo. Seja muito bem-vindo à nossa Célula {celula}{lider_info}. Esperamos por si no próximo encontro!",
+                'tags' => ['{visitante}', '{visitante_primeiro_nome}', '{celula}', '{lider_info}', '{lider}', '{lider_completo}', '{lider_telefone}', '{zona}'],
             ],
             'visitor_zone_pastor' => [
                 'id' => 'visitor_zone_pastor',
@@ -87,12 +87,12 @@ class SmsCenterController extends Controller
             'visitor_welcome_general' => [
                 'id' => 'visitor_welcome_general',
                 'key' => 'sms.template.visitor_welcome_general',
-                'title' => 'Visitante: Boas-vindas Inicial Geral',
+                'title' => 'Visitante: Boas-vindas pós-feedback (Geral)',
                 'category' => 'visitor_welcome',
                 'category_label' => 'Boas-vindas & Acolhimento',
-                'description' => 'Enviado ao visitante quando registrado sem célula definida.',
-                'default' => "Paz e graça, {visitante}! Foi uma honra receber você na Life Church. Em breve nossa equipe entrará em contato para orar e acolher você. Deus abençoe!",
-                'tags' => ['{visitante}'],
+                'description' => 'Enviado ao visitante após feedback de contato quando não possui célula vinculada.',
+                'default' => "Paz e graça, {visitante}! Foi uma honra falarmos consigo. Seja muito bem-vindo à Life Church. Estamos à sua inteira disposição para orar e caminhar juntos!",
+                'tags' => ['{visitante}', '{visitante_primeiro_nome}', '{zona}'],
             ],
             'general_broadcast' => [
                 'id' => 'general_broadcast',

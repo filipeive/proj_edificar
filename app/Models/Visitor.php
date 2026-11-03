@@ -48,11 +48,19 @@ class Visitor extends CongregationModel
             if ($visitor->cell_id || $visitor->zone_id) {
                 $visitor->notifyAssignment();
             }
+
+            if (in_array($visitor->contact_status, ['contatado', 'integrado'])) {
+                $visitor->sendIntegrationSms();
+            }
         });
 
         static::updated(function ($visitor) {
             if (($visitor->wasChanged('cell_id') && $visitor->cell_id) || ($visitor->wasChanged('zone_id') && $visitor->zone_id)) {
                 $visitor->notifyAssignment();
+            }
+
+            if ($visitor->wasChanged('contact_status') && in_array($visitor->contact_status, ['contatado', 'integrado'])) {
+                $visitor->sendIntegrationSms();
             }
         });
     }
@@ -231,22 +239,10 @@ class Visitor extends CongregationModel
                     }
                 }
 
-                // 4. Notificar o próprio Visitante (Boas-vindas e Conexão de Comunhão)
-                if ($this->phone) {
-                    $leaderRef = ($leader && $leader->phone) ? ", com o Líder {$leaderFirstName}, tel. {$leader->phone}" : ($leader ? ", com o Líder {$leaderFirstName}" : "");
-                    $defaultTplWelcome = "Paz e graça, {visitante}! Foi uma alegria receber você na Life Church. Conectamos você à nossa Célula {celula}{lider_info}. Seja muito bem-vindo à nossa família!";
-                    $tplWelcome = Setting::get('sms.template.visitor_welcome_cell', $defaultTplWelcome);
-                    $msgVisitor = str_replace(
-                        ['{visitante}', '{visitante_primeiro_nome}', '{celula}', '{lider_info}', '{lider}', '{lider_telefone}'],
-                        [$this->name, $this->getFirstName($this->name), $cell->name, $leaderRef, $leaderFirstName, $leader?->phone ?? ''],
-                        $tplWelcome
-                    );
-                    $results['visitor'] = $smsService->send($this->phone, $msgVisitor, array_merge($metaBase, [
-                        'recipient_name' => $this->name,
-                        'recipient_type' => 'visitante',
-                        'context'        => 'visitor_welcome',
-                    ]));
-                }
+                // 4. Visitante (Opção B - Apenas pós-feedback do líder)
+                // O visitante não recebe SMS imediato no cadastro/atribuição.
+                // A mensagem de boas-vindas/integração é enviada apenas após o líder registrar o contato/feedback.
+                $results['visitor'] = false;
             } elseif ($zone) {
                 $pastor = $zone->pastor;
                 $pastorFirstName = $pastor ? $this->getFirstName($pastor->name) : 'Pastor';
@@ -281,27 +277,91 @@ class Visitor extends CongregationModel
                     }
                 }
 
-                // Boas-vindas simples ao visitante se tiver telefone
-                if ($this->phone) {
-                    $defaultTplZoneWelcome = "Paz e graça, {visitante}! Foi uma honra receber você na Life Church. Em breve nossa equipe entrará em contato para orar e acolher você. Deus abençoe!";
-                    $tplZoneWelcome = Setting::get('sms.template.visitor_welcome_general', $defaultTplZoneWelcome);
-                    $msgVisitor = str_replace(
-                        ['{visitante}', '{visitante_primeiro_nome}'],
-                        [$this->name, $this->getFirstName($this->name)],
-                        $tplZoneWelcome
-                    );
-                    $results['visitor'] = $smsService->send($this->phone, $msgVisitor, array_merge($metaBase, [
-                        'recipient_name' => $this->name,
-                        'recipient_type' => 'visitante',
-                        'context'        => 'visitor_welcome',
-                    ]));
-                }
+                // Opção B: O acolhimento ao visitante é enviado apenas após o contato/feedback.
+                $results['visitor'] = false;
             }
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Erro ao notificar rede de líderes sobre visitante: ' . $e->getMessage());
         }
 
         return $results;
+    }
+
+    /**
+     * Envia SMS de acolhimento e integração ao visitante APÓS o feedback de contato/integração (Opção B).
+     */
+    public function sendIntegrationSms(?string $status = null): bool
+    {
+        $status = $status ?? $this->contact_status;
+        if (!in_array($status, ['contatado', 'integrado'])) {
+            return false;
+        }
+
+        if (empty($this->phone)) {
+            return false;
+        }
+
+        // Evitar duplicidade de SMS de integração caso já tenha sido enviada com sucesso
+        $alreadySent = SmsMessage::where('reference_type', self::class)
+            ->where('reference_id', $this->id)
+            ->where('context', 'visitor_integration')
+            ->where('status', 'sent')
+            ->exists();
+
+        if ($alreadySent) {
+            return false;
+        }
+
+        try {
+            $smsService = app(\App\Services\Sms\SmsService::class);
+            $cell = $this->cell;
+            $zone = $this->zone ?? ($cell?->supervision?->zone);
+
+            $metaBase = [
+                'reference_type' => self::class,
+                'reference_id'   => $this->id,
+                'congregation_id'=> $this->congregation_id,
+                'recipient_name' => $this->name,
+                'recipient_type' => 'visitante',
+                'context'        => 'visitor_integration',
+            ];
+
+            $visitorFirstName = $this->getFirstName($this->name);
+
+            if ($cell) {
+                $leader = $cell->leader;
+                $leaderFirstName = $leader ? $this->getFirstName($leader->name) : 'Líder';
+                $leaderRef = ($leader && $leader->phone) 
+                    ? ", com o Líder {$leaderFirstName} (tel. {$leader->phone})" 
+                    : ($leader ? ", com o Líder {$leaderFirstName}" : "");
+
+                $defaultTpl = "Paz e graça, {visitante}! Que alegria termos falado consigo. Seja muito bem-vindo à nossa Célula {celula}{lider_info}. Esperamos por si no próximo encontro!";
+                $tpl = Setting::get('sms.template.visitor_welcome_cell', $defaultTpl);
+
+                $msg = str_replace(
+                    ['{visitante}', '{visitante_primeiro_nome}', '{celula}', '{lider_info}', '{lider}', '{lider_completo}', '{lider_telefone}', '{zona}'],
+                    [$this->name, $visitorFirstName, $cell->name, $leaderRef, $leaderFirstName, $leader?->name ?? '', $leader?->phone ?? '', $zone?->name ?? ''],
+                    $tpl
+                );
+
+                return (bool) $smsService->send($this->phone, $msg, $metaBase);
+            } elseif ($zone) {
+                $defaultTpl = "Paz e graça, {visitante}! Foi uma honra falarmos consigo. Seja muito bem-vindo à Life Church. Estamos à sua inteira disposição para orar e caminhar juntos!";
+                $tpl = Setting::get('sms.template.visitor_welcome_general', $defaultTpl);
+
+                $msg = str_replace(
+                    ['{visitante}', '{visitante_primeiro_nome}', '{zona}'],
+                    [$this->name, $visitorFirstName, $zone->name],
+                    $tpl
+                );
+
+                return (bool) $smsService->send($this->phone, $msg, $metaBase);
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Erro ao enviar SMS de integração ao visitante: ' . $e->getMessage());
+        }
+
+        return false;
     }
 
     /**

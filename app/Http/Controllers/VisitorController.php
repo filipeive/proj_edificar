@@ -347,6 +347,8 @@ class VisitorController extends Controller
             'notes' => 'nullable|string',
         ]);
 
+        $statusChanged = $visitor->contact_status !== $request->contact_status;
+
         $visitor->update([
             'contact_status' => $request->contact_status,
             'notes' => $request->notes,
@@ -354,7 +356,12 @@ class VisitorController extends Controller
             'contacted_by' => $request->contact_status !== 'pendente' ? Auth::id() : null,
         ]);
 
-        return back()->with('success', 'Acompanhamento registrado com sucesso!');
+        $feedbackMsg = 'Acompanhamento registrado com sucesso!';
+        if ($statusChanged && in_array($request->contact_status, ['contatado', 'integrado']) && !empty($visitor->phone)) {
+            $feedbackMsg .= ' Mensagem SMS de acolhimento enviada ao visitante.';
+        }
+
+        return back()->with('success', $feedbackMsg);
     }
 
     /**

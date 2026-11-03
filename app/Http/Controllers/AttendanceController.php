@@ -268,9 +268,16 @@ class AttendanceController extends Controller
             $updateData['contacted_by'] = $user->id;
         }
 
+        $statusChanged = $visitor->contact_status !== $validated['contact_status'];
+
         $visitor->update($updateData);
 
-        return redirect()->back()->with('success', 'Feedback do visitante atualizado com sucesso!');
+        $feedbackMsg = 'Feedback do visitante atualizado com sucesso!';
+        if ($statusChanged && in_array($validated['contact_status'], ['contatado', 'integrado']) && !empty($visitor->phone)) {
+            $feedbackMsg .= ' Mensagem SMS de acolhimento enviada ao visitante.';
+        }
+
+        return redirect()->back()->with('success', $feedbackMsg);
     }
 
     private function monthDates(int $year, int $month): array
