@@ -20,10 +20,6 @@ class CourseClassController extends Controller
     {
         $user = auth()->user();
 
-        if (($user->isSupervisor() || $user->isSecretaria() || $user->isMembro()) && !$user->hasAnyCourseEnrollment() && !$user->isCourseTeacher()) {
-            abort(403, 'Você não possui acesso a turmas.');
-        }
-
         $courseId = $request->query('course_id');
         $type = $request->query('type');
         $status = $request->query('status');

@@ -275,6 +275,16 @@ class User extends Authenticatable
         return $this->role === 'lider_celula';
     }
 
+    public function isLiderCelula()
+    {
+        return $this->role === 'lider_celula';
+    }
+
+    public function isMembro()
+    {
+        return $this->role === 'membro';
+    }
+
     public function isTimoteo()
     {
         return $this->role === 'timoteo';
