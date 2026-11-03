@@ -496,6 +496,7 @@ class User extends Authenticatable
 
             // Sistema
             'menu_stats' => $this->isAdmin() || $this->isPastor() || $this->isPastorZona() || $this->isSupervisor() || $this->isSubSupervisor() || $this->isComissaoObra(),
+            'menu_sms' => $this->isAdmin() || $this->isPastorSenior() || $this->isPastor() || $this->isPastorZona() || $this->isSecretaria(),
             'menu_users' => $this->isAdmin() || $this->isPastorSenior(),
             'menu_settings' => $this->isAdmin() || $this->isPastor(),
 

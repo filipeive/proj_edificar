@@ -216,6 +216,14 @@ Route::middleware('auth')->group(function () {
             Route::post('/public-forms', [\App\Http\Controllers\Admin\PublicFormSettingController::class, 'store'])->name('public-forms.store');
         });
 
+        // Central de SMS & Notificações (Super Admin, Admin, Secretaria, Pastores)
+        Route::middleware('role:super_admin,admin,secretaria,pastor_senior,pastor,pastor_zona')->prefix('sms')->name('sms.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\SmsCenterController::class, 'index'])->name('index');
+            Route::post('/send', [\App\Http\Controllers\Admin\SmsCenterController::class, 'send'])->name('send');
+            Route::post('/{smsMessage}/resend', [\App\Http\Controllers\Admin\SmsCenterController::class, 'resend'])->name('resend');
+            Route::get('/recipients-count', [\App\Http\Controllers\Admin\SmsCenterController::class, 'getRecipientsCount'])->name('recipients-count');
+        });
+
         // Intermediate Restricted (Admin, Pastor Zona, Supervisor, Secretaria, Lider Celula)
         Route::middleware('role:super_admin,admin,pastor_zona,supervisor,secretaria,pastor,lider_celula,administracao')->group(function () {
             // Centralized Zones Management

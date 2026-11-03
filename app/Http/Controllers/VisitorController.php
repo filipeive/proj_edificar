@@ -169,7 +169,7 @@ class VisitorController extends Controller
     {
         $user = Auth::user();
         $this->ensureCanAccessVisitor($user, $visitor);
-        $visitor->load(['zone', 'cell', 'creator', 'contactedBy']);
+        $visitor->load(['zone', 'cell.supervision.supervisor', 'cell.leader', 'creator', 'contactedBy', 'smsMessages']);
         $cells = $visitor->zone ? $visitor->zone->cells : collect();
         $zonesQuery = Zone::orderBy('name');
 
@@ -312,9 +312,19 @@ class VisitorController extends Controller
         $user = Auth::user();
         $this->ensureCanAccessVisitor($user, $visitor);
 
-        $visitor->notifyAssignment();
+        $results = $visitor->notifyAssignment();
 
-        return back()->with('success', 'Supervisor e Pastor de Zona notificados com sucesso via SMS!');
+        $parts = [];
+        if (!empty($results['pastor'])) $parts[] = 'Pastor';
+        if (!empty($results['supervisor'])) $parts[] = 'Supervisor';
+        if (!empty($results['leader'])) $parts[] = 'Líder de Célula';
+        if (!empty($results['visitor'])) $parts[] = 'Visitante';
+
+        $feedback = count($parts) > 0 
+            ? 'Rede de acolhimento notificada via SMS (' . implode(', ', $parts) . ') e alertas no sistema!' 
+            : 'Rede pastoral notificada com sucesso!';
+
+        return back()->with('success', $feedback);
     }
 
     /**

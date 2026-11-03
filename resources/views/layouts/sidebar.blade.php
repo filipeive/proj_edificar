@@ -442,6 +442,13 @@
                 </div>
             @endif
 
+            @if ($authUser && $authUser->hasPermission('menu_sms'))
+                <a href="{{ route('sms.index') }}" data-tooltip="Central de SMS" class="nav-item relative flex items-center px-3 py-2 rounded-lg text-xs font-bold transition-colors group {{ request()->routeIs('sms.*') ? 'bg-white/10 text-orange-400 border border-white/10' : 'text-gray-400 hover:bg-white/5 hover:text-white' }}">
+                    <i class="bi bi-chat-quote-fill text-sm flex-shrink-0"></i>
+                    <span class="sidebar-text ml-3 tracking-tight">Central de SMS</span>
+                </a>
+            @endif
+
             @if ($authUser && $authUser->hasPermission('menu_users'))
                 <a href="{{ route('users.index') }}" data-tooltip="Utilizadores" class="nav-item relative flex items-center px-3 py-2 rounded-lg text-xs font-bold transition-colors group {{ request()->routeIs('users.*') ? 'bg-white/10 text-orange-400 border border-white/10' : 'text-gray-400 hover:bg-white/5 hover:text-white' }}">
                     <i class="bi bi-person-lock text-sm flex-shrink-0"></i>

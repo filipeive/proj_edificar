@@ -256,13 +256,15 @@
                                         </button>
                                     @endif
                                 </div>
-                                @if($visitor->contact_status !== 'integrado' && in_array(Auth::user()->role, ['super_admin', 'admin', 'pastor_senior', 'pastor', 'secretaria']))
-                                    <form method="POST" action="{{ route('visitors.notify-supervisor', $visitor) }}">
+                                @if($visitor->contact_status !== 'integrado' && in_array(Auth::user()->role, ['super_admin', 'admin', 'pastor_senior', 'pastor', 'secretaria', 'pastor_zona', 'supervisor']))
+                                    <form method="POST" action="{{ route('visitors.notify-supervisor', $visitor) }}" class="pt-1"
+                                        onsubmit="return confirm('Deseja notificar a rede pastoral (Pastor de Zona, Supervisor e Líder de Célula) via SMS?')">
                                         @csrf
-                                        <button type="submit" class="w-full inline-flex items-center justify-center gap-1.5 rounded-lg border border-orange-200 bg-orange-50 px-3 py-2 text-xs font-bold text-orange-700 hover:bg-orange-100 transition-colors">
-                                            <i class="bi bi-chat-left-text-fill text-xs"></i>
-                                            <span>Notificar Liderança</span>
+                                        <button type="submit" class="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-orange-700 hover:bg-orange-800 px-3 py-2 text-xs font-black text-white shadow-sm transition">
+                                            <i class="bi bi-broadcast text-xs"></i>
+                                            <span>Notificar Rede Pastoral (SMS)</span>
                                         </button>
+                                        <p class="text-[9px] text-gray-500 text-center mt-1">Dispara SMS para Pastor, Supervisor e Líder de Célula</p>
                                     </form>
                                 @endif
                             </div>
@@ -289,6 +291,39 @@
                         @endif
                     </div>
                 </div>
+
+                <!-- Histórico de SMS da Rede -->
+                @if($visitor->smsMessages && $visitor->smsMessages->count() > 0)
+                    <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
+                        <div class="flex items-center justify-between pb-2 border-b border-gray-100">
+                            <div class="flex items-center gap-1.5">
+                                <i class="bi bi-chat-quote-fill text-orange-700 text-xs"></i>
+                                <h3 class="text-xs font-black uppercase tracking-wider text-gray-900">SMS da Rede</h3>
+                            </div>
+                            <span class="text-[10px] font-bold text-gray-400">{{ $visitor->smsMessages->count() }} envios</span>
+                        </div>
+
+                        <div class="space-y-2 max-h-56 overflow-y-auto">
+                            @foreach($visitor->smsMessages as $sms)
+                                <div class="p-2.5 rounded-lg border border-gray-100 bg-gray-50/70 text-xs space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <span class="font-bold text-gray-900">{{ $sms->recipient_name ?? $sms->phone }}</span>
+                                        @if($sms->status === 'sent')
+                                            <span class="text-[9px] font-black uppercase text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded">Enviado</span>
+                                        @else
+                                            <span class="text-[9px] font-black uppercase text-red-600 bg-red-100 px-1.5 py-0.2 rounded">Falha</span>
+                                        @endif
+                                    </div>
+                                    <p class="text-[10px] text-gray-500 line-clamp-2">{{ $sms->message }}</p>
+                                    <div class="text-[9px] text-gray-400 flex items-center justify-between pt-0.5">
+                                        <span>{{ $sms->context_label }}</span>
+                                        <span>{{ $sms->created_at->format('d/m H:i') }}</span>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
 
                 <!-- Metadados de Cadastro -->
                 <div class="rounded-xl border border-gray-200 bg-white p-3.5 shadow-sm text-center space-y-1">
