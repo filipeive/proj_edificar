@@ -31,3 +31,4 @@ Thumbs.db
 /android
 /ios
 /.capacitor
+*.apk

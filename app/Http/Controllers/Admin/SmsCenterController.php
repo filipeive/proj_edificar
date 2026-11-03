@@ -41,8 +41,8 @@ class SmsCenterController extends Controller
                 'category' => 'visitor_network',
                 'category_label' => 'Rede de Visitantes',
                 'description' => 'Enviado ao líder da célula quando um novo visitante é alocado à sua célula.',
-                'default' => "Paz Líder {lider}! [AÇÃO IMEDIATA]: Novo visitante alocado para a Célula {celula}: {visitante} (Tel: {telefone}, Bairro: {bairro}). Favor fazer contato de acolhimento e integrá-lo no próximo encontro!",
-                'tags' => ['{lider}', '{celula}', '{visitante}', '{telefone}', '{bairro}', '{supervisao}', '{zona}'],
+                'default' => "Paz, Líder {lider}. Temos um novo visitante direcionado para a sua Célula {celula}: {visitante}{contato}. Por favor, faça contato de acolhimento e convide-o para o próximo encontro da célula.",
+                'tags' => ['{lider}', '{celula}', '{visitante}', '{contato}', '{telefone}', '{bairro}', '{supervisao}', '{zona}'],
             ],
             'visitor_supervisor' => [
                 'id' => 'visitor_supervisor',
@@ -51,8 +51,8 @@ class SmsCenterController extends Controller
                 'category' => 'visitor_network',
                 'category_label' => 'Rede de Visitantes',
                 'description' => 'Enviado ao supervisor para orientar e acompanhar o acolhimento do visitante pelo líder.',
-                'default' => "Paz Supervisor {supervisor}! [AÇÃO]: O visitante {visitante} ({telefone}, bairro {bairro}) foi alocado à célula {celula}. Acompanhe o líder {lider} ({lider_telefone}) para acolhimento e feedback.",
-                'tags' => ['{supervisor}', '{visitante}', '{telefone}', '{bairro}', '{celula}', '{supervisao}', '{lider}', '{lider_telefone}', '{zona}'],
+                'default' => "Paz, Supervisor {supervisor}. O visitante {visitante}{contato} foi direcionado para a Célula {celula}. Solicitamos o seu acompanhamento junto ao {lider_info} para assegurar a integração.",
+                'tags' => ['{supervisor}', '{visitante}', '{contato}', '{celula}', '{supervisao}', '{lider}', '{lider_info}', '{zona}'],
             ],
             'visitor_pastor' => [
                 'id' => 'visitor_pastor',
@@ -61,8 +61,8 @@ class SmsCenterController extends Controller
                 'category' => 'visitor_network',
                 'category_label' => 'Rede de Visitantes',
                 'description' => 'Enviado ao pastor de zona para conhecimento e cobertura pastoral.',
-                'default' => "Paz Pastor {pastor}! [INFORME PASTORAL]: O visitante {visitante} ({telefone}, bairro {bairro}) foi alocado à Célula {celula} (Zona: {zona}). Líder e Supervisor foram acionados para acolhimento.",
-                'tags' => ['{pastor}', '{visitante}', '{telefone}', '{bairro}', '{celula}', '{supervisao}', '{zona}'],
+                'default' => "Paz, Pastor {pastor}. Informamos que o visitante {visitante}{contato} foi acolhido e alocado à Célula {celula}, na Zona {zona}. O líder e o supervisor já foram acionados para o acolhimento.",
+                'tags' => ['{pastor}', '{visitante}', '{contato}', '{celula}', '{supervisao}', '{zona}'],
             ],
             'visitor_welcome_cell' => [
                 'id' => 'visitor_welcome_cell',
@@ -71,7 +71,7 @@ class SmsCenterController extends Controller
                 'category' => 'visitor_welcome',
                 'category_label' => 'Boas-vindas & Acolhimento',
                 'description' => 'Enviado ao visitante dando as boas-vindas da igreja e indicando sua célula e líder.',
-                'default' => "Olá {visitante}! A família Life Church alegra-se com a sua visita! Conectamos você à Célula {celula}{lider_info}. Seja muito bem-vindo(a)!",
+                'default' => "Paz e graça, {visitante}! Foi uma alegria receber você na Life Church. Conectamos você à nossa Célula {celula}{lider_info}. Seja muito bem-vindo à nossa família!",
                 'tags' => ['{visitante}', '{celula}', '{lider_info}', '{lider}', '{lider_telefone}'],
             ],
             'visitor_zone_pastor' => [
@@ -81,8 +81,8 @@ class SmsCenterController extends Controller
                 'category' => 'visitor_network',
                 'category_label' => 'Rede de Visitantes',
                 'description' => 'Enviado ao pastor de zona quando visitante é registrado na zona mas ainda não tem célula.',
-                'default' => "Paz Pastor {pastor}! [NOVO VISITANTE]: {visitante} ({telefone}, bairro {bairro}) foi registrado na sua Zona ({zona}). Favor encaminhar ao supervisor para atribuição de célula.",
-                'tags' => ['{pastor}', '{visitante}', '{telefone}', '{bairro}', '{zona}'],
+                'default' => "Paz, Pastor {pastor}. Um novo visitante foi registrado na Zona {zona}: {visitante}{contato}. Favor orientar o supervisor para o devido acolhimento e encaminhamento à célula.",
+                'tags' => ['{pastor}', '{visitante}', '{contato}', '{telefone}', '{bairro}', '{zona}'],
             ],
             'visitor_welcome_general' => [
                 'id' => 'visitor_welcome_general',
@@ -91,7 +91,7 @@ class SmsCenterController extends Controller
                 'category' => 'visitor_welcome',
                 'category_label' => 'Boas-vindas & Acolhimento',
                 'description' => 'Enviado ao visitante quando registrado sem célula definida.',
-                'default' => "Olá {visitante}! Agradecemos pela sua visita à Life Church! Em breve entraremos em contato para acolher e orar por si. Deus abençoe!",
+                'default' => "Paz e graça, {visitante}! Foi uma honra receber você na Life Church. Em breve nossa equipe entrará em contato para orar e acolher você. Deus abençoe!",
                 'tags' => ['{visitante}'],
             ],
             'general_broadcast' => [
@@ -101,7 +101,7 @@ class SmsCenterController extends Controller
                 'category' => 'general',
                 'category_label' => 'Comunicados Gerais',
                 'description' => 'Modelo sugerido para avisos e convites disparados em massa.',
-                'default' => "Paz {nome}! Lembramos de nosso encontro nesta semana na Life Church. Sua presença é muito importante. Deus abençoe!",
+                'default' => "Paz e graça, {nome}! Lembramos de nosso encontro nesta semana na Life Church. Sua presença é muito especial para nós. Esperamos por si!",
                 'tags' => ['{nome}'],
             ],
         ];
