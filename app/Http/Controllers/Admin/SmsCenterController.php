@@ -42,7 +42,7 @@ class SmsCenterController extends Controller
                 'category_label' => 'Rede de Visitantes',
                 'description' => 'Enviado ao líder da célula quando um novo visitante é alocado à sua célula.',
                 'default' => "Paz, Líder {lider}. Temos um novo visitante direcionado para a sua Célula {celula}: {visitante}{contato}. Por favor, faça contato de acolhimento e convide-o para o próximo encontro da célula.",
-                'tags' => ['{lider}', '{celula}', '{visitante}', '{contato}', '{telefone}', '{bairro}', '{supervisao}', '{zona}'],
+                'tags' => ['{lider}', '{celula}', '{visitante}', '{contato}', '{a_convite_de}', '{quem_convidou}', '{telefone}', '{bairro}', '{supervisao}', '{zona}'],
             ],
             'visitor_supervisor' => [
                 'id' => 'visitor_supervisor',
@@ -52,7 +52,7 @@ class SmsCenterController extends Controller
                 'category_label' => 'Rede de Visitantes',
                 'description' => 'Enviado ao supervisor para orientar e acompanhar o acolhimento do visitante pelo líder.',
                 'default' => "Paz, Supervisor {supervisor}. O visitante {visitante}{contato} foi direcionado para a Célula {celula}. Solicitamos o seu acompanhamento junto ao {lider_info} para assegurar a integração.",
-                'tags' => ['{supervisor}', '{visitante}', '{contato}', '{celula}', '{supervisao}', '{lider}', '{lider_info}', '{zona}'],
+                'tags' => ['{supervisor}', '{visitante}', '{contato}', '{a_convite_de}', '{quem_convidou}', '{celula}', '{supervisao}', '{lider}', '{lider_info}', '{zona}'],
             ],
             'visitor_pastor' => [
                 'id' => 'visitor_pastor',
@@ -62,7 +62,7 @@ class SmsCenterController extends Controller
                 'category_label' => 'Rede de Visitantes',
                 'description' => 'Enviado ao pastor de zona para conhecimento e cobertura pastoral.',
                 'default' => "Paz, Pastor {pastor}. Informamos que o visitante {visitante}{contato} foi acolhido e alocado à Célula {celula}, na Zona {zona}. O líder e o supervisor já foram acionados para o acolhimento.",
-                'tags' => ['{pastor}', '{visitante}', '{contato}', '{celula}', '{supervisao}', '{zona}'],
+                'tags' => ['{pastor}', '{visitante}', '{contato}', '{a_convite_de}', '{quem_convidou}', '{celula}', '{supervisao}', '{zona}'],
             ],
             'visitor_welcome_cell' => [
                 'id' => 'visitor_welcome_cell',
@@ -82,7 +82,7 @@ class SmsCenterController extends Controller
                 'category_label' => 'Rede de Visitantes',
                 'description' => 'Enviado ao pastor de zona quando visitante é registrado na zona mas ainda não tem célula.',
                 'default' => "Paz, Pastor {pastor}. Um novo visitante foi registrado na Zona {zona}: {visitante}{contato}. Favor orientar o supervisor para o devido acolhimento e encaminhamento à célula.",
-                'tags' => ['{pastor}', '{visitante}', '{contato}', '{telefone}', '{bairro}', '{zona}'],
+                'tags' => ['{pastor}', '{visitante}', '{contato}', '{a_convite_de}', '{quem_convidou}', '{telefone}', '{bairro}', '{zona}'],
             ],
             'visitor_welcome_general' => [
                 'id' => 'visitor_welcome_general',

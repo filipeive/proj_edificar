@@ -145,10 +145,13 @@
                         </div>
                     </div>
 
-                    @if($visitor->invited_by_someone)
-                        <div class="p-3 rounded-lg border border-blue-200 bg-blue-50/60 flex items-center justify-between text-xs">
-                            <span class="text-blue-900 font-medium">Veio a convite de:</span>
-                            <strong class="text-blue-900 font-black">{{ $visitor->inviter_name }}</strong>
+                    @if($visitor->invited_by_someone || $visitor->inviter_name)
+                        <div class="p-3 rounded-lg border border-blue-200 bg-blue-50/60 dark:bg-blue-950/20 dark:border-blue-900/40 flex items-center justify-between text-xs">
+                            <span class="text-blue-900 dark:text-blue-300 font-medium flex items-center gap-1.5">
+                                <i class="bi bi-person-heart text-blue-600 dark:text-blue-400 text-sm"></i>
+                                Veio a convite de:
+                            </span>
+                            <strong class="text-blue-900 dark:text-blue-200 font-black">{{ $visitor->inviter_name ?: 'Membro da igreja' }}</strong>
                         </div>
                     @endif
 

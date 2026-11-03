@@ -70,14 +70,29 @@ class Visitor extends CongregationModel
     }
 
     /**
-     * Retorna uma descrição textual fluida de contato e bairro sem parênteses robóticos.
-     * Ex: ", tel. 841234567, bairro Acordo de Lusaka" ou ", bairro Acordo de Lusaka" ou ""
+     * Retorna a expressão "a convite de [Nome]" se houver quem convidou.
+     */
+    public function getInviterText(): string
+    {
+        $inviter = trim($this->inviter_name ?? '');
+        if (!empty($inviter)) {
+            return 'a convite de ' . $inviter;
+        }
+        return '';
+    }
+
+    /**
+     * Retorna uma descrição textual fluida de contato, quem convidou e bairro sem parênteses robóticos.
+     * Ex: ", tel. 841234567, a convite de Maria Santos, bairro Acordo de Lusaka" ou ", a convite de Maria Santos, bairro Acordo de Lusaka" ou ""
      */
     public function getFormattedContactDetails(): string
     {
         $parts = [];
         if (!empty($this->phone)) {
             $parts[] = 'tel. ' . $this->phone;
+        }
+        if (!empty(trim($this->inviter_name ?? ''))) {
+            $parts[] = 'a convite de ' . trim($this->inviter_name);
         }
         if (!empty($this->neighborhood)) {
             $parts[] = 'bairro ' . $this->neighborhood;
@@ -130,14 +145,17 @@ class Visitor extends CongregationModel
                 $supervisorFirstName = $supervisor ? $this->getFirstName($supervisor->name) : 'Supervisor';
                 $pastorFirstName = $pastor ? $this->getFirstName($pastor->name) : 'Pastor';
                 $contactSummary = $this->getFormattedContactDetails();
+                $inviterText = $this->getInviterText();
+                $inviterName = trim($this->inviter_name ?? '');
+                $inviterRef = $inviterName ? " (a convite de {$inviterName})" : "";
 
                 // 1. Notificar Líder de Célula (Ação Imediata de Acolhimento)
                 if ($leader && $leader->phone) {
                     $defaultTplLeader = "Paz, Líder {lider}. Temos um novo visitante direcionado para a sua Célula {celula}: {visitante}{contato}. Por favor, faça contato de acolhimento e convide-o para o próximo encontro da célula.";
                     $tplLeader = Setting::get('sms.template.visitor_leader', $defaultTplLeader);
                     $msgLeader = str_replace(
-                        ['{lider}', '{lider_completo}', '{celula}', '{visitante}', '{contato}', '{telefone}', '{bairro}', '{supervisao}', '{zona}'],
-                        [$leaderFirstName, $leader->name, $cell->name, $this->name, $contactSummary, $this->phone ?? '', $this->neighborhood ?? '', $supervision->name ?? '', $zone->name ?? ''],
+                        ['{lider}', '{lider_completo}', '{celula}', '{visitante}', '{contato}', '{a_convite_de}', '{quem_convidou}', '{inviter}', '{telefone}', '{bairro}', '{supervisao}', '{zona}'],
+                        [$leaderFirstName, $leader->name, $cell->name, $this->name, $contactSummary, $inviterText, $inviterName, $inviterName, $this->phone ?? '', $this->neighborhood ?? '', $supervision->name ?? '', $zone->name ?? ''],
                         $tplLeader
                     );
                     $results['leader'] = $smsService->send($leader->phone, $msgLeader, array_merge($metaBase, [
@@ -151,7 +169,7 @@ class Visitor extends CongregationModel
                         $leader->notify(new \App\Notifications\VisitorAssignedNotification(
                             $this,
                             'lider',
-                            "Ação de acolhimento: Faça contato com {$this->name} na Célula {$cell->name}."
+                            "Ação de acolhimento: Faça contato com {$this->name}{$inviterRef} na Célula {$cell->name}."
                         ));
                     } catch (\Exception $e) {
                         \Illuminate\Support\Facades\Log::warning('Erro notificação db líder: ' . $e->getMessage());
@@ -164,8 +182,8 @@ class Visitor extends CongregationModel
                     $defaultTplSupervisor = "Paz, Supervisor {supervisor}. O visitante {visitante}{contato} foi direcionado para a Célula {celula}. Solicitamos o seu acompanhamento junto ao {lider_info} para assegurar a integração.";
                     $tplSupervisor = Setting::get('sms.template.visitor_supervisor', $defaultTplSupervisor);
                     $msgSupervisor = str_replace(
-                        ['{supervisor}', '{supervisor_completo}', '{visitante}', '{contato}', '{celula}', '{supervisao}', '{lider}', '{lider_info}', '{lider_telefone}', '{zona}'],
-                        [$supervisorFirstName, $supervisor->name, $this->name, $contactSummary, $cell->name, $supervision->name ?? '', $leaderFirstName, $leaderRef, $leader?->phone ?? '', $zone->name ?? ''],
+                        ['{supervisor}', '{supervisor_completo}', '{visitante}', '{contato}', '{a_convite_de}', '{quem_convidou}', '{inviter}', '{celula}', '{supervisao}', '{lider}', '{lider_info}', '{lider_telefone}', '{zona}'],
+                        [$supervisorFirstName, $supervisor->name, $this->name, $contactSummary, $inviterText, $inviterName, $inviterName, $cell->name, $supervision->name ?? '', $leaderFirstName, $leaderRef, $leader?->phone ?? '', $zone->name ?? ''],
                         $tplSupervisor
                     );
                     $results['supervisor'] = $smsService->send($supervisor->phone, $msgSupervisor, array_merge($metaBase, [
@@ -179,7 +197,7 @@ class Visitor extends CongregationModel
                         $supervisor->notify(new \App\Notifications\VisitorAssignedNotification(
                             $this,
                             'supervisor',
-                            "Acompanhamento: Visitante {$this->name} alocado à Célula {$cell->name}."
+                            "Acompanhamento: Visitante {$this->name}{$inviterRef} alocado à Célula {$cell->name}."
                         ));
                     } catch (\Exception $e) {
                         \Illuminate\Support\Facades\Log::warning('Erro notificação db supervisor: ' . $e->getMessage());
@@ -191,8 +209,8 @@ class Visitor extends CongregationModel
                     $defaultTplPastor = "Paz, Pastor {pastor}. Informamos que o visitante {visitante}{contato} foi acolhido e alocado à Célula {celula}, na Zona {zona}. O líder e o supervisor já foram acionados para o acolhimento.";
                     $tplPastor = Setting::get('sms.template.visitor_pastor', $defaultTplPastor);
                     $msgPastor = str_replace(
-                        ['{pastor}', '{pastor_completo}', '{visitante}', '{contato}', '{celula}', '{supervisao}', '{zona}'],
-                        [$pastorFirstName, $pastor->name, $this->name, $contactSummary, $cell->name, $supervision->name ?? '', $zone->name ?? ''],
+                        ['{pastor}', '{pastor_completo}', '{visitante}', '{contato}', '{a_convite_de}', '{quem_convidou}', '{inviter}', '{celula}', '{supervisao}', '{zona}'],
+                        [$pastorFirstName, $pastor->name, $this->name, $contactSummary, $inviterText, $inviterName, $inviterName, $cell->name, $supervision->name ?? '', $zone->name ?? ''],
                         $tplPastor
                     );
                     $results['pastor'] = $smsService->send($pastor->phone, $msgPastor, array_merge($metaBase, [
@@ -206,7 +224,7 @@ class Visitor extends CongregationModel
                         $pastor->notify(new \App\Notifications\VisitorAssignedNotification(
                             $this,
                             'pastor',
-                            "Informe pastoral: Visitante {$this->name} alocado à Célula {$cell->name} na Zona {$zone->name}."
+                            "Informe pastoral: Visitante {$this->name}{$inviterRef} alocado à Célula {$cell->name} na Zona {$zone->name}."
                         ));
                     } catch (\Exception $e) {
                         \Illuminate\Support\Facades\Log::warning('Erro notificação db pastor: ' . $e->getMessage());
@@ -233,13 +251,16 @@ class Visitor extends CongregationModel
                 $pastor = $zone->pastor;
                 $pastorFirstName = $pastor ? $this->getFirstName($pastor->name) : 'Pastor';
                 $contactSummary = $this->getFormattedContactDetails();
+                $inviterText = $this->getInviterText();
+                $inviterName = trim($this->inviter_name ?? '');
+                $inviterRef = $inviterName ? " (a convite de {$inviterName})" : "";
 
                 if ($pastor && $pastor->phone) {
                     $defaultTplZonePastor = "Paz, Pastor {pastor}. Um novo visitante foi registrado na Zona {zona}: {visitante}{contato}. Favor orientar o supervisor para o devido acolhimento e encaminhamento à célula.";
                     $tplZonePastor = Setting::get('sms.template.visitor_zone_pastor', $defaultTplZonePastor);
                     $msgPastor = str_replace(
-                        ['{pastor}', '{pastor_completo}', '{visitante}', '{contato}', '{telefone}', '{bairro}', '{zona}'],
-                        [$pastorFirstName, $pastor->name, $this->name, $contactSummary, $this->phone ?? '', $this->neighborhood ?? '', $zone->name],
+                        ['{pastor}', '{pastor_completo}', '{visitante}', '{contato}', '{a_convite_de}', '{quem_convidou}', '{inviter}', '{telefone}', '{bairro}', '{zona}'],
+                        [$pastorFirstName, $pastor->name, $this->name, $contactSummary, $inviterText, $inviterName, $inviterName, $this->phone ?? '', $this->neighborhood ?? '', $zone->name],
                         $tplZonePastor
                     );
                     $results['pastor'] = $smsService->send($pastor->phone, $msgPastor, array_merge($metaBase, [
@@ -253,7 +274,7 @@ class Visitor extends CongregationModel
                         $pastor->notify(new \App\Notifications\VisitorAssignedNotification(
                             $this,
                             'pastor',
-                            "Novo visitante na Zona {$zone->name}: {$this->name}."
+                            "Novo visitante na Zona {$zone->name}: {$this->name}{$inviterRef}."
                         ));
                     } catch (\Exception $e) {
                         \Illuminate\Support\Facades\Log::warning('Erro notificação db pastor: ' . $e->getMessage());

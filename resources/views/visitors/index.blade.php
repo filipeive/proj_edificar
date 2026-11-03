@@ -232,7 +232,18 @@
                                     </div>
                                 </td>
                                 <td class="px-4 py-2.5">
-                                    <span class="text-gray-900 block truncate">{{ $visitor->phone ?: 'Sem telefone' }}</span>
+                                    @if($visitor->phone)
+                                        <span class="text-gray-900 block truncate">{{ $visitor->phone }}</span>
+                                    @else
+                                        <span class="text-amber-600 dark:text-amber-400 font-semibold text-xs block truncate">Sem telefone</span>
+                                    @endif
+
+                                    @if($visitor->invited_by_someone || $visitor->inviter_name)
+                                        <span class="text-[10px] text-blue-700 dark:text-blue-400 font-medium block truncate" title="A convite de {{ $visitor->inviter_name }}">
+                                            <i class="bi bi-person-heart text-[9px] mr-0.5"></i>Convite: {{ $visitor->inviter_name ?: 'Alguém' }}
+                                        </span>
+                                    @endif
+
                                     @if($visitor->neighborhood)
                                         <span class="text-[10px] text-gray-400 block truncate">{{ $visitor->neighborhood }}</span>
                                     @endif
@@ -313,7 +324,14 @@
                             <span class="text-[10px] font-bold text-gray-400">{{ $visitor->visit_date->format('d/m/Y') }}</span>
                         </div>
                         <h4 class="text-xs font-bold text-gray-900 truncate">{{ $visitor->name }}</h4>
-                        <p class="text-[11px] text-gray-500 truncate mt-0.5">{{ $visitor->phone ?: 'Sem telefone' }}</p>
+                        <p class="text-[11px] {{ $visitor->phone ? 'text-gray-500' : 'text-amber-600 font-semibold' }} truncate mt-0.5">
+                            {{ $visitor->phone ?: 'Sem telefone' }}
+                        </p>
+                        @if($visitor->invited_by_someone || $visitor->inviter_name)
+                            <p class="text-[10px] text-blue-700 dark:text-blue-400 font-medium truncate mt-0.5" title="A convite de {{ $visitor->inviter_name }}">
+                                <i class="bi bi-person-heart text-[9px] mr-0.5"></i>Convite: {{ $visitor->inviter_name ?: 'Alguém' }}
+                            </p>
+                        @endif
                         @if($visitor->zone)
                             <p class="text-[10px] text-blue-700 font-bold truncate mt-0.5">{{ $visitor->zone->name }}</p>
                         @endif
