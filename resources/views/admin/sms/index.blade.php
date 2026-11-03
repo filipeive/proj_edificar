@@ -112,22 +112,28 @@
             </div>
 
             <!-- Tab Switcher Header -->
-            <div class="flex items-center gap-1.5 bg-gray-100 dark:bg-zinc-800 p-1 rounded-xl self-start md:self-auto border border-gray-200 dark:border-zinc-700">
+            <div class="flex items-center gap-1.5 bg-gray-100 dark:bg-zinc-800 p-1 rounded-xl self-start md:self-auto border border-gray-200 dark:border-zinc-700 overflow-x-auto max-w-full">
                 <button type="button" @click="activeTab = 'history'"
                     :class="activeTab === 'history' ? 'bg-white dark:bg-zinc-900 text-orange-700 dark:text-orange-400 shadow-sm font-black' : 'text-gray-600 dark:text-zinc-400 font-bold hover:text-gray-900'"
-                    class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition">
+                    class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition whitespace-nowrap">
                     <i class="bi bi-list-check"></i>
                     <span>Monitoramento</span>
                 </button>
                 <button type="button" @click="activeTab = 'send'"
                     :class="activeTab === 'send' ? 'bg-white dark:bg-zinc-900 text-orange-700 dark:text-orange-400 shadow-sm font-black' : 'text-gray-600 dark:text-zinc-400 font-bold hover:text-gray-900'"
-                    class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition">
+                    class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition whitespace-nowrap">
                     <i class="bi bi-broadcast"></i>
                     <span>Novo Comunicado</span>
                 </button>
+                <button type="button" @click="activeTab = 'templates'"
+                    :class="activeTab === 'templates' ? 'bg-white dark:bg-zinc-900 text-orange-700 dark:text-orange-400 shadow-sm font-black' : 'text-gray-600 dark:text-zinc-400 font-bold hover:text-gray-900'"
+                    class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition whitespace-nowrap">
+                    <i class="bi bi-sliders"></i>
+                    <span>Templates de Mensagens</span>
+                </button>
                 <button type="button" @click="activeTab = 'network'"
                     :class="activeTab === 'network' ? 'bg-white dark:bg-zinc-900 text-orange-700 dark:text-orange-400 shadow-sm font-black' : 'text-gray-600 dark:text-zinc-400 font-bold hover:text-gray-900'"
-                    class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition">
+                    class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition whitespace-nowrap">
                     <i class="bi bi-diagram-3-fill"></i>
                     <span>Rede de Visitantes</span>
                 </button>
@@ -479,18 +485,28 @@
 
                         <!-- Mensagem -->
                         <div class="space-y-1.5">
-                            <div class="flex items-center justify-between">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
                                 <label class="block text-xs font-black uppercase tracking-wider text-gray-700 dark:text-zinc-300">
                                     2. Conteúdo da Mensagem <span class="text-red-500">*</span>
                                 </label>
-                                <div class="flex items-center gap-1.5">
-                                    <span class="text-[11px] font-bold"
-                                        :class="charCount > 160 ? 'text-orange-600 dark:text-orange-400' : 'text-gray-500 dark:text-zinc-400'">
-                                        <span x-text="charCount"></span>/160 caracteres
-                                    </span>
-                                    <span class="rounded bg-gray-100 dark:bg-zinc-800 px-1.5 py-0.5 text-[10px] font-black text-gray-600 dark:text-zinc-400">
-                                        <span x-text="partsCount"></span> SMS
-                                    </span>
+                                <div class="flex items-center gap-2">
+                                    <!-- Seletor de Modelo -->
+                                    <select @change="if ($event.target.value) { messageText = $event.target.value; $event.target.value = ''; }"
+                                        class="text-[11px] font-bold rounded-lg border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 py-1 px-2.5 shadow-sm">
+                                        <option value="">Carregar Modelo...</option>
+                                        @foreach($templates as $t)
+                                            <option value="{{ $t['current'] }}">{{ $t['title'] }}</option>
+                                        @endforeach
+                                    </select>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-[11px] font-bold"
+                                            :class="charCount > 160 ? 'text-orange-600 dark:text-orange-400' : 'text-gray-500 dark:text-zinc-400'">
+                                            <span x-text="charCount"></span>/160 caracteres
+                                        </span>
+                                        <span class="rounded bg-gray-100 dark:bg-zinc-800 px-1.5 py-0.5 text-[10px] font-black text-gray-600 dark:text-zinc-400">
+                                            <span x-text="partsCount"></span> SMS
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
 
@@ -639,6 +655,119 @@
         </div>
     </div>
 
+    <!-- ==================== TAB: TEMPLATES DE MENSAGENS ==================== -->
+    <div x-show="activeTab === 'templates'" class="space-y-5" x-cloak>
+        <!-- Top Banner da Aba -->
+        <div class="rounded-xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 sm:p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-black uppercase tracking-wider text-orange-700 dark:text-orange-400">Personalização de Mensageria</span>
+                    <span class="inline-flex items-center rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-xs font-bold text-orange-800 dark:text-orange-400">
+                        {{ count($templates) }} Modelos Ativos
+                    </span>
+                </div>
+                <h2 class="text-lg font-black text-gray-900 dark:text-white mt-0.5">Modelos & Templates de SMS</h2>
+                <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">
+                    Edite os textos das notificações automáticas da Rede Pastoral e dos comunicados. As tags dinâmicas como <code>{visitante}</code>, <code>{celula}</code> serão preenchidas automaticamente pelo sistema.
+                </p>
+            </div>
+
+            <!-- Botão de Restaurar Todos -->
+            <form method="POST" action="{{ route('sms.templates.reset') }}"
+                onsubmit="return confirm('Tem certeza que deseja restaurar TODOS os templates para os textos originais de fábrica?')">
+                @csrf
+                <button type="submit"
+                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-xs font-bold text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-700 shadow-sm transition">
+                    <i class="bi bi-arrow-counterclockwise text-gray-500"></i>
+                    <span>Restaurar Padrões de Fábrica</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Formulário de Atualização dos Templates -->
+        <form method="POST" action="{{ route('sms.templates.update') }}" class="space-y-4">
+            @csrf
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @foreach($templates as $id => $tpl)
+                    <div class="rounded-xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm flex flex-col justify-between overflow-hidden"
+                        x-data="{
+                            text: {{ Js::from($tpl['current']) }},
+                            get len() { return this.text.length; },
+                            get parts() { return this.len <= 160 ? 1 : Math.ceil(this.len / 153); },
+                            insertTag(tag) { this.text += ' ' + tag + ' '; }
+                        }">
+
+                        <!-- Card Header -->
+                        <div class="p-4 border-b border-gray-100 dark:border-zinc-800/80 bg-gray-50/50 dark:bg-zinc-800/30 flex items-start justify-between gap-3">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="rounded bg-orange-100 dark:bg-orange-950/40 text-orange-800 dark:text-orange-300 text-[9px] font-black uppercase px-2 py-0.5">
+                                        {{ $tpl['category_label'] }}
+                                    </span>
+                                </div>
+                                <h3 class="text-sm font-black text-gray-900 dark:text-white">{{ $tpl['title'] }}</h3>
+                                <p class="text-[11px] text-gray-500 dark:text-zinc-400 leading-snug">{{ $tpl['description'] }}</p>
+                            </div>
+
+                            <!-- Botão Individual de Restaurar -->
+                            <button type="submit" form="reset-form-{{ $id }}"
+                                class="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-gray-200 dark:border-zinc-700 text-gray-400 hover:text-orange-700 dark:hover:text-orange-400 hover:bg-gray-100 dark:hover:bg-zinc-800 transition shrink-0"
+                                title="Restaurar este modelo para o padrão">
+                                <i class="bi bi-arrow-clockwise text-xs"></i>
+                            </button>
+                        </div>
+
+                        <!-- Card Body (Textarea & Tags) -->
+                        <div class="p-4 space-y-3 flex-1 flex flex-col justify-between">
+                            <div class="space-y-1.5">
+                                <div class="flex items-center justify-between text-[11px]">
+                                    <span class="font-bold text-gray-500 dark:text-zinc-400">Texto do SMS:</span>
+                                    <span class="font-bold" :class="len > 160 ? 'text-orange-600 dark:text-orange-400' : 'text-gray-400'">
+                                        <span x-text="len"></span>/160 chars • <span x-text="parts"></span> SMS
+                                    </span>
+                                </div>
+                                <textarea name="template_{{ $id }}" x-model="text" rows="3" required
+                                    class="w-full rounded-lg border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white p-2.5 text-xs focus:border-orange-500 focus:ring-orange-500 font-sans"></textarea>
+                            </div>
+
+                            <!-- Tags Rápidas -->
+                            <div class="space-y-1 pt-1">
+                                <span class="text-[9px] font-black uppercase tracking-wider text-gray-400">Tags disponíveis (clique para inserir):</span>
+                                <div class="flex flex-wrap items-center gap-1">
+                                    @foreach($tpl['tags'] as $tag)
+                                        <button type="button" @click="insertTag('{{ $tag }}')"
+                                            class="inline-flex items-center rounded bg-gray-100 dark:bg-zinc-800 hover:bg-orange-50 dark:hover:bg-zinc-700 px-1.5 py-0.5 text-[10px] font-bold text-gray-600 dark:text-zinc-300 hover:text-orange-700 dark:hover:text-orange-400 border border-gray-200 dark:border-zinc-700 transition">
+                                            <code>{{ $tag }}</code>
+                                        </button>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            <!-- Botão Salvar Todos -->
+            <div class="sticky bottom-4 z-20 flex justify-end">
+                <button type="submit"
+                    class="inline-flex items-center gap-2 rounded-xl bg-orange-700 hover:bg-orange-800 px-6 py-3 text-sm font-black text-white shadow-xl hover:shadow-2xl transition">
+                    <i class="bi bi-check2-circle text-base"></i>
+                    <span>Salvar Todos os Templates de SMS</span>
+                </button>
+            </div>
+        </form>
+
+        <!-- Formulários ocultos para restauração individual -->
+        @foreach($templates as $id => $tpl)
+            <form id="reset-form-{{ $id }}" method="POST" action="{{ route('sms.templates.reset') }}"
+                onsubmit="return confirm('Restaurar o template \'{{ $tpl['title'] }}\' para o padrão original?')">
+                @csrf
+                <input type="hidden" name="template_id" value="{{ $id }}">
+            </form>
+        @endforeach
+    </div>
+
     <!-- Modal: Detalhes do SMS -->
     <div x-show="showModal" x-cloak
         class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
@@ -712,3 +841,4 @@
 
 </div>
 @endsection
+

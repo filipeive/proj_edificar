@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Cell;
 use App\Models\Congregation;
+use App\Models\Setting;
 use App\Models\SmsMessage;
 use App\Models\Supervision;
 use App\Models\User;
@@ -25,6 +26,85 @@ class SmsCenterController extends Controller
     {
         $this->smsService = $smsService;
         $this->congregationContext = $congregationContext;
+    }
+
+    /**
+     * Lista de templates padrão do sistema.
+     */
+    public static function getDefaultTemplates(): array
+    {
+        return [
+            'visitor_leader' => [
+                'id' => 'visitor_leader',
+                'key' => 'sms.template.visitor_leader',
+                'title' => 'Rede: Ação Líder de Célula',
+                'category' => 'visitor_network',
+                'category_label' => 'Rede de Visitantes',
+                'description' => 'Enviado ao líder da célula quando um novo visitante é alocado à sua célula.',
+                'default' => "Paz Líder {lider}! [AÇÃO IMEDIATA]: Novo visitante alocado para a Célula {celula}: {visitante} (Tel: {telefone}, Bairro: {bairro}). Favor fazer contato de acolhimento e integrá-lo no próximo encontro!",
+                'tags' => ['{lider}', '{celula}', '{visitante}', '{telefone}', '{bairro}', '{supervisao}', '{zona}'],
+            ],
+            'visitor_supervisor' => [
+                'id' => 'visitor_supervisor',
+                'key' => 'sms.template.visitor_supervisor',
+                'title' => 'Rede: Ação Supervisor',
+                'category' => 'visitor_network',
+                'category_label' => 'Rede de Visitantes',
+                'description' => 'Enviado ao supervisor para orientar e acompanhar o acolhimento do visitante pelo líder.',
+                'default' => "Paz Supervisor {supervisor}! [AÇÃO]: O visitante {visitante} ({telefone}, bairro {bairro}) foi alocado à célula {celula}. Acompanhe o líder {lider} ({lider_telefone}) para acolhimento e feedback.",
+                'tags' => ['{supervisor}', '{visitante}', '{telefone}', '{bairro}', '{celula}', '{supervisao}', '{lider}', '{lider_telefone}', '{zona}'],
+            ],
+            'visitor_pastor' => [
+                'id' => 'visitor_pastor',
+                'key' => 'sms.template.visitor_pastor',
+                'title' => 'Rede: Informe Pastoral',
+                'category' => 'visitor_network',
+                'category_label' => 'Rede de Visitantes',
+                'description' => 'Enviado ao pastor de zona para conhecimento e cobertura pastoral.',
+                'default' => "Paz Pastor {pastor}! [INFORME PASTORAL]: O visitante {visitante} ({telefone}, bairro {bairro}) foi alocado à Célula {celula} (Zona: {zona}). Líder e Supervisor foram acionados para acolhimento.",
+                'tags' => ['{pastor}', '{visitante}', '{telefone}', '{bairro}', '{celula}', '{supervisao}', '{zona}'],
+            ],
+            'visitor_welcome_cell' => [
+                'id' => 'visitor_welcome_cell',
+                'key' => 'sms.template.visitor_welcome_cell',
+                'title' => 'Visitante: Boas-vindas com Célula',
+                'category' => 'visitor_welcome',
+                'category_label' => 'Boas-vindas & Acolhimento',
+                'description' => 'Enviado ao visitante dando as boas-vindas da igreja e indicando sua célula e líder.',
+                'default' => "Olá {visitante}! A família Life Church alegra-se com a sua visita! Conectamos você à Célula {celula}{lider_info}. Seja muito bem-vindo(a)!",
+                'tags' => ['{visitante}', '{celula}', '{lider_info}', '{lider}', '{lider_telefone}'],
+            ],
+            'visitor_zone_pastor' => [
+                'id' => 'visitor_zone_pastor',
+                'key' => 'sms.template.visitor_zone_pastor',
+                'title' => 'Rede: Novo Visitante na Zona (sem célula)',
+                'category' => 'visitor_network',
+                'category_label' => 'Rede de Visitantes',
+                'description' => 'Enviado ao pastor de zona quando visitante é registrado na zona mas ainda não tem célula.',
+                'default' => "Paz Pastor {pastor}! [NOVO VISITANTE]: {visitante} ({telefone}, bairro {bairro}) foi registrado na sua Zona ({zona}). Favor encaminhar ao supervisor para atribuição de célula.",
+                'tags' => ['{pastor}', '{visitante}', '{telefone}', '{bairro}', '{zona}'],
+            ],
+            'visitor_welcome_general' => [
+                'id' => 'visitor_welcome_general',
+                'key' => 'sms.template.visitor_welcome_general',
+                'title' => 'Visitante: Boas-vindas Inicial Geral',
+                'category' => 'visitor_welcome',
+                'category_label' => 'Boas-vindas & Acolhimento',
+                'description' => 'Enviado ao visitante quando registrado sem célula definida.',
+                'default' => "Olá {visitante}! Agradecemos pela sua visita à Life Church! Em breve entraremos em contato para acolher e orar por si. Deus abençoe!",
+                'tags' => ['{visitante}'],
+            ],
+            'general_broadcast' => [
+                'id' => 'general_broadcast',
+                'key' => 'sms.template.general_broadcast',
+                'title' => 'Modelo Base: Comunicado Geral',
+                'category' => 'general',
+                'category_label' => 'Comunicados Gerais',
+                'description' => 'Modelo sugerido para avisos e convites disparados em massa.',
+                'default' => "Paz {nome}! Lembramos de nosso encontro nesta semana na Life Church. Sua presença é muito importante. Deus abençoe!",
+                'tags' => ['{nome}'],
+            ],
+        ];
     }
 
     /**
@@ -94,6 +174,12 @@ class SmsCenterController extends Controller
             'sender' => config('services.httpsms.from') ?? config('services.sms.sender_id', 'LIFECHURCH'),
         ];
 
+        // Carregar templates com valores atuais
+        $templates = self::getDefaultTemplates();
+        foreach ($templates as $id => &$tpl) {
+            $tpl['current'] = Setting::get($tpl['key'], $tpl['default']);
+        }
+
         return view('admin.sms.index', compact(
             'messages',
             'totalSent',
@@ -105,7 +191,8 @@ class SmsCenterController extends Controller
             'supervisions',
             'cells',
             'counts',
-            'gatewayInfo'
+            'gatewayInfo',
+            'templates'
         ));
     }
 
@@ -147,11 +234,11 @@ class SmsCenterController extends Controller
             $msg = $summary['total'] === 1
                 ? "Mensagem SMS enviada com sucesso para {$recipients[0]['phone']}!"
                 : "Sucesso! {$summary['sent']} mensagens SMS enviadas com êxito.";
-            return redirect()->route('sms.index')->with('success', $msg);
+            return redirect()->route('sms.index', ['tab' => 'history'])->with('success', $msg);
         } elseif ($summary['sent'] > 0 && $summary['failed'] > 0) {
-            return redirect()->route('sms.index')->with('warning', "Envio concluído: {$summary['sent']} enviados com sucesso, {$summary['failed']} falharam.");
+            return redirect()->route('sms.index', ['tab' => 'history'])->with('warning', "Envio concluído: {$summary['sent']} enviados com sucesso, {$summary['failed']} falharam.");
         } else {
-            return redirect()->route('sms.index')->with('error', "Falha ao enviar mensagens. Verifique a configuração e saldo do gateway de SMS.");
+            return redirect()->route('sms.index', ['tab' => 'history'])->with('error', "Falha ao enviar mensagens. Verifique a configuração e saldo do gateway de SMS.");
         }
     }
 
@@ -179,6 +266,51 @@ class SmsCenterController extends Controller
             'count' => count($recipients),
             'target_type' => $request->target_type,
         ]);
+    }
+
+    /**
+     * Atualizar templates de mensagens SMS.
+     */
+    public function updateTemplates(Request $request)
+    {
+        $templates = self::getDefaultTemplates();
+        $updatedCount = 0;
+
+        foreach ($templates as $id => $tpl) {
+            $fieldName = "template_{$id}";
+            if ($request->has($fieldName)) {
+                $content = trim($request->input($fieldName));
+                if (!empty($content)) {
+                    Setting::set($tpl['key'], $content, 'string', 'sms_templates');
+                    $updatedCount++;
+                }
+            }
+        }
+
+        return redirect()->route('sms.index', ['tab' => 'templates'])
+            ->with('success', "{$updatedCount} template(s) de SMS salvos com sucesso!");
+    }
+
+    /**
+     * Restaurar templates para os valores padrão originais.
+     */
+    public function resetTemplates(Request $request)
+    {
+        $templates = self::getDefaultTemplates();
+
+        if ($request->filled('template_id') && isset($templates[$request->template_id])) {
+            $tpl = $templates[$request->template_id];
+            Setting::set($tpl['key'], $tpl['default'], 'string', 'sms_templates');
+            return redirect()->route('sms.index', ['tab' => 'templates'])
+                ->with('success', "Template '{$tpl['title']}' restaurado para o padrão original.");
+        }
+
+        foreach ($templates as $tpl) {
+            Setting::set($tpl['key'], $tpl['default'], 'string', 'sms_templates');
+        }
+
+        return redirect()->route('sms.index', ['tab' => 'templates'])
+            ->with('success', 'Todos os templates foram restaurados para os padrões originais com sucesso!');
     }
 
     /**

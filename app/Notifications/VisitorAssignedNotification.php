@@ -41,3 +41,4 @@ class VisitorAssignedNotification extends Notification
         ];
     }
 }
+

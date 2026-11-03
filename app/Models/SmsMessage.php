@@ -126,3 +126,4 @@ class SmsMessage extends CongregationModel
         };
     }
 }
+

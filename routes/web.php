@@ -222,6 +222,8 @@ Route::middleware('auth')->group(function () {
             Route::post('/send', [\App\Http\Controllers\Admin\SmsCenterController::class, 'send'])->name('send');
             Route::post('/{smsMessage}/resend', [\App\Http\Controllers\Admin\SmsCenterController::class, 'resend'])->name('resend');
             Route::get('/recipients-count', [\App\Http\Controllers\Admin\SmsCenterController::class, 'getRecipientsCount'])->name('recipients-count');
+            Route::post('/templates', [\App\Http\Controllers\Admin\SmsCenterController::class, 'updateTemplates'])->name('templates.update');
+            Route::post('/templates/reset', [\App\Http\Controllers\Admin\SmsCenterController::class, 'resetTemplates'])->name('templates.reset');
         });
 
         // Intermediate Restricted (Admin, Pastor Zona, Supervisor, Secretaria, Lider Celula)
